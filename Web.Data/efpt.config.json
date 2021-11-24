@@ -1,0 +1,61 @@
+﻿{
+   "CodeGenerationMode": 0,
+   "ContextClassName": "DbHRMSContext",
+   "ContextNamespace": null,
+   "DefaultDacpacSchema": null,
+   "FilterSchemas": false,
+   "IncludeConnectionString": true,
+   "ModelNamespace": null,
+   "OutputContextPath": "Db_Context",
+   "OutputPath": "Models",
+   "ProjectRootNamespace": "Web.DLL",
+   "Schemas": null,
+   "SelectedHandlebarsLanguage": 0,
+   "SelectedToBeGenerated": 1,
+   "Tables": [
+      {
+         "Name": "[dbo].[ems_tbl_academic_qualification]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[ems_tbl_emergency_contact]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[ems_tbl_employee_details]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[ems_tbl_employee_professional_details]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[ems_tbl_hrms_user]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[ems_tbl_professional_qualification]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[ems_tbl_working_history]",
+         "ObjectType": 0
+      }
+   ],
+   "UiHint": "BUGGY-LAPTOP.EMS",
+   "UseBoolPropertiesWithoutDefaultSql": false,
+   "UseDatabaseNames": false,
+   "UseDbContextSplitting": false,
+   "UseFluentApiOnly": false,
+   "UseHandleBars": false,
+   "UseInflector": false,
+   "UseLegacyPluralizer": false,
+   "UseNoConstructor": false,
+   "UseNoDefaultConstructor": false,
+   "UseNoNavigations": false,
+   "UseNoObjectFilter": false,
+   "UseNodaTime": false,
+   "UseNullableReferences": false,
+   "UseSchemaFolders": false,
+   "UseSpatial": false
+}
