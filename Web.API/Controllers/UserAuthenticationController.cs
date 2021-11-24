@@ -40,18 +40,20 @@ namespace Web.API.Controllers
         }
    
         [HttpPost("auth/register")]
-        public IActionResult Register([FromBody] RegisterCredential register)
+        public BaseResponse Register([FromBody] RegisterCredential register)
         {
             try
             {
-                IActionResult response = Unauthorized();
+                BaseResponse response = new BaseResponse();
                 string generatedToken = _jwtAuth.Register(register);
 
                 if (!string.IsNullOrEmpty(generatedToken))
                 {
-                    response = Ok(new { token = generatedToken });
+                    response = new BaseResponse() { Success = true, Message = generatedToken };
                 }
-
+                else {
+                    response = new BaseResponse() { Success = false, Message = "Model State is not valid." };
+                }
                 return response;
             }
             catch (Exception ex)

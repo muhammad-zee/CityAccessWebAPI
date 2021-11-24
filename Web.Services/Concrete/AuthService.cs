@@ -102,7 +102,7 @@ namespace Web.Services.Concrete
 
                 _hrmsUserAuthRepository.Insert(obj);
                 //unitorWork.Commit();
-
+                return "User Created";
             }
             return null;
         }
