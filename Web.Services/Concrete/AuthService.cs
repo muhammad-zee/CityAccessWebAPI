@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.IO;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
@@ -12,6 +13,7 @@ using Web.DLL;
 using Web.DLL.Generic_Repository;
 using Web.Model;
 using Web.Model.Common;
+using Web.Services.Enums;
 using Web.Services.Interfaces;
 
 namespace Web.Services.Concrete
@@ -81,11 +83,12 @@ namespace Web.Services.Concrete
             };
         }
 
-        public string Register(RegisterCredential register)
+        public int? Register(RegisterCredential register)
         {
             //first validate the username and password from the db and then generate token
             if (!string.IsNullOrEmpty(register.UserName) && !string.IsNullOrEmpty(register.Password)
-                && !string.IsNullOrEmpty(register.PrimaryEmail) && !string.IsNullOrEmpty(register.OfficePhoneNumber) && !string.IsNullOrEmpty(register.Gender))
+                && !string.IsNullOrEmpty(register.PrimaryEmail) && !string.IsNullOrEmpty(register.OfficePhoneNumber) && !string.IsNullOrEmpty(register.Gender)
+                && !string.IsNullOrEmpty(register.RoleIds))
             {
                 var alreadyExist = _userRepo.GetList().Where(x => x.UserName == register.UserName).FirstOrDefault();
                 if (alreadyExist == null)
@@ -101,7 +104,7 @@ namespace Web.Services.Concrete
                         OfficePhoneNumber = register.OfficePhoneNumber,
                         Gender = register.Gender,
                         CreatedBy = register.CreatedBy,
-                        CreatedDate = DateTime.Now,
+                        CreatedDate = DateTime.UtcNow,
                         IsDeleted = false
                     };
                     _userRepo.Insert(obj);
@@ -110,13 +113,37 @@ namespace Web.Services.Concrete
                     List<UserRole> userRoleList = new List<UserRole>();
                     foreach (var item in roleIds)
                     {
-                        userRoleList.Add(new UserRole() { UserId = obj.UserId.ToString(), RoleId = item.ToString() });
+                        userRoleList.Add(new UserRole() { UserId = obj.UserId, RoleId = item });
+                    }
+                    _userRoleRepo.Insert(userRoleList);
+
+                    if (register.UserImage != null && register.UserImage.Count() > 0)
+                    {
+                        var outPath = _config["FilePath:Path"];
+                        if (!Directory.Exists(outPath))
+                        {
+                            Directory.CreateDirectory(outPath);
+                        }
+                        outPath += "UserProfiles/";
+                        if (!Directory.Exists(outPath))
+                        {
+                            Directory.CreateDirectory(outPath);
+                        }
+                        outPath += $"UserProfilePic_{obj.UserId}.png";
+
+                        using (FileStream fs = new FileStream(outPath, FileMode.Create, FileAccess.Write)) 
+                        {
+                            fs.Write(register.UserImage);
+                        }
+                        var newAddedUser = _userRepo.GetList().Where(x => x.UserId == obj.UserId).FirstOrDefault();
+                        newAddedUser.UserImage = outPath;
+                        _userRepo.Update(newAddedUser);
                     }
 
-                    return "Created";
+                    return (int?)UserEnums.Created;
                 }
                 else {
-                    return "AlreadyExist";
+                    return (int?)UserEnums.AlreadyCreated;
                 }
                 
                 //unitorWork.Commit();

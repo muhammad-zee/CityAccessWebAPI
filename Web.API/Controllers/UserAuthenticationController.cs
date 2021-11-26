@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Web.API.Helper;
 using Web.Model;
 using Web.Model.Common;
+using Web.Services.Enums;
 using Web.Services.Interfaces;
 
 namespace Web.API.Controllers
@@ -47,19 +48,19 @@ namespace Web.API.Controllers
                 BaseResponse response = new BaseResponse();
                 register.UserName = register.PrimaryEmail;
 
-                //////////////// Generate Password ///////////////////////
+                //////////////////////////// Generate Password //////////////////////////////
                 var strongPassword = HelperExtension.CreateRandomPassword(register.FirstName);
                 var hashPswd = HelperExtension.Encrypt(strongPassword);
-                //////////////////////////////////////////////////////////
+                /////////////////////////////////////////////////////////////////////////////
 
                 register.Password = hashPswd;
-                string result = _jwtAuth.Register(register);
+                int? result = _jwtAuth.Register(register);
                 
-                if (!string.IsNullOrEmpty(result))
+                if (result != null)
                 {
-                    if (result.Equals("Created"))
+                    if (result.Equals((int?)UserEnums.Created))
                     {
-                        response = new BaseResponse() { Success = true, Message = result + " \nUserName: " + register.UserName + " \n Password: " + strongPassword };
+                        response = new BaseResponse() { Success = true, Message = result + " \n UserName: " + register.UserName + " \n Password: " + strongPassword };
                     }
                     else 
                     {
@@ -75,7 +76,7 @@ namespace Web.API.Controllers
             catch (Exception ex)
             {
                 _logger.LogExceptions(ex);
-                return null;
+                return new BaseResponse() { Success = false, Message = ex.ToString()};
             }
         }
 

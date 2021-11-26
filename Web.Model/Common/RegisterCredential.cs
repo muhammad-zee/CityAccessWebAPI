@@ -25,13 +25,13 @@ namespace Web.Model.Common
         public string HomeAddress { get; set; }
         public int CreatedBy { get; set; }
         public DateTime CreatedDate { get; set; }
-        public string ModifiedBy { get; set; }
+        public int ModifiedBy { get; set; }
         public DateTime? ModifiedDate { get; set; }
         public bool IsDeleted { get; set; } = false;
         public string City { get; set; }
         public int? StateKey { get; set; }
         public string Zip { get; set; }
-        public string UserImage { get; set; }
+        public byte[] UserImage { get; set; }
         public string RoleIds { get; set; }
     }
 }

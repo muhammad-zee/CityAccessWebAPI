@@ -26,7 +26,7 @@ namespace Web.Data.Models
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseSqlServer("Data Source=192.168.11.13;Initial Catalog=RouteAndQueue;User Id=sa;Password=4292;");
+                optionsBuilder.UseSqlServer("Data Source=192.168.0.15;Initial Catalog=RouteAndQueue;User Id=sa;Password=4292;");
             }
         }
 
@@ -39,8 +39,6 @@ namespace Web.Data.Models
                 entity.Property(e => e.CreatedDate)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
-
-                entity.Property(e => e.ModifiedBy).HasMaxLength(128);
 
                 entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
 
@@ -82,8 +80,6 @@ namespace Web.Data.Models
                     .HasMaxLength(256)
                     .IsUnicode(false);
 
-                entity.Property(e => e.ModifiedBy).HasMaxLength(128);
-
                 entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
 
                 entity.Property(e => e.OfficeAddress)
@@ -105,19 +101,6 @@ namespace Web.Data.Models
                     .HasMaxLength(256);
 
                 entity.Property(e => e.Zip).HasMaxLength(100);
-            });
-
-            modelBuilder.Entity<UserRole>(entity =>
-            {
-                entity.Property(e => e.UserRoleId).HasMaxLength(128);
-
-                entity.Property(e => e.RoleId)
-                    .IsRequired()
-                    .HasMaxLength(128);
-
-                entity.Property(e => e.UserId)
-                    .IsRequired()
-                    .HasMaxLength(128);
             });
 
             OnModelCreatingPartial(modelBuilder);

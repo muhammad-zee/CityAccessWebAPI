@@ -7,8 +7,8 @@ namespace Web.Data.Models
 {
     public partial class UserRole
     {
-        public string UserRoleId { get; set; }
-        public string UserId { get; set; }
-        public string RoleId { get; set; }
+        public int UserRoleId { get; set; }
+        public int UserId { get; set; }
+        public int RoleId { get; set; }
     }
 }
