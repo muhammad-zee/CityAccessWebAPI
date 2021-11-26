@@ -112,7 +112,7 @@ namespace Web.Services.Extensions
         //                                           .Replace("gt", "GreaterThan")
         //                                           .Replace("lt", "LessThan")
         //                                           .Replace("neq", "NotEqual");
-                                                  
+
 
         //    switch (comparisonOperator)
         //    {
@@ -156,6 +156,18 @@ namespace Web.Services.Extensions
         //    return source;
         //}
 
+        public static IEnumerable<TSource> DistinctBy<TSource, TKey>
+        (this IEnumerable<TSource> source, Func<TSource, TKey> keySelector)
+        {
+            HashSet<TKey> seenKeys = new HashSet<TKey>();
+            foreach (TSource element in source)
+            {
+                if (seenKeys.Add(keySelector(element)))
+                {
+                    yield return element;
+                }
+            }
+        }
 
         public static List<Dictionary<string, object>> ReaderToList(this DbDataReader reader, string includeColumns = "")
         {

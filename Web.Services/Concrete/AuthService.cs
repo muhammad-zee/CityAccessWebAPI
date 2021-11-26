@@ -14,6 +14,7 @@ using Web.DLL.Generic_Repository;
 using Web.Model;
 using Web.Model.Common;
 using Web.Services.Enums;
+using Web.Services.Helper;
 using Web.Services.Interfaces;
 
 namespace Web.Services.Concrete
@@ -83,71 +84,81 @@ namespace Web.Services.Concrete
             };
         }
 
-        public int? Register(RegisterCredential register)
+        public string SaveUser(RegisterCredential register)
         {
-            //first validate the username and password from the db and then generate token
-            if (!string.IsNullOrEmpty(register.UserName) && !string.IsNullOrEmpty(register.Password)
-                && !string.IsNullOrEmpty(register.PrimaryEmail) && !string.IsNullOrEmpty(register.OfficePhoneNumber) && !string.IsNullOrEmpty(register.Gender)
-                && !string.IsNullOrEmpty(register.RoleIds))
+            if (register.UserId > 0)
             {
-                var alreadyExist = _userRepo.GetList().Where(x => x.UserName == register.UserName).FirstOrDefault();
-                if (alreadyExist == null)
+                var user = AutoMapperHelper.MapSingleRow<RegisterCredential, User>(register);
+                _userRepo.Update(user);
+                return UserEnums.Updated.ToString();
+            }
+            else
+            {
+                //first validate the username and password from the db and then generate token
+                if (!string.IsNullOrEmpty(register.UserName) && !string.IsNullOrEmpty(register.Password)
+                    && !string.IsNullOrEmpty(register.PrimaryEmail) && !string.IsNullOrEmpty(register.OfficePhoneNumber) && !string.IsNullOrEmpty(register.Gender)
+                    && !string.IsNullOrEmpty(register.RoleIds))
                 {
-                    var obj = new User()
+                    var alreadyExist = _userRepo.GetList().Where(x => x.UserName == register.UserName).FirstOrDefault();
+                    if (alreadyExist == null)
                     {
-                        FirstName = register.FirstName,
-                        MiddleName = register.MiddleName,
-                        LastName = register.LastName,
-                        UserName = register.UserName,
-                        Password = register.Password,
-                        PrimaryEmail = register.PrimaryEmail,
-                        OfficePhoneNumber = register.OfficePhoneNumber,
-                        Gender = register.Gender,
-                        CreatedBy = register.CreatedBy,
-                        CreatedDate = DateTime.UtcNow,
-                        IsDeleted = false
-                    };
-                    _userRepo.Insert(obj);
-                    
-                    var roleIds = register.RoleIds.Split(',').Select(int.Parse).ToList();
-                    List<UserRole> userRoleList = new List<UserRole>();
-                    foreach (var item in roleIds)
-                    {
-                        userRoleList.Add(new UserRole() { UserId = obj.UserId, RoleId = item });
+                        var obj = new User()
+                        {
+                            FirstName = register.FirstName,
+                            MiddleName = register.MiddleName,
+                            LastName = register.LastName,
+                            UserName = register.UserName,
+                            Password = register.Password,
+                            PrimaryEmail = register.PrimaryEmail,
+                            OfficePhoneNumber = register.OfficePhoneNumber,
+                            Gender = register.Gender,
+                            CreatedBy = register.CreatedBy,
+                            CreatedDate = DateTime.UtcNow,
+                            IsDeleted = false
+                        };
+                        _userRepo.Insert(obj);
+
+                        var roleIds = register.RoleIds.Split(',').Select(int.Parse).ToList();
+                        List<UserRole> userRoleList = new List<UserRole>();
+                        foreach (var item in roleIds)
+                        {
+                            userRoleList.Add(new UserRole() { UserId = obj.UserId, RoleId = item });
+                        }
+                        _userRoleRepo.Insert(userRoleList);
+
+                        if (register.UserImage != null && register.UserImage.Count() > 0)
+                        {
+                            var outPath = Directory.GetCurrentDirectory(); //_config["FilePath:Path"];
+                                                                           //if (!Directory.Exists(outPath))
+                                                                           //{
+                                                                           //    Directory.CreateDirectory(outPath);
+                                                                           //}
+                            outPath += "/UserProfiles/";
+                            if (!Directory.Exists(outPath))
+                            {
+                                Directory.CreateDirectory(outPath);
+                            }
+                            outPath += $"UserProfilePic_{obj.UserId}.png";
+
+                            using (FileStream fs = new FileStream(outPath, FileMode.Create, FileAccess.Write))
+                            {
+                                fs.Write(register.UserImageByte);
+                            }
+                            var newAddedUser = _userRepo.GetList().Where(x => x.UserId == obj.UserId).FirstOrDefault();
+                            newAddedUser.UserImage = outPath;
+                            _userRepo.Update(newAddedUser);
+                        }
+
+                        return UserEnums.Created.ToString();
                     }
-                    _userRoleRepo.Insert(userRoleList);
-
-                    if (register.UserImage != null && register.UserImage.Count() > 0)
+                    else
                     {
-                        var outPath = _config["FilePath:Path"];
-                        if (!Directory.Exists(outPath))
-                        {
-                            Directory.CreateDirectory(outPath);
-                        }
-                        outPath += "UserProfiles/";
-                        if (!Directory.Exists(outPath))
-                        {
-                            Directory.CreateDirectory(outPath);
-                        }
-                        outPath += $"UserProfilePic_{obj.UserId}.png";
-
-                        using (FileStream fs = new FileStream(outPath, FileMode.Create, FileAccess.Write)) 
-                        {
-                            fs.Write(register.UserImage);
-                        }
-                        var newAddedUser = _userRepo.GetList().Where(x => x.UserId == obj.UserId).FirstOrDefault();
-                        newAddedUser.UserImage = outPath;
-                        _userRepo.Update(newAddedUser);
+                        return UserEnums.AlreadyCreated.ToString();
                     }
 
-                    return (int?)UserEnums.Created;
+                    //unitorWork.Commit();
+
                 }
-                else {
-                    return (int?)UserEnums.AlreadyCreated;
-                }
-                
-                //unitorWork.Commit();
-                
             }
             return null;
         }

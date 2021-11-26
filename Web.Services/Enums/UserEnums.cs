@@ -10,12 +10,12 @@ namespace Web.Services.Enums
     public enum UserEnums
     {
         [Description("Created")]
-        Created = 1,
+        Created = 'C',
         [Description("Updated")]
-        Updated = 2,
+        Updated = 'U',
         [Description("Deleted")]
-        Deleted = 3,
+        Deleted = 'D',
         [Description("AlreadyCreated")]
-        AlreadyCreated = 4
+        AlreadyCreated = 'X'
     }
 }

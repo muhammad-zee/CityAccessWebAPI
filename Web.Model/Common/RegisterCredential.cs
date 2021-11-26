@@ -5,7 +5,7 @@ namespace Web.Model.Common
 {
     public class RegisterCredential
     {
-        public int Id { get; set; }
+        public int UserId { get; set; }
         [Required]
         public string UserName { get; set; }
         public string FirstName { get; set; }
@@ -31,7 +31,8 @@ namespace Web.Model.Common
         public string City { get; set; }
         public int? StateKey { get; set; }
         public string Zip { get; set; }
-        public byte[] UserImage { get; set; }
+        public byte[] UserImageByte { get; set; }
+        public string UserImage { get; set; }
         public string RoleIds { get; set; }
     }
 }

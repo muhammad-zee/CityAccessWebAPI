@@ -6,6 +6,6 @@ namespace Web.Services.Interfaces
     {
         BaseResponse Authentication(UserCredential login);
 
-        int? Register(RegisterCredential register);
+        string SaveUser(RegisterCredential register);
     }
 }

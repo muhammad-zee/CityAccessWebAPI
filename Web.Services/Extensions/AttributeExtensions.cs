@@ -25,7 +25,7 @@ namespace Web.Services.Extensions
             catch { return ""; }
 
         }
-         
+
         public static string FormatDateTime(this DateTime value)
         {
             return value.ToString("MM/dd/yyyy HH:mm:ss");
@@ -156,8 +156,6 @@ namespace Web.Services.Extensions
                 return 0;
             }
         }
-
-
 
         public static string ToYesNo(this bool obj)
         {

@@ -40,8 +40,8 @@ namespace Web.API.Controllers
             }
         }
    
-        [HttpPost("auth/register")]
-        public BaseResponse Register([FromBody] RegisterCredential register)
+        [HttpPost("auth/SaveUser")]
+        public BaseResponse SaveUser([FromBody] RegisterCredential register)
         {
             try
             {
@@ -54,15 +54,23 @@ namespace Web.API.Controllers
                 /////////////////////////////////////////////////////////////////////////////
 
                 register.Password = hashPswd;
-                int? result = _jwtAuth.Register(register);
+
+                //byte[] bytes = System.IO.File.ReadAllBytes(@"D:\pic.jpg");
+                //register.UserImage = bytes;
+
+                string result = _jwtAuth.SaveUser(register);
                 
                 if (result != null)
                 {
-                    if (result.Equals((int?)UserEnums.Created))
+                    if (result.Equals(UserEnums.Created.ToString()))
                     {
-                        response = new BaseResponse() { Success = true, Message = result + " \n UserName: " + register.UserName + " \n Password: " + strongPassword };
+                        response = new BaseResponse() { Success = true, Message = "User created successfully" + " \n UserName: " + register.UserName + " \n Password: " + strongPassword };
                     }
-                    else 
+                    else if (result.Equals(UserEnums.Updated.ToString())) 
+                    {
+                        response = new BaseResponse() { Success = true, Message = "User updated successfully" };
+                    }
+                    else
                     {
                         response = new BaseResponse() { Success = false, Message = "User is already exist against this Email." };
                     }
