@@ -44,7 +44,7 @@ namespace Web.API
                 c.SwaggerDoc("v1", new OpenApiInfo
                 {
                     Version = "v1",
-                    Title = "HRMS API",
+                    Title = "Routing And Queueing API",
                     // Description = "API with ASP.NET Core",
                     //Contact = new OpenApiContact()
                     //{
@@ -111,7 +111,7 @@ namespace Web.API
             {*/
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "TestingAPIForHawklogix v1"));
+                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "RoutingAndQueueingAPI v1"));
             /*}*/
 
             app.UseHttpsRedirection();
