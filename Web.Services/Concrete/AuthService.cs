@@ -100,7 +100,7 @@ namespace Web.Services.Concrete
                         PrimaryEmail = register.PrimaryEmail,
                         OfficePhoneNumber = register.OfficePhoneNumber,
                         Gender = register.Gender,
-                        CreatedBy = "test",
+                        CreatedBy = register.CreatedBy,
                         CreatedDate = DateTime.Now,
                         IsDeleted = false
                     };
@@ -110,7 +110,7 @@ namespace Web.Services.Concrete
                     List<UserRole> userRoleList = new List<UserRole>();
                     foreach (var item in roleIds)
                     {
-                        userRoleList.Add(new UserRole() { UserId = obj.Id.ToString(), RoleId = item.ToString() });
+                        userRoleList.Add(new UserRole() { UserId = obj.UserId.ToString(), RoleId = item.ToString() });
                     }
 
                     return "Created";

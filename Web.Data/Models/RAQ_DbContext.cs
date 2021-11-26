@@ -26,7 +26,7 @@ namespace Web.Data.Models
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseSqlServer("Data Source=192.168.0.13;Initial Catalog=RouteAndQueue;User Id=sa;Password=4292;");
+                optionsBuilder.UseSqlServer("Data Source=192.168.11.13;Initial Catalog=RouteAndQueue;User Id=sa;Password=4292;");
             }
         }
 
@@ -36,10 +36,6 @@ namespace Web.Data.Models
 
             modelBuilder.Entity<Role>(entity =>
             {
-                entity.Property(e => e.CreatedBy)
-                    .IsRequired()
-                    .HasMaxLength(128);
-
                 entity.Property(e => e.CreatedDate)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
@@ -61,10 +57,6 @@ namespace Web.Data.Models
             modelBuilder.Entity<User>(entity =>
             {
                 entity.Property(e => e.City).HasMaxLength(40);
-
-                entity.Property(e => e.CreatedBy)
-                    .IsRequired()
-                    .HasMaxLength(128);
 
                 entity.Property(e => e.CreatedDate)
                     .HasColumnType("datetime")

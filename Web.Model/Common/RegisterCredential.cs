@@ -23,7 +23,7 @@ namespace Web.Model.Common
         public string Gender { get; set; }
         public string OfficeAddress { get; set; }
         public string HomeAddress { get; set; }
-        public string CreatedBy { get; set; }
+        public int CreatedBy { get; set; }
         public DateTime CreatedDate { get; set; }
         public string ModifiedBy { get; set; }
         public DateTime? ModifiedDate { get; set; }
