@@ -1,19 +1,37 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Web.API.Helper;
+using Web.Data.Models;
+using Web.Services.Concrete;
+using Web.Services.Interfaces;
 
 namespace Web.API.Controllers
 {
     [Route("Role")]
     public class RoleController : ControllerBase
     {
-        // GET: api/<EmployeeController>
-        [HttpGet]
-        public IEnumerable<string> Get()
+        Logger _logger;
+        private IWebHostEnvironment _hostEnvironment;
+        private readonly IRoleService _roleService;
+
+        public RoleController(IConfiguration config,IWebHostEnvironment environment,IRoleService roleService)
         {
-            return new string[] { "value1", "value2" };
+            this._hostEnvironment = environment;
+            this._logger = new Logger(_hostEnvironment);
+            this._roleService = roleService;
+        }
+
+        // GET: api/<EmployeeController>
+        [HttpGet("GetAllRoles")]
+
+        public IEnumerable<Role> Get()
+        {
+            return _roleService.getRoleList();
         }
 
         // GET api/<EmployeeController>/5

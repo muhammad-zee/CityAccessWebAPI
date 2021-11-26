@@ -86,6 +86,8 @@ namespace Web.API
                      IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Secret"]))
                  };
              });
+
+
             // register the repositories
             services.AddDbContext<RAQ_DbContext>();
             services.AddScoped<DbContext>(sp => sp.GetService<RAQ_DbContext>());
@@ -97,6 +99,7 @@ namespace Web.API
 
             //Register Services
             services.AddTransient(typeof(IJwtAuthService), typeof(AuthService));
+            services.AddTransient(typeof(IRoleService), typeof(RoleService));
             services.AddTransient(typeof(IUserAuthRepository), typeof(UserAuthRepository));
 
             //Register Services Repositories

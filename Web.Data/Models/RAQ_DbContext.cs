@@ -17,8 +17,10 @@ namespace Web.Data.Models
         {
         }
 
+        public virtual DbSet<Component> Components { get; set; }
         public virtual DbSet<Role> Roles { get; set; }
         public virtual DbSet<User> Users { get; set; }
+        public virtual DbSet<UserAccess> UserAccesses { get; set; }
         public virtual DbSet<UserRole> UserRoles { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -33,6 +35,41 @@ namespace Web.Data.Models
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasAnnotation("Relational:Collation", "SQL_Latin1_General_CP1_CI_AS");
+
+            modelBuilder.Entity<Component>(entity =>
+            {
+                entity.Property(e => e.ComModuleName)
+                    .HasMaxLength(200)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.FormId)
+                    .HasMaxLength(200)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.ModuleImage)
+                    .HasMaxLength(500)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.PageDescription)
+                    .HasMaxLength(200)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.PageName)
+                    .HasMaxLength(200)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.PageTitle)
+                    .HasMaxLength(200)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.PageUrl)
+                    .HasMaxLength(200)
+                    .IsUnicode(false);
+            });
 
             modelBuilder.Entity<Role>(entity =>
             {
@@ -101,6 +138,20 @@ namespace Web.Data.Models
                     .HasMaxLength(256);
 
                 entity.Property(e => e.Zip).HasMaxLength(100);
+            });
+
+            modelBuilder.Entity<UserAccess>(entity =>
+            {
+                entity.HasKey(e => e.UserId)
+                    .HasName("PK_user_access");
+
+                entity.ToTable("UserAccess");
+
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.UserRoleId).HasMaxLength(128);
             });
 
             OnModelCreatingPartial(modelBuilder);
