@@ -6,7 +6,7 @@ using Web.Model.Common;
 
 namespace Web.DLL.Generic_Repository
 {
-    public interface IRepository<T> where T : BaseEntity
+    public interface IRepository<T> where T : class
     {
         IQueryable<T> GetList();
         IQueryable<T> GetList(Expression<Func<T, bool>> predicate);

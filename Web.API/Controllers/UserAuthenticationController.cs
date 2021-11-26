@@ -45,11 +45,27 @@ namespace Web.API.Controllers
             try
             {
                 BaseResponse response = new BaseResponse();
-                string generatedToken = _jwtAuth.Register(register);
+                register.UserName = register.PrimaryEmail;
 
-                if (!string.IsNullOrEmpty(generatedToken))
+                //////////////// Generate Password ///////////////////////
+                var strongPassword = HelperExtension.CreateRandomPassword(register.FirstName);
+                var hashPswd = HelperExtension.Encrypt(strongPassword);
+                //////////////////////////////////////////////////////////
+
+                register.Password = hashPswd;
+                string result = _jwtAuth.Register(register);
+                
+                if (!string.IsNullOrEmpty(result))
                 {
-                    response = new BaseResponse() { Success = true, Message = generatedToken };
+                    if (result.Equals("Created"))
+                    {
+                        response = new BaseResponse() { Success = true, Message = result + " \nUserName: " + register.UserName + " \n Password: " + strongPassword };
+                    }
+                    else 
+                    {
+                        response = new BaseResponse() { Success = false, Message = "User is already exist against this Email." };
+                    }
+                    
                 }
                 else {
                     response = new BaseResponse() { Success = false, Message = "Model State is not valid." };

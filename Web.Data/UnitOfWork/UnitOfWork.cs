@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Web.Data;
-using Web.DLL.Db_Context;
+using Web.Data.Models;
 using Web.DLL.Generic_Repository;
 using Web.Model;
 using Web.Model.Common;
@@ -10,13 +10,13 @@ namespace Web.DLL
 {
     public class UnitOfWork : IUnitOfWork
     {
-        private DbHRMSContext _context;
-        public UnitOfWork(DbHRMSContext context)
+        private RAQ_DbContext _context;
+        public UnitOfWork(RAQ_DbContext context)
         {
             _context = context;
         }
 
-        public DbHRMSContext Context
+        public RAQ_DbContext Context
         {
             get
             {

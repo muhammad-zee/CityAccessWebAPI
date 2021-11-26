@@ -3,19 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
-using Web.DLL.Db_Context;
+using Web.Data.Models;
 using Web.Model.Common;
 
 namespace Web.DLL.Generic_Repository
 {
-    public class GenericRepository<T> : IRepository<T> where T : BaseEntity
+    public class GenericRepository<T> : IRepository<T> where T : class
     {
-        private readonly DbHRMSContext _appContext;
+        private readonly RAQ_DbContext _appContext;
         private DbSet<T> _entities;
         private UnitOfWork _unitOfWork;
 
         #region CTOR
-        public GenericRepository(DbHRMSContext appContext)
+        public GenericRepository(RAQ_DbContext appContext)
         {
             _appContext = appContext;
         }

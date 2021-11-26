@@ -7,8 +7,9 @@ using System.Text;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Web.Data.Interfaces;
+using Web.Data.Models;
 using Web.DLL;
-using Web.DLL.Models;
+using Web.DLL.Generic_Repository;
 using Web.Model;
 using Web.Model.Common;
 using Web.Services.Interfaces;
@@ -17,13 +18,17 @@ namespace Web.Services.Concrete
 {
     public class AuthService : IJwtAuthService
     {
-        private readonly IHRMSUserAuthRepository _hrmsUserAuthRepository;
+        //private readonly IUserAuthRepository _userAuthRepository;
+        private readonly GenericRepository<User> _userRepo;
+        private readonly GenericRepository<UserRole> _userRoleRepo;
         IConfiguration _config;
         private readonly UnitOfWork unitorWork;
-        public AuthService(IConfiguration config, IHRMSUserAuthRepository hrmsUserAuthRepository)
+        public AuthService(IConfiguration config, /*IUserAuthRepository userAuthRepository,*/ IRepository<User> userRepo, IRepository<UserRole> userRoleRepo)
         {
             _config = config;
-            _hrmsUserAuthRepository = hrmsUserAuthRepository;
+            //_userAuthRepository = userAuthRepository;
+            _userRepo = (GenericRepository<User>)userRepo;
+            _userRoleRepo = (GenericRepository<UserRole>)userRoleRepo;
         }
 
 
@@ -32,10 +37,12 @@ namespace Web.Services.Concrete
             BaseResponse response = new BaseResponse();
             if (!string.IsNullOrEmpty(login.email) && !string.IsNullOrEmpty(login.password))
             {
-                var result = _hrmsUserAuthRepository.Table.Where(x => x.EthuEmailAddress == login.email && x.EthuPassword == login.password).FirstOrDefault();
+                var result = _userRepo.Table.Where(x => x.PrimaryEmail == login.email && x.Password == login.password).FirstOrDefault();
                 if (result != null)
                 {
-                    response.Data = GenerateJSONWebToken(login);
+                    var token = GenerateJSONWebToken(login);
+                    var obj = new { token = token, result.PrimaryEmail, result.OfficePhoneNumber };
+                    response.Data = obj; //GenerateJSONWebToken(login);
                     response.Success = true;
                     response.Message = "User found";
                 }
@@ -76,33 +83,44 @@ namespace Web.Services.Concrete
 
         public string Register(RegisterCredential register)
         {
-            // first validate the username and password from the db and then generate token
-            if (!string.IsNullOrEmpty(register.username) && !string.IsNullOrEmpty(register.password)
-                && !string.IsNullOrEmpty(register.email) && !string.IsNullOrEmpty(register.phone) && !string.IsNullOrEmpty(register.gender))
+            //first validate the username and password from the db and then generate token
+            if (!string.IsNullOrEmpty(register.UserName) && !string.IsNullOrEmpty(register.Password)
+                && !string.IsNullOrEmpty(register.PrimaryEmail) && !string.IsNullOrEmpty(register.OfficePhoneNumber) && !string.IsNullOrEmpty(register.Gender))
             {
-                List<EmsTblHrmsUser> obj = new List<EmsTblHrmsUser>();
-
-                obj.Add(new EmsTblHrmsUser
+                var alreadyExist = _userRepo.GetList().Where(x => x.UserName == register.UserName).FirstOrDefault();
+                if (alreadyExist == null)
                 {
-                    EthuFullName = "test",
-                    EthuUserName = register.username,
-                    EthuPassword = register.password,
-                    EthuEmailAddress = register.email,
-                    EthuPhoneNumber = register.phone,
-                    EthuGender = register.gender,
-                    EthuCreatedBy = "test",
-                    EthuCreatedByDate = DateTime.Now,
-                    EthuCreatedByName = "test",
-                    EthuModifiedBy = "test",
-                    EthuModifiedByDate = DateTime.Now,
-                    EthuModifiedByName = "test",
-                    EthuIsDelete = "no"
+                    var obj = new User()
+                    {
+                        FirstName = register.FirstName,
+                        MiddleName = register.MiddleName,
+                        LastName = register.LastName,
+                        UserName = register.UserName,
+                        Password = register.Password,
+                        PrimaryEmail = register.PrimaryEmail,
+                        OfficePhoneNumber = register.OfficePhoneNumber,
+                        Gender = register.Gender,
+                        CreatedBy = "test",
+                        CreatedDate = DateTime.Now,
+                        IsDeleted = false
+                    };
+                    _userRepo.Insert(obj);
+                    
+                    var roleIds = register.RoleIds.Split(',').Select(int.Parse).ToList();
+                    List<UserRole> userRoleList = new List<UserRole>();
+                    foreach (var item in roleIds)
+                    {
+                        userRoleList.Add(new UserRole() { UserId = obj.Id.ToString(), RoleId = item.ToString() });
+                    }
 
-                });
-
-                _hrmsUserAuthRepository.Insert(obj);
+                    return "Created";
+                }
+                else {
+                    return "AlreadyExist";
+                }
+                
                 //unitorWork.Commit();
-                return "User Created";
+                
             }
             return null;
         }

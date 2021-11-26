@@ -12,8 +12,8 @@ using Web.API.Helper;
 using Web.Data;
 using Web.Data.Concrete;
 using Web.Data.Interfaces;
+using Web.Data.Models;
 using Web.DLL;
-using Web.DLL.Db_Context;
 using Web.DLL.Generic_Repository;
 using Web.Services.Concrete;
 using Web.Services.Interfaces;
@@ -33,7 +33,7 @@ namespace Web.API
         public void ConfigureServices(IServiceCollection services)
         {
 
-            services.AddDbContext<DbHRMSContext>(options =>
+            services.AddDbContext<RAQ_DbContext>(options =>
               options.UseSqlServer(
                  Configuration.GetConnectionString("DefaultConnection")));
 
@@ -87,8 +87,8 @@ namespace Web.API
                  };
              });
             // register the repositories
-            services.AddDbContext<DbHRMSContext>();
-            services.AddScoped<DbContext>(sp => sp.GetService<DbHRMSContext>());
+            services.AddDbContext<RAQ_DbContext>();
+            services.AddScoped<DbContext>(sp => sp.GetService<RAQ_DbContext>());
 
             services.AddTransient(typeof(IUnitOfWork), typeof(UnitOfWork));
 
@@ -97,7 +97,7 @@ namespace Web.API
 
             //Register Services
             services.AddTransient(typeof(IJwtAuthService), typeof(AuthService));
-            services.AddTransient(typeof(IHRMSUserAuthRepository), typeof(HRMSUserAuthRepository));
+            services.AddTransient(typeof(IUserAuthRepository), typeof(UserAuthRepository));
 
             //Register Services Repositories
 
