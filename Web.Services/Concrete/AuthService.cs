@@ -47,14 +47,14 @@ namespace Web.Services.Concrete
                 if (result != null)
                 {
                     var AuthorizedUser = GenerateJSONWebToken(result);
-                    response.Data = AuthorizedUser; ;
-                    response.Success = HttpStatusCode.OK;
+                    response.Body = AuthorizedUser; ;
+                    response.Status = HttpStatusCode.OK;
                     response.Message = "User found";
                 }
                 else
                 {
-                    response.Data = null;
-                    response.Success = HttpStatusCode.NotFound;
+                    response.Body = null;
+                    response.Status = HttpStatusCode.NotFound;
                     response.Message = "User not found";
                 }
             }

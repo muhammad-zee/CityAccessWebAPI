@@ -4,8 +4,8 @@ namespace Web.Model
 {
     public class BaseResponse
     {
-        public HttpStatusCode Success { get; set; }
+        public HttpStatusCode Status { get; set; }
         public string Message { get; set; }
-        public object Data { get; set; }
+        public object Body { get; set; }
     }
 }

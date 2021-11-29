@@ -36,7 +36,7 @@ namespace Web.API.Controllers
             catch(Exception ex)
             {
                 _logger.LogExceptions(ex);
-                return new BaseResponse() { Success = HttpStatusCode.BadRequest, Message = ex.ToString() };
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
         }
    
@@ -64,27 +64,27 @@ namespace Web.API.Controllers
                 {
                     if (result.Equals(UserEnums.Created.ToString()))
                     {
-                        response = new BaseResponse() { Success = HttpStatusCode.OK, Message = "User created successfully" + " \n UserName: " + register.UserName + " \n Password: " + strongPassword };
+                        response = new BaseResponse() { Status = HttpStatusCode.OK, Message = "User created successfully" + " \n UserName: " + register.UserName + " \n Password: " + strongPassword };
                     }
                     else if (result.Equals(UserEnums.Updated.ToString())) 
                     {
-                        response = new BaseResponse() { Success = HttpStatusCode.OK, Message = "User updated successfully" };
+                        response = new BaseResponse() { Status = HttpStatusCode.OK, Message = "User updated successfully" };
                     }
                     else
                     {
-                        response = new BaseResponse() { Success = HttpStatusCode.BadRequest, Message = "User already exist against this Email." };
+                        response = new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = "User already exist against this Email." };
                     }
                     
                 }
                 else {
-                    response = new BaseResponse() { Success = HttpStatusCode.BadRequest, Message = "Model State is not valid." };
+                    response = new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = "Model State is not valid." };
                 }
                 return response;
             }
             catch (Exception ex)
             {
                 _logger.LogExceptions(ex);
-                return new BaseResponse() { Success = HttpStatusCode.BadRequest, Message = ex.ToString()};
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString()};
             }
         }
 

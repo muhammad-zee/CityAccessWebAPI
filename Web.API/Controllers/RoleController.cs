@@ -38,12 +38,12 @@ namespace Web.API.Controllers
             try
             {
                 var roleObj = "jhe;laskdjf";// _roleService.getRoleList();
-                return new BaseResponse { Success = HttpStatusCode.OK, Message = "Roles List Returned", Data = roleObj };
+                return new BaseResponse { Status = HttpStatusCode.OK, Message = "Roles List Returned", Body = roleObj };
             }
             catch (Exception ex)
             {
                 _logger.LogExceptions(ex);
-                return new BaseResponse() { Success = HttpStatusCode.BadRequest, Message = ex.ToString() };
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
 
         }
