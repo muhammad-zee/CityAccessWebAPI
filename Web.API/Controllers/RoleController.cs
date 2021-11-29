@@ -1,17 +1,21 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Web.API.Helper;
 using Web.Data.Models;
+using Web.Model;
 using Web.Services.Concrete;
 using Web.Services.Interfaces;
 
 namespace Web.API.Controllers
 {
+    [Authorize]
     [Route("Role")]
     public class RoleController : ControllerBase
     {
@@ -29,35 +33,45 @@ namespace Web.API.Controllers
         // GET: api/<EmployeeController>
         [HttpGet("GetAllRoles")]
 
-        public IEnumerable<Role> Get()
+        public BaseResponse Get()
         {
-            return _roleService.getRoleList();
+            try
+            {
+                var roleObj = "jhe;laskdjf";// _roleService.getRoleList();
+                return new BaseResponse { Success = HttpStatusCode.OK, Message = "Roles List Returned", Data = roleObj };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Success = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+
         }
 
-        // GET api/<EmployeeController>/5
-        [HttpGet("{id}")]
-        public string Get(int id)
-        {
-            return "value";
-        }
+        //// GET api/<EmployeeController>/5
+        //[HttpGet("{id}")]
+        //public string Get(int id)
+        //{
+        //    return "value";
+        //}
 
-        // POST api/<EmployeeController>
-        [HttpPost]
-        public void Post([FromBody] string value)
-        {
-        }
+        //// POST api/<EmployeeController>
+        //[HttpPost]
+        //public void Post([FromBody] string value)
+        //{
+        //}
 
-        // PUT api/<EmployeeController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
+        //// PUT api/<EmployeeController>/5
+        //[HttpPut("{id}")]
+        //public void Put(int id, [FromBody] string value)
+        //{
+        //}
 
-        // DELETE api/<EmployeeController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
-        }
+        //// DELETE api/<EmployeeController>/5
+        //[HttpDelete("{id}")]
+        //public void Delete(int id)
+        //{
+        //}
 
     }
 }

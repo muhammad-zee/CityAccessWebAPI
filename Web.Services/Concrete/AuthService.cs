@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Security.Claims;
 using System.Text;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using Web.API.Helper;
 using Web.Data.Interfaces;
 using Web.Data.Models;
 using Web.DLL;
@@ -40,33 +42,33 @@ namespace Web.Services.Concrete
             BaseResponse response = new BaseResponse();
             if (!string.IsNullOrEmpty(login.email) && !string.IsNullOrEmpty(login.password))
             {
+                login.password = HelperExtension.Encrypt(login.password);
                 var result = _userRepo.Table.Where(x => x.PrimaryEmail == login.email && x.Password == login.password).FirstOrDefault();
                 if (result != null)
                 {
-                    var token = GenerateJSONWebToken(login);
-                    var obj = new { token = token, result.PrimaryEmail, result.OfficePhoneNumber };
-                    response.Data = obj; //GenerateJSONWebToken(login);
-                    response.Success = true;
+                    var AuthorizedUser = GenerateJSONWebToken(result);
+                    response.Data = AuthorizedUser; ;
+                    response.Success = HttpStatusCode.OK;
                     response.Message = "User found";
                 }
                 else
                 {
                     response.Data = null;
-                    response.Success = false;
+                    response.Success = HttpStatusCode.NotFound;
                     response.Message = "User not found";
                 }
             }
             return response;
         }
 
-        private object GenerateJSONWebToken(UserCredential userInfo)
+        private object GenerateJSONWebToken(User user)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Secret"]));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
             var claims = new[]
             {
-                    new Claim(JwtRegisteredClaimNames.Sub, userInfo.email),
+                    new Claim(JwtRegisteredClaimNames.Sub, user.PrimaryEmail),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
 
             };
@@ -80,7 +82,10 @@ namespace Web.Services.Concrete
             return new
             {
                 token = new JwtSecurityTokenHandler().WriteToken(token),
-                expires = tokenExpiryTime
+                expires = tokenExpiryTime,
+                PrimaryEmail = user.PrimaryEmail,
+                PhoneNumber = user.PersonalMobileNumber
+
             };
         }
 

@@ -1,3 +1,4 @@
+using System.Net;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -15,6 +16,7 @@ using Web.Data.Interfaces;
 using Web.Data.Models;
 using Web.DLL;
 using Web.DLL.Generic_Repository;
+using Web.Model;
 using Web.Services.Concrete;
 using Web.Services.Interfaces;
 
@@ -85,6 +87,13 @@ namespace Web.API
                      ValidAudience = Configuration["Jwt:ValidAudience"],
                      IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Secret"]))
                  };
+                 //options.Events = new JwtBearerEvents
+                 //{
+                 //    OnAuthenticationFailed = async (context) =>
+                 //    {
+                 //        context.Response = ;
+                 //    }
+                 //}
              });
 
 
