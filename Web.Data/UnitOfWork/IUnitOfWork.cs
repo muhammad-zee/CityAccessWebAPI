@@ -1,8 +1,6 @@
 ﻿using System;
 using Web.Data.Models;
-using Web.DLL;
 using Web.DLL.Generic_Repository;
-using Web.Model;
 using Web.Model.Common;
 
 namespace Web.Data

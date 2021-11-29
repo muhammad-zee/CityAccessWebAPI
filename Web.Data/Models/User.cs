@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 #nullable disable
 
@@ -29,5 +28,9 @@ namespace Web.Data.Models
         public int? StateKey { get; set; }
         public string Zip { get; set; }
         public string UserImage { get; set; }
+        public bool TwoFactorEnabled { get; set; }
+        public bool IsTwoFactorVerify { get; set; }
+        public string TwoFactorCode { get; set; }
+        public DateTime? CodeExpiryTime { get; set; }
     }
 }

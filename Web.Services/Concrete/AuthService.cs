@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
+using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.IO;
@@ -6,10 +8,7 @@ using System.Linq;
 using System.Net;
 using System.Security.Claims;
 using System.Text;
-using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
 using Web.API.Helper;
-using Web.Data.Interfaces;
 using Web.Data.Models;
 using Web.DLL;
 using Web.DLL.Generic_Repository;

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Web.Data;
 using Web.Data.Models;
 using Web.DLL.Generic_Repository;
-using Web.Model;
 using Web.Model.Common;
 
 namespace Web.DLL

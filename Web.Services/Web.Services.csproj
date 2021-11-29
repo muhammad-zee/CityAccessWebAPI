@@ -6,6 +6,9 @@
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="10.1.1" />
+    <PackageReference Include="Twilio" Version="5.68.1" />
+    <PackageReference Include="Twilio.AspNet.Common" Version="5.68.3" />
+    <PackageReference Include="Twilio.AspNet.Core" Version="5.68.3" />
   </ItemGroup>
 
   <ItemGroup>

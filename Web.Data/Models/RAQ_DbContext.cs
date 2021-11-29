@@ -1,6 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
+﻿using Microsoft.EntityFrameworkCore;
 
 #nullable disable
 
@@ -18,6 +16,7 @@ namespace Web.Data.Models
         }
 
         public virtual DbSet<Component> Components { get; set; }
+        public virtual DbSet<ComponentAccess> ComponentAccesses { get; set; }
         public virtual DbSet<Role> Roles { get; set; }
         public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<UserAccess> UserAccesses { get; set; }
@@ -27,12 +26,12 @@ namespace Web.Data.Models
         {
             if (!optionsBuilder.IsConfigured)
             {
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
+        #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
                 optionsBuilder.UseSqlServer("Data Source=192.168.0.15;Initial Catalog=RouteAndQueue;User Id=sa;Password=4292;");
             }
         }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder) 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasAnnotation("Relational:Collation", "SQL_Latin1_General_CP1_CI_AS");
 
@@ -71,6 +70,19 @@ namespace Web.Data.Models
                     .IsUnicode(false);
             });
 
+            modelBuilder.Entity<ComponentAccess>(entity =>
+            {
+                entity.ToTable("ComponentAccess");
+
+                entity.Property(e => e.ComIdFk).HasColumnName("ComIdFK");
+
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.RoleIdFk).HasMaxLength(128);
+            });
+
             modelBuilder.Entity<Role>(entity =>
             {
                 entity.Property(e => e.CreatedDate)
@@ -92,6 +104,8 @@ namespace Web.Data.Models
             modelBuilder.Entity<User>(entity =>
             {
                 entity.Property(e => e.City).HasMaxLength(40);
+
+                entity.Property(e => e.CodeExpiryTime).HasColumnType("datetime");
 
                 entity.Property(e => e.CreatedDate)
                     .HasColumnType("datetime")
@@ -129,6 +143,10 @@ namespace Web.Data.Models
 
                 entity.Property(e => e.StateKey).HasColumnName("State_key");
 
+                entity.Property(e => e.TwoFactorCode)
+                    .HasMaxLength(10)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.UserImage)
                     .HasMaxLength(200)
                     .HasColumnName("User_Image");
@@ -151,7 +169,7 @@ namespace Web.Data.Models
 
                 entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
 
-                entity.Property(e => e.UserRoleId).HasMaxLength(128);
+                entity.Property(e => e.RoleIdFk).HasMaxLength(128);
             });
 
             OnModelCreatingPartial(modelBuilder);
