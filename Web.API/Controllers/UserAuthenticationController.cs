@@ -36,7 +36,7 @@ namespace Web.API.Controllers
             catch(Exception ex)
             {
                 _logger.LogExceptions(ex);
-                return null;
+                return new BaseResponse() { Success = false, Message = ex.ToString() };
             }
         }
    
