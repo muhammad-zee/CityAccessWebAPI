@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Net;
 using System.Reflection;
 using Web.API.Helper;
 using Web.Model;
@@ -13,6 +15,8 @@ using Web.Services.Interfaces;
 
 namespace Web.API.Controllers
 {
+    [Authorize]
+    //[Route("Role")]
     public class AdminController : Controller
     {
         private readonly IAdminService _adminService;
@@ -26,6 +30,54 @@ namespace Web.API.Controllers
             _hostEnvironment = environment;
             _logger = new Logger(_hostEnvironment);
         }
+
+        #region Role
+
+        // GET: api/<EmployeeController>
+        [HttpGet("GetAllRoles")]
+
+        public BaseResponse GetRoles()
+        {
+            try
+            {
+                var roleObj = _adminService.getRoleList();
+                return new BaseResponse { Status = HttpStatusCode.OK, Message = "Roles List Returned", Body = roleObj };
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+
+        }
+
+        //// GET api/<EmployeeController>/5
+        //[HttpGet("{id}")]
+        //public string Get(int id)
+        //{
+        //    return "value";
+        //}
+
+        //// POST api/<EmployeeController>
+        //[HttpPost]
+        //public void Post([FromBody] string value)
+        //{
+        //}
+
+        //// PUT api/<EmployeeController>/5
+        //[HttpPut("{id}")]
+        //public void Put(int id, [FromBody] string value)
+        //{
+        //}
+
+        //// DELETE api/<EmployeeController>/5
+        //[HttpDelete("{id}")]
+        //public void Delete(int id)
+        //{
+        //}
+
+        #endregion
 
         #region Component
 
@@ -68,5 +120,7 @@ namespace Web.API.Controllers
         }
 
         #endregion
+
+
     }
 }

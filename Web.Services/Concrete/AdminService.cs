@@ -14,13 +14,21 @@ namespace Web.Services.Concrete
     public class AdminService: IAdminService
     {
         private IRepository<Component> _component;
+        private IRepository<Role> _role;
         IConfiguration _config;
-        public AdminService(IConfiguration config, IRepository<Component> component)
+        public AdminService(IConfiguration config, IRepository<Component> component, IRepository<Role> role)
         {
-            this._component = component;
             this._config = config;
+            this._component = component;
+            this._role = role;
         }
+        #region Roles
 
+        public IQueryable<Role> getRoleList()
+        {
+            return this._role.GetList().Where(item => !item.IsDeleted);
+        }
+        #endregion
         #region Component
 
         public BaseResponse AddOrUpdateComponent(List<ComponentVM> components) 

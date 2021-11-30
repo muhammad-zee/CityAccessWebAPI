@@ -99,5 +99,20 @@ namespace Web.API.Controllers
             return new BaseResponse();
         }
 
+        [HttpPost("auth/SendTwoFactorAuthenticationCode")]
+        public BaseResponse SendVerificationCode([FromBody] RequestTwoFactorAuthenticationCode Authentication)
+        {
+            try
+            {
+                BaseResponse response = _jwtAuth.TwoFactorAuthentication(Authentication);
+                return response;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
     }
 }

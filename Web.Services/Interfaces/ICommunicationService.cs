@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SendGrid.Helpers.Mail;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,6 +10,7 @@ namespace Web.Services.Interfaces
 {
     public interface ICommunicationService
     {
-         string SendSms(SmsRequest sr);
+        bool SendSms(string ToPhoneNumber, string SmsBody);
+        bool SendEmail(string To, string Subject, string HtmlContent, byte[] ImageContent);
     }
 }

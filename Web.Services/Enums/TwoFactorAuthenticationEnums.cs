@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Web.Data.Models;
 
-namespace Web.Services.Interfaces
+namespace Web.Services.Enums
 {
-    public interface IRoleService
+    public enum TwoFactorAuthenticationEnums
     {
-        IQueryable<Role> getRoleList();
-
+        Sms = 0,
+        Email = 1
     }
+
 }

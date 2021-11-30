@@ -27,16 +27,16 @@ namespace Web.Services.Concrete
         //private readonly IUserAuthRepository _userAuthRepository;
         private readonly GenericRepository<User> _userRepo;
         private readonly GenericRepository<UserRole> _userRoleRepo;
-        private readonly ICommunicationService _smsService;
+        private readonly ICommunicationService _communicationService;
         IConfiguration _config;
         private readonly UnitOfWork unitorWork;
-        public AuthService(IConfiguration config, /*IUserAuthRepository userAuthRepository,*/ IRepository<User> userRepo, IRepository<UserRole> userRoleRepo,ICommunicationService smsService)
+        public AuthService(IConfiguration config, /*IUserAuthRepository userAuthRepository,*/ IRepository<User> userRepo, IRepository<UserRole> userRoleRepo,ICommunicationService communicationService)
         {
             _config = config;
             //_userAuthRepository = userAuthRepository;
             _userRepo = (GenericRepository<User>)userRepo;
             _userRoleRepo = (GenericRepository<UserRole>)userRoleRepo;
-            this._smsService = smsService;
+            this._communicationService = communicationService;
         }
 
 
@@ -77,19 +77,13 @@ namespace Web.Services.Concrete
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
 
             };
-            var tokenExpiryTime = DateTime.UtcNow.AddMinutes(120);
+            var tokenExpiryTime = DateTime.UtcNow.AddMinutes(_config["Jwt:JwtExpiryTime"].ToInt());
             var token = new JwtSecurityToken(_config["Jwt:ValidIssuer"],
               _config["Jwt:ValidIssuer"],
               claims,
               expires: tokenExpiryTime,
               signingCredentials: credentials);
 
-            //Two Factor Code Sending Implementation
-            bool? Authentication_Code_Sent = null;
-            if (user.TwoFactorEnabled)
-            {
-                Authentication_Code_Sent = Send_Two_Factor_Authentication_Code(user);
-            }
             return new
             {
                 token = new JwtSecurityTokenHandler().WriteToken(token),
@@ -98,50 +92,13 @@ namespace Web.Services.Concrete
                 PhoneNumber = user.PersonalMobileNumber,
                 TwoFactorEnabled = user.TwoFactorEnabled,
                 IsTwoFactorVerify = user.IsTwoFactorVerify,
-                TwoFactorCode = user.TwoFactorCode,
-                CodeExpiryTime = user.CodeExpiryTime,
-                AuthenticationCodeSent = Authentication_Code_Sent
+                UserId =user.UserId
 
 
             };
         }
 
-        public bool Send_Two_Factor_Authentication_Code(User user)
-        {
-            try
-            {
-                var Two_Factor_Authentication_Code = GenerateTwoFactorAuthenticationCode();
-                var smsParams = new SmsRequest
-                {
-                    To = user.PersonalMobileNumber ,
-                    Body = "Routing and Queueing Two Factor Authentication Code: " + Two_Factor_Authentication_Code,
-                };
-                var Sent_Sms_Status = this._smsService.SendSms(smsParams);
-                if(Sent_Sms_Status!= "")
-                {
-                    user.TwoFactorCode = Two_Factor_Authentication_Code;
-                    user.CodeExpiryTime = DateTime.UtcNow.AddMinutes(10);
-                    _userRepo.Update(user);
-                }
-
-                return true;
-
-            }
-            catch(Exception ex)
-            {
-                return false;
-
-            }
-        }
-        public string GenerateTwoFactorAuthenticationCode()
-        {
-            string chars = _config["TwoFactorVerificationCode"].ToString();
-            var random = new Random();
-            return new string(
-            Enumerable.Repeat(chars, 6)
-            .Select(s => s[random.Next(s.Length)])
-            .ToArray());
-        }
+     
         public string SaveUser(RegisterCredential register)
         {
             if (register.UserId > 0)
@@ -219,6 +176,80 @@ namespace Web.Services.Concrete
                 }
             }
             return null;
+        }
+
+        public BaseResponse TwoFactorAuthentication(RequestTwoFactorAuthenticationCode Authentication)
+        {
+            var user = _userRepo.Table.Where(u => u.UserId == Authentication.UserId).FirstOrDefault();
+
+            var Authentication_Code_Sent = Send_Two_Factor_Authentication_Code(user, Authentication);
+            VerifyTwoFactorAuthenticationCode responseBody;
+            string ResponseMessage = "";
+            if (Authentication_Code_Sent)
+            {
+                ResponseMessage = "Authentication Code Sent";
+                responseBody = new VerifyTwoFactorAuthenticationCode
+                {
+                    UserId = user.UserId,
+                    AuthenticationCode = user.TwoFactorCode,
+                    AuthenticationCodeExpireTime = user.CodeExpiryTime,
+                    AuthenticationCodeExpiresInMinutes = _config["Jwt:JwtExpiryTime"].ToInt()
+                };
+            }
+            else
+            {
+                ResponseMessage = "Authentication Not Code Sent";
+                responseBody = null;
+            }
+            return new BaseResponse
+            {
+                Status = HttpStatusCode.OK,
+                Message = ResponseMessage,
+                Body = responseBody
+            };
+        }
+        public bool Send_Two_Factor_Authentication_Code(User user, RequestTwoFactorAuthenticationCode Authentication)
+        {
+            try
+            {
+                string Two_Factor_Authentication_Code = GenerateTwoFactorAuthenticationCode();
+                string Message_Body = "Routing and Queueing Two Factor Authentication Code: " + Two_Factor_Authentication_Code;
+                bool Code_Sent = false;
+                if(Authentication.SendCodeOn.Equals(TwoFactorAuthenticationEnums.Sms.ToInt()))
+                {
+                    Code_Sent = this._communicationService.SendSms(user.PersonalMobileNumber, Message_Body);
+                }
+                else if (Authentication.SendCodeOn.Equals(TwoFactorAuthenticationEnums.Email.ToInt()))
+                {
+                    Code_Sent = this._communicationService.SendEmail(user.PrimaryEmail, "Authentication Code", Message_Body, null);
+                }
+
+                if (Code_Sent)
+                {
+                    user.TwoFactorCode = Two_Factor_Authentication_Code;
+                    user.CodeExpiryTime = DateTime.UtcNow.AddMinutes(10);
+                    _userRepo.Update(user);
+                }
+                
+
+
+                return Code_Sent;
+
+            }
+            catch (Exception ex)
+            {
+                return false;
+
+            }
+        }
+        public string GenerateTwoFactorAuthenticationCode()
+        {
+            string chars = _config["TwoFactorVerificationCode"].ToString();
+            var random = new Random();
+            return new string(
+            Enumerable.Repeat(chars, 6)
+            .Select(s => s[random.Next(s.Length)])
+            .ToArray());
         }
     }
 }
