@@ -16,7 +16,6 @@ using Web.DLL.Generic_Repository;
 using Web.Model;
 using Web.Model.Common;
 using Web.Services.Enums;
-using Web.Services.Extensions;
 using Web.Services.Helper;
 using Web.Services.Interfaces;
 
@@ -176,7 +175,7 @@ namespace Web.Services.Concrete
                         };
                         _userRepo.Insert(obj);
 
-                        var roleIds = register.RoleIds.ToIntList(); //Split(',').Select(int.Parse).ToList();
+                        var roleIds = register.RoleIds.Split(',').Select(int.Parse).ToList();
                         List<UserRole> userRoleList = new List<UserRole>();
                         foreach (var item in roleIds)
                         {
