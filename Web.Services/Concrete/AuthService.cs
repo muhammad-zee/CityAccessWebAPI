@@ -219,7 +219,9 @@ namespace Web.Services.Concrete
             }
             return null;
         }
-        public string SendResetPasswordMail(string userName, string url) 
+
+        #region Reset Password
+        public string SendResetPasswordMail(string userName, string url)
         {
             try
             {
@@ -268,7 +270,7 @@ namespace Web.Services.Concrete
             return null;
         }
 
-        public string ResetPassword(UserCredential credential) 
+        public string ResetPassword(UserCredential credential)
         {
             try
             {
@@ -289,5 +291,6 @@ namespace Web.Services.Concrete
             return null;
         }
 
+        #endregion
     }
 }
