@@ -12,7 +12,7 @@ using Web.Services.Interfaces;
 
 namespace Web.Services.Concrete
 {
-    class SmsService : ISmsService
+    public class SmsService : ISmsService
     {
         private string Twilio_AccountSid;
         private string Twilio_AuthToken;
@@ -24,6 +24,7 @@ namespace Web.Services.Concrete
         }
         public string SendSms(SmsRequest sr)
         {
+            sr.From = this._config["Twilio:PhoneNumber"];
             TwilioClient.Init(this.Twilio_AccountSid, this.Twilio_AuthToken);
             var messageResource = MessageResource.Create(
                 to:new PhoneNumber(sr.To),

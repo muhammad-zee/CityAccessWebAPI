@@ -8,6 +8,7 @@ using System.Linq;
 using System.Net;
 using System.Security.Claims;
 using System.Text;
+using Twilio.AspNet.Common;
 using Web.API.Helper;
 using Web.Data.Models;
 using Web.DLL;
@@ -25,27 +26,31 @@ namespace Web.Services.Concrete
         //private readonly IUserAuthRepository _userAuthRepository;
         private readonly GenericRepository<User> _userRepo;
         private readonly GenericRepository<UserRole> _userRoleRepo;
+        private readonly ISmsService _smsService;
         IConfiguration _config;
         private readonly UnitOfWork unitorWork;
-        public AuthService(IConfiguration config, /*IUserAuthRepository userAuthRepository,*/ IRepository<User> userRepo, IRepository<UserRole> userRoleRepo)
+        public AuthService(IConfiguration config, /*IUserAuthRepository userAuthRepository,*/ IRepository<User> userRepo, IRepository<UserRole> userRoleRepo,ISmsService smsService)
         {
             _config = config;
             //_userAuthRepository = userAuthRepository;
             _userRepo = (GenericRepository<User>)userRepo;
             _userRoleRepo = (GenericRepository<UserRole>)userRoleRepo;
+            this._smsService = smsService;
         }
 
 
         public BaseResponse Authentication(UserCredential login)
         {
+
+           
             BaseResponse response = new BaseResponse();
             if (!string.IsNullOrEmpty(login.email) && !string.IsNullOrEmpty(login.password))
             {
                 login.password = HelperExtension.Encrypt(login.password);
-                var result = _userRepo.Table.Where(x => x.PrimaryEmail == login.email && x.Password == login.password).FirstOrDefault();
-                if (result != null)
+                var user = _userRepo.Table.Where(x => x.PrimaryEmail == login.email && x.Password == login.password).FirstOrDefault();
+                if (user != null)
                 {
-                    var AuthorizedUser = GenerateJSONWebToken(result);
+                    var AuthorizedUser = GenerateJSONWebToken(user);
                     response.Body = AuthorizedUser; ;
                     response.Status = HttpStatusCode.OK;
                     response.Message = "User found";
@@ -78,16 +83,64 @@ namespace Web.Services.Concrete
               expires: tokenExpiryTime,
               signingCredentials: credentials);
 
+            //Two Factor Code Sending Implementation
+            bool? Authentication_Code_Sent = null;
+            if (user.TwoFactorEnabled)
+            {
+                Authentication_Code_Sent = Send_Two_Factor_Authentication_Code(user);
+            }
             return new
             {
                 token = new JwtSecurityTokenHandler().WriteToken(token),
                 expires = tokenExpiryTime,
                 PrimaryEmail = user.PrimaryEmail,
-                PhoneNumber = user.PersonalMobileNumber
+                PhoneNumber = user.PersonalMobileNumber,
+                TwoFactorEnabled = user.TwoFactorEnabled,
+                IsTwoFactorVerify = user.IsTwoFactorVerify,
+                TwoFactorCode = user.TwoFactorCode,
+                CodeExpiryTime = user.CodeExpiryTime,
+                AuthenticationCodeSent = Authentication_Code_Sent
+
 
             };
         }
 
+        public bool Send_Two_Factor_Authentication_Code(User user)
+        {
+            try
+            {
+                var Two_Factor_Authentication_Code = GenerateTwoFactorAuthenticationCode();
+                var smsParams = new SmsRequest
+                {
+                    To = user.PersonalMobileNumber ,
+                    Body = "Routing and Queueing Two Factor Authentication Code: " + Two_Factor_Authentication_Code,
+                };
+                var Sent_Sms_Status = this._smsService.SendSms(smsParams);
+                if(Sent_Sms_Status!= "")
+                {
+                    user.TwoFactorCode = Two_Factor_Authentication_Code;
+                    user.CodeExpiryTime = DateTime.UtcNow.AddMinutes(10);
+                    _userRepo.Update(user);
+                }
+
+                return true;
+
+            }
+            catch(Exception ex)
+            {
+                return false;
+
+            }
+        }
+        public string GenerateTwoFactorAuthenticationCode()
+        {
+            string chars = _config["TwoFactorVerificationCode"].ToString();
+            var random = new Random();
+            return new string(
+            Enumerable.Repeat(chars, 6)
+            .Select(s => s[random.Next(s.Length)])
+            .ToArray());
+        }
         public string SaveUser(RegisterCredential register)
         {
             if (register.UserId > 0)
