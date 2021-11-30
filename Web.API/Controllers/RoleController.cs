@@ -3,15 +3,9 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
 using System.Net;
-using System.Threading.Tasks;
 using Web.API.Helper;
-using Web.Data.Models;
 using Web.Model;
-using Web.Services.Concrete;
 using Web.Services.Interfaces;
 
 namespace Web.API.Controllers
@@ -24,7 +18,7 @@ namespace Web.API.Controllers
         private IWebHostEnvironment _hostEnvironment;
         private readonly IRoleService _roleService;
 
-        public RoleController(IConfiguration config,IWebHostEnvironment environment,IRoleService roleService)
+        public RoleController(IConfiguration config, IWebHostEnvironment environment, IRoleService roleService)
         {
             this._hostEnvironment = environment;
             this._logger = new Logger(_hostEnvironment);

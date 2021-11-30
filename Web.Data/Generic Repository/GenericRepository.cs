@@ -1,10 +1,9 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using Microsoft.EntityFrameworkCore;
 using Web.Data.Models;
-using Web.Model.Common;
 
 namespace Web.DLL.Generic_Repository
 {
@@ -52,14 +51,15 @@ namespace Web.DLL.Generic_Repository
         }
         #endregion
 
-     
+
         #region Methods
 
         public IQueryable<T> GetList()
         {
             return this.Entities;
         }
-        public T GetById(int Id) {
+        public T GetById(int Id)
+        {
             object[] Ids = new object[Id];
             return _entities.FindAsync(Ids).Result;
         }

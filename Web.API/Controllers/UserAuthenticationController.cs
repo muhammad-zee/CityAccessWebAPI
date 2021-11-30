@@ -1,9 +1,9 @@
-﻿using System;
-using System.ComponentModel;
-using System.Net;
-using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using System;
+using System.ComponentModel;
+using System.Net;
 using Web.API.Helper;
 using Web.Model;
 using Web.Model.Common;
@@ -33,9 +33,9 @@ namespace Web.API.Controllers
             try
             {
                 BaseResponse response = _jwtAuth.Authentication(login);
-                return response;                
+                return response;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogExceptions(ex);
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
@@ -62,14 +62,14 @@ namespace Web.API.Controllers
                 //register.UserImage = bytes;
 
                 string result = _jwtAuth.SaveUser(register);
-                
+
                 if (result != null)
                 {
                     if (result.Equals(UserEnums.Created.ToString()))
                     {
                         response = new BaseResponse() { Status = HttpStatusCode.OK, Message = "User created successfully" + " \n UserName: " + register.UserName + " \n Password: " + strongPassword };
                     }
-                    else if (result.Equals(UserEnums.Updated.ToString())) 
+                    else if (result.Equals(UserEnums.Updated.ToString()))
                     {
                         response = new BaseResponse() { Status = HttpStatusCode.OK, Message = "User updated successfully" };
                     }
@@ -77,9 +77,10 @@ namespace Web.API.Controllers
                     {
                         response = new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = "User already exist against this Email." };
                     }
-                    
+
                 }
-                else {
+                else
+                {
                     response = new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = "Model State is not valid." };
                 }
                 return response;
@@ -87,11 +88,12 @@ namespace Web.API.Controllers
             catch (Exception ex)
             {
                 _logger.LogExceptions(ex);
-                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString()};
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
         }
 
 
+        #region Reset Password
         [Description("Send Mail on Forget Password")]
         [HttpGet("auth/forgetpassword/{username}/{url}")]
         public BaseResponse ForgetPassword(string username, string url)
@@ -117,7 +119,8 @@ namespace Web.API.Controllers
                     };
                 }
             }
-            else {
+            else
+            {
                 response = new BaseResponse()
                 {
                     Status = HttpStatusCode.NotFound,
@@ -129,7 +132,7 @@ namespace Web.API.Controllers
 
         [Description("Reset User Password")]
         [HttpPost("auth/resetpassword")]
-        public BaseResponse ResetPassword([FromBody] UserCredential credential) 
+        public BaseResponse ResetPassword([FromBody] UserCredential credential)
         {
             var response = new BaseResponse();
             var result = _jwtAuth.ResetPassword(credential);
@@ -162,6 +165,6 @@ namespace Web.API.Controllers
             }
             return response;
         }
-
+        #endregion
     }
 }

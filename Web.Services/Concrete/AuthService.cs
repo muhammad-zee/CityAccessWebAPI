@@ -25,13 +25,12 @@ namespace Web.Services.Concrete
 {
     public class AuthService : IJwtAuthService
     {
-        //private readonly IUserAuthRepository _userAuthRepository;
         private readonly GenericRepository<User> _userRepo;
         private readonly GenericRepository<UserRole> _userRoleRepo;
         private readonly ICommunicationService _smsService;
         IConfiguration _config;
         private readonly UnitOfWork unitorWork;
-        public AuthService(IConfiguration config, /*IUserAuthRepository userAuthRepository,*/ IRepository<User> userRepo, IRepository<UserRole> userRoleRepo,ICommunicationService smsService)
+        public AuthService(IConfiguration config, IRepository<User> userRepo, IRepository<UserRole> userRoleRepo, ICommunicationService smsService)
         {
             _config = config;
             //_userAuthRepository = userAuthRepository;
@@ -44,7 +43,7 @@ namespace Web.Services.Concrete
         public BaseResponse Authentication(UserCredential login)
         {
 
-           
+
             BaseResponse response = new BaseResponse();
             if (!string.IsNullOrEmpty(login.email) && !string.IsNullOrEmpty(login.password))
             {
@@ -112,11 +111,11 @@ namespace Web.Services.Concrete
                 var Two_Factor_Authentication_Code = GenerateTwoFactorAuthenticationCode();
                 var smsParams = new SmsRequest
                 {
-                    To = user.PersonalMobileNumber ,
+                    To = user.PersonalMobileNumber,
                     Body = "Routing and Queueing Two Factor Authentication Code: " + Two_Factor_Authentication_Code,
                 };
                 var Sent_Sms_Status = this._smsService.SendSms(smsParams);
-                if(Sent_Sms_Status!= "")
+                if (Sent_Sms_Status != "")
                 {
                     user.TwoFactorCode = Two_Factor_Authentication_Code;
                     user.CodeExpiryTime = DateTime.UtcNow.AddMinutes(10);
@@ -126,7 +125,7 @@ namespace Web.Services.Concrete
                 return true;
 
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return false;
 
@@ -174,29 +173,22 @@ namespace Web.Services.Concrete
                             IsDeleted = false
                         };
                         _userRepo.Insert(obj);
-
-                        var roleIds = register.RoleIds.ToIntList(); //Split(',').Select(int.Parse).ToList();
+                        var roleIds = register.RoleIds.ToIntList();
                         List<UserRole> userRoleList = new List<UserRole>();
                         foreach (var item in roleIds)
                         {
                             userRoleList.Add(new UserRole() { UserId = obj.UserId, RoleId = item });
                         }
                         _userRoleRepo.Insert(userRoleList);
-
-                        if (register.UserImage != null && register.UserImage.Count() > 0)
+                        if (register.UserImageByte != null && register.UserImageByte.Count() > 0)
                         {
-                            var outPath = Directory.GetCurrentDirectory(); //_config["FilePath:Path"];
-                                                                           //if (!Directory.Exists(outPath))
-                                                                           //{
-                                                                           //    Directory.CreateDirectory(outPath);
-                                                                           //}
+                            var outPath = Directory.GetCurrentDirectory();
                             outPath += "/UserProfiles/";
                             if (!Directory.Exists(outPath))
                             {
                                 Directory.CreateDirectory(outPath);
                             }
                             outPath += $"UserProfilePic_{obj.UserId}.png";
-
                             using (FileStream fs = new FileStream(outPath, FileMode.Create, FileAccess.Write))
                             {
                                 fs.Write(register.UserImageByte);

@@ -1,18 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Microsoft.AspNetCore.Hosting;
+using System;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Hosting;
 
 namespace Web.API.Helper
 {
-    public  class Logger
+    public class Logger
     {
         private IWebHostEnvironment _hostEnvironment;
 
-        public  Logger(IWebHostEnvironment hostEnvironment)
+        public Logger(IWebHostEnvironment hostEnvironment)
         {
             _hostEnvironment = hostEnvironment;
         }
@@ -21,7 +17,7 @@ namespace Web.API.Helper
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         public static string logType = "";
         #endregion
-         Logger()
+        Logger()
         {
             try
             {
@@ -45,7 +41,7 @@ namespace Web.API.Helper
         }
 
         #region Methods
-        public  void LogInfo(string entry)
+        public void LogInfo(string entry)
         {
             try
             {
@@ -58,7 +54,7 @@ namespace Web.API.Helper
             }
         }
 
-        public  void LogError(string entry)
+        public void LogError(string entry)
         {
             try
             {
@@ -71,7 +67,7 @@ namespace Web.API.Helper
             }
         }
 
-        public  void LogExceptions(Exception ex)
+        public void LogExceptions(Exception ex)
         {
             configure();
             string complete = ex.ToString();

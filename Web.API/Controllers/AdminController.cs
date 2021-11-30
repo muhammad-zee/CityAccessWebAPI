@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using Web.API.Helper;
 using Web.Model;
 using Web.Model.Common;
@@ -30,7 +31,7 @@ namespace Web.API.Controllers
         #region Component
 
         [Description("Get Controllers Actions List")]
-        [HttpPost("apimethods/getcontrolleractiondetails")]
+        [HttpPost("admin/getcontrolleractiondetails")]
         public BaseResponse GetControllerActionDetails()
         {
             Assembly asm = Assembly.GetExecutingAssembly();
@@ -65,6 +66,37 @@ namespace Web.API.Controllers
             var result = _adminService.AddOrUpdateComponent(ComponentList);
 
             return result;
+        }
+
+        #endregion
+
+        #region Component Access
+
+        [Description("Get All Components")]
+        [HttpGet("admin/getallcomponenets")]
+        public async Task<BaseResponse> GetAllComponenets()
+        {
+            var response = new BaseResponse();
+            response = _adminService.GetAllComponents();
+            return response;
+        }
+
+        [Description("Get Component By Id")]
+        [HttpGet("admin/getcomponentbyid/{Id}")]
+        public async Task<BaseResponse> GetComponentById(int Id)
+        {
+            var response = new BaseResponse();
+            response = _adminService.GetComponentById(Id);
+            return response;
+        }
+
+        [Description("Get All Components By Role Id")]
+        [HttpGet("admin/getcomponentsbyroleid/{Id}")]
+        public async Task<BaseResponse> GetComponentsByRoleId(int Id)
+        {
+            var response = new BaseResponse();
+            response = _adminService.GetComponentsByRoleId(Id);
+            return response;
         }
 
         #endregion

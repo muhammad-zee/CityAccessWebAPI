@@ -6,11 +6,11 @@ using Web.Services.Interfaces;
 
 namespace Web.Services.Concrete
 {
-    public class RoleService :IRoleService
+    public class RoleService : IRoleService
     {
         private IRepository<Role> _role;
-            IConfiguration _config;
-        public RoleService(IConfiguration config,IRepository<Role> role)
+        IConfiguration _config;
+        public RoleService(IConfiguration config, IRepository<Role> role)
         {
             this._role = role;
             this._config = config;

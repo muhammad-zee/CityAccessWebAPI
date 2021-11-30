@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using Web.Model.Common;
 
 namespace Web.DLL.Generic_Repository
 {
@@ -10,6 +9,7 @@ namespace Web.DLL.Generic_Repository
     {
         IQueryable<T> GetList();
         IQueryable<T> GetList(Expression<Func<T, bool>> predicate);
+        T GetById(int Id);
         T GetByPreducate(Expression<Func<T, bool>> predicate);
         void Insert(T entity);
         void Insert(IEnumerable<T> entities);

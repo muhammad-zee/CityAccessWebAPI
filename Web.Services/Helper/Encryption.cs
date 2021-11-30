@@ -54,7 +54,7 @@ namespace TeleSpecialists.BLL.Helpers
 
             //generate random IV (16 bytes)
             string hexIV = generateRandomHex(16);
-            
+
             //convert plainText to hex string.
             byte[] bytesData = System.Text.Encoding.UTF8.GetBytes(text);
             string hexStr = dataToHexString(bytesData);
@@ -100,15 +100,15 @@ namespace TeleSpecialists.BLL.Helpers
             hexKey = hexKey.Replace(" ", "");
             hexKey = hexKey.ToLower();
 
-            if(hexKey.Length != 64)
+            if (hexKey.Length != 64)
             {
                 throw new Exception("key length is not 256 bit (64 hex characters)");
             }
 
             int i;
-            for(i=0;i<hexKey.Length;i+=2)
+            for (i = 0; i < hexKey.Length; i += 2)
             {
-                if(hexKey[i] == '0' && hexKey[i+1] == '0')
+                if (hexKey[i] == '0' && hexKey[i + 1] == '0')
                 {
                     throw new Exception("key cannot contain zero byte block");
                 }
@@ -146,7 +146,7 @@ namespace TeleSpecialists.BLL.Helpers
             aes.Mode = CipherMode.CBC;
             aes.Padding = PaddingMode.PKCS7;
             var encryptor = aes.CreateEncryptor(key, iv);
-            
+
             MemoryStream memoryStream = new MemoryStream();
             CryptoStream cryptoStream = new CryptoStream(memoryStream, encryptor, CryptoStreamMode.Write);
             cryptoStream.Write(data, 0, data.Length);
@@ -163,7 +163,7 @@ namespace TeleSpecialists.BLL.Helpers
             byte[] data = dataFromHexString(hexString);
             byte[] key = dataFromHexString(hexKey);
             byte[] iv = dataFromHexString(hexIV);
-            
+
             var aes = Aes.Create();
             aes.Mode = CipherMode.CBC;
             aes.Padding = PaddingMode.PKCS7;
