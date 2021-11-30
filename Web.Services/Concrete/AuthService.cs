@@ -26,10 +26,10 @@ namespace Web.Services.Concrete
         //private readonly IUserAuthRepository _userAuthRepository;
         private readonly GenericRepository<User> _userRepo;
         private readonly GenericRepository<UserRole> _userRoleRepo;
-        private readonly ICommunicationService _smsService;
+        private readonly ISmsService _smsService;
         IConfiguration _config;
         private readonly UnitOfWork unitorWork;
-        public AuthService(IConfiguration config, /*IUserAuthRepository userAuthRepository,*/ IRepository<User> userRepo, IRepository<UserRole> userRoleRepo,ICommunicationService smsService)
+        public AuthService(IConfiguration config, /*IUserAuthRepository userAuthRepository,*/ IRepository<User> userRepo, IRepository<UserRole> userRoleRepo,ISmsService smsService)
         {
             _config = config;
             //_userAuthRepository = userAuthRepository;
@@ -76,7 +76,7 @@ namespace Web.Services.Concrete
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
 
             };
-            var tokenExpiryTime = DateTime.UtcNow.AddMinutes(120);
+            var tokenExpiryTime = DateTime.Now.AddMinutes(120);
             var token = new JwtSecurityToken(_config["Jwt:ValidIssuer"],
               _config["Jwt:ValidIssuer"],
               claims,

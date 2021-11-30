@@ -7,7 +7,7 @@ using Twilio.AspNet.Common;
 
 namespace Web.Services.Interfaces
 {
-    public interface ICommunicationService
+    public interface ISmsService
     {
          string SendSms(SmsRequest sr);
     }

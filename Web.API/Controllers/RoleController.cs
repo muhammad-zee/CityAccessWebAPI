@@ -17,7 +17,7 @@ namespace Web.API.Controllers
 {
     [Authorize]
     [Route("Role")]
-    public class RoleController : BaseController
+    public class RoleController : ControllerBase
     {
         Logger _logger;
         private IWebHostEnvironment _hostEnvironment;
@@ -39,7 +39,6 @@ namespace Web.API.Controllers
             {
                 var roleObj = "jhe;laskdjf";// _roleService.getRoleList();
                 return new BaseResponse { Status = HttpStatusCode.OK, Message = "Roles List Returned", Body = roleObj };
-
             }
             catch (Exception ex)
             {
