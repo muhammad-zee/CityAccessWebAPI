@@ -59,6 +59,10 @@ namespace Web.DLL.Generic_Repository
         {
             return this.Entities;
         }
+        public T GetById(int Id) {
+            object[] Ids = new object[Id];
+            return _entities.FindAsync(Ids).Result;
+        }
         public IQueryable<T> GetList(Expression<Func<T, bool>> predicate)
         {
             return this.Entities.Where(predicate);

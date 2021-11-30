@@ -93,10 +93,74 @@ namespace Web.API.Controllers
 
 
         [Description("Send Mail on Forget Password")]
-        [HttpGet("auth/forgetpassword/{username}")]
-        public BaseResponse ForgetPassword(string username)
+        [HttpGet("auth/forgetpassword/{username}/{url}")]
+        public BaseResponse ForgetPassword(string username, string url)
         {
-            return new BaseResponse();
+            var response = new BaseResponse();
+            var result = _jwtAuth.SendResetPasswordMail(username, url);
+            if (result != null)
+            {
+                if (result.Equals(StatusEnum.Success.ToString()))
+                {
+                    response = new BaseResponse()
+                    {
+                        Status = HttpStatusCode.OK,
+                        Message = "Mail send successfully",
+                    };
+                }
+                else
+                {
+                    response = new BaseResponse()
+                    {
+                        Status = HttpStatusCode.BadRequest,
+                        Message = result
+                    };
+                }
+            }
+            else {
+                response = new BaseResponse()
+                {
+                    Status = HttpStatusCode.NotFound,
+                    Message = "User not found",
+                };
+            }
+            return response;
+        }
+
+        [Description("Reset User Password")]
+        [HttpPost("auth/resetpassword")]
+        public BaseResponse ResetPassword([FromBody] UserCredential credential) 
+        {
+            var response = new BaseResponse();
+            var result = _jwtAuth.ResetPassword(credential);
+            if (result != null)
+            {
+                if (result.Equals(StatusEnum.Success.ToString()))
+                {
+                    response = new BaseResponse()
+                    {
+                        Status = HttpStatusCode.OK,
+                        Message = "Password changed successfully",
+                    };
+                }
+                else
+                {
+                    response = new BaseResponse()
+                    {
+                        Status = HttpStatusCode.BadRequest,
+                        Message = result
+                    };
+                }
+            }
+            else
+            {
+                response = new BaseResponse()
+                {
+                    Status = HttpStatusCode.NotFound,
+                    Message = "User not found",
+                };
+            }
+            return response;
         }
 
     }

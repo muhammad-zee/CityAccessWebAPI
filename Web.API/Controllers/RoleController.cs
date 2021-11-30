@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -32,7 +33,6 @@ namespace Web.API.Controllers
 
         // GET: api/<EmployeeController>
         [HttpGet("GetAllRoles")]
-
         public BaseResponse Get()
         {
             try

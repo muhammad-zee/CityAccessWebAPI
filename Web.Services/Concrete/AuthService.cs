@@ -6,6 +6,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Mail;
 using System.Security.Claims;
 using System.Text;
 using Twilio.AspNet.Common;
@@ -65,7 +66,6 @@ namespace Web.Services.Concrete
             }
             return response;
         }
-
         private object GenerateJSONWebToken(User user)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Secret"]));
@@ -105,7 +105,6 @@ namespace Web.Services.Concrete
 
             };
         }
-
         public bool Send_Two_Factor_Authentication_Code(User user)
         {
             try
@@ -220,5 +219,75 @@ namespace Web.Services.Concrete
             }
             return null;
         }
+        public string SendResetPasswordMail(string userName, string url) 
+        {
+            try
+            {
+                var user = _userRepo.Table.Where(x => x.UserName == userName).FirstOrDefault();
+                if (user != null)
+                {
+                    string Name = string.Empty;
+                    string MrOrMrs = "Mr/Mrs.";
+                    if (!string.IsNullOrEmpty(user.FirstName))
+                    {
+                        Name = user.FirstName;
+                        if (!string.IsNullOrEmpty(user.LastName))
+                        {
+                            Name += user.LastName;
+                        }
+                    }
+                    else
+                    {
+                        Name = new MailAddress(userName).User;
+                    }
+                    if (!string.IsNullOrEmpty(user.Gender))
+                    {
+                        if (user.Gender.Equals("Male"))
+                        {
+                            MrOrMrs = "Mr.";
+                        }
+                        else if (user.Gender.Equals("Female"))
+                        {
+                            MrOrMrs = "Mrs.";
+                        }
+                    }
+                    string siteUrl = _config["siteUrl"];
+                    string hashUserName = HelperExtension.Encrypt(userName);
+                    string mailMessageTemplate = $"<b>Hi! {MrOrMrs} {Name},</b> <br />" +
+                        $"<p>Please <a href='{siteUrl + hashUserName}' target='_blank'>Click here</a> to reset your password.</p> <br />" +
+                        $"<p>If you didn’t ask to reset your password, you can ignore this email.</p> <br /><br />" +
+                        $"<p>Thank You!</p>";
+
+                    return StatusEnum.Success.ToString();
+                }
+            }
+            catch (Exception ex)
+            {
+                return ex.ToString();
+            }
+            return null;
+        }
+
+        public string ResetPassword(UserCredential credential) 
+        {
+            try
+            {
+                var user = _userRepo.Table.Where(x => x.UserName == credential.email).FirstOrDefault();
+                if (user != null)
+                {
+                    var hashPswd = HelperExtension.Encrypt(credential.password);
+                    user.Password = hashPswd;
+                    _userRepo.Update(user);
+                    return StatusEnum.Success.ToString();
+                }
+            }
+            catch (Exception ex)
+            {
+                return ex.ToString();
+            }
+
+            return null;
+        }
+
     }
 }
