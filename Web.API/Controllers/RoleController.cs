@@ -17,7 +17,7 @@ namespace Web.API.Controllers
 {
     [Authorize]
     [Route("Role")]
-    public class RoleController : BaseController
+    public class RoleController : Controller
     {
         Logger _logger;
         private IWebHostEnvironment _hostEnvironment;
