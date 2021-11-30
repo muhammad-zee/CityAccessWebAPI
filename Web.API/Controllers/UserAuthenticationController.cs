@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Net;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -24,7 +25,8 @@ namespace Web.API.Controllers
             _hostEnvironment = environment;
             _logger = new Logger(_hostEnvironment);
         }
-       
+
+        [Description("User Login")]
         [HttpPost("auth/userAuth")]
         public BaseResponse Login([FromBody] UserCredential login)
         {
@@ -39,7 +41,8 @@ namespace Web.API.Controllers
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
         }
-   
+
+        [Description("Add or Update User")]
         [HttpPost("auth/SaveUser")]
         public BaseResponse SaveUser([FromBody] RegisterCredential register)
         {
@@ -86,6 +89,14 @@ namespace Web.API.Controllers
                 _logger.LogExceptions(ex);
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString()};
             }
+        }
+
+
+        [Description("Send Mail on Forget Password")]
+        [HttpGet("auth/forgetpassword/{username}")]
+        public BaseResponse ForgetPassword(string username)
+        {
+            return new BaseResponse();
         }
 
     }
