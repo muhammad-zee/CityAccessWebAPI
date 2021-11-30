@@ -12,12 +12,12 @@ using Web.Services.Interfaces;
 
 namespace Web.Services.Concrete
 {
-    public class SmsService : ISmsService
+    public class CommunicationService : ICommunicationService
     {
         private string Twilio_AccountSid;
         private string Twilio_AuthToken;
         private IConfiguration _config;
-        public SmsService(IConfiguration config) {
+        public CommunicationService(IConfiguration config) {
             this._config = config;
             this.Twilio_AccountSid = this._config["Twilio:AccountSid"].ToString();
             this.Twilio_AuthToken = this._config["Twilio:AuthToken"].ToString();
