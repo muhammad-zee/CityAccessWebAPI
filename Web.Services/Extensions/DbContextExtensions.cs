@@ -169,6 +169,17 @@ namespace Web.Services.Extensions
             }
         }
 
+        public static List<int> ToIntList(this string commaSepratedString) 
+        {
+            if (!string.IsNullOrEmpty(commaSepratedString))
+            {
+                return commaSepratedString.Split(',').Select(int.Parse).ToList();
+            }
+            else {
+                return new List<int>();
+            }
+        }
+
         public static List<Dictionary<string, object>> ReaderToList(this DbDataReader reader, string includeColumns = "")
         {
             var expandolist = new List<Dictionary<string, object>>();
