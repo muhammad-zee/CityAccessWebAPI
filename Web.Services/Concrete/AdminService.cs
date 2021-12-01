@@ -7,6 +7,7 @@ using Web.DLL.Generic_Repository;
 using Web.Model;
 using Web.Model.Common;
 using Web.Services.Enums;
+using Web.Services.Helper;
 using Web.Services.Interfaces;
 
 namespace Web.Services.Concrete
@@ -34,7 +35,33 @@ namespace Web.Services.Concrete
         {
             return this._role.GetList().Where(item => !item.IsDeleted);
         }
+        public string SaveRole(RoleVM role)
+        {
+            string response = string.Empty;
+            var newRole = AutoMapperHelper.MapSingleRow<RoleVM, Role>(role);
+            if (role.RoleId > 0)
+            {
+                if (_role.Table.Count(r => r.RoleName == role.RoleName && !r.IsDeleted) == 0)
+                {
+                    _role.Insert(newRole);
+                    response = StatusEnums.Success.ToString();
+                }
+                else
+                {
+                    response = StatusEnums.AlreadyExist.ToString();
+                }
+
+            }
+            else
+            {
+                _role.Update(newRole);
+                response = StatusEnums.Success.ToString();
+            }
+
+            return response;
+        }
         #endregion
+
         #region Component
 
         public BaseResponse AddOrUpdateComponent(List<ComponentVM> components)
@@ -96,7 +123,7 @@ namespace Web.Services.Concrete
             BaseResponse response = new BaseResponse()
             {
                 Status = System.Net.HttpStatusCode.OK,
-                Message = UserEnums.Created.ToString(),
+                Message = StatusEnums.Created.ToString(),
                 Body = _component.GetList().ToList(),
             };
 

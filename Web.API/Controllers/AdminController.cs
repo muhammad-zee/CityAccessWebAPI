@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using Web.API.Helper;
 using Web.Model;
 using Web.Model.Common;
+using Web.Services.Enums;
 using Web.Services.Interfaces;
 
 namespace Web.API.Controllers
@@ -58,9 +59,15 @@ namespace Web.API.Controllers
         {
             try
             {
-                var roleObj = _adminService.getRoleList();
-                return new BaseResponse { Status = HttpStatusCode.OK, Message = "Roles List Returned", Body = roleObj };
-
+                var saveResponse = _adminService.SaveRole(role);
+                if (saveResponse == StatusEnums.AlreadyExist.ToString())
+                {
+                    return new BaseResponse { Status = HttpStatusCode.BadRequest, Message = "Role already exists"};
+                }
+                else /*if (saveResponse == StatusEnums.Success.ToString())*/
+                {
+                    return new BaseResponse { Status = HttpStatusCode.OK, Message = "Roles List Returned" };
+                }
             }
             catch (Exception ex)
             {

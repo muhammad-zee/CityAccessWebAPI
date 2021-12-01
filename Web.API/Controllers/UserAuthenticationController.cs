@@ -65,11 +65,11 @@ namespace Web.API.Controllers
 
                 if (result != null)
                 {
-                    if (result.Equals(UserEnums.Created.ToString()))
+                    if (result.Equals(StatusEnums.Created.ToString()))
                     {
                         response = new BaseResponse() { Status = HttpStatusCode.OK, Message = "User created successfully" + " \n UserName: " + register.UserName + " \n Password: " + strongPassword };
                     }
-                    else if (result.Equals(UserEnums.Updated.ToString()))
+                    else if (result.Equals(StatusEnums.Updated.ToString()))
                     {
                         response = new BaseResponse() { Status = HttpStatusCode.OK, Message = "User updated successfully" };
                     }
@@ -98,11 +98,11 @@ namespace Web.API.Controllers
         [HttpGet("auth/forgetpassword/{username}/{url}")]
         public BaseResponse ForgetPassword(string username, string url)
         {
-            var response = new BaseResponse();
+            BaseResponse response = null;
             var result = _jwtAuth.SendResetPasswordMail(username, url);
             if (result != null)
             {
-                if (result.Equals(StatusEnum.Success.ToString()))
+                if (result.Equals(StatusEnums.Success.ToString()))
                 {
                     response = new BaseResponse()
                     {
@@ -139,7 +139,7 @@ namespace Web.API.Controllers
             var result = _jwtAuth.ResetPassword(credential);
             if (result != null)
             {
-                if (result.Equals(StatusEnum.Success.ToString()))
+                if (result.Equals(StatusEnums.Success.ToString()))
                 {
                     response = new BaseResponse()
                     {

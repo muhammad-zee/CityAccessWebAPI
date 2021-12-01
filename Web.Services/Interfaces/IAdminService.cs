@@ -16,5 +16,6 @@ namespace Web.Services.Interfaces
         BaseResponse GetComponentsByRoleId(int Id);
 
         IQueryable<Role> getRoleList();
+        string SaveRole(RoleVM role);
     }
 }

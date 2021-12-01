@@ -109,7 +109,7 @@ namespace Web.Services.Concrete
             {
                 var user = AutoMapperHelper.MapSingleRow<RegisterCredentialVM, User>(register);
                 _userRepo.Update(user);
-                return UserEnums.Updated.ToString();
+                return StatusEnums.Updated.ToString();
             }
             else
             {
@@ -161,11 +161,11 @@ namespace Web.Services.Concrete
                             _userRepo.Update(newAddedUser);
                         }
 
-                        return UserEnums.Created.ToString();
+                        return StatusEnums.Created.ToString();
                     }
                     else
                     {
-                        return UserEnums.AlreadyCreated.ToString();
+                        return StatusEnums.AlreadyExist.ToString();
                     }
 
                     //unitorWork.Commit();
@@ -215,7 +215,7 @@ namespace Web.Services.Concrete
                         $"<p>If you didn’t ask to reset your password, you can ignore this email.</p> <br /><br />" +
                         $"<p>Thank You!</p>";
 
-                    return StatusEnum.Success.ToString();
+                    return StatusEnums.Success.ToString();
                 }
             }
             catch (Exception ex)
@@ -235,7 +235,7 @@ namespace Web.Services.Concrete
                     var hashPswd = HelperExtension.Encrypt(credential.password);
                     user.Password = hashPswd;
                     _userRepo.Update(user);
-                    return StatusEnum.Success.ToString();
+                    return StatusEnums.Success.ToString();
                 }
             }
             catch (Exception ex)
@@ -269,7 +269,7 @@ namespace Web.Services.Concrete
             }
             else
             {
-                ResponseMessage = "Authentication Not Code Sent";
+                ResponseMessage = "Authentication Code Not Sent";
                 responseBody = null;
             }
             return new BaseResponse
@@ -286,11 +286,11 @@ namespace Web.Services.Concrete
                 string Two_Factor_Authentication_Code = GenerateTwoFactorAuthenticationCode();
                 string Message_Body = "Routing and Queueing Two Factor Authentication Code: " + Two_Factor_Authentication_Code;
                 bool Code_Sent = false;
-                if(Authentication.SendCodeOn.Equals(TwoFactorAuthenticationEnums.Sms.ToInt()))
+                if(Authentication.SendCodeOn.Equals(TwoFactorAuthenticationEnums.S.ToString()))
                 {
                     Code_Sent = this._communicationService.SendSms(user.PersonalMobileNumber, Message_Body);
                 }
-                else if (Authentication.SendCodeOn.Equals(TwoFactorAuthenticationEnums.Email.ToInt()))
+                else if (Authentication.SendCodeOn.Equals(TwoFactorAuthenticationEnums.E.ToString()))
                 {
                     Code_Sent = this._communicationService.SendEmail(user.PrimaryEmail, "Authentication Code", Message_Body, null);
                 }

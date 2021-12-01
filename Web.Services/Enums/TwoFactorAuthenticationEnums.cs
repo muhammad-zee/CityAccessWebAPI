@@ -2,13 +2,17 @@
 using Web.Data.Models;
 using System.Text;
 using System.Threading.Tasks;
+using System.ComponentModel;
 
 namespace Web.Services.Enums
 {
     public enum TwoFactorAuthenticationEnums
     {
-        Sms = 0,
-        Email = 1
+        [Description("Send Code on SMS")]
+        S = 'S',
+
+        [Description("Send Code on Email")]
+        E = 'E'
     }
 
 }

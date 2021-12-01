@@ -8,21 +8,24 @@ namespace Web.Model.Common
         public int UserId { get; set; }
         [Required]
         public string UserName { get; set; }
+        [Required]
         public string FirstName { get; set; }
         public string MiddleName { get; set; }
+        [Required]
         public string LastName { get; set; }
         [Required]
         public string PrimaryEmail { get; set; }
         public string SecondaryEmail { get; set; }
-        [Required]
+        //[Required]
         public string Password { get; set; }
-        [Required]
         public string OfficePhoneNumber { get; set; }
+        [Required]
         public string PersonalMobileNumber { get; set; }
         [Required]
         public string Gender { get; set; }
         public string OfficeAddress { get; set; }
         public string HomeAddress { get; set; }
+        [Required]
         public int CreatedBy { get; set; }
         public DateTime CreatedDate { get; set; }
         public int ModifiedBy { get; set; }

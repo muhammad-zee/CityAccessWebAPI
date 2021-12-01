@@ -6,7 +6,7 @@ namespace Web.Model.Common
     public class RequestTwoFactorAuthenticationCode
     {
         public int UserId { get; set; }
-        public int SendCodeOn { get; set; }
+        public string SendCodeOn { get; set; }
         public string PhoneNumber { get; set; }
         public string Email { get; set; }
     }
