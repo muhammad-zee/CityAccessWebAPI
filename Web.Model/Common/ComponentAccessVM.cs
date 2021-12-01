@@ -13,9 +13,5 @@
         public bool opened { get; set; }
     }
 
-    public class attrVM
-    {
-        public int id { get; set; }
-        public bool selected { get; set; }
-    }
+
 }

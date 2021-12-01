@@ -9,7 +9,6 @@ using System.Net;
 using System.Net.Mail;
 using System.Security.Claims;
 using System.Text;
-using Twilio.AspNet.Common;
 using Web.API.Helper;
 using Web.Data.Models;
 using Web.DLL;
@@ -30,7 +29,7 @@ namespace Web.Services.Concrete
         private readonly ICommunicationService _communicationService;
         IConfiguration _config;
         private readonly UnitOfWork unitorWork;
-        public AuthService(IConfiguration config, /*IUserAuthRepository userAuthRepository,*/ IRepository<User> userRepo, IRepository<UserRole> userRoleRepo,ICommunicationService communicationService)
+        public AuthService(IConfiguration config, /*IUserAuthRepository userAuthRepository,*/ IRepository<User> userRepo, IRepository<UserRole> userRoleRepo, ICommunicationService communicationService)
         {
             _config = config;
             //_userAuthRepository = userAuthRepository;
@@ -96,7 +95,7 @@ namespace Web.Services.Concrete
                 PrimaryEmail = user.PrimaryEmail,
                 PhoneNumber = user.PersonalMobileNumber,
                 TwoFactorEnabled = user.TwoFactorEnabled,
-                UserId =user.UserId,
+                UserId = user.UserId,
                 Username = user.UserName
 
 
@@ -167,9 +166,6 @@ namespace Web.Services.Concrete
                     {
                         return UserEnums.AlreadyCreated.ToString();
                     }
-
-                    //unitorWork.Commit();
-
                 }
             }
             return null;
@@ -286,7 +282,7 @@ namespace Web.Services.Concrete
                 string Two_Factor_Authentication_Code = GenerateTwoFactorAuthenticationCode();
                 string Message_Body = "Routing and Queueing Two Factor Authentication Code: " + Two_Factor_Authentication_Code;
                 bool Code_Sent = false;
-                if(Authentication.SendCodeOn.Equals(TwoFactorAuthenticationEnums.Sms.ToInt()))
+                if (Authentication.SendCodeOn.Equals(TwoFactorAuthenticationEnums.Sms.ToInt()))
                 {
                     Code_Sent = this._communicationService.SendSms(user.PersonalMobileNumber, Message_Body);
                 }
@@ -301,7 +297,7 @@ namespace Web.Services.Concrete
                     user.CodeExpiryTime = DateTime.UtcNow.AddMinutes(_config["TwoFactorAuthentication:TwoFactorAuthenticationExpiryMinutes"].ToInt());
                     _userRepo.Update(user);
                 }
-                
+
 
 
                 return Code_Sent;

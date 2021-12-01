@@ -17,7 +17,6 @@ using Web.Services.Interfaces;
 namespace Web.API.Controllers
 {
     [Authorize]
-    //[Route("Role")]
     public class AdminController : Controller
     {
         private readonly IAdminService _adminService;
@@ -143,27 +142,67 @@ namespace Web.API.Controllers
         [HttpGet("admin/getallcomponenets")]
         public async Task<BaseResponse> GetAllComponenets()
         {
-            var response = new BaseResponse();
-            response = _adminService.GetAllComponents();
-            return response;
+            try
+            {
+                var response = new BaseResponse();
+                response = _adminService.GetAllComponents();
+                return response;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogExceptions(ex);
+                return new BaseResponse()
+                {
+                    Status = HttpStatusCode.BadRequest,
+                    Message = ex.ToString(),
+                    Body = null
+                };
+            }
         }
 
         [Description("Get Component By Id")]
         [HttpGet("admin/getcomponentbyid/{Id}")]
         public async Task<BaseResponse> GetComponentById(int Id)
         {
-            var response = new BaseResponse();
-            response = _adminService.GetComponentById(Id);
-            return response;
+
+            try
+            {
+                var response = new BaseResponse();
+                response = _adminService.GetComponentById(Id);
+                return response;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogExceptions(ex);
+                return new BaseResponse()
+                {
+                    Status = HttpStatusCode.BadRequest,
+                    Message = ex.ToString(),
+                    Body = null
+                };
+            }
         }
 
         [Description("Get All Components By Role Id")]
         [HttpGet("admin/getcomponentsbyroleid/{Id}")]
         public async Task<BaseResponse> GetComponentsByRoleId(int Id)
         {
-            var response = new BaseResponse();
-            response = _adminService.GetComponentsByRoleId(Id);
-            return response;
+            try
+            {
+                var response = new BaseResponse();
+                response = _adminService.GetComponentsByRoleId(Id);
+                return response;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogExceptions(ex);
+                return new BaseResponse()
+                {
+                    Status = HttpStatusCode.BadRequest,
+                    Message = ex.ToString(),
+                    Body = null
+                };
+            }
         }
 
         #endregion
