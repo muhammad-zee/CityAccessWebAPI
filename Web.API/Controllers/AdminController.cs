@@ -35,7 +35,7 @@ namespace Web.API.Controllers
         #region Role
 
         // GET: api/<EmployeeController>
-        [HttpGet("GetAllRoles")]
+        [HttpGet("admin/GetAllRoles")]
 
         public BaseResponse GetRoles()
         {
@@ -53,6 +53,21 @@ namespace Web.API.Controllers
 
         }
 
+        [HttpPost("admin/SaveRole")]
+        public BaseResponse SaveRole(RoleVM role)
+        {
+            try
+            {
+                var roleObj = _adminService.getRoleList();
+                return new BaseResponse { Status = HttpStatusCode.OK, Message = "Roles List Returned", Body = roleObj };
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
         //// GET api/<EmployeeController>/5
         //[HttpGet("{id}")]
         //public string Get(int id)
