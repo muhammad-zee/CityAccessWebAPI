@@ -311,7 +311,7 @@ namespace Web.Services.Concrete
         }
         public string GenerateTwoFactorAuthenticationCode()
         {
-            string chars = _config["TwoFactorVerificationCode"].ToString();
+            string chars = _config["TwoFactorAuthentication:TwoFactorAuthenticationCode"].ToString();
             var random = new Random();
             return new string(
             Enumerable.Repeat(chars, 6)
