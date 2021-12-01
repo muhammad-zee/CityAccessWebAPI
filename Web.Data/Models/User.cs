@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 #nullable disable
 
@@ -31,5 +32,7 @@ namespace Web.Data.Models
         public bool TwoFactorEnabled { get; set; }
         public string TwoFactorCode { get; set; }
         public DateTime? CodeExpiryTime { get; set; }
+        public bool IsTwoFactRememberChecked { get; set; }
+        public DateTime? TwoFactorExpiryDate { get; set; }
     }
 }
