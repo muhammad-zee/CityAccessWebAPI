@@ -17,8 +17,10 @@ namespace Web.Services.Concrete
         private IRepository<Role> _role;
         private IRepository<ComponentAccess> _componentAccess;
         IConfiguration _config;
-        public AdminService(IConfiguration config, IRepository<Component> component, IRepository<ComponentAccess> componentAccess)
-        public AdminService(IConfiguration config, IRepository<Component> component, IRepository<Role> role)
+        public AdminService(IConfiguration config, 
+            IRepository<Component> component, 
+            IRepository<ComponentAccess> componentAccess, 
+            IRepository<Role> role)
         {
             this._componentAccess = componentAccess;
             this._component = component;

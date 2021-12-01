@@ -31,7 +31,6 @@ namespace Web.Services.Concrete
         IConfiguration _config;
         private readonly UnitOfWork unitorWork;
         public AuthService(IConfiguration config, /*IUserAuthRepository userAuthRepository,*/ IRepository<User> userRepo, IRepository<UserRole> userRoleRepo,ICommunicationService communicationService)
-        public AuthService(IConfiguration config, IRepository<User> userRepo, IRepository<UserRole> userRoleRepo, ICommunicationService smsService)
         {
             _config = config;
             //_userAuthRepository = userAuthRepository;
@@ -49,7 +48,7 @@ namespace Web.Services.Concrete
             if (!string.IsNullOrEmpty(login.email) && !string.IsNullOrEmpty(login.password))
             {
                 login.password = HelperExtension.Encrypt(login.password);
-                var user = _userRepo.Table.Where(x => x.PrimaryEmail == login.email && x.Password == login.password).FirstOrDefault();
+                var user = _userRepo.Table.Where(x => (x.PrimaryEmail == login.email || x.UserName == login.email) && x.Password == login.password).FirstOrDefault();
                 if (user != null)
                 {
                     var AuthorizedUser = GenerateJSONWebToken(user);
@@ -61,7 +60,7 @@ namespace Web.Services.Concrete
                 {
                     response.Body = null;
                     response.Status = HttpStatusCode.NotFound;
-                    response.Message = "User not found";
+                    response.Message = "Email or password is not valid.";
                 }
             }
             return response;
@@ -92,7 +91,8 @@ namespace Web.Services.Concrete
                 PhoneNumber = user.PersonalMobileNumber,
                 TwoFactorEnabled = user.TwoFactorEnabled,
                 IsTwoFactorVerify = user.IsTwoFactorVerify,
-                UserId =user.UserId
+                UserId =user.UserId,
+                Username = user.UserName
 
 
             };
@@ -242,6 +242,9 @@ namespace Web.Services.Concrete
             return null;
         }
 
+        #endregion
+
+        #region Two Factor Atuthentication
         public BaseResponse TwoFactorAuthentication(RequestTwoFactorAuthenticationCode Authentication)
         {
             var user = _userRepo.Table.Where(u => u.UserId == Authentication.UserId).FirstOrDefault();
@@ -257,7 +260,7 @@ namespace Web.Services.Concrete
                     UserId = user.UserId,
                     AuthenticationCode = user.TwoFactorCode,
                     AuthenticationCodeExpireTime = user.CodeExpiryTime,
-                    AuthenticationCodeExpiresInMinutes = _config["Jwt:JwtExpiryTime"].ToInt()
+                    AuthenticationCodeExpiresInMinutes = _config["TwoFactorAuthentication:TwoFactorAuthenticationExpiryMinutes"].ToInt()
                 };
             }
             else
@@ -291,7 +294,7 @@ namespace Web.Services.Concrete
                 if (Code_Sent)
                 {
                     user.TwoFactorCode = Two_Factor_Authentication_Code;
-                    user.CodeExpiryTime = DateTime.UtcNow.AddMinutes(10);
+                    user.CodeExpiryTime = DateTime.UtcNow.AddMinutes(_config["TwoFactorAuthentication:TwoFactorAuthenticationExpiryMinutes"].ToInt());
                     _userRepo.Update(user);
                 }
                 
@@ -315,5 +318,7 @@ namespace Web.Services.Concrete
             .Select(s => s[random.Next(s.Length)])
             .ToArray());
         }
+
+        #endregion
     }
 }
