@@ -83,6 +83,12 @@ namespace Web.Services.Concrete
               expires: tokenExpiryTime,
               signingCredentials: credentials);
 
+            //checking Verified for future or not 
+            if (user.TwoFactorEnabled && user.IsTwoFactRememberChecked && DateTime.UtcNow <= user.TwoFactorExpiryDate )
+            {
+                user.TwoFactorEnabled = false;
+            }
+
             return new
             {
                 token = new JwtSecurityTokenHandler().WriteToken(token),
@@ -330,11 +336,13 @@ namespace Web.Services.Concrete
                         user.TwoFactorExpiryDate = DateTime.UtcNow.AddDays(_config["TwoFactorAuthentication:VerifyForFutureDays"].ToInt());
                         _userRepo.Update(user);
                     }
-                    return new BaseResponse { Status = HttpStatusCode.OK, Message = "Authentication Code Verified." };
+                    verifyCode.AuthenticationStatus = "Verified";
+                    return new BaseResponse { Status = HttpStatusCode.OK, Message = "Authentication Code Verified.",Body=verifyCode };
                 }
                 else
                 {
-                    return new BaseResponse { Status = HttpStatusCode.NotFound, Message = "Authentication Code Mismatch." };
+                    verifyCode.AuthenticationStatus = "Not Verified";
+                    return new BaseResponse { Status = HttpStatusCode.NotFound, Message = "Authentication Code Mismatch.",Body= verifyCode };
                 }
                 
             }
