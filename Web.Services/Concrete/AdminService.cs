@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using Web.Data.Models;
 using Web.DLL.Generic_Repository;
 using Web.Model;
@@ -15,12 +16,14 @@ namespace Web.Services.Concrete
     {
         private IRepository<Component> _component;
         private IRepository<Role> _role;
+        private IRepository<User> _user;
         private IRepository<ComponentAccess> _componentAccess;
         private IRepository<UserAccess> _userAccess;
         IConfiguration _config;
         public AdminService(IConfiguration config,
             IRepository<Component> component,
             IRepository<ComponentAccess> componentAccess,
+            IRepository<User> user,
             IRepository<Role> role,
             IRepository<UserAccess> userAccess)
         {
@@ -28,16 +31,45 @@ namespace Web.Services.Concrete
             this._component = component;
             this._config = config;
             this._component = component;
+            this._user = user;
             this._role = role;
             this._userAccess = userAccess;
         }
-        #region Roles
 
+
+        #region Users
+
+        public BaseResponse GetAllUsers() 
+        {
+            var result = _user.GetList().ToList();
+            return new BaseResponse { Status = HttpStatusCode.OK, Message = "Users List Returned", Body = result };
+        }
+
+        public BaseResponse GetUserById(int Id)
+        {
+            var USER = _user.Table.Where(x =>x.UserId == Id).FirstOrDefault();
+            if (USER != null)
+            {
+                return new BaseResponse { Status = HttpStatusCode.OK, Message = "User Found", Body = USER };
+            }
+            else {
+                return new BaseResponse { Status = HttpStatusCode.NotFound, Message = "User Not Found" };
+            }
+            
+        }
+
+        #endregion
+
+
+
+        #region Roles
         public IQueryable<Role> getRoleList()
         {
             return this._role.GetList().Where(item => !item.IsDeleted);
         }
         #endregion
+        
+        
         #region Component
 
         public BaseResponse AddOrUpdateComponent(List<ComponentVM> components)
@@ -213,7 +245,6 @@ namespace Web.Services.Concrete
             return response;
         }
 
-
         public BaseResponse AddOrUpdateUserRoleComponentAccess(ComponentAccessUserRoleVM componentAccess)
         {
             if (componentAccess.RoleId > 0 && componentAccess.UserId > 0) 
@@ -221,31 +252,20 @@ namespace Web.Services.Concrete
                 /////////// Get Allowed Component Ids /////////
                 var compIds = componentAccess.Attributes.Where(x => x.selected == true).Select(x => x.id).ToList();
 
-                /////////// Get List of that components from which Access is Removed /////////
-                var toBeDeleteComps = _userAccess.Table.Where(x => x.RoleIdFk == componentAccess.RoleId.ToString() && x.UserId == componentAccess.UserId && !compIds.Contains(x.UserComIdFk)).ToList();
+                /////////// Get Allowed Role Access /////////
+                var roleAccess = _componentAccess.Table.Where(x => x.RoleIdFk == componentAccess.RoleId.ToString() && x.IsDeleted == false).ToList();
 
-                /////////// Remove List of that components from which Access is Removed /////////
-                toBeDeleteComps.ForEach(x => { x.IsDeleted = true; x.ModifiedBy = componentAccess.LoggedInUserId; x.ModifiedDate = DateTime.UtcNow; });
-                _userAccess.Update(toBeDeleteComps);
+                /////////// Get Matched Access Ids /////////
+                var MatcheAccessIds = roleAccess.Where(x => compIds.Contains(x.ComIdFk.Value)).Select(x => x.ComIdFk).ToList();
 
-                /////////// Get Already Exist Component For the Selected Role and User /////////
-                var alreadyExistComps = _userAccess.Table.Where(x => x.RoleIdFk == componentAccess.RoleId.ToString() && x.UserId == componentAccess.UserId).ToList();
+                ///////////// Remove Matched Role Components from coming List /////////
+                compIds.RemoveAll(x => MatcheAccessIds.Contains(x));
 
-                /////////// Get Already Exist Active Component Ids /////////
-                var alreadyExistActiveCompIds = alreadyExistComps.Where(x => x.UserActive == true).Select(x => x.UserComIdFk).ToList();
+                /////////// Get AlreadyExist Allowed UserRole Access /////////
+                var alreadyExist = _userAccess.Table.Where(x => compIds.Contains(x.UserComIdFk) && x.RoleIdFk == componentAccess.RoleId.ToString() && x.UserId == componentAccess.UserId && x.IsDeleted == false).ToList();
 
-                /////////// Remove Already Exist Component from coming List /////////
-                compIds.RemoveAll(x => alreadyExistActiveCompIds.Contains(x));
-
-                /////////// Get Already Exist DeActive Component from Db /////////
-                var compsNeedToBeActive = alreadyExistComps.Where(x => x.UserActive == false && compIds.Contains(x.UserComIdFk)).ToList();
-
-                /////////// Activate and Update Already Exist DeActive Component from Db /////////
-                compsNeedToBeActive.ForEach(x => { x.UserActive = true; x.ModifiedBy = componentAccess.LoggedInUserId; x.ModifiedDate = DateTime.UtcNow; });
-                _userAccess.Update(compsNeedToBeActive);
-
-                /////////// Remove Already Exist Updated Component from coming List /////////
-                compIds.RemoveAll(x => compsNeedToBeActive.Select(x => x.UserComIdFk).Contains(x));
+                ///////////// Remove Already Exist User Component Access from coming List /////////
+                compIds.RemoveAll(x => alreadyExist.Select(x => x.UserComIdFk).Contains(x));
 
                 /////////// Now add new ones /////////
                 var comps = compIds.Select(x => new UserAccess()
@@ -263,6 +283,33 @@ namespace Web.Services.Concrete
                 _userAccess.Insert(comps);
 
                 return new BaseResponse() { Status = System.Net.HttpStatusCode.OK, Message = "Access saved successfully" };
+
+                ///////////// Get List of that components from which Access is Removed /////////
+                //var toBeDeleteComps = _userAccess.Table.Where(x => x.RoleIdFk == componentAccess.RoleId.ToString() && x.UserId == componentAccess.UserId && !compIds.Contains(x.UserComIdFk)).ToList();
+
+                ///////////// Remove List of that components from which Access is Removed /////////
+                //toBeDeleteComps.ForEach(x => { x.IsDeleted = true; x.ModifiedBy = componentAccess.LoggedInUserId; x.ModifiedDate = DateTime.UtcNow; });
+                //_userAccess.Update(toBeDeleteComps);
+
+                ///////////// Get Already Exist Component For the Selected Role and User /////////
+                //var alreadyExistComps = _userAccess.Table.Where(x => x.RoleIdFk == componentAccess.RoleId.ToString() && x.UserId == componentAccess.UserId).ToList();
+
+                ///////////// Get Already Exist Active Component Ids /////////
+                //var alreadyExistActiveCompIds = alreadyExistComps.Where(x => x.UserActive == true).Select(x => x.UserComIdFk).ToList();
+
+                ///////////// Remove Already Exist Component from coming List /////////
+                //compIds.RemoveAll(x => alreadyExistActiveCompIds.Contains(x));
+
+                ///////////// Get Already Exist DeActive Component from Db /////////
+                //var compsNeedToBeActive = alreadyExistComps.Where(x => x.UserActive == false && compIds.Contains(x.UserComIdFk)).ToList();
+
+                ///////////// Activate and Update Already Exist DeActive Component from Db /////////
+                //compsNeedToBeActive.ForEach(x => { x.UserActive = true; x.ModifiedBy = componentAccess.LoggedInUserId; x.ModifiedDate = DateTime.UtcNow; });
+                //_userAccess.Update(compsNeedToBeActive);
+
+                ///////////// Remove Already Exist Updated Component from coming List /////////
+                //compIds.RemoveAll(x => compsNeedToBeActive.Select(x => x.UserComIdFk).Contains(x));
+               
             }
             else if (componentAccess.RoleId > 0)
             {

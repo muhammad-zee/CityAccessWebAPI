@@ -31,6 +31,44 @@ namespace Web.API.Controllers
             _logger = new Logger(_hostEnvironment);
         }
 
+        #region Users
+
+        [Description("Get Users List")]
+        [HttpPost("admin/GetAllUsers")]
+        public async Task<BaseResponse> GetAllUsers() 
+        {
+            try
+            {
+                var response = _adminService.GetAllUsers();
+                return response;
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
+        [Description("Get User By Id")]
+        [HttpPost("admin/GetAllUsers/{Id}")]
+        public async Task<BaseResponse> GetUserById(int Id)
+        {
+            try
+            {
+                var response = _adminService.GetUserById(Id);
+                return response;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
+
+        #endregion
+
         #region Role
 
         // GET: api/<EmployeeController>
