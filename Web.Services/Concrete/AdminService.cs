@@ -59,6 +59,23 @@ namespace Web.Services.Concrete
             
         }
 
+        public BaseResponse DeleteUser(int Id)
+        {
+            var USER = _user.Table.Where(x => x.UserId == Id).FirstOrDefault();
+            if (USER != null)
+            {
+                USER.IsDeleted = true;
+                _user.Update(USER);
+                return new BaseResponse { Status = HttpStatusCode.OK, Message = "User Deleted" };
+            }
+            else
+            {
+                return new BaseResponse { Status = HttpStatusCode.NotFound, Message = "User Not Found" };
+            }
+
+        }
+
+
         #endregion
 
 
@@ -93,6 +110,22 @@ namespace Web.Services.Concrete
 
             return response;
         }
+
+        public BaseResponse DeleteRole(int Id) 
+        {
+            var Role = _role.Table.Where(x => x.RoleId == Id).FirstOrDefault();
+            if (Role != null)
+            {
+                Role.IsDeleted = true;
+                _role.Update(Role);
+                return new BaseResponse { Status = HttpStatusCode.OK, Message = "Role Deleted" };
+            }
+            else
+            {
+                return new BaseResponse { Status = HttpStatusCode.NotFound, Message = "Role Not Found" };
+            }
+        }
+
         #endregion
 
         #region Component
