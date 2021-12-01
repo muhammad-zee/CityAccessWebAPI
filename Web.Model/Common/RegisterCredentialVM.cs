@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Web.Model.Common
 {
-    public class RegisterCredential
+    public class RegisterCredentialVM
     {
         public int UserId { get; set; }
         [Required]

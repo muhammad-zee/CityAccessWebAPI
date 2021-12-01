@@ -28,7 +28,7 @@ namespace Web.API.Controllers
 
         [Description("User Login")]
         [HttpPost("auth/userAuth")]
-        public BaseResponse Login([FromBody] UserCredential login)
+        public BaseResponse Login([FromBody] UserCredentialVM login)
         {
             try
             {
@@ -44,7 +44,7 @@ namespace Web.API.Controllers
 
         [Description("Add or Update User")]
         [HttpPost("auth/SaveUser")]
-        public BaseResponse SaveUser([FromBody] RegisterCredential register)
+        public BaseResponse SaveUser([FromBody] RegisterCredentialVM register)
         {
             try
             {
@@ -147,7 +147,7 @@ namespace Web.API.Controllers
 
         [Description("Reset User Password")]
         [HttpPost("auth/resetpassword")]
-        public BaseResponse ResetPassword([FromBody] UserCredential credential)
+        public BaseResponse ResetPassword([FromBody] UserCredentialVM credential)
         {
             var response = new BaseResponse();
             var result = _jwtAuth.ResetPassword(credential);

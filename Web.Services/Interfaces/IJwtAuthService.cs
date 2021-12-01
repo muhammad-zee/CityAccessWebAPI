@@ -4,10 +4,10 @@ namespace Web.Services.Interfaces
 {
     public interface IJwtAuthService
     {
-        BaseResponse Authentication(UserCredential login);
+        BaseResponse Authentication(UserCredentialVM login);
         BaseResponse TwoFactorAuthentication(RequestTwoFactorAuthenticationCode Authentication);
-        string SaveUser(RegisterCredential register);
+        string SaveUser(RegisterCredentialVM register);
         string SendResetPasswordMail(string userName, string url);
-        string ResetPassword(UserCredential credential);
+        string ResetPassword(UserCredentialVM credential);
     }
 }

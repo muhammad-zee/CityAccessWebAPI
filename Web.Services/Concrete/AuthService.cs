@@ -40,7 +40,7 @@ namespace Web.Services.Concrete
         }
 
 
-        public BaseResponse Authentication(UserCredential login)
+        public BaseResponse Authentication(UserCredentialVM login)
         {
 
 
@@ -99,11 +99,11 @@ namespace Web.Services.Concrete
         }
 
      
-        public string SaveUser(RegisterCredential register)
+        public string SaveUser(RegisterCredentialVM register)
         {
             if (register.UserId > 0)
             {
-                var user = AutoMapperHelper.MapSingleRow<RegisterCredential, User>(register);
+                var user = AutoMapperHelper.MapSingleRow<RegisterCredentialVM, User>(register);
                 _userRepo.Update(user);
                 return UserEnums.Updated.ToString();
             }
@@ -221,7 +221,7 @@ namespace Web.Services.Concrete
             return null;
         }
 
-        public string ResetPassword(UserCredential credential)
+        public string ResetPassword(UserCredentialVM credential)
         {
             try
             {
