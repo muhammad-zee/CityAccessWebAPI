@@ -20,9 +20,16 @@ namespace Web.Services.Interfaces
         #region Users
         BaseResponse GetAllUsers();
         BaseResponse GetUserById(int Id);
+        BaseResponse DeleteUser(int Id);
+
         #endregion
 
+        #region Roles
         IQueryable<Role> getRoleList();
         string SaveRole(RoleVM role);
+        BaseResponse DeleteRole(int Id);
+
+        #endregion
+
     }
 }

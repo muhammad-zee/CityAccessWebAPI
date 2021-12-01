@@ -67,6 +67,22 @@ namespace Web.API.Controllers
             }
         }
 
+        [Description("Delete User")]
+        [HttpPost("admin/DeleteUser/{Id}")]
+        public async Task<BaseResponse> DeleteUser(int Id)
+        {
+            try
+            {
+                var response = _adminService.DeleteUser(Id);
+                return response;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
 
         #endregion
 
@@ -74,7 +90,6 @@ namespace Web.API.Controllers
 
         // GET: api/<EmployeeController>
         [HttpGet("admin/GetAllRoles")]
-
         public BaseResponse GetRoles()
         {
             try
@@ -112,30 +127,22 @@ namespace Web.API.Controllers
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
         }
-        //// GET api/<EmployeeController>/5
-        //[HttpGet("{id}")]
-        //public string Get(int id)
-        //{
-        //    return "value";
-        //}
 
-        //// POST api/<EmployeeController>
-        //[HttpPost]
-        //public void Post([FromBody] string value)
-        //{
-        //}
-
-        //// PUT api/<EmployeeController>/5
-        //[HttpPut("{id}")]
-        //public void Put(int id, [FromBody] string value)
-        //{
-        //}
-
-        //// DELETE api/<EmployeeController>/5
-        //[HttpDelete("{id}")]
-        //public void Delete(int id)
-        //{
-        //}
+        [Description("Delete Role")]
+        [HttpPost("admin/DeleteRole/{Id}")]
+        public async Task<BaseResponse> DeleteRole(int Id)
+        {
+            try
+            {
+                var response = _adminService.DeleteRole(Id);
+                return response;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
 
         #endregion
 
