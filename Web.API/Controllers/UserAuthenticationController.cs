@@ -130,20 +130,6 @@ namespace Web.API.Controllers
             return response;
         }
 
-        [HttpPost("auth/SendTwoFactorAuthenticationCode")]
-        public BaseResponse SendVerificationCode([FromBody] RequestTwoFactorAuthenticationCode Authentication)
-        {
-            try
-            {
-                BaseResponse response = _jwtAuth.TwoFactorAuthentication(Authentication);
-                return response;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogExceptions(ex);
-                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
-            }
-        }
 
         [Description("Reset User Password")]
         [HttpPost("auth/resetpassword")]
@@ -179,6 +165,41 @@ namespace Web.API.Controllers
                 };
             }
             return response;
+        }
+        #endregion
+
+
+        #region Two Factor Authentication
+
+        [HttpPost("auth/SendTwoFactorAuthenticationCode")]
+        public BaseResponse SendAuthenticationCode([FromBody] RequestTwoFactorAuthenticationCode Authentication)
+        {
+            try
+            {
+                BaseResponse response = _jwtAuth.TwoFactorAuthentication(Authentication);
+                return response;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
+        [HttpPost("auth/VerigyTwoFactorAuthenticationCode")]
+        public BaseResponse VerifyAuthenticationCode([FromBody] VerifyTwoFactorAuthenticationCode verifyCode)
+        {
+            try
+            {
+                BaseResponse response = _jwtAuth.VerifyTwoFactorAuthentication(verifyCode);
+                return response;
+            }
+            catch(Exception ex)
+            {
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+
+            }
         }
         #endregion
     }

@@ -11,6 +11,8 @@ namespace Web.Model.Common
     {
         public int UserId { get; set; }
         public int SendCodeOn { get; set; }
+        public string PhoneNumber { get; set; }
+        public string Email { get; set; }
     }
     public class VerifyTwoFactorAuthenticationCode
     {
@@ -19,6 +21,7 @@ namespace Web.Model.Common
         public DateTime? AuthenticationCodeExpireTime { get; set; }
         public int AuthenticationCodeExpiresInMinutes { get; set; }
         public string AuthenticationStatus { get; set; }
+        public bool VerifyForThirtyDays { get; set; }
     }
 
 }
