@@ -1,9 +1,5 @@
 ﻿using AutoMapper;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Web.Services.Helper
 {
@@ -18,7 +14,8 @@ namespace Web.Services.Helper
 
         public static List<TDestination> MapList<TSource, TDestination>(List<TSource> inputModel)
         {
-            var config = new MapperConfiguration(cfg => {
+            var config = new MapperConfiguration(cfg =>
+            {
                 cfg.AllowNullCollections = true;
                 cfg.CreateMap<TSource, TDestination>(MemberList.Source);
             });
@@ -27,7 +24,8 @@ namespace Web.Services.Helper
         }
         public static ICollection<TDestination> MapCollection<TSource, TDestination>(ICollection<TSource> inputModel)
         {
-            var config = new MapperConfiguration(cfg => {
+            var config = new MapperConfiguration(cfg =>
+            {
                 cfg.AllowNullCollections = true;
                 cfg.CreateMap<TSource, TDestination>(MemberList.Source);
             });

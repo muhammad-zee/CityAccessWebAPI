@@ -7,5 +7,7 @@ namespace Web.Services.Interfaces
         BaseResponse Authentication(UserCredential login);
         BaseResponse TwoFactorAuthentication(RequestTwoFactorAuthenticationCode Authentication);
         string SaveUser(RegisterCredential register);
+        string SendResetPasswordMail(string userName, string url);
+        string ResetPassword(UserCredential credential);
     }
 }

@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
-using System.Reflection;
-using Web.Data.Models;
 
 namespace Web.Services.Extensions
 {
@@ -166,17 +164,6 @@ namespace Web.Services.Extensions
                 {
                     yield return element;
                 }
-            }
-        }
-
-        public static List<int> ToIntList(this string commaSepratedString) 
-        {
-            if (!string.IsNullOrEmpty(commaSepratedString))
-            {
-                return commaSepratedString.Split(',').Select(int.Parse).ToList();
-            }
-            else {
-                return new List<int>();
             }
         }
 

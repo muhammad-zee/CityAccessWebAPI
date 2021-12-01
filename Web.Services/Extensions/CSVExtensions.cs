@@ -54,7 +54,7 @@ namespace Web.Services.Extensions
 
             else
             {
-                output.AppendLine(QuoteRecord(fields.Select(f => f.Name.Replace("_", " ").Replace("dot",".")), CsvSeparator));
+                output.AppendLine(QuoteRecord(fields.Select(f => f.Name.Replace("_", " ").Replace("dot", ".")), CsvSeparator));
             }
 
             foreach (var record in objects)

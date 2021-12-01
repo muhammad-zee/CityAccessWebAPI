@@ -1,5 +1,3 @@
-using System.Net;
-using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -9,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System.Text;
 using Web.API.Helper;
 using Web.Data;
 using Web.Data.Concrete;
@@ -16,7 +15,6 @@ using Web.Data.Interfaces;
 using Web.Data.Models;
 using Web.DLL;
 using Web.DLL.Generic_Repository;
-using Web.Model;
 using Web.Services.Concrete;
 using Web.Services.Interfaces;
 
@@ -122,9 +120,9 @@ namespace Web.API
             loggerFactory.AddLog4Net();
             /*if (env.IsDevelopment())
             {*/
-                app.UseDeveloperExceptionPage();
-                app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "RoutingAndQueueingAPI v1"));
+            app.UseDeveloperExceptionPage();
+            app.UseSwagger();
+            app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "RoutingAndQueueingAPI v1"));
             /*}*/
 
             app.UseHttpsRedirection();

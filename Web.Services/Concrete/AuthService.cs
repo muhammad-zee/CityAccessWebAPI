@@ -6,6 +6,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Mail;
 using System.Security.Claims;
 using System.Text;
 using Twilio.AspNet.Common;
@@ -24,13 +25,13 @@ namespace Web.Services.Concrete
 {
     public class AuthService : IJwtAuthService
     {
-        //private readonly IUserAuthRepository _userAuthRepository;
         private readonly GenericRepository<User> _userRepo;
         private readonly GenericRepository<UserRole> _userRoleRepo;
         private readonly ICommunicationService _communicationService;
         IConfiguration _config;
         private readonly UnitOfWork unitorWork;
         public AuthService(IConfiguration config, /*IUserAuthRepository userAuthRepository,*/ IRepository<User> userRepo, IRepository<UserRole> userRoleRepo,ICommunicationService communicationService)
+        public AuthService(IConfiguration config, IRepository<User> userRepo, IRepository<UserRole> userRoleRepo, ICommunicationService smsService)
         {
             _config = config;
             //_userAuthRepository = userAuthRepository;
@@ -43,7 +44,7 @@ namespace Web.Services.Concrete
         public BaseResponse Authentication(UserCredential login)
         {
 
-           
+
             BaseResponse response = new BaseResponse();
             if (!string.IsNullOrEmpty(login.email) && !string.IsNullOrEmpty(login.password))
             {
@@ -65,7 +66,6 @@ namespace Web.Services.Concrete
             }
             return response;
         }
-
         private object GenerateJSONWebToken(User user)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Secret"]));
@@ -132,29 +132,22 @@ namespace Web.Services.Concrete
                             IsDeleted = false
                         };
                         _userRepo.Insert(obj);
-
-                        var roleIds = register.RoleIds.ToIntList(); //Split(',').Select(int.Parse).ToList();
+                        var roleIds = register.RoleIds.ToIntList();
                         List<UserRole> userRoleList = new List<UserRole>();
                         foreach (var item in roleIds)
                         {
                             userRoleList.Add(new UserRole() { UserId = obj.UserId, RoleId = item });
                         }
                         _userRoleRepo.Insert(userRoleList);
-
-                        if (register.UserImage != null && register.UserImage.Count() > 0)
+                        if (register.UserImageByte != null && register.UserImageByte.Count() > 0)
                         {
-                            var outPath = Directory.GetCurrentDirectory(); //_config["FilePath:Path"];
-                                                                           //if (!Directory.Exists(outPath))
-                                                                           //{
-                                                                           //    Directory.CreateDirectory(outPath);
-                                                                           //}
+                            var outPath = Directory.GetCurrentDirectory();
                             outPath += "/UserProfiles/";
                             if (!Directory.Exists(outPath))
                             {
                                 Directory.CreateDirectory(outPath);
                             }
                             outPath += $"UserProfilePic_{obj.UserId}.png";
-
                             using (FileStream fs = new FileStream(outPath, FileMode.Create, FileAccess.Write))
                             {
                                 fs.Write(register.UserImageByte);
@@ -175,6 +168,77 @@ namespace Web.Services.Concrete
 
                 }
             }
+            return null;
+        }
+
+        #region Reset Password
+        public string SendResetPasswordMail(string userName, string url)
+        {
+            try
+            {
+                var user = _userRepo.Table.Where(x => x.UserName == userName).FirstOrDefault();
+                if (user != null)
+                {
+                    string Name = string.Empty;
+                    string MrOrMrs = "Mr/Mrs.";
+                    if (!string.IsNullOrEmpty(user.FirstName))
+                    {
+                        Name = user.FirstName;
+                        if (!string.IsNullOrEmpty(user.LastName))
+                        {
+                            Name += user.LastName;
+                        }
+                    }
+                    else
+                    {
+                        Name = new MailAddress(userName).User;
+                    }
+                    if (!string.IsNullOrEmpty(user.Gender))
+                    {
+                        if (user.Gender.Equals("Male"))
+                        {
+                            MrOrMrs = "Mr.";
+                        }
+                        else if (user.Gender.Equals("Female"))
+                        {
+                            MrOrMrs = "Mrs.";
+                        }
+                    }
+                    string siteUrl = _config["siteUrl"];
+                    string hashUserName = HelperExtension.Encrypt(userName);
+                    string mailMessageTemplate = $"<b>Hi! {MrOrMrs} {Name},</b> <br />" +
+                        $"<p>Please <a href='{siteUrl + hashUserName}' target='_blank'>Click here</a> to reset your password.</p> <br />" +
+                        $"<p>If you didn’t ask to reset your password, you can ignore this email.</p> <br /><br />" +
+                        $"<p>Thank You!</p>";
+
+                    return StatusEnum.Success.ToString();
+                }
+            }
+            catch (Exception ex)
+            {
+                return ex.ToString();
+            }
+            return null;
+        }
+
+        public string ResetPassword(UserCredential credential)
+        {
+            try
+            {
+                var user = _userRepo.Table.Where(x => x.UserName == credential.email).FirstOrDefault();
+                if (user != null)
+                {
+                    var hashPswd = HelperExtension.Encrypt(credential.password);
+                    user.Password = hashPswd;
+                    _userRepo.Update(user);
+                    return StatusEnum.Success.ToString();
+                }
+            }
+            catch (Exception ex)
+            {
+                return ex.ToString();
+            }
+
             return null;
         }
 

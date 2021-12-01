@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Web.Services.Extensions
 {
@@ -184,6 +182,17 @@ namespace Web.Services.Extensions
             }
         }
 
+        public static List<int> ToIntList(this string commaSepratedString)
+        {
+            if (!string.IsNullOrEmpty(commaSepratedString))
+            {
+                return commaSepratedString.Split(',').Select(int.Parse).ToList();
+            }
+            else
+            {
+                return new List<int>();
+            }
+        }
         public static string GetAbbreviation(this string inputString)
         {
 

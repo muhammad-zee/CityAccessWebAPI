@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Dynamic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Web.Services.Extensions
 {
@@ -45,7 +42,7 @@ namespace Web.Services.Extensions
                 expandoDict[propertyName] = propertyValue;
             else
                 expandoDict.Add(propertyName, propertyValue);
-        }     
+        }
 
 
         /// <summary>
