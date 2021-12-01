@@ -2,10 +2,6 @@
 using SendGrid;
 using SendGrid.Helpers.Mail;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Twilio;
 using Twilio.AspNet.Common;
@@ -69,7 +65,7 @@ namespace Web.Services.Concrete
                 string status = messageResource.Status.ToString();
                 return status;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return ex.Message;
             }
@@ -105,7 +101,7 @@ namespace Web.Services.Concrete
             //}
             //NewSendEmail.SendingEmail();
             var res = SendingEmailAsync(sgm, ImageName, ImageContent);
-            var result =  res.Result;
+            var result = res.Result;
             if (result == "Email Sent")
             {
                 return true;
