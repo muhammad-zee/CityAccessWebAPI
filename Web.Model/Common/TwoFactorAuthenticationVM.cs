@@ -19,13 +19,7 @@ namespace Web.Model.Common
         public string AuthenticationStatus { get; set; }
         public bool isVerifyForFuture { get; set; }
     }
-    public class VerifyTwoFactorAuthenticationCodeReq
-    {
-        public int UserId { get; set; }
-        public string AuthenticationCode { get; set; }
-        public bool isVerifyForFuture { get; set; }
-        public string AuthenticationStatus { get; set; }
-    }
+    
 
 
 }

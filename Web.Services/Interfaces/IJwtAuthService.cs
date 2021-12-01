@@ -6,7 +6,7 @@ namespace Web.Services.Interfaces
     {
         BaseResponse Authentication(UserCredentialVM login);
         BaseResponse TwoFactorAuthentication(RequestTwoFactorAuthenticationCode Authentication);
-        BaseResponse VerifyTwoFactorAuthentication(VerifyTwoFactorAuthenticationCodeReq verifyCode);
+        BaseResponse VerifyTwoFactorAuthentication(VerifyTwoFactorAuthenticationCode verifyCode);
         string SaveUser(RegisterCredentialVM register);
         string SendResetPasswordMail(string userName, string url);
         string ResetPassword(UserCredentialVM credential);

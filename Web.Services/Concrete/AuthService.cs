@@ -319,7 +319,7 @@ namespace Web.Services.Concrete
             .ToArray());
         }
 
-        public BaseResponse VerifyTwoFactorAuthentication(VerifyTwoFactorAuthenticationCodeReq verifyCode)
+        public BaseResponse VerifyTwoFactorAuthentication(VerifyTwoFactorAuthenticationCode verifyCode)
         {
             var user = _userRepo.Table.Where(u => u.UserId == verifyCode.UserId && !u.IsDeleted).FirstOrDefault();
             if(user != null )

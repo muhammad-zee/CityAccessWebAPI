@@ -186,8 +186,8 @@ namespace Web.API.Controllers
             }
         }
 
-        [HttpPost("auth/VerigyTwoFactorAuthenticationCode")]
-        public BaseResponse VerifyAuthenticationCode([FromBody] VerifyTwoFactorAuthenticationCodeReq verifyCode)
+        [HttpPost("auth/VerifyTwoFactorAuthenticationCode")]
+        public BaseResponse VerifyAuthenticationCode([FromBody] VerifyTwoFactorAuthenticationCode verifyCode)
         {
             try
             {
