@@ -18,9 +18,9 @@ namespace Web.Data.Models
         public virtual DbSet<Component> Components { get; set; }
         public virtual DbSet<ComponentAccess> ComponentAccesses { get; set; }
         public virtual DbSet<Role> Roles { get; set; }
-        public virtual DbSet<User> Users { get; set; }
+        public virtual DbSet<UserVM> Users { get; set; }
         public virtual DbSet<UserAccess> UserAccesses { get; set; }
-        public virtual DbSet<UserRole> UserRoles { get; set; }
+        public virtual DbSet<UserRoleVM> UserRoles { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -101,7 +101,7 @@ namespace Web.Data.Models
                     .HasMaxLength(256);
             });
 
-            modelBuilder.Entity<User>(entity =>
+            modelBuilder.Entity<UserVM>(entity =>
             {
                 entity.Property(e => e.City).HasMaxLength(40);
 
