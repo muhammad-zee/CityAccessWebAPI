@@ -5,6 +5,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="PartialClasses\**" />
+    <EmbeddedResource Remove="PartialClasses\**" />
+    <None Remove="PartialClasses\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.10" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="5.0.10">
       <PrivateAssets>all</PrivateAssets>
@@ -24,7 +30,6 @@
 
   <ItemGroup>
     <Folder Include="Models\" />
-    <Folder Include="PartialClasses\" />
   </ItemGroup>
 
 </Project>
