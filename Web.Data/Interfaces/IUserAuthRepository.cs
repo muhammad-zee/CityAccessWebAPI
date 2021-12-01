@@ -3,7 +3,7 @@ using Web.DLL.Generic_Repository;
 
 namespace Web.Data.Interfaces
 {
-    public interface IUserAuthRepository : IRepository<UserVM>
+    public interface IUserAuthRepository : IRepository<User>
     {
     }
 }

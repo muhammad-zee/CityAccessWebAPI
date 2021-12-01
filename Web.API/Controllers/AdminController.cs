@@ -10,7 +10,6 @@ using System.Net;
 using System.Reflection;
 using System.Threading.Tasks;
 using Web.API.Helper;
-using Web.Data.Models;
 using Web.Model;
 using Web.Model.Common;
 using Web.Services.Interfaces;
@@ -36,7 +35,7 @@ namespace Web.API.Controllers
         #region Role
 
         // GET: api/<EmployeeController>
-        [HttpGet("admin/GetAllRoles")]
+        [HttpGet("GetAllRoles")]
 
         public BaseResponse GetRoles()
         {
@@ -54,8 +53,6 @@ namespace Web.API.Controllers
 
         }
 
-        //[HttpPost("SaveRole")]
-        //public BaseResponse SaveRole(Role)
         //// GET api/<EmployeeController>/5
         //[HttpGet("{id}")]
         //public string Get(int id)
