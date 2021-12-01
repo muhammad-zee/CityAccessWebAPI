@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Text.Json.Serialization;
 
 namespace Web.Model.Common
 {
@@ -18,10 +14,13 @@ namespace Web.Model.Common
     {
         public int UserId { get; set; }
         public string AuthenticationCode { get; set; }
+        [JsonIgnore]
         public DateTime? AuthenticationCodeExpireTime { get; set; }
+        [JsonIgnore]
         public int AuthenticationCodeExpiresInMinutes { get; set; }
+        [JsonIgnore]
         public string AuthenticationStatus { get; set; }
-        public bool VerifyForThirtyDays { get; set; }
+        public bool isVerifyForFuture { get; set; }
     }
 
 }

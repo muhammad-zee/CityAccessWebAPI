@@ -48,7 +48,7 @@ namespace Web.Services.Concrete
             if (!string.IsNullOrEmpty(login.email) && !string.IsNullOrEmpty(login.password))
             {
                 login.password = HelperExtension.Encrypt(login.password);
-                var user = _userRepo.Table.Where(x => (x.PrimaryEmail == login.email || x.UserName == login.email) && x.Password == login.password).FirstOrDefault();
+                var user = _userRepo.Table.Where(x => (x.PrimaryEmail == login.email || x.UserName == login.email) && x.Password == login.password && !x.IsDeleted).FirstOrDefault();
                 if (user != null)
                 {
                     var AuthorizedUser = GenerateJSONWebToken(user);
@@ -319,8 +319,30 @@ namespace Web.Services.Concrete
 
         public BaseResponse VerifyTwoFactorAuthentication(VerifyTwoFactorAuthenticationCode verifyCode)
         {
-            //var user = _userRepo.Table.Where(user)
-            return null;
+            var user = _userRepo.Table.Where(u => u.UserId == verifyCode.UserId && !u.IsDeleted).FirstOrDefault();
+            if(user != null )
+            {
+                if(verifyCode.AuthenticationCode == user.TwoFactorCode)
+                {
+                    if (verifyCode.isVerifyForFuture)
+                    {
+                        user.IsTwoFactRememberChecked = true;
+                        user.TwoFactorExpiryDate = DateTime.UtcNow.AddDays(_config["TwoFactorAuthentication:VerifyForFutureDays"].ToInt());
+                        _userRepo.Update(user);
+                    }
+                    return new BaseResponse { Status = HttpStatusCode.OK, Message = "Authentication Code Verified." };
+                }
+                else
+                {
+                    return new BaseResponse { Status = HttpStatusCode.NotFound, Message = "Authentication Code Mismatch." };
+                }
+                
+            }
+            else
+            {
+
+                return new BaseResponse { Status = HttpStatusCode.NotFound, Message = "User Not Found" };
+            }
         }
 
         #endregion
