@@ -29,6 +29,7 @@ namespace Web.Data.Models
         public string Zip { get; set; }
         public string UserImage { get; set; }
         public bool TwoFactorEnabled { get; set; }
+        public bool IsTwoFactorVerify { get; set; }
         public string TwoFactorCode { get; set; }
         public DateTime? CodeExpiryTime { get; set; }
     }

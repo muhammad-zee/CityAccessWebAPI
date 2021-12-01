@@ -90,6 +90,7 @@ namespace Web.Services.Concrete
                 PrimaryEmail = user.PrimaryEmail,
                 PhoneNumber = user.PersonalMobileNumber,
                 TwoFactorEnabled = user.TwoFactorEnabled,
+                IsTwoFactorVerify = user.IsTwoFactorVerify,
                 UserId =user.UserId,
                 Username = user.UserName
 
@@ -97,6 +98,7 @@ namespace Web.Services.Concrete
             };
         }
 
+     
         public string SaveUser(RegisterCredentialVM register)
         {
             if (register.UserId > 0)
@@ -315,12 +317,6 @@ namespace Web.Services.Concrete
             Enumerable.Repeat(chars, 6)
             .Select(s => s[random.Next(s.Length)])
             .ToArray());
-        }
-
-        public BaseResponse VerifyTwoFactorAuthentication(VerifyTwoFactorAuthenticationCode verifyCode)
-        {
-            //var user = _userRepo.Table.Where(user)
-            return null;
         }
 
         #endregion
