@@ -17,7 +17,7 @@ using Web.Services.Interfaces;
 
 namespace Web.API.Controllers
 {
-    [Authorize]
+    //[Authorize]
     public class AdminController : Controller
     {
         private readonly IAdminService _adminService;
@@ -52,7 +52,7 @@ namespace Web.API.Controllers
         }
 
         [Description("Get User By Id")]
-        [HttpGet("admin/GetAllUsers/{Id}")]
+        [HttpGet("admin/GetUserById/{Id}")]
         public async Task<BaseResponse> GetUserById(int Id)
         {
             try
