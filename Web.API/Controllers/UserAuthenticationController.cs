@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -12,6 +13,7 @@ using Web.Services.Interfaces;
 
 namespace Web.API.Controllers
 {
+    
     public class UserAuthenticationController : Controller
     {
         private readonly IJwtAuthService _jwtAuth;
@@ -26,6 +28,7 @@ namespace Web.API.Controllers
             _logger = new Logger(_hostEnvironment);
         }
 
+        [AllowAnonymous]
         [Description("User Login")]
         [HttpPost("auth/userAuth")]
         public BaseResponse Login([FromBody] UserCredentialVM login)
@@ -57,6 +60,7 @@ namespace Web.API.Controllers
             }
         }
 
+        [Authorize]
         [Description("Add or Update User")]
         [HttpPost("auth/SaveUser")]
         public BaseResponse SaveUser([FromBody] RegisterCredentialVM register)
@@ -109,6 +113,7 @@ namespace Web.API.Controllers
 
 
         #region Reset Password
+        [AllowAnonymous]
         [Description("Send Mail on Forget Password")]
         [HttpGet("auth/forgetpassword/{username}/{url}")]
         public BaseResponse ForgetPassword(string username, string url)
@@ -145,7 +150,7 @@ namespace Web.API.Controllers
             return response;
         }
 
-
+        [AllowAnonymous]
         [Description("Reset User Password")]
         [HttpPost("auth/resetpassword")]
         public BaseResponse ResetPassword([FromBody] UserCredentialVM credential)
@@ -185,7 +190,7 @@ namespace Web.API.Controllers
 
 
         #region Two Factor Authentication
-
+        [AllowAnonymous]
         [HttpPost("auth/SendTwoFactorAuthenticationCode")]
         public BaseResponse SendAuthenticationCode([FromBody] RequestTwoFactorAuthenticationCode Authentication)
         {
@@ -200,7 +205,7 @@ namespace Web.API.Controllers
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
         }
-
+        [AllowAnonymous]
         [HttpPost("auth/VerifyTwoFactorAuthenticationCode")]
         public BaseResponse VerifyAuthenticationCode([FromBody] VerifyTwoFactorAuthenticationCode verifyCode)
         {
