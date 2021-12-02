@@ -40,7 +40,7 @@ namespace Web.Services.Concrete
 
         #region Users
 
-        public BaseResponse GetAllUsers() 
+        public BaseResponse GetAllUsers()
         {
             var result = _user.Table.Where(x => x.IsDeleted == false).ToList();
             return new BaseResponse { Status = HttpStatusCode.OK, Message = "Users List Returned", Body = result };
@@ -53,10 +53,11 @@ namespace Web.Services.Concrete
             {
                 return new BaseResponse { Status = HttpStatusCode.OK, Message = "User Found", Body = USER };
             }
-            else {
+            else
+            {
                 return new BaseResponse { Status = HttpStatusCode.NotFound, Message = "User Not Found" };
             }
-            
+
         }
 
         public BaseResponse DeleteUser(int Id)
@@ -111,7 +112,7 @@ namespace Web.Services.Concrete
             return response;
         }
 
-        public BaseResponse DeleteRole(int Id) 
+        public BaseResponse DeleteRole(int Id)
         {
             var Role = _role.Table.Where(x => x.RoleId == Id && x.IsDeleted == false).FirstOrDefault();
             if (Role != null)
@@ -306,21 +307,21 @@ namespace Web.Services.Concrete
         public BaseResponse GetComponentsByUserRoleId(int roleId, int userId)
         {
             var response = new BaseResponse();
-           
+
             //////// Make a join of ComponentAccess Table with Component to get List of Accessible Components By Role Id ////////
             var userRoleAcceess = (from rca in _componentAccess.Table
-                               join ra in _component.Table on rca.ComIdFk equals ra.ComponentId
-                               join uca in _userAccess.Table on ra.ComponentId equals uca.UserComIdFk
-                               where rca.RoleIdFk == roleId.ToString()
-                               && uca.RoleIdFk == roleId.ToString() && uca.UserId == userId
-                               && ra.IsDeleted == false && rca.IsDeleted == false && uca.IsDeleted == false
-                               select new ComponentAccessVM()
-                               {
-                                   id = ra.ComponentId,
-                                   text = ra.ComModuleName,
-                                   parent = ra.ParentComponentId != null ? ra.ParentComponentId.ToString() : "#",
-                                   state = new ComponentAccessStateVM() { opened = true },
-                               }).ToList();
+                                   join ra in _component.Table on rca.ComIdFk equals ra.ComponentId
+                                   join uca in _userAccess.Table on ra.ComponentId equals uca.UserComIdFk
+                                   where rca.RoleIdFk == roleId.ToString()
+                                   && uca.RoleIdFk == roleId && uca.UserIdFk == userId
+                                   && ra.IsDeleted == false && rca.IsDeleted == false && uca.IsDeleted == false
+                                   select new ComponentAccessVM()
+                                   {
+                                       id = ra.ComponentId,
+                                       text = ra.ComModuleName,
+                                       parent = ra.ParentComponentId != null ? ra.ParentComponentId.ToString() : "#",
+                                       state = new ComponentAccessStateVM() { opened = true },
+                                   }).ToList();
 
             if (userRoleAcceess.Count() > 0)
             {
@@ -346,7 +347,7 @@ namespace Web.Services.Concrete
 
         public BaseResponse AddOrUpdateUserRoleComponentAccess(ComponentAccessUserRoleVM componentAccess)
         {
-            if (componentAccess.RoleId > 0 && componentAccess.UserId > 0) 
+            if (componentAccess.RoleId > 0 && componentAccess.UserId > 0)
             {
                 /////////// Get Allowed Component Ids /////////
                 var compIds = componentAccess.Attributes.Where(x => x.selected == true).Select(x => x.id).ToList();
@@ -361,7 +362,7 @@ namespace Web.Services.Concrete
                 compIds.RemoveAll(x => MatcheAccessIds.Contains(x));
 
                 /////////// Get AlreadyExist Allowed UserRole Access /////////
-                var alreadyExist = _userAccess.Table.Where(x => x.RoleIdFk == componentAccess.RoleId.ToString() && x.UserId == componentAccess.UserId && x.IsDeleted == false).ToList();
+                var alreadyExist = _userAccess.Table.Where(x => x.RoleIdFk == componentAccess.RoleId && x.UserIdFk == componentAccess.UserId && x.IsDeleted == false).ToList();
 
                 ///////////// Remove Already Exist User Component Access from coming List /////////
                 compIds.RemoveAll(x => alreadyExist.Select(x => x.UserComIdFk).Contains(x));
@@ -376,8 +377,8 @@ namespace Web.Services.Concrete
                 {
 
                     UserComIdFk = x,
-                    RoleIdFk = componentAccess.RoleId.ToString(),
-                    UserId = componentAccess.UserId,
+                    RoleIdFk = componentAccess.RoleId,
+                    UserIdFk = componentAccess.UserId,
                     UserActive = true,
                     IsDeleted = false,
                     CreatedBy = componentAccess.LoggedInUserId,
@@ -413,7 +414,7 @@ namespace Web.Services.Concrete
 
                 ///////////// Remove Already Exist Updated Component from coming List /////////
                 //compIds.RemoveAll(x => compsNeedToBeActive.Select(x => x.UserComIdFk).Contains(x));
-               
+
             }
             else if (componentAccess.RoleId > 0)
             {

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 #nullable disable
 
@@ -10,7 +9,6 @@ namespace Web.Data.Models
         public int ComponentId { get; set; }
         public string ComModuleName { get; set; }
         public int? ParentComponentId { get; set; }
-        public int RoleIdFk { get; set; }
         public string PageUrl { get; set; }
         public string PageName { get; set; }
         public string PageTitle { get; set; }

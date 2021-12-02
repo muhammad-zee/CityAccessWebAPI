@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 #nullable disable
 
@@ -7,8 +6,9 @@ namespace Web.Data.Models
 {
     public partial class UserAccess
     {
-        public int UserId { get; set; }
-        public string RoleIdFk { get; set; }
+        public int UserAccessId { get; set; }
+        public int UserIdFk { get; set; }
+        public int RoleIdFk { get; set; }
         public int UserComIdFk { get; set; }
         public bool UserActive { get; set; }
         public int CreatedBy { get; set; }

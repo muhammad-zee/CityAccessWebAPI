@@ -1,6 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
+﻿using Microsoft.EntityFrameworkCore;
 
 #nullable disable
 
@@ -164,16 +162,11 @@ namespace Web.Data.Models
 
             modelBuilder.Entity<UserAccess>(entity =>
             {
-                entity.HasKey(e => e.UserId)
-                    .HasName("PK_user_access");
-
                 entity.ToTable("UserAccess");
 
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");
 
                 entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
-
-                entity.Property(e => e.RoleIdFk).HasMaxLength(128);
             });
 
             OnModelCreatingPartial(modelBuilder);

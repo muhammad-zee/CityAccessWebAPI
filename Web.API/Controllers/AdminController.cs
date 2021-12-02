@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -36,7 +35,7 @@ namespace Web.API.Controllers
 
         [Description("Get Users List")]
         [HttpGet("admin/GetAllUsers")]
-        public async Task<BaseResponse> GetAllUsers() 
+        public async Task<BaseResponse> GetAllUsers()
         {
             try
             {
@@ -114,7 +113,7 @@ namespace Web.API.Controllers
                 var saveResponse = _adminService.SaveRole(role);
                 if (saveResponse == StatusEnums.AlreadyExist.ToString())
                 {
-                    return new BaseResponse { Status = HttpStatusCode.BadRequest, Message = "Role already exists"};
+                    return new BaseResponse { Status = HttpStatusCode.BadRequest, Message = "Role already exists" };
                 }
                 else /*if (saveResponse == StatusEnums.Success.ToString())*/
                 {

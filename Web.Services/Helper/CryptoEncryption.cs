@@ -1,14 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Web.Services.Helper
 {
-    public static  class CryptoEncryption
+    public static class CryptoEncryption
     {
         public static string key = "mySecretKeyHere";
         public static string Decrypt(string cipherText)

@@ -194,7 +194,7 @@ namespace Web.API.Controllers
                 BaseResponse response = _jwtAuth.VerifyTwoFactorAuthentication(verifyCode);
                 return response;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogExceptions(ex);
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };

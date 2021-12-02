@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Text.Json.Serialization;
 
 namespace Web.Model.Common
 {
@@ -19,7 +18,7 @@ namespace Web.Model.Common
         public string AuthenticationStatus { get; set; }
         public bool isVerifyForFuture { get; set; }
     }
-    
+
 
 
 }

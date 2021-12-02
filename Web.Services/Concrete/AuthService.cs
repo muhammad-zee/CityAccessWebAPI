@@ -83,7 +83,7 @@ namespace Web.Services.Concrete
               signingCredentials: credentials);
 
             //checking Verified for future or not 
-            if (user.TwoFactorEnabled && user.IsTwoFactRememberChecked && DateTime.UtcNow <= user.TwoFactorExpiryDate )
+            if (user.TwoFactorEnabled && user.IsTwoFactRememberChecked && DateTime.UtcNow <= user.TwoFactorExpiryDate)
             {
                 user.TwoFactorEnabled = false;
             }
@@ -114,7 +114,7 @@ namespace Web.Services.Concrete
             {
                 //first validate the username and password from the db and then generate token
                 if (!string.IsNullOrEmpty(register.UserName) && !string.IsNullOrEmpty(register.Password)
-                    && !string.IsNullOrEmpty(register.PrimaryEmail)  && !string.IsNullOrEmpty(register.Gender)
+                    && !string.IsNullOrEmpty(register.PrimaryEmail) && !string.IsNullOrEmpty(register.Gender)
                     && !string.IsNullOrEmpty(register.RoleIds))
                 {
                     var alreadyExist = _userRepo.GetList().Where(x => x.UserName == register.UserName).FirstOrDefault();
@@ -282,7 +282,7 @@ namespace Web.Services.Concrete
                 string Two_Factor_Authentication_Code = GenerateTwoFactorAuthenticationCode();
                 string Message_Body = "Routing and Queueing Two Factor Authentication Code: " + Two_Factor_Authentication_Code;
                 bool Code_Sent = false;
-                if(Authentication.SendCodeOn.Equals(TwoFactorAuthenticationEnums.S.ToString()))
+                if (Authentication.SendCodeOn.Equals(TwoFactorAuthenticationEnums.S.ToString()))
                 {
                     Code_Sent = this._communicationService.SendSms(user.PersonalMobileNumber, Message_Body);
                 }
@@ -322,9 +322,9 @@ namespace Web.Services.Concrete
         public BaseResponse VerifyTwoFactorAuthentication(VerifyTwoFactorAuthenticationCode verifyCode)
         {
             var user = _userRepo.Table.Where(u => u.UserId == verifyCode.UserId && !u.IsDeleted).FirstOrDefault();
-            if(user != null )
+            if (user != null)
             {
-                if(verifyCode.AuthenticationCode == user.TwoFactorCode)
+                if (verifyCode.AuthenticationCode == user.TwoFactorCode)
                 {
                     if (verifyCode.isVerifyForFuture)
                     {
@@ -333,14 +333,14 @@ namespace Web.Services.Concrete
                         _userRepo.Update(user);
                     }
                     verifyCode.AuthenticationStatus = "Verified";
-                    return new BaseResponse { Status = HttpStatusCode.OK, Message = "Authentication Code Verified.",Body=verifyCode };
+                    return new BaseResponse { Status = HttpStatusCode.OK, Message = "Authentication Code Verified.", Body = verifyCode };
                 }
                 else
                 {
                     verifyCode.AuthenticationStatus = "Not Verified";
-                    return new BaseResponse { Status = HttpStatusCode.NotFound, Message = "Authentication Code Mismatch.",Body= verifyCode };
+                    return new BaseResponse { Status = HttpStatusCode.NotFound, Message = "Authentication Code Mismatch.", Body = verifyCode };
                 }
-                
+
             }
             else
             {
