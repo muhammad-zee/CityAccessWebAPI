@@ -42,13 +42,13 @@ namespace Web.Services.Concrete
 
         public BaseResponse GetAllUsers() 
         {
-            var result = _user.GetList().ToList();
+            var result = _user.Table.Where(x => x.IsDeleted == false).ToList();
             return new BaseResponse { Status = HttpStatusCode.OK, Message = "Users List Returned", Body = result };
         }
 
         public BaseResponse GetUserById(int Id)
         {
-            var USER = _user.Table.Where(x =>x.UserId == Id).FirstOrDefault();
+            var USER = _user.Table.Where(x => x.UserId == Id && x.IsDeleted == false).FirstOrDefault();
             if (USER != null)
             {
                 return new BaseResponse { Status = HttpStatusCode.OK, Message = "User Found", Body = USER };
@@ -61,7 +61,7 @@ namespace Web.Services.Concrete
 
         public BaseResponse DeleteUser(int Id)
         {
-            var USER = _user.Table.Where(x => x.UserId == Id).FirstOrDefault();
+            var USER = _user.Table.Where(x => x.UserId == Id && x.IsDeleted == false).FirstOrDefault();
             if (USER != null)
             {
                 USER.IsDeleted = true;
@@ -113,7 +113,7 @@ namespace Web.Services.Concrete
 
         public BaseResponse DeleteRole(int Id) 
         {
-            var Role = _role.Table.Where(x => x.RoleId == Id).FirstOrDefault();
+            var Role = _role.Table.Where(x => x.RoleId == Id && x.IsDeleted == false).FirstOrDefault();
             if (Role != null)
             {
                 Role.IsDeleted = true;
@@ -286,7 +286,7 @@ namespace Web.Services.Concrete
             {
                 response = new BaseResponse()
                 {
-                    Status = System.Net.HttpStatusCode.OK,
+                    Status = HttpStatusCode.OK,
                     Message = "Data Found",
                     Body = roleAcceess,
                 };
@@ -295,13 +295,54 @@ namespace Web.Services.Concrete
             {
                 response = new BaseResponse()
                 {
-                    Status = System.Net.HttpStatusCode.NotFound,
+                    Status = HttpStatusCode.NotFound,
                     Message = "Data not Found",
                     Body = null,
                 };
             }
             return response;
         }
+
+        public BaseResponse GetComponentsByUserRoleId(int roleId, int userId)
+        {
+            var response = new BaseResponse();
+           
+            //////// Make a join of ComponentAccess Table with Component to get List of Accessible Components By Role Id ////////
+            var userRoleAcceess = (from rca in _componentAccess.Table
+                               join ra in _component.Table on rca.ComIdFk equals ra.ComponentId
+                               join uca in _userAccess.Table on ra.ComponentId equals uca.UserComIdFk
+                               where rca.RoleIdFk == roleId.ToString()
+                               && uca.RoleIdFk == roleId.ToString() && uca.UserId == userId
+                               && ra.IsDeleted == false && rca.IsDeleted == false && uca.IsDeleted == false
+                               select new ComponentAccessVM()
+                               {
+                                   id = ra.ComponentId,
+                                   text = ra.ComModuleName,
+                                   parent = ra.ParentComponentId != null ? ra.ParentComponentId.ToString() : "#",
+                                   state = new ComponentAccessStateVM() { opened = true },
+                               }).ToList();
+
+            if (userRoleAcceess.Count() > 0)
+            {
+                response = new BaseResponse()
+                {
+                    Status = HttpStatusCode.OK,
+                    Message = "Data Found",
+                    Body = userRoleAcceess,
+                };
+            }
+            else
+            {
+                response = new BaseResponse()
+                {
+                    Status = HttpStatusCode.NotFound,
+                    Message = "Data not Found",
+                    Body = null,
+                };
+            }
+            return response;
+        }
+
 
         public BaseResponse AddOrUpdateUserRoleComponentAccess(ComponentAccessUserRoleVM componentAccess)
         {
@@ -320,10 +361,15 @@ namespace Web.Services.Concrete
                 compIds.RemoveAll(x => MatcheAccessIds.Contains(x));
 
                 /////////// Get AlreadyExist Allowed UserRole Access /////////
-                var alreadyExist = _userAccess.Table.Where(x => compIds.Contains(x.UserComIdFk) && x.RoleIdFk == componentAccess.RoleId.ToString() && x.UserId == componentAccess.UserId && x.IsDeleted == false).ToList();
+                var alreadyExist = _userAccess.Table.Where(x => x.RoleIdFk == componentAccess.RoleId.ToString() && x.UserId == componentAccess.UserId && x.IsDeleted == false).ToList();
 
                 ///////////// Remove Already Exist User Component Access from coming List /////////
                 compIds.RemoveAll(x => alreadyExist.Select(x => x.UserComIdFk).Contains(x));
+
+                var extrasCompsAccess = alreadyExist.Where(x => !compIds.Contains(x.UserComIdFk) && x.IsDeleted == false).ToList();
+
+                extrasCompsAccess.ForEach(x => { x.IsDeleted = true; x.ModifiedBy = componentAccess.LoggedInUserId; x.ModifiedDate = DateTime.UtcNow; });
+                _userAccess.Update(extrasCompsAccess);
 
                 /////////// Now add new ones /////////
                 var comps = compIds.Select(x => new UserAccess()
@@ -340,7 +386,7 @@ namespace Web.Services.Concrete
 
                 _userAccess.Insert(comps);
 
-                return new BaseResponse() { Status = System.Net.HttpStatusCode.OK, Message = "Access saved successfully" };
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Component Access saved successfully" };
 
                 ///////////// Get List of that components from which Access is Removed /////////
                 //var toBeDeleteComps = _userAccess.Table.Where(x => x.RoleIdFk == componentAccess.RoleId.ToString() && x.UserId == componentAccess.UserId && !compIds.Contains(x.UserComIdFk)).ToList();

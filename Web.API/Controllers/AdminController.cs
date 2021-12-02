@@ -107,7 +107,7 @@ namespace Web.API.Controllers
         }
 
         [HttpPost("admin/SaveRole")]
-        public BaseResponse SaveRole(RoleVM role)
+        public BaseResponse SaveRole([FromBody] RoleVM role)
         {
             try
             {
@@ -256,6 +256,51 @@ namespace Web.API.Controllers
                 };
             }
         }
+
+        [Description("Get All Components By UserRole Id")]
+        [HttpGet("admin/GetComponentsByUserRoleId/{roleId}/{userId}")]
+        public async Task<BaseResponse> GetComponentsByUserRoleId(int roleId, int userId)
+        {
+            try
+            {
+                var response = new BaseResponse();
+                response = _adminService.GetComponentsByUserRoleId(roleId, userId);
+                return response;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogExceptions(ex);
+                return new BaseResponse()
+                {
+                    Status = HttpStatusCode.BadRequest,
+                    Message = ex.ToString(),
+                    Body = null
+                };
+            }
+        }
+
+        [Description("Add Or Update User Role Component Access")]
+        [HttpPost("admin/AddOrUpdateUserRoleComponentAccess")]
+        public async Task<BaseResponse> AddOrUpdateUserRoleComponentAccess([FromBody] ComponentAccessUserRoleVM componentAccess)
+        {
+            try
+            {
+                var response = new BaseResponse();
+                response = _adminService.AddOrUpdateUserRoleComponentAccess(componentAccess);
+                return response;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogExceptions(ex);
+                return new BaseResponse()
+                {
+                    Status = HttpStatusCode.BadRequest,
+                    Message = ex.ToString(),
+                    Body = null
+                };
+            }
+        }
+
 
         #endregion
     }
