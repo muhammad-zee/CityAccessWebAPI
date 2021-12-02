@@ -35,7 +35,7 @@ namespace Web.API.Controllers
         #region Users
 
         [Description("Get Users List")]
-        [HttpPost("admin/GetAllUsers")]
+        [HttpGet("admin/GetAllUsers")]
         public async Task<BaseResponse> GetAllUsers() 
         {
             try
@@ -52,7 +52,7 @@ namespace Web.API.Controllers
         }
 
         [Description("Get User By Id")]
-        [HttpPost("admin/GetAllUsers/{Id}")]
+        [HttpGet("admin/GetAllUsers/{Id}")]
         public async Task<BaseResponse> GetUserById(int Id)
         {
             try
@@ -68,7 +68,7 @@ namespace Web.API.Controllers
         }
 
         [Description("Delete User")]
-        [HttpPost("admin/DeleteUser/{Id}")]
+        [HttpGet("admin/DeleteUser/{Id}")]
         public async Task<BaseResponse> DeleteUser(int Id)
         {
             try
