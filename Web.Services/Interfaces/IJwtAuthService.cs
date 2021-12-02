@@ -5,6 +5,7 @@ namespace Web.Services.Interfaces
     public interface IJwtAuthService
     {
         BaseResponse Authentication(UserCredentialVM login);
+        BaseResponse RefreshToken(int UserId);
         BaseResponse TwoFactorAuthentication(RequestTwoFactorAuthenticationCode Authentication);
         BaseResponse VerifyTwoFactorAuthentication(VerifyTwoFactorAuthenticationCode verifyCode);
         string SaveUser(RegisterCredentialVM register);

@@ -59,8 +59,29 @@ namespace Web.Services.Concrete
                 {
                     response.Body = null;
                     response.Status = HttpStatusCode.NotFound;
-                    response.Message = "Email or password is not valid.";
+                    response.Message = "Email or password is not valid";
                 }
+            }
+            return response;
+        }
+        public BaseResponse RefreshToken(int UserId)
+        {
+
+
+            BaseResponse response = new BaseResponse();
+            var user = _userRepo.Table.Where(u => u.UserId == UserId && !u.IsDeleted).FirstOrDefault();
+            if (user != null)
+            {
+                var AuthorizationToken = GenerateJSONWebToken(user);
+                response.Status = HttpStatusCode.OK;
+                response.Message = "User found";
+                response.Body = AuthorizationToken; ;
+            }
+            else
+            {
+                response.Body = null;
+                response.Status = HttpStatusCode.NotFound;
+                response.Message = "User Not Found";
             }
             return response;
         }

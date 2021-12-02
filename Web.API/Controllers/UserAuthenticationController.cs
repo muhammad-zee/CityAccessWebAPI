@@ -41,6 +41,21 @@ namespace Web.API.Controllers
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
         }
+        [Description("Refresh Authenticaiton Token")]
+        [HttpGet("auth/RefreshToken")]
+        public BaseResponse RefreshToken(int UserId)
+        {
+            try
+            {
+                BaseResponse response = _jwtAuth.RefreshToken(UserId);
+                return response;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
 
         [Description("Add or Update User")]
         [HttpPost("auth/SaveUser")]
