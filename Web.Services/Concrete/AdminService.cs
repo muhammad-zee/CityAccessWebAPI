@@ -405,28 +405,40 @@ namespace Web.Services.Concrete
         {
             var response = new BaseResponse();
 
-            //////// Make a join of ComponentAccess Table with Component to get List of Accessible Components By Role Id ////////
-            var userRoleAcceess = (from rca in _componentAccess.Table
-                                   join ra in _component.Table on rca.ComIdFk equals ra.ComponentId
-                                   join uca in _userAccess.Table on ra.ComponentId equals uca.UserComIdFk
-                                   where rca.RoleIdFk == roleId
-                                   && uca.RoleIdFk == roleId && uca.UserIdFk == userId
-                                   && ra.IsDeleted == false && rca.IsDeleted == false && uca.IsDeleted == false
-                                   select new ComponentAccessVM()
-                                   {
-                                       id = ra.ComponentId,
-                                       text = ra.ComModuleName,
-                                       parent = ra.ParentComponentId != null ? ra.ParentComponentId.ToString() : "#",
-                                       state = new ComponentAccessStateVM() { opened = true },
-                                   }).ToList();
+            var result = _component.Table.Where(x => x.Status == true).ToList();
+            var treeItems = result.Select(x => new TreeviewItemVM()
+            {
+                key = x.ComponentId.ToString(),
+                ParentKey = x.ParentComponentId,
+                label = x.ComModuleName,
+                expanded = true,
+            }).ToList();
+            var treeViewItems = treeItems.BuildTree();
+            var selectedUserRoleAccessIds = _componentAccess.Table.Where(x => x.RoleIdFk == roleId).Select(x => new { key = x.ComIdFk }).ToList();
+            selectedUserRoleAccessIds.AddRange(_userAccess.Table.Where(x => x.RoleIdFk == roleId && x.UserIdFk == userId).Select(x => new { key = x.UserComIdFk }).ToList());
 
-            if (userRoleAcceess.Count() > 0)
+            //////// Make a join of ComponentAccess Table with Component to get List of Accessible Components By Role Id ////////
+            //var userRoleAcceess = (from rca in _componentAccess.Table
+            //                       join ra in _component.Table on rca.ComIdFk equals ra.ComponentId
+            //                       join uca in _userAccess.Table on ra.ComponentId equals uca.UserComIdFk
+            //                       where rca.RoleIdFk == roleId
+            //                       && uca.RoleIdFk == roleId && uca.UserIdFk == userId
+            //                       && ra.IsDeleted == false && rca.IsDeleted == false && uca.IsDeleted == false
+            //                       select new ComponentAccessVM()
+            //                       {
+            //                           id = ra.ComponentId,
+            //                           text = ra.ComModuleName,
+            //                           parent = ra.ParentComponentId != null ? ra.ParentComponentId.ToString() : "#",
+            //                           state = new ComponentAccessStateVM() { opened = true },
+            //                       }).ToList();
+
+            if (treeViewItems.Count() > 0)
             {
                 response = new BaseResponse()
                 {
                     Status = HttpStatusCode.OK,
                     Message = "Data Found",
-                    Body = userRoleAcceess,
+                    Body = new { TreeViewItems = treeViewItems, SelectedIds = selectedUserRoleAccessIds },
                 };
             }
             else
