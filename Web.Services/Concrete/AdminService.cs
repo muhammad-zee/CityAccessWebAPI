@@ -367,7 +367,7 @@ namespace Web.Services.Concrete
                 expanded = true,
             }).ToList();
             var treeViewItems = treeItems.BuildTree();
-            var selectedRoleAccessIds = _componentAccess.Table.Where(x => x.RoleIdFk == Id).Select(x => new { key = x.ComIdFk }).ToList();
+            var selectedRoleAccessIds = _componentAccess.Table.Where(x => x.RoleIdFk == Id && x.IsDeleted == false).Select(x => new { key = x.ComIdFk }).ToList();
 
             //var roleAcceess = (from rca in _componentAccess.Table
             //                   join ra in _component.Table on rca.ComIdFk equals ra.ComponentId
@@ -414,8 +414,8 @@ namespace Web.Services.Concrete
                 expanded = true,
             }).ToList();
             var treeViewItems = treeItems.BuildTree();
-            var selectedUserRoleAccessIds = _componentAccess.Table.Where(x => x.RoleIdFk == roleId).Select(x => new { key = x.ComIdFk }).ToList();
-            selectedUserRoleAccessIds.AddRange(_userAccess.Table.Where(x => x.RoleIdFk == roleId && x.UserIdFk == userId).Select(x => new { key = x.UserComIdFk }).ToList());
+            var selectedUserRoleAccessIds = _componentAccess.Table.Where(x => x.RoleIdFk == roleId && x.IsDeleted == false).Select(x => new { key = x.ComIdFk }).ToList();
+            selectedUserRoleAccessIds.AddRange(_userAccess.Table.Where(x => x.RoleIdFk == roleId && x.UserIdFk == userId && x.IsDeleted == false && x.UserActive == true).Select(x => new { key = x.UserComIdFk }).ToList());
 
             //////// Make a join of ComponentAccess Table with Component to get List of Accessible Components By Role Id ////////
             //var userRoleAcceess = (from rca in _componentAccess.Table
