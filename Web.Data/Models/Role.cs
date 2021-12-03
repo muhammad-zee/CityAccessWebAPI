@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 #nullable disable
 
@@ -6,6 +7,12 @@ namespace Web.Data.Models
 {
     public partial class Role
     {
+        public Role()
+        {
+            ComponentAccesses = new HashSet<ComponentAccess>();
+            UserRoles = new HashSet<UserRole>();
+        }
+
         public int RoleId { get; set; }
         public string RoleName { get; set; }
         public string RoleDescription { get; set; }
@@ -15,5 +22,8 @@ namespace Web.Data.Models
         public int? ModifiedBy { get; set; }
         public DateTime? ModifiedDate { get; set; }
         public bool IsDeleted { get; set; }
+
+        public virtual ICollection<ComponentAccess> ComponentAccesses { get; set; }
+        public virtual ICollection<UserRole> UserRoles { get; set; }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 #nullable disable
 
@@ -13,7 +14,6 @@ namespace Web.Data.Models
         public string PageName { get; set; }
         public string PageTitle { get; set; }
         public string PageDescription { get; set; }
-        public string FormId { get; set; }
         public bool Status { get; set; }
         public int CreatedBy { get; set; }
         public DateTime CreatedDate { get; set; }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Web.Model.Common
 {
@@ -21,5 +22,6 @@ namespace Web.Model.Common
         public bool IsDeleted { get; set; }
         public int? SortOrder { get; set; }
         public string ModuleImage { get; set; }
+        public List<ComponentVM> Children { get; set; }
     }
 }

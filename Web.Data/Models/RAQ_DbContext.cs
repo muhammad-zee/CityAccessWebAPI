@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 #nullable disable
 
@@ -43,10 +45,6 @@ namespace Web.Data.Models
 
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");
 
-                entity.Property(e => e.FormId)
-                    .HasMaxLength(200)
-                    .IsUnicode(false);
-
                 entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
 
                 entity.Property(e => e.ModuleImage)
@@ -80,7 +78,11 @@ namespace Web.Data.Models
 
                 entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
 
-                entity.Property(e => e.RoleIdFk).HasMaxLength(128);
+                entity.HasOne(d => d.RoleIdFkNavigation)
+                    .WithMany(p => p.ComponentAccesses)
+                    .HasForeignKey(d => d.RoleIdFk)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_ComponentAccess_Roles");
             });
 
             modelBuilder.Entity<Role>(entity =>
@@ -167,6 +169,29 @@ namespace Web.Data.Models
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");
 
                 entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+
+                entity.HasOne(d => d.UserIdFkNavigation)
+                    .WithMany(p => p.UserAccesses)
+                    .HasForeignKey(d => d.UserIdFk)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_UserAccess_Users");
+            });
+
+            modelBuilder.Entity<UserRole>(entity =>
+            {
+                entity.Property(e => e.UserRoleId).ValueGeneratedOnAdd();
+
+                entity.HasOne(d => d.RoleIdFkNavigation)
+                    .WithMany(p => p.UserRoles)
+                    .HasForeignKey(d => d.RoleIdFk)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_UserRoles_Roles");
+
+                entity.HasOne(d => d.UserRoleNavigation)
+                    .WithOne(p => p.UserRole)
+                    .HasForeignKey<UserRole>(d => d.UserRoleId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_UserRoles_UserRoles");
             });
 
             OnModelCreatingPartial(modelBuilder);

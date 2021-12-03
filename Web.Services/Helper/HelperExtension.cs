@@ -1,11 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using Web.Model.Common;
 
 namespace Web.API.Helper
 {
-    public class HelperExtension
+    public static class HelperExtension
     {
         public static string CreateRandomPassword(string firstName, int length = 15)
         {
@@ -69,5 +72,37 @@ namespace Web.API.Helper
             }
             return cipherText;
         }
+
+        public static IList<TreeviewItemVM> BuildTree(this IEnumerable<TreeviewItemVM> source)
+        {
+            var groups = source.GroupBy(i => i.ParentKey);
+
+            var roots = groups.FirstOrDefault(g => g.Key.HasValue == false).ToList();
+
+            if (roots.Count > 0)
+            {
+                var dict = groups.Where(g => g.Key.HasValue).ToDictionary(g => g.Key.Value.ToString(), g => g.ToList());
+                for (int i = 0; i < roots.Count; i++)
+                    AddChildren(roots[i], dict);
+            }
+
+            return roots;
+        }
+
+        private static void AddChildren(TreeviewItemVM node, IDictionary<string, List<TreeviewItemVM>> source)
+        {
+            if (source.ContainsKey(node.key))
+            {
+                node.children = source[node.key];
+                for (int i = 0; i < node.children.Count; i++)
+                    AddChildren(node.children[i], source);
+            }
+            else
+            {
+                node.children = new List<TreeviewItemVM>();
+                node.expanded = false;
+            }
+        }
+
     }
 }

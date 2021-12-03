@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Web.Model.Common
@@ -37,5 +38,6 @@ namespace Web.Model.Common
         public byte[] UserImageByte { get; set; }
         public string UserImage { get; set; }
         public string RoleIds { get; set; }
+        public List<UserRoleVM> UserRole { get; set; }
     }
 }
