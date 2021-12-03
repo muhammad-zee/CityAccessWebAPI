@@ -160,7 +160,7 @@ namespace Web.Services.Concrete
                         List<UserRole> userRoleList = new List<UserRole>();
                         foreach (var item in roleIds)
                         {
-                            userRoleList.Add(new UserRole() { UserId = obj.UserId, RoleId = item });
+                            userRoleList.Add(new UserRole() { UserIdFK = obj.UserId, RoleIdFK = item });
                         }
                         _userRoleRepo.Insert(userRoleList);
                         if (register.UserImageByte != null && register.UserImageByte.Count() > 0)

@@ -17,7 +17,7 @@ using Web.Services.Interfaces;
 
 namespace Web.API.Controllers
 {
-    [Authorize]
+    //[Authorize]
     public class AdminController : Controller
     {
         private readonly IAdminService _adminService;
@@ -95,6 +95,22 @@ namespace Web.API.Controllers
             try
             {
                 var roleObj = _adminService.getRoleList();
+                return new BaseResponse { Status = HttpStatusCode.OK, Message = "Roles List Returned", Body = roleObj };
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+
+        }
+        [HttpGet("admin/GetRolesByUserId/{UserId}")]
+        public BaseResponse GetRoles(int UserId)
+        {
+            try
+            {
+                var roleObj = _adminService.getRoleListByUserId(UserId).ToList();
                 return new BaseResponse { Status = HttpStatusCode.OK, Message = "Roles List Returned", Body = roleObj };
 
             }

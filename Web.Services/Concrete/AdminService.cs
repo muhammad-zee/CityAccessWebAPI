@@ -20,12 +20,14 @@ namespace Web.Services.Concrete
         private IRepository<User> _user;
         private IRepository<ComponentAccess> _componentAccess;
         private IRepository<UserAccess> _userAccess;
+        private IRepository<UserRole> _userRole;
         IConfiguration _config;
         public AdminService(IConfiguration config,
             IRepository<Component> component,
             IRepository<ComponentAccess> componentAccess,
             IRepository<User> user,
             IRepository<Role> role,
+            IRepository<UserRole> userRole,
             IRepository<UserAccess> userAccess)
         {
             this._componentAccess = componentAccess;
@@ -34,6 +36,7 @@ namespace Web.Services.Concrete
             this._component = component;
             this._user = user;
             this._role = role;
+            this._userRole = userRole;
             this._userAccess = userAccess;
         }
 
@@ -85,6 +88,23 @@ namespace Web.Services.Concrete
         public IQueryable<Role> getRoleList()
         {
             return this._role.GetList().Where(item => !item.IsDeleted);
+        }
+        public IQueryable<UserRoleVM> getRoleListByUserId(int UserId)
+        {
+            var userRoleList = this._userRole.GetList().Where(item => item.UserIdFK == UserId);
+            var roleList = this._role.GetList().Where(item => !item.IsDeleted);
+            var userRoles = ( from ur in userRoleList
+                              join r in roleList
+                              on ur.RoleIdFK equals r.RoleId
+                              select new UserRoleVM
+                              {
+                                  UserRoleId = ur.UserRoleId,
+                                  UserId = ur.UserIdFK,
+                                  RoleId = ur.RoleIdFK,
+                                  RoleName = r.RoleName
+                              }
+                              );
+            return userRoles;
         }
         public string SaveRole(RoleVM role)
         {
