@@ -168,13 +168,13 @@ namespace Web.Services.Concrete
                             IsDeleted = false
                         };
                         _userRepo.Insert(obj);
-                        var roleIds = register.RoleIds.ToIntList();
-                        List<UserRole> userRoleList = new List<UserRole>();
-                        foreach (var item in roleIds)
-                        {
-                            userRoleList.Add(new UserRole() { UserIdFk = obj.UserId, RoleIdFk = item });
-                        }
-                        _userRoleRepo.Insert(userRoleList);
+                        //var roleIds = register.RoleIds.ToIntList();
+                        //List<UserRole> userRoleList = new List<UserRole>();
+                        //foreach (var item in roleIds)
+                        //{
+                        //    userRoleList.Add(new UserRole() { UserIdFk = obj.UserId, RoleIdFk = item });
+                        //}
+                        //_userRoleRepo.Insert(userRoleList);
                         if (register.UserImageByte != null && register.UserImageByte.Count() > 0)
                         {
                             var outPath = Directory.GetCurrentDirectory();
