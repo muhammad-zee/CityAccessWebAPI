@@ -405,6 +405,31 @@ namespace Web.Services.Concrete
         {
             var response = new BaseResponse();
 
+            //////// Make a join of ComponentAccess Table with Component to get List of Accessible Components By Role Id ////////
+            var roleacceess = (from rca in _componentAccess.Table
+                               join ra in _component.Table on rca.ComIdFk equals ra.ComponentId
+                               where rca.RoleIdFk == roleId && !ra.IsDeleted && !rca.IsDeleted
+                               select new ComponentAccessVM()
+                               {
+                                   id = ra.ComponentId,
+                                   text = ra.ComModuleName,
+                                   parent = ra.ParentComponentId != null ? ra.ParentComponentId.ToString() : "#",
+                                   state = new ComponentAccessStateVM() { opened = true },
+                               }).ToList();
+
+            var userRoleAcceess = (from rca in _componentAccess.Table
+                                   join ra in _component.Table on rca.ComIdFk equals ra.ComponentId
+                                   join uca in _userAccess.Table on ra.ComponentId equals uca.UserComIdFk
+                                   where rca.RoleIdFk == roleId
+                                   && uca.RoleIdFk == roleId && uca.UserIdFk == userId
+                                   && ra.IsDeleted == false && rca.IsDeleted == false && uca.IsDeleted == false
+                                   select new ComponentAccessVM()
+                                   {
+                                       id = ra.ComponentId,
+                                       text = ra.ComModuleName,
+                                       parent = ra.ParentComponentId != null ? ra.ParentComponentId.ToString() : "#",
+                                       state = new ComponentAccessStateVM() { opened = true },
+                                   }).ToList();
             var result = _component.Table.Where(x => x.Status == true).ToList();
             var treeItems = result.Select(x => new TreeviewItemVM()
             {
@@ -579,6 +604,8 @@ namespace Web.Services.Concrete
 
             return new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "Please select a role." };
         }
+
+
 
         #endregion
 
