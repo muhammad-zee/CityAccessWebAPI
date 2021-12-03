@@ -68,11 +68,10 @@ namespace Web.API.Controllers
             try
             {
                 BaseResponse response = null;
-                register.UserName = register.PrimaryEmail;
-
+                
                 //////////////////////////// Generate Password //////////////////////////////
                 var strongPassword = HelperExtension.CreateRandomPassword(register.FirstName);
-                var hashPswd = HelperExtension.Encrypt(strongPassword);
+                var hashPswd = HelperExtension.Encrypt(register.Password);
                 /////////////////////////////////////////////////////////////////////////////
 
                 register.Password = hashPswd;

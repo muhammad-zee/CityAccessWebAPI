@@ -157,8 +157,11 @@ namespace Web.Services.Concrete
                             UserName = register.UserName,
                             Password = register.Password,
                             PrimaryEmail = register.PrimaryEmail,
-                            OfficePhoneNumber = register.OfficePhoneNumber,
+                            PersonalMobileNumber = register.PersonalMobileNumber,
                             Gender = register.Gender,
+                            HomeAddress = register.HomeAddress,
+                            City = register.City,
+                            Zip = register.Zip,
                             CreatedBy = register.CreatedBy,
                             CreatedDate = DateTime.UtcNow,
                             IsDeleted = false

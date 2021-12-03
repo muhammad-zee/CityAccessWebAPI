@@ -60,7 +60,9 @@ namespace Web.Services.Concrete
             var USER = _user.Table.Where(x => x.UserId == Id && x.IsDeleted == false).FirstOrDefault();
             if (USER != null)
             {
-                return new BaseResponse { Status = HttpStatusCode.OK, Message = "User Found", Body = USER };
+                var user = AutoMapperHelper.MapSingleRow<User, RegisterCredentialVM>(USER);
+                user.UserRole = getRoleListByUserId(Id).ToList();
+                return new BaseResponse { Status = HttpStatusCode.OK, Message = "User Found", Body = user };
             }
             else
             {
