@@ -52,7 +52,7 @@ namespace Web.Services.Concrete
             {
                 item.UserRole = getRoleListByUserId(item.UserId).ToList();
             }
-            return new BaseResponse { Status = HttpStatusCode.OK, Message = "Users List Returned", Body = result };
+            return new BaseResponse { Status = HttpStatusCode.OK, Message = "Users List Returned", Body = users };
         }
 
         public BaseResponse GetUserById(int Id)

@@ -136,6 +136,7 @@ namespace Web.Services.Concrete
             if (register.UserId > 0)
             {
                 var user = AutoMapperHelper.MapSingleRow<RegisterCredentialVM, User>(register);
+                user.Password = _userRepo.Table.Where(x => x.UserId == register.UserId).Select(x => x.Password).AsQueryable().FirstOrDefault();
                 _userRepo.Update(user);
                 return StatusEnums.Updated.ToString();
             }
