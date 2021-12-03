@@ -27,15 +27,23 @@ namespace Web.Services.Concrete
         private readonly GenericRepository<User> _userRepo;
         private readonly GenericRepository<UserRole> _userRoleRepo;
         private readonly ICommunicationService _communicationService;
+        private readonly IAdminService _adminService;
         IConfiguration _config;
         private readonly UnitOfWork unitorWork;
-        public AuthService(IConfiguration config, /*IUserAuthRepository userAuthRepository,*/ IRepository<User> userRepo, IRepository<UserRole> userRoleRepo, ICommunicationService communicationService)
+        public AuthService(IConfiguration config,
+            /*IUserAuthRepository userAuthRepository,*/
+            IRepository<User> userRepo,
+            IRepository<UserRole> userRoleRepo,
+            ICommunicationService communicationService,
+            IAdminService adminService)
         {
             _config = config;
             //_userAuthRepository = userAuthRepository;
             _userRepo = (GenericRepository<User>)userRepo;
             _userRoleRepo = (GenericRepository<UserRole>)userRoleRepo;
             this._communicationService = communicationService;
+            this._adminService = adminService;
+            
         }
 
 
@@ -108,7 +116,7 @@ namespace Web.Services.Concrete
             {
                 user.TwoFactorEnabled = false;
             }
-
+            List<UserRoleVM> UserRole =this._adminService.getRoleListByUserId(user.UserId).ToList();
             return new
             {
                 token = new JwtSecurityTokenHandler().WriteToken(token),
@@ -117,8 +125,8 @@ namespace Web.Services.Concrete
                 PhoneNumber = user.PersonalMobileNumber,
                 TwoFactorEnabled = user.TwoFactorEnabled,
                 UserId = user.UserId,
-                Username = user.UserName
-
+                Username = user.UserName,
+                UserRole = UserRole
 
             };
         }

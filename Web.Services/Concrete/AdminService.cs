@@ -98,8 +98,8 @@ namespace Web.Services.Concrete
                               on ur.RoleIdFK equals r.RoleId
                               select new UserRoleVM
                               {
-                                  UserRoleId = ur.UserRoleId,
-                                  UserId = ur.UserIdFK,
+                                  //UserRoleId = ur.UserRoleId,
+                                  //UserId = ur.UserIdFK,
                                   RoleId = ur.RoleIdFK,
                                   RoleName = r.RoleName
                               }
