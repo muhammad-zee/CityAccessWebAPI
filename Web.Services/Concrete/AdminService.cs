@@ -462,7 +462,7 @@ namespace Web.Services.Concrete
                 var compIds = componentAccess.Attributes.Where(x => x.selected == true).Select(x => x.id).ToList();
 
                 /////////// Get Allowed Role Access /////////
-                var roleAccess = _componentAccess.Table.Where(x => x.RoleIdFk == componentAccess.RoleId && x.IsDeleted == false).ToList();
+                var roleAccess = _componentAccess.Table.Where(x => x.RoleIdFk == componentAccess.RoleId && x.IsDeleted == false && x.Active == true).ToList();
 
                 /////////// Get Matched Access Ids /////////
                 var MatcheAccessIds = roleAccess.Where(x => compIds.Contains(x.ComIdFk)).Select(x => x.ComIdFk).ToList();
@@ -471,13 +471,18 @@ namespace Web.Services.Concrete
                 compIds.RemoveAll(x => MatcheAccessIds.Contains(x));
 
                 /////////// Get AlreadyExist Allowed UserRole Access /////////
-                var alreadyExist = _userAccess.Table.Where(x => x.RoleIdFk == componentAccess.RoleId && x.UserIdFk == componentAccess.UserId && x.IsDeleted == false).ToList();
+                var alreadyExist = _userAccess.Table.Where(x => x.RoleIdFk == componentAccess.RoleId && x.UserIdFk == componentAccess.UserId && x.UserActive == true && x.IsDeleted == false).ToList();
 
                 ///////////// Remove Already Exist User Component Access from coming List /////////
                 compIds.RemoveAll(x => alreadyExist.Select(x => x.UserComIdFk).Contains(x));
 
-                var extrasCompsAccess = alreadyExist.Where(x => !compIds.Contains(x.UserComIdFk) && x.IsDeleted == false).ToList();
+                ///////////// Remove Access from components /////////
+                var removeCompsAccess = alreadyExist.Where(x => !compIds.Contains(x.UserComIdFk) && x.IsDeleted == false && x.UserActive == true).ToList();
+                removeCompsAccess.ForEach(x => x.UserActive = false);
+                _userAccess.Update(removeCompsAccess);
 
+                ///////////// Remove components which has no access/////////
+                var extrasCompsAccess = alreadyExist.Where(x => !compIds.Contains(x.UserComIdFk) && x.IsDeleted == false && x.UserActive == false).ToList();
                 extrasCompsAccess.ForEach(x => { x.IsDeleted = true; x.ModifiedBy = componentAccess.LoggedInUserId; x.ModifiedDate = DateTime.UtcNow; });
                 _userAccess.Update(extrasCompsAccess);
 
