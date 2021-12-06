@@ -154,16 +154,7 @@ namespace Web.API.Controllers
         {
             try
             {
-                if (role.RoleId > 0)
-                {
-                    var saveRespose = StatusEnums.Success.ToString();
-                }
-                else
-                {
-                var saveResponse = _adminService.SaveRole(role);
-
-                }
-
+                string saveResponse = _adminService.SaveRole(role);
                 if (saveResponse == StatusEnums.AlreadyExist.ToString())
                 {
                     return new BaseResponse { Status = HttpStatusCode.BadRequest, Message = "Role already exists" };
@@ -181,7 +172,7 @@ namespace Web.API.Controllers
         }
 
         [Description("Delete Role")]
-        [HttpPost("admin/DeleteRole/{Id}")]
+        [HttpGet("admin/DeleteRole/{Id}")]
         public async Task<BaseResponse> DeleteRole(int Id)
         {
             try
