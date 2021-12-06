@@ -18,6 +18,8 @@ namespace Web.DLL.Generic_Repository
         void Delete(T entity);
         IQueryable<T> Table { get; }
         IQueryable<T> GetAllIncluding(params Expression<Func<T, object>>[] includeProperties);
+
+        IQueryable<T> ExcuteSql(string Qry);
         void DeleteRange(IEnumerable<T> entities);
     }
 }

@@ -10,6 +10,7 @@ using System.Net;
 using System.Reflection;
 using System.Threading.Tasks;
 using Web.API.Helper;
+using Web.Data.Models;
 using Web.Model;
 using Web.Model.Common;
 using Web.Services.Enums;

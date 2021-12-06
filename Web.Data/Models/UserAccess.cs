@@ -18,6 +18,7 @@ namespace Web.Data.Models
         public DateTime? ModifiedDate { get; set; }
         public bool IsDeleted { get; set; }
 
+        public virtual Component ComponentIdFkNavigation { get; set; }
         public virtual Role RoleIdFkNavigation { get; set; }
         public virtual User UserIdFkNavigation { get; set; }
     }

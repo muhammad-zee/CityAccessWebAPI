@@ -7,6 +7,11 @@ namespace Web.Data.Models
 {
     public partial class ControlList
     {
+        public ControlList()
+        {
+            ControlListDetails = new HashSet<ControlListDetail>();
+        }
+
         public int ControlListId { get; set; }
         public string ControlListType { get; set; }
         public string ControlListTitle { get; set; }
@@ -16,5 +21,7 @@ namespace Web.Data.Models
         public int? ModifiedBy { get; set; }
         public DateTime? ModifiedDate { get; set; }
         public bool IsDeleted { get; set; }
+
+        public virtual ICollection<ControlListDetail> ControlListDetails { get; set; }
     }
 }
