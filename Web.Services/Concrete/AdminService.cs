@@ -90,6 +90,42 @@ namespace Web.Services.Concrete
 
         #endregion
 
+        #region UserRole
+
+        public BaseResponse GetUsersByRoleId(int roleId) 
+        {
+            var roleUsers = (from ur in _userRole.Table
+                             join u in _user.Table on ur.UserIdFk equals u.UserId
+                             where ur.RoleIdFk == roleId
+                             select u
+                             ).ToList();
+            var roleUsersVM = AutoMapperHelper.MapList<User, RegisterCredentialVM>(roleUsers);
+            var response = new BaseResponse();
+
+            if (roleUsersVM.Count() > 0)
+            {
+                response = new BaseResponse()
+                {
+                    Status = HttpStatusCode.OK,
+                    Message = "Data Found",
+                    Body = roleUsersVM,
+                };
+            }
+            else
+            {
+                response = new BaseResponse()
+                {
+                    Status = HttpStatusCode.NotFound,
+                    Message = "Data not Found",
+                    Body = null,
+                };
+            }
+
+            return response;
+        }
+
+        #endregion
+
         #region Roles
         public IQueryable<Role> getRoleList()
         {

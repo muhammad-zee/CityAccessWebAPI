@@ -26,6 +26,10 @@ namespace Web.Services.Interfaces
 
         #endregion
 
+        #region User Role
+        BaseResponse GetUsersByRoleId(int roleId);
+        #endregion
+
         #region Roles
         IQueryable<Role> getRoleList();
         IQueryable<UserRoleVM> getRoleListByUserId(int UserId);

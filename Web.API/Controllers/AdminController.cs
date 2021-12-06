@@ -85,6 +85,32 @@ namespace Web.API.Controllers
 
         #endregion
 
+        #region User Role
+
+        public async Task<BaseResponse> GetUsersByRoleId(int roleId) 
+        {
+            try
+            {
+                var response = new BaseResponse();
+                response = _adminService.GetUsersByRoleId(roleId);
+                return response;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogExceptions(ex);
+                return new BaseResponse()
+                {
+                    Status = HttpStatusCode.BadRequest,
+                    Message = ex.ToString(),
+                    Body = null
+                };
+            }
+
+        }
+
+
+        #endregion
+
         #region Role
 
         // GET: api/<EmployeeController>
