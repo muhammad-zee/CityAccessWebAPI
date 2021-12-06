@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 #nullable disable
 
@@ -6,6 +7,12 @@ namespace Web.Data.Models
 {
     public partial class Component
     {
+        public Component()
+        {
+            ComponentAccesses = new HashSet<ComponentAccess>();
+            UserAccesses = new HashSet<UserAccess>();
+        }
+
         public int ComponentId { get; set; }
         public string ComModuleName { get; set; }
         public int? ParentComponentId { get; set; }
@@ -21,5 +28,8 @@ namespace Web.Data.Models
         public bool IsDeleted { get; set; }
         public int? SortOrder { get; set; }
         public string ModuleImage { get; set; }
+
+        public virtual ICollection<ComponentAccess> ComponentAccesses { get; set; }
+        public virtual ICollection<UserAccess> UserAccesses { get; set; }
     }
 }

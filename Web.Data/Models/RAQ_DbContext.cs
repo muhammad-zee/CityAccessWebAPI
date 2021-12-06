@@ -18,6 +18,7 @@ namespace Web.Data.Models
         public virtual DbSet<Component> Components { get; set; }
         public virtual DbSet<ComponentAccess> ComponentAccesses { get; set; }
         public virtual DbSet<ControlList> ControlLists { get; set; }
+        public virtual DbSet<ControlListDetail> ControlListDetails { get; set; }
         public virtual DbSet<Role> Roles { get; set; }
         public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<UserAccess> UserAccesses { get; set; }
@@ -77,11 +78,17 @@ namespace Web.Data.Models
 
                 entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
 
+                entity.HasOne(d => d.ComponentIdFkNavigation)
+                    .WithMany(p => p.ComponentAccesses)
+                    .HasForeignKey(d => d.ComponentIdFk)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Components_ComponentAccess");
+
                 entity.HasOne(d => d.RoleIdFkNavigation)
                     .WithMany(p => p.ComponentAccesses)
                     .HasForeignKey(d => d.RoleIdFk)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_ComponentAccess_Roles");
+                    .HasConstraintName("FK_ComponentAccess");
             });
 
             modelBuilder.Entity<ControlList>(entity =>
@@ -100,6 +107,31 @@ namespace Web.Data.Models
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");
 
                 entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+            });
+
+            modelBuilder.Entity<ControlListDetail>(entity =>
+            {
+                entity.ToTable("ControlListDetail");
+
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.Description).HasMaxLength(300);
+
+                entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.Title)
+                    .IsRequired()
+                    .HasMaxLength(150);
+
+                entity.Property(e => e.UniqueId)
+                    .HasMaxLength(128)
+                    .IsUnicode(false);
+
+                entity.HasOne(d => d.ControlListIdFkNavigation)
+                    .WithMany(p => p.ControlListDetails)
+                    .HasForeignKey(d => d.ControlListIdFk)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_ControlList_data");
             });
 
             modelBuilder.Entity<Role>(entity =>
@@ -186,6 +218,12 @@ namespace Web.Data.Models
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");
 
                 entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+
+                entity.HasOne(d => d.ComponentIdFkNavigation)
+                    .WithMany(p => p.UserAccesses)
+                    .HasForeignKey(d => d.ComponentIdFk)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Components_UserAccess");
 
                 entity.HasOne(d => d.RoleIdFkNavigation)
                     .WithMany(p => p.UserAccesses)

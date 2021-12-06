@@ -164,6 +164,11 @@ namespace Web.DLL.Generic_Repository
             return queryable;
         }
 
+        public IQueryable<T> ExcuteSql(string Qry) {
+            return this.Entities.FromSqlRaw($"{Qry}");
+        }
+        
+
         #endregion
     }
 }

@@ -16,6 +16,7 @@ namespace Web.Services.Concrete
 {
     public class AdminService : IAdminService
     {
+        private RAQ_DbContext _dbContext;
         private IRepository<Component> _component;
         private IRepository<Role> _role;
         private IRepository<User> _user;
@@ -23,7 +24,8 @@ namespace Web.Services.Concrete
         private IRepository<UserAccess> _userAccess;
         private IRepository<UserRole> _userRole;
         IConfiguration _config;
-        public AdminService(IConfiguration config,
+        public AdminService(RAQ_DbContext dbContext,
+            IConfiguration config,
             IRepository<Component> component,
             IRepository<ComponentAccess> componentAccess,
             IRepository<User> user,
@@ -31,6 +33,7 @@ namespace Web.Services.Concrete
             IRepository<UserRole> userRole,
             IRepository<UserAccess> userAccess)
         {
+            this._dbContext = dbContext;
             this._componentAccess = componentAccess;
             this._component = component;
             this._config = config;
@@ -441,17 +444,18 @@ namespace Web.Services.Concrete
 
             //////// Make a join of ComponentAccess Table with Component to get List of Accessible Components By Role Id ////////
             List<ComponentAccessVM> roleacceess = (from ca in _componentAccess.Table
-                                                   join c in _component.Table on ca.ComponentIdFk equals c.ComponentId
-                                                   where ca.RoleIdFk == roleId && !c.IsDeleted && !ca.IsDeleted && ca.Active
-                                                   select new ComponentAccessVM()
-                                                   {
-                                                       ComponentId = c.ComponentId,
-                                                       ComModuleName = c.ComModuleName,
-                                                       RoleId = ca.RoleIdFk,
-                                                       ParentComponentId = c.ParentComponentId,
-
-                                                   }).ToList();
-
+                               join c in _component.Table on ca.ComponentIdFk equals c.ComponentId
+                               where ca.RoleIdFk == roleId && !c.IsDeleted && !ca.IsDeleted && ca.IsActive
+                               select new ComponentAccessVM()
+                               {
+                                   ComponentId = c.ComponentId,
+                                   ComModuleName = c.ComModuleName,
+                                   RoleId = ca.RoleIdFk,
+                                   ParentComponentId = c.ParentComponentId,
+                                   
+                               }).ToList();
+            //var queryReturn = this._dbContext.UserRoles. .ExcuteSql("select * from Roles");
+            //List<ComponentAccessVM> roleaccees = this. //dasq("CreateStudents @p0, @p1", parameters: new[] { "Bill", "Gates" });
             //var userRoleAcceess = (from rca in _componentAccess.Table
             //                       join ra in _component.Table on rca.ComIdFk equals ra.ComponentId
             //                       join uca in _userAccess.Table on ra.ComponentId equals uca.UserComIdFk
@@ -465,7 +469,7 @@ namespace Web.Services.Concrete
             //                           parent = ra.ParentComponentId != null ? ra.ParentComponentId.ToString() : "#",
             //                           state = new ComponentAccessStateVM() { opened = true },
             //                       }).ToList();
-           
+
 
             if (roleacceess.Count() > 0)
             {
@@ -496,7 +500,7 @@ namespace Web.Services.Concrete
                 var compIds = componentAccess.Attributes.Where(x => x.selected == true).Select(x => x.id).ToList();
 
                 /////////// Get Allowed Role Access /////////
-                var roleAccess = _componentAccess.Table.Where(x => x.RoleIdFk == componentAccess.RoleId && x.IsDeleted == false && x.Active == true).ToList();
+                var roleAccess = _componentAccess.Table.Where(x => x.RoleIdFk == componentAccess.RoleId && x.IsDeleted == false && x.IsActive == true).ToList();
 
                 /////////// Get Matched Access Ids /////////
                 var MatcheAccessIds = roleAccess.Where(x => compIds.Contains(x.ComponentIdFk)).Select(x => x.ComponentIdFk).ToList();
@@ -554,16 +558,16 @@ namespace Web.Services.Concrete
                 var alreadyExistComps = _componentAccess.Table.Where(x => x.RoleIdFk == componentAccess.RoleId).ToList();
 
                 /////////// Get Already Exist Active Component Ids /////////
-                var alreadyExistActiveCompIds = alreadyExistComps.Where(x => x.Active == true).Select(x => x.ComponentIdFk).ToList();
+                var alreadyExistActiveCompIds = alreadyExistComps.Where(x => x.IsActive == true).Select(x => x.ComponentIdFk).ToList();
 
                 /////////// Remove Already Exist Component from coming List /////////
                 compIds.RemoveAll(x => alreadyExistActiveCompIds.Contains(x));
 
                 /////////// Get Already Exist DeActive Component from Db /////////
-                var compsNeedToBeActive = alreadyExistComps.Where(x => x.Active == false && compIds.Contains(x.ComponentIdFk)).ToList();
+                var compsNeedToBeActive = alreadyExistComps.Where(x => x.IsActive == false && compIds.Contains(x.ComponentIdFk)).ToList();
 
                 /////////// Activate and Update Already Exist DeActive Component from Db /////////
-                compsNeedToBeActive.ForEach(x => { x.Active = true; x.ModifiedBy = componentAccess.LoggedInUserId; x.ModifiedDate = DateTime.UtcNow; });
+                compsNeedToBeActive.ForEach(x => { x.IsActive = true; x.ModifiedBy = componentAccess.LoggedInUserId; x.ModifiedDate = DateTime.UtcNow; });
                 _componentAccess.Update(compsNeedToBeActive);
 
                 /////////// Remove Already Exist Updated Component from coming List /////////
@@ -575,7 +579,7 @@ namespace Web.Services.Concrete
 
                     ComponentIdFk = x,
                     RoleIdFk = componentAccess.RoleId,
-                    Active = true,
+                    IsActive = true,
                     IsDeleted = false,
                     CreatedBy = componentAccess.LoggedInUserId,
                     CreatedDate = DateTime.UtcNow,

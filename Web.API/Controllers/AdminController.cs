@@ -9,6 +9,7 @@ using System.Net;
 using System.Reflection;
 using System.Threading.Tasks;
 using Web.API.Helper;
+using Web.Data.Models;
 using Web.Model;
 using Web.Model.Common;
 using Web.Services.Enums;
@@ -299,7 +300,7 @@ namespace Web.API.Controllers
         }
 
         [Description("Get All Components By UserRole Id")]
-        [HttpGet("admin/GetComponentsByUserRoleId/{roleId}/{userId}")]
+        [HttpGet("admin/GetComponentsByUserRoleId")]
         public async Task<BaseResponse> GetComponentsByUserRoleId(int roleId, int userId)
         {
             try

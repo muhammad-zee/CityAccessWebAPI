@@ -10,8 +10,6 @@ using Microsoft.OpenApi.Models;
 using System.Text;
 using Web.API.Helper;
 using Web.Data;
-using Web.Data.Concrete;
-using Web.Data.Interfaces;
 using Web.Data.Models;
 using Web.DLL;
 using Web.DLL.Generic_Repository;
@@ -106,7 +104,6 @@ namespace Web.API
 
             //Register Services
             services.AddTransient(typeof(IJwtAuthService), typeof(AuthService));
-            services.AddTransient(typeof(IUserAuthRepository), typeof(UserAuthRepository));
             services.AddTransient(typeof(ICommunicationService), typeof(CommunicationService));
             services.AddTransient(typeof(IAdminService), typeof(AdminService));
 
