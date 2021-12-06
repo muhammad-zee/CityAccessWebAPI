@@ -153,7 +153,16 @@ namespace Web.API.Controllers
         {
             try
             {
+                if (role.RoleId > 0)
+                {
+                    var saveRespose = StatusEnums.Success.ToString();
+                }
+                else
+                {
                 var saveResponse = _adminService.SaveRole(role);
+
+                }
+
                 if (saveResponse == StatusEnums.AlreadyExist.ToString())
                 {
                     return new BaseResponse { Status = HttpStatusCode.BadRequest, Message = "Role already exists" };
