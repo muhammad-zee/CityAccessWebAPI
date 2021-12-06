@@ -10,6 +10,7 @@ namespace Web.Data.Models
         public User()
         {
             UserAccesses = new HashSet<UserAccess>();
+            UserRoles = new HashSet<UserRole>();
         }
 
         public int UserId { get; set; }
@@ -39,8 +40,9 @@ namespace Web.Data.Models
         public DateTime? CodeExpiryTime { get; set; }
         public bool IsTwoFactRememberChecked { get; set; }
         public DateTime? TwoFactorExpiryDate { get; set; }
+        public bool IsRequirePasswordReset { get; set; }
 
-        public virtual UserRole UserRole { get; set; }
         public virtual ICollection<UserAccess> UserAccesses { get; set; }
+        public virtual ICollection<UserRole> UserRoles { get; set; }
     }
 }

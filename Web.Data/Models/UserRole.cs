@@ -12,6 +12,6 @@ namespace Web.Data.Models
         public int RoleIdFk { get; set; }
 
         public virtual Role RoleIdFkNavigation { get; set; }
-        public virtual User UserRoleNavigation { get; set; }
+        public virtual User UserIdFkNavigation { get; set; }
     }
 }

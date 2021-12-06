@@ -179,19 +179,17 @@ namespace Web.Data.Models
 
             modelBuilder.Entity<UserRole>(entity =>
             {
-                entity.Property(e => e.UserRoleId).ValueGeneratedOnAdd();
-
                 entity.HasOne(d => d.RoleIdFkNavigation)
                     .WithMany(p => p.UserRoles)
                     .HasForeignKey(d => d.RoleIdFk)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_UserRoles_Roles");
 
-                entity.HasOne(d => d.UserRoleNavigation)
-                    .WithOne(p => p.UserRole)
-                    .HasForeignKey<UserRole>(d => d.UserRoleId)
+                entity.HasOne(d => d.UserIdFkNavigation)
+                    .WithMany(p => p.UserRoles)
+                    .HasForeignKey(d => d.UserIdFk)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_UserRoles_UserRoles");
+                    .HasConstraintName("FK_UserRoles_Users");
             });
 
             OnModelCreatingPartial(modelBuilder);
