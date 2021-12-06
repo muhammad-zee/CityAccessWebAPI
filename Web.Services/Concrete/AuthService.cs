@@ -126,7 +126,8 @@ namespace Web.Services.Concrete
                 TwoFactorEnabled = user.TwoFactorEnabled,
                 UserId = user.UserId,
                 Username = user.UserName,
-                UserRole = UserRole
+                UserRole = UserRole,
+                IsRequirePasswordReset = user.IsRequirePasswordReset
 
             };
         }
@@ -136,8 +137,33 @@ namespace Web.Services.Concrete
             if (register.UserId > 0)
             {
                 var user = AutoMapperHelper.MapSingleRow<RegisterCredentialVM, User>(register);
-                user.Password = _userRepo.Table.Where(x => x.UserId == register.UserId).Select(x => x.Password).AsQueryable().FirstOrDefault();
+                if (!user.IsRequirePasswordReset)
+                {
+                    user.Password = _userRepo.Table.Where(x => x.UserId == register.UserId && x.IsDeleted == false).Select(x => x.Password).AsQueryable().FirstOrDefault();
+                }
+                else {
+                    user.IsRequirePasswordReset = false;
+                }
                 _userRepo.Update(user);
+
+                if (!string.IsNullOrEmpty(register.RoleIds)) 
+                {
+                    var roleIds = register.RoleIds.ToIntList();
+                    var userRoles = _userRoleRepo.Table.Where(x => x.UserIdFk == register.UserId).ToList();
+                    _userRoleRepo.DeleteRange(userRoles);
+
+                    if (roleIds.Count() > 0) 
+                    {
+                        List<UserRole> userRoleList = new List<UserRole>();
+                        foreach (var item in roleIds)
+                        {
+                            userRoleList.Add(new UserRole() { UserIdFk = user.UserId, RoleIdFk = item });
+                        }
+                        _userRoleRepo.Insert(userRoleList);
+                    }
+                    
+                }
+
                 return StatusEnums.Updated.ToString();
             }
             else
@@ -147,7 +173,7 @@ namespace Web.Services.Concrete
                     && !string.IsNullOrEmpty(register.PrimaryEmail) && !string.IsNullOrEmpty(register.Gender)
                     && !string.IsNullOrEmpty(register.RoleIds))
                 {
-                    var alreadyExist = _userRepo.GetList().Where(x => x.UserName == register.UserName).FirstOrDefault();
+                    var alreadyExist = _userRepo.GetList().Where(x => x.UserName == register.UserName && x.IsDeleted == false).FirstOrDefault();
                     if (alreadyExist == null)
                     {
                         var obj = new User()
@@ -165,16 +191,17 @@ namespace Web.Services.Concrete
                             Zip = register.Zip,
                             CreatedBy = register.CreatedBy,
                             CreatedDate = DateTime.UtcNow,
-                            IsDeleted = false
+                            IsDeleted = false,
+                            IsRequirePasswordReset = true
                         };
                         _userRepo.Insert(obj);
-                        //var roleIds = register.RoleIds.ToIntList();
-                        //List<UserRole> userRoleList = new List<UserRole>();
-                        //foreach (var item in roleIds)
-                        //{
-                        //    userRoleList.Add(new UserRole() { UserIdFk = obj.UserId, RoleIdFk = item });
-                        //}
-                        //_userRoleRepo.Insert(userRoleList);
+                        var roleIds = register.RoleIds.ToIntList();
+                        List<UserRole> userRoleList = new List<UserRole>();
+                        foreach (var item in roleIds)
+                        {
+                            userRoleList.Add(new UserRole() { UserIdFk = obj.UserId, RoleIdFk = item });
+                        }
+                        _userRoleRepo.Insert(userRoleList);
                         if (register.UserImageByte != null && register.UserImageByte.Count() > 0)
                         {
                             var outPath = Directory.GetCurrentDirectory();

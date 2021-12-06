@@ -19,6 +19,7 @@ namespace Web.Data.Models
 
         public virtual DbSet<Component> Components { get; set; }
         public virtual DbSet<ComponentAccess> ComponentAccesses { get; set; }
+        public virtual DbSet<ControlList> ControlLists { get; set; }
         public virtual DbSet<Role> Roles { get; set; }
         public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<UserAccess> UserAccesses { get; set; }
@@ -72,7 +73,7 @@ namespace Web.Data.Models
             {
                 entity.ToTable("ComponentAccess");
 
-                entity.Property(e => e.ComIdFk).HasColumnName("ComIdFK");
+                entity.Property(e => e.ComponentIdFk).HasColumnName("ComponentIdFK");
 
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");
 
@@ -83,6 +84,24 @@ namespace Web.Data.Models
                     .HasForeignKey(d => d.RoleIdFk)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_ComponentAccess_Roles");
+            });
+
+            modelBuilder.Entity<ControlList>(entity =>
+            {
+                entity.ToTable("ControlList");
+
+                entity.Property(e => e.ControlListTitle)
+                    .IsRequired()
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.ControlListType)
+                    .IsRequired()
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
             });
 
             modelBuilder.Entity<Role>(entity =>
@@ -170,28 +189,32 @@ namespace Web.Data.Models
 
                 entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
 
+                entity.HasOne(d => d.RoleIdFkNavigation)
+                    .WithMany(p => p.UserAccesses)
+                    .HasForeignKey(d => d.RoleIdFk)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_UserAccess_Users");
+
                 entity.HasOne(d => d.UserIdFkNavigation)
                     .WithMany(p => p.UserAccesses)
                     .HasForeignKey(d => d.UserIdFk)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_UserAccess_Users");
+                    .HasConstraintName("FK_UserAccess_Users1");
             });
 
             modelBuilder.Entity<UserRole>(entity =>
             {
-                entity.Property(e => e.UserRoleId).ValueGeneratedOnAdd();
-
                 entity.HasOne(d => d.RoleIdFkNavigation)
                     .WithMany(p => p.UserRoles)
                     .HasForeignKey(d => d.RoleIdFk)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_UserRoles_Roles");
 
-                entity.HasOne(d => d.UserRoleNavigation)
-                    .WithOne(p => p.UserRole)
-                    .HasForeignKey<UserRole>(d => d.UserRoleId)
+                entity.HasOne(d => d.UserIdFkNavigation)
+                    .WithMany(p => p.UserRoles)
+                    .HasForeignKey(d => d.UserIdFk)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_UserRoles_UserRoles");
+                    .HasConstraintName("FK_UserRoles_Users");
             });
 
             OnModelCreatingPartial(modelBuilder);

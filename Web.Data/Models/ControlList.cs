@@ -5,18 +5,16 @@ using System.Collections.Generic;
 
 namespace Web.Data.Models
 {
-    public partial class ComponentAccess
+    public partial class ControlList
     {
-        public int ComponentAccessId { get; set; }
-        public int RoleIdFk { get; set; }
-        public int ComponentIdFk { get; set; }
+        public int ControlListId { get; set; }
+        public string ControlListType { get; set; }
+        public string ControlListTitle { get; set; }
+        public bool ControlListIsActive { get; set; }
         public int CreatedBy { get; set; }
         public DateTime CreatedDate { get; set; }
         public int? ModifiedBy { get; set; }
         public DateTime? ModifiedDate { get; set; }
         public bool IsDeleted { get; set; }
-        public bool Active { get; set; }
-
-        public virtual Role RoleIdFkNavigation { get; set; }
     }
 }
