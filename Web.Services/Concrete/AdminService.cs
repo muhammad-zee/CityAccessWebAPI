@@ -426,8 +426,8 @@ namespace Web.Services.Concrete
             }).ToList();
             var treeViewItems = treeItems.BuildTree();
             //<--------Make a join of ComponentAccess Table with Component to get List of Accessible Components By Role and user Id----------->
-            var selectedUserRoleAccessIds = _componentAccess.Table.Where(x => x.RoleIdFk == roleId && x.IsActive == true && x.IsDeleted == false).Select(x => new { key = x.ComponentIdFk }).ToList();
-            selectedUserRoleAccessIds.AddRange(_userAccess.Table.Where(x => x.RoleIdFk == roleId && x.UserIdFk == userId && x.IsActive == true && x.IsDeleted == false).Select(x => new { key = x.ComponentIdFk }).ToList());
+            var selectedUserRoleAccessIds = _componentAccess.Table.Where(x => x.RoleIdFk == roleId && x.IsActive == true && x.IsDeleted == false).Select(x => new { key = x.ComponentIdFk.ToString() }).ToList();
+            selectedUserRoleAccessIds.AddRange(_userAccess.Table.Where(x => x.RoleIdFk == roleId && x.UserIdFk == userId && x.IsActive == true && x.IsDeleted == false).Select(x => new { key = x.ComponentIdFk.ToString() }).ToList());
 
             if (treeViewItems.Count() > 0)
             {
