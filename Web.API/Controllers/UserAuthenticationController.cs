@@ -13,7 +13,7 @@ using Web.Services.Interfaces;
 
 namespace Web.API.Controllers
 {
-    
+
     public class UserAuthenticationController : Controller
     {
         private readonly IJwtAuthService _jwtAuth;
@@ -68,7 +68,7 @@ namespace Web.API.Controllers
             try
             {
                 BaseResponse response = null;
-                
+
                 //////////////////////////// Generate Password //////////////////////////////
                 var strongPassword = HelperExtension.CreateRandomPassword(register.FirstName);
                 var hashPswd = HelperExtension.Encrypt(register.Password);
