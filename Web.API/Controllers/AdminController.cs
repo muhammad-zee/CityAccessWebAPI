@@ -88,6 +88,7 @@ namespace Web.API.Controllers
 
         #region User Role
 
+        [HttpGet("admin/GetUsersByRoleId/{roleId}")]
         public async Task<BaseResponse> GetUsersByRoleId(int roleId) 
         {
             try
