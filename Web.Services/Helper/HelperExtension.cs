@@ -104,5 +104,44 @@ namespace Web.API.Helper
             }
         }
 
+
+        public static IList<ComponentAccessTreeVM> BuildComponentAccessTree(this IEnumerable<ComponentAccessTreeVM> source)
+        {
+            var groups = source.GroupBy(i => i.ParentComponentId);
+
+            var roots = groups.FirstOrDefault(g => g.Key.HasValue == false).ToList();
+
+            if (roots.Count > 0)
+            {
+                var dict = groups.Where(g => g.Key.HasValue).ToDictionary(g => g.Key.Value.ToString(), g => g.ToList());
+                for (int i = 0; i < roots.Count; i++)
+                    AddActionList(roots[i], dict);
+            }
+
+            return roots;
+        }
+
+        private static void AddActionList(ComponentAccessTreeVM node, IDictionary<string, List<ComponentAccessTreeVM>> source)
+        {
+            if (source.ContainsKey(node.ComponentId))
+            {
+                node.children = source[node.ComponentId];
+                for (int i = 0; i < node.children.Count; i++)
+                    AddActionList(node.children[i], source);
+                if (node.Actions == null)
+                {
+                    node.Actions = new List<string>();
+                }
+                foreach (var child in node.children)
+                {
+
+                    node.Actions.Add(child.ModuleName);
+                }
+            }
+            else
+            {
+                node.children = new List<ComponentAccessTreeVM>();
+            }
+        }
     }
 }

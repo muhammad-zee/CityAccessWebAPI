@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -466,7 +467,15 @@ namespace Web.Services.Concrete
                                    ParentComponentId = c.ParentComponentId,
                                    
                                }).ToList();
-            //var queryReturn = this._dbContext.UserRoles. .ExcuteSql("select * from Roles");
+            var treeItems = roleacceess.Select(x => new ComponentAccessTreeVM()
+            {
+                ComponentId = x.ComponentId.ToString(),
+                ParentComponentId = x.ParentComponentId,
+                ModuleName = x.ComModuleName
+            }).ToList();
+            var treeViewItems = treeItems.BuildComponentAccessTree();
+            //var queryReturn = this._dbContext.Database.ExecuteSqlRawAsync("getComponentAccessByUserAndRole @pUserId, @pRoleId", parameters: new[] { 1016, 2 }).Result;
+
             //List<ComponentAccessVM> roleaccees = this. //dasq("CreateStudents @p0, @p1", parameters: new[] { "Bill", "Gates" });
             //var userRoleAcceess = (from rca in _componentAccess.Table
             //                       join ra in _component.Table on rca.ComIdFk equals ra.ComponentId
@@ -482,14 +491,20 @@ namespace Web.Services.Concrete
             //                           state = new ComponentAccessStateVM() { opened = true },
             //                       }).ToList();
 
-
+            foreach(var tree in treeViewItems)
+            {
+                //if (tree.ParentKey != null)
+                //{
+                //    tree.children = null;
+                //}
+            }
             if (roleacceess.Count() > 0)
             {
                 response = new BaseResponse()
                 {
                     Status = HttpStatusCode.OK,
                     Message = "Data Found",
-                    Body = roleacceess 
+                    Body = treeViewItems 
                 };
             }
             else
