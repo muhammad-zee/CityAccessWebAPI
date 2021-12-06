@@ -293,7 +293,7 @@ namespace Web.API.Controllers
             try
             {
                 var response = new BaseResponse();
-                response = _adminService.GetComponentsByRoleId(Id);
+                response = _adminService.GetComponentsTreeByRoleId(Id);
                 return response;
             }
             catch (Exception ex)
@@ -307,6 +307,29 @@ namespace Web.API.Controllers
                 };
             }
         }
+
+        [Description("Get All Components Tree By UserRole Id")]
+        [HttpGet("admin/GetComponentsTreeByUserRoleId")]
+        public async Task<BaseResponse> GetComponentsTreeByUserRoleId(int roleId, int userId)
+        {
+            try
+            {
+                var response = new BaseResponse();
+                response = _adminService.GetComponentsTreeByUserRoleId(roleId, userId);
+                return response;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogExceptions(ex);
+                return new BaseResponse()
+                {
+                    Status = HttpStatusCode.BadRequest,
+                    Message = ex.ToString(),
+                    Body = null
+                };
+            }
+        }
+
 
         [Description("Get All Components By UserRole Id")]
         [HttpGet("admin/GetComponentsByUserRoleId")]
@@ -330,27 +353,27 @@ namespace Web.API.Controllers
             }
         }
 
-        [Description("Add Or Update User Role Component Access")]
-        [HttpPost("admin/AddOrUpdateUserRoleComponentAccess")]
-        public async Task<BaseResponse> AddOrUpdateUserRoleComponentAccess([FromBody] ComponentAccessUserRoleVM componentAccess)
-        {
-            try
-            {
-                var response = new BaseResponse();
-                response = _adminService.AddOrUpdateUserRoleComponentAccess(componentAccess);
-                return response;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogExceptions(ex);
-                return new BaseResponse()
-                {
-                    Status = HttpStatusCode.BadRequest,
-                    Message = ex.ToString(),
-                    Body = null
-                };
-            }
-        }
+        //[Description("Add Or Update User Role Component Access")]
+        //[HttpPost("admin/AddOrUpdateUserRoleComponentAccess")]
+        //public async Task<BaseResponse> AddOrUpdateUserRoleComponentAccess([FromBody] ComponentAccessUserRoleVM componentAccess)
+        //{
+        //    try
+        //    {
+        //        var response = new BaseResponse();
+        //        response = _adminService.AddOrUpdateUserRoleComponentAccess(componentAccess);
+        //        return response;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogExceptions(ex);
+        //        return new BaseResponse()
+        //        {
+        //            Status = HttpStatusCode.BadRequest,
+        //            Message = ex.ToString(),
+        //            Body = null
+        //        };
+        //    }
+        //}
 
 
 
@@ -361,8 +384,7 @@ namespace Web.API.Controllers
             try
             {
                 var response = new BaseResponse();
-                response.Status = HttpStatusCode.OK;
-                //response = _adminService.AddOrUpdateUserRoleComponentAccess(componentAccess);
+                response = _adminService.AddOrUpdateUserRoleComponentAccess(componentAccess);
                 return response;
             }
             catch (Exception ex)

@@ -13,9 +13,10 @@ namespace Web.Services.Interfaces
         BaseResponse AddOrUpdateComponent(List<ComponentVM> components);
         BaseResponse GetAllComponents();
         BaseResponse GetComponentById(int Id);
-        BaseResponse GetComponentsByRoleId(int Id);
+        BaseResponse GetComponentsTreeByRoleId(int Id);
         BaseResponse GetComponentsByUserRoleId(int roleId, int userId);
-        BaseResponse AddOrUpdateUserRoleComponentAccess(ComponentAccessUserRoleVM componentAccess);
+        BaseResponse GetComponentsTreeByUserRoleId(int roleId, int userId);
+        BaseResponse AddOrUpdateUserRoleComponentAccess(ComponentAccessUserRoleVMUpdate componentAccess);
 
         #endregion
 

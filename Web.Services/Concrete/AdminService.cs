@@ -375,25 +375,10 @@ namespace Web.Services.Concrete
             return TreeviewItemVM;
         }
 
-        public BaseResponse GetComponentsByRoleId(int Id)
+        public BaseResponse GetComponentsTreeByRoleId(int Id)
         {
 
             var response = new BaseResponse();
-            //var roleAccess = _componentAccess.Table.Where(x => x.RoleIdFk == Id.ToString() && x.IsDeleted == false).ToList();
-            //var compIds = roleAccess.Select(x => x.ComIdFk).ToList();
-            //var roleComponents = _component.Table.Where(x => compIds.Contains(x.ComponentId) && x.IsDeleted == false ).ToList();
-            //var roleAccessVM = new List<ComponentAccessVM>();
-            //roleAccessVM = AutoMapperHelper.MapList<ComponentAccess, ComponentAccessVM>(roleAccess);
-            //foreach (var item in roleAccessVM)
-            //{
-            //    item.Component = new ComponentVM();
-            //    var roleComponentsVM = roleComponents.Where(x => x.ComponentId == item.ComIdFk).FirstOrDefault();
-            //    if (roleComponentsVM != null) 
-            //    {
-            //        item.Component = AutoMapperHelper.MapSingleRow<Component, ComponentVM>(roleComponentsVM);
-            //    }
-            //}
-
             //<--------Make a join of ComponentAccess Table with Component to get List of Accessible Components By Role Id----------->
             var result = _component.Table.Where(x => x.Status == true).ToList();
             var treeItems = result.Select(x => new TreeviewItemVM()
@@ -406,17 +391,6 @@ namespace Web.Services.Concrete
             var treeViewItems = treeItems.BuildTree();
             var selectedRoleAccessIds = _componentAccess.Table.Where(x => x.RoleIdFk == Id && x.IsDeleted == false).Select(x => new { key = x.ComponentIdFk.ToString() }).ToList();
 
-            //var roleAcceess = (from rca in _componentAccess.Table
-            //                   join ra in _component.Table on rca.ComIdFk equals ra.ComponentId
-            //                   where rca.RoleIdFk == Id && ra.IsDeleted == false && rca.IsDeleted == false
-            //                   select new ComponentAccessVM()
-            //                   {
-            //                       id = ra.ComponentId,
-            //                       text = ra.ComModuleName,
-            //                       parent = ra.ParentComponentId != null ? ra.ParentComponentId.ToString() : "#",
-            //                       state = new ComponentAccessStateVM() { opened = true },
-            //                   }).ToList();
-
             if (treeViewItems.Count() > 0)
             {
                 response = new BaseResponse()
@@ -424,6 +398,44 @@ namespace Web.Services.Concrete
                     Status = HttpStatusCode.OK,
                     Message = "Data Found",
                     Body = new { TreeViewItems = treeViewItems, SelectedIds = selectedRoleAccessIds },
+                };
+            }
+            else
+            {
+                response = new BaseResponse()
+                {
+                    Status = HttpStatusCode.NotFound,
+                    Message = "Data not Found",
+                    Body = null,
+                };
+            }
+            return response;
+        }
+
+        public BaseResponse GetComponentsTreeByUserRoleId(int roleId, int userId)
+        {
+
+            var response = new BaseResponse();
+            var result = _component.Table.Where(x => x.Status == true).ToList();
+            var treeItems = result.Select(x => new TreeviewItemVM()
+            {
+                key = x.ComponentId.ToString(),
+                ParentKey = x.ParentComponentId,
+                label = x.ComModuleName,
+                expanded = true,
+            }).ToList();
+            var treeViewItems = treeItems.BuildTree();
+            //<--------Make a join of ComponentAccess Table with Component to get List of Accessible Components By Role and user Id----------->
+            var selectedUserRoleAccessIds = _componentAccess.Table.Where(x => x.RoleIdFk == roleId && x.IsActive == true && x.IsDeleted == false).Select(x => new { key = x.ComponentIdFk }).ToList();
+            selectedUserRoleAccessIds.AddRange(_userAccess.Table.Where(x => x.RoleIdFk == roleId && x.UserIdFk == userId && x.IsActive == true && x.IsDeleted == false).Select(x => new { key = x.ComponentIdFk }).ToList());
+
+            if (treeViewItems.Count() > 0)
+            {
+                response = new BaseResponse()
+                {
+                    Status = HttpStatusCode.OK,
+                    Message = "Data Found",
+                    Body = new { TreeViewItems = treeViewItems, SelectedIds = selectedUserRoleAccessIds },
                 };
             }
             else
@@ -492,12 +504,12 @@ namespace Web.Services.Concrete
             return response;
         }
 
-        public BaseResponse AddOrUpdateUserRoleComponentAccess(ComponentAccessUserRoleVM componentAccess)
+        public BaseResponse AddOrUpdateUserRoleComponentAccess(ComponentAccessUserRoleVMUpdate componentAccess)
         {
             if (componentAccess.RoleId > 0 && componentAccess.UserId > 0)
             {
                 /////////// Get Allowed Component Ids /////////
-                var compIds = componentAccess.Attributes.Where(x => x.selected == true).Select(x => x.id).ToList();
+                var compIds = componentAccess.AccessAttr.Select(x => Convert.ToInt32(x.Key)).Distinct().ToList();
 
                 /////////// Get Allowed Role Access /////////
                 var roleAccess = _componentAccess.Table.Where(x => x.RoleIdFk == componentAccess.RoleId && x.IsDeleted == false && x.IsActive == true).ToList();
@@ -539,13 +551,31 @@ namespace Web.Services.Concrete
 
                 _userAccess.Insert(comps);
 
+                /////////// Get Components which Allowed to Role but NotAllowed to User /////////
+                var UnMatcheAccessIds = roleAccess.Where(x => !compIds.Contains(x.ComponentIdFk)).Select(x => x.ComponentIdFk).ToList();
+
+                /////////// Now add NotAllowed ones /////////
+                comps = compIds.Select(x => new UserAccess()
+                {
+
+                    ComponentIdFk = x,
+                    RoleIdFk = componentAccess.RoleId,
+                    UserIdFk = componentAccess.UserId,
+                    IsActive = false,
+                    IsDeleted = false,
+                    CreatedBy = componentAccess.LoggedInUserId,
+                    CreatedDate = DateTime.UtcNow,
+                }).ToList();
+
+                _userAccess.Insert(comps);
+
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Component Access saved successfully" };
 
             }
             else if (componentAccess.RoleId > 0)
             {
                 /////////// Get Allowed Component Ids /////////
-                var compIds = componentAccess.Attributes.Where(x => x.selected == true).Select(x => x.id).ToList();
+                var compIds = componentAccess.AccessAttr.Select(x => Convert.ToInt32(x.Key)).Distinct().ToList();
 
                 /////////// Get List of that components from which Access is Removed /////////
                 var toBeDeleteComps = _componentAccess.Table.Where(x => x.RoleIdFk == componentAccess.RoleId && !compIds.Contains(x.ComponentIdFk)).ToList();
