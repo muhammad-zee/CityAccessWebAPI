@@ -294,7 +294,7 @@ namespace Web.Services.Concrete
                 var iCategory = new TreeviewItemVM();
                 iCategory.label = pItem.ComModuleName;
                 iCategory.key = pItem.ComponentId.ToString();
-                iCategory.@checked = (_componentAccess.Table.Where(x => x.ComIdFk == pItem.ComponentId && x.RoleIdFk == Id).FirstOrDefault() != null) ? true : false;
+                iCategory.@checked = (_componentAccess.Table.Where(x => x.ComponentIdFk == pItem.ComponentId && x.RoleIdFk == Id).FirstOrDefault() != null) ? true : false;
                 iCategory.expanded = false;
                 iCategory.disabled = false;
                 int ChildComponentsCount = result.Where(x => x.ParentComponentId == pItem.ComponentId).Count();
@@ -310,7 +310,7 @@ namespace Web.Services.Concrete
 
                     cCategory.label = cItem.ComModuleName;
                     cCategory.key = cItem.ComponentId.ToString();
-                    cCategory.@checked = (_componentAccess.Table.Where(x => x.ComIdFk == cItem.ComponentId && x.RoleIdFk == Id).FirstOrDefault() != null) ? true : false; ;
+                    cCategory.@checked = (_componentAccess.Table.Where(x => x.ComponentIdFk == cItem.ComponentId && x.RoleIdFk == Id).FirstOrDefault() != null) ? true : false; ;
                     cCategory.expanded = false;
                     cCategory.disabled = false;
                     int Child2ComponentsCount = result.Where(x => x.ParentComponentId == null).Count();
@@ -323,7 +323,7 @@ namespace Web.Services.Concrete
                         TreeviewItemVM c2Category = new TreeviewItemVM();
                         c2Category.label = c2Item.ComModuleName;
                         c2Category.key = c2Item.ComponentId.ToString();
-                        c2Category.@checked = (_componentAccess.Table.Where(x => x.ComIdFk == c2Item.ComponentId && x.RoleIdFk == Id).FirstOrDefault() != null) ? true : false; ;
+                        c2Category.@checked = (_componentAccess.Table.Where(x => x.ComponentIdFk == c2Item.ComponentId && x.RoleIdFk == Id).FirstOrDefault() != null) ? true : false; ;
                         c2Category.expanded = false;
                         c2Category.disabled = false;
 
@@ -367,7 +367,7 @@ namespace Web.Services.Concrete
                 expanded = true,
             }).ToList();
             var treeViewItems = treeItems.BuildTree();
-            var selectedRoleAccessIds = _componentAccess.Table.Where(x => x.RoleIdFk == Id && x.IsDeleted == false).Select(x => new { key = x.ComIdFk }).ToList();
+            var selectedRoleAccessIds = _componentAccess.Table.Where(x => x.RoleIdFk == Id && x.IsDeleted == false).Select(x => new { key = x.ComponentIdFk }).ToList();
 
             //var roleAcceess = (from rca in _componentAccess.Table
             //                   join ra in _component.Table on rca.ComIdFk equals ra.ComponentId
@@ -407,7 +407,7 @@ namespace Web.Services.Concrete
 
             //////// Make a join of ComponentAccess Table with Component to get List of Accessible Components By Role Id ////////
             List<ComponentAccessVM> roleacceess = (from ca in _componentAccess.Table
-                               join c in _component.Table on ca.ComIdFk equals c.ComponentId
+                               join c in _component.Table on ca.ComponentIdFk equals c.ComponentId
                                where ca.RoleIdFk == roleId && !c.IsDeleted && !ca.IsDeleted && ca.Active
                                select new ComponentAccessVM()
                                {
@@ -440,8 +440,8 @@ namespace Web.Services.Concrete
                 expanded = true,
             }).ToList();
             var treeViewItems = treeItems.BuildTree();
-            var selectedUserRoleAccessIds = _componentAccess.Table.Where(x => x.RoleIdFk == roleId && x.IsDeleted == false).Select(x => new { key = x.ComIdFk }).ToList();
-            selectedUserRoleAccessIds.AddRange(_userAccess.Table.Where(x => x.RoleIdFk == roleId && x.UserIdFk == userId && x.IsDeleted == false && x.UserActive == true).Select(x => new { key = x.UserComIdFk }).ToList());
+            var selectedUserRoleAccessIds = _componentAccess.Table.Where(x => x.RoleIdFk == roleId && x.IsDeleted == false).Select(x => new { key = x.ComponentIdFk }).ToList();
+            selectedUserRoleAccessIds.AddRange(_userAccess.Table.Where(x => x.RoleIdFk == roleId && x.UserIdFk == userId && x.IsDeleted == false && x.IsActive == true).Select(x => new { key = x.ComponentIdFk }).ToList());
 
             //////// Make a join of ComponentAccess Table with Component to get List of Accessible Components By Role Id ////////
             //var userRoleAcceess = (from rca in _componentAccess.Table
@@ -491,24 +491,24 @@ namespace Web.Services.Concrete
                 var roleAccess = _componentAccess.Table.Where(x => x.RoleIdFk == componentAccess.RoleId && x.IsDeleted == false && x.Active == true).ToList();
 
                 /////////// Get Matched Access Ids /////////
-                var MatcheAccessIds = roleAccess.Where(x => compIds.Contains(x.ComIdFk)).Select(x => x.ComIdFk).ToList();
+                var MatcheAccessIds = roleAccess.Where(x => compIds.Contains(x.ComponentIdFk)).Select(x => x.ComponentIdFk).ToList();
 
                 ///////////// Remove Matched Role Components from coming List /////////
                 compIds.RemoveAll(x => MatcheAccessIds.Contains(x));
 
                 /////////// Get AlreadyExist Allowed UserRole Access /////////
-                var alreadyExist = _userAccess.Table.Where(x => x.RoleIdFk == componentAccess.RoleId && x.UserIdFk == componentAccess.UserId && x.UserActive == true && x.IsDeleted == false).ToList();
+                var alreadyExist = _userAccess.Table.Where(x => x.RoleIdFk == componentAccess.RoleId && x.UserIdFk == componentAccess.UserId && x.IsActive == true && x.IsDeleted == false).ToList();
 
                 ///////////// Remove Already Exist User Component Access from coming List /////////
-                compIds.RemoveAll(x => alreadyExist.Select(x => x.UserComIdFk).Contains(x));
+                compIds.RemoveAll(x => alreadyExist.Select(x => x.ComponentIdFk).Contains(x));
 
                 ///////////// Remove Access from components /////////
-                var removeCompsAccess = alreadyExist.Where(x => !compIds.Contains(x.UserComIdFk) && x.IsDeleted == false && x.UserActive == true).ToList();
-                removeCompsAccess.ForEach(x => x.UserActive = false);
+                var removeCompsAccess = alreadyExist.Where(x => !compIds.Contains(x.ComponentIdFk) && x.IsDeleted == false && x.IsActive == true).ToList();
+                removeCompsAccess.ForEach(x => x.IsActive = false);
                 _userAccess.Update(removeCompsAccess);
 
                 ///////////// Remove components which has no access/////////
-                var extrasCompsAccess = alreadyExist.Where(x => !compIds.Contains(x.UserComIdFk) && x.IsDeleted == false && x.UserActive == false).ToList();
+                var extrasCompsAccess = alreadyExist.Where(x => !compIds.Contains(x.ComponentIdFk) && x.IsDeleted == false && x.IsActive == false).ToList();
                 extrasCompsAccess.ForEach(x => { x.IsDeleted = true; x.ModifiedBy = componentAccess.LoggedInUserId; x.ModifiedDate = DateTime.UtcNow; });
                 _userAccess.Update(extrasCompsAccess);
 
@@ -516,10 +516,10 @@ namespace Web.Services.Concrete
                 var comps = compIds.Select(x => new UserAccess()
                 {
 
-                    UserComIdFk = x,
+                    ComponentIdFk = x,
                     RoleIdFk = componentAccess.RoleId,
                     UserIdFk = componentAccess.UserId,
-                    UserActive = true,
+                    IsActive = true,
                     IsDeleted = false,
                     CreatedBy = componentAccess.LoggedInUserId,
                     CreatedDate = DateTime.UtcNow,
@@ -562,7 +562,7 @@ namespace Web.Services.Concrete
                 var compIds = componentAccess.Attributes.Where(x => x.selected == true).Select(x => x.id).ToList();
 
                 /////////// Get List of that components from which Access is Removed /////////
-                var toBeDeleteComps = _componentAccess.Table.Where(x => x.RoleIdFk == componentAccess.RoleId && !compIds.Contains(x.ComIdFk)).ToList();
+                var toBeDeleteComps = _componentAccess.Table.Where(x => x.RoleIdFk == componentAccess.RoleId && !compIds.Contains(x.ComponentIdFk)).ToList();
 
                 /////////// Remove List of that components from which Access is Removed /////////
                 toBeDeleteComps.ForEach(x => { x.IsDeleted = true; x.ModifiedBy = componentAccess.LoggedInUserId; x.ModifiedDate = DateTime.UtcNow; });
@@ -572,26 +572,26 @@ namespace Web.Services.Concrete
                 var alreadyExistComps = _componentAccess.Table.Where(x => x.RoleIdFk == componentAccess.RoleId).ToList();
 
                 /////////// Get Already Exist Active Component Ids /////////
-                var alreadyExistActiveCompIds = alreadyExistComps.Where(x => x.Active == true).Select(x => x.ComIdFk).ToList();
+                var alreadyExistActiveCompIds = alreadyExistComps.Where(x => x.Active == true).Select(x => x.ComponentIdFk).ToList();
 
                 /////////// Remove Already Exist Component from coming List /////////
                 compIds.RemoveAll(x => alreadyExistActiveCompIds.Contains(x));
 
                 /////////// Get Already Exist DeActive Component from Db /////////
-                var compsNeedToBeActive = alreadyExistComps.Where(x => x.Active == false && compIds.Contains(x.ComIdFk)).ToList();
+                var compsNeedToBeActive = alreadyExistComps.Where(x => x.Active == false && compIds.Contains(x.ComponentIdFk)).ToList();
 
                 /////////// Activate and Update Already Exist DeActive Component from Db /////////
                 compsNeedToBeActive.ForEach(x => { x.Active = true; x.ModifiedBy = componentAccess.LoggedInUserId; x.ModifiedDate = DateTime.UtcNow; });
                 _componentAccess.Update(compsNeedToBeActive);
 
                 /////////// Remove Already Exist Updated Component from coming List /////////
-                compIds.RemoveAll(x => compsNeedToBeActive.Select(x => x.ComIdFk).Contains(x));
+                compIds.RemoveAll(x => compsNeedToBeActive.Select(x => x.ComponentIdFk).Contains(x));
 
                 /////////// Now add new ones /////////
                 var comps = compIds.Select(x => new ComponentAccess()
                 {
 
-                    ComIdFk = x,
+                    ComponentIdFk = x,
                     RoleIdFk = componentAccess.RoleId,
                     Active = true,
                     IsDeleted = false,
