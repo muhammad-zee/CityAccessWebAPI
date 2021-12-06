@@ -404,7 +404,7 @@ namespace Web.Services.Concrete
                 expanded = true,
             }).ToList();
             var treeViewItems = treeItems.BuildTree();
-            var selectedRoleAccessIds = _componentAccess.Table.Where(x => x.RoleIdFk == Id && x.IsDeleted == false).Select(x => new { key = x.ComponentIdFk }).ToList();
+            var selectedRoleAccessIds = _componentAccess.Table.Where(x => x.RoleIdFk == Id && x.IsDeleted == false).Select(x => new { key = x.ComponentIdFk.ToString() }).ToList();
 
             //var roleAcceess = (from rca in _componentAccess.Table
             //                   join ra in _component.Table on rca.ComIdFk equals ra.ComponentId

@@ -344,6 +344,30 @@ namespace Web.API.Controllers
         }
 
 
+
+        [Description("Add/Update User Role Component Access")]
+        [HttpPost("admin/UpdateUserRoleComponentAccess")]
+        public async Task<BaseResponse> UpdateUserRoleComponentAccess([FromBody] ComponentAccessUserRoleVMUpdate componentAccess)
+        {
+            try
+            {
+                var response = new BaseResponse();
+                response.Status = HttpStatusCode.OK;
+                //response = _adminService.AddOrUpdateUserRoleComponentAccess(componentAccess);
+                return response;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogExceptions(ex);
+                return new BaseResponse()
+                {
+                    Status = HttpStatusCode.BadRequest,
+                    Message = ex.ToString(),
+                    Body = null
+                };
+            }
+        }
+
         #endregion
     }
 }
