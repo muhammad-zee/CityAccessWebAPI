@@ -93,8 +93,6 @@ namespace Web.Services.Concrete
 
         #endregion
 
-
-
         #region Roles
         public IQueryable<Role> getRoleList()
         {
@@ -104,16 +102,16 @@ namespace Web.Services.Concrete
         {
             var userRoleList = this._userRole.GetList().Where(item => item.UserIdFk == UserId);
             var roleList = this._role.GetList().Where(item => !item.IsDeleted);
-            var userRoles = ( from ur in userRoleList
-                              join r in roleList
-                              on ur.RoleIdFk equals r.RoleId
-                              select new UserRoleVM
-                              {
-                                  //UserRoleId = ur.UserRoleId,
-                                  //UserId = ur.UserIdFK,
-                                  RoleId = ur.RoleIdFk,
-                                  RoleName = r.RoleName
-                              }
+            var userRoles = (from ur in userRoleList
+                             join r in roleList
+                             on ur.RoleIdFk equals r.RoleId
+                             select new UserRoleVM
+                             {
+                                 //UserRoleId = ur.UserRoleId,
+                                 //UserId = ur.UserIdFK,
+                                 RoleId = ur.RoleIdFk,
+                                 RoleName = r.RoleName
+                             }
                               );
             return userRoles;
         }
@@ -283,7 +281,7 @@ namespace Web.Services.Concrete
             return response;
         }
 
-        public TreeviewItemVM[] GetAllModuleMenu(int Id) 
+        public TreeviewItemVM[] GetAllModuleMenu(int Id)
         {
             var result = _component.Table.Where(x => x.Status == true).ToList();
             int parentComponentCount = result.Where(x => x.ParentComponentId == null).Count();
@@ -343,7 +341,7 @@ namespace Web.Services.Concrete
 
         public BaseResponse GetComponentsByRoleId(int Id)
         {
-            
+
             var response = new BaseResponse();
             //var roleAccess = _componentAccess.Table.Where(x => x.RoleIdFk == Id.ToString() && x.IsDeleted == false).ToList();
             //var compIds = roleAccess.Select(x => x.ComIdFk).ToList();
@@ -389,7 +387,7 @@ namespace Web.Services.Concrete
                 {
                     Status = HttpStatusCode.OK,
                     Message = "Data Found",
-                    Body = new { TreeViewItems = treeViewItems, SelectedIds = selectedRoleAccessIds},
+                    Body = new { TreeViewItems = treeViewItems, SelectedIds = selectedRoleAccessIds },
                 };
             }
             else
@@ -506,32 +504,6 @@ namespace Web.Services.Concrete
                 _userAccess.Insert(comps);
 
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Component Access saved successfully" };
-
-                ///////////// Get List of that components from which Access is Removed /////////
-                //var toBeDeleteComps = _userAccess.Table.Where(x => x.RoleIdFk == componentAccess.RoleId.ToString() && x.UserId == componentAccess.UserId && !compIds.Contains(x.UserComIdFk)).ToList();
-
-                ///////////// Remove List of that components from which Access is Removed /////////
-                //toBeDeleteComps.ForEach(x => { x.IsDeleted = true; x.ModifiedBy = componentAccess.LoggedInUserId; x.ModifiedDate = DateTime.UtcNow; });
-                //_userAccess.Update(toBeDeleteComps);
-
-                ///////////// Get Already Exist Component For the Selected Role and User /////////
-                //var alreadyExistComps = _userAccess.Table.Where(x => x.RoleIdFk == componentAccess.RoleId.ToString() && x.UserId == componentAccess.UserId).ToList();
-
-                ///////////// Get Already Exist Active Component Ids /////////
-                //var alreadyExistActiveCompIds = alreadyExistComps.Where(x => x.UserActive == true).Select(x => x.UserComIdFk).ToList();
-
-                ///////////// Remove Already Exist Component from coming List /////////
-                //compIds.RemoveAll(x => alreadyExistActiveCompIds.Contains(x));
-
-                ///////////// Get Already Exist DeActive Component from Db /////////
-                //var compsNeedToBeActive = alreadyExistComps.Where(x => x.UserActive == false && compIds.Contains(x.UserComIdFk)).ToList();
-
-                ///////////// Activate and Update Already Exist DeActive Component from Db /////////
-                //compsNeedToBeActive.ForEach(x => { x.UserActive = true; x.ModifiedBy = componentAccess.LoggedInUserId; x.ModifiedDate = DateTime.UtcNow; });
-                //_userAccess.Update(compsNeedToBeActive);
-
-                ///////////// Remove Already Exist Updated Component from coming List /////////
-                //compIds.RemoveAll(x => compsNeedToBeActive.Select(x => x.UserComIdFk).Contains(x));
 
             }
             else if (componentAccess.RoleId > 0)

@@ -43,7 +43,7 @@ namespace Web.Services.Concrete
             _userRoleRepo = (GenericRepository<UserRole>)userRoleRepo;
             this._communicationService = communicationService;
             this._adminService = adminService;
-            
+
         }
 
 
@@ -116,7 +116,7 @@ namespace Web.Services.Concrete
             {
                 user.TwoFactorEnabled = false;
             }
-            List<UserRoleVM> UserRole =this._adminService.getRoleListByUserId(user.UserId).ToList();
+            List<UserRoleVM> UserRole = this._adminService.getRoleListByUserId(user.UserId).ToList();
             return new
             {
                 token = new JwtSecurityTokenHandler().WriteToken(token),
@@ -141,18 +141,19 @@ namespace Web.Services.Concrete
                 {
                     user.Password = _userRepo.Table.Where(x => x.UserId == register.UserId && x.IsDeleted == false).Select(x => x.Password).AsQueryable().FirstOrDefault();
                 }
-                else {
+                else
+                {
                     user.IsRequirePasswordReset = false;
                 }
                 _userRepo.Update(user);
 
-                if (!string.IsNullOrEmpty(register.RoleIds)) 
+                if (!string.IsNullOrEmpty(register.RoleIds))
                 {
                     var roleIds = register.RoleIds.ToIntList();
                     var userRoles = _userRoleRepo.Table.Where(x => x.UserIdFk == register.UserId).ToList();
                     _userRoleRepo.DeleteRange(userRoles);
 
-                    if (roleIds.Count() > 0) 
+                    if (roleIds.Count() > 0)
                     {
                         List<UserRole> userRoleList = new List<UserRole>();
                         foreach (var item in roleIds)
@@ -161,7 +162,7 @@ namespace Web.Services.Concrete
                         }
                         _userRoleRepo.Insert(userRoleList);
                     }
-                    
+
                 }
 
                 return StatusEnums.Updated.ToString();
@@ -215,11 +216,16 @@ namespace Web.Services.Concrete
                             {
                                 fs.Write(register.UserImageByte);
                             }
-                            var newAddedUser = _userRepo.GetList().Where(x => x.UserId == obj.UserId).FirstOrDefault();
+                            var newAddedUser = _userRepo.Table.Where(x => x.UserId == obj.UserId).FirstOrDefault();
                             newAddedUser.UserImage = outPath;
                             _userRepo.Update(newAddedUser);
                         }
+                        string sub = "Account Created.";
+                        string mailBody = $"<b>Hi! {obj.FirstName}, </b><br />" +
+                            $"<p>Your account is created.</p></br />" +
+                            $"<p>Thanks!</p>";
 
+                        this._communicationService.SendEmail(obj.PrimaryEmail, sub, mailBody, null);
                         return StatusEnums.Created.ToString();
                     }
                     else
@@ -270,6 +276,7 @@ namespace Web.Services.Concrete
                         $"<p>Please <a href='{siteUrl + hashUserName}' target='_blank'>Click here</a> to reset your password.</p> <br />" +
                         $"<p>If you didn’t ask to reset your password, you can ignore this email.</p> <br /><br />" +
                         $"<p>Thank You!</p>";
+                    this._communicationService.SendEmail(user.PrimaryEmail, "Reset Password", mailMessageTemplate, null);
 
                     return StatusEnums.Success.ToString();
                 }
