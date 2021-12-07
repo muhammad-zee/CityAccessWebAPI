@@ -28,6 +28,7 @@ namespace Web.Data.Models
         public bool IsDeleted { get; set; }
         public int? SortOrder { get; set; }
         public string ModuleImage { get; set; }
+        public bool IsAction { get; set; }
 
         public virtual ICollection<ComponentAccess> ComponentAccesses { get; set; }
         public virtual ICollection<UserAccess> UserAccesses { get; set; }

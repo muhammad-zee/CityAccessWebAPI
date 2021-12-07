@@ -492,8 +492,12 @@ namespace Web.Services.Concrete
             }).ToList();
             var treeViewItems = treeItems.BuildComponentAccessTree();
             //var queryReturn = this._dbContext.Database.ExecuteSqlRawAsync("getComponentAccessByUserAndRole @pUserId, @pRoleId", parameters: new[] { 1016, 2 }).Result;
-            var queryReturn = this._dbContext.Set<ComponentAccessDbReturnVM>().FromSqlInterpolated($"getComponentAccessByUserAndRole").AsNoTracking().ToList();
+            //var queryReturn = this._dbContext.Set<ComponentAccessDbReturnVM>().FromSqlInterpolated($"getComponentAccessByUserAndRole").AsNoTracking().ToList();
 
+            var res = _dbContext.LoadStoredProc("getComponentAccessByUserAndRole")
+                .WithSqlParam("@pUserId", userId)
+                .WithSqlParam("@pRoleId", roleId)
+                .ExecuteStoredProc<ComponentAccessDbReturnVM>().Result;
             //List<ComponentAccessVM> roleaccees = this. //dasq("CreateStudents @p0, @p1", parameters: new[] { "Bill", "Gates" });
             //var userRoleAcceess = (from rca in _componentAccess.Table
             //                       join ra in _component.Table on rca.ComIdFk equals ra.ComponentId
@@ -679,7 +683,8 @@ namespace Web.Services.Concrete
         {
             var UCLDetails = (from ucl in _controlList.Table
                               join ucld in _controlListDetails.Table on ucl.ControlListId equals ucld.ControlListIdFk
-                              where ucl.ControlListId == Id && ucl.IsDeleted == false && ucld.IsDeleted == false && ucld.IsActive == true
+                              where ucl.ControlListId == Id && ucl.IsDeleted == false && ucld.IsDeleted == false 
+                              && ucl.ControlListIsActive == true && ucld.IsActive == true
                               select new 
                               {
                                   ControlListDetailId = ucld.ControlListDetailId,
