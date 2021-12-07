@@ -398,7 +398,7 @@ namespace Web.Services.Concrete
                 expanded = true,
             }).ToList();
             var treeViewItems = treeItems.BuildTree();
-            var selectedRoleAccessIds = _componentAccess.Table.Where(x => x.RoleIdFk == Id).Select(x => new { key = x.ComponentIdFk.ToString() }).ToList();
+            var selectedRoleAccessIds = _componentAccess.Table.Where(x => x.RoleIdFk == Id && x.IsActive == true).Select(x => new { key = x.ComponentIdFk.ToString() }).ToList();
 
             if (treeViewItems.Count() > 0)
             {
