@@ -16,14 +16,9 @@ namespace Web.Model.Common
 
         [JsonIgnore]
         public List<ComponentAccessTreeVM> children { get; set; }
+        [JsonIgnore]
+        public bool IsAction { get; set; }
 
     }
-    public class ComponentAccessDbReturnVM
-    {
-        public int ComponentId { get; set; }
-        public string ComModuleName { get; set; }
-        public int? ParentComponentId { get; set; }
-        public bool IsActive { get; set; }
-
-    }
+ 
 }

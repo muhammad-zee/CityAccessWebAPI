@@ -114,7 +114,7 @@ namespace Web.API.Helper
             var groups = source.GroupBy(i => i.ParentComponentId);
 
             var roots = groups.FirstOrDefault(g => g.Key.HasValue == false).ToList();
-
+            roots = source.Where(s => !s.IsAction && s.ParentComponentId != null).ToList();
             if (roots.Count > 0)
             {
                 var dict = groups.Where(g => g.Key.HasValue).ToDictionary(g => g.Key.Value.ToString(), g => g.ToList());

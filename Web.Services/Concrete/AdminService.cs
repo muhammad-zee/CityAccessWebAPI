@@ -470,34 +470,37 @@ namespace Web.Services.Concrete
 
         public BaseResponse GetComponentsByUserRoleId(int roleId, int userId)
         {
-            var response = new BaseResponse();
+            BaseResponse response = null;
+
+            var RCAresultData = _dbContext.LoadStoredProc("getComponentAccessByUserAndRole")
+             .WithSqlParam("@pUserId", userId)
+             .WithSqlParam("@pRoleId", roleId)
+             .ExecuteStoredProc<ComponentAccessVM>().Result;
 
             //////// Make a join of ComponentAccess Table with Component to get List of Accessible Components By Role Id ////////
-            List<ComponentAccessVM> roleacceess = (from ca in _componentAccess.Table
-                               join c in _component.Table on ca.ComponentIdFk equals c.ComponentId
-                               where ca.RoleIdFk == roleId && !c.IsDeleted && ca.IsActive
-                               select new ComponentAccessVM()
-                               {
-                                   ComponentId = c.ComponentId,
-                                   ComModuleName = c.ComModuleName,
-                                   RoleId = ca.RoleIdFk,
-                                   ParentComponentId = c.ParentComponentId,
-                                   
-                               }).ToList();
-            var treeItems = roleacceess.Select(x => new ComponentAccessTreeVM()
+            //List<ComponentAccessVM> roleacceess = (from ca in RCAresultData
+
+            //                   select new ComponentAccessVM()
+            //                   {
+            //                       ComponentId = ca.ComponentId,
+            //                       ComModuleName = ca.ComModuleName,
+            //                       ParentComponentId = ca.ParentComponentId,
+            //                       IsAction = ca.IsAction
+            //                   }).ToList();
+            var treeItems = RCAresultData.Select(x => new ComponentAccessTreeVM()
             {
                 ComponentId = x.ComponentId.ToString(),
                 ParentComponentId = x.ParentComponentId,
-                ModuleName = x.ComModuleName
+                ModuleName = x.ComModuleName,
+                IsAction = x.IsAction
             }).ToList();
             var treeViewItems = treeItems.BuildComponentAccessTree();
-            //var queryReturn = this._dbContext.Database.ExecuteSqlRawAsync("getComponentAccessByUserAndRole @pUserId, @pRoleId", parameters: new[] { 1016, 2 }).Result;
-            //var queryReturn = this._dbContext.Set<ComponentAccessDbReturnVM>().FromSqlInterpolated($"getComponentAccessByUserAndRole").AsNoTracking().ToList();
 
-            var res = _dbContext.LoadStoredProc("getComponentAccessByUserAndRole")
-                .WithSqlParam("@pUserId", userId)
-                .WithSqlParam("@pRoleId", roleId)
-                .ExecuteStoredProc<ComponentAccessDbReturnVM>().Result;
+
+            //var queryReturn = this._dbContext.Set<ComponentAccessDbReturnVM>().FromSqlRaw<ComponentAccessDbReturnVM>($"Exec getComponentAccessByUserAndRole").AsNoTracking().ToList();
+
+
+         
             //List<ComponentAccessVM> roleaccees = this. //dasq("CreateStudents @p0, @p1", parameters: new[] { "Bill", "Gates" });
             //var userRoleAcceess = (from rca in _componentAccess.Table
             //                       join ra in _component.Table on rca.ComIdFk equals ra.ComponentId
@@ -520,7 +523,7 @@ namespace Web.Services.Concrete
                 //    tree.children = null;
                 //}
             }
-            if (roleacceess.Count() > 0)
+            if (RCAresultData.Count() > 0)
             {
                 response = new BaseResponse()
                 {
