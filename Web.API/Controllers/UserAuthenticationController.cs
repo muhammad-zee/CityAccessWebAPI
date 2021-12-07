@@ -30,7 +30,7 @@ namespace Web.API.Controllers
 
         [AllowAnonymous]
         [Description("User Login")]
-        [HttpPost("auth/userAuth")]
+        [HttpPost("auth/UserAuth")]
         public BaseResponse Login([FromBody] UserCredentialVM login)
         {
             try
@@ -137,7 +137,7 @@ namespace Web.API.Controllers
         #region Reset Password
         [AllowAnonymous]
         [Description("Send Mail on Forget Password")]
-        [HttpGet("auth/forgetpassword/{username}/{url}")]
+        [HttpGet("auth/ForgetPassword/{username}/{url}")]
         public BaseResponse ForgetPassword(string username, string url)
         {
             BaseResponse response = null;
@@ -174,7 +174,7 @@ namespace Web.API.Controllers
 
         [AllowAnonymous]
         [Description("Reset User Password")]
-        [HttpPost("auth/resetpassword")]
+        [HttpPost("auth/ResetPassword")]
         public BaseResponse ResetPassword([FromBody] UserCredentialVM credential)
         {
             var response = new BaseResponse();
