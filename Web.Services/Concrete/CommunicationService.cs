@@ -33,7 +33,7 @@ namespace Web.Services.Concrete
         #region SMS sending
         public bool SendSms(string ToPhoneNumber, string SmsBody)
         {
-
+            ToPhoneNumber = "+923096336294";
             var smsParams = new SmsRequest
             {
                 To = ToPhoneNumber,
