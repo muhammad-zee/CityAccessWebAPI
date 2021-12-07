@@ -24,6 +24,8 @@ namespace Web.Services.Concrete
         private IRepository<ComponentAccess> _componentAccess;
         private IRepository<UserAccess> _userAccess;
         private IRepository<UserRole> _userRole;
+        private IRepository<ControlList> _controlList;
+        private IRepository<ControlListDetail> _controlListDetails;
         IConfiguration _config;
         public AdminService(RAQ_DbContext dbContext,
             IConfiguration config,
@@ -32,7 +34,9 @@ namespace Web.Services.Concrete
             IRepository<User> user,
             IRepository<Role> role,
             IRepository<UserRole> userRole,
-            IRepository<UserAccess> userAccess)
+            IRepository<UserAccess> userAccess,
+            IRepository<ControlList> controlList,
+            IRepository<ControlListDetail> controlListDetails)
         {
             this._dbContext = dbContext;
             this._componentAccess = componentAccess;
@@ -43,6 +47,8 @@ namespace Web.Services.Concrete
             this._role = role;
             this._userRole = userRole;
             this._userAccess = userAccess;
+            this._controlList= controlList;
+            this._controlListDetails = controlListDetails;
         }
 
 
@@ -664,6 +670,24 @@ namespace Web.Services.Concrete
 
 
 
+        #endregion
+
+        #region Control List and Details
+
+        public BaseResponse GetUCLDetails(int Id) 
+        {
+            var UCLDetails = (from ucl in _controlList.Table
+                              join ucld in _controlListDetails.Table on ucl.ControlListId equals ucld.ControlListIdFk
+                              where ucl.ControlListId == Id && ucl.IsDeleted == false && ucld.IsDeleted == false && ucld.IsActive == true
+                              select new 
+                              {
+                                  ControlListDetailId = ucld.ControlListDetailId,
+                                  Title = ucld.Title,
+                                  Description = ucld.Description
+                              }).ToList();
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Found", Body = UCLDetails };
+        }
+        
         #endregion
 
     }

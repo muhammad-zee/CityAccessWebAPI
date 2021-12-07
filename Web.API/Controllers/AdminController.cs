@@ -392,5 +392,31 @@ namespace Web.API.Controllers
         }
 
         #endregion
+
+        #region Control List and Details
+
+        [Description("Get Control List Data")]
+        [HttpGet("admin/GetUCLDetails/{Id}")]
+        public BaseResponse GetUCLDetails(int Id) 
+        {
+            try
+            {
+                var result = _adminService.GetUCLDetails(Id);
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogExceptions(ex);
+                return new BaseResponse()
+                {
+                    Status = HttpStatusCode.BadRequest,
+                    Message = ex.ToString(),
+                    Body = null
+                };
+            }
+        
+        }
+
+        #endregion
     }
 }

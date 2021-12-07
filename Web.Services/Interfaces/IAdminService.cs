@@ -39,5 +39,9 @@ namespace Web.Services.Interfaces
 
         #endregion
 
+        #region Control List and Details
+        BaseResponse GetUCLDetails(int Id);
+        #endregion
+
     }
 }
