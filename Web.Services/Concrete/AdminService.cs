@@ -181,7 +181,7 @@ namespace Web.Services.Concrete
                 var newRole = _role.Table.Where(r => r.RoleId == role.RoleId && !r.IsDeleted).FirstOrDefault();
                 newRole.RoleName = role.RoleName;
                 newRole.RoleDescription = role.RoleDescription;
-                newRole.RoleDescription = role.RoleDescription;
+                newRole.RoleDiscrimination = role.RoleDiscrimination;
                 newRole.ModifiedDate = DateTime.UtcNow;
                 newRole.ModifiedBy = role.ModifiedBy;
                 _role.Update(newRole);
@@ -492,6 +492,7 @@ namespace Web.Services.Concrete
             }).ToList();
             var treeViewItems = treeItems.BuildComponentAccessTree();
             //var queryReturn = this._dbContext.Database.ExecuteSqlRawAsync("getComponentAccessByUserAndRole @pUserId, @pRoleId", parameters: new[] { 1016, 2 }).Result;
+            var queryReturn = this._dbContext.Set<ComponentAccessDbReturnVM>().FromSqlInterpolated($"getComponentAccessByUserAndRole").AsNoTracking().ToList();
 
             //List<ComponentAccessVM> roleaccees = this. //dasq("CreateStudents @p0, @p1", parameters: new[] { "Bill", "Gates" });
             //var userRoleAcceess = (from rca in _componentAccess.Table
@@ -508,7 +509,7 @@ namespace Web.Services.Concrete
             //                           state = new ComponentAccessStateVM() { opened = true },
             //                       }).ToList();
 
-            foreach(var tree in treeViewItems)
+            foreach (var tree in treeViewItems)
             {
                 //if (tree.ParentKey != null)
                 //{

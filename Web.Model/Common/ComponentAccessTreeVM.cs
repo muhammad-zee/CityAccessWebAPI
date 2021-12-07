@@ -18,4 +18,12 @@ namespace Web.Model.Common
         public List<ComponentAccessTreeVM> children { get; set; }
 
     }
+    public class ComponentAccessDbReturnVM
+    {
+        public int ComponentId { get; set; }
+        public string ComModuleName { get; set; }
+        public int? ParentComponentId { get; set; }
+        public bool IsActive { get; set; }
+
+    }
 }
