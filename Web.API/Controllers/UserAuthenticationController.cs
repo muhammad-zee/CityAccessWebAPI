@@ -62,7 +62,7 @@ namespace Web.API.Controllers
 
         [AllowAnonymous]
         [Description("Update Password")]
-        [HttpPost("auth/updatepassword")]
+        [HttpPost("auth/UpdatePassword")]
         public BaseResponse UpdatePassword(UserCredentialVM model) 
         {
             try
