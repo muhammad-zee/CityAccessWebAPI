@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Web.Model.Common
 {
-    public class ComponentAccessTreeVM
+    public class ComponentAccessByRoleAndUserTreeVM
     {
         public string ComponentId { get; set; }
         public string ModuleName { get; set; }
@@ -15,7 +15,7 @@ namespace Web.Model.Common
         public List<string> Actions { get; set; }
 
         [JsonIgnore]
-        public List<ComponentAccessTreeVM> children { get; set; }
+        public List<ComponentAccessByRoleAndUserTreeVM> children { get; set; }
         [JsonIgnore]
         public bool IsAction { get; set; }
 

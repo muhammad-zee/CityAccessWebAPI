@@ -109,37 +109,22 @@ namespace Web.API.Helper
         }
 
 
-        public static IList<ComponentAccessTreeVM> BuildComponentAccessTree(this IEnumerable<ComponentAccessTreeVM> source)
+        public static IList<ComponentAccessByRoleAndUserTreeVM> BuildComponentAccessTree(this IEnumerable<ComponentAccessByRoleAndUserTreeVM> source)
         {
             var groups = source.GroupBy(i => i.ParentComponentId);
 
-            var roots = groups.FirstOrDefault(g => g.Key.HasValue == false).ToList();
-            roots = source.Where(s => !s.IsAction && s.ParentComponentId != null).ToList();
+            //var roots = groups.FirstOrDefault(g => g.Key.HasValue == false).ToList();
+           var roots = source.Where(s => !s.IsAction ).ToList();
             if (roots.Count > 0)
             {
                 var dict = groups.Where(g => g.Key.HasValue).ToDictionary(g => g.Key.Value.ToString(), g => g.ToList());
                 for (int i = 0; i < roots.Count; i++)
                     AddActionList(roots[i], dict);
             }
-            //foreach( var root in roots)
-            //{
-            //    if (root.Actions == null)
-            //    {
-            //        root.Actions = new List<string>();
-            //    }
-            //    if(root.children!= null)
-            //    {
-            //        foreach (var child in root.children)
-            //        {
-            //            root.Actions.Add(child.ModuleName);
-            //        }
-            //    }
-            //}
-
             return roots;
         }
 
-        private static void AddActionList(ComponentAccessTreeVM node, IDictionary<string, List<ComponentAccessTreeVM>> source)
+        private static void AddActionList(ComponentAccessByRoleAndUserTreeVM node, IDictionary<string, List<ComponentAccessByRoleAndUserTreeVM>> source)
         {
             if (source.ContainsKey(node.ComponentId))
             {
@@ -158,7 +143,7 @@ namespace Web.API.Helper
             }
             else
             {
-                node.children = new List<ComponentAccessTreeVM>();
+                node.children = new List<ComponentAccessByRoleAndUserTreeVM>();
             }
         }
 
