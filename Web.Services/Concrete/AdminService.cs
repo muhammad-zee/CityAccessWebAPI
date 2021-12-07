@@ -58,9 +58,11 @@ namespace Web.Services.Concrete
         {
             var result = _user.Table.Where(x => x.IsDeleted == false).ToList();
             var users = AutoMapperHelper.MapList<User, RegisterCredentialVM>(result);
+            var genders = _controlListDetails.Table.Select(x => new { x.ControlListDetailId, x.Title });
             foreach (var item in users)
             {
                 item.UserRole = getRoleListByUserId(item.UserId).ToList();
+                item.Gender = genders.Where(x => x.ControlListDetailId == Convert.ToInt32(item.Gender)).Select(x => x.Title).FirstOrDefault();
             }
             return new BaseResponse { Status = HttpStatusCode.OK, Message = "Users List Returned", Body = users };
         }
@@ -68,10 +70,12 @@ namespace Web.Services.Concrete
         public BaseResponse GetUserById(int Id)
         {
             var USER = _user.Table.Where(x => x.UserId == Id && x.IsDeleted == false).FirstOrDefault();
+            var genders = _controlListDetails.Table.Select(x => new { x.ControlListDetailId, x.Title });
             if (USER != null)
             {
                 var user = AutoMapperHelper.MapSingleRow<User, RegisterCredentialVM>(USER);
                 user.UserRole = getRoleListByUserId(Id).ToList();
+                user.Gender = genders.Where(x => x.ControlListDetailId == Convert.ToInt32(user.Gender)).Select(x => x.Title).FirstOrDefault();
                 return new BaseResponse { Status = HttpStatusCode.OK, Message = "User Found", Body = user };
             }
             else

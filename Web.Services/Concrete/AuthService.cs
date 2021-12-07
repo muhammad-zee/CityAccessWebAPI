@@ -151,10 +151,35 @@ namespace Web.Services.Concrete
         {
             if (register.UserId > 0)
             {
-                var user = AutoMapperHelper.MapSingleRow<RegisterCredentialVM, User>(register);
-                user.Password = _userRepo.Table.Where(x => x.UserId == register.UserId && x.IsDeleted == false).Select(x => x.Password).AsQueryable().FirstOrDefault();
+                var user = _userRepo.Table.Where(x => x.UserId == register.UserId && x.IsDeleted == false).FirstOrDefault();
+                user.FirstName = register.FirstName;
+                user.MiddleName = register.MiddleName;
+                user.LastName = register.LastName;
+                user.PersonalMobileNumber = register.PersonalMobileNumber;
+                user.StateKey = register.StateKey;
+                user.Gender = register.GenderId.ToString();
+                user.HomeAddress = register.HomeAddress;
+                user.City = register.City;
+                user.Zip = register.Zip;
+                user.ModifiedBy = register.ModifiedBy;
+                user.ModifiedDate = DateTime.UtcNow;
+                if (register.UserImageByte != null && register.UserImageByte.Count() > 0)
+                {
+                    var outPath = Directory.GetCurrentDirectory();
+                    outPath += "/UserProfiles/";
+                    if (!Directory.Exists(outPath))
+                    {
+                        Directory.CreateDirectory(outPath);
+                    }
+                    outPath += $"{user.FirstName}-{user.LastName}_{user.UserId}.png";
+                    using (FileStream fs = new FileStream(outPath, FileMode.Create, FileAccess.Write))
+                    {
+                        fs.Write(register.UserImageByte);
+                    }
+                    user.UserImage = outPath;
+                }
                 _userRepo.Update(user);
-
+                
                 if (!string.IsNullOrEmpty(register.RoleIds))
                 {
                     var roleIds = register.RoleIds.ToIntList();
@@ -179,7 +204,7 @@ namespace Web.Services.Concrete
             {
                 //first validate the username and password from the db and then generate token
                 if (!string.IsNullOrEmpty(register.UserName) && !string.IsNullOrEmpty(register.Password)
-                    && !string.IsNullOrEmpty(register.PrimaryEmail) && !string.IsNullOrEmpty(register.Gender)
+                    && !string.IsNullOrEmpty(register.PrimaryEmail) && !string.IsNullOrEmpty(register.GenderId.ToString())
                     && !string.IsNullOrEmpty(register.RoleIds))
                 {
                     var alreadyExist = _userRepo.GetList().Where(x => x.UserName == register.UserName && x.IsDeleted == false).FirstOrDefault();
@@ -194,7 +219,7 @@ namespace Web.Services.Concrete
                             Password = register.Password,
                             PrimaryEmail = register.PrimaryEmail,
                             PersonalMobileNumber = register.PersonalMobileNumber,
-                            Gender = register.Gender,
+                            Gender = register.GenderId.ToString(),
                             HomeAddress = register.HomeAddress,
                             City = register.City,
                             Zip = register.Zip,
@@ -219,7 +244,7 @@ namespace Web.Services.Concrete
                             {
                                 Directory.CreateDirectory(outPath);
                             }
-                            outPath += $"UserProfilePic_{obj.UserId}.png";
+                            outPath += $"{obj.FirstName}-{obj.LastName}_{obj.UserId}.png";
                             using (FileStream fs = new FileStream(outPath, FileMode.Create, FileAccess.Write))
                             {
                                 fs.Write(register.UserImageByte);

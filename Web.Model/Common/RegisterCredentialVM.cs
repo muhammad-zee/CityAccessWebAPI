@@ -23,6 +23,7 @@ namespace Web.Model.Common
         [Required]
         public string PersonalMobileNumber { get; set; }
         [Required]
+        public int GenderId { get; set; }
         public string Gender { get; set; }
         public string OfficeAddress { get; set; } = "";
         public string HomeAddress { get; set; } = "";

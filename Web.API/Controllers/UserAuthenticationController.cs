@@ -100,7 +100,7 @@ namespace Web.API.Controllers
                 register.Password = hashPswd;
 
                 //byte[] bytes = System.IO.File.ReadAllBytes(@"D:\pic.jpg");
-                //register.UserImage = bytes;
+                //register.UserImageByte = bytes;
 
                 string result = _jwtAuth.SaveUser(register);
 
