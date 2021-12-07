@@ -117,6 +117,20 @@ namespace Web.API.Helper
                 for (int i = 0; i < roots.Count; i++)
                     AddActionList(roots[i], dict);
             }
+            //foreach( var root in roots)
+            //{
+            //    if (root.Actions == null)
+            //    {
+            //        root.Actions = new List<string>();
+            //    }
+            //    if(root.children!= null)
+            //    {
+            //        foreach (var child in root.children)
+            //        {
+            //            root.Actions.Add(child.ModuleName);
+            //        }
+            //    }
+            //}
 
             return roots;
         }

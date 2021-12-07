@@ -329,7 +329,7 @@ namespace Web.API.Controllers
         {
             try
             {
-                var response = new BaseResponse();
+                BaseResponse response = null;
                 response = _adminService.GetComponentsByUserRoleId(roleId, userId);
                 return response;
             }
