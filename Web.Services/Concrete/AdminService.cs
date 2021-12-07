@@ -394,6 +394,7 @@ namespace Web.Services.Concrete
                 key = x.ComponentId.ToString(),
                 ParentKey = x.ParentComponentId,
                 label = x.ComModuleName,
+                icon = x.PageUrl,
                 expanded = true,
             }).ToList();
             var treeViewItems = treeItems.BuildTree();
@@ -430,6 +431,7 @@ namespace Web.Services.Concrete
                 key = x.ComponentId.ToString(),
                 ParentKey = x.ParentComponentId,
                 label = x.ComModuleName,
+                icon = x.PageUrl,
                 expanded = true,
             }).ToList();
             var treeViewItems = treeItems.BuildTree();
