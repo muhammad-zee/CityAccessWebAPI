@@ -6,6 +6,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="ElmahCore" Version="2.0.7" />
+    <PackageReference Include="ElmahCore.Sql" Version="2.0.7" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.10" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="5.0.10">

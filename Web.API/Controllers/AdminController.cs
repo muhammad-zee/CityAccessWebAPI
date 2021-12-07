@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using ElmahCore;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -9,11 +11,11 @@ using System.Net;
 using System.Reflection;
 using System.Threading.Tasks;
 using Web.API.Helper;
-using Web.Data.Models;
 using Web.Model;
 using Web.Model.Common;
 using Web.Services.Enums;
 using Web.Services.Interfaces;
+
 
 namespace Web.API.Controllers
 {
@@ -46,6 +48,7 @@ namespace Web.API.Controllers
             }
             catch (Exception ex)
             {
+                ElmahExtensions.RiseError(ex); 
                 _logger.LogExceptions(ex);
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
@@ -62,6 +65,7 @@ namespace Web.API.Controllers
             }
             catch (Exception ex)
             {
+                ElmahExtensions.RiseError(ex); 
                 _logger.LogExceptions(ex);
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
@@ -78,6 +82,7 @@ namespace Web.API.Controllers
             }
             catch (Exception ex)
             {
+                ElmahExtensions.RiseError(ex); 
                 _logger.LogExceptions(ex);
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
@@ -89,7 +94,7 @@ namespace Web.API.Controllers
         #region User Role
 
         [HttpGet("admin/GetUsersByRoleId/{roleId}")]
-        public async Task<BaseResponse> GetUsersByRoleId(int roleId) 
+        public async Task<BaseResponse> GetUsersByRoleId(int roleId)
         {
             try
             {
@@ -99,6 +104,7 @@ namespace Web.API.Controllers
             }
             catch (Exception ex)
             {
+                ElmahExtensions.RiseError(ex); 
                 _logger.LogExceptions(ex);
                 return new BaseResponse()
                 {
@@ -127,6 +133,7 @@ namespace Web.API.Controllers
             }
             catch (Exception ex)
             {
+                ElmahExtensions.RiseError(ex); 
                 _logger.LogExceptions(ex);
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
@@ -143,6 +150,7 @@ namespace Web.API.Controllers
             }
             catch (Exception ex)
             {
+                ElmahExtensions.RiseError(ex);
                 _logger.LogExceptions(ex);
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
@@ -166,6 +174,7 @@ namespace Web.API.Controllers
             }
             catch (Exception ex)
             {
+                ElmahExtensions.RiseError(ex); 
                 _logger.LogExceptions(ex);
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
@@ -182,6 +191,7 @@ namespace Web.API.Controllers
             }
             catch (Exception ex)
             {
+                ElmahExtensions.RiseError(ex); 
                 _logger.LogExceptions(ex);
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
@@ -245,6 +255,7 @@ namespace Web.API.Controllers
             }
             catch (Exception ex)
             {
+                ElmahExtensions.RiseError(ex);
                 _logger.LogExceptions(ex);
                 return new BaseResponse()
                 {
@@ -268,6 +279,7 @@ namespace Web.API.Controllers
             }
             catch (Exception ex)
             {
+                ElmahExtensions.RiseError(ex); 
                 _logger.LogExceptions(ex);
                 return new BaseResponse()
                 {
@@ -290,6 +302,7 @@ namespace Web.API.Controllers
             }
             catch (Exception ex)
             {
+                ElmahExtensions.RiseError(ex); 
                 _logger.LogExceptions(ex);
                 return new BaseResponse()
                 {
@@ -312,6 +325,7 @@ namespace Web.API.Controllers
             }
             catch (Exception ex)
             {
+                ElmahExtensions.RiseError(ex); 
                 _logger.LogExceptions(ex);
                 return new BaseResponse()
                 {
@@ -335,6 +349,7 @@ namespace Web.API.Controllers
             }
             catch (Exception ex)
             {
+                ElmahExtensions.RiseError(ex);
                 _logger.LogExceptions(ex);
                 return new BaseResponse()
                 {
@@ -357,7 +372,7 @@ namespace Web.API.Controllers
         //    }
         //    catch (Exception ex)
         //    {
-        //        _logger.LogExceptions(ex);
+        //        ElmahExtensions.RiseError(ex);_logger.LogExceptions(ex);
         //        return new BaseResponse()
         //        {
         //            Status = HttpStatusCode.BadRequest,
@@ -381,6 +396,7 @@ namespace Web.API.Controllers
             }
             catch (Exception ex)
             {
+                ElmahExtensions.RiseError(ex); 
                 _logger.LogExceptions(ex);
                 return new BaseResponse()
                 {
@@ -397,7 +413,7 @@ namespace Web.API.Controllers
 
         [Description("Get Control List Data")]
         [HttpGet("admin/GetUCLDetails/{Id}")]
-        public BaseResponse GetUCLDetails(int Id) 
+        public BaseResponse GetUCLDetails(int Id)
         {
             try
             {
@@ -406,6 +422,7 @@ namespace Web.API.Controllers
             }
             catch (Exception ex)
             {
+                ElmahExtensions.RiseError(ex); 
                 _logger.LogExceptions(ex);
                 return new BaseResponse()
                 {
@@ -414,7 +431,7 @@ namespace Web.API.Controllers
                     Body = null
                 };
             }
-        
+
         }
 
         #endregion

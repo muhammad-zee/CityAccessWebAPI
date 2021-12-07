@@ -1,3 +1,5 @@
+using ElmahCore.Mvc;
+using ElmahCore.Sql;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -7,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System;
 using System.Text;
 using Web.API.Helper;
 using Web.Data;
@@ -92,6 +95,11 @@ namespace Web.API
                  //}
              });
 
+            services.AddElmah<SqlErrorLog>(options =>
+            {
+                options.ConnectionString = Configuration.GetConnectionString("DefaultConnection");
+                //options.LogPath = "~/errors.xml";
+            });
 
             // register the repositories
             services.AddDbContext<RAQ_DbContext>();
@@ -106,6 +114,8 @@ namespace Web.API
             services.AddTransient(typeof(IJwtAuthService), typeof(AuthService));
             services.AddTransient(typeof(ICommunicationService), typeof(CommunicationService));
             services.AddTransient(typeof(IAdminService), typeof(AdminService));
+            services.AddTransient(typeof(IScheduleService), typeof(ScheduleService));
+            services.AddTransient(typeof(IFacilityService), typeof(FacilityService));
 
             //Register Services Repositories
 
@@ -129,6 +139,9 @@ namespace Web.API
             app.UseAuthentication();
 
             app.UseAuthorization();
+
+            //app.UseElmahIo();
+            app.UseElmah();
 
             // global error handler
             app.UseMiddleware<ErrorHandlerMiddleware>();

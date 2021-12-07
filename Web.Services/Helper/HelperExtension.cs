@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using ElmahCore;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
@@ -193,8 +194,9 @@ namespace Web.API.Helper
                               dr.GetValue(colMapping[prop.Name.ToLower()].ColumnOrdinal.Value);
                             prop.SetValue(obj, val == DBNull.Value ? null : val);
                         }
-                        catch
+                        catch (Exception ex)
                         {
+                            ElmahExtensions.RiseError(ex);
                             prop.SetValue(obj, null);
                         }
                     }
@@ -217,9 +219,10 @@ namespace Web.API.Helper
                         return reader.MapToList<T>();
                     }
                 }
-                catch (Exception e)
+                catch (Exception ex)
                 {
-                    throw (e);
+                    ElmahExtensions.RiseError(ex);
+                    throw (ex);
                 }
                 finally
                 {

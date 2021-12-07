@@ -483,16 +483,6 @@ namespace Web.Services.Concrete
              .WithSqlParam("@pRoleId", roleId)
              .ExecuteStoredProc<ComponentAccessByRoleAndUserVM>().Result;
 
-            //////// Make a join of ComponentAccess Table with Component to get List of Accessible Components By Role Id ////////
-            //List<ComponentAccessVM> roleacceess = (from ca in RCAresultData
-
-            //                   select new ComponentAccessVM()
-            //                   {
-            //                       ComponentId = ca.ComponentId,
-            //                       ComModuleName = ca.ComModuleName,
-            //                       ParentComponentId = ca.ParentComponentId,
-            //                       IsAction = ca.IsAction
-            //                   }).ToList();
             var treeItems = RCAresultData.Select(x => new ComponentAccessByRoleAndUserTreeVM()
             {
                 ComponentId = x.ComponentId.ToString(),
@@ -501,27 +491,6 @@ namespace Web.Services.Concrete
                 IsAction = x.IsAction
             }).ToList();
             var treeViewItems = treeItems.BuildComponentAccessTree();
-
-
-            //var queryReturn = this._dbContext.Set<ComponentAccessDbReturnVM>().FromSqlRaw<ComponentAccessDbReturnVM>($"Exec getComponentAccessByUserAndRole").AsNoTracking().ToList();
-
-
-         
-            //List<ComponentAccessVM> roleaccees = this. //dasq("CreateStudents @p0, @p1", parameters: new[] { "Bill", "Gates" });
-            //var userRoleAcceess = (from rca in _componentAccess.Table
-            //                       join ra in _component.Table on rca.ComIdFk equals ra.ComponentId
-            //                       join uca in _userAccess.Table on ra.ComponentId equals uca.UserComIdFk
-            //                       where rca.RoleIdFk == roleId
-            //                       && uca.RoleIdFk == roleId && uca.UserIdFk == userId
-            //                       && ra.IsDeleted == false && rca.IsDeleted == false && uca.IsDeleted == false
-            //                       select new ComponentAccessVM()
-            //                       {
-            //                           id = ra.ComponentId,
-            //                           text = ra.ComModuleName,
-            //                           parent = ra.ParentComponentId != null ? ra.ParentComponentId.ToString() : "#",
-            //                           state = new ComponentAccessStateVM() { opened = true },
-            //                       }).ToList();
-
             foreach (var tree in treeViewItems)
             {
                 //if (tree.ParentKey != null)

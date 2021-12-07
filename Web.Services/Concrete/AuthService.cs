@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using ElmahCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
@@ -325,6 +326,7 @@ namespace Web.Services.Concrete
             }
             catch (Exception ex)
             {
+                ElmahExtensions.RiseError(ex);
                 return ex.ToString();
             }
             return null;
@@ -345,6 +347,7 @@ namespace Web.Services.Concrete
             }
             catch (Exception ex)
             {
+                ElmahExtensions.RiseError(ex);
                 return ex.ToString();
             }
 
@@ -414,6 +417,7 @@ namespace Web.Services.Concrete
             }
             catch (Exception ex)
             {
+                ElmahExtensions.RiseError(ex);
                 return false;
 
             }

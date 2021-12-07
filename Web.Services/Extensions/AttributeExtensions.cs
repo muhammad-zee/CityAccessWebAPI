@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ElmahCore;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -20,7 +21,10 @@ namespace Web.Services.Extensions
                 var da = (DescriptionAttribute[])(value.GetType().GetField(value.ToString())).GetCustomAttributes(typeof(DescriptionAttribute), false);
                 return da.Length > 0 ? da[0].Description : value.ToString();
             }
-            catch { return ""; }
+            catch(Exception ex) {
+                ElmahExtensions.RiseError(ex);
+                return ""; 
+            }
 
         }
 
@@ -77,8 +81,9 @@ namespace Web.Services.Extensions
                 }
                 return 0;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                ElmahExtensions.RiseError(ex);
                 return 0;
             }
         }
@@ -92,8 +97,9 @@ namespace Web.Services.Extensions
                 }
                 return 0;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                ElmahExtensions.RiseError(ex);
                 return 0;
             }
         }
@@ -133,8 +139,9 @@ namespace Web.Services.Extensions
                 }
                 return 0;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                ElmahExtensions.RiseError(ex);
                 return 0;
             }
         }
@@ -149,8 +156,9 @@ namespace Web.Services.Extensions
                 }
                 return 0;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                ElmahExtensions.RiseError(ex);
                 return 0;
             }
         }
@@ -176,8 +184,9 @@ namespace Web.Services.Extensions
                 }
                 return false;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                ElmahExtensions.RiseError(ex);
                 return false;
             }
         }

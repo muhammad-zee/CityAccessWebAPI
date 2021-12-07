@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using ElmahCore;
+using Microsoft.Extensions.Configuration;
 using SendGrid;
 using SendGrid.Helpers.Mail;
 using System;
@@ -7,6 +8,7 @@ using Twilio;
 using Twilio.AspNet.Common;
 using Twilio.Rest.Api.V2010.Account;
 using Twilio.Types;
+using Web.Services.Enums;
 using Web.Services.Interfaces;
 
 namespace Web.Services.Concrete
@@ -67,6 +69,7 @@ namespace Web.Services.Concrete
             }
             catch (Exception ex)
             {
+                ElmahExtensions.RiseError(ex);
                 return ex.Message;
             }
 
@@ -102,7 +105,7 @@ namespace Web.Services.Concrete
             //NewSendEmail.SendingEmail();
             var res = SendingEmailAsync(sgm, ImageName, ImageContent);
             var result = res.Result;
-            if (result == "Email Sent")
+            if (result == CommunicationEnums.Sent.ToString())
             {
                 return true;
             }
@@ -131,16 +134,17 @@ namespace Web.Services.Concrete
 
                 if (status == "Unauthorized")
                 {
-                    response = "Email Failed";
+                    response = CommunicationEnums.NotSent.ToString();
                 }
                 else
                 {
-                    response = "Email Sent";
+                    response = CommunicationEnums.Sent.ToString();
                 }
                 return response;
             }
             catch (Exception ex)
             {
+                ElmahExtensions.RiseError(ex);
                 response = ex.Message.ToString();
                 return response;
             }
