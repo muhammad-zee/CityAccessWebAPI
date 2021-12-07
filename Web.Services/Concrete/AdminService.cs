@@ -81,6 +81,7 @@ namespace Web.Services.Concrete
             if (USER != null)
             {
                 USER.IsDeleted = true;
+                USER.ModifiedDate = DateTime.UtcNow;
                 _user.Update(USER);
                 return new BaseResponse { Status = HttpStatusCode.OK, Message = "User Deleted" };
             }
@@ -155,9 +156,9 @@ namespace Web.Services.Concrete
         public string SaveRole(RoleVM role)
         {
             string response = string.Empty;
-            var newRole = AutoMapperHelper.MapSingleRow<RoleVM, Role>(role);
-            if (role.RoleId > 0)
+            if (role.RoleId == 0)
             {
+            var newRole = AutoMapperHelper.MapSingleRow<RoleVM, Role>(role);
                 if (_role.Table.Count(r => r.RoleName == role.RoleName && !r.IsDeleted) == 0)
                 {
                     _role.Insert(newRole);
@@ -171,6 +172,12 @@ namespace Web.Services.Concrete
             }
             else
             {
+                var newRole = _role.Table.Where(r => r.RoleId == role.RoleId && !r.IsDeleted).FirstOrDefault();
+                newRole.RoleName = role.RoleName;
+                newRole.RoleDescription = role.RoleDescription;
+                newRole.RoleDescription = role.RoleDescription;
+                newRole.ModifiedDate = DateTime.UtcNow;
+                newRole.ModifiedBy = role.ModifiedBy;
                 _role.Update(newRole);
                 response = StatusEnums.Success.ToString();
             }
