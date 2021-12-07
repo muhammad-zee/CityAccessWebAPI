@@ -62,7 +62,8 @@ namespace Web.Services.Concrete
             foreach (var item in users)
             {
                 item.UserRole = getRoleListByUserId(item.UserId).ToList();
-                item.Gender = genders.Where(x => x.ControlListDetailId == Convert.ToInt32(item.Gender)).Select(x => x.Title).FirstOrDefault();
+                item.GenderId = Convert.ToInt32(item.Gender);
+                item.Gender = genders.Where(x => x.ControlListDetailId == item.GenderId).Select(x => x.Title).FirstOrDefault();
             }
             return new BaseResponse { Status = HttpStatusCode.OK, Message = "Users List Returned", Body = users };
         }
@@ -75,7 +76,8 @@ namespace Web.Services.Concrete
             {
                 var user = AutoMapperHelper.MapSingleRow<User, RegisterCredentialVM>(USER);
                 user.UserRole = getRoleListByUserId(Id).ToList();
-                user.Gender = genders.Where(x => x.ControlListDetailId == Convert.ToInt32(user.Gender)).Select(x => x.Title).FirstOrDefault();
+                user.GenderId = Convert.ToInt32(user.Gender);
+                user.Gender = genders.Where(x => x.ControlListDetailId == user.GenderId).Select(x => x.Title).FirstOrDefault();
                 return new BaseResponse { Status = HttpStatusCode.OK, Message = "User Found", Body = user };
             }
             else

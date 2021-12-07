@@ -49,13 +49,11 @@ namespace Web.Services.Concrete
 
         public BaseResponse Authentication(UserCredentialVM login)
         {
-
-
             BaseResponse response = new BaseResponse();
             if (!string.IsNullOrEmpty(login.email) && !string.IsNullOrEmpty(login.password))
             {
                 login.password = HelperExtension.Encrypt(login.password);
-                var user = _userRepo.Table.Where(x => (x.PrimaryEmail == login.email || x.UserName == login.email) && x.Password == login.password && !x.IsDeleted).FirstOrDefault();
+                var user = _userRepo.Table.Where(x => (x.UserName == login.email) && x.Password == login.password && !x.IsDeleted).FirstOrDefault();
                 if (user != null)
                 {
                     var AuthorizedUser = GenerateJSONWebToken(user);
@@ -152,10 +150,20 @@ namespace Web.Services.Concrete
             if (register.UserId > 0)
             {
                 var user = _userRepo.Table.Where(x => x.UserId == register.UserId && x.IsDeleted == false).FirstOrDefault();
+                if (user.UserName != register.UserName)
+                {
+                    var alreadyExist = _userRepo.Table.Where(x => x.UserName == register.UserName && x.UserId != register.UserId).FirstOrDefault();
+                    if (alreadyExist != null) 
+                    {
+                        return StatusEnums.AlreadyExist.ToString();
+                    }
+                }
                 user.FirstName = register.FirstName;
                 user.MiddleName = register.MiddleName;
                 user.LastName = register.LastName;
                 user.PersonalMobileNumber = register.PersonalMobileNumber;
+                user.UserName = register.UserName;
+                user.PrimaryEmail = register.PrimaryEmail;
                 user.StateKey = register.StateKey;
                 user.Gender = register.GenderId.ToString();
                 user.HomeAddress = register.HomeAddress;
@@ -207,7 +215,7 @@ namespace Web.Services.Concrete
                     && !string.IsNullOrEmpty(register.PrimaryEmail) && !string.IsNullOrEmpty(register.GenderId.ToString())
                     && !string.IsNullOrEmpty(register.RoleIds))
                 {
-                    var alreadyExist = _userRepo.GetList().Where(x => x.UserName == register.UserName && x.IsDeleted == false).FirstOrDefault();
+                    var alreadyExist = _userRepo.GetList().Where(x => x.UserName == register.UserName && x.PrimaryEmail == register.PrimaryEmail && x.IsDeleted == false).FirstOrDefault();
                     if (alreadyExist == null)
                     {
                         var obj = new User()
@@ -223,6 +231,7 @@ namespace Web.Services.Concrete
                             HomeAddress = register.HomeAddress,
                             City = register.City,
                             Zip = register.Zip,
+                            StateKey = register.StateKey,
                             CreatedBy = register.CreatedBy,
                             CreatedDate = DateTime.UtcNow,
                             IsDeleted = false,
