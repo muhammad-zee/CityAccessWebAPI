@@ -532,6 +532,10 @@ namespace Web.Services.Concrete
                 /////////// Get Matched Access Ids /////////
                 var MatcheAccessIds = roleAccess.Where(x => compIds.Contains(x.ComponentIdFk)).Select(x => x.ComponentIdFk).ToList();
 
+                /////////// Delete those components which are now allowed and Already Exist in Component Access and also Exist in User Access with isActive = false /////////
+                var dltFromUserComps = _userAccess.Table.Where(x => compIds.Contains(x.ComponentIdFk) && x.IsActive == false).ToList();
+                _userAccess.DeleteRange(dltFromUserComps);
+
                 ///////////// Remove Matched Role Components from coming List /////////
                 compIds.RemoveAll(x => MatcheAccessIds.Contains(x));
 
@@ -545,6 +549,9 @@ namespace Web.Services.Concrete
                 
                 ///////////// Remove Already Exist User Component Access from coming List /////////
                 compIds.RemoveAll(x => alreadyExist.Select(x => x.ComponentIdFk).Contains(x));
+
+                ///////////// Remove NotAllowed User Component Access from coming List /////////
+                compIds.RemoveAll(x => removeCompsAccess.Select(x => x.ComponentIdFk).Contains(x));
 
                 /////////////// Remove components which has no access/////////
                 //var extrasCompsAccess = alreadyExist.Where(x => !compIds.Contains(x.ComponentIdFk) && x.IsDeleted == false && x.IsActive == false).ToList();
@@ -567,20 +574,30 @@ namespace Web.Services.Concrete
 
                 /////////// Get Components which Allowed to Role but NotAllowed to User /////////
                 var UnMatcheAccessIds = roleAccess.Where(x => !componentAccess.AccessAttr.Select(x => Convert.ToInt32(x.Key)).Distinct().ToList().Contains(x.ComponentIdFk)).Select(x => x.ComponentIdFk).ToList();
-
-                /////////// Now add NotAllowed ones /////////
-                comps = UnMatcheAccessIds.Select(x => new UserAccess()
+                UnMatcheAccessIds.RemoveAll(x => _userAccess.Table.Where(x => x.IsActive == false).Select(x => x.ComponentIdFk).Contains(x));
+                if (UnMatcheAccessIds.Count() > 0) 
                 {
+                    /////////// Now add NotAllowed ones /////////
+                    comps = UnMatcheAccessIds.Select(x => new UserAccess()
+                    {
 
-                    ComponentIdFk = x,
-                    RoleIdFk = componentAccess.RoleId,
-                    UserIdFk = componentAccess.UserId,
-                    IsActive = false,
-                    CreatedBy = componentAccess.LoggedInUserId,
-                    CreatedDate = DateTime.UtcNow,
-                }).ToList();
+                        ComponentIdFk = x,
+                        RoleIdFk = componentAccess.RoleId,
+                        UserIdFk = componentAccess.UserId,
+                        IsActive = false,
+                        CreatedBy = componentAccess.LoggedInUserId,
+                        CreatedDate = DateTime.UtcNow,
+                    }).ToList();
 
-                _userAccess.Insert(comps);
+                    _userAccess.Insert(comps);
+                }
+
+                /////////// Now Delete Allowed Components from UserAccess Which is already Exist in ComponentAccess  /////////
+                var duplicateComps = _userAccess.Table.Where(x => roleAccess.Select(x => x.ComponentIdFk).Contains(x.ComponentIdFk) && x.RoleIdFk == componentAccess.RoleId && x.UserIdFk == componentAccess.UserId && x.IsActive == true).AsQueryable().ToList();
+                _userAccess.DeleteRange(duplicateComps);
+
+                var extras = _userAccess.Table.Where(x => x.IsActive == false && !_componentAccess.Table.Where(r => r.RoleIdFk == componentAccess.RoleId).Select(x => x.ComponentIdFk).Contains(x.ComponentIdFk)).ToList();
+                _userAccess.DeleteRange(extras);
 
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Component Access saved successfully" };
 
