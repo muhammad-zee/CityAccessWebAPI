@@ -132,19 +132,27 @@ namespace Web.Services.Concrete
             };
         }
 
+        public BaseResponse ConfirmPassword(UserCredentialVM modelUser) 
+        {
+            var user = _userRepo.Table.Where(x => x.PrimaryEmail == modelUser.email).FirstOrDefault();
+            if (user != null)
+            {
+                user.IsRequirePasswordReset = false;
+                user.Password = modelUser.password;
+                _userRepo.Update(user);
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Password Updated" };
+            }
+            else {
+                return new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "User Not Found" };
+            }
+        }
+
         public string SaveUser(RegisterCredentialVM register)
         {
             if (register.UserId > 0)
             {
                 var user = AutoMapperHelper.MapSingleRow<RegisterCredentialVM, User>(register);
-                if (!user.IsRequirePasswordReset)
-                {
-                    user.Password = _userRepo.Table.Where(x => x.UserId == register.UserId && x.IsDeleted == false).Select(x => x.Password).AsQueryable().FirstOrDefault();
-                }
-                else
-                {
-                    user.IsRequirePasswordReset = false;
-                }
+                user.Password = _userRepo.Table.Where(x => x.UserId == register.UserId && x.IsDeleted == false).Select(x => x.Password).AsQueryable().FirstOrDefault();
                 _userRepo.Update(user);
 
                 if (!string.IsNullOrEmpty(register.RoleIds))

@@ -60,6 +60,29 @@ namespace Web.API.Controllers
             }
         }
 
+        [AllowAnonymous]
+        [Description("Update Password")]
+        [HttpPost("auth/updatepassword")]
+        public BaseResponse UpdatePassword(UserCredentialVM model) 
+        {
+            try
+            {
+                //////////////////////////// Encrypt Password //////////////////////////////
+                var hashPswd = HelperExtension.Encrypt(model.password);
+                /////////////////////////////////////////////////////////////////////////////
+                model.password = hashPswd;
+
+                var result = _jwtAuth.ConfirmPassword(model);
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        
+        }
+
         //[Authorize]
         [Description("Add or Update User")]
         [HttpPost("auth/SaveUser")]
