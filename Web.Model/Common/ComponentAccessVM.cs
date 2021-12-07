@@ -1,6 +1,6 @@
 ﻿namespace Web.Model.Common
 {
-    public class ComponentAccessVM
+    public class ComponentAccessByRoleAndUserVM
     {
         public int ComponentId { get; set; }
         public string ComModuleName { get; set; }
