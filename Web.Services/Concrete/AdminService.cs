@@ -605,7 +605,7 @@ namespace Web.Services.Concrete
 
                 /////////// Get Components which Allowed to Role but NotAllowed to User /////////
                 var UnMatcheAccessIds = roleAccess.Where(x => !componentAccess.AccessAttr.Select(x => Convert.ToInt32(x.Key)).Distinct().ToList().Contains(x.ComponentIdFk)).Select(x => x.ComponentIdFk).ToList();
-                UnMatcheAccessIds.RemoveAll(x => _userAccess.Table.Where(x => x.IsActive == false).Select(x => x.ComponentIdFk).Contains(x));
+                UnMatcheAccessIds.RemoveAll(x => _userAccess.Table.Where(x => x.IsActive == false && x.UserIdFk == componentAccess.UserId && x.UserIdFk == componentAccess.RoleId).Select(x => x.ComponentIdFk).Contains(x));
                 if (UnMatcheAccessIds.Count() > 0) 
                 {
                     /////////// Now add NotAllowed ones /////////
