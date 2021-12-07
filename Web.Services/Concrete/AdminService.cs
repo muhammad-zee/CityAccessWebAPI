@@ -439,13 +439,15 @@ namespace Web.Services.Concrete
             var selectedUserRoleAccessIds = _componentAccess.Table.Where(x => x.RoleIdFk == roleId && x.IsActive == true).Select(x => new { key = x.ComponentIdFk.ToString() }).ToList();
             selectedUserRoleAccessIds.AddRange(_userAccess.Table.Where(x => x.RoleIdFk == roleId && x.UserIdFk == userId && x.IsActive == true).Select(x => new { key = x.ComponentIdFk.ToString() }).ToList());
 
+            selectedUserRoleAccessIds.RemoveAll(x => _userAccess.Table.Where(x => x.IsActive == false).Select(x => new { key = x.ComponentIdFk.ToString() }).ToList().Contains(x));
+
             if (treeViewItems.Count() > 0)
             {
                 response = new BaseResponse()
                 {
                     Status = HttpStatusCode.OK,
                     Message = "Data Found",
-                    Body = new { TreeViewItems = treeViewItems, SelectedIds = selectedUserRoleAccessIds },
+                    Body = new { TreeViewItems = treeViewItems, SelectedIds = selectedUserRoleAccessIds.Distinct() },
                 };
             }
             else
