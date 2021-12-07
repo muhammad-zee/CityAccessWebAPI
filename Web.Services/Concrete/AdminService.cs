@@ -687,7 +687,7 @@ namespace Web.Services.Concrete
                               && ucl.ControlListIsActive == true && ucld.IsActive == true
                               select new 
                               {
-                                  ControlListDetailId = ucld.ControlListDetailId,
+                                  Id = ucld.ControlListDetailId,
                                   Title = ucld.Title,
                                   Description = ucld.Description
                               }).ToList();
