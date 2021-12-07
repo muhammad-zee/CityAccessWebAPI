@@ -479,7 +479,7 @@ namespace Web.Services.Concrete
             var RCAresultData = _dbContext.LoadStoredProc("getComponentAccessByUserAndRole")
              .WithSqlParam("@pUserId", userId)
              .WithSqlParam("@pRoleId", roleId)
-             .ExecuteStoredProc<ComponentAccessVM>().Result;
+             .ExecuteStoredProc<ComponentAccessByRoleAndUserVM>().Result;
 
             //////// Make a join of ComponentAccess Table with Component to get List of Accessible Components By Role Id ////////
             //List<ComponentAccessVM> roleacceess = (from ca in RCAresultData
@@ -491,7 +491,7 @@ namespace Web.Services.Concrete
             //                       ParentComponentId = ca.ParentComponentId,
             //                       IsAction = ca.IsAction
             //                   }).ToList();
-            var treeItems = RCAresultData.Select(x => new ComponentAccessTreeVM()
+            var treeItems = RCAresultData.Select(x => new ComponentAccessByRoleAndUserTreeVM()
             {
                 ComponentId = x.ComponentId.ToString(),
                 ParentComponentId = x.ParentComponentId,
