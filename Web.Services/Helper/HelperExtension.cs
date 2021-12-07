@@ -129,8 +129,8 @@ namespace Web.API.Helper
             if (source.ContainsKey(node.ComponentId))
             {
                 node.children = source[node.ComponentId];
-                for (int i = 0; i < node.children.Count; i++)
-                    AddActionList(node.children[i], source);
+                //for (int i = 0; i < node.children.Count; i++)
+                //    AddActionList(node.children[i], source);
                 if (node.Actions == null)
                 {
                     node.Actions = new List<string>();
