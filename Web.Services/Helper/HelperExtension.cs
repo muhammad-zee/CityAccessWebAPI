@@ -196,7 +196,6 @@ namespace Web.API.Helper
                         }
                         catch (Exception ex)
                         {
-                            ElmahExtensions.RiseError(ex);
                             prop.SetValue(obj, null);
                         }
                     }
@@ -221,7 +220,6 @@ namespace Web.API.Helper
                 }
                 catch (Exception ex)
                 {
-                    ElmahExtensions.RiseError(ex);
                     throw (ex);
                 }
                 finally

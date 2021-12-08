@@ -495,13 +495,6 @@ namespace Web.Services.Concrete
                 IsAction = x.IsAction
             }).ToList();
             var treeViewItems = treeItems.BuildComponentAccessTree();
-            foreach (var tree in treeViewItems)
-            {
-                //if (tree.ParentKey != null)
-                //{
-                //    tree.children = null;
-                //}
-            }
             if (RCAresultData.Count() > 0)
             {
                 response = new BaseResponse()

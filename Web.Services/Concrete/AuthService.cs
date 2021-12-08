@@ -326,7 +326,7 @@ namespace Web.Services.Concrete
             }
             catch (Exception ex)
             {
-                ElmahExtensions.RiseError(ex);
+                //ElmahExtensions.RiseError(ex);
                 return ex.ToString();
             }
             return null;
@@ -347,7 +347,7 @@ namespace Web.Services.Concrete
             }
             catch (Exception ex)
             {
-                ElmahExtensions.RiseError(ex);
+                //ElmahExtensions.RiseError(ex);
                 return ex.ToString();
             }
 
@@ -417,7 +417,7 @@ namespace Web.Services.Concrete
             }
             catch (Exception ex)
             {
-                ElmahExtensions.RiseError(ex);
+                //ElmahExtensions.RiseError(ex);
                 return false;
 
             }
