@@ -101,7 +101,6 @@ namespace Web.API
                 options.ConnectionString = Configuration.GetConnectionString("DefaultConnection");
                 options.Path = new PathString("/elm");
                 options.ApplicationName = "RoutingAndQueueingAPI";
-                //options.LogPath = "~/errors.xml";
             });
 
             // register the repositories

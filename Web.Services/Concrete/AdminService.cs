@@ -482,7 +482,7 @@ namespace Web.Services.Concrete
         {
             BaseResponse response = null;
 
-            var RCAresultData = _dbContext.LoadStoredProc("getComponentAccessByUserAndRole")
+            var RCAresultData = _dbContext.LoadStoredProc("raq_getComponentAccessByUserAndRole")
              .WithSqlParam("@pUserId", userId)
              .WithSqlParam("@pRoleId", roleId)
              .ExecuteStoredProc<ComponentAccessByRoleAndUserVM>().Result;
