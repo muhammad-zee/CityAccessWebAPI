@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using ElmahCore;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -40,6 +41,7 @@ namespace Web.API.Controllers
             }
             catch (Exception ex)
             {
+                ElmahExtensions.RiseError(ex);
                 _logger.LogExceptions(ex);
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
@@ -55,6 +57,7 @@ namespace Web.API.Controllers
             }
             catch (Exception ex)
             {
+                ElmahExtensions.RiseError(ex);
                 _logger.LogExceptions(ex);
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
@@ -77,6 +80,7 @@ namespace Web.API.Controllers
             }
             catch (Exception ex)
             {
+                ElmahExtensions.RiseError(ex);
                 _logger.LogExceptions(ex);
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
@@ -128,6 +132,7 @@ namespace Web.API.Controllers
             }
             catch (Exception ex)
             {
+                ElmahExtensions.RiseError(ex);
                 _logger.LogExceptions(ex);
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
@@ -223,6 +228,7 @@ namespace Web.API.Controllers
             }
             catch (Exception ex)
             {
+                ElmahExtensions.RiseError(ex);
                 _logger.LogExceptions(ex);
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
@@ -238,6 +244,7 @@ namespace Web.API.Controllers
             }
             catch (Exception ex)
             {
+                ElmahExtensions.RiseError(ex);
                 _logger.LogExceptions(ex);
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
 
