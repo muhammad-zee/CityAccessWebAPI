@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Dynamic.Core;
 using System.Net;
 using Web.API.Helper;
 using Web.Data.Models;
@@ -113,12 +114,12 @@ namespace Web.Services.Concrete
         {
             var roleUsers = (from ur in _userRole.Table
                              join u in _user.Table on ur.UserIdFk equals u.UserId
-                             where ur.RoleIdFk == roleId
+                             where ur.RoleIdFk == roleId && u.IsDeleted == false
                              select new
                              {
                                  UserId = u.UserId,
                                  Name = u.FirstName + " " + u.LastName
-                             }).ToList();
+                             }).OrderBy("Name").ToList();
             //var roleUsersVM = AutoMapperHelper.MapList<User, RegisterCredentialVM>(roleUsers);
             var response = new BaseResponse();
 
