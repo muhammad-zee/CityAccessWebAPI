@@ -410,7 +410,7 @@ namespace Web.Services.Concrete
                 key = x.ComponentId.ToString(),
                 ParentKey = x.ParentComponentId,
                 label = x.ComModuleName,
-                icon = x.PageUrl,
+                icon = x.ModuleImage,
                 expanded = true,
             }).ToList();
             var treeViewItems = treeItems.BuildTree();
@@ -447,7 +447,7 @@ namespace Web.Services.Concrete
                 key = x.ComponentId.ToString(),
                 ParentKey = x.ParentComponentId,
                 label = x.ComModuleName,
-                icon = x.PageUrl,
+                icon = x.ModuleImage,
                 expanded = true,
             }).ToList();
             var treeViewItems = treeItems.BuildTree();
@@ -495,13 +495,6 @@ namespace Web.Services.Concrete
                 IsAction = x.IsAction
             }).ToList();
             var treeViewItems = treeItems.BuildComponentAccessTree();
-            foreach (var tree in treeViewItems)
-            {
-                //if (tree.ParentKey != null)
-                //{
-                //    tree.children = null;
-                //}
-            }
             if (RCAresultData.Count() > 0)
             {
                 response = new BaseResponse()
@@ -652,8 +645,6 @@ namespace Web.Services.Concrete
 
             return new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "Please select a role." };
         }
-
-
 
         #endregion
 

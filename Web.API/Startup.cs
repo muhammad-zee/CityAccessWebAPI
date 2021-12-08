@@ -3,6 +3,7 @@ using ElmahCore.Sql;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -98,6 +99,8 @@ namespace Web.API
             services.AddElmah<SqlErrorLog>(options =>
             {
                 options.ConnectionString = Configuration.GetConnectionString("DefaultConnection");
+                options.Path = new PathString("/elm");
+                options.ApplicationName = "RoutingAndQueueingAPI";
                 //options.LogPath = "~/errors.xml";
             });
 
@@ -142,7 +145,8 @@ namespace Web.API
 
             //app.UseElmahIo();
             app.UseElmah();
-
+            app.UseElmahExceptionPage();
+            
             // global error handler
             app.UseMiddleware<ErrorHandlerMiddleware>();
 

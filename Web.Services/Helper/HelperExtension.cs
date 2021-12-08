@@ -194,9 +194,8 @@ namespace Web.API.Helper
                               dr.GetValue(colMapping[prop.Name.ToLower()].ColumnOrdinal.Value);
                             prop.SetValue(obj, val == DBNull.Value ? null : val);
                         }
-                        catch (Exception ex)
+                        catch 
                         {
-                            ElmahExtensions.RiseError(ex);
                             prop.SetValue(obj, null);
                         }
                     }
