@@ -114,18 +114,21 @@ namespace Web.Services.Concrete
             var roleUsers = (from ur in _userRole.Table
                              join u in _user.Table on ur.UserIdFk equals u.UserId
                              where ur.RoleIdFk == roleId
-                             select u
-                             ).ToList();
-            var roleUsersVM = AutoMapperHelper.MapList<User, RegisterCredentialVM>(roleUsers);
+                             select new
+                             {
+                                 UserId = u.UserId,
+                                 Name = u.FirstName + " " + u.LastName
+                             }).ToList();
+            //var roleUsersVM = AutoMapperHelper.MapList<User, RegisterCredentialVM>(roleUsers);
             var response = new BaseResponse();
 
-            if (roleUsersVM.Count() > 0)
+            if (roleUsers.Count() > 0)
             {
                 response = new BaseResponse()
                 {
                     Status = HttpStatusCode.OK,
                     Message = "Data Found",
-                    Body = roleUsersVM,
+                    Body = roleUsers,
                 };
             }
             else
