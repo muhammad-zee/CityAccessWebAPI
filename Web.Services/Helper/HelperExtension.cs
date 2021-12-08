@@ -220,7 +220,6 @@ namespace Web.API.Helper
                 }
                 catch (Exception ex)
                 {
-                    ElmahExtensions.RiseError(ex);
                     throw (ex);
                 }
                 finally
