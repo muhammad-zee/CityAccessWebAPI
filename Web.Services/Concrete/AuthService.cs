@@ -62,7 +62,7 @@ namespace Web.Services.Concrete
                     response.Status = HttpStatusCode.OK;
                     response.Message = "User found";
                 }
-                else
+                else 
                 {
                     response.Body = null;
                     response.Status = HttpStatusCode.NotFound;
