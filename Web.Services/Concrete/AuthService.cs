@@ -51,10 +51,10 @@ namespace Web.Services.Concrete
         public BaseResponse Authentication(UserCredentialVM login)
         {
             BaseResponse response = new BaseResponse();
-            if (!string.IsNullOrEmpty(login.email) && !string.IsNullOrEmpty(login.password))
+            if (!string.IsNullOrEmpty(login.username) && !string.IsNullOrEmpty(login.password))
             {
                 //login.password = HelperExtension.Encrypt(login.password);
-                var user = _userRepo.Table.Where(x => (x.UserName == login.email) && x.Password == login.password && !x.IsDeleted).FirstOrDefault();
+                var user = _userRepo.Table.Where(x => (x.UserName == login.username) && x.Password == login.password && !x.IsDeleted).FirstOrDefault();
                 if (user != null)
                 {
                     var AuthorizedUser = GenerateJSONWebToken(user);
@@ -133,7 +133,7 @@ namespace Web.Services.Concrete
 
         public BaseResponse ConfirmPassword(UserCredentialVM modelUser) 
         {
-            var user = _userRepo.Table.Where(x => x.PrimaryEmail == modelUser.email).FirstOrDefault();
+            var user = _userRepo.Table.Where(x => x.PrimaryEmail == modelUser.username).FirstOrDefault();
             if (user != null)
             {
                 user.IsRequirePasswordReset = false;
@@ -338,7 +338,7 @@ namespace Web.Services.Concrete
         {
             try
             {
-                var user = _userRepo.Table.Where(x => x.UserName == credential.email).FirstOrDefault();
+                var user = _userRepo.Table.Where(x => x.UserName == credential.username).FirstOrDefault();
                 if (user != null)
                 {
                     var hashPswd = HelperExtension.Encrypt(credential.password);
