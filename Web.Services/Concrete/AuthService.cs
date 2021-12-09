@@ -1,5 +1,4 @@
-﻿using ElmahCore;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
@@ -10,7 +9,6 @@ using System.Net;
 using System.Net.Mail;
 using System.Security.Claims;
 using System.Text;
-using Web.API.Helper;
 using Web.Data.Models;
 using Web.DLL;
 using Web.DLL.Generic_Repository;
@@ -31,6 +29,7 @@ namespace Web.Services.Concrete
         private readonly IAdminService _adminService;
         IConfiguration _config;
         private readonly UnitOfWork unitorWork;
+        private string _encryptionKey = "";
         public AuthService(IConfiguration config,
             /*IUserAuthRepository userAuthRepository,*/
             IRepository<User> userRepo,
@@ -38,12 +37,13 @@ namespace Web.Services.Concrete
             ICommunicationService communicationService,
             IAdminService adminService)
         {
-            _config = config;
+            this._config = config;
             //_userAuthRepository = userAuthRepository;
-            _userRepo = (GenericRepository<User>)userRepo;
-            _userRoleRepo = (GenericRepository<UserRole>)userRoleRepo;
+            this._userRepo = (GenericRepository<User>)userRepo;
+            this._userRoleRepo = (GenericRepository<UserRole>)userRoleRepo;
             this._communicationService = communicationService;
             this._adminService = adminService;
+            this._encryptionKey = this._config["Encryption:key"].ToString();
 
         }
 
@@ -53,7 +53,7 @@ namespace Web.Services.Concrete
             BaseResponse response = new BaseResponse();
             if (!string.IsNullOrEmpty(login.username) && !string.IsNullOrEmpty(login.password))
             {
-                //login.password = HelperExtension.Encrypt(login.password);
+                //login.password = Encryption.encryptData(login.password, this._encryptionKey);
                 var user = _userRepo.Table.Where(x => (x.UserName == login.username) && x.Password == login.password && !x.IsDeleted).FirstOrDefault();
                 if (user != null)
                 {
@@ -316,7 +316,7 @@ namespace Web.Services.Concrete
                         }
                     }
                     string siteUrl = _config["siteUrl"];
-                    string hashUserName = HelperExtension.Encrypt(userName);
+                    string hashUserName = Encryption.encryptData(userName,this._encryptionKey);
                     string mailMessageTemplate = $"<b>Hi! {MrOrMrs} {Name},</b> <br />" +
                         $"<p>Please <a href='{siteUrl + hashUserName}' target='_blank'>Click here</a> to reset your password.</p> <br />" +
                         $"<p>If you didn’t ask to reset your password, you can ignore this email.</p> <br /><br />" +
@@ -341,7 +341,8 @@ namespace Web.Services.Concrete
                 var user = _userRepo.Table.Where(x => x.UserName == credential.username).FirstOrDefault();
                 if (user != null)
                 {
-                    var hashPswd = HelperExtension.Encrypt(credential.password);
+                    //var hashPswd = HelperExtension.Encrypt(credential.password);
+                    var hashPswd = Encryption.encryptData(credential.password,this._encryptionKey);
                     user.Password = hashPswd;
                     _userRepo.Update(user);
                     return StatusEnums.Success.ToString();
