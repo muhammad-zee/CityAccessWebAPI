@@ -53,20 +53,34 @@ namespace Web.Services.Concrete
             BaseResponse response = new BaseResponse();
             if (!string.IsNullOrEmpty(login.username) && !string.IsNullOrEmpty(login.password))
             {
-                //login.password = Encryption.encryptData(login.password, this._encryptionKey);
-                var user = _userRepo.Table.Where(x => (x.UserName == login.username) && x.Password == login.password && !x.IsDeleted).FirstOrDefault();
+                login.password = Encryption.decryptData(login.password, this._encryptionKey);
+                var user = _userRepo.Table.Where(x => (x.UserName == login.username) && !x.IsDeleted).FirstOrDefault();
+                //var user = (from u in this._userRepo.Table
+                //            where u.UserName == login.username //&& Encryption.decryptData(u.Password, this._encryptionKey) == login.password
+                //            && !u.IsDeleted
+                //            select u).FirstOrDefault();
                 if (user != null)
                 {
-                    var AuthorizedUser = GenerateJSONWebToken(user);
-                    response.Body = AuthorizedUser; ;
-                    response.Status = HttpStatusCode.OK;
-                    response.Message = "User found";
+                user.Password = Encryption.decryptData(user.Password, this._encryptionKey);
+                    if(user.Password == login.password)
+                    {
+                        var AuthorizedUser = GenerateJSONWebToken(user);
+                        response.Body = AuthorizedUser; ;
+                        response.Status = HttpStatusCode.OK;
+                        response.Message = "User found";
+                    }
+                    else
+                    {
+                    response.Body = null;
+                    response.Status = HttpStatusCode.NotFound;
+                    response.Message = "Password is incorrect";
+                    }
                 }
                 else 
                 {
                     response.Body = null;
                     response.Status = HttpStatusCode.NotFound;
-                    response.Message = "Email or password is not valid";
+                    response.Message = "Username is not valid";
                 }
             }
             return response;
