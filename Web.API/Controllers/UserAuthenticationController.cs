@@ -97,7 +97,7 @@ namespace Web.API.Controllers
                 {
                     if (result.Equals(StatusEnums.Created.ToString()))
                     {
-                        response = new BaseResponse() { Status = HttpStatusCode.OK, Message = "User created successfully" + " \n UserName: " + register.UserName + " \n Password: " + strongPassword };
+                        response = new BaseResponse() { Status = HttpStatusCode.OK, Message = "User created successfully"};
                     }
                     else if (result.Equals(StatusEnums.Updated.ToString()))
                     {

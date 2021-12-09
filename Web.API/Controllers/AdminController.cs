@@ -413,8 +413,8 @@ namespace Web.API.Controllers
         #region Control List and Details
 
         [Description("Get Control List Data")]
-        [HttpGet("admin/GetUCLDetails/{Id}")]
-        public BaseResponse GetUCLDetails(List<int> Id)
+        [HttpPost("admin/GetUCLDetails")]
+        public BaseResponse GetUCLDetails([FromBody] List<int> Id)
         {
             try
             {
