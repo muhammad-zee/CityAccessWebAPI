@@ -658,16 +658,20 @@ namespace Web.Services.Concrete
                               select new
                               {
                                   ParentId = ucl.ControlListId,
+                                  ParetntTitle = ucl.ControlListTitle,
                                   Id = ucld.ControlListDetailId,
                                   Title = ucld.Title,
                                   Description = ucld.Description
                               }).ToList();
+
+            Dictionary<string, object> keyValues = new Dictionary<string, object>();
+
             List<object> list = new List<object>();
             foreach (var item in Ids)
             {
-                list.Add(UCLDetails.Where(x => x.ParentId == item).ToList());
+                keyValues.Add(UCLDetails.Where(x => x.ParentId == item).Select(x => x.ParetntTitle).FirstOrDefault(), UCLDetails.Where(x => x.ParentId == item).ToList());
             }
-            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Found", Body = list };
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Found", Body = keyValues };
         }
 
 
