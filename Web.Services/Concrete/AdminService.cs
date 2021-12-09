@@ -650,14 +650,15 @@ namespace Web.Services.Concrete
 
         #region Control List and Details
 
-        public BaseResponse GetUCLDetails(int Id) 
+        public BaseResponse GetUCLDetails(List<int> Ids) 
         {
             var UCLDetails = (from ucl in _controlList.Table
                               join ucld in _controlListDetails.Table on ucl.ControlListId equals ucld.ControlListIdFk
-                              where ucl.ControlListId == Id && ucl.IsDeleted == false && ucld.IsDeleted == false 
+                              where Ids.Contains(ucl.ControlListId) && ucl.IsDeleted == false && ucld.IsDeleted == false 
                               && ucl.ControlListIsActive == true && ucld.IsActive == true
                               select new 
                               {
+                                  ParentId = ucl.ControlListId,
                                   Id = ucld.ControlListDetailId,
                                   Title = ucld.Title,
                                   Description = ucld.Description
