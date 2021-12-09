@@ -70,11 +70,6 @@ namespace Web.API.Controllers
         {
             try
             {
-                //////////////////////////// Encrypt Password //////////////////////////////
-                var hashPswd = HelperExtension.Encrypt(model.password);
-                /////////////////////////////////////////////////////////////////////////////
-                model.password = hashPswd;
-
                 var result = _jwtAuth.ConfirmPassword(model);
                 return result;
             }
@@ -95,16 +90,6 @@ namespace Web.API.Controllers
             try
             {
                 BaseResponse response = null;
-
-                //////////////////////////// Generate Password //////////////////////////////
-                var strongPassword = HelperExtension.CreateRandomPassword(register.FirstName);
-                var hashPswd = HelperExtension.Encrypt(register.Password);
-                /////////////////////////////////////////////////////////////////////////////
-
-                register.Password = hashPswd;
-
-                //byte[] bytes = System.IO.File.ReadAllBytes(@"D:\pic.jpg");
-                //register.UserImageByte = bytes;
 
                 string result = _jwtAuth.SaveUser(register);
 
