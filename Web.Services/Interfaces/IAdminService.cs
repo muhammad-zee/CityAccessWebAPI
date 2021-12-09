@@ -40,7 +40,7 @@ namespace Web.Services.Interfaces
         #endregion
 
         #region Control List and Details
-        BaseResponse GetUCLDetails(int Id);
+        BaseResponse GetUCLDetails(List<int> Id);
         #endregion
 
     }

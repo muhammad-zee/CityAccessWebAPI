@@ -665,7 +665,8 @@ namespace Web.Services.Concrete
                               }).ToList();
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Found", Body = UCLDetails };
         }
-        
+
+
         #endregion
 
     }

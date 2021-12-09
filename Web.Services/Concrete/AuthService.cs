@@ -53,7 +53,7 @@ namespace Web.Services.Concrete
             BaseResponse response = new BaseResponse();
             if (!string.IsNullOrEmpty(login.email) && !string.IsNullOrEmpty(login.password))
             {
-                login.password = HelperExtension.Encrypt(login.password);
+                //login.password = HelperExtension.Encrypt(login.password);
                 var user = _userRepo.Table.Where(x => (x.UserName == login.email) && x.Password == login.password && !x.IsDeleted).FirstOrDefault();
                 if (user != null)
                 {

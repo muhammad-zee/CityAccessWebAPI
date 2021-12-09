@@ -414,7 +414,7 @@ namespace Web.API.Controllers
 
         [Description("Get Control List Data")]
         [HttpGet("admin/GetUCLDetails/{Id}")]
-        public BaseResponse GetUCLDetails(int Id)
+        public BaseResponse GetUCLDetails(List<int> Id)
         {
             try
             {
