@@ -1,5 +1,6 @@
 ﻿using ElmahCore;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -361,18 +362,18 @@ namespace Web.API.Controllers
         }
 
         //[Description("Add Or Update User Role Component Access")]
-        //[HttpPost("admin/AddOrUpdateUserRoleComponentAccess")]
-        //public async Task<BaseResponse> AddOrUpdateUserRoleComponentAccess([FromBody] ComponentAccessUserRoleVM componentAccess)
+        //[HttpPost("admin/upload")]
+        //public async Task<BaseResponse> AddOrUpdateUserRoleComponentAccess([FromBody] object componentAccess)
         //{
         //    try
         //    {
         //        var response = new BaseResponse();
-        //        response = _adminService.AddOrUpdateUserRoleComponentAccess(componentAccess);
+        //        //response = _adminService.AddOrUpdateUserRoleComponentAccess(componentAccess);
         //        return response;
         //    }
         //    catch (Exception ex)
         //    {
-        //        ElmahExtensions.RiseError(ex);_logger.LogExceptions(ex);
+        //        ElmahExtensions.RiseError(ex); _logger.LogExceptions(ex);
         //        return new BaseResponse()
         //        {
         //            Status = HttpStatusCode.BadRequest,

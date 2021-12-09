@@ -172,7 +172,7 @@ namespace Web.Services.Concrete
                 user.Zip = register.Zip;
                 user.ModifiedBy = register.ModifiedBy;
                 user.ModifiedDate = DateTime.UtcNow;
-                if (register.UserImageByte != null && register.UserImageByte.Count() > 0)
+                if (!string.IsNullOrEmpty(register.UserImage))
                 {
                     var outPath = Directory.GetCurrentDirectory();
                     outPath += "/UserProfiles/";
@@ -180,6 +180,7 @@ namespace Web.Services.Concrete
                     {
                         Directory.CreateDirectory(outPath);
                     }
+                    register.UserImageByte = Convert.FromBase64String(register.UserImage.Replace("data:image/jpeg;base64,",""));
                     outPath += $"{user.FirstName}-{user.LastName}_{user.UserId}.png";
                     using (FileStream fs = new FileStream(outPath, FileMode.Create, FileAccess.Write))
                     {
@@ -246,7 +247,7 @@ namespace Web.Services.Concrete
                             userRoleList.Add(new UserRole() { UserIdFk = obj.UserId, RoleIdFk = item });
                         }
                         _userRoleRepo.Insert(userRoleList);
-                        if (register.UserImageByte != null && register.UserImageByte.Count() > 0)
+                        if (!string.IsNullOrEmpty(register.UserImage))
                         {
                             var outPath = Directory.GetCurrentDirectory();
                             outPath += "/UserProfiles/";
@@ -255,6 +256,7 @@ namespace Web.Services.Concrete
                                 Directory.CreateDirectory(outPath);
                             }
                             outPath += $"{obj.FirstName}-{obj.LastName}_{obj.UserId}.png";
+                            register.UserImageByte = Convert.FromBase64String(register.UserImage);
                             using (FileStream fs = new FileStream(outPath, FileMode.Create, FileAccess.Write))
                             {
                                 fs.Write(register.UserImageByte);
