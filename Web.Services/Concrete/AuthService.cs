@@ -147,7 +147,7 @@ namespace Web.Services.Concrete
 
         public BaseResponse ConfirmPassword(UserCredentialVM modelUser) 
         {
-            var user = _userRepo.Table.Where(x => x.PrimaryEmail == modelUser.username).FirstOrDefault();
+            var user = _userRepo.Table.Where(x => x.UserName == modelUser.username).FirstOrDefault();
             if (user != null)
             {
                 user.IsRequirePasswordReset = false;
