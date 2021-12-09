@@ -7,7 +7,7 @@ namespace Web.Services.Helper
 {
     public static class Encryption
     {
-  
+
         public static string generateRandomHex(int byteLength)
         {
             int stringLength = byteLength * 2;

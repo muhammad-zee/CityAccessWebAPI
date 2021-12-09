@@ -1,14 +1,9 @@
-﻿using ElmahCore;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
-using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Security.Cryptography;
-using System.Text;
 using System.Threading.Tasks;
 using Web.Model.Common;
 
@@ -17,8 +12,8 @@ namespace Web.Services.Helper
 {
     public static class HelperExtension
     {
-   
-       public static string CreateRandomPassword(string firstName, int length = 15)
+
+        public static string CreateRandomPassword(string firstName, int length = 15)
         {
             // Create a string of characters, numbers, special characters that allowed in the password  
             string validChars = "ABCDEFGHJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*?_-";
@@ -75,7 +70,7 @@ namespace Web.Services.Helper
             var groups = source.GroupBy(i => i.ParentComponentId);
 
             //var roots = groups.FirstOrDefault(g => g.Key.HasValue == false).ToList();
-           var roots = source.Where(s => !s.IsAction ).ToList();
+            var roots = source.Where(s => !s.IsAction).ToList();
             if (roots.Count > 0)
             {
                 var dict = groups.Where(g => g.Key.HasValue).ToDictionary(g => g.Key.Value.ToString(), g => g.ToList());
@@ -154,7 +149,7 @@ namespace Web.Services.Helper
                               dr.GetValue(colMapping[prop.Name.ToLower()].ColumnOrdinal.Value);
                             prop.SetValue(obj, val == DBNull.Value ? null : val);
                         }
-                        catch 
+                        catch
                         {
                             prop.SetValue(obj, null);
                         }

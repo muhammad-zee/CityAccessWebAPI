@@ -11,6 +11,6 @@ namespace Web.Model.Common
     }
     public class AccessAttr
     {
-        public string Key  { get; set; }
+        public string Key { get; set; }
     }
 }
