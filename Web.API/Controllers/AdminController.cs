@@ -1,9 +1,7 @@
 ﻿using ElmahCore;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -49,7 +47,7 @@ namespace Web.API.Controllers
             }
             catch (Exception ex)
             {
-                ElmahExtensions.RiseError(ex); 
+                ElmahExtensions.RiseError(ex);
                 _logger.LogExceptions(ex);
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
@@ -66,7 +64,7 @@ namespace Web.API.Controllers
             }
             catch (Exception ex)
             {
-                ElmahExtensions.RiseError(ex); 
+                ElmahExtensions.RiseError(ex);
                 _logger.LogExceptions(ex);
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
@@ -83,7 +81,7 @@ namespace Web.API.Controllers
             }
             catch (Exception ex)
             {
-                ElmahExtensions.RiseError(ex); 
+                ElmahExtensions.RiseError(ex);
                 _logger.LogExceptions(ex);
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
@@ -105,7 +103,7 @@ namespace Web.API.Controllers
             }
             catch (Exception ex)
             {
-                ElmahExtensions.RiseError(ex); 
+                ElmahExtensions.RiseError(ex);
                 _logger.LogExceptions(ex);
                 return new BaseResponse()
                 {
@@ -134,7 +132,7 @@ namespace Web.API.Controllers
             }
             catch (Exception ex)
             {
-                ElmahExtensions.RiseError(ex); 
+                ElmahExtensions.RiseError(ex);
                 _logger.LogExceptions(ex);
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
@@ -175,7 +173,7 @@ namespace Web.API.Controllers
             }
             catch (Exception ex)
             {
-                ElmahExtensions.RiseError(ex); 
+                ElmahExtensions.RiseError(ex);
                 _logger.LogExceptions(ex);
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
@@ -192,7 +190,7 @@ namespace Web.API.Controllers
             }
             catch (Exception ex)
             {
-                ElmahExtensions.RiseError(ex); 
+                ElmahExtensions.RiseError(ex);
                 _logger.LogExceptions(ex);
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
@@ -280,7 +278,7 @@ namespace Web.API.Controllers
             }
             catch (Exception ex)
             {
-                ElmahExtensions.RiseError(ex); 
+                ElmahExtensions.RiseError(ex);
                 _logger.LogExceptions(ex);
                 return new BaseResponse()
                 {
@@ -303,7 +301,7 @@ namespace Web.API.Controllers
             }
             catch (Exception ex)
             {
-                ElmahExtensions.RiseError(ex); 
+                ElmahExtensions.RiseError(ex);
                 _logger.LogExceptions(ex);
                 return new BaseResponse()
                 {
@@ -326,7 +324,7 @@ namespace Web.API.Controllers
             }
             catch (Exception ex)
             {
-                ElmahExtensions.RiseError(ex); 
+                ElmahExtensions.RiseError(ex);
                 _logger.LogExceptions(ex);
                 return new BaseResponse()
                 {
@@ -397,7 +395,7 @@ namespace Web.API.Controllers
             }
             catch (Exception ex)
             {
-                ElmahExtensions.RiseError(ex); 
+                ElmahExtensions.RiseError(ex);
                 _logger.LogExceptions(ex);
                 return new BaseResponse()
                 {
@@ -423,7 +421,7 @@ namespace Web.API.Controllers
             }
             catch (Exception ex)
             {
-                ElmahExtensions.RiseError(ex); 
+                ElmahExtensions.RiseError(ex);
                 _logger.LogExceptions(ex);
                 return new BaseResponse()
                 {

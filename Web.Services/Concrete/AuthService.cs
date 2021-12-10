@@ -61,8 +61,8 @@ namespace Web.Services.Concrete
                 //            select u).FirstOrDefault();
                 if (user != null)
                 {
-                user.Password = Encryption.decryptData(user.Password, this._encryptionKey);
-                    if(user.Password == login.password)
+                    user.Password = Encryption.decryptData(user.Password, this._encryptionKey);
+                    if (user.Password == login.password)
                     {
                         var AuthorizedUser = GenerateJSONWebToken(user);
                         response.Body = AuthorizedUser; ;
@@ -71,12 +71,12 @@ namespace Web.Services.Concrete
                     }
                     else
                     {
-                    response.Body = null;
-                    response.Status = HttpStatusCode.NotFound;
-                    response.Message = "Password is incorrect";
+                        response.Body = null;
+                        response.Status = HttpStatusCode.NotFound;
+                        response.Message = "Password is incorrect";
                     }
                 }
-                else 
+                else
                 {
                     response.Body = null;
                     response.Status = HttpStatusCode.NotFound;
@@ -145,7 +145,7 @@ namespace Web.Services.Concrete
             };
         }
 
-        public BaseResponse ConfirmPassword(UserCredentialVM modelUser) 
+        public BaseResponse ConfirmPassword(UserCredentialVM modelUser)
         {
             var user = _userRepo.Table.Where(x => x.UserName == modelUser.username).FirstOrDefault();
             if (user != null)
@@ -155,7 +155,8 @@ namespace Web.Services.Concrete
                 _userRepo.Update(user);
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Password Updated" };
             }
-            else {
+            else
+            {
                 return new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "User Not Found" };
             }
         }
@@ -168,7 +169,7 @@ namespace Web.Services.Concrete
                 if (user.UserName != register.UserName)
                 {
                     var alreadyExist = _userRepo.Table.Where(x => x.UserName == register.UserName && x.UserId != register.UserId).FirstOrDefault();
-                    if (alreadyExist != null) 
+                    if (alreadyExist != null)
                     {
                         return StatusEnums.AlreadyExist.ToString();
                     }
@@ -194,7 +195,7 @@ namespace Web.Services.Concrete
                     {
                         Directory.CreateDirectory(outPath);
                     }
-                    register.UserImageByte = Convert.FromBase64String(register.UserImage.Replace("data:image/jpeg;base64,",""));
+                    register.UserImageByte = Convert.FromBase64String(register.UserImage.Replace("data:image/jpeg;base64,", ""));
                     outPath += $"{user.FirstName}-{user.LastName}_{user.UserId}.png";
                     using (FileStream fs = new FileStream(outPath, FileMode.Create, FileAccess.Write))
                     {
@@ -203,7 +204,7 @@ namespace Web.Services.Concrete
                     user.UserImage = outPath;
                 }
                 _userRepo.Update(user);
-                
+
                 if (!string.IsNullOrEmpty(register.RoleIds))
                 {
                     var roleIds = register.RoleIds.ToIntList();
@@ -330,7 +331,7 @@ namespace Web.Services.Concrete
                         }
                     }
                     string siteUrl = _config["siteUrl"];
-                    string hashUserName = Encryption.encryptData(userName,this._encryptionKey);
+                    string hashUserName = Encryption.encryptData(userName, this._encryptionKey);
                     string mailMessageTemplate = $"<b>Hi! {MrOrMrs} {Name},</b> <br />" +
                         $"<p>Please <a href='{siteUrl + hashUserName}' target='_blank'>Click here</a> to reset your password.</p> <br />" +
                         $"<p>If you didn’t ask to reset your password, you can ignore this email.</p> <br /><br />" +
@@ -356,7 +357,7 @@ namespace Web.Services.Concrete
                 if (user != null)
                 {
                     //var hashPswd = HelperExtension.Encrypt(credential.password);
-                    var hashPswd = Encryption.encryptData(credential.password,this._encryptionKey);
+                    var hashPswd = Encryption.encryptData(credential.password, this._encryptionKey);
                     user.Password = hashPswd;
                     _userRepo.Update(user);
                     return StatusEnums.Success.ToString();

@@ -3,10 +3,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
@@ -22,7 +20,7 @@ namespace Web.API.Controllers
         private IConfiguration _config;
         Logger _logger;
         private IWebHostEnvironment _hostEnvironment;
-        public ScheduleController(IConfiguration config, IWebHostEnvironment environment,IScheduleService scheduleService)
+        public ScheduleController(IConfiguration config, IWebHostEnvironment environment, IScheduleService scheduleService)
         {
             this._config = config;
             this._hostEnvironment = environment;

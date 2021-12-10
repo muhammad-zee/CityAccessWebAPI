@@ -10,7 +10,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using System;
 using System.Text;
 using Web.API.Helper;
 using Web.Data;
@@ -18,7 +17,6 @@ using Web.Data.Models;
 using Web.DLL;
 using Web.DLL.Generic_Repository;
 using Web.Services.Concrete;
-using Web.Services.Helper;
 using Web.Services.Interfaces;
 
 namespace Web.API
@@ -146,7 +144,7 @@ namespace Web.API
             //app.UseElmahIo();
             app.UseElmah();
             app.UseElmahExceptionPage();
-            
+
             // global error handler
             app.UseMiddleware<ErrorHandlerMiddleware>();
 

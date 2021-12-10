@@ -47,7 +47,7 @@ namespace Web.Services.Concrete
             this._role = role;
             this._userRole = userRole;
             this._userAccess = userAccess;
-            this._controlList= controlList;
+            this._controlList = controlList;
             this._controlListDetails = controlListDetails;
         }
 
@@ -109,7 +109,7 @@ namespace Web.Services.Concrete
 
         #region UserRole
 
-        public BaseResponse GetUsersByRoleId(int roleId) 
+        public BaseResponse GetUsersByRoleId(int roleId)
         {
             var roleUsers = (from ur in _userRole.Table
                              join u in _user.Table on ur.UserIdFk equals u.UserId
@@ -173,7 +173,7 @@ namespace Web.Services.Concrete
             string response = string.Empty;
             if (role.RoleId == 0)
             {
-            var newRole = AutoMapperHelper.MapSingleRow<RoleVM, Role>(role);
+                var newRole = AutoMapperHelper.MapSingleRow<RoleVM, Role>(role);
                 if (_role.Table.Count(r => r.RoleName == role.RoleName && !r.IsDeleted) == 0)
                 {
                     _role.Insert(newRole);
@@ -500,7 +500,7 @@ namespace Web.Services.Concrete
                 {
                     Status = HttpStatusCode.OK,
                     Message = "Data Found",
-                    Body = treeViewItems 
+                    Body = treeViewItems
                 };
             }
             else
@@ -529,8 +529,8 @@ namespace Web.Services.Concrete
                 var MatcheAccessIds = roleAccess.Where(x => compIds.Contains(x.ComponentIdFk)).Select(x => x.ComponentIdFk).ToList();
 
                 /////////// Delete those components which are now allowed and Already Exist in Component Access and also Exist in User Access with isActive = false /////////
-                var dltFromUserComps = _userAccess.Table.Where(x => x.RoleIdFk == componentAccess.RoleId && 
-                                        x.UserIdFk == componentAccess.UserId && compIds.Contains(x.ComponentIdFk) && 
+                var dltFromUserComps = _userAccess.Table.Where(x => x.RoleIdFk == componentAccess.RoleId &&
+                                        x.UserIdFk == componentAccess.UserId && compIds.Contains(x.ComponentIdFk) &&
                                         x.IsActive == false).ToList();
 
                 _userAccess.DeleteRange(dltFromUserComps);
@@ -545,7 +545,7 @@ namespace Web.Services.Concrete
                 var removeCompsAccess = alreadyExist.Where(x => !compIds.Contains(x.ComponentIdFk) && x.IsActive == true).ToList();
                 removeCompsAccess.ForEach(x => x.IsActive = false);
                 _userAccess.Update(removeCompsAccess);
-                
+
                 ///////////// Remove Already Exist User Component Access from coming List /////////
                 compIds.RemoveAll(x => alreadyExist.Select(x => x.ComponentIdFk).Contains(x));
 
@@ -569,7 +569,7 @@ namespace Web.Services.Concrete
                 /////////// Get Components which Allowed to Role but NotAllowed to User /////////
                 var UnMatcheAccessIds = roleAccess.Where(x => !componentAccess.AccessAttr.Select(x => Convert.ToInt32(x.Key)).Distinct().ToList().Contains(x.ComponentIdFk)).Select(x => x.ComponentIdFk).ToList();
                 UnMatcheAccessIds.RemoveAll(x => _userAccess.Table.Where(x => x.IsActive == false && x.UserIdFk == componentAccess.UserId && x.UserIdFk == componentAccess.RoleId).Select(x => x.ComponentIdFk).Contains(x));
-                if (UnMatcheAccessIds.Count() > 0) 
+                if (UnMatcheAccessIds.Count() > 0)
                 {
                     /////////// Now add NotAllowed ones /////////
                     comps = UnMatcheAccessIds.Select(x => new UserAccess()
@@ -649,20 +649,29 @@ namespace Web.Services.Concrete
 
         #region Control List and Details
 
-        public BaseResponse GetUCLDetails(List<int> Ids) 
+        public BaseResponse GetUCLDetails(List<int> Ids)
         {
             var UCLDetails = (from ucl in _controlList.Table
                               join ucld in _controlListDetails.Table on ucl.ControlListId equals ucld.ControlListIdFk
-                              where Ids.Contains(ucl.ControlListId) && ucl.IsDeleted == false && ucld.IsDeleted == false 
+                              where Ids.Contains(ucl.ControlListId) && ucl.IsDeleted == false && ucld.IsDeleted == false
                               && ucl.ControlListIsActive == true && ucld.IsActive == true
-                              select new 
+                              select new
                               {
                                   ParentId = ucl.ControlListId,
+                                  ParetntTitle = ucl.ControlListTitle,
                                   Id = ucld.ControlListDetailId,
                                   Title = ucld.Title,
                                   Description = ucld.Description
                               }).ToList();
-            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Found", Body = UCLDetails };
+
+            Dictionary<string, object> keyValues = new Dictionary<string, object>();
+
+            List<object> list = new List<object>();
+            foreach (var item in Ids)
+            {
+                keyValues.Add(UCLDetails.Where(x => x.ParentId == item).Select(x => x.ParetntTitle).FirstOrDefault(), UCLDetails.Where(x => x.ParentId == item).ToList());
+            }
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Found", Body = keyValues };
         }
 
 

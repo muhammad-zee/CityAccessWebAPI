@@ -66,7 +66,7 @@ namespace Web.API.Controllers
         [AllowAnonymous]
         [Description("Update Password")]
         [HttpPost("auth/UpdatePassword")]
-        public BaseResponse UpdatePassword([FromBody] UserCredentialVM model) 
+        public BaseResponse UpdatePassword([FromBody] UserCredentialVM model)
         {
             try
             {
@@ -79,7 +79,7 @@ namespace Web.API.Controllers
                 _logger.LogExceptions(ex);
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
-        
+
         }
 
         //[Authorize]
@@ -97,7 +97,7 @@ namespace Web.API.Controllers
                 {
                     if (result.Equals(StatusEnums.Created.ToString()))
                     {
-                        response = new BaseResponse() { Status = HttpStatusCode.OK, Message = "User created successfully"};
+                        response = new BaseResponse() { Status = HttpStatusCode.OK, Message = "User created successfully" };
                     }
                     else if (result.Equals(StatusEnums.Updated.ToString()))
                     {
