@@ -154,7 +154,7 @@ namespace Web.API
             //app.UseElmahIo();
             app.UseElmah();
             app.UseElmahExceptionPage();
-
+            app.UseStaticFiles();
             // global error handler
             app.UseMiddleware<ErrorHandlerMiddleware>();
 
