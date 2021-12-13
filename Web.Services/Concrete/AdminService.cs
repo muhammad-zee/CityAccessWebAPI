@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Net;
@@ -64,6 +65,7 @@ namespace Web.Services.Concrete
                 item.UserRole = getRoleListByUserId(item.UserId).ToList();
                 item.GenderId = Convert.ToInt32(item.Gender);
                 item.Gender = genders.Where(x => x.ControlListDetailId == item.GenderId).Select(x => x.Title).FirstOrDefault();
+                item.UserImage = item.UserImage.Replace(Directory.GetCurrentDirectory()+"/", "");
             }
             return new BaseResponse { Status = HttpStatusCode.OK, Message = "Users List Returned", Body = users };
         }
@@ -78,6 +80,7 @@ namespace Web.Services.Concrete
                 user.UserRole = getRoleListByUserId(Id).ToList();
                 user.GenderId = Convert.ToInt32(user.Gender);
                 user.Gender = genders.Where(x => x.ControlListDetailId == user.GenderId).Select(x => x.Title).FirstOrDefault();
+                user.UserImage = user.UserImage.Replace(Directory.GetCurrentDirectory()+"/", "");
                 return new BaseResponse { Status = HttpStatusCode.OK, Message = "User Found", Body = user };
             }
             else
@@ -665,8 +668,6 @@ namespace Web.Services.Concrete
                               }).ToList();
 
             Dictionary<string, object> keyValues = new Dictionary<string, object>();
-
-            List<object> list = new List<object>();
             foreach (var item in Ids)
             {
                 keyValues.Add(UCLDetails.Where(x => x.ParentId == item).Select(x => x.ParetntTitle).FirstOrDefault(), UCLDetails.Where(x => x.ParentId == item).ToList());

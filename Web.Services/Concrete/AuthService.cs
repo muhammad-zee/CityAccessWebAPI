@@ -53,14 +53,10 @@ namespace Web.Services.Concrete
             BaseResponse response = new BaseResponse();
             if (!string.IsNullOrEmpty(login.username) && !string.IsNullOrEmpty(login.password))
             {
-                login.password = Encryption.decryptData(login.password, this._encryptionKey);
                 var user = _userRepo.Table.Where(x => (x.UserName == login.username) && !x.IsDeleted).FirstOrDefault();
-                //var user = (from u in this._userRepo.Table
-                //            where u.UserName == login.username //&& Encryption.decryptData(u.Password, this._encryptionKey) == login.password
-                //            && !u.IsDeleted
-                //            select u).FirstOrDefault();
                 if (user != null)
                 {
+                    login.password = Encryption.decryptData(login.password, this._encryptionKey);
                     user.Password = Encryption.decryptData(user.Password, this._encryptionKey);
                     if (user.Password == login.password)
                     {
