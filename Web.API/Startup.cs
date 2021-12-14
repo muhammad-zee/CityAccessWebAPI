@@ -117,6 +117,7 @@ namespace Web.API
             services.AddTransient(typeof(IAdminService), typeof(AdminService));
             services.AddTransient(typeof(IScheduleService), typeof(ScheduleService));
             services.AddTransient(typeof(IFacilityService), typeof(FacilityService));
+            services.AddTransient(typeof(ICallService), typeof(CallService));
 
             //Register Services Repositories
 
