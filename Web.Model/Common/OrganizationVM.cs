@@ -1,17 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 
-#nullable disable
-
-namespace Web.Data.Models
+namespace Web.Model.Common
 {
-    public partial class Organization
+    public class OrganizationVM
     {
-        public Organization()
-        {
-            OrganizationDepartments = new HashSet<OrganizationDepartment>();
-        }
-
         public int OrganizationId { get; set; }
         public string OrganizationName { get; set; }
         public int? OrganizationType { get; set; }
@@ -31,6 +23,6 @@ namespace Web.Data.Models
         public bool IsActive { get; set; }
         public bool IsDeleted { get; set; }
 
-        public virtual ICollection<OrganizationDepartment> OrganizationDepartments { get; set; }
+        public string DepartmentIdsFk { get; set; }
     }
 }

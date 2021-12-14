@@ -1,6 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
+﻿using Microsoft.EntityFrameworkCore;
 
 #nullable disable
 
@@ -22,10 +20,13 @@ namespace Web.Data.Models
         public virtual DbSet<ControlList> ControlLists { get; set; }
         public virtual DbSet<ControlListDetail> ControlListDetails { get; set; }
         public virtual DbSet<Department> Departments { get; set; }
+        public virtual DbSet<DepartmentService> DepartmentServices { get; set; }
         public virtual DbSet<ElmahError> ElmahErrors { get; set; }
         public virtual DbSet<Organization> Organizations { get; set; }
+        public virtual DbSet<OrganizationDepartment> OrganizationDepartments { get; set; }
         public virtual DbSet<Role> Roles { get; set; }
         public virtual DbSet<ServiceLine> ServiceLines { get; set; }
+        public virtual DbSet<State> States { get; set; }
         public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<UserAccess> UserAccesses { get; set; }
         public virtual DbSet<UserRole> UserRoles { get; set; }
@@ -142,13 +143,30 @@ namespace Web.Data.Models
 
             modelBuilder.Entity<Department>(entity =>
             {
-                entity.HasNoKey();
+                entity.Property(e => e.DepartmentId).ValueGeneratedNever();
 
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");
 
                 entity.Property(e => e.DepartmentName).HasMaxLength(500);
 
                 entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+            });
+
+            modelBuilder.Entity<DepartmentService>(entity =>
+            {
+                entity.ToTable("DepartmentService");
+
+                entity.HasOne(d => d.DepartmentIdFkNavigation)
+                    .WithMany(p => p.DepartmentServices)
+                    .HasForeignKey(d => d.DepartmentIdFk)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Department_Service");
+
+                entity.HasOne(d => d.ServiceIdFkNavigation)
+                    .WithMany(p => p.DepartmentServices)
+                    .HasForeignKey(d => d.ServiceIdFk)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Department_Service1");
             });
 
             modelBuilder.Entity<ElmahError>(entity =>
@@ -195,8 +213,6 @@ namespace Web.Data.Models
 
             modelBuilder.Entity<Organization>(entity =>
             {
-                entity.HasNoKey();
-
                 entity.Property(e => e.City).HasMaxLength(50);
 
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");
@@ -205,7 +221,9 @@ namespace Web.Data.Models
 
                 entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
 
-                entity.Property(e => e.OrganizationId).ValueGeneratedOnAdd();
+                entity.Property(e => e.OrganizationName)
+                    .IsRequired()
+                    .HasMaxLength(500);
 
                 entity.Property(e => e.PhoneNo).HasColumnType("decimal(10, 2)");
 
@@ -218,6 +236,23 @@ namespace Web.Data.Models
                 entity.Property(e => e.PrimaryMobileNo2).HasColumnType("decimal(10, 2)");
 
                 entity.Property(e => e.Zip).HasMaxLength(100);
+            });
+
+            modelBuilder.Entity<OrganizationDepartment>(entity =>
+            {
+                entity.ToTable("OrganizationDepartment");
+
+                entity.HasOne(d => d.DepartmentIdFkNavigation)
+                    .WithMany(p => p.OrganizationDepartments)
+                    .HasForeignKey(d => d.DepartmentIdFk)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Organization_Department1");
+
+                entity.HasOne(d => d.OrganizationIdFkNavigation)
+                    .WithMany(p => p.OrganizationDepartments)
+                    .HasForeignKey(d => d.OrganizationIdFk)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Organization_Department");
             });
 
             modelBuilder.Entity<Role>(entity =>
@@ -239,7 +274,8 @@ namespace Web.Data.Models
 
             modelBuilder.Entity<ServiceLine>(entity =>
             {
-                entity.HasNoKey();
+                entity.HasKey(e => e.ServiceId)
+                    .HasName("ServiceId");
 
                 entity.ToTable("ServiceLine");
 
@@ -247,7 +283,24 @@ namespace Web.Data.Models
 
                 entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
 
-                entity.Property(e => e.ServiceId).ValueGeneratedOnAdd();
+                entity.Property(e => e.ServiceName)
+                    .IsRequired()
+                    .HasMaxLength(500);
+            });
+
+            modelBuilder.Entity<State>(entity =>
+            {
+                entity.HasNoKey();
+
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.StateName).HasMaxLength(500);
+
+                entity.Property(e => e.StateProvince)
+                    .HasMaxLength(100)
+                    .IsFixedLength(true);
             });
 
             modelBuilder.Entity<User>(entity =>

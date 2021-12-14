@@ -139,8 +139,8 @@ namespace Web.API
             {
                 // For Debug in Kestrel
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Web API V1");
-               // To deploy on IIS
-               c.SwaggerEndpoint("/mysite/swagger/v1/swagger.json", "Web API V1");
+                // To deploy on IIS
+                c.SwaggerEndpoint("/mysite/swagger/v1/swagger.json", "Web API V1");
                 c.RoutePrefix = string.Empty;
             });
             app.UseHttpsRedirection();
