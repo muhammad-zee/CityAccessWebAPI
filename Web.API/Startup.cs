@@ -154,7 +154,7 @@ namespace Web.API
             //app.UseElmahIo();
             app.UseElmah();
             app.UseElmahExceptionPage();
-            app.UseStaticFiles();
+
             // global error handler
             app.UseMiddleware<ErrorHandlerMiddleware>();
 
@@ -164,6 +164,7 @@ namespace Web.API
               .AllowAnyHeader()
               .AllowCredentials());
 
+            app.UseStaticFiles();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

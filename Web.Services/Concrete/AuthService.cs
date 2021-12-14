@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
@@ -30,7 +31,9 @@ namespace Web.Services.Concrete
         IConfiguration _config;
         private readonly UnitOfWork unitorWork;
         private string _encryptionKey = "";
+        private IHostingEnvironment _environment;
         public AuthService(IConfiguration config,
+            IHostingEnvironment environment,
             /*IUserAuthRepository userAuthRepository,*/
             IRepository<User> userRepo,
             IRepository<UserRole> userRoleRepo,
@@ -38,6 +41,7 @@ namespace Web.Services.Concrete
             IAdminService adminService)
         {
             this._config = config;
+            this._environment = environment;
             //_userAuthRepository = userAuthRepository;
             this._userRepo = (GenericRepository<User>)userRepo;
             this._userRoleRepo = (GenericRepository<UserRole>)userRoleRepo;
@@ -185,19 +189,23 @@ namespace Web.Services.Concrete
                 user.ModifiedDate = DateTime.UtcNow;
                 if (!string.IsNullOrEmpty(register.UserImage))
                 {
-                    var outPath = Directory.GetCurrentDirectory();
-                    outPath += "/UserProfiles/";
-                    if (!Directory.Exists(outPath))
+                    //var outPath = Directory.GetCurrentDirectory();
+                    var RootPath = this._environment.WebRootPath;
+                    string FilePath = "UserProfiles\\";
+                    var targetPath = Path.Combine(RootPath, FilePath);
+
+                    if (!Directory.Exists(targetPath))
                     {
-                        Directory.CreateDirectory(outPath);
+                        Directory.CreateDirectory(targetPath);
                     }
                     register.UserImageByte = Convert.FromBase64String(register.UserImage.Replace("data:image/jpeg;base64,", ""));
-                    outPath += $"{user.FirstName}-{user.LastName}_{user.UserId}.png";
-                    using (FileStream fs = new FileStream(outPath, FileMode.Create, FileAccess.Write))
+                    targetPath += $"{user.FirstName}-{user.LastName}_{user.UserId}.png";
+                    using (FileStream fs = new FileStream(targetPath, FileMode.Create, FileAccess.Write))
                     {
                         fs.Write(register.UserImageByte);
                     }
-                    user.UserImage = outPath;
+                    user.UserImage = targetPath.Replace(RootPath, "").Replace("\\","/"); ;
+                    ;
                 }
                 _userRepo.Update(user);
 
@@ -260,20 +268,21 @@ namespace Web.Services.Concrete
                         _userRoleRepo.Insert(userRoleList);
                         if (!string.IsNullOrEmpty(register.UserImage))
                         {
-                            var outPath = Directory.GetCurrentDirectory();
-                            outPath += "/UserProfiles/";
-                            if (!Directory.Exists(outPath))
+                            var RootPath = this._environment.WebRootPath;
+                            string FilePath = "UserProfiles\\";
+                            var targetPath = Path.Combine(RootPath, FilePath);
+                            if (!Directory.Exists(targetPath))
                             {
-                                Directory.CreateDirectory(outPath);
+                                Directory.CreateDirectory(targetPath);
                             }
-                            outPath += $"{obj.FirstName}-{obj.LastName}_{obj.UserId}.png";
-                            register.UserImageByte = Convert.FromBase64String(register.UserImage);
-                            using (FileStream fs = new FileStream(outPath, FileMode.Create, FileAccess.Write))
+                            targetPath += $"{obj.FirstName}-{obj.LastName}_{obj.UserId}.png";
+                            register.UserImageByte = Convert.FromBase64String(register.UserImage.Replace("data:image/jpeg;base64,", ""));
+                            using (FileStream fs = new FileStream(targetPath, FileMode.Create, FileAccess.Write))
                             {
                                 fs.Write(register.UserImageByte);
                             }
                             var newAddedUser = _userRepo.Table.Where(x => x.UserId == obj.UserId).FirstOrDefault();
-                            newAddedUser.UserImage = outPath;
+                            newAddedUser.UserImage = targetPath.Replace(RootPath, "").Replace("\\", "/"); ;
                             _userRepo.Update(newAddedUser);
                         }
                         string sub = "Account Created.";

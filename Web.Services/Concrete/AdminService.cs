@@ -65,7 +65,7 @@ namespace Web.Services.Concrete
                 item.UserRole = getRoleListByUserId(item.UserId).ToList();
                 item.GenderId = Convert.ToInt32(item.Gender);
                 item.Gender = genders.Where(x => x.ControlListDetailId == item.GenderId).Select(x => x.Title).FirstOrDefault();
-                item.UserImage = item.UserImage.Replace(Directory.GetCurrentDirectory()+"/", "");
+                item.UserImage = String.IsNullOrEmpty(item.UserImage) ? "" : item.UserImage.Replace(Directory.GetCurrentDirectory() + "/", "");
             }
             return new BaseResponse { Status = HttpStatusCode.OK, Message = "Users List Returned", Body = users };
         }
