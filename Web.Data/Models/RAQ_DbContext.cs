@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 #nullable disable
 
@@ -19,7 +21,11 @@ namespace Web.Data.Models
         public virtual DbSet<ComponentAccess> ComponentAccesses { get; set; }
         public virtual DbSet<ControlList> ControlLists { get; set; }
         public virtual DbSet<ControlListDetail> ControlListDetails { get; set; }
+        public virtual DbSet<Department> Departments { get; set; }
+        public virtual DbSet<ElmahError> ElmahErrors { get; set; }
+        public virtual DbSet<Organization> Organizations { get; set; }
         public virtual DbSet<Role> Roles { get; set; }
+        public virtual DbSet<ServiceLine> ServiceLines { get; set; }
         public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<UserAccess> UserAccesses { get; set; }
         public virtual DbSet<UserRole> UserRoles { get; set; }
@@ -134,6 +140,86 @@ namespace Web.Data.Models
                     .HasConstraintName("FK_ControlList_data");
             });
 
+            modelBuilder.Entity<Department>(entity =>
+            {
+                entity.HasNoKey();
+
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.DepartmentName).HasMaxLength(500);
+
+                entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+            });
+
+            modelBuilder.Entity<ElmahError>(entity =>
+            {
+                entity.HasKey(e => e.ErrorId)
+                    .IsClustered(false);
+
+                entity.ToTable("ELMAH_Error");
+
+                entity.HasIndex(e => new { e.Application, e.TimeUtc, e.Sequence }, "IX_ELMAH_Error_App_Time_Seq");
+
+                entity.Property(e => e.ErrorId).HasDefaultValueSql("(newid())");
+
+                entity.Property(e => e.AllXml).IsRequired();
+
+                entity.Property(e => e.Application)
+                    .IsRequired()
+                    .HasMaxLength(60);
+
+                entity.Property(e => e.Host)
+                    .IsRequired()
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.Message)
+                    .IsRequired()
+                    .HasMaxLength(500);
+
+                entity.Property(e => e.Sequence).ValueGeneratedOnAdd();
+
+                entity.Property(e => e.Source)
+                    .IsRequired()
+                    .HasMaxLength(60);
+
+                entity.Property(e => e.TimeUtc).HasColumnType("datetime");
+
+                entity.Property(e => e.Type)
+                    .IsRequired()
+                    .HasMaxLength(100);
+
+                entity.Property(e => e.User)
+                    .IsRequired()
+                    .HasMaxLength(50);
+            });
+
+            modelBuilder.Entity<Organization>(entity =>
+            {
+                entity.HasNoKey();
+
+                entity.Property(e => e.City).HasMaxLength(50);
+
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.FaxNo).HasColumnType("decimal(10, 2)");
+
+                entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.OrganizationId).ValueGeneratedOnAdd();
+
+                entity.Property(e => e.PhoneNo).HasColumnType("decimal(10, 2)");
+
+                entity.Property(e => e.PrimaryAddress).HasMaxLength(50);
+
+                entity.Property(e => e.PrimaryAddress2).HasMaxLength(50);
+
+                entity.Property(e => e.PrimaryMobileNo).HasColumnType("decimal(10, 2)");
+
+                entity.Property(e => e.PrimaryMobileNo2).HasColumnType("decimal(10, 2)");
+
+                entity.Property(e => e.Zip).HasMaxLength(100);
+            });
+
             modelBuilder.Entity<Role>(entity =>
             {
                 entity.Property(e => e.CreatedDate)
@@ -143,13 +229,25 @@ namespace Web.Data.Models
                 entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
 
                 entity.Property(e => e.RoleDiscrimination)
-                    .IsRequired()
                     .HasMaxLength(128)
                     .HasDefaultValueSql("('')");
 
                 entity.Property(e => e.RoleName)
                     .IsRequired()
                     .HasMaxLength(256);
+            });
+
+            modelBuilder.Entity<ServiceLine>(entity =>
+            {
+                entity.HasNoKey();
+
+                entity.ToTable("ServiceLine");
+
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.ServiceId).ValueGeneratedOnAdd();
             });
 
             modelBuilder.Entity<User>(entity =>
