@@ -62,19 +62,21 @@ namespace Web.Services.Concrete
             };
         }
 
-        public BaseResponse AddOrUpdateServiceLine(ServiceLine serviceLine)
+        public BaseResponse AddOrUpdateServiceLine(ServiceLineVM serviceLine)
         {
             BaseResponse response = null;
             if (serviceLine.ServiceId > 0)
             {
                 serviceLine.ModifiedDate = DateTime.UtcNow;
-                _serviceRepo.Update(serviceLine);
+                var service = AutoMapperHelper.MapSingleRow<ServiceLineVM, ServiceLine>(serviceLine);
+                _serviceRepo.Update(service);
                 response = new BaseResponse() { Status = HttpStatusCode.OK, Message = "Successfully Updated", Body = serviceLine };
             }
             else
             {
                 serviceLine.CreatedDate = DateTime.UtcNow;
-                _serviceRepo.Insert(serviceLine);
+                var service = AutoMapperHelper.MapSingleRow<ServiceLineVM, ServiceLine>(serviceLine);
+                _serviceRepo.Insert(service);
                 response = new BaseResponse() { Status = HttpStatusCode.OK, Message = "Successfully Created", Body = serviceLine };
             }
             return response;
