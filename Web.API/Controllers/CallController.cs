@@ -34,6 +34,22 @@ namespace Web.API.Controllers
             this._logger = new Logger(this._hostEnvironment);
         }
 
+        [HttpGet("Call/Token")]
+
+        public BaseResponse Token(string Identity)
+        {
+            try
+            {
+                return this._callService.GenerateToken(Identity);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+
+        }
         [HttpGet("Call/Call")]
 
         public CallResource Call()

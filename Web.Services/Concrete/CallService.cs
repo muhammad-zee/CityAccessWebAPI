@@ -1,13 +1,16 @@
 ﻿using Microsoft.Extensions.Configuration;
 using System;
+using System.Collections.Generic;
 using System.Net;
 using Twilio;
 using Twilio.AspNet.Core;
+using Twilio.Jwt.AccessToken;
 using Twilio.Rest.Api.V2010.Account;
 using Twilio.TwiML;
 using Twilio.TwiML.Voice;
 using Twilio.Types;
 using Web.DLL;
+using Web.Model;
 using Web.Services.Interfaces;
 
 
@@ -21,6 +24,11 @@ namespace Web.Services.Concrete
         private string origin = "";
         private string Twilio_AccountSid;
         private string Twilio_AuthToken;
+        private string Twillio_TwiMLAppSid;
+        private string Twillio_VoiceApiKey;
+        private string Twillio_VoiceApiKeySecret;
+
+
 
 
 
@@ -29,11 +37,60 @@ namespace Web.Services.Concrete
         {
             this._config = config;
             this._communicationService = communicationService;
-            this.Twilio_AccountSid = this._config["Twilio:AccountSid"].ToString();
-            this.Twilio_AuthToken = this._config["Twilio:AuthToken"].ToString();
             this.origin= this._config["Twilio:CallbackDomain"].ToString();
 
+            //Twilio Credentials
+            this.Twilio_AccountSid = this._config["Twilio:AccountSid"].ToString();
+            this.Twilio_AuthToken = this._config["Twilio:AuthToken"].ToString();
+            this.Twillio_TwiMLAppSid = this._config["Twilio:TwiMLAppSid"].ToString();
+            this.Twillio_VoiceApiKey = this._config["Twilio:VoiceApiKey"].ToString();
+            this.Twillio_VoiceApiKeySecret = this._config["Twilio:VoiceApiKeySecret"].ToString();
+
         }
+
+        #region Generate Twilio Voice Capability Token
+        public BaseResponse GenerateToken(string Identity)
+        {
+            BaseResponse response = new BaseResponse();
+            TwilioClient.Init(this.Twilio_AccountSid, this.Twilio_AuthToken);
+            // Create a Voice grant for this token
+            var grant = new VoiceGrant();
+            grant.OutgoingApplicationSid = Twillio_TwiMLAppSid;
+            //grant.PushCredentialSid = PushCredentialSid;
+
+            grant.IncomingAllow = true;
+            var grants = new HashSet<IGrant>
+                {
+                    { grant }
+                };
+
+            // Create an Access Token generator
+            var Expirydate = DateTime.Now.AddHours(23);
+            if (this.Twillio_VoiceApiKey != null)
+            {
+                var token = new Token(
+                            this.Twilio_AccountSid,
+                            this.Twilio_AuthToken,
+                            this.Twillio_VoiceApiKeySecret,
+                            Identity,
+                            grants: grants,
+                            expiration: Expirydate);
+
+                var resposeData = new
+                {
+                    token = token.ToJwt(),
+                    identity = Identity
+                };
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Token Generated", Body = resposeData };
+            }
+            else
+            {
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = "Failed To Generate Token" };
+
+            }
+
+        }
+        #endregion
         public CallResource Call()
         {
             var CallConnectedUrl = $"{origin}/Call/CallConnected";
