@@ -102,6 +102,14 @@ namespace Web.Services.Concrete
             response.Append(dial);
             return TwiML(response);
         }
+        public TwiMLResult EnqueueCall()
+        {
+            var response = new VoiceResponse();
+            var dial = new Dial();
+            dial.Client("zee");
+            response.Append(dial);
+            return TwiML(response);
+        }
         public CallResource Call()
         {
             var CallConnectedUrl = $"{origin}/Call/CallConnected";

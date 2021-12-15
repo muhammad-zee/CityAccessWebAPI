@@ -8,6 +8,7 @@ namespace Web.Services.Interfaces
     public interface ICallService
     {
         BaseResponse GenerateToken(string Identity);
+        TwiMLResult EnqueueCall();
         TwiMLResult Connect(string phoneNumber, string Twilio_PhoneNumber);
         CallResource Call();
         string CallbackStatus(string Callsid, string CallStatus);
