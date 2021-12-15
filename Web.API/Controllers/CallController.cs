@@ -51,13 +51,28 @@ namespace Web.API.Controllers
 
         }
 
+        [HttpPost("Call/EnqueueCall")]
+        public TwiMLResult EnqueueCall()
+        {
+            try
+            {
+                return this._callService.EnqueueCall();
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return this._callService.ExceptionResponse(ex);
+            }
+
+        }
+
         [HttpPost("Call/Connect")]
         public TwiMLResult Connect(string phoneNumber, string Twilio_PhoneNumber)
         {
             try
             {
-                return this._callService.Connect(phoneNumber,Twilio_PhoneNumber
-);
+                return this._callService.Connect(phoneNumber,Twilio_PhoneNumber);
             }
             catch (Exception ex)
             {
