@@ -70,7 +70,7 @@ namespace Web.Services.Concrete
             {
                 var token = new Token(
                             this.Twilio_AccountSid,
-                            this.Twilio_AuthToken,
+                            this.Twillio_VoiceApiKey,
                             this.Twillio_VoiceApiKeySecret,
                             Identity,
                             grants: grants,
@@ -90,7 +90,18 @@ namespace Web.Services.Concrete
             }
 
         }
+
         #endregion
+
+
+        public TwiMLResult Connect(string phoneNumber, string Twilio_PhoneNumber)
+        {
+            var response = new VoiceResponse();
+            var dial = new Dial(callerId: Twilio_PhoneNumber/*, record: Dial.RecordEnum.RecordFromAnswer*/);
+            dial.Number(phoneNumber);
+            response.Append(dial);
+            return TwiML(response);
+        }
         public CallResource Call()
         {
             var CallConnectedUrl = $"{origin}/Call/CallConnected";
@@ -99,8 +110,7 @@ namespace Web.Services.Concrete
             //var StatusCallbackUrl = $"{origin}/Call/CallbackStatus";
             //url = url.Replace(" ", "%20");
             var To = new PhoneNumber("+923327097498");
-            //var From = new PhoneNumber("(616) 449-2720");
-            var From = new PhoneNumber("(931) 548-6906");
+            var From = new PhoneNumber("(616) 449-2720");
             ServicePointManager.SecurityProtocol = (SecurityProtocolType)3072; //TLS 1.2                                                                             
             TwilioClient.Init(this.Twilio_AccountSid, this.Twilio_AuthToken);
             var call = CallResource.Create(to: To,
