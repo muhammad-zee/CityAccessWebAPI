@@ -10,18 +10,21 @@ namespace Web.Services.Interfaces
         BaseResponse GetAllServiceLines();
         BaseResponse GetServiceLineById(int Id);
         BaseResponse AddOrUpdateServiceLine(ServiceLineVM serviceLine);
+        BaseResponse DeleteServiceLine(int Id, int userId);
         #endregion
 
         #region Department
         BaseResponse GetAllDepartments();
         BaseResponse GetDepartmentById(int Id);
         BaseResponse AddOrUpdateDepartment(DepartmentVM department);
+        BaseResponse DeleteDepartment(int Id, int userId);
         #endregion
 
         #region Organization
         BaseResponse GetAllOrganizations();
         BaseResponse GetOrganizationById(int Id);
         BaseResponse AddOrUpdateOrganization(OrganizationVM organization);
+        BaseResponse DeleteOrganization(int Id, int userId);
         #endregion
     }
 }

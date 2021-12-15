@@ -75,6 +75,21 @@ namespace Web.API.Controllers
             }
         }
 
+        [Description("Delete Service Line")]
+        [HttpGet("service/DeleteServiceLine/{Id}/{userId}")]
+        public BaseResponse DeleteServiceLine(int Id, int userId)
+        {
+            try
+            {
+                var res = _facilityService.DeleteServiceLine(Id, userId);
+                return res;
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
         #endregion
 
 
@@ -125,6 +140,20 @@ namespace Web.API.Controllers
             }
         }
 
+        [Description("Delete Department")]
+        [HttpGet("dpt/DeleteDepartment/{Id}/{userId}")]
+        public BaseResponse DeleteDepartment(int Id, int userId)
+        {
+            try
+            {
+                var res = _facilityService.DeleteDepartment(Id, userId);
+                return res;
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
         #endregion
 
 
@@ -167,6 +196,21 @@ namespace Web.API.Controllers
             try
             {
                 var res = _facilityService.AddOrUpdateOrganization(organization);
+                return res;
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
+        [Description("Delete Department")]
+        [HttpGet("org/DeleteOrganization/{Id}/{userId}")]
+        public BaseResponse DeleteOrganization(int Id, int userId)
+        {
+            try
+            {
+                var res = _facilityService.DeleteOrganization(Id, userId);
                 return res;
             }
             catch (Exception ex)
