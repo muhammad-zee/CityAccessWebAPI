@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Web.Model.Common
 {
@@ -24,5 +25,6 @@ namespace Web.Model.Common
         public bool IsDeleted { get; set; }
 
         public string DepartmentIdsFk { get; set; }
+        public List<DepartmentVM> Departments { get; set; }
     }
 }

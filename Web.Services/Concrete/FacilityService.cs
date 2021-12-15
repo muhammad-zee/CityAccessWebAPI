@@ -76,7 +76,8 @@ namespace Web.Services.Concrete
                     _serviceRepo.Update(service);
                     response = new BaseResponse() { Status = HttpStatusCode.OK, Message = "Successfully Updated", Body = serviceLine };
                 }
-                else {
+                else
+                {
                     response = new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "Data Not Found" };
                 }
             }
@@ -90,6 +91,23 @@ namespace Web.Services.Concrete
             return response;
         }
 
+        public BaseResponse DeleteServiceLine(int Id, int userId) 
+        {
+            var service = _serviceRepo.Table.Where(x => x.ServiceId == Id).FirstOrDefault();
+            if (service != null)
+            {
+                service.IsDeleted = true;
+                service.ModifiedBy = userId;
+                service.ModifiedDate = DateTime.UtcNow;
+                _serviceRepo.Update(service);
+
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Deleted Successfully" };
+            }
+            else 
+            {
+                return new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "Data Not Found" };
+            }
+        }
 
         #endregion
 
@@ -97,12 +115,48 @@ namespace Web.Services.Concrete
 
         public BaseResponse GetAllDepartments()
         {
-            var departments = _departmentRepo.Table.Where(x => x.IsDeleted == false || x.IsDeleted == null).ToList();
+            //var departments = (from d in _departmentRepo.Table
+            //                   join ds in _departmentServiceRepo.Table on d.DepartmentId equals ds.DepartmentIdFk
+            //                   //join s in _serviceRepo.Table on ds.ServiceIdFk equals s.ServiceId
+            //                   select new DepartmentVM()
+            //                   {
+            //                       DepartmentId = d.DepartmentId,
+            //                       DepartmentName = d.DepartmentName,
+            //                       CreatedBy = d.CreatedBy,
+            //                       CreatedDate = d.CreatedDate,
+            //                       ModifiedBy = d.ModifiedBy,
+            //                       ModifiedDate = d.ModifiedDate,
+            //                       IsDeleted = d.IsDeleted,
+            //                       ServiceLines = AutoMapperHelper.MapList<ServiceLine, ServiceLineVM>(_serviceRepo.Table.Where(x => x.ServiceId == ds.ServiceIdFk && x.IsDeleted != true).ToList())
+            //                   });
+            var departments = _departmentRepo.Table.Where(x => x.IsDeleted != true).ToList();
+            var dpts = AutoMapperHelper.MapList<Department, DepartmentVM>(departments);
+            //_departmentServiceRepo.Table.Where(x => dpts.Select(x => x.DepartmentId).Contains(x.DepartmentIdFk)).Select(x => x.ServiceIdFk).Distinct().ToList();
+            var dptServices = (from ds in _departmentServiceRepo.Table
+                               join s in _serviceRepo.Table on ds.ServiceIdFk equals s.ServiceId
+                               where dpts.Select(x => x.DepartmentId).Contains(ds.DepartmentIdFk) && s.IsDeleted != true
+                               select new ServiceLineVM()
+                               {
+                                   ServiceId = s.ServiceId,
+                                   ServiceName = s.ServiceName,
+                                   ServiceType = s.ServiceType,
+                                   CreatedBy = s.CreatedBy,
+                                   CreatedDate = s.CreatedDate,
+                                   ModifiedBy = s.ModifiedBy,
+                                   ModifiedDate = s.ModifiedDate,
+                                   DepartmentIdFk = ds.DepartmentIdFk
+                               }).Distinct().ToList();
+
+            foreach (var item in dpts)
+            {
+                item.ServiceLines = dptServices.Where(x => x.DepartmentIdFk == item.DepartmentId).ToList();
+            }
+
             return new BaseResponse()
             {
                 Status = HttpStatusCode.OK,
                 Message = "Data Found",
-                Body = departments
+                Body = dpts
             };
         }
 
@@ -139,11 +193,11 @@ namespace Web.Services.Concrete
                         dptServices.Add(new DepartmentService() { ServiceIdFk = item, DepartmentIdFk = dpt.DepartmentId });
                     }
                     _departmentServiceRepo.Insert(dptServices);
-                    response = new BaseResponse() { Status = HttpStatusCode.OK, Message = "Successfully Updated", Body = dpt };
+                    response = new BaseResponse() { Status = HttpStatusCode.OK, Message = "Successfully Updated" };
                 }
-                else 
+                else
                 {
-                    response = new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "Data Not Found"};
+                    response = new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "Data Not Found" };
                 }
             }
             else
@@ -157,12 +211,28 @@ namespace Web.Services.Concrete
                     dptServices.Add(new DepartmentService() { ServiceIdFk = item, DepartmentIdFk = dpt.DepartmentId });
                 }
                 _departmentServiceRepo.Insert(dptServices);
-                response = new BaseResponse() { Status = HttpStatusCode.OK, Message = "Successfully Created", Body = dpt };
+                response = new BaseResponse() { Status = HttpStatusCode.OK, Message = "Successfully Created" };
             }
             return response;
         }
 
+        public BaseResponse DeleteDepartment(int Id, int userId)
+        {
+            var dpt = _departmentRepo.Table.Where(x => x.DepartmentId == Id).FirstOrDefault();
+            if (dpt != null)
+            {
+                dpt.IsDeleted = true;
+                dpt.ModifiedBy = userId;
+                dpt.ModifiedDate = DateTime.UtcNow;
+                _departmentRepo.Update(dpt);
 
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Deleted Successfully" };
+            }
+            else
+            {
+                return new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "Data Not Found" };
+            }
+        }
         #endregion
 
         #region Organization 
@@ -170,11 +240,31 @@ namespace Web.Services.Concrete
         public BaseResponse GetAllOrganizations()
         {
             var organizations = _organizationRepo.Table.Where(x => x.IsDeleted == false).ToList();
+            var orgs = AutoMapperHelper.MapList<Organization, OrganizationVM>(organizations);
+            var dpts = (from od in _organizationDepartmentRepo.Table
+                        join d in _departmentRepo.Table on od.DepartmentIdFk equals d.DepartmentId
+                        where d.IsDeleted != true && orgs.Select(x => x.OrganizationId).Contains(od.OrganizationIdFk)
+                        select new DepartmentVM()
+                        {
+                            DepartmentId = d.DepartmentId,
+                            DepartmentName = d.DepartmentName,
+                            CreatedBy = d.CreatedBy,
+                            CreatedDate = d.CreatedDate,
+                            ModifiedBy = d.ModifiedBy,
+                            ModifiedDate = d.ModifiedDate,
+                            IsDeleted = d.IsDeleted,
+                            OrganizationIdFk = od.OrganizationIdFk
+                        });
+            foreach (var item in orgs)
+            {
+                item.Departments = dpts.Where(x => x.OrganizationIdFk == item.OrganizationId).ToList();
+            }
+
             return new BaseResponse()
             {
                 Status = HttpStatusCode.OK,
                 Message = "Data Found",
-                Body = organizations
+                Body = orgs
             };
         }
 
@@ -192,13 +282,13 @@ namespace Web.Services.Concrete
         public BaseResponse AddOrUpdateOrganization(OrganizationVM organization)
         {
             BaseResponse response = null;
-            
+
             var dptIds = organization.DepartmentIdsFk.ToIntList();
             List<OrganizationDepartment> orgDpt = new List<OrganizationDepartment>();
             if (organization.OrganizationId > 0)
             {
                 var org = _organizationRepo.Table.Where(x => x.IsDeleted != true && x.OrganizationId == organization.OrganizationId).FirstOrDefault();
-                if (org != null) 
+                if (org != null)
                 {
                     org.OrganizationName = organization.OrganizationName;
                     org.ModifiedBy = organization.ModifiedBy;
@@ -234,7 +324,23 @@ namespace Web.Services.Concrete
             return response;
         }
 
+        public BaseResponse DeleteOrganization(int Id, int userId)
+        {
+            var org = _organizationRepo.Table.Where(x => x.OrganizationId == Id).FirstOrDefault();
+            if (org != null)
+            {
+                org.IsDeleted = true;
+                org.ModifiedBy = userId;
+                org.ModifiedDate = DateTime.UtcNow;
+                _organizationRepo.Update(org);
 
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Deleted Successfully" };
+            }
+            else
+            {
+                return new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "Data Not Found" };
+            }
+        }
         #endregion
 
     }
