@@ -38,7 +38,7 @@ namespace Web.Data.Models
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseSqlServer("Data Source=192.168.0.11;Initial Catalog=RouteAndQueue;User Id=sa;Password=4292;");
+                optionsBuilder.UseSqlServer("Data Source=192.168.0.27;Initial Catalog=RouteAndQueue;User Id=sa;Password=4292;");
             }
         }
 
@@ -225,15 +225,15 @@ namespace Web.Data.Models
                     .IsRequired()
                     .HasMaxLength(500);
 
-                entity.Property(e => e.PhoneNo).HasColumnType("decimal(10, 2)");
+                entity.Property(e => e.PhoneNo).HasMaxLength(15);
 
                 entity.Property(e => e.PrimaryAddress).HasMaxLength(50);
 
                 entity.Property(e => e.PrimaryAddress2).HasMaxLength(50);
 
-                entity.Property(e => e.PrimaryMobileNo).HasColumnType("decimal(10, 2)");
+                entity.Property(e => e.PrimaryMobileNo).HasMaxLength(15);
 
-                entity.Property(e => e.PrimaryMobileNo2).HasColumnType("decimal(10, 2)");
+                entity.Property(e => e.PrimaryMobileNo2).HasMaxLength(15);
 
                 entity.Property(e => e.Zip).HasMaxLength(100);
             });
@@ -325,6 +325,8 @@ namespace Web.Data.Models
                     .HasMaxLength(500)
                     .IsUnicode(false);
 
+                entity.Property(e => e.IsActive).HasDefaultValueSql("((1))");
+
                 entity.Property(e => e.LastName)
                     .HasMaxLength(256)
                     .IsUnicode(false);
@@ -338,6 +340,10 @@ namespace Web.Data.Models
                 entity.Property(e => e.OfficeAddress)
                     .HasMaxLength(500)
                     .IsUnicode(false);
+
+                entity.Property(e => e.OfficePhoneNumber).HasMaxLength(15);
+
+                entity.Property(e => e.PersonalMobileNumber).HasMaxLength(15);
 
                 entity.Property(e => e.PrimaryEmail).HasMaxLength(256);
 

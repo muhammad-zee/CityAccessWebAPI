@@ -41,6 +41,7 @@ namespace Web.Data.Models
         public bool IsTwoFactRememberChecked { get; set; }
         public DateTime? TwoFactorExpiryDate { get; set; }
         public bool IsRequirePasswordReset { get; set; }
+        public bool? IsActive { get; set; }
 
         public virtual ICollection<UserAccess> UserAccesses { get; set; }
         public virtual ICollection<UserRole> UserRoles { get; set; }

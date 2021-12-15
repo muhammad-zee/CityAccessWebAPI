@@ -10,10 +10,10 @@ namespace Web.Model.Common
         public int? OrganizationType { get; set; }
         public string PrimaryAddress { get; set; }
         public string PrimaryAddress2 { get; set; }
-        public decimal? PhoneNo { get; set; }
-        public decimal? PrimaryMobileNo { get; set; }
-        public decimal? PrimaryMobileNo2 { get; set; }
-        public decimal? FaxNo { get; set; }
+        public string PhoneNo { get; set; }
+        public string PrimaryMobileNo { get; set; }
+        public string PrimaryMobileNo2 { get; set; }
+        public string FaxNo { get; set; }
         public string City { get; set; }
         public int? StateIdFk { get; set; }
         public string Zip { get; set; }
