@@ -62,12 +62,11 @@ namespace Web.API.Controllers
 
         [Description("Add Or Update Service Line")]
         [HttpPost("service/AddOrUpdateServiceLine")]
-        public BaseResponse AddOrUpdateServiceLine(ServiceLineVM serviceLine)
+        public BaseResponse AddOrUpdateServiceLine([FromBody] ServiceLineVM serviceLine)
         {
             try
             {
-                var service = AutoMapperHelper.MapSingleRow<ServiceLineVM, ServiceLine>(serviceLine);
-                var res = _facilityService.AddOrUpdateServiceLine(service);
+                var res = _facilityService.AddOrUpdateServiceLine(serviceLine);
                 return res;
             }
             catch (Exception ex)
@@ -113,7 +112,7 @@ namespace Web.API.Controllers
 
         [Description("Add Or Update Department ")]
         [HttpPost("dpt/AddOrUpdateDepartment")]
-        public BaseResponse AddOrUpdateDepartment(DepartmentVM department)
+        public BaseResponse AddOrUpdateDepartment([FromBody] DepartmentVM department)
         {
             try
             {
@@ -163,7 +162,7 @@ namespace Web.API.Controllers
 
         [Description("Add Or Update Organization ")]
         [HttpPost("org/AddOrUpdateOrganization")]
-        public BaseResponse AddOrUpdateOrganization(OrganizationVM organization)
+        public BaseResponse AddOrUpdateOrganization([FromBody] OrganizationVM organization)
         {
             try
             {

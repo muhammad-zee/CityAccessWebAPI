@@ -9,7 +9,7 @@ namespace Web.Services.Interfaces
         #region Service Lines
         BaseResponse GetAllServiceLines();
         BaseResponse GetServiceLineById(int Id);
-        BaseResponse AddOrUpdateServiceLine(ServiceLine serviceLine);
+        BaseResponse AddOrUpdateServiceLine(ServiceLineVM serviceLine);
         #endregion
 
         #region Department

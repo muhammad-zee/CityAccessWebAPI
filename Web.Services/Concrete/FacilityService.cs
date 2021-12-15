@@ -62,19 +62,29 @@ namespace Web.Services.Concrete
             };
         }
 
-        public BaseResponse AddOrUpdateServiceLine(ServiceLine serviceLine)
+        public BaseResponse AddOrUpdateServiceLine(ServiceLineVM serviceLine)
         {
             BaseResponse response = null;
             if (serviceLine.ServiceId > 0)
             {
-                serviceLine.ModifiedDate = DateTime.UtcNow;
-                _serviceRepo.Update(serviceLine);
-                response = new BaseResponse() { Status = HttpStatusCode.OK, Message = "Successfully Updated", Body = serviceLine };
+                var service = _serviceRepo.Table.Where(x => x.IsDeleted != true && x.ServiceId == serviceLine.ServiceId).FirstOrDefault();
+                if (service != null)
+                {
+                    service.ServiceName = serviceLine.ServiceName;
+                    service.ModifiedBy = serviceLine.ModifiedBy;
+                    service.ModifiedDate = DateTime.UtcNow;
+                    _serviceRepo.Update(service);
+                    response = new BaseResponse() { Status = HttpStatusCode.OK, Message = "Successfully Updated", Body = serviceLine };
+                }
+                else {
+                    response = new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "Data Not Found" };
+                }
             }
             else
             {
                 serviceLine.CreatedDate = DateTime.UtcNow;
-                _serviceRepo.Insert(serviceLine);
+                var service = AutoMapperHelper.MapSingleRow<ServiceLineVM, ServiceLine>(serviceLine);
+                _serviceRepo.Insert(service);
                 response = new BaseResponse() { Status = HttpStatusCode.OK, Message = "Successfully Created", Body = serviceLine };
             }
             return response;
@@ -87,7 +97,7 @@ namespace Web.Services.Concrete
 
         public BaseResponse GetAllDepartments()
         {
-            var departments = _departmentRepo.Table.Where(x => x.IsDeleted == false).ToList();
+            var departments = _departmentRepo.Table.Where(x => x.IsDeleted == false || x.IsDeleted == null).ToList();
             return new BaseResponse()
             {
                 Status = HttpStatusCode.OK,
@@ -111,24 +121,34 @@ namespace Web.Services.Concrete
         {
             BaseResponse response = null;
 
-            var dpt = AutoMapperHelper.MapSingleRow<DepartmentVM, Department>(department);
             var serviceIds = department.ServicesIdFks.ToIntList();
             List<DepartmentService> dptServices = new List<DepartmentService>();
             if (department.DepartmentId > 0)
             {
-                dpt.ModifiedDate = DateTime.UtcNow;
-                _departmentRepo.Update(dpt);
-                var alreadyExistServices = _departmentServiceRepo.Table.Where(x => x.DepartmentIdFk == department.DepartmentId).ToList();
-                _departmentServiceRepo.DeleteRange(alreadyExistServices);
-                foreach (var item in serviceIds)
+                var dpt = _departmentRepo.Table.Where(x => (x.IsDeleted == false || x.IsDeleted == null) && x.DepartmentId == department.DepartmentId).FirstOrDefault();
+                if (dpt != null)
                 {
-                    dptServices.Add(new DepartmentService() { ServiceIdFk = item, DepartmentIdFk = dpt.DepartmentId });
+                    dpt.DepartmentName = department.DepartmentName;
+                    dpt.ModifiedBy = department.ModifiedBy;
+                    dpt.ModifiedDate = DateTime.UtcNow;
+                    _departmentRepo.Update(dpt);
+                    var alreadyExistServices = _departmentServiceRepo.Table.Where(x => x.DepartmentIdFk == department.DepartmentId).ToList();
+                    _departmentServiceRepo.DeleteRange(alreadyExistServices);
+                    foreach (var item in serviceIds)
+                    {
+                        dptServices.Add(new DepartmentService() { ServiceIdFk = item, DepartmentIdFk = dpt.DepartmentId });
+                    }
+                    _departmentServiceRepo.Insert(dptServices);
+                    response = new BaseResponse() { Status = HttpStatusCode.OK, Message = "Successfully Updated", Body = dpt };
                 }
-                _departmentServiceRepo.Insert(dptServices);
-                response = new BaseResponse() { Status = HttpStatusCode.OK, Message = "Successfully Updated", Body = dpt };
+                else 
+                {
+                    response = new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "Data Not Found"};
+                }
             }
             else
             {
+                var dpt = AutoMapperHelper.MapSingleRow<DepartmentVM, Department>(department);
                 dpt.CreatedDate = DateTime.UtcNow;
                 _departmentRepo.Insert(dpt);
 
@@ -172,24 +192,36 @@ namespace Web.Services.Concrete
         public BaseResponse AddOrUpdateOrganization(OrganizationVM organization)
         {
             BaseResponse response = null;
-            var org = AutoMapperHelper.MapSingleRow<OrganizationVM, Organization>(organization);
+            
             var dptIds = organization.DepartmentIdsFk.ToIntList();
             List<OrganizationDepartment> orgDpt = new List<OrganizationDepartment>();
             if (organization.OrganizationId > 0)
             {
-                org.ModifiedDate = DateTime.UtcNow;
-                _organizationRepo.Update(org);
-                var alreadyExistDpts = _organizationDepartmentRepo.Table.Where(x => x.OrganizationIdFk == organization.OrganizationId).ToList();
-                _organizationDepartmentRepo.DeleteRange(alreadyExistDpts);
-                foreach (var item in dptIds)
+                var org = _organizationRepo.Table.Where(x => x.IsDeleted != true && x.OrganizationId == organization.OrganizationId).FirstOrDefault();
+                if (org != null) 
                 {
-                    orgDpt.Add(new OrganizationDepartment() { OrganizationIdFk = org.OrganizationId, DepartmentIdFk = item });
+                    org.OrganizationName = organization.OrganizationName;
+                    org.ModifiedBy = organization.ModifiedBy;
+                    org.ModifiedDate = DateTime.UtcNow;
+                    _organizationRepo.Update(org);
+                    var alreadyExistDpts = _organizationDepartmentRepo.Table.Where(x => x.OrganizationIdFk == organization.OrganizationId).ToList();
+                    _organizationDepartmentRepo.DeleteRange(alreadyExistDpts);
+                    foreach (var item in dptIds)
+                    {
+                        orgDpt.Add(new OrganizationDepartment() { OrganizationIdFk = org.OrganizationId, DepartmentIdFk = item });
+                    }
+                    _organizationDepartmentRepo.Insert(orgDpt);
+                    response = new BaseResponse() { Status = HttpStatusCode.OK, Message = "Successfully Updated", Body = organization };
                 }
-                _organizationDepartmentRepo.Insert(orgDpt);
-                response = new BaseResponse() { Status = HttpStatusCode.OK, Message = "Successfully Updated", Body = organization };
+                else
+                {
+                    response = new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "Data Not Found" };
+                }
+
             }
             else
             {
+                var org = AutoMapperHelper.MapSingleRow<OrganizationVM, Organization>(organization);
                 org.CreatedDate = DateTime.UtcNow;
                 _organizationRepo.Insert(org);
                 foreach (var item in dptIds)
