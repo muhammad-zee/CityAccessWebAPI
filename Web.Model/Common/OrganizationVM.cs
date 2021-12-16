@@ -23,7 +23,8 @@ namespace Web.Model.Common
         public DateTime? ModifiedDate { get; set; }
         public bool IsActive { get; set; }
         public bool IsDeleted { get; set; }
-
+        public string OrgType { get; set; }
+        
         public string DepartmentIdsFk { get; set; }
         public List<DepartmentVM> Departments { get; set; }
     }

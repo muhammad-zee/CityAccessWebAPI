@@ -7,6 +7,7 @@ using Web.Data.Models;
 using Web.DLL.Generic_Repository;
 using Web.Model;
 using Web.Model.Common;
+using Web.Services.Enums;
 using Web.Services.Extensions;
 using Web.Services.Helper;
 using Web.Services.Interfaces;
@@ -21,13 +22,15 @@ namespace Web.Services.Concrete
         private IRepository<Organization> _organizationRepo;
         private IRepository<DepartmentService> _departmentServiceRepo;
         private IRepository<OrganizationDepartment> _organizationDepartmentRepo;
+        private IRepository<ControlListDetail> _controlListDetails;
 
         public FacilityService(RAQ_DbContext dbContext,
             IRepository<ServiceLine> serviceRepo,
             IRepository<Department> departmentRepo,
             IRepository<Organization> organizationRepo,
             IRepository<DepartmentService> departmentServiceRepo,
-            IRepository<OrganizationDepartment> organizationDepartmentRepo
+            IRepository<OrganizationDepartment> organizationDepartmentRepo,
+            IRepository<ControlListDetail> controlListDetails
             )
         {
             this._dbContext = dbContext;
@@ -36,6 +39,7 @@ namespace Web.Services.Concrete
             this._organizationRepo = organizationRepo;
             this._departmentServiceRepo = departmentServiceRepo;
             this._organizationDepartmentRepo = organizationDepartmentRepo;
+            this._controlListDetails = controlListDetails;
         }
 
         #region Service Line
@@ -255,8 +259,10 @@ namespace Web.Services.Concrete
                             IsDeleted = d.IsDeleted,
                             OrganizationIdFk = od.OrganizationIdFk
                         });
+            var types = _controlListDetails.Table.Where(x => x.ControlListIdFk == UCLEnums.OrgType.ToInt()).Select(x => new { x.ControlListDetailId, x.Title });
             foreach (var item in orgs)
             {
+                item.OrgType = types.Where(x => x.ControlListDetailId == item.OrganizationType).Select(x => x.Title).FirstOrDefault();
                 item.Departments = dpts.Where(x => x.OrganizationIdFk == item.OrganizationId).ToList();
             }
 
