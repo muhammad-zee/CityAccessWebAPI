@@ -3,11 +3,15 @@ using Microsoft.Extensions.Configuration;
 using SendGrid;
 using SendGrid.Helpers.Mail;
 using System;
+using System.Collections.Generic;
+using System.Net;
 using System.Threading.Tasks;
 using Twilio;
 using Twilio.AspNet.Common;
+using Twilio.Jwt.AccessToken;
 using Twilio.Rest.Api.V2010.Account;
 using Twilio.Types;
+using Web.Model;
 using Web.Services.Enums;
 using Web.Services.Interfaces;
 
@@ -22,14 +26,26 @@ namespace Web.Services.Concrete
         private string SendGrid_ApiKey;
         private string FromEmail;
 
+        private string Twilio_ChatServiceSid;
+        private string Twilio_ChatPushCredentialSid;
+        private string Twilio_ChatApiKey;
+        private string Twilio_ChatApiKeySecret;
+
+
         private IConfiguration _config;
         public CommunicationService(IConfiguration config)
         {
+          
             this._config = config;
             this.Twilio_AccountSid = this._config["Twilio:AccountSid"].ToString();
             this.Twilio_AuthToken = this._config["Twilio:AuthToken"].ToString();
             this.SendGrid_ApiKey = this._config["SendGrid:ApiKey"].ToString();
             this.FromEmail = this._config["SendGrid:FromEmail"].ToString();
+
+            this.Twilio_ChatServiceSid = this._config["Twilio:ChatServiceSid"].ToString();
+            this.Twilio_ChatPushCredentialSid = this._config["Twilio:PushCredentialSid"].ToString();
+            this.Twilio_ChatApiKey = this._config["Twilio:ChatApiKey"].ToString();
+            this.Twilio_ChatApiKeySecret = this._config["Twilio:ChatApiKeySecret"].ToString();
         }
 
         #region SMS sending
@@ -155,6 +171,35 @@ namespace Web.Services.Concrete
         }
 
 
+        #endregion
+
+
+        #region Twilio Conversation
+
+        public BaseResponse generateConversationToken(string Identity)
+        {
+            BaseResponse response = new BaseResponse();
+            TwilioClient.Init(this.Twilio_AccountSid, this.Twilio_AuthToken);
+            var grants = new HashSet<IGrant>
+            {
+                new ChatGrant {
+                    ServiceSid = this.Twilio_ChatServiceSid,
+                    PushCredentialSid = this.Twilio_ChatPushCredentialSid
+                }
+            };
+
+            var chatToken = new Token(
+                this.Twilio_AccountSid,
+                this.Twilio_ChatApiKey,
+                this.Twilio_ChatApiKeySecret,
+                Identity,
+                grants: grants);
+
+            response.Status = HttpStatusCode.OK;
+            response.Message = "Token Generated";
+            response.Body = new { identity = Identity, token = chatToken.ToJwt() };
+            return response;
+        }
         #endregion
     }
 
