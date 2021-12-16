@@ -54,6 +54,19 @@ namespace Web.Services.Concrete
         }
 
 
+        #region Dashboard Data
+
+        public BaseResponse GetLabelCounts() 
+        {
+            var LabelCounts = _dbContext.LoadStoredProc("raq_getCountOfTablesForDashboard")
+            .ExecuteStoredProc<TableCountsForDashBoardVM>().Result.FirstOrDefault();
+
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Found", Body = LabelCounts };
+        }
+
+        #endregion
+
+
         #region Users
 
         public BaseResponse GetAllUsers()

@@ -119,23 +119,8 @@ namespace Web.Services.Concrete
 
         public BaseResponse GetAllDepartments()
         {
-            //var departments = (from d in _departmentRepo.Table
-            //                   join ds in _departmentServiceRepo.Table on d.DepartmentId equals ds.DepartmentIdFk
-            //                   //join s in _serviceRepo.Table on ds.ServiceIdFk equals s.ServiceId
-            //                   select new DepartmentVM()
-            //                   {
-            //                       DepartmentId = d.DepartmentId,
-            //                       DepartmentName = d.DepartmentName,
-            //                       CreatedBy = d.CreatedBy,
-            //                       CreatedDate = d.CreatedDate,
-            //                       ModifiedBy = d.ModifiedBy,
-            //                       ModifiedDate = d.ModifiedDate,
-            //                       IsDeleted = d.IsDeleted,
-            //                       ServiceLines = AutoMapperHelper.MapList<ServiceLine, ServiceLineVM>(_serviceRepo.Table.Where(x => x.ServiceId == ds.ServiceIdFk && x.IsDeleted != true).ToList())
-            //                   });
             var departments = _departmentRepo.Table.Where(x => x.IsDeleted != true).ToList();
             var dpts = AutoMapperHelper.MapList<Department, DepartmentVM>(departments);
-            //_departmentServiceRepo.Table.Where(x => dpts.Select(x => x.DepartmentId).Contains(x.DepartmentIdFk)).Select(x => x.ServiceIdFk).Distinct().ToList();
             var dptServices = (from ds in _departmentServiceRepo.Table
                                join s in _serviceRepo.Table on ds.ServiceIdFk equals s.ServiceId
                                where dpts.Select(x => x.DepartmentId).Contains(ds.DepartmentIdFk) && s.IsDeleted != true

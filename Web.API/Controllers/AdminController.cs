@@ -33,6 +33,25 @@ namespace Web.API.Controllers
             _logger = new Logger(_hostEnvironment);
         }
 
+
+        #region DashBoard
+
+        [Description("Get Label Counts")]
+        [HttpGet("admin/GetLabelCounts")]
+        public BaseResponse GetLabelCounts() 
+        {
+            try
+            {
+                return _adminService.GetLabelCounts();
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = ex.ToString() };
+            }
+        }
+
+        #endregion
+
         #region Users
 
         [Description("Get Users List")]

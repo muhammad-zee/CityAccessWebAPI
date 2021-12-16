@@ -8,6 +8,12 @@ namespace Web.Services.Interfaces
 {
     public interface IAdminService
     {
+        #region Dashboard
+        BaseResponse GetLabelCounts();
+
+        #endregion
+
+
         #region Components
 
         BaseResponse AddOrUpdateComponent(List<ComponentVM> components);
