@@ -185,6 +185,8 @@ namespace Web.Services.Concrete
                 user.HomeAddress = register.HomeAddress;
                 user.City = register.City;
                 user.Zip = register.Zip;
+                user.TwoFactorEnabled = register.TwoFactorEnabled;
+                user.IsActive = register.IsActive;
                 user.ModifiedBy = register.ModifiedBy;
                 user.ModifiedDate = DateTime.UtcNow;
                 if (!string.IsNullOrEmpty(register.UserImage))
@@ -252,6 +254,8 @@ namespace Web.Services.Concrete
                             HomeAddress = register.HomeAddress,
                             City = register.City,
                             Zip = register.Zip,
+                            TwoFactorEnabled = register.TwoFactorEnabled,
+                            IsActive = register.IsActive,
                             StateKey = register.StateKey,
                             CreatedBy = register.CreatedBy,
                             CreatedDate = DateTime.UtcNow,

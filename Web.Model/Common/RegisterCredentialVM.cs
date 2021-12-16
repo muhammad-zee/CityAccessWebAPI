@@ -36,6 +36,8 @@ namespace Web.Model.Common
         public string City { get; set; } = "";
         public int? StateKey { get; set; } = 0;
         public string Zip { get; set; } = "";
+        public bool TwoFactorEnabled { get; set; }
+        public bool IsActive { get; set; }
         public byte[] UserImageByte { get; set; }
         public string UserImage { get; set; } = "";
         public string RoleIds { get; set; } = "";
