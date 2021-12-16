@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using log4net.Appender;
+using Microsoft.AspNetCore.Hosting;
 using System;
 using System.IO;
 
@@ -36,6 +37,20 @@ namespace Web.API.Helper
             if (System.IO.File.Exists(logFile))
             {
                 FileInfo logFileInfo = new FileInfo(logFile);
+                //FileAppender fileAppender = new FileAppender();
+                var RootPath = this._hostEnvironment.WebRootPath+"\\Logs";
+                if (!Directory.Exists(RootPath)) 
+                {
+                    Directory.CreateDirectory(RootPath);
+                }
+                string FilePath = $"\\log4net_{DateTime.UtcNow.ToString("dd-MM-yyyy")}.txt";
+                var targetPath = Path.Combine(RootPath, FilePath);
+                //fileAppender.File = targetPath;
+                if (!File.Exists(targetPath)) 
+                {
+                    File.Create(targetPath);
+                }
+                log4net.GlobalContext.Properties["LogFileName"] = targetPath;
                 log4net.Config.XmlConfigurator.ConfigureAndWatch(logFileInfo);
             }
         }

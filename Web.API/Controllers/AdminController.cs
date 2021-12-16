@@ -46,6 +46,8 @@ namespace Web.API.Controllers
             }
             catch (Exception ex)
             {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = ex.ToString() };
             }
         }

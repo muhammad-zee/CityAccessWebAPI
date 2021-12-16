@@ -20,7 +20,7 @@ namespace Web.Data.Models
         public string PhoneNo { get; set; }
         public string PrimaryMobileNo { get; set; }
         public string PrimaryMobileNo2 { get; set; }
-        public decimal? FaxNo { get; set; }
+        public string FaxNo { get; set; }
         public string City { get; set; }
         public int? StateIdFk { get; set; }
         public string Zip { get; set; }

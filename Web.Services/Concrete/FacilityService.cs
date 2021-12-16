@@ -281,6 +281,14 @@ namespace Web.Services.Concrete
                 var org = _organizationRepo.Table.Where(x => x.IsDeleted != true && x.OrganizationId == organization.OrganizationId).FirstOrDefault();
                 if (org != null)
                 {
+                    org.City = organization.City;
+                    org.PhoneNo = organization.PhoneNo;
+                    org.FaxNo = organization.FaxNo;
+                    org.Zip = organization.Zip;
+                    org.OrganizationType = organization.OrganizationType;
+                    org.PrimaryAddress = organization.PrimaryAddress;
+                    org.PrimaryAddress2 = organization.PrimaryAddress2;
+                    org.StateIdFk = organization.StateIdFk;
                     org.OrganizationName = organization.OrganizationName;
                     org.ModifiedBy = organization.ModifiedBy;
                     org.ModifiedDate = DateTime.UtcNow;
