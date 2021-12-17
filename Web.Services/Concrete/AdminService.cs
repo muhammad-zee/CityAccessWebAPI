@@ -73,7 +73,7 @@ namespace Web.Services.Concrete
         {
             var result = _user.Table.Where(x => x.IsDeleted == false).ToList();
             var users = AutoMapperHelper.MapList<User, RegisterCredentialVM>(result);
-            var genders = _controlListDetails.Table.Where(x => x.ControlListIdFk == UCLEnums.States.ToInt()).Select(x => new { x.ControlListDetailId, x.Title });
+            var genders = _controlListDetails.Table.Where(x => x.ControlListIdFk == UCLEnums.Genders.ToInt()).Select(x => new { x.ControlListDetailId, x.Title });
             foreach (var item in users)
             {
                 item.UserRole = getRoleListByUserId(item.UserId).ToList();
