@@ -10,8 +10,10 @@ using Twilio;
 using Twilio.AspNet.Common;
 using Twilio.Jwt.AccessToken;
 using Twilio.Rest.Api.V2010.Account;
+using Twilio.Rest.Conversations.V1.Service;
 using Twilio.Types;
 using Web.Model;
+using Web.Model.Common;
 using Web.Services.Enums;
 using Web.Services.Interfaces;
 
@@ -200,6 +202,19 @@ namespace Web.Services.Concrete
             response.Body = new { identity = Identity, token = chatToken.ToJwt() };
             return response;
         }
+
+        public BaseResponse sendPushNotification(ConversationMessageVM msg)
+        {
+            TwilioClient.Init(this.Twilio_AccountSid, this.Twilio_AuthToken);
+            var Notify = Twilio.Rest.Conversations.V1.Service.Conversation.MessageResource.Create(
+                                       body: msg.body,
+                                       attributes: msg.attributes,
+                                       pathChatServiceSid: this.Twilio_ChatServiceSid,
+                                       pathConversationSid: msg.channelSid
+                                       );
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Notification Sent", Body = Notify };
+        }
+
         #endregion
     }
 
