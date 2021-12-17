@@ -305,6 +305,10 @@ namespace Web.Data.Models
 
             modelBuilder.Entity<User>(entity =>
             {
+                entity.Property(e => e.ChannelSid)
+                    .HasMaxLength(50)
+                    .HasColumnName("ChannelSId");
+
                 entity.Property(e => e.City).HasMaxLength(40);
 
                 entity.Property(e => e.CodeExpiryTime).HasColumnType("datetime");
@@ -364,6 +368,8 @@ namespace Web.Data.Models
                 entity.Property(e => e.UserName)
                     .IsRequired()
                     .HasMaxLength(256);
+
+                entity.Property(e => e.UserUniqueId).HasMaxLength(15);
 
                 entity.Property(e => e.Zip).HasMaxLength(100);
             });

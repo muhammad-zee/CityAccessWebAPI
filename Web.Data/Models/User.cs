@@ -42,6 +42,8 @@ namespace Web.Data.Models
         public DateTime? TwoFactorExpiryDate { get; set; }
         public bool IsRequirePasswordReset { get; set; }
         public bool? IsActive { get; set; }
+        public string ChannelSid { get; set; }
+        public string UserUniqueId { get; set; }
 
         public virtual ICollection<UserAccess> UserAccesses { get; set; }
         public virtual ICollection<UserRole> UserRoles { get; set; }

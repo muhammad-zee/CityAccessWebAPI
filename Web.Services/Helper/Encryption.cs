@@ -49,12 +49,12 @@ namespace Web.Services.Helper
             return hexString;
         }
 
-        public static string encryptData(string text, string hexKey)
+        public static string encryptData(string text, string hexKey, int byteLength = 16)
         {
             checkKey(hexKey);
 
             //generate random IV (16 bytes)
-            string hexIV = generateRandomHex(16);
+            string hexIV = generateRandomHex(byteLength);
 
             //convert plainText to hex string.
             byte[] bytesData = System.Text.Encoding.UTF8.GetBytes(text);
