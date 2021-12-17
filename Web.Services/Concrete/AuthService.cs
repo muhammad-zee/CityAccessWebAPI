@@ -307,11 +307,11 @@ namespace Web.Services.Concrete
         }
 
         #region Reset Password
-        public string SendResetPasswordMail(string userName, string url)
+        public string SendResetPasswordMail(string email, string url)
         {
             try
             {
-                var user = _userRepo.Table.Where(x => x.UserName == userName).FirstOrDefault();
+                var user = _userRepo.Table.Where(x => x.PrimaryEmail == email).FirstOrDefault();
                 if (user != null)
                 {
                     string Name = string.Empty;
@@ -326,7 +326,7 @@ namespace Web.Services.Concrete
                     }
                     else
                     {
-                        Name = new MailAddress(userName).User;
+                        Name = new MailAddress(email).User;
                     }
                     if (!string.IsNullOrEmpty(user.Gender))
                     {
@@ -339,10 +339,10 @@ namespace Web.Services.Concrete
                             MrOrMrs = "Mrs.";
                         }
                     }
-                    string siteUrl = _config["siteUrl"];
-                    string hashUserName = Encryption.encryptData(userName, this._encryptionKey);
+                    //string siteUrl = _config["siteUrl"];
+                    string hashUserName = Encryption.encryptData(email, this._encryptionKey);
                     string mailMessageTemplate = $"<b>Hi! {MrOrMrs} {Name},</b> <br />" +
-                        $"<p>Please <a href='{siteUrl + hashUserName}' target='_blank'>Click here</a> to reset your password.</p> <br />" +
+                        $"<p>Please <a href='{url + hashUserName}' target='_blank'>Click here</a> to reset your password.</p> <br />" +
                         $"<p>If you didn’t ask to reset your password, you can ignore this email.</p> <br /><br />" +
                         $"<p>Thank You!</p>";
                     this._communicationService.SendEmail(user.PrimaryEmail, "Reset Password", mailMessageTemplate, null);

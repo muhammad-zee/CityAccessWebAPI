@@ -10,7 +10,7 @@ namespace Web.Services.Interfaces
         BaseResponse VerifyTwoFactorAuthentication(VerifyTwoFactorAuthenticationCode verifyCode);
         BaseResponse ConfirmPassword(UserCredentialVM modelUser);
         string SaveUser(RegisterCredentialVM register);
-        string SendResetPasswordMail(string userName, string url);
+        string SendResetPasswordMail(string email, string url);
         string ResetPassword(UserCredentialVM credential);
     }
 }
