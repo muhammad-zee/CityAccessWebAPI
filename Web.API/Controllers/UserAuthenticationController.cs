@@ -127,11 +127,11 @@ namespace Web.API.Controllers
         #region Reset Password
         [AllowAnonymous]
         [Description("Send Mail on Forget Password")]
-        [HttpGet("auth/ForgetPassword")]
-        public BaseResponse ForgetPassword(string email, string url)
+        [HttpPost("auth/ForgetPassword")]
+        public BaseResponse ForgetPassword([FromBody] ForgetPasswordVM forgetPassword)
         {
             BaseResponse response = null;
-            var result = _jwtAuth.SendResetPasswordMail(email, url);
+            var result = _jwtAuth.SendResetPasswordMail(forgetPassword.Email, forgetPassword.Url);
             if (result != null)
             {
                 if (result.Equals(StatusEnums.Success.ToString()))

@@ -342,9 +342,9 @@ namespace Web.Services.Concrete
                         }
                     }
                     //string siteUrl = _config["siteUrl"];
-                    string hashUserName = Encryption.encryptData(email, this._encryptionKey);
+                    string hashUserName = Encryption.encryptData(user.UserName , this._encryptionKey);
                     string mailMessageTemplate = $"<b>Hi! {MrOrMrs} {Name},</b> <br />" +
-                        $"<p>Please <a href='{url + hashUserName}' target='_blank'>Click here</a> to reset your password.</p> <br />" +
+                        $"<p>Please <a href='{url +"/" + hashUserName}' target='_blank'>Click here</a> to reset your password.</p> <br />" +
                         $"<p>If you didn’t ask to reset your password, you can ignore this email.</p> <br /><br />" +
                         $"<p>Thank You!</p>";
                     this._communicationService.SendEmail(user.PrimaryEmail, "Reset Password", mailMessageTemplate, null);
@@ -368,8 +368,8 @@ namespace Web.Services.Concrete
                 if (user != null)
                 {
                     //var hashPswd = HelperExtension.Encrypt(credential.password);
-                    var hashPswd = Encryption.encryptData(credential.password, this._encryptionKey);
-                    user.Password = hashPswd;
+                    //var hashPswd = Encryption.encryptData(credential.password, this._encryptionKey);
+                    user.Password = credential.password;
                     _userRepo.Update(user);
                     return StatusEnums.Success.ToString();
                 }
