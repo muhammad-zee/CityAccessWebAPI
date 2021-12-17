@@ -57,9 +57,19 @@ namespace Web.Services.Concrete
             BaseResponse response = new BaseResponse();
             if (!string.IsNullOrEmpty(login.username) && !string.IsNullOrEmpty(login.password))
             {
-                var user = _userRepo.Table.Where(x => (x.UserName == login.username) && !x.IsDeleted).FirstOrDefault();
+                var user = this._userRepo.Table.Where(x => (x.UserName == login.username) && !x.IsDeleted).FirstOrDefault();
                 if (user != null)
                 {
+                    if (string.IsNullOrEmpty(user.UserUniqueId))
+                    {
+                        var randomString = HelperExtension.CreateRandomString();
+                        while (_userRepo.Table.Count(u => u.UserUniqueId == randomString && !u.IsDeleted) > 0)
+                        {
+                            randomString = HelperExtension.CreateRandomString();
+                        }
+                            user.UserUniqueId = randomString;
+                        this._userRepo.Update(user);
+                    }
                     login.password = Encryption.decryptData(login.password, this._encryptionKey);
                     user.Password = Encryption.decryptData(user.Password, this._encryptionKey);
                     if (user.Password == login.password)
@@ -134,13 +144,16 @@ namespace Web.Services.Concrete
             {
                 token = new JwtSecurityTokenHandler().WriteToken(token),
                 expires = tokenExpiryTime,
-                PrimaryEmail = user.PrimaryEmail,
-                PhoneNumber = user.PersonalMobileNumber,
                 TwoFactorEnabled = user.TwoFactorEnabled,
                 UserId = user.UserId,
+                UserFullName = user.FirstName + " " + user.LastName,
+                PhoneNumber = user.PersonalMobileNumber,
                 Username = user.UserName,
+                PrimaryEmail = user.PrimaryEmail,
                 UserRole = UserRole,
-                IsRequirePasswordReset = user.IsRequirePasswordReset
+                IsRequirePasswordReset = user.IsRequirePasswordReset,
+                NotificationChannelSid = user.ChannelSid,
+                UserUniqueId = user.UserUniqueId
 
             };
         }
@@ -242,6 +255,10 @@ namespace Web.Services.Concrete
                     if (alreadyExist == null)
                     {
                         var randomString = HelperExtension.CreateRandomString();
+                        while(_userRepo.Table.Count(u=>u.UserUniqueId == randomString && !u.IsDeleted) > 0)
+                        {
+                            randomString = HelperExtension.CreateRandomString();
+                        }
                         var obj = new User()
                         {
                             FirstName = register.FirstName,

@@ -4,6 +4,7 @@ using SendGrid;
 using SendGrid.Helpers.Mail;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Twilio;
@@ -12,6 +13,8 @@ using Twilio.Jwt.AccessToken;
 using Twilio.Rest.Api.V2010.Account;
 using Twilio.Rest.Conversations.V1.Service;
 using Twilio.Types;
+using Web.Data.Models;
+using Web.DLL.Generic_Repository;
 using Web.Model;
 using Web.Model.Common;
 using Web.Services.Enums;
@@ -35,7 +38,9 @@ namespace Web.Services.Concrete
 
 
         private IConfiguration _config;
-        public CommunicationService(IConfiguration config)
+
+        private readonly IRepository<User> _userRepo;
+        public CommunicationService(IConfiguration config, IRepository<User> userRepo)
         {
           
             this._config = config;
@@ -48,6 +53,8 @@ namespace Web.Services.Concrete
             this.Twilio_ChatPushCredentialSid = this._config["Twilio:PushCredentialSid"].ToString();
             this.Twilio_ChatApiKey = this._config["Twilio:ChatApiKey"].ToString();
             this.Twilio_ChatApiKeySecret = this._config["Twilio:ChatApiKeySecret"].ToString();
+
+            this._userRepo = userRepo;
         }
 
         #region SMS sending
@@ -213,6 +220,23 @@ namespace Web.Services.Concrete
                                        pathConversationSid: msg.channelSid
                                        );
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Notification Sent", Body = Notify };
+        }
+
+
+        public BaseResponse saveUserChannelSid(int UserId, string ChannelSid)
+        {
+            BaseResponse response = new BaseResponse();
+
+            var user = this._userRepo.Table.FirstOrDefault(u => u.UserId == UserId && !u.IsDeleted);
+            if(user!= null)
+            {
+                user.ChannelSid = ChannelSid;
+                this._userRepo.Update(user);
+            }
+            response.Status = HttpStatusCode.OK;
+            response.Message = "Notificaiton Channel Saved Successfully";
+            response.Body = new { UserId=UserId,UserChannelSid = ChannelSid };
+            return response;
         }
 
         #endregion

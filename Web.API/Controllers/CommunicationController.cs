@@ -60,5 +60,19 @@ namespace Web.API.Controllers
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
         }
+        [HttpGet("Communication/saveUserChannelSid")]
+        public BaseResponse saveUserChannelSid(int UserId, string ChannelSid)
+        {
+            try
+            {
+                return this._communicaitonService.saveUserChannelSid(UserId, ChannelSid);
+            }
+            catch(Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
     }
 }
