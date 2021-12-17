@@ -9,6 +9,7 @@ namespace Web.Services.Interfaces
         #region Service Lines
         BaseResponse GetAllServiceLines();
         BaseResponse GetServiceLineById(int Id);
+        BaseResponse GetServicesByIds(string Ids);
         BaseResponse AddOrUpdateServiceLine(ServiceLineVM serviceLine);
         BaseResponse DeleteServiceLine(int Id, int userId);
         #endregion
@@ -16,6 +17,7 @@ namespace Web.Services.Interfaces
         #region Department
         BaseResponse GetAllDepartments();
         BaseResponse GetDepartmentById(int Id);
+        BaseResponse GetDepartmentsByIds(string Ids);
         BaseResponse AddOrUpdateDepartment(DepartmentVM department);
         BaseResponse DeleteDepartment(int Id, int userId);
         #endregion

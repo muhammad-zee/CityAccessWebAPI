@@ -66,6 +66,29 @@ namespace Web.Services.Concrete
             };
         }
 
+        public BaseResponse GetServicesByIds(string Ids) 
+        {
+            if (!string.IsNullOrEmpty(Ids))
+            {
+                var idsList = Ids.ToIntList();
+                var services = (from ds in _departmentServiceRepo.Table
+                                  join s in _serviceRepo.Table on ds.ServiceIdFk equals s.ServiceId
+                                  where idsList.Contains(ds.DepartmentIdFk) && s.IsDeleted != true
+                                  select new ServiceLineVM()
+                                  {
+                                      ServiceId = s.ServiceId,
+                                      ServiceName = s.ServiceName,
+                                      DepartmentIdFk = ds.DepartmentIdFk
+                                  }).DistinctBy(x => x.ServiceName).ToList();
+
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Found", Body = services };
+            }
+            else
+            {
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Select at least one Department" };
+            }
+        }
+
         public BaseResponse AddOrUpdateServiceLine(ServiceLineVM serviceLine)
         {
             BaseResponse response = null;
@@ -158,6 +181,28 @@ namespace Web.Services.Concrete
                 Message = "Data Found",
                 Body = department
             };
+        }
+
+        public BaseResponse GetDepartmentsByIds(string Ids) 
+        {
+            if (!string.IsNullOrEmpty(Ids))
+            {
+                var idsList = Ids.ToIntList();
+                var department = (from od in _organizationDepartmentRepo.Table
+                                  join d in _departmentRepo.Table on od.DepartmentIdFk equals d.DepartmentId
+                                  where d.IsDeleted != true && idsList.Contains(od.OrganizationIdFk)
+                                  select new DepartmentVM()
+                                  {
+                                      DepartmentId = d.DepartmentId,
+                                      DepartmentName = d.DepartmentName,
+                                      OrganizationIdFk = od.OrganizationIdFk
+                                  }).DistinctBy(x => x.DepartmentName).ToList();
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Found", Body = department };
+            }
+            else 
+            {
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Select at least one Organization"};
+            }
         }
 
         public BaseResponse AddOrUpdateDepartment(DepartmentVM department)

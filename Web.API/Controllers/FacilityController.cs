@@ -60,6 +60,21 @@ namespace Web.API.Controllers
             }
         }
 
+        [Description("Get Services By Ids")]
+        [HttpGet("service/GetServicesByIds/{Ids}")]
+        public BaseResponse GetServicesByIds(string Ids)
+        {
+            try
+            {
+                var res = _facilityService.GetServicesByIds(Ids);
+                return res;
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
         [Description("Add Or Update Service Line")]
         [HttpPost("service/AddOrUpdateServiceLine")]
         public BaseResponse AddOrUpdateServiceLine([FromBody] ServiceLineVM serviceLine)
@@ -117,6 +132,21 @@ namespace Web.API.Controllers
             try
             {
                 var res = _facilityService.GetDepartmentById(Id);
+                return res;
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
+        [Description("Get Departments By Ids")]
+        [HttpGet("dpt/GetDepartmentsByIds/{Ids}")]
+        public BaseResponse GetDepartmentsByIds(string Ids)
+        {
+            try
+            {
+                var res = _facilityService.GetDepartmentsByIds(Ids);
                 return res;
             }
             catch (Exception ex)
