@@ -11,6 +11,7 @@ using Twilio;
 using Twilio.AspNet.Common;
 using Twilio.Jwt.AccessToken;
 using Twilio.Rest.Api.V2010.Account;
+using Twilio.Rest.Chat.V2.Service;
 using Twilio.Rest.Conversations.V1.Service;
 using Twilio.Types;
 using Web.Data.Models;
@@ -237,6 +238,17 @@ namespace Web.Services.Concrete
             response.Message = "Notificaiton Channel Saved Successfully";
             response.Body = new { UserId=UserId,UserChannelSid = ChannelSid };
             return response;
+        }
+
+        public BaseResponse delateChatChannel(string ChannelSid)
+        {
+            TwilioClient.Init(this.Twilio_AccountSid, this.Twilio_AuthToken);
+            var channels = ChannelResource.Read(pathServiceSid: this.Twilio_ChatServiceSid);
+            foreach (var ch in channels)
+            {
+                //var delete = ChannelResource.Delete(pathServiceSid: this.Twilio_ChatServiceSid, pathSid: ch.Sid);
+            }
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Channels Deleted"};
         }
 
         #endregion
