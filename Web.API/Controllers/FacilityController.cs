@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -13,7 +14,7 @@ using Web.Services.Interfaces;
 
 namespace Web.API.Controllers
 {
-
+    [Authorize]
     public class FacilityController : Controller
     {
         private readonly IFacilityService _facilityService;

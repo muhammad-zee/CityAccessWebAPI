@@ -1,4 +1,5 @@
 ﻿using ElmahCore;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -18,7 +19,7 @@ using Web.Services.Interfaces;
 
 namespace Web.API.Controllers
 {
-    //[Authorize]
+    [Authorize]
     public class AdminController : Controller
     {
         private readonly IAdminService _adminService;

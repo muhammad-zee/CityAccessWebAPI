@@ -82,7 +82,7 @@ namespace Web.API.Controllers
 
         }
 
-        //[Authorize]
+        [Authorize]
         [Description("Add or Update User")]
         [HttpPost("auth/SaveUser")]
         public BaseResponse SaveUser([FromBody] RegisterCredentialVM register)

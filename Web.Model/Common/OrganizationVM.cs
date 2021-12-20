@@ -24,7 +24,8 @@ namespace Web.Model.Common
         public bool IsActive { get; set; }
         public bool IsDeleted { get; set; }
         public string OrgType { get; set; }
-        
+        public string State { get; set; }
+
         public string DepartmentIdsFk { get; set; }
         public List<DepartmentVM> Departments { get; set; }
     }

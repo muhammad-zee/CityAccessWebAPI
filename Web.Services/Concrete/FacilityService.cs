@@ -290,8 +290,10 @@ namespace Web.Services.Concrete
                             OrganizationIdFk = od.OrganizationIdFk
                         });
             var types = _controlListDetails.Table.Where(x => x.ControlListIdFk == UCLEnums.OrgType.ToInt()).Select(x => new { x.ControlListDetailId, x.Title });
+            var states = _controlListDetails.Table.Where(x => x.ControlListIdFk == UCLEnums.States.ToInt()).Select(x => new { x.ControlListDetailId, x.Title });
             foreach (var item in orgs)
             {
+                item.State = states.Where(x => x.ControlListDetailId == item.StateIdFk).Select(x => x.Title).FirstOrDefault();
                 item.OrgType = types.Where(x => x.ControlListDetailId == item.OrganizationType).Select(x => x.Title).FirstOrDefault();
                 item.Departments = dpts.Where(x => x.OrganizationIdFk == item.OrganizationId).ToList();
             }
