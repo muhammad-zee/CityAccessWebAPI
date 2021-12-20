@@ -152,7 +152,7 @@ namespace Web.Services.Concrete
                 PrimaryEmail = user.PrimaryEmail,
                 UserRole = UserRole,
                 IsRequirePasswordReset = user.IsRequirePasswordReset,
-                NotificationChannelSid = user.ChannelSid,
+                NotificationChannelSid = user.UserChannelSid,
                 UserUniqueId = user.UserUniqueId
 
             };

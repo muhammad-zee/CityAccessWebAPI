@@ -305,10 +305,6 @@ namespace Web.Data.Models
 
             modelBuilder.Entity<User>(entity =>
             {
-                entity.Property(e => e.ChannelSid)
-                    .HasMaxLength(50)
-                    .HasColumnName("ChannelSId");
-
                 entity.Property(e => e.City).HasMaxLength(40);
 
                 entity.Property(e => e.CodeExpiryTime).HasColumnType("datetime");
@@ -360,6 +356,10 @@ namespace Web.Data.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.TwoFactorExpiryDate).HasColumnType("datetime");
+
+                entity.Property(e => e.UserChannelSid)
+                    .HasMaxLength(50)
+                    .HasColumnName("UserChannelSId");
 
                 entity.Property(e => e.UserImage)
                     .HasMaxLength(200)

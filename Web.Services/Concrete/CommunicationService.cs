@@ -231,7 +231,7 @@ namespace Web.Services.Concrete
             var user = this._userRepo.Table.FirstOrDefault(u => u.UserId == UserId && !u.IsDeleted);
             if(user!= null)
             {
-                user.ChannelSid = ChannelSid;
+                user.UserChannelSid = ChannelSid;
                 this._userRepo.Update(user);
             }
             response.Status = HttpStatusCode.OK;
