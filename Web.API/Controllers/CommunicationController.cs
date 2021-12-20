@@ -74,5 +74,19 @@ namespace Web.API.Controllers
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
         }
+        [HttpGet("Communication/daleteChannelBySid")]
+        public BaseResponse daleteChannelBySid(string ChannelSid)
+        {
+            try
+            {
+                return this._communicaitonService.delateChatChannel( ChannelSid);
+            }
+            catch(Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
     }
 }
