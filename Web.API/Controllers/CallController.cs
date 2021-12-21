@@ -1,4 +1,5 @@
 ﻿using ElmahCore;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -20,6 +21,7 @@ using Web.Services.Interfaces;
 
 namespace Web.API.Controllers
 {
+    //[Authorize]
     public class CallController : TwilioController
     {
         private readonly ICallService _callService;
@@ -72,7 +74,7 @@ namespace Web.API.Controllers
         {
             try
             {
-                return this._callService.Connect(phoneNumber,Twilio_PhoneNumber);
+                return this._callService.Connect(phoneNumber, Twilio_PhoneNumber);
             }
             catch (Exception ex)
             {
@@ -148,7 +150,7 @@ namespace Web.API.Controllers
         {
             try
             {
-                return this._callService.ReceiveVoicemail( RecordingUrl,  RecordingSid);
+                return this._callService.ReceiveVoicemail(RecordingUrl, RecordingSid);
             }
             catch (Exception ex)
             {
@@ -156,6 +158,24 @@ namespace Web.API.Controllers
                 _logger.LogExceptions(ex);
                 return this._callService.ExceptionResponse(ex);
             }
+        }
+
+
+        #region IVR Settings
+        [HttpGet("ivr/getIvrTree")]
+        public BaseResponse getIvrTree()
+        {
+            try
+            {
+                return this._callService.getIvrTree();
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+            #endregion
         }
     }
 }

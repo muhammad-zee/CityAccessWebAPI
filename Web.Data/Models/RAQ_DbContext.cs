@@ -17,6 +17,7 @@ namespace Web.Data.Models
         {
         }
 
+        public virtual DbSet<ClinicalHour> ClinicalHours { get; set; }
         public virtual DbSet<Component> Components { get; set; }
         public virtual DbSet<ComponentAccess> ComponentAccesses { get; set; }
         public virtual DbSet<ControlList> ControlLists { get; set; }
@@ -24,6 +25,7 @@ namespace Web.Data.Models
         public virtual DbSet<Department> Departments { get; set; }
         public virtual DbSet<DepartmentService> DepartmentServices { get; set; }
         public virtual DbSet<ElmahError> ElmahErrors { get; set; }
+        public virtual DbSet<Ivrsetting> Ivrsettings { get; set; }
         public virtual DbSet<Organization> Organizations { get; set; }
         public virtual DbSet<OrganizationDepartment> OrganizationDepartments { get; set; }
         public virtual DbSet<Role> Roles { get; set; }
@@ -45,6 +47,24 @@ namespace Web.Data.Models
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasAnnotation("Relational:Collation", "SQL_Latin1_General_CP1_CI_AS");
+
+            modelBuilder.Entity<ClinicalHour>(entity =>
+            {
+                entity.Property(e => e.CreatedDate)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.EndDate).HasColumnType("datetime");
+
+                entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.StartDate).HasColumnType("datetime");
+
+                entity.HasOne(d => d.OrganizationIdFkNavigation)
+                    .WithMany(p => p.ClinicalHours)
+                    .HasForeignKey(d => d.OrganizationIdFk)
+                    .HasConstraintName("FK_ClinicalHours_Organizations");
+            });
 
             modelBuilder.Entity<Component>(entity =>
             {
@@ -207,6 +227,32 @@ namespace Web.Data.Models
                     .HasMaxLength(100);
 
                 entity.Property(e => e.User)
+                    .IsRequired()
+                    .HasMaxLength(50);
+            });
+
+            modelBuilder.Entity<Ivrsetting>(entity =>
+            {
+                entity.HasKey(e => e.IvrId)
+                    .HasName("PK_dbo.InteractiveVoiceResponse");
+
+                entity.ToTable("IVRSettings");
+
+                entity.Property(e => e.CreatedDate)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.Description)
+                    .IsRequired()
+                    .HasMaxLength(100);
+
+                entity.Property(e => e.Icon).HasMaxLength(20);
+
+                entity.Property(e => e.IvrparentId).HasColumnName("IVRParentId");
+
+                entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.Name)
                     .IsRequired()
                     .HasMaxLength(50);
             });

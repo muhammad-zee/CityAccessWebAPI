@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using Twilio;
 using Twilio.AspNet.Core;
@@ -9,8 +10,12 @@ using Twilio.Rest.Api.V2010.Account;
 using Twilio.TwiML;
 using Twilio.TwiML.Voice;
 using Twilio.Types;
+using Web.Data.Models;
 using Web.DLL;
+using Web.DLL.Generic_Repository;
 using Web.Model;
+using Web.Model.Common;
+using Web.Services.Helper;
 using Web.Services.Interfaces;
 
 
@@ -19,6 +24,7 @@ namespace Web.Services.Concrete
     public class CallService : TwilioController,ICallService
     {
         private readonly ICommunicationService _communicationService;
+        private readonly IRepository<Ivrsetting> _ivrSettings;
         IConfiguration _config;
         private readonly UnitOfWork unitorWork;
         private string origin = "";
@@ -33,10 +39,12 @@ namespace Web.Services.Concrete
 
 
         public CallService(IConfiguration config,
-            ICommunicationService communicationService)
+            ICommunicationService communicationService,
+            IRepository<Ivrsetting> ivrSettings)
         {
             this._config = config;
             this._communicationService = communicationService;
+            this._ivrSettings = ivrSettings;
             this.origin= this._config["Twilio:CallbackDomain"].ToString();
 
             //Twilio Credentials
@@ -205,5 +213,26 @@ namespace Web.Services.Concrete
             response.Say(ex.Message.ToString());
             return TwiML(response);
         }
+
+        #region IVR Settings
+        public BaseResponse getIvrTree()
+        {
+            var IvrSetting = this._ivrSettings.Table.Where(i => !i.IsDeleted).ToList();
+            var treeItems = IvrSetting.Select(x => new IvrTreeVM()
+            {
+                key = x.IvrId.ToString(),
+                ParentKey = x.IvrparentId,
+                data = x.Description,
+                label = x.Name,
+                expandedIcon = x.Icon,
+                collapsedIcon = x.Icon
+            }).ToList();
+            var treeViewItems = treeItems.BuildIvrTree();
+            return new BaseResponse { Status = HttpStatusCode.OK, Message = "IVR Returned", Body = treeViewItems };
+        }
+
+   
+
+        #endregion
     }
 }

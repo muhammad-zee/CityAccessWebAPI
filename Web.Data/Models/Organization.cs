@@ -9,6 +9,7 @@ namespace Web.Data.Models
     {
         public Organization()
         {
+            ClinicalHours = new HashSet<ClinicalHour>();
             OrganizationDepartments = new HashSet<OrganizationDepartment>();
         }
 
@@ -31,6 +32,7 @@ namespace Web.Data.Models
         public bool IsActive { get; set; }
         public bool IsDeleted { get; set; }
 
+        public virtual ICollection<ClinicalHour> ClinicalHours { get; set; }
         public virtual ICollection<OrganizationDepartment> OrganizationDepartments { get; set; }
     }
 }

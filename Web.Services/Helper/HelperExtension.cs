@@ -104,7 +104,35 @@ namespace Web.Services.Helper
             }
         }
 
+        public static IList<IvrTreeVM> BuildIvrTree(this IEnumerable<IvrTreeVM> source)
+        {
+            var groups = source.GroupBy(i => i.ParentKey);
 
+            var roots = groups.FirstOrDefault(g => g.Key.HasValue == false).ToList();
+
+            if (roots.Count > 0)
+            {
+                var dict = groups.Where(g => g.Key.HasValue).ToDictionary(g => g.Key.Value.ToString(), g => g.ToList());
+                for (int i = 0; i < roots.Count; i++)
+                    AddIvrTreeChildren(roots[i], dict);
+            }
+
+            return roots;
+        }
+
+        private static void AddIvrTreeChildren(IvrTreeVM node, IDictionary<string, List<IvrTreeVM>> source)
+        {
+            if (source.ContainsKey(node.key))
+            {
+                node.children = source[node.key];
+                for (int i = 0; i < node.children.Count; i++)
+                    AddIvrTreeChildren(node.children[i], source);
+            }
+            else
+            {
+                node.children = new List<IvrTreeVM>();
+            }
+        }
         public static DbCommand LoadStoredProc(
            this DbContext context, string storedProcName)
         {
