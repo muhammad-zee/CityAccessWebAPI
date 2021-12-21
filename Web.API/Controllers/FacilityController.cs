@@ -236,7 +236,7 @@ namespace Web.API.Controllers
         }
 
         [Description("Delete Department")]
-        [HttpGet("org/DeleteOrganization/{Id}/{userId}")]
+        [HttpGet("org/DeleteOrganization")]
         public BaseResponse DeleteOrganization(int Id, int userId)
         {
             try
