@@ -246,7 +246,7 @@ namespace Web.Services.Concrete
         }
         public BaseResponse saveIvrNode(IvrSettingVM model) 
         {
-            var ivrNode = new Ivrsetting();
+            Ivrsetting ivrNode = null;
             if (model.IvrId > 0)
             {
                  ivrNode = this._ivrSettings.Table.Where(i => i.IvrId == model.IvrId && !i.IsDeleted).FirstOrDefault();
@@ -267,7 +267,7 @@ namespace Web.Services.Concrete
             }
             else
             {
-                
+                new Ivrsetting();
                 ivrNode.IvrparentId = model.IvrparentId;
                 ivrNode.OrganizationTypeIdFk = model.OrganizationTypeIdFk;
                 ivrNode.Name = model.Name;
@@ -281,7 +281,6 @@ namespace Web.Services.Concrete
                 ivrNode.IsDeleted = false;
                 this._ivrSettings.Insert(ivrNode);
             }
-            var IVRs = _ivrSettings.Table.Where(x => x.IsDeleted != true).ToList();
             return new BaseResponse()
             {
                 Status = HttpStatusCode.OK,
