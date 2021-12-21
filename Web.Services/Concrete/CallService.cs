@@ -225,7 +225,9 @@ namespace Web.Services.Concrete
                 data = x.Description,
                 label = x.Name,
                 expandedIcon = x.Icon,
-                collapsedIcon = x.Icon
+                collapsedIcon = x.Icon,
+                KeyPress = x.KeyPress,
+                expanded = true
             }).ToList();
             var treeViewItems = treeItems.BuildIvrTree();
             return new BaseResponse { Status = HttpStatusCode.OK, Message = "IVR Returned", Body = treeViewItems };

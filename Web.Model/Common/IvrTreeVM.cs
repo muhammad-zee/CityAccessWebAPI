@@ -15,7 +15,10 @@ namespace Web.Model.Common
         public string expandedIcon { get; set; }
         public string collapsedIcon { get; set; }
         public int? ParentKey { get; set; }
+        public int? KeyPress { get; set; }
+        public bool expanded { get;set;}
         public IList<IvrTreeVM> children { get; set; }
+        
     }
    
 }

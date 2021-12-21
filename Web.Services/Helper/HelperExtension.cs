@@ -130,6 +130,7 @@ namespace Web.Services.Helper
             }
             else
             {
+                node.expanded = false;
                 node.children = new List<IvrTreeVM>();
             }
         }
