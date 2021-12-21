@@ -218,20 +218,27 @@ namespace Web.Services.Concrete
         public BaseResponse getIvrTree()
         {
             var IvrSetting = this._ivrSettings.Table.Where(i => !i.IsDeleted).ToList();
-            var treeItems = IvrSetting.Select(x => new IvrTreeVM()
+            if (IvrSetting.Count() > 0)
             {
-                key = x.IvrId.ToString(),
-                ParentKey = x.IvrparentId,
-                data = x.Description,
-                label = x.Name,
-                expandedIcon = x.Icon,
-                collapsedIcon = x.Icon,
-                KeyPress = x.KeyPress,
-                expanded = true,
-                organizationTypeIdFk = x.OrganizationTypeIdFk
-            }).ToList();
-            var treeViewItems = treeItems.BuildIvrTree();
-            return new BaseResponse { Status = HttpStatusCode.OK, Message = "IVR Returned", Body = treeViewItems };
+                var treeItems = IvrSetting.Select(x => new IvrTreeVM()
+                {
+                    key = x.IvrId.ToString(),
+                    ParentKey = x.IvrparentId,
+                    data = x.Description,
+                    label = x.Name,
+                    expandedIcon = x.Icon,
+                    collapsedIcon = x.Icon,
+                    KeyPress = x.KeyPress,
+                    expanded = true,
+                    organizationTypeIdFk = x.OrganizationTypeIdFk
+                }).ToList();
+                var treeViewItems = treeItems.BuildIvrTree();
+                return new BaseResponse { Status = HttpStatusCode.OK, Message = "IVR Returned", Body = treeViewItems };
+            }
+            else 
+            {
+                return new BaseResponse { Status = HttpStatusCode.NotFound, Message = "IVR Not Found" };
+            } 
         }
 
         public BaseResponse getIvrNodes() 
@@ -267,7 +274,7 @@ namespace Web.Services.Concrete
             else
             {
                 ivrNode = new Ivrsetting();
-                ivrNode.IvrparentId = model.IvrparentId;
+                ivrNode.IvrparentId = model.IvrparentId == 0 ? null : model.IvrparentId;
                 ivrNode.OrganizationTypeIdFk = model.OrganizationTypeIdFk;
                 ivrNode.Name = model.Name;
                 ivrNode.Description = model.Description;
