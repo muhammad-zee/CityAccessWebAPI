@@ -14,7 +14,7 @@ using Web.Services.Interfaces;
 
 namespace Web.API.Controllers
 {
-    [Authorize]
+    //[Authorize]
     public class FacilityController : Controller
     {
         private readonly IFacilityService _facilityService;

@@ -20,6 +20,7 @@ namespace Web.Services.Concrete
         private IRepository<ServiceLine> _serviceRepo;
         private IRepository<Department> _departmentRepo;
         private IRepository<Organization> _organizationRepo;
+        private IRepository<ClinicalHour> _clinicalHour;
         private IRepository<DepartmentService> _departmentServiceRepo;
         private IRepository<OrganizationDepartment> _organizationDepartmentRepo;
         private IRepository<ControlListDetail> _controlListDetails;
@@ -28,6 +29,7 @@ namespace Web.Services.Concrete
             IRepository<ServiceLine> serviceRepo,
             IRepository<Department> departmentRepo,
             IRepository<Organization> organizationRepo,
+            IRepository<ClinicalHour> clinicalHour,
             IRepository<DepartmentService> departmentServiceRepo,
             IRepository<OrganizationDepartment> organizationDepartmentRepo,
             IRepository<ControlListDetail> controlListDetails
@@ -37,6 +39,7 @@ namespace Web.Services.Concrete
             this._serviceRepo = serviceRepo;
             this._departmentRepo = departmentRepo;
             this._organizationRepo = organizationRepo;
+            this._clinicalHour = clinicalHour;
             this._departmentServiceRepo = departmentServiceRepo;
             this._organizationDepartmentRepo = organizationDepartmentRepo;
             this._controlListDetails = controlListDetails;
@@ -66,20 +69,20 @@ namespace Web.Services.Concrete
             };
         }
 
-        public BaseResponse GetServicesByIds(string Ids) 
+        public BaseResponse GetServicesByIds(string Ids)
         {
             if (!string.IsNullOrEmpty(Ids))
             {
                 var idsList = Ids.ToIntList();
                 var services = (from ds in _departmentServiceRepo.Table
-                                  join s in _serviceRepo.Table on ds.ServiceIdFk equals s.ServiceId
-                                  where idsList.Contains(ds.DepartmentIdFk) && s.IsDeleted != true
-                                  select new ServiceLineVM()
-                                  {
-                                      ServiceId = s.ServiceId,
-                                      ServiceName = s.ServiceName,
-                                      DepartmentIdFk = ds.DepartmentIdFk
-                                  }).DistinctBy(x => x.ServiceName).ToList();
+                                join s in _serviceRepo.Table on ds.ServiceIdFk equals s.ServiceId
+                                where idsList.Contains(ds.DepartmentIdFk) && s.IsDeleted != true
+                                select new ServiceLineVM()
+                                {
+                                    ServiceId = s.ServiceId,
+                                    ServiceName = s.ServiceName,
+                                    DepartmentIdFk = ds.DepartmentIdFk
+                                }).DistinctBy(x => x.ServiceName).ToList();
 
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Found", Body = services };
             }
@@ -118,7 +121,7 @@ namespace Web.Services.Concrete
             return response;
         }
 
-        public BaseResponse DeleteServiceLine(int Id, int userId) 
+        public BaseResponse DeleteServiceLine(int Id, int userId)
         {
             var service = _serviceRepo.Table.Where(x => x.ServiceId == Id).FirstOrDefault();
             if (service != null)
@@ -130,7 +133,7 @@ namespace Web.Services.Concrete
 
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Deleted Successfully" };
             }
-            else 
+            else
             {
                 return new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "Data Not Found" };
             }
@@ -183,7 +186,7 @@ namespace Web.Services.Concrete
             };
         }
 
-        public BaseResponse GetDepartmentsByIds(string Ids) 
+        public BaseResponse GetDepartmentsByIds(string Ids)
         {
             if (!string.IsNullOrEmpty(Ids))
             {
@@ -199,9 +202,9 @@ namespace Web.Services.Concrete
                                   }).DistinctBy(x => x.DepartmentName).ToList();
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Found", Body = department };
             }
-            else 
+            else
             {
-                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Select at least one Organization"};
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Select at least one Organization" };
             }
         }
 
@@ -347,6 +350,40 @@ namespace Web.Services.Concrete
                         orgDpt.Add(new OrganizationDepartment() { OrganizationIdFk = org.OrganizationId, DepartmentIdFk = item });
                     }
                     _organizationDepartmentRepo.Insert(orgDpt);
+
+                    if (organization.ClinicalHours.Count() > 0)
+                    {
+                        List<ClinicalHour> ClinicalHour = new List<ClinicalHour>();
+                        foreach (var item in organization.ClinicalHours.Where(x => x.ClinicalHourId != 0))
+                        {
+                            var cHours = org.ClinicalHours.Where(x => x.OrganizationIdFk == organization.OrganizationId && x.IsDeleted != true).FirstOrDefault();
+                            if (cHours != null) 
+                            {
+                                cHours.WeekDayIdFk = item.WeekDayIdFk;
+                                cHours.StartDate = item.StartDate;
+                                cHours.EndDate = item.EndDate;
+                                cHours.StartTime = item.StartTime;
+                                cHours.EndTime = item.EndTime;
+                                cHours.ModifiedDate = item.ModifiedDate;
+                                cHours.ModifiedBy = item.ModifiedBy;
+                                ClinicalHour.Add(cHours);
+                            }
+                        }
+                        _clinicalHour.Update(ClinicalHour);
+                        if (organization.ClinicalHours.Where(x => x.ClinicalHourId == 0).Count() > 0) 
+                        {
+                            ClinicalHour = new List<ClinicalHour>();
+                            foreach (var item in organization.ClinicalHours.Where(x => x.ClinicalHourId == 0))
+                            {
+                                var clinicalHours = AutoMapperHelper.MapSingleRow<ClinicalHoursVM, ClinicalHour>(item);
+                                clinicalHours.OrganizationIdFk = org.OrganizationId;
+                                clinicalHours.CreatedDate = DateTime.Now;
+                                ClinicalHour.Add(clinicalHours);
+                            }
+                            _clinicalHour.Insert(ClinicalHour);
+                        }
+                    }
+
                     response = new BaseResponse() { Status = HttpStatusCode.OK, Message = "Successfully Updated", Body = organization };
                 }
                 else
@@ -365,6 +402,20 @@ namespace Web.Services.Concrete
                     orgDpt.Add(new OrganizationDepartment() { OrganizationIdFk = org.OrganizationId, DepartmentIdFk = item });
                 }
                 _organizationDepartmentRepo.Insert(orgDpt);
+
+                if (organization.ClinicalHours.Count() > 0)
+                {
+                    List<ClinicalHour> ClinicalHour = new List<ClinicalHour>();
+                    foreach (var item in organization.ClinicalHours)
+                    {
+                        var clinicalHours = AutoMapperHelper.MapSingleRow<ClinicalHoursVM, ClinicalHour>(item);
+                        clinicalHours.OrganizationIdFk = org.OrganizationId;
+                        clinicalHours.CreatedDate = DateTime.Now;
+                        ClinicalHour.Add(clinicalHours);
+                    }
+                    _clinicalHour.Insert(ClinicalHour);
+                }
+
                 response = new BaseResponse() { Status = HttpStatusCode.OK, Message = "Successfully Created", Body = organization };
             }
             return response;
