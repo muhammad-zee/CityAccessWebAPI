@@ -267,7 +267,7 @@ namespace Web.Services.Concrete
             else
             {
                 ivrNode = new Ivrsetting();
-                ivrNode.IvrparentId = model.IvrparentId;
+                ivrNode.IvrparentId = model.IvrparentId == 0 ? null : model.IvrparentId;
                 ivrNode.OrganizationTypeIdFk = model.OrganizationTypeIdFk;
                 ivrNode.Name = model.Name;
                 ivrNode.Description = model.Description;

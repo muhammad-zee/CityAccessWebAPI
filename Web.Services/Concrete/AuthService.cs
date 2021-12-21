@@ -70,6 +70,7 @@ namespace Web.Services.Concrete
                             user.UserUniqueId = randomString;
                         this._userRepo.Update(user);
                     }
+
                     login.password = Encryption.decryptData(login.password, this._encryptionKey);
                     user.Password = Encryption.decryptData(user.Password, this._encryptionKey);
                     if (user.Password == login.password)
