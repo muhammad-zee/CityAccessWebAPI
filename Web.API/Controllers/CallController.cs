@@ -175,7 +175,25 @@ namespace Web.API.Controllers
                 _logger.LogExceptions(ex);
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
-            #endregion
+           
         }
+
+        [HttpGet("ivr/getAllIVR")]
+        public BaseResponse getAllIVR()
+        {
+            try
+            {
+                return this._callService.getAllIVR();
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+
+        }
+
+        #endregion
     }
 }

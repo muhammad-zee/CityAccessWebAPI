@@ -227,13 +227,23 @@ namespace Web.Services.Concrete
                 expandedIcon = x.Icon,
                 collapsedIcon = x.Icon,
                 KeyPress = x.KeyPress,
-                expanded = true
+                expanded = true,
+                organizationTypeIdFk = x.OrganizationTypeIdFk
             }).ToList();
             var treeViewItems = treeItems.BuildIvrTree();
             return new BaseResponse { Status = HttpStatusCode.OK, Message = "IVR Returned", Body = treeViewItems };
         }
 
-   
+        public BaseResponse getAllIVR() 
+        {
+            var IVRs = _ivrSettings.Table.Where(x => x.IsDeleted != true).ToList();
+            return new BaseResponse()
+            {
+                Status = HttpStatusCode.OK,
+                Message = "Data Found",
+                Body = IVRs
+            };
+        }
 
         #endregion
     }

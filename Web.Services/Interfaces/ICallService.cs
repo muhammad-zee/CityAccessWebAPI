@@ -18,6 +18,7 @@ namespace Web.Services.Interfaces
         TwiMLResult ReceiveVoicemail(string RecordingUrl, string RecordingSid);
 
         BaseResponse getIvrTree();
+        BaseResponse getAllIVR();
 
     }
 }
