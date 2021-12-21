@@ -351,7 +351,7 @@ namespace Web.Services.Concrete
                     }
                     _organizationDepartmentRepo.Insert(orgDpt);
 
-                    if (organization.ClinicalHours.Count() > 0)
+                    if (organization.ClinicalHours != null && organization.ClinicalHours.Count() > 0)
                     {
                         List<ClinicalHour> ClinicalHour = new List<ClinicalHour>();
                         foreach (var item in organization.ClinicalHours.Where(x => x.ClinicalHourId != 0))
