@@ -1,7 +1,9 @@
 ﻿using System;
 using Twilio.AspNet.Core;
 using Twilio.Rest.Api.V2010.Account;
+using Web.Data.Models;
 using Web.Model;
+using Web.Model.Common;
 
 namespace Web.Services.Interfaces
 {
@@ -18,7 +20,8 @@ namespace Web.Services.Interfaces
         TwiMLResult ReceiveVoicemail(string RecordingUrl, string RecordingSid);
 
         BaseResponse getIvrTree();
-        BaseResponse getAllIVR();
+        BaseResponse getIvrNodes();
+        BaseResponse saveIvrNode(IvrSettingVM model);
 
     }
 }

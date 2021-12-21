@@ -14,6 +14,7 @@ using Twilio.AspNet.Core;
 using Twilio.Rest.Api.V2010.Account;
 using Twilio.TwiML;
 using Web.API.Helper;
+using Web.Data.Models;
 using Web.Model;
 using Web.Model.Common;
 using Web.Services.Enums;
@@ -178,12 +179,28 @@ namespace Web.API.Controllers
            
         }
 
-        [HttpGet("ivr/getAllIVR")]
-        public BaseResponse getAllIVR()
+        [HttpGet("ivr/getIvrNodes")]
+        public BaseResponse getIvrNodes()
         {
             try
             {
-                return this._callService.getAllIVR();
+                return this._callService.getIvrNodes();
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+
+        }
+        [HttpGet("ivr/saveIvrNode")]
+
+        public BaseResponse saveIvrNode(IvrSettingVM model)
+        {
+            try
+            {
+                return this._callService.saveIvrNode(model);
             }
             catch (Exception ex)
             {

@@ -234,7 +234,7 @@ namespace Web.Services.Concrete
             return new BaseResponse { Status = HttpStatusCode.OK, Message = "IVR Returned", Body = treeViewItems };
         }
 
-        public BaseResponse getAllIVR() 
+        public BaseResponse getIvrNodes() 
         {
             var IVRs = _ivrSettings.Table.Where(x => x.IsDeleted != true).ToList();
             return new BaseResponse()
@@ -242,6 +242,51 @@ namespace Web.Services.Concrete
                 Status = HttpStatusCode.OK,
                 Message = "Data Found",
                 Body = IVRs
+            };
+        }
+        public BaseResponse saveIvrNode(IvrSettingVM model) 
+        {
+            var ivrNode = new Ivrsetting();
+            if (model.IvrId > 0)
+            {
+                 ivrNode = this._ivrSettings.Table.Where(i => i.IvrId == model.IvrId && !i.IsDeleted).FirstOrDefault();
+                if(ivrNode != null)
+                {
+                    ivrNode.IvrparentId = model.IvrparentId;
+                    ivrNode.OrganizationTypeIdFk = model.OrganizationTypeIdFk;
+                    ivrNode.Name = model.Name;
+                    ivrNode.Description = model.Description;
+                    ivrNode.KeyPress = model.KeyPress;
+                    ivrNode.Icon = model.Icon;
+                    ivrNode.ModifiedBy = model.ModifiedBy;
+                    ivrNode.ModifiedDate = DateTime.UtcNow;
+                    ivrNode.IsDeleted = false;
+                    this._ivrSettings.Update(ivrNode);
+                }
+
+            }
+            else
+            {
+                
+                ivrNode.IvrparentId = model.IvrparentId;
+                ivrNode.OrganizationTypeIdFk = model.OrganizationTypeIdFk;
+                ivrNode.Name = model.Name;
+                ivrNode.Description = model.Description;
+                ivrNode.KeyPress = model.KeyPress;
+                ivrNode.Icon = model.Icon;
+                ivrNode.CreatedBy = model.CreatedBy;
+                ivrNode.CreatedDate = DateTime.UtcNow;
+                ivrNode.ModifiedBy = model.ModifiedBy;
+                ivrNode.ModifiedDate = DateTime.UtcNow;
+                ivrNode.IsDeleted = false;
+                this._ivrSettings.Insert(ivrNode);
+            }
+            var IVRs = _ivrSettings.Table.Where(x => x.IsDeleted != true).ToList();
+            return new BaseResponse()
+            {
+                Status = HttpStatusCode.OK,
+                Message = "Node Saved",
+                Body = ivrNode
             };
         }
 
