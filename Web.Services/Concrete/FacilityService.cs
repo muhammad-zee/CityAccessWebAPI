@@ -364,7 +364,7 @@ namespace Web.Services.Concrete
                                 cHours.EndDate = item.EndDate;
                                 cHours.StartTime = item.StartTime;
                                 cHours.EndTime = item.EndTime;
-                                cHours.ModifiedDate = item.ModifiedDate;
+                                cHours.ModifiedDate = DateTime.UtcNow;
                                 cHours.ModifiedBy = item.ModifiedBy;
                                 ClinicalHour.Add(cHours);
                             }
@@ -377,7 +377,7 @@ namespace Web.Services.Concrete
                             {
                                 var clinicalHours = AutoMapperHelper.MapSingleRow<ClinicalHoursVM, ClinicalHour>(item);
                                 clinicalHours.OrganizationIdFk = org.OrganizationId;
-                                clinicalHours.CreatedDate = DateTime.Now;
+                                clinicalHours.CreatedDate = DateTime.UtcNow;
                                 ClinicalHour.Add(clinicalHours);
                             }
                             _clinicalHour.Insert(ClinicalHour);

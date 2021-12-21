@@ -176,7 +176,7 @@ namespace Web.API.Controllers
                 _logger.LogExceptions(ex);
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
-           
+
         }
 
         [HttpGet("ivr/getIvrNodes")]
@@ -194,13 +194,29 @@ namespace Web.API.Controllers
             }
 
         }
-        [HttpGet("ivr/saveIvrNode")]
 
-        public BaseResponse saveIvrNode(IvrSettingVM model)
+        [HttpPost("ivr/saveIvrNode")]
+        public BaseResponse saveIvrNode([FromBody] IvrSettingVM model)
         {
             try
             {
                 return this._callService.saveIvrNode(model);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+
+        }
+
+        [HttpGet("ivr/deleteIVRNode/{Id}/{userId}")]
+        public BaseResponse DeleteIVRNode(int Id, int userId)
+        {
+            try
+            {
+                return this._callService.DeleteIVRNode(Id, userId);
             }
             catch (Exception ex)
             {
