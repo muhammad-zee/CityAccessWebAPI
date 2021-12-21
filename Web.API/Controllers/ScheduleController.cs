@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Net;
@@ -10,6 +11,7 @@ using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Web.API.Helper;
 using Web.Model;
+using Web.Model.Common;
 using Web.Services.Interfaces;
 
 namespace Web.API.Controllers
@@ -26,6 +28,64 @@ namespace Web.API.Controllers
             this._hostEnvironment = environment;
             this._logger = new Logger(this._hostEnvironment);
             this._scheduleService = scheduleService;
+        }
+
+
+
+        [Description("Load Schedule")]
+        [Route("Schedule/LoadSchedule")]
+        [HttpPost, DisableRequestSizeLimit]
+        public ActionResult LoadSchedule([FromBody] EditParams param,bool readOnly = false)
+        {
+            try
+            {
+                List<ScheduleEventData> _list = new List<ScheduleEventData>();
+                ScheduleEventData obj = new ScheduleEventData();
+
+                obj.Id = 1;
+                obj.Subject = "Muhammad Masud";
+                obj.IsAllDay = false;
+                obj.StartTime = DateTime.Now;
+                obj.EndTime = DateTime.Now.AddHours(8);
+                obj.OwnerId = 1;
+                _list.Add(obj);
+
+                return Json(_list);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return Json("");
+            }
+        }
+
+        [Description("Update Schedule")]
+        [Route("Schedule/UpdateSchedule")]
+        [HttpPost, DisableRequestSizeLimit]
+        public ActionResult UpdateSchedule([FromBody] EditParams param)
+        {
+            try
+            {
+                List<ScheduleEventData> list = new List<ScheduleEventData>();
+                ScheduleEventData obj = new ScheduleEventData();
+
+                obj.Id = 1;
+                obj.Subject = "Muhammad Masud";
+                obj.IsAllDay = false;
+                obj.StartTime = DateTime.Now;
+                obj.EndTime = DateTime.Now.AddHours(10);
+                obj.OwnerId = 1;
+                list.Add(obj);
+
+                return Json(list);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return Json("");
+            }
         }
 
         [Description("Import Schedule")]
