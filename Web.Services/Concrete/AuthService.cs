@@ -219,8 +219,7 @@ namespace Web.Services.Concrete
                     {
                         fs.Write(register.UserImageByte);
                     }
-                    user.UserImage = targetPath.Replace(RootPath, "").Replace("\\", "/"); ;
-                    ;
+                    user.UserImage = targetPath.Replace(RootPath, "").Replace("\\", "/");
                 }
                 _userRepo.Update(user);
 
