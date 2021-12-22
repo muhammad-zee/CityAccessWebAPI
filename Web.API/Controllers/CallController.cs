@@ -219,5 +219,58 @@ namespace Web.API.Controllers
         }
 
         #endregion
+
+        #region IVR
+
+        [HttpGet("ivr/getAllIvrs")]
+        public BaseResponse getAllIvrs()
+        {
+            try
+            {
+                return this._callService.getAllIvrs();
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+
+        }
+
+        [HttpPost("ivr/saveIvr")]
+        public BaseResponse saveIVR([FromBody] IVRVM model)
+        {
+            try
+            {
+                return this._callService.saveIVR(model);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+
+        }
+
+        [HttpGet("ivr/deleteIVR/{Id}/{userId}")]
+        public BaseResponse DeleteIVR(int Id, int userId)
+        {
+            try
+            {
+                return this._callService.DeleteIVR(Id, userId);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+
+        }
+
+        #endregion
+
     }
 }

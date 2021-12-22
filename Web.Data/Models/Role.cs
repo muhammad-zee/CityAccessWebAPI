@@ -10,7 +10,6 @@ namespace Web.Data.Models
         public Role()
         {
             ComponentAccesses = new HashSet<ComponentAccess>();
-            OrganizationRoles = new HashSet<OrganizationRole>();
             UserAccesses = new HashSet<UserAccess>();
             UserRoles = new HashSet<UserRole>();
         }
@@ -26,7 +25,6 @@ namespace Web.Data.Models
         public bool IsDeleted { get; set; }
 
         public virtual ICollection<ComponentAccess> ComponentAccesses { get; set; }
-        public virtual ICollection<OrganizationRole> OrganizationRoles { get; set; }
         public virtual ICollection<UserAccess> UserAccesses { get; set; }
         public virtual ICollection<UserRole> UserRoles { get; set; }
     }

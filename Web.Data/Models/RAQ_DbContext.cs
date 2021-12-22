@@ -27,7 +27,6 @@ namespace Web.Data.Models
         public virtual DbSet<Ivrsetting> Ivrsettings { get; set; }
         public virtual DbSet<Organization> Organizations { get; set; }
         public virtual DbSet<OrganizationDepartment> OrganizationDepartments { get; set; }
-        public virtual DbSet<OrganizationRole> OrganizationRoles { get; set; }
         public virtual DbSet<Role> Roles { get; set; }
         public virtual DbSet<ServiceLine> ServiceLines { get; set; }
         public virtual DbSet<State> States { get; set; }
@@ -332,21 +331,6 @@ namespace Web.Data.Models
                     .HasForeignKey(d => d.OrganizationIdFk)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Organization_Department");
-            });
-
-            modelBuilder.Entity<OrganizationRole>(entity =>
-            {
-                entity.HasOne(d => d.OrganizationIdFkNavigation)
-                    .WithMany(p => p.OrganizationRoles)
-                    .HasForeignKey(d => d.OrganizationIdFk)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_Organization_Roles");
-
-                entity.HasOne(d => d.RoleIdFkNavigation)
-                    .WithMany(p => p.OrganizationRoles)
-                    .HasForeignKey(d => d.RoleIdFk)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_Organization_Roles1");
             });
 
             modelBuilder.Entity<Role>(entity =>

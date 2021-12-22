@@ -25,6 +25,7 @@ namespace Web.Services.Concrete
     {
         private readonly ICommunicationService _communicationService;
         private readonly IRepository<Ivrsetting> _ivrSettings;
+        private readonly IRepository<InteractiveVoiceResponse> _IVR;
         IConfiguration _config;
         private readonly UnitOfWork unitorWork;
         private string origin = "";
@@ -35,16 +36,15 @@ namespace Web.Services.Concrete
         private string Twillio_VoiceApiKeySecret;
 
 
-
-
-
         public CallService(IConfiguration config,
             ICommunicationService communicationService,
-            IRepository<Ivrsetting> ivrSettings)
+            IRepository<Ivrsetting> ivrSettings,
+            IRepository<InteractiveVoiceResponse> IVR)
         {
             this._config = config;
             this._communicationService = communicationService;
             this._ivrSettings = ivrSettings;
+            this._IVR = IVR;
             this.origin = this._config["Twilio:CallbackDomain"].ToString();
 
             //Twilio Credentials
@@ -303,6 +303,82 @@ namespace Web.Services.Concrete
                 _ivrSettings.Update(IVRNode);
 
                 var childNodes = _ivrSettings.Table.Where(x => x.IvrparentId == Id && x.IsDeleted != true).ToList();
+                childNodes.ForEach(x => { x.IsDeleted = true; x.ModifiedBy = userId; x.ModifiedDate = DateTime.UtcNow; });
+
+                _ivrSettings.Update(childNodes);
+
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Successfully Deleted" };
+            }
+            else
+            {
+                return new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "Record Not Found" };
+            }
+
+        }
+
+        #endregion
+
+
+        #region IVR
+
+        public BaseResponse getAllIvrs()
+        {
+            var IVRs = _IVR.Table.Where(x => x.IsDeleted != true).ToList();
+            return new BaseResponse()
+            {
+                Status = HttpStatusCode.OK,
+                Message = "Data Found",
+                Body = IVRs
+            };
+        }
+        public BaseResponse saveIVR(IVRVM model)
+        {
+            InteractiveVoiceResponse ivr = null;
+            if (model.IvrId > 0)
+            {
+                ivr = this._IVR.Table.Where(i => i.IvrId == model.IvrId && !i.IsDeleted).FirstOrDefault();
+                if (ivr != null)
+                {
+                    ivr.OrganizationTypeIdFk = model.OrganizationTypeIdFk;
+                    ivr.Name = model.Name;
+                    ivr.Description = model.Description;
+                    ivr.ModifiedBy = model.ModifiedBy;
+                    ivr.ModifiedDate = DateTime.UtcNow;
+                    ivr.IsDeleted = false;
+                    this._IVR.Update(ivr);
+                }
+
+            }
+            else
+            {
+                ivr = new InteractiveVoiceResponse();
+                ivr.OrganizationTypeIdFk = model.OrganizationTypeIdFk;
+                ivr.Name = model.Name;
+                ivr.Description = model.Description;
+                ivr.CreatedBy = model.CreatedBy;
+                ivr.CreatedDate = DateTime.UtcNow;
+                ivr.IsDeleted = false;
+                this._IVR.Insert(ivr);
+            }
+            return new BaseResponse()
+            {
+                Status = HttpStatusCode.OK,
+                Message = "Node Saved",
+                Body = ivr
+            };
+        }
+
+        public BaseResponse DeleteIVR(int Id, int userId)
+        {
+            var IVRNode = this._IVR.Table.Where(x => x.IvrId == Id && x.IsDeleted != true).FirstOrDefault();
+            if (IVRNode != null)
+            {
+                IVRNode.IsDeleted = true;
+                IVRNode.ModifiedBy = userId;
+                IVRNode.ModifiedDate = DateTime.UtcNow;
+                this._IVR.Update(IVRNode);
+
+                var childNodes = _ivrSettings.Table.Where(x => x.IvrIdFk == Id && x.IsDeleted != true).ToList();
                 childNodes.ForEach(x => { x.IsDeleted = true; x.ModifiedBy = userId; x.ModifiedDate = DateTime.UtcNow; });
 
                 _ivrSettings.Update(childNodes);

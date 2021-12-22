@@ -23,5 +23,15 @@ namespace Web.Services.Interfaces
         BaseResponse saveIvrNode(IvrSettingVM model);
         BaseResponse DeleteIVRNode(int Id, int userId);
 
+
+        #region IVR
+
+        BaseResponse getAllIvrs();
+        BaseResponse saveIVR(IVRVM model);
+        BaseResponse DeleteIVR(int Id, int userId);
+
+        #endregion
+
+
     }
 }
