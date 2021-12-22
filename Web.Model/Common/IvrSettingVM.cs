@@ -5,8 +5,8 @@ namespace Web.Model.Common
     public class IvrSettingVM
     {
         public int IvrSettingsId { get; set; }
+        public int IvrIdFk { get; set; }
         public int? IvrparentId { get; set; }
-        public int? OrganizationTypeIdFk { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public int? KeyPress { get; set; }

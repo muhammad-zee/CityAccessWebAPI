@@ -154,12 +154,13 @@ namespace Web.API.Controllers
 
 
         #region IVR Settings
-        [HttpGet("ivr/getIvrTree")]
-        public BaseResponse getIvrTree()
+
+        [HttpGet("ivr/getIvrTree/{Id}")]
+        public BaseResponse getIvrTree(int Id)
         {
             try
             {
-                return this._callService.getIvrTree();
+                return this._callService.getIvrTree(Id);
             }
             catch (Exception ex)
             {
@@ -170,12 +171,12 @@ namespace Web.API.Controllers
 
         }
 
-        [HttpGet("ivr/getIvrNodes")]
-        public BaseResponse getIvrNodes()
+        [HttpGet("ivr/getIvrNodes/{Id}")]
+        public BaseResponse getIvrNodes(int Id)
         {
             try
             {
-                return this._callService.getIvrNodes();
+                return this._callService.getIvrNodes(Id);
             }
             catch (Exception ex)
             {

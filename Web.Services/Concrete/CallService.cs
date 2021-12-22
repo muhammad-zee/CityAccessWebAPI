@@ -15,6 +15,8 @@ using Web.DLL;
 using Web.DLL.Generic_Repository;
 using Web.Model;
 using Web.Model.Common;
+using Web.Services.Enums;
+using Web.Services.Extensions;
 using Web.Services.Helper;
 using Web.Services.Interfaces;
 
@@ -26,6 +28,7 @@ namespace Web.Services.Concrete
         private readonly ICommunicationService _communicationService;
         private readonly IRepository<Ivrsetting> _ivrSettings;
         private readonly IRepository<InteractiveVoiceResponse> _IVR;
+        private IRepository<ControlListDetail> _controlListDetails;
         IConfiguration _config;
         private readonly UnitOfWork unitorWork;
         private string origin = "";
@@ -39,12 +42,14 @@ namespace Web.Services.Concrete
         public CallService(IConfiguration config,
             ICommunicationService communicationService,
             IRepository<Ivrsetting> ivrSettings,
-            IRepository<InteractiveVoiceResponse> IVR)
+            IRepository<InteractiveVoiceResponse> IVR,
+            IRepository<ControlListDetail> controlListDetails)
         {
             this._config = config;
             this._communicationService = communicationService;
             this._ivrSettings = ivrSettings;
             this._IVR = IVR;
+            this._controlListDetails = controlListDetails;
             this.origin = this._config["Twilio:CallbackDomain"].ToString();
 
             //Twilio Credentials
@@ -239,10 +244,44 @@ namespace Web.Services.Concrete
                 return new BaseResponse { Status = HttpStatusCode.NotFound, Message = "IVR Not Found" };
             }
         }
+        public BaseResponse getIvrTree(int Id)
+        {
+            var IvrSetting = this._ivrSettings.Table.Where(i => !i.IsDeleted && i.IvrIdFk == Id).ToList();
+            if (IvrSetting.Count() > 0)
+            {
+                var treeItems = IvrSetting.Select(x => new IvrTreeVM()
+                {
+                    key = x.IvrSettingsId.ToString(),
+                    ParentKey = x.IvrparentId,
+                    data = x.Description,
+                    label = x.Name,
+                    expandedIcon = x.Icon,
+                    collapsedIcon = x.Icon,
+                    KeyPress = x.KeyPress,
+                    expanded = true
+                }).ToList();
+                var treeViewItems = treeItems.BuildIvrTree();
+                return new BaseResponse { Status = HttpStatusCode.OK, Message = "IVR Returned", Body = treeViewItems };
+            }
+            else
+            {
+                return new BaseResponse { Status = HttpStatusCode.NotFound, Message = "IVR Not Found" };
+            }
+        }
 
         public BaseResponse getIvrNodes()
         {
             var IVRs = _ivrSettings.Table.Where(x => x.IsDeleted != true).ToList();
+            return new BaseResponse()
+            {
+                Status = HttpStatusCode.OK,
+                Message = "Data Found",
+                Body = IVRs
+            };
+        }
+        public BaseResponse getIvrNodes(int Id)
+        {
+            var IVRs = _ivrSettings.Table.Where(x => x.IsDeleted != true && x.IvrIdFk == Id).ToList();
             return new BaseResponse()
             {
                 Status = HttpStatusCode.OK,
@@ -258,6 +297,7 @@ namespace Web.Services.Concrete
                 ivrNode = this._ivrSettings.Table.Where(i => i.IvrSettingsId == model.IvrSettingsId && !i.IsDeleted).FirstOrDefault();
                 if (ivrNode != null)
                 {
+                    ivrNode.IvrIdFk = model.IvrIdFk;
                     ivrNode.IvrparentId = model.IvrparentId;
                     ivrNode.Name = model.Name;
                     ivrNode.Description = model.Description;
@@ -272,6 +312,7 @@ namespace Web.Services.Concrete
             else
             {
                 ivrNode = new Ivrsetting();
+                ivrNode.IvrIdFk = model.IvrIdFk;
                 ivrNode.IvrparentId = model.IvrparentId == 0 ? null : model.IvrparentId;
                 ivrNode.Name = model.Name;
                 ivrNode.Description = model.Description;
@@ -324,11 +365,14 @@ namespace Web.Services.Concrete
         public BaseResponse getAllIvrs()
         {
             var IVRs = _IVR.Table.Where(x => x.IsDeleted != true).ToList();
+            var types = _controlListDetails.Table.Where(x => x.ControlListIdFk == UCLEnums.OrgType.ToInt()).Select(x => new { x.ControlListDetailId, x.Title });
+            var IVRVMs = AutoMapperHelper.MapList<InteractiveVoiceResponse, IVRVM>(IVRs);
+            IVRVMs.ForEach(x => x.OrganizationType = types.Where(t => t.ControlListDetailId == x.OrganizationTypeIdFk).Select(ty => ty.Title).FirstOrDefault());
             return new BaseResponse()
             {
                 Status = HttpStatusCode.OK,
                 Message = "Data Found",
-                Body = IVRs
+                Body = IVRVMs
             };
         }
         public BaseResponse saveIVR(IVRVM model)

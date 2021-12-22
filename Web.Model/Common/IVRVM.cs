@@ -14,5 +14,7 @@ namespace Web.Model.Common
         public bool IsDeleted { get; set; }
         public int OrganizationTypeIdFk { get; set; }
 
+        public string OrganizationType { get; set; }
+
     }
 }
