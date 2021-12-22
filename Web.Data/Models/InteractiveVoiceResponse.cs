@@ -20,6 +20,7 @@ namespace Web.Data.Models
         public int? ModifiedBy { get; set; }
         public DateTime? ModifiedDate { get; set; }
         public bool IsDeleted { get; set; }
+        public int OrganizationTypeIdFk { get; set; }
 
         public virtual ICollection<Ivrsetting> Ivrsettings { get; set; }
     }
