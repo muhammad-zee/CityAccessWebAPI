@@ -94,6 +94,7 @@ namespace Web.Services.Concrete
         public BaseResponse GetServicesByOrganizationId(int OrganizationId)
         {
             var services = _dbContext.LoadStoredProc("raq_getAllServicesByOrganizationId")
+                .WithSqlParam("@pOrganizationId", OrganizationId)
             .ExecuteStoredProc<ServiceLineVM>().Result.ToList();
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Found", Body = services };
 
