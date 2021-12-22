@@ -4,7 +4,7 @@ namespace Web.Model.Common
 {
     public class ServiceLineVM
     {
-        public int ServiceId { get; set; }
+        public int ServiceLineId { get; set; }
         public string ServiceName { get; set; }
         public int? ServiceType { get; set; }
         public int CreatedBy { get; set; }

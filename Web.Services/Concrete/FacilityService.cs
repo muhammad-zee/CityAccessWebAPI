@@ -79,7 +79,7 @@ namespace Web.Services.Concrete
                                 where idsList.Contains(ds.DepartmentIdFk) && s.IsDeleted != true
                                 select new ServiceLineVM()
                                 {
-                                    ServiceId = s.ServiceLineId,
+                                    ServiceLineId = s.ServiceLineId,
                                     ServiceName = s.ServiceName,
                                     DepartmentIdFk = ds.DepartmentIdFk
                                 }).DistinctBy(x => x.ServiceName).ToList();
@@ -91,13 +91,20 @@ namespace Web.Services.Concrete
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Select at least one Department" };
             }
         }
+        public BaseResponse GetServicesByOrganizationId(int OrganizationId)
+        {
+            var services = _dbContext.LoadStoredProc("raq_getAllServicesByOrganizationId")
+            .ExecuteStoredProc<ServiceLineVM>().Result.ToList();
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Found", Body = services };
+
+        }
 
         public BaseResponse AddOrUpdateServiceLine(ServiceLineVM serviceLine)
         {
             BaseResponse response = null;
-            if (serviceLine.ServiceId > 0)
+            if (serviceLine.ServiceLineId > 0)
             {
-                var service = _serviceRepo.Table.Where(x => x.IsDeleted != true && x.ServiceLineId == serviceLine.ServiceId).FirstOrDefault();
+                var service = _serviceRepo.Table.Where(x => x.IsDeleted != true && x.ServiceLineId == serviceLine.ServiceLineId).FirstOrDefault();
                 if (service != null)
                 {
                     service.ServiceName = serviceLine.ServiceName;
@@ -152,7 +159,7 @@ namespace Web.Services.Concrete
                                where dpts.Select(x => x.DepartmentId).Contains(ds.DepartmentIdFk) && s.IsDeleted != true
                                select new ServiceLineVM()
                                {
-                                   ServiceId = s.ServiceLineId,
+                                   ServiceLineId = s.ServiceLineId,
                                    ServiceName = s.ServiceName,
                                    ServiceType = s.ServiceType,
                                    CreatedBy = s.CreatedBy,

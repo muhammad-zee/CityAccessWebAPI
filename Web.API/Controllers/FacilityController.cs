@@ -75,6 +75,20 @@ namespace Web.API.Controllers
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
         }
+        [Description("Get Services By Ids")]
+        [HttpGet("service/GetServicesByOrganizationId/{OrganizationId}")]
+        public BaseResponse GetServicesByOrganizationId(int OrganizationId)
+        {
+            try
+            {
+                var res = _facilityService.GetServicesByOrganizationId(OrganizationId);
+                return res;
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
 
         [Description("Add Or Update Service Line")]
         [HttpPost("service/AddOrUpdateServiceLine")]
