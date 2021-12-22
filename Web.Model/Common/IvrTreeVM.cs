@@ -17,7 +17,6 @@ namespace Web.Model.Common
         public int? ParentKey { get; set; }
         public int? KeyPress { get; set; }
         public bool expanded { get;set;}
-        public int? organizationTypeIdFk { get; set; }
         public IList<IvrTreeVM> children { get; set; }
         
     }

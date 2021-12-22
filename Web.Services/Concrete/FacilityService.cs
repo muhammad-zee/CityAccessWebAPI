@@ -60,7 +60,7 @@ namespace Web.Services.Concrete
 
         public BaseResponse GetServiceLineById(int Id)
         {
-            var serviceLine = _serviceRepo.Table.Where(x => x.ServiceId == Id && x.IsDeleted == false).FirstOrDefault();
+            var serviceLine = _serviceRepo.Table.Where(x => x.ServiceLineId == Id && x.IsDeleted == false).FirstOrDefault();
             return new BaseResponse()
             {
                 Status = HttpStatusCode.OK,
@@ -75,11 +75,11 @@ namespace Web.Services.Concrete
             {
                 var idsList = Ids.ToIntList();
                 var services = (from ds in _departmentServiceRepo.Table
-                                join s in _serviceRepo.Table on ds.ServiceIdFk equals s.ServiceId
+                                join s in _serviceRepo.Table on ds.ServiceIdFk equals s.ServiceLineId
                                 where idsList.Contains(ds.DepartmentIdFk) && s.IsDeleted != true
                                 select new ServiceLineVM()
                                 {
-                                    ServiceId = s.ServiceId,
+                                    ServiceId = s.ServiceLineId,
                                     ServiceName = s.ServiceName,
                                     DepartmentIdFk = ds.DepartmentIdFk
                                 }).DistinctBy(x => x.ServiceName).ToList();
@@ -97,7 +97,7 @@ namespace Web.Services.Concrete
             BaseResponse response = null;
             if (serviceLine.ServiceId > 0)
             {
-                var service = _serviceRepo.Table.Where(x => x.IsDeleted != true && x.ServiceId == serviceLine.ServiceId).FirstOrDefault();
+                var service = _serviceRepo.Table.Where(x => x.IsDeleted != true && x.ServiceLineId == serviceLine.ServiceId).FirstOrDefault();
                 if (service != null)
                 {
                     service.ServiceName = serviceLine.ServiceName;
@@ -123,7 +123,7 @@ namespace Web.Services.Concrete
 
         public BaseResponse DeleteServiceLine(int Id, int userId)
         {
-            var service = _serviceRepo.Table.Where(x => x.ServiceId == Id).FirstOrDefault();
+            var service = _serviceRepo.Table.Where(x => x.ServiceLineId == Id).FirstOrDefault();
             if (service != null)
             {
                 service.IsDeleted = true;
@@ -148,11 +148,11 @@ namespace Web.Services.Concrete
             var departments = _departmentRepo.Table.Where(x => x.IsDeleted != true).ToList();
             var dpts = AutoMapperHelper.MapList<Department, DepartmentVM>(departments);
             var dptServices = (from ds in _departmentServiceRepo.Table
-                               join s in _serviceRepo.Table on ds.ServiceIdFk equals s.ServiceId
+                               join s in _serviceRepo.Table on ds.ServiceIdFk equals s.ServiceLineId
                                where dpts.Select(x => x.DepartmentId).Contains(ds.DepartmentIdFk) && s.IsDeleted != true
                                select new ServiceLineVM()
                                {
-                                   ServiceId = s.ServiceId,
+                                   ServiceId = s.ServiceLineId,
                                    ServiceName = s.ServiceName,
                                    ServiceType = s.ServiceType,
                                    CreatedBy = s.CreatedBy,

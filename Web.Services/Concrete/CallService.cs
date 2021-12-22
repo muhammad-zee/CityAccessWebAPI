@@ -222,15 +222,14 @@ namespace Web.Services.Concrete
             {
                 var treeItems = IvrSetting.Select(x => new IvrTreeVM()
                 {
-                    key = x.IvrId.ToString(),
+                    key = x.IvrSettingsId.ToString(),
                     ParentKey = x.IvrparentId,
                     data = x.Description,
                     label = x.Name,
                     expandedIcon = x.Icon,
                     collapsedIcon = x.Icon,
                     KeyPress = x.KeyPress,
-                    expanded = true,
-                    organizationTypeIdFk = x.OrganizationTypeIdFk
+                    expanded = true
                 }).ToList();
                 var treeViewItems = treeItems.BuildIvrTree();
                 return new BaseResponse { Status = HttpStatusCode.OK, Message = "IVR Returned", Body = treeViewItems };
@@ -254,13 +253,12 @@ namespace Web.Services.Concrete
         public BaseResponse saveIvrNode(IvrSettingVM model) 
         {
             Ivrsetting ivrNode = null;
-            if (model.IvrId > 0)
+            if (model.IvrSettingsId > 0)
             {
-                 ivrNode = this._ivrSettings.Table.Where(i => i.IvrId == model.IvrId && !i.IsDeleted).FirstOrDefault();
+                 ivrNode = this._ivrSettings.Table.Where(i => i.IvrSettingsId == model.IvrSettingsId && !i.IsDeleted).FirstOrDefault();
                 if(ivrNode != null)
                 {
                     ivrNode.IvrparentId = model.IvrparentId;
-                    ivrNode.OrganizationTypeIdFk = model.OrganizationTypeIdFk;
                     ivrNode.Name = model.Name;
                     ivrNode.Description = model.Description;
                     ivrNode.KeyPress = model.KeyPress;
@@ -275,7 +273,6 @@ namespace Web.Services.Concrete
             {
                 ivrNode = new Ivrsetting();
                 ivrNode.IvrparentId = model.IvrparentId == 0 ? null : model.IvrparentId;
-                ivrNode.OrganizationTypeIdFk = model.OrganizationTypeIdFk;
                 ivrNode.Name = model.Name;
                 ivrNode.Description = model.Description;
                 ivrNode.KeyPress = model.KeyPress;
@@ -297,7 +294,7 @@ namespace Web.Services.Concrete
 
         public BaseResponse DeleteIVRNode(int Id, int userId) 
         {
-            var IVRNode = _ivrSettings.Table.Where(x => x.IvrId == Id && x.IsDeleted != true).FirstOrDefault();
+            var IVRNode = _ivrSettings.Table.Where(x => x.IvrSettingsId == Id && x.IsDeleted != true).FirstOrDefault();
             if (IVRNode != null)
             {
                 IVRNode.IsDeleted = true;

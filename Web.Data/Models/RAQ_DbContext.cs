@@ -25,6 +25,7 @@ namespace Web.Data.Models
         public virtual DbSet<Department> Departments { get; set; }
         public virtual DbSet<DepartmentService> DepartmentServices { get; set; }
         public virtual DbSet<ElmahError> ElmahErrors { get; set; }
+        public virtual DbSet<InteractiveVoiceResponse> InteractiveVoiceResponses { get; set; }
         public virtual DbSet<Ivrsetting> Ivrsettings { get; set; }
         public virtual DbSet<Organization> Organizations { get; set; }
         public virtual DbSet<OrganizationDepartment> OrganizationDepartments { get; set; }
@@ -63,7 +64,12 @@ namespace Web.Data.Models
                 entity.HasOne(d => d.OrganizationIdFkNavigation)
                     .WithMany(p => p.ClinicalHours)
                     .HasForeignKey(d => d.OrganizationIdFk)
-                    .HasConstraintName("FK_ClinicalHours_Organizations");
+                    .HasConstraintName("FK_ClinicalHours");
+
+                entity.HasOne(d => d.ServicelineIdFkNavigation)
+                    .WithMany(p => p.ClinicalHours)
+                    .HasForeignKey(d => d.ServicelineIdFk)
+                    .HasConstraintName("FK_ClinicalHours_ServiceLine");
             });
 
             modelBuilder.Entity<Component>(entity =>
@@ -231,9 +237,31 @@ namespace Web.Data.Models
                     .HasMaxLength(50);
             });
 
-            modelBuilder.Entity<Ivrsetting>(entity =>
+            modelBuilder.Entity<InteractiveVoiceResponse>(entity =>
             {
                 entity.HasKey(e => e.IvrId)
+                    .HasName("PK_dbo.IVResponse");
+
+                entity.ToTable("InteractiveVoiceResponse");
+
+                entity.Property(e => e.CreatedDate)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.Description)
+                    .IsRequired()
+                    .HasMaxLength(100);
+
+                entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(50);
+            });
+
+            modelBuilder.Entity<Ivrsetting>(entity =>
+            {
+                entity.HasKey(e => e.IvrSettingsId)
                     .HasName("PK_dbo.InteractiveVoiceResponse");
 
                 entity.ToTable("IVRSettings");
@@ -255,6 +283,12 @@ namespace Web.Data.Models
                 entity.Property(e => e.Name)
                     .IsRequired()
                     .HasMaxLength(50);
+
+                entity.HasOne(d => d.IvrIdFkNavigation)
+                    .WithMany(p => p.Ivrsettings)
+                    .HasForeignKey(d => d.IvrIdFk)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_IVRSettings_InteractiveVoiceResponse");
             });
 
             modelBuilder.Entity<Organization>(entity =>
@@ -320,9 +354,6 @@ namespace Web.Data.Models
 
             modelBuilder.Entity<ServiceLine>(entity =>
             {
-                entity.HasKey(e => e.ServiceId)
-                    .HasName("ServiceId");
-
                 entity.ToTable("ServiceLine");
 
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");
