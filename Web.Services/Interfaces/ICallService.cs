@@ -1,7 +1,6 @@
 ﻿using System;
 using Twilio.AspNet.Core;
 using Twilio.Rest.Api.V2010.Account;
-using Web.Data.Models;
 using Web.Model;
 using Web.Model.Common;
 

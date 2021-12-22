@@ -1,15 +1,12 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.ComponentModel;
 using System.Net;
 using Web.API.Helper;
-using Web.Data.Models;
 using Web.Model;
 using Web.Model.Common;
-using Web.Services.Helper;
 using Web.Services.Interfaces;
 
 namespace Web.API.Controllers

@@ -1,5 +1,4 @@
-﻿using Web.Data.Models;
-using Web.Model;
+﻿using Web.Model;
 using Web.Model.Common;
 
 namespace Web.Services.Interfaces

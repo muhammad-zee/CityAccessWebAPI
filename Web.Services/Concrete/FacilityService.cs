@@ -1,5 +1,4 @@
-﻿using AutoMapper.Configuration;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -365,7 +364,7 @@ namespace Web.Services.Concrete
                         foreach (var item in organization.ClinicalHours.Where(x => x.ClinicalHourId != 0))
                         {
                             var cHours = org.ClinicalHours.Where(x => x.OrganizationIdFk == organization.OrganizationId && x.IsDeleted != true).FirstOrDefault();
-                            if (cHours != null) 
+                            if (cHours != null)
                             {
                                 cHours.WeekDayIdFk = item.WeekDayIdFk;
                                 cHours.StartDate = item.StartDate;
@@ -378,7 +377,7 @@ namespace Web.Services.Concrete
                             }
                         }
                         _clinicalHour.Update(ClinicalHour);
-                        if (organization.ClinicalHours.Where(x => x.ClinicalHourId == 0).Count() > 0) 
+                        if (organization.ClinicalHours.Where(x => x.ClinicalHourId == 0).Count() > 0)
                         {
                             ClinicalHour = new List<ClinicalHour>();
                             foreach (var item in organization.ClinicalHours.Where(x => x.ClinicalHourId == 0))
@@ -411,7 +410,7 @@ namespace Web.Services.Concrete
                 }
                 _organizationDepartmentRepo.Insert(orgDpt);
 
-                if (organization.ClinicalHours != null &&  organization.ClinicalHours.Count() > 0)
+                if (organization.ClinicalHours != null && organization.ClinicalHours.Count() > 0)
                 {
                     List<ClinicalHour> ClinicalHour = new List<ClinicalHour>();
                     foreach (var item in organization.ClinicalHours)

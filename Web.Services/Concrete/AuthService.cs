@@ -67,7 +67,7 @@ namespace Web.Services.Concrete
                         {
                             randomString = HelperExtension.CreateRandomString();
                         }
-                            user.UserUniqueId = randomString;
+                        user.UserUniqueId = randomString;
                         this._userRepo.Update(user);
                     }
 
@@ -255,7 +255,7 @@ namespace Web.Services.Concrete
                     if (alreadyExist == null)
                     {
                         var randomString = HelperExtension.CreateRandomString();
-                        while(_userRepo.Table.Count(u=>u.UserUniqueId == randomString && !u.IsDeleted) > 0)
+                        while (_userRepo.Table.Count(u => u.UserUniqueId == randomString && !u.IsDeleted) > 0)
                         {
                             randomString = HelperExtension.CreateRandomString();
                         }
@@ -359,9 +359,9 @@ namespace Web.Services.Concrete
                         }
                     }
                     //string siteUrl = _config["siteUrl"];
-                    string hashUserName = Encryption.encryptData(user.UserName , this._encryptionKey);
+                    string hashUserName = Encryption.encryptData(user.UserName, this._encryptionKey);
                     string mailMessageTemplate = $"<b>Hi! {MrOrMrs} {Name},</b> <br />" +
-                        $"<p>Please <a href='{url +"/" + hashUserName}' target='_blank'>Click here</a> to reset your password.</p> <br />" +
+                        $"<p>Please <a href='{url + "/" + hashUserName}' target='_blank'>Click here</a> to reset your password.</p> <br />" +
                         $"<p>If you didn’t ask to reset your password, you can ignore this email.</p> <br /><br />" +
                         $"<p>Thank You!</p>";
                     this._communicationService.SendEmail(user.PrimaryEmail, "Reset Password", mailMessageTemplate, null);

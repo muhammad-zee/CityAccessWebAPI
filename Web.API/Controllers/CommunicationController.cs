@@ -3,16 +3,10 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
 using System.Net;
-using System.Reflection;
-using System.Threading.Tasks;
 using Web.API.Helper;
 using Web.Model;
 using Web.Model.Common;
-using Web.Services.Enums;
 using Web.Services.Interfaces;
 
 namespace Web.API.Controllers
@@ -38,7 +32,7 @@ namespace Web.API.Controllers
             {
                 return this._communicaitonService.generateConversationToken(Identity);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 ElmahExtensions.RiseError(ex);
                 _logger.LogExceptions(ex);
@@ -53,7 +47,7 @@ namespace Web.API.Controllers
             {
                 return this._communicaitonService.sendPushNotification(msg);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 ElmahExtensions.RiseError(ex);
                 _logger.LogExceptions(ex);
@@ -67,7 +61,7 @@ namespace Web.API.Controllers
             {
                 return this._communicaitonService.saveUserChannelSid(UserId, ChannelSid);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 ElmahExtensions.RiseError(ex);
                 _logger.LogExceptions(ex);
@@ -79,9 +73,9 @@ namespace Web.API.Controllers
         {
             try
             {
-                return this._communicaitonService.delateChatChannel( ChannelSid);
+                return this._communicaitonService.delateChatChannel(ChannelSid);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 ElmahExtensions.RiseError(ex);
                 _logger.LogExceptions(ex);

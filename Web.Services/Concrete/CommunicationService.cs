@@ -12,7 +12,6 @@ using Twilio.AspNet.Common;
 using Twilio.Jwt.AccessToken;
 using Twilio.Rest.Api.V2010.Account;
 using Twilio.Rest.Chat.V2.Service;
-using Twilio.Rest.Conversations.V1.Service;
 using Twilio.Types;
 using Web.Data.Models;
 using Web.DLL.Generic_Repository;
@@ -43,7 +42,7 @@ namespace Web.Services.Concrete
         private readonly IRepository<User> _userRepo;
         public CommunicationService(IConfiguration config, IRepository<User> userRepo)
         {
-          
+
             this._config = config;
             this.Twilio_AccountSid = this._config["Twilio:AccountSid"].ToString();
             this.Twilio_AuthToken = this._config["Twilio:AuthToken"].ToString();
@@ -229,14 +228,14 @@ namespace Web.Services.Concrete
             BaseResponse response = new BaseResponse();
 
             var user = this._userRepo.Table.FirstOrDefault(u => u.UserId == UserId && !u.IsDeleted);
-            if(user!= null)
+            if (user != null)
             {
                 user.UserChannelSid = ChannelSid;
                 this._userRepo.Update(user);
             }
             response.Status = HttpStatusCode.OK;
             response.Message = "Notificaiton Channel Saved Successfully";
-            response.Body = new { UserId=UserId,UserChannelSid = ChannelSid };
+            response.Body = new { UserId = UserId, UserChannelSid = ChannelSid };
             return response;
         }
 
@@ -248,7 +247,7 @@ namespace Web.Services.Concrete
             {
                 //var delete = ChannelResource.Delete(pathServiceSid: this.Twilio_ChatServiceSid, pathSid: ch.Sid);
             }
-            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Channels Deleted"};
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Channels Deleted" };
         }
 
         #endregion

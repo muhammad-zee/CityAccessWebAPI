@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace Web.Model.Common
 {
@@ -16,9 +12,9 @@ namespace Web.Model.Common
         public string collapsedIcon { get; set; }
         public int? ParentKey { get; set; }
         public int? KeyPress { get; set; }
-        public bool expanded { get;set;}
+        public bool expanded { get; set; }
         public IList<IvrTreeVM> children { get; set; }
-        
+
     }
-   
+
 }

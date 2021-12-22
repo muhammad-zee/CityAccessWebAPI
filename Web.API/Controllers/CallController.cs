@@ -1,23 +1,14 @@
 ﻿using ElmahCore;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
 using System.Net;
-using System.Reflection;
-using System.Threading.Tasks;
 using Twilio.AspNet.Core;
 using Twilio.Rest.Api.V2010.Account;
-using Twilio.TwiML;
 using Web.API.Helper;
-using Web.Data.Models;
 using Web.Model;
 using Web.Model.Common;
-using Web.Services.Enums;
 using Web.Services.Interfaces;
 
 namespace Web.API.Controllers

@@ -21,7 +21,7 @@ using Web.Services.Interfaces;
 
 namespace Web.Services.Concrete
 {
-    public class CallService : TwilioController,ICallService
+    public class CallService : TwilioController, ICallService
     {
         private readonly ICommunicationService _communicationService;
         private readonly IRepository<Ivrsetting> _ivrSettings;
@@ -45,7 +45,7 @@ namespace Web.Services.Concrete
             this._config = config;
             this._communicationService = communicationService;
             this._ivrSettings = ivrSettings;
-            this.origin= this._config["Twilio:CallbackDomain"].ToString();
+            this.origin = this._config["Twilio:CallbackDomain"].ToString();
 
             //Twilio Credentials
             this.Twilio_AccountSid = this._config["Twilio:AccountSid"].ToString();
@@ -148,9 +148,9 @@ namespace Web.Services.Concrete
             //var GatherResponseUrl = $"https://" + origin + "/AutomatedCall/PatientResponse?PatientID=" + PatientID + "&AppointmentID=" + AppointmentID + "&Price=" + Price;
             var GatherResponseUrl = $"{origin}/Call/PromptResponse";
 
-            var gather = new Gather(numDigits: 1, timeout: 10, action: new Uri(GatherResponseUrl)).Pause(length:3)
+            var gather = new Gather(numDigits: 1, timeout: 10, action: new Uri(GatherResponseUrl)).Pause(length: 3)
                                           .Say("Press one to do  talk to Bilal.", language: "en").Pause(length: 1)
-                                          .Say("Press two to talk to an Zee.", language: "en").Pause(length:1)
+                                          .Say("Press two to talk to an Zee.", language: "en").Pause(length: 1)
                                           .Say("Press three to send voice mail");
             response.Append(gather);
             response.Say("You did not press any key,\n good bye.!");
@@ -170,7 +170,7 @@ namespace Web.Services.Concrete
             {
                 response.Say("sorry to say zee is not here. we will get back to you when zee will be back");
             }
-            else if(QueryDigit == 3)
+            else if (QueryDigit == 3)
             {
                 var RecordUrl = $"{origin}/Call/ReceiveVoicemail";
 
@@ -234,13 +234,13 @@ namespace Web.Services.Concrete
                 var treeViewItems = treeItems.BuildIvrTree();
                 return new BaseResponse { Status = HttpStatusCode.OK, Message = "IVR Returned", Body = treeViewItems };
             }
-            else 
+            else
             {
                 return new BaseResponse { Status = HttpStatusCode.NotFound, Message = "IVR Not Found" };
-            } 
+            }
         }
 
-        public BaseResponse getIvrNodes() 
+        public BaseResponse getIvrNodes()
         {
             var IVRs = _ivrSettings.Table.Where(x => x.IsDeleted != true).ToList();
             return new BaseResponse()
@@ -250,13 +250,13 @@ namespace Web.Services.Concrete
                 Body = IVRs
             };
         }
-        public BaseResponse saveIvrNode(IvrSettingVM model) 
+        public BaseResponse saveIvrNode(IvrSettingVM model)
         {
             Ivrsetting ivrNode = null;
             if (model.IvrSettingsId > 0)
             {
-                 ivrNode = this._ivrSettings.Table.Where(i => i.IvrSettingsId == model.IvrSettingsId && !i.IsDeleted).FirstOrDefault();
-                if(ivrNode != null)
+                ivrNode = this._ivrSettings.Table.Where(i => i.IvrSettingsId == model.IvrSettingsId && !i.IsDeleted).FirstOrDefault();
+                if (ivrNode != null)
                 {
                     ivrNode.IvrparentId = model.IvrparentId;
                     ivrNode.Name = model.Name;
@@ -292,7 +292,7 @@ namespace Web.Services.Concrete
             };
         }
 
-        public BaseResponse DeleteIVRNode(int Id, int userId) 
+        public BaseResponse DeleteIVRNode(int Id, int userId)
         {
             var IVRNode = _ivrSettings.Table.Where(x => x.IvrSettingsId == Id && x.IsDeleted != true).FirstOrDefault();
             if (IVRNode != null)
@@ -309,11 +309,11 @@ namespace Web.Services.Concrete
 
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Successfully Deleted" };
             }
-            else 
+            else
             {
                 return new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "Record Not Found" };
             }
-        
+
         }
 
         #endregion

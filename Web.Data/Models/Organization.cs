@@ -11,6 +11,7 @@ namespace Web.Data.Models
         {
             ClinicalHours = new HashSet<ClinicalHour>();
             OrganizationDepartments = new HashSet<OrganizationDepartment>();
+            OrganizationRoles = new HashSet<OrganizationRole>();
         }
 
         public int OrganizationId { get; set; }
@@ -34,5 +35,6 @@ namespace Web.Data.Models
 
         public virtual ICollection<ClinicalHour> ClinicalHours { get; set; }
         public virtual ICollection<OrganizationDepartment> OrganizationDepartments { get; set; }
+        public virtual ICollection<OrganizationRole> OrganizationRoles { get; set; }
     }
 }

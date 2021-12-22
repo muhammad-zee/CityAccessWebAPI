@@ -39,7 +39,7 @@ namespace Web.API.Controllers
 
         [Description("Get Label Counts")]
         [HttpGet("admin/GetLabelCounts")]
-        public BaseResponse GetLabelCounts() 
+        public BaseResponse GetLabelCounts()
         {
             try
             {
