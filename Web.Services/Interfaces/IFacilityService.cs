@@ -10,6 +10,7 @@ namespace Web.Services.Interfaces
         BaseResponse GetAllServiceLines();
         BaseResponse GetServiceLineById(int Id);
         BaseResponse GetServicesByIds(string Ids);
+        BaseResponse GetServicesByOrganizationId(int OrganizationId);
         BaseResponse AddOrUpdateServiceLine(ServiceLineVM serviceLine);
         BaseResponse DeleteServiceLine(int Id, int userId);
         #endregion
