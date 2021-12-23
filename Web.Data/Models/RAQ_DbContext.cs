@@ -33,6 +33,7 @@ namespace Web.Data.Models
         public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<UserAccess> UserAccesses { get; set; }
         public virtual DbSet<UserRole> UserRoles { get; set; }
+        public virtual DbSet<UsersRelation> UsersRelations { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -489,6 +490,21 @@ namespace Web.Data.Models
                     .HasForeignKey(d => d.UserIdFk)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_UserRoles_Users");
+            });
+
+            modelBuilder.Entity<UsersRelation>(entity =>
+            {
+                entity.ToTable("UsersRelation");
+
+                entity.Property(e => e.CreatedDate)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.IsActive)
+                    .IsRequired()
+                    .HasDefaultValueSql("((1))");
+
+                entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
             });
 
             OnModelCreatingPartial(modelBuilder);

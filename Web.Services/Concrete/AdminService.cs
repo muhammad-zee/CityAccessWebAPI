@@ -28,6 +28,7 @@ namespace Web.Services.Concrete
         private IRepository<UserRole> _userRole;
         private IRepository<ControlList> _controlList;
         private IRepository<ControlListDetail> _controlListDetails;
+        private readonly IRepository<UsersRelation> _userRelationRepo;
         IConfiguration _config;
         public AdminService(RAQ_DbContext dbContext,
             IConfiguration config,
@@ -37,6 +38,7 @@ namespace Web.Services.Concrete
             IRepository<Role> role,
             IRepository<UserRole> userRole,
             IRepository<UserAccess> userAccess,
+            IRepository<UsersRelation> userRelationRepo,
             IRepository<ControlList> controlList,
             IRepository<ControlListDetail> controlListDetails)
         {
@@ -49,6 +51,7 @@ namespace Web.Services.Concrete
             this._role = role;
             this._userRole = userRole;
             this._userAccess = userAccess;
+            this._userRelationRepo = userRelationRepo;
             this._controlList = controlList;
             this._controlListDetails = controlListDetails;
         }
@@ -73,6 +76,7 @@ namespace Web.Services.Concrete
         {
             var result = _user.Table.Where(x => x.IsDeleted == false).ToList();
             var users = AutoMapperHelper.MapList<User, RegisterCredentialVM>(result);
+            var userRelationIds = this._userRelationRepo.GetList();
             var genders = _controlListDetails.Table.Where(x => x.ControlListIdFk == UCLEnums.Genders.ToInt()).Select(x => new { x.ControlListDetailId, x.Title });
             foreach (var item in users)
             {
@@ -80,6 +84,10 @@ namespace Web.Services.Concrete
                 item.GenderId = Convert.ToInt32(item.Gender);
                 item.Gender = genders.Where(x => x.ControlListDetailId == item.GenderId).Select(x => x.Title).FirstOrDefault();
                 item.UserImage = String.IsNullOrEmpty(item.UserImage) ? "" : item.UserImage.Replace(Directory.GetCurrentDirectory() + "/", "");
+
+                item.OrgIdsList = userRelationIds.Where(x => x.UserIdFk == item.UserId).Select(x => x.OrganizationIdFk).ToList();
+                item.DptIdsList = userRelationIds.Where(x => x.UserIdFk == item.UserId).Select(x => x.DepartmentIdFk).ToList();
+                item.ServiceLineIdsList = userRelationIds.Where(x => x.UserIdFk == item.UserId).Select(x => x.ServiceLineIdFk).ToList();
             }
             return new BaseResponse { Status = HttpStatusCode.OK, Message = "Users List Returned", Body = users };
         }

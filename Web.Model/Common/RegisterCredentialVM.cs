@@ -41,6 +41,15 @@ namespace Web.Model.Common
         public byte[] UserImageByte { get; set; }
         public string UserImage { get; set; } = "";
         public string RoleIds { get; set; } = "";
+        public string orgIds { get; set; } = "";
+        public string dptIds { get; set; } = "";
+        public string serviceIds { get; set; } = "";
+
+        public List<int> OrgIdsList { get; set; }
+        public List<int> DptIdsList { get; set; }
+        public List<int> ServiceLineIdsList { get; set; }
+
+
         public List<UserRoleVM> UserRole { get; set; }
     }
 }
