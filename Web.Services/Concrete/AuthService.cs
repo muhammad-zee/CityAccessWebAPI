@@ -253,7 +253,10 @@ namespace Web.Services.Concrete
 
                 var existingUserRelations = _userRelationRepo.Table.Where(x => x.UserIdFk == user.UserId && x.IsDeleted != true).ToList();
                 //existingUserRelations.ForEach(x => { x.IsDeleted = true; x.IsActive = false; x.ModifiedBy = user.ModifiedBy; x.ModifiedDate = DateTime.UtcNow; });
-                _userRelationRepo.DeleteRange(existingUserRelations);
+                if (existingUserRelations.Count() > 0) 
+                {
+                    _userRelationRepo.DeleteRange(existingUserRelations);
+                }
 
 
                 var orgIds = register.orgIds.ToIntList();
@@ -284,7 +287,10 @@ namespace Web.Services.Concrete
                         }
                     }
                 }
-                this._userRelationRepo.Insert(userRelations);
+                if (userRelations.Count() > 0) 
+                {
+                    this._userRelationRepo.Insert(userRelations);
+                }
 
                 return StatusEnums.Updated.ToString();
             }
