@@ -85,9 +85,9 @@ namespace Web.Services.Concrete
                 item.Gender = genders.Where(x => x.ControlListDetailId == item.GenderId).Select(x => x.Title).FirstOrDefault();
                 item.UserImage = String.IsNullOrEmpty(item.UserImage) ? "" : item.UserImage.Replace(Directory.GetCurrentDirectory() + "/", "");
 
-                item.OrgIdsList = userRelationIds.Where(x => x.UserIdFk == item.UserId).Select(x => x.OrganizationIdFk).ToList();
-                item.DptIdsList = userRelationIds.Where(x => x.UserIdFk == item.UserId).Select(x => x.DepartmentIdFk).ToList();
-                item.ServiceLineIdsList = userRelationIds.Where(x => x.UserIdFk == item.UserId).Select(x => x.ServiceLineIdFk).ToList();
+                item.OrgIdsList = userRelationIds.Where(x => x.UserIdFk == item.UserId).Select(x => x.OrganizationIdFk).Distinct().ToList();
+                item.DptIdsList = userRelationIds.Where(x => x.UserIdFk == item.UserId).Select(x => x.DepartmentIdFk).Distinct().ToList();
+                item.ServiceLineIdsList = userRelationIds.Where(x => x.UserIdFk == item.UserId).Select(x => x.ServiceLineIdFk).Distinct().ToList();
             }
             return new BaseResponse { Status = HttpStatusCode.OK, Message = "Users List Returned", Body = users };
         }
