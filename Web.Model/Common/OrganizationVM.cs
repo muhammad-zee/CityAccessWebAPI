@@ -29,6 +29,6 @@ namespace Web.Model.Common
         public string DepartmentIdsFk { get; set; }
         public List<DepartmentVM> Departments { get; set; }
 
-        public List<ClinicalHoursVM> ClinicalHours { get; set; }
+        public List<clinicalHours> ClinicalHours { get; set; }
     }
 }
