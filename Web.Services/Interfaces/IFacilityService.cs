@@ -36,7 +36,7 @@ namespace Web.Services.Interfaces
         BaseResponse GetAllClinicalHours();
         BaseResponse GetClinicalHourById(int Id);
         BaseResponse GetClinicalHourByServiceLineId(int orgId, int serviceLineId);
-        BaseResponse AddOrUpdateClinicalHour(ClinicalHoursVM clinicalHours);
+        BaseResponse AddOrUpdateClinicalHour(OrganizationSchedule clinicalHours);
         BaseResponse DeleteClinicalHour(int Id, int userId);
 
         #endregion

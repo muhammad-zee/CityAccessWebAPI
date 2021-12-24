@@ -370,7 +370,7 @@ namespace Web.API.Controllers
 
         [Description("Add Or Update Clinical Hours")]
         [HttpPost("ClinicalHour/AddOrUpdateClinicalHour")]
-        public BaseResponse AddOrUpdateClinicalHour([FromBody] ClinicalHoursVM clinicalHours)
+        public BaseResponse AddOrUpdateClinicalHour([FromBody]OrganizationSchedule clinicalHours)
         {
             try
             {

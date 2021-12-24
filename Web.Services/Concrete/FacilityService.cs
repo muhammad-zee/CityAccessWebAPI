@@ -544,11 +544,28 @@ namespace Web.Services.Concrete
             //this._clinicalHour.Table.Where(x => x.ServicelineIdFk == serviceLineId && x.IsDeleted == false).ToList();
             if (cHours != null && cHours.Count() > 0)
             {
+                List<clinicalHours> _List = new List<clinicalHours>();
+                clinicalHours obj;
+                foreach (var item in cHours)
+                {
+                    obj = new clinicalHours();
+                    obj.ServicelineIdFk = item.ServicelineIdFk;
+                    obj.id = item.ClinicalHourId;
+                    obj.day = item.WeekDayIdFk;
+                    obj.startDate = item.StartDate;
+                    obj.endDate = item.EndDate;
+                    obj.startTime = item.StartTime.ToEST();
+                    obj.endTime = item.EndTime.ToEST();
+                    obj.startBreak = item.StartBreak;
+                    obj.endBreak = item.EndBreak;
+                    _List.Add(obj);
+                }
+
                 return new BaseResponse()
                 {
                     Status = HttpStatusCode.OK,
                     Message = "Data Found",
-                    Body = cHours
+                    Body = _List
                 };
             }
             else
@@ -563,45 +580,77 @@ namespace Web.Services.Concrete
         }
 
 
-        public BaseResponse AddOrUpdateClinicalHour(ClinicalHoursVM clinicalHours)
+        public BaseResponse AddOrUpdateClinicalHour(OrganizationSchedule clinicalHours)
         {
             BaseResponse response = null;
-
-            if (clinicalHours.ClinicalHourId > 0)
+            ClinicalHour chour;
+            if(clinicalHours != null && clinicalHours.organizationHours.Count > 0 )
             {
-                var cHour = this._clinicalHour.Table.Where(x => x.IsDeleted != true && x.ClinicalHourId == clinicalHours.ClinicalHourId).FirstOrDefault();
-                if (cHour != null)
+                for (int i = 0; i < clinicalHours.organizationHours.Count(); i++)
                 {
-                    //cHour.WeekDayIdFk = clinicalHours.WeekDayIdFk;
-                    //cHour.ServicelineIdFk = clinicalHours.ServicelineIdFk;
-                    //cHour.StartDate = clinicalHours.StartDate;
-                    //cHour.StartTime = clinicalHours.StartTime;
-                    //cHour.StartBreak = clinicalHours.StartBreak;
-                    //cHour.EndDate = clinicalHours.EndDate;
-                    //cHour.EndTime = clinicalHours.EndTime;
-                    //cHour.EndBreak = clinicalHours.EndBreak;
-                    //cHour.ModifiedBy = clinicalHours.ModifiedBy;
-                    //cHour.ModifiedDate = DateTime.UtcNow;
-                    //cHour.IsDeleted = false;
+                    var _clinicalHours = clinicalHours.organizationHours[i];
+                    if (_clinicalHours.id > 0)
+                    {
 
-                    this._clinicalHour.Update(cHour);
+                        var cHour = this._clinicalHour.Table.Where(x => x.IsDeleted != true && x.ClinicalHourId == _clinicalHours.id).FirstOrDefault();
+                        if (cHour != null)
+                        {
+                            cHour.WeekDayIdFk = _clinicalHours.day;
+                            cHour.ServicelineIdFk = clinicalHours.serviceId;
+                            cHour.StartDate = _clinicalHours.startDate;
+                            cHour.StartTime = _clinicalHours.startTime;
+                            cHour.StartBreak = _clinicalHours.startBreak;
+                            cHour.EndDate = _clinicalHours.endDate;
+                            cHour.EndTime = _clinicalHours.endTime;
+                            cHour.EndBreak = _clinicalHours.endBreak;
+                            cHour.ModifiedBy = clinicalHours.LoggedInUserId;
+                            cHour.ModifiedDate = DateTime.UtcNow;
+                            cHour.IsDeleted = false;
 
-                    response = new BaseResponse() { Status = HttpStatusCode.OK, Message = "Successfully Updated", Body = cHour };
+                            this._clinicalHour.Update(cHour);
+
+                            response = new BaseResponse() { Status = HttpStatusCode.OK, Message = "Successfully Updated", Body = cHour };
+                        }
+                        else
+                        {
+                            response = new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "Data Not Found" };
+                        }
+
+                    }
+                    else
+                    {
+                        chour = new ClinicalHour();
+                        chour.WeekDayIdFk = _clinicalHours.day;
+                        chour.ServicelineIdFk = clinicalHours.serviceId;
+                        chour.CreatedBy = clinicalHours.LoggedInUserId;
+                        chour.CreatedDate = DateTime.UtcNow;
+                        chour.IsDeleted = false;
+                        chour.StartDate = _clinicalHours.startDate.AddDays(1);
+                        chour.EndDate = _clinicalHours.endDate.AddDays(1);
+                        chour.StartTime = _clinicalHours.startTime;
+                        chour.EndTime = _clinicalHours.endTime;
+                        chour.StartBreak = _clinicalHours.startBreak;
+                        chour.EndBreak = _clinicalHours.endBreak;
+                        //var chour = AutoMapperHelper.MapSingleRow<clinicalHours, ClinicalHour>(_clinicalHours);
+                        this._clinicalHour.Insert(chour);
+
+                        response = new BaseResponse() { Status = HttpStatusCode.OK, Message = "Successfully Created", Body = clinicalHours };
+                    }
                 }
-                else
-                {
-                    response = new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "Data Not Found" };
-                }
-
             }
             else
             {
-                var chour = AutoMapperHelper.MapSingleRow<ClinicalHoursVM, ClinicalHour>(clinicalHours);
-                chour.CreatedDate = DateTime.UtcNow;
-                this._clinicalHour.Insert(chour);
+                var clinicHour = this._clinicalHour.Table.Where(x => x.ServicelineIdFk == clinicalHours.serviceId).ToList();
+                if (clinicHour != null && clinicHour.Count() > 0)
+                {
+                    this._clinicalHour.DeleteRange(clinicHour);
+                }
 
-                response = new BaseResponse() { Status = HttpStatusCode.OK, Message = "Successfully Created", Body = clinicalHours };
+                response = new BaseResponse() { Status = HttpStatusCode.OK, Message = "Successfully Deleted", Body = "" };
             }
+
+            
+            
             return response;
         }
 
