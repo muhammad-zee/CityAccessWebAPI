@@ -89,6 +89,7 @@ namespace Web.API.Controllers
         {
             try
             {
+                var state = ModelState;
                 BaseResponse response = null;
 
                 string result = _jwtAuth.SaveUser(register);

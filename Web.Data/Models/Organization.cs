@@ -7,12 +7,6 @@ namespace Web.Data.Models
 {
     public partial class Organization
     {
-        public Organization()
-        {
-            ClinicalHours = new HashSet<ClinicalHour>();
-            OrganizationDepartments = new HashSet<OrganizationDepartment>();
-        }
-
         public int OrganizationId { get; set; }
         public string OrganizationName { get; set; }
         public int? OrganizationType { get; set; }
@@ -31,8 +25,5 @@ namespace Web.Data.Models
         public DateTime? ModifiedDate { get; set; }
         public bool IsActive { get; set; }
         public bool IsDeleted { get; set; }
-
-        public virtual ICollection<ClinicalHour> ClinicalHours { get; set; }
-        public virtual ICollection<OrganizationDepartment> OrganizationDepartments { get; set; }
     }
 }

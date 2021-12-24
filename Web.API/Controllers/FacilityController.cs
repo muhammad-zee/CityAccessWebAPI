@@ -124,11 +124,19 @@ namespace Web.API.Controllers
 
         [Description("Get All Departments")]
         [HttpGet("dpt/GetAllDepartments")]
-        public BaseResponse GetAllDepartments()
+        public BaseResponse GetAllDepartments(int? OrganizationId)
         {
             try
             {
-                var res = _facilityService.GetAllDepartments();
+                BaseResponse res = null;
+                if (OrganizationId != null) {
+                    res = this._facilityService.GetAllDepartmentsByOrganizationId(Convert.ToInt32(OrganizationId));
+                }
+                else
+                {
+                res = this._facilityService.GetAllDepartments();
+                }
+
                 return res;
             }
             catch (Exception ex)
@@ -183,12 +191,12 @@ namespace Web.API.Controllers
         }
 
         [Description("Delete Department")]
-        [HttpGet("dpt/DeleteDepartment/{Id}/{userId}")]
-        public BaseResponse DeleteDepartment(int Id, int userId)
+        [HttpGet("dpt/DeleteDepartment/{departmentId}/{userId}/{organizationId}")]
+        public BaseResponse DeleteDepartment(int departmentId, int userId,int organizationId)
         {
             try
             {
-                var res = _facilityService.DeleteDepartment(Id, userId);
+                var res = _facilityService.DeleteDepartment(departmentId, userId, organizationId);
                 return res;
             }
             catch (Exception ex)

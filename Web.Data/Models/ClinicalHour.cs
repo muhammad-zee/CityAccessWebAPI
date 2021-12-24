@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 #nullable disable
 
@@ -8,8 +9,7 @@ namespace Web.Data.Models
     {
         public int ClinicalHourId { get; set; }
         public int WeekDayIdFk { get; set; }
-        public int? OrganizationIdFk { get; set; }
-        public int? ServicelineIdFk { get; set; }
+        public int ServicelineIdFk { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
         public TimeSpan StartTime { get; set; }
@@ -22,7 +22,6 @@ namespace Web.Data.Models
         public DateTime? ModifiedDate { get; set; }
         public bool IsDeleted { get; set; }
 
-        public virtual Organization OrganizationIdFkNavigation { get; set; }
         public virtual ServiceLine ServicelineIdFkNavigation { get; set; }
     }
 }

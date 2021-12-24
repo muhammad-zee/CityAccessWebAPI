@@ -13,7 +13,7 @@ namespace Web.Model.Common
         public DateTime? ModifiedDate { get; set; }
         public bool? IsDeleted { get; set; }
 
-        public int? OrganizationIdFk { get; set; }
+        public int OrganizationIdFk { get; set; }
 
         public string ServicesIdFks { get; set; }
         public List<ServiceLineVM> ServiceLines { get; set; }

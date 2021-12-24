@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 #nullable disable
 
@@ -21,12 +23,10 @@ namespace Web.Data.Models
         public virtual DbSet<ControlList> ControlLists { get; set; }
         public virtual DbSet<ControlListDetail> ControlListDetails { get; set; }
         public virtual DbSet<Department> Departments { get; set; }
-        public virtual DbSet<DepartmentService> DepartmentServices { get; set; }
         public virtual DbSet<ElmahError> ElmahErrors { get; set; }
         public virtual DbSet<InteractiveVoiceResponse> InteractiveVoiceResponses { get; set; }
         public virtual DbSet<Ivrsetting> Ivrsettings { get; set; }
         public virtual DbSet<Organization> Organizations { get; set; }
-        public virtual DbSet<OrganizationDepartment> OrganizationDepartments { get; set; }
         public virtual DbSet<Role> Roles { get; set; }
         public virtual DbSet<ServiceLine> ServiceLines { get; set; }
         public virtual DbSet<State> States { get; set; }
@@ -60,14 +60,10 @@ namespace Web.Data.Models
 
                 entity.Property(e => e.StartDate).HasColumnType("datetime");
 
-                entity.HasOne(d => d.OrganizationIdFkNavigation)
-                    .WithMany(p => p.ClinicalHours)
-                    .HasForeignKey(d => d.OrganizationIdFk)
-                    .HasConstraintName("FK_ClinicalHours");
-
                 entity.HasOne(d => d.ServicelineIdFkNavigation)
                     .WithMany(p => p.ClinicalHours)
                     .HasForeignKey(d => d.ServicelineIdFk)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_ClinicalHours_ServiceLine");
             });
 
@@ -175,23 +171,6 @@ namespace Web.Data.Models
                 entity.Property(e => e.DepartmentName).HasMaxLength(500);
 
                 entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
-            });
-
-            modelBuilder.Entity<DepartmentService>(entity =>
-            {
-                entity.ToTable("DepartmentService");
-
-                entity.HasOne(d => d.DepartmentIdFkNavigation)
-                    .WithMany(p => p.DepartmentServices)
-                    .HasForeignKey(d => d.DepartmentIdFk)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_Department_Service");
-
-                entity.HasOne(d => d.ServiceIdFkNavigation)
-                    .WithMany(p => p.DepartmentServices)
-                    .HasForeignKey(d => d.ServiceIdFk)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_Department_Service1");
             });
 
             modelBuilder.Entity<ElmahError>(entity =>
@@ -315,23 +294,6 @@ namespace Web.Data.Models
                 entity.Property(e => e.PrimaryMobileNo2).HasMaxLength(15);
 
                 entity.Property(e => e.Zip).HasMaxLength(100);
-            });
-
-            modelBuilder.Entity<OrganizationDepartment>(entity =>
-            {
-                entity.ToTable("OrganizationDepartment");
-
-                entity.HasOne(d => d.DepartmentIdFkNavigation)
-                    .WithMany(p => p.OrganizationDepartments)
-                    .HasForeignKey(d => d.DepartmentIdFk)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_Organization_Department1");
-
-                entity.HasOne(d => d.OrganizationIdFkNavigation)
-                    .WithMany(p => p.OrganizationDepartments)
-                    .HasForeignKey(d => d.OrganizationIdFk)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_Organization_Department");
             });
 
             modelBuilder.Entity<Role>(entity =>

@@ -16,10 +16,11 @@ namespace Web.Services.Interfaces
 
         #region Department
         BaseResponse GetAllDepartments();
+        BaseResponse GetAllDepartmentsByOrganizationId(int OrganizationId);
         BaseResponse GetDepartmentById(int Id);
         BaseResponse GetDepartmentsByIds(string Ids);
         BaseResponse AddOrUpdateDepartment(DepartmentVM department);
-        BaseResponse DeleteDepartment(int Id, int userId);
+        BaseResponse DeleteDepartment(int departmentId, int userId,int organizationId);
         #endregion
 
         #region Organization
