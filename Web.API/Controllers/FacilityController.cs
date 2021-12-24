@@ -30,12 +30,21 @@ namespace Web.API.Controllers
         #region Service Lines
 
         [Description("Get All Service Lines")]
-        [HttpGet("service/GetAllServiceLines")]
-        public BaseResponse GetAllServiceLines()
+        [HttpGet("service/GetAllServiceLines/{departmentId}")]
+        public BaseResponse GetAllServiceLines(int? departmentId)
         {
             try
             {
-                var res = _facilityService.GetAllServiceLines();
+                BaseResponse res = null;
+                if(departmentId!= null)
+                {
+                    res = this._facilityService.GetAllServiceLinesByDepartmentId(Convert.ToInt32(departmentId));
+                }
+                else
+                {
+                 res = this._facilityService.GetAllServiceLines();
+                }
+
                 return res;
             }
             catch (Exception ex)
