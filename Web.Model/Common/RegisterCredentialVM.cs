@@ -49,7 +49,6 @@ namespace Web.Model.Common
         public List<int> DptIdsList { get; set; }
         public List<int> ServiceLineIdsList { get; set; }
 
-
         public List<UserRoleVM> UserRole { get; set; }
     }
 }

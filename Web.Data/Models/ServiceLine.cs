@@ -10,6 +10,7 @@ namespace Web.Data.Models
         public ServiceLine()
         {
             ClinicalHours = new HashSet<ClinicalHour>();
+            UsersRelations = new HashSet<UsersRelation>();
         }
 
         public int ServiceLineId { get; set; }
@@ -24,5 +25,6 @@ namespace Web.Data.Models
 
         public virtual Department DepartmentIdFkNavigation { get; set; }
         public virtual ICollection<ClinicalHour> ClinicalHours { get; set; }
+        public virtual ICollection<UsersRelation> UsersRelations { get; set; }
     }
 }

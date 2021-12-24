@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 #nullable disable
 
@@ -16,5 +15,8 @@ namespace Web.Data.Models
         public DateTime? ModifiedDate { get; set; }
         public bool? IsActive { get; set; }
         public bool IsDeleted { get; set; }
+
+        public virtual ServiceLine ServiceLineIdFkNavigation { get; set; }
+        public virtual User UserIdFkNavigation { get; set; }
     }
 }

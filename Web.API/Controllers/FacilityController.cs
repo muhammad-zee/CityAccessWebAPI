@@ -36,13 +36,13 @@ namespace Web.API.Controllers
             try
             {
                 BaseResponse res = null;
-                if(departmentId!= null)
+                if (departmentId != null)
                 {
                     res = this._facilityService.GetAllServiceLinesByDepartmentId(Convert.ToInt32(departmentId));
                 }
                 else
                 {
-                 res = this._facilityService.GetAllServiceLines();
+                    res = this._facilityService.GetAllServiceLines();
                 }
 
                 return res;

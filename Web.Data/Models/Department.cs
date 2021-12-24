@@ -14,7 +14,7 @@ namespace Web.Data.Models
 
         public int DepartmentId { get; set; }
         public string DepartmentName { get; set; }
-        public int OrganizationIdFk { get; set; }
+        public int? OrganizationIdFk { get; set; }
         public int? CreatedBy { get; set; }
         public DateTime? CreatedDate { get; set; }
         public int? ModifiedBy { get; set; }

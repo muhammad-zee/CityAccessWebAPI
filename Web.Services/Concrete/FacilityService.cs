@@ -58,7 +58,7 @@ namespace Web.Services.Concrete
         }
         public BaseResponse GetAllServiceLinesByDepartmentId(int DepartmentId)
         {
-            var services = _serviceRepo.Table.Where(x => x.IsDeleted == false && x.DepartmentIdFk ==  DepartmentId).ToList();
+            var services = _serviceRepo.Table.Where(x => x.IsDeleted == false && x.DepartmentIdFk == DepartmentId).ToList();
             if (services.Count() > 0)
             {
                 return new BaseResponse()
@@ -70,12 +70,12 @@ namespace Web.Services.Concrete
             }
             else
             {
-            return new BaseResponse()
-            {
-                Status = HttpStatusCode.OK,
-                Message = "Services Not Found",
-                Body = services
-            };
+                return new BaseResponse()
+                {
+                    Status = HttpStatusCode.OK,
+                    Message = "Services Not Found",
+                    Body = services
+                };
             }
         }
         public BaseResponse GetServiceLineById(int Id)
@@ -103,7 +103,7 @@ namespace Web.Services.Concrete
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Select at least one Department" };
             }
         }
-       
+
         public BaseResponse GetServicesByOrganizationId(int OrganizationId)
         {
             var services = _dbContext.LoadStoredProc("raq_getAllServicesByOrganizationId")
@@ -115,7 +115,7 @@ namespace Web.Services.Concrete
 
         public BaseResponse AddOrUpdateServiceLine(ServiceLineVM serviceLine)
         {
-            BaseResponse response = null; 
+            BaseResponse response = null;
 
             if (serviceLine.ServiceLineId > 0)
             {
@@ -169,8 +169,8 @@ namespace Web.Services.Concrete
         {
             var departments = _departmentRepo.Table.Where(x => x.IsDeleted != true).ToList();
             var dpts = AutoMapperHelper.MapList<Department, DepartmentVM>(departments);
-            var dptServices = (from s in this._serviceRepo.Table                              
-                               //where dpts.Select(x => x.DepartmentId).Contains(ds.DepartmentIdFk) && s.IsDeleted != true
+            var dptServices = (from s in this._serviceRepo.Table
+                                   //where dpts.Select(x => x.DepartmentId).Contains(ds.DepartmentIdFk) && s.IsDeleted != true
                                select new ServiceLineVM()
                                {
                                    ServiceLineId = s.ServiceLineId,
@@ -195,13 +195,13 @@ namespace Web.Services.Concrete
                 Body = dpts
             };
         }
-        
+
         public BaseResponse GetAllDepartmentsByOrganizationId(int OrganizationId)
         {
             var departments = this._departmentRepo.Table.Where(od => od.OrganizationIdFk == OrganizationId && od.IsDeleted != true).ToList();
             var dpts = AutoMapperHelper.MapList<Department, DepartmentVM>(departments);
             var dptServices = (from s in this._serviceRepo.Table
-                               where dpts.Select(x => x.DepartmentId).Contains(s.DepartmentIdFk) && s.IsDeleted != true 
+                               where dpts.Select(x => x.DepartmentId).Contains(s.DepartmentIdFk) && s.IsDeleted != true
                                select new ServiceLineVM()
                                {
                                    ServiceLineId = s.ServiceLineId,
@@ -243,7 +243,17 @@ namespace Web.Services.Concrete
             if (!string.IsNullOrEmpty(Ids))
             {
                 var idsList = Ids.ToIntList();
-                var department = new DepartmentVM(); //this._departmentRepo.Table.Where(d=>d.IsDeleted!=true && idsList.Contains(d.OrganizationIdFk)).ToList()
+                var department = new List<DepartmentVM>();
+
+                department = _departmentRepo.Table.Where(x => x.IsDeleted != true && idsList.Contains(x.OrganizationIdFk.Value)).Select(x => new DepartmentVM()
+                {
+
+                    DepartmentId = x.DepartmentId,
+                    DepartmentName = idsList.Count > 0 ? (x.DepartmentName + " / " + _organizationRepo.Table.Where(x1 => x1.OrganizationId == x.OrganizationIdFk).Select(x1 => x1.OrganizationName).FirstOrDefault()) : x.DepartmentName
+
+                }).ToList();
+
+                //this._departmentRepo.Table.Where(d=>d.IsDeleted!=true && idsList.Contains(d.OrganizationIdFk)).ToList()
                 //    (from od in _organizationDepartmentRepo.Table
                 //                  join d in _departmentRepo.Table on od.DepartmentIdFk equals d.DepartmentId
                 //                  where d.IsDeleted != true && idsList.Contains(od.OrganizationIdFk)
@@ -283,10 +293,10 @@ namespace Web.Services.Concrete
             }
             else
             {
-                var dpt =  AutoMapperHelper.MapSingleRow<DepartmentVM, Department>(department);
-                    dpt.CreatedDate = DateTime.UtcNow;
-                    this._departmentRepo.Insert(dpt);
-               
+                var dpt = AutoMapperHelper.MapSingleRow<DepartmentVM, Department>(department);
+                dpt.CreatedDate = DateTime.UtcNow;
+                this._departmentRepo.Insert(dpt);
+
                 response = new BaseResponse() { Status = HttpStatusCode.OK, Message = "Successfully Created" };
             }
             return response;
@@ -318,7 +328,7 @@ namespace Web.Services.Concrete
         {
             var organizations = _organizationRepo.Table.Where(x => x.IsDeleted == false).ToList();
             var orgs = AutoMapperHelper.MapList<Organization, OrganizationVM>(organizations);
-            var departments = this._departmentRepo.Table.Where(d => d.IsDeleted != true && orgs.Select(x => x.OrganizationId).Contains(d.OrganizationIdFk)).ToList();
+            var departments = this._departmentRepo.Table.Where(d => d.IsDeleted != true && orgs.Select(x => x.OrganizationId).Contains(d.OrganizationIdFk.Value)).ToList();
             var dpts = AutoMapperHelper.MapList<Department, DepartmentVM>(departments);
 
             var types = _controlListDetails.Table.Where(x => x.ControlListIdFk == UCLEnums.OrgType.ToInt()).Select(x => new { x.ControlListDetailId, x.Title });
@@ -522,8 +532,8 @@ namespace Web.Services.Concrete
                           && sl.IsDeleted != true
                           && ch.IsDeleted != true
                           select ch).ToList();
-                
-                //this._clinicalHour.Table.Where(x => x.ServicelineIdFk == serviceLineId && x.IsDeleted == false).ToList();
+
+            //this._clinicalHour.Table.Where(x => x.ServicelineIdFk == serviceLineId && x.IsDeleted == false).ToList();
             if (cHours != null && cHours.Count() > 0)
             {
                 return new BaseResponse()
@@ -554,17 +564,17 @@ namespace Web.Services.Concrete
                 var cHour = this._clinicalHour.Table.Where(x => x.IsDeleted != true && x.ClinicalHourId == clinicalHours.ClinicalHourId).FirstOrDefault();
                 if (cHour != null)
                 {
-                    cHour.WeekDayIdFk = clinicalHours.WeekDayIdFk;
-                    cHour.ServicelineIdFk = clinicalHours.ServicelineIdFk;
-                    cHour.StartDate = clinicalHours.StartDate;
-                    cHour.StartTime = clinicalHours.StartTime;
-                    cHour.StartBreak = clinicalHours.StartBreak;
-                    cHour.EndDate = clinicalHours.EndDate;
-                    cHour.EndTime = clinicalHours.EndTime;
-                    cHour.EndBreak = clinicalHours.EndBreak;
-                    cHour.ModifiedBy = clinicalHours.ModifiedBy;
-                    cHour.ModifiedDate = DateTime.UtcNow;
-                    cHour.IsDeleted = false;
+                    //cHour.WeekDayIdFk = clinicalHours.WeekDayIdFk;
+                    //cHour.ServicelineIdFk = clinicalHours.ServicelineIdFk;
+                    //cHour.StartDate = clinicalHours.StartDate;
+                    //cHour.StartTime = clinicalHours.StartTime;
+                    //cHour.StartBreak = clinicalHours.StartBreak;
+                    //cHour.EndDate = clinicalHours.EndDate;
+                    //cHour.EndTime = clinicalHours.EndTime;
+                    //cHour.EndBreak = clinicalHours.EndBreak;
+                    //cHour.ModifiedBy = clinicalHours.ModifiedBy;
+                    //cHour.ModifiedDate = DateTime.UtcNow;
+                    //cHour.IsDeleted = false;
 
                     this._clinicalHour.Update(cHour);
 

@@ -92,28 +92,48 @@ namespace Web.API.Controllers
                 var state = ModelState;
                 BaseResponse response = null;
 
-                string result = _jwtAuth.SaveUser(register);
+                response = _jwtAuth.SaveUser(register);
 
-                if (result != null)
+                if (response != null)
                 {
-                    if (result.Equals(StatusEnums.Created.ToString()))
-                    {
-                        response = new BaseResponse() { Status = HttpStatusCode.OK, Message = "User created successfully" };
-                    }
-                    else if (result.Equals(StatusEnums.Updated.ToString()))
-                    {
-                        response = new BaseResponse() { Status = HttpStatusCode.OK, Message = "User updated successfully" };
-                    }
-                    else
-                    {
-                        response = new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = "User already exist against this Email." };
-                    }
+                    //if (result.Equals(StatusEnums.Created.ToString()))
+                    //{
+                    //    response = new BaseResponse() { Status = HttpStatusCode.OK, Message = "User created successfully" };
+                    //}
+                    //else if (result.Equals(StatusEnums.Updated.ToString()))
+                    //{
+                    //    response = new BaseResponse() { Status = HttpStatusCode.OK, Message = "User updated successfully" };
+                    //}
+                    //else
+                    //{
+                    //    response = new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = "User already exist against this Email." };
+                    //}
 
+                    return response;
                 }
                 else
                 {
                     response = new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = "Model State is not valid." };
                 }
+                return response;
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
+
+        [Authorize]
+        [Description("Add or Update Association User")]
+        [HttpPost("auth/addOrUpdateAssociation")]
+        public BaseResponse AssociationUser([FromBody] RegisterCredentialVM associate)
+        {
+            try
+            {
+                var response = _jwtAuth.AssociationUser(associate);
                 return response;
             }
             catch (Exception ex)

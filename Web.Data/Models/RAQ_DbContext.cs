@@ -1,6 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
+﻿using Microsoft.EntityFrameworkCore;
 
 #nullable disable
 
@@ -54,11 +52,19 @@ namespace Web.Data.Models
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
+                entity.Property(e => e.EndBreak).HasColumnType("datetime");
+
                 entity.Property(e => e.EndDate).HasColumnType("datetime");
+
+                entity.Property(e => e.EndTime).HasColumnType("datetime");
 
                 entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
 
+                entity.Property(e => e.StartBreak).HasColumnType("datetime");
+
                 entity.Property(e => e.StartDate).HasColumnType("datetime");
+
+                entity.Property(e => e.StartTime).HasColumnType("datetime");
 
                 entity.HasOne(d => d.ServicelineIdFkNavigation)
                     .WithMany(p => p.ClinicalHours)
@@ -478,6 +484,18 @@ namespace Web.Data.Models
                     .HasDefaultValueSql("((1))");
 
                 entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+
+                entity.HasOne(d => d.ServiceLineIdFkNavigation)
+                    .WithMany(p => p.UsersRelations)
+                    .HasForeignKey(d => d.ServiceLineIdFk)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_UsersRelation_ServiceLine");
+
+                entity.HasOne(d => d.UserIdFkNavigation)
+                    .WithMany(p => p.UsersRelations)
+                    .HasForeignKey(d => d.UserIdFk)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_UsersRelation_Users");
             });
 
             OnModelCreatingPartial(modelBuilder);

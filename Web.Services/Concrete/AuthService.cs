@@ -184,7 +184,7 @@ namespace Web.Services.Concrete
             }
         }
 
-        public string SaveUser(RegisterCredentialVM register)
+        public BaseResponse SaveUser(RegisterCredentialVM register)
         {
 
             if (register.UserId > 0)
@@ -195,7 +195,11 @@ namespace Web.Services.Concrete
                     var alreadyExist = _userRepo.Table.Where(x => x.UserName == register.UserName && x.UserId != register.UserId).FirstOrDefault();
                     if (alreadyExist != null)
                     {
-                        return StatusEnums.AlreadyExist.ToString();
+                        return new BaseResponse()
+                        {
+                            Status = HttpStatusCode.OK,
+                            Message = "AlreadyExist",
+                        };
                     }
                 }
                 user.FirstName = register.FirstName;
@@ -260,40 +264,45 @@ namespace Web.Services.Concrete
                 }
 
 
-                var orgIds = register.orgIds.ToIntList();
-                var dptIds = register.dptIds.ToIntList();
-                var serviceLineIds = register.serviceIds.ToIntList();
+                //var orgIds = register.orgIds.ToIntList();
+                //var dptIds = register.dptIds.ToIntList();
+                //var serviceLineIds = register.serviceIds.ToIntList();
 
-                List<UsersRelation> userRelations = new List<UsersRelation>();
+                //List<UsersRelation> userRelations = new List<UsersRelation>();
                 //foreach (var item in orgIds)
                 //{
-                    //var dpt = this._organizationDepartmentRepo.Table.Where(x => x.OrganizationIdFk == item && dptIds.Contains(x.DepartmentIdFk)).Select(x => x.DepartmentIdFk).ToList();
-                    //foreach (var dptId in dpt)
-                    //{
-                    //    var serviceLines = this._departmentServiceRepo.Table.Where(x => x.DepartmentIdFk == dptId && serviceLineIds.Contains(x.ServiceIdFk)).Select(x => x.ServiceIdFk).ToList();
-                    //    foreach (var sl in serviceLines)
-                    //    {
-                    //        var relation = new UsersRelation()
-                    //        {
-                    //            UserIdFk = user.UserId,
-                    //            OrganizationIdFk = item,
-                    //            DepartmentIdFk = dptId,
-                    //            ServiceLineIdFk = sl,
-                    //            CreatedBy = register.ModifiedBy,
-                    //            CreatedDate = DateTime.UtcNow,
-                    //            IsActive = true,
-                    //            IsDeleted = false
-                    //        };
-                    //        userRelations.Add(relation);
-                    //    }
-                    //}
+                //var dpt = this._organizationDepartmentRepo.Table.Where(x => x.OrganizationIdFk == item && dptIds.Contains(x.DepartmentIdFk)).Select(x => x.DepartmentIdFk).ToList();
+                //foreach (var dptId in dpt)
+                //{
+                //    var serviceLines = this._departmentServiceRepo.Table.Where(x => x.DepartmentIdFk == dptId && serviceLineIds.Contains(x.ServiceIdFk)).Select(x => x.ServiceIdFk).ToList();
+                //    foreach (var sl in serviceLines)
+                //    {
+                //        var relation = new UsersRelation()
+                //        {
+                //            UserIdFk = user.UserId,
+                //            OrganizationIdFk = item,
+                //            DepartmentIdFk = dptId,
+                //            ServiceLineIdFk = sl,
+                //            CreatedBy = register.ModifiedBy,
+                //            CreatedDate = DateTime.UtcNow,
+                //            IsActive = true,
+                //            IsDeleted = false
+                //        };
+                //        userRelations.Add(relation);
+                //    }
                 //}
-                if (userRelations.Count() > 0) 
-                {
-                    this._userRelationRepo.Insert(userRelations);
-                }
+                //}
+                //if (userRelations.Count() > 0) 
+                //{
+                //    this._userRelationRepo.Insert(userRelations);
+                //}
 
-                return StatusEnums.Updated.ToString();
+                return new BaseResponse()
+                {
+                    Status = HttpStatusCode.OK,
+                    Message = "Updated",
+                    Body = user.UserId,
+                };
             }
             else
             {
@@ -360,35 +369,35 @@ namespace Web.Services.Concrete
                             _userRepo.Update(newAddedUser);
                         }
 
-                        var orgIds = register.orgIds.ToIntList();
-                        var dptIds = register.dptIds.ToIntList();
-                        var serviceLineIds = register.serviceIds.ToIntList();
+                        //var orgIds = register.orgIds.ToIntList();
+                        //var dptIds = register.dptIds.ToIntList();
+                        //var serviceLineIds = register.serviceIds.ToIntList();
 
-                        List<UsersRelation> userRelations = new List<UsersRelation>();
+                        //List<UsersRelation> userRelations = new List<UsersRelation>();
                         //foreach (var item in orgIds)
                         //{
-                            //var dpt = this._organizationDepartmentRepo.Table.Where(x => x.OrganizationIdFk == item && dptIds.Contains(x.DepartmentIdFk)).Select(x => x.DepartmentIdFk).ToList();
-                            //foreach (var dptId in dpt)
-                            //{
-                            //    var serviceLines = this._departmentServiceRepo.Table.Where(x => x.DepartmentIdFk == dptId && serviceLineIds.Contains(x.ServiceIdFk)).Select(x => x.ServiceIdFk).ToList();
-                            //    foreach (var sl in serviceLines)
-                            //    {
-                            //        var relation = new UsersRelation()
-                            //        {
-                            //            UserIdFk = obj.UserId,
-                            //            OrganizationIdFk = item,
-                            //            DepartmentIdFk = dptId,
-                            //            ServiceLineIdFk = sl,
-                            //            CreatedBy = register.CreatedBy,
-                            //            CreatedDate = DateTime.UtcNow,
-                            //            IsActive = true,
-                            //            IsDeleted = false
-                            //        };
-                            //        userRelations.Add(relation);
-                            //    }
-                            //}
+                        //var dpt = this._organizationDepartmentRepo.Table.Where(x => x.OrganizationIdFk == item && dptIds.Contains(x.DepartmentIdFk)).Select(x => x.DepartmentIdFk).ToList();
+                        //foreach (var dptId in dpt)
+                        //{
+                        //    var serviceLines = this._departmentServiceRepo.Table.Where(x => x.DepartmentIdFk == dptId && serviceLineIds.Contains(x.ServiceIdFk)).Select(x => x.ServiceIdFk).ToList();
+                        //    foreach (var sl in serviceLines)
+                        //    {
+                        //        var relation = new UsersRelation()
+                        //        {
+                        //            UserIdFk = obj.UserId,
+                        //            OrganizationIdFk = item,
+                        //            DepartmentIdFk = dptId,
+                        //            ServiceLineIdFk = sl,
+                        //            CreatedBy = register.CreatedBy,
+                        //            CreatedDate = DateTime.UtcNow,
+                        //            IsActive = true,
+                        //            IsDeleted = false
+                        //        };
+                        //        userRelations.Add(relation);
+                        //    }
                         //}
-                        this._userRelationRepo.Insert(userRelations);
+                        //}
+                        //this._userRelationRepo.Insert(userRelations);
 
                         string sub = "Account Created.";
                         string mailBody = $"<b>Hi! {obj.FirstName}, </b><br />" +
@@ -396,15 +405,64 @@ namespace Web.Services.Concrete
                             $"<p>Thanks!</p>";
 
                         this._communicationService.SendEmail(obj.PrimaryEmail, sub, mailBody, null);
-                        return StatusEnums.Created.ToString();
+                        return new BaseResponse()
+                        {
+                            Status = HttpStatusCode.OK,
+                            Message = "Created",
+                            Body = obj.UserId,
+                        };
                     }
                     else
                     {
-                        return StatusEnums.AlreadyExist.ToString();
+                        return new BaseResponse()
+                        {
+                            Status = HttpStatusCode.OK,
+                            Message = "AlreadyExist",
+                        };
                     }
                 }
             }
             return null;
+        }
+
+        public BaseResponse AssociationUser(RegisterCredentialVM associate)
+        {
+            //var orgIds = associate.orgIds.ToIntList();
+            //var dptIds = associate.dptIds.ToIntList();
+            var serviceLineIds = associate.serviceIds.ToIntList();
+
+            List<UsersRelation> userRelations = new List<UsersRelation>();
+
+            var relation = _userRelationRepo.Table.Where(x => x.UserIdFk == associate.UserId && x.IsDeleted != true).ToList();
+            if (relation.Count() > 0)
+            {
+                _userRelationRepo.DeleteRange(relation);
+            }
+
+            foreach (var item in serviceLineIds)
+            {
+                var userRelation = new UsersRelation()
+                {
+                    UserIdFk = associate.UserId,
+                    ServiceLineIdFk = item,
+                    CreatedBy = associate.CreatedBy,
+                    CreatedDate = DateTime.UtcNow,
+                    IsDeleted = false,
+                };
+
+                userRelations.Add(userRelation);
+            }
+
+            if (userRelations.Count > 0)
+            {
+                _userRelationRepo.Insert(userRelations);
+            }
+
+            return new BaseResponse()
+            {
+                Status = HttpStatusCode.OK,
+                Message = "Saved",
+            };
         }
 
         #region Reset Password
