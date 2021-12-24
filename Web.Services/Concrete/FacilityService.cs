@@ -82,6 +82,7 @@ namespace Web.Services.Concrete
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Select at least one Department" };
             }
         }
+       
         public BaseResponse GetServicesByOrganizationId(int OrganizationId)
         {
             var services = _dbContext.LoadStoredProc("raq_getAllServicesByOrganizationId")
@@ -172,6 +173,7 @@ namespace Web.Services.Concrete
                 Body = dpts
             };
         }
+        
         public BaseResponse GetAllDepartmentsByOrganizationId(int OrganizationId)
         {
             var departments = this._departmentRepo.Table.Where(od => od.OrganizationIdFk == OrganizationId && od.IsDeleted != true).ToList();
@@ -268,7 +270,7 @@ namespace Web.Services.Concrete
             return response;
         }
 
-        public BaseResponse DeleteDepartment(int departmentId, int userId,int organizationId)
+        public BaseResponse DeleteDepartment(int departmentId, int userId, int organizationId)
         {
             var dpt = _departmentRepo.Table.Where(x => x.DepartmentId == departmentId && x.IsDeleted != true).FirstOrDefault();
             //var deptOrgRelation = this._organizationDepartmentRepo.Table.FirstOrDefault(r => r.DepartmentIdFk == departmentId && r.OrganizationIdFk == organizationId);
@@ -303,7 +305,7 @@ namespace Web.Services.Concrete
             {
                 item.State = states.Where(x => x.ControlListDetailId == item.StateIdFk).Select(x => x.Title).FirstOrDefault();
                 item.OrgType = types.Where(x => x.ControlListDetailId == item.OrganizationType).Select(x => x.Title).FirstOrDefault();
-                item.Departments = dpts.Where(x => x.OrganizationIdFk == item.OrganizationId).ToList();
+                //item.Departments = dpts.Where(x => x.OrganizationIdFk == item.OrganizationId).ToList();
             }
 
             return new BaseResponse()
@@ -444,6 +446,143 @@ namespace Web.Services.Concrete
                 return new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "Data Not Found" };
             }
         }
+        #endregion
+
+
+        #region Clinical Hours 
+
+        public BaseResponse GetAllClinicalHours()
+        {
+            var cHour = this._clinicalHour.Table.Where(x => x.IsDeleted != true).ToList();
+
+            return new BaseResponse()
+            {
+                Status = HttpStatusCode.OK,
+                Message = "Data Found",
+                Body = cHour
+            };
+        }
+
+        public BaseResponse GetClinicalHourById(int Id)
+        {
+            var cHour = this._clinicalHour.Table.Where(x => x.ClinicalHourId == Id && x.IsDeleted == false).FirstOrDefault();
+            if (cHour != null)
+            {
+                return new BaseResponse()
+                {
+                    Status = HttpStatusCode.OK,
+                    Message = "Data Found",
+                    Body = cHour
+                };
+            }
+            else
+            {
+                return new BaseResponse()
+                {
+                    Status = HttpStatusCode.NotFound,
+                    Message = "Data Not Found"
+                };
+            }
+
+        }
+
+        public BaseResponse GetClinicalHourByServiceLineId(int orgId, int serviceLineId)
+        {
+            var cHours = (from ch in this._clinicalHour.Table
+                          join sl in this._serviceRepo.Table on ch.ServicelineIdFk equals sl.ServiceLineId
+                          join d in this._departmentRepo.Table on sl.DepartmentIdFk equals d.DepartmentId
+                          join org in this._organizationRepo.Table on d.OrganizationIdFk equals org.OrganizationId
+                          where
+                          org.OrganizationId == orgId
+                          && sl.ServiceLineId == serviceLineId
+                          && org.IsDeleted != true
+                          && d.IsDeleted != true
+                          && sl.IsDeleted != true
+                          && ch.IsDeleted != true
+                          select ch).ToList();
+                
+                //this._clinicalHour.Table.Where(x => x.ServicelineIdFk == serviceLineId && x.IsDeleted == false).ToList();
+            if (cHours != null && cHours.Count() > 0)
+            {
+                return new BaseResponse()
+                {
+                    Status = HttpStatusCode.OK,
+                    Message = "Data Found",
+                    Body = cHours
+                };
+            }
+            else
+            {
+                return new BaseResponse()
+                {
+                    Status = HttpStatusCode.NotFound,
+                    Message = "Data Not Found"
+                };
+            }
+
+        }
+
+
+        public BaseResponse AddOrUpdateClinicalHour(ClinicalHoursVM clinicalHours)
+        {
+            BaseResponse response = null;
+
+            if (clinicalHours.ClinicalHourId > 0)
+            {
+                var cHour = this._clinicalHour.Table.Where(x => x.IsDeleted != true && x.ClinicalHourId == clinicalHours.ClinicalHourId).FirstOrDefault();
+                if (cHour != null)
+                {
+                    cHour.WeekDayIdFk = clinicalHours.WeekDayIdFk;
+                    cHour.ServicelineIdFk = clinicalHours.ServicelineIdFk;
+                    cHour.StartDate = clinicalHours.StartDate;
+                    cHour.StartTime = clinicalHours.StartTime;
+                    cHour.StartBreak = clinicalHours.StartBreak;
+                    cHour.EndDate = clinicalHours.EndDate;
+                    cHour.EndTime = clinicalHours.EndTime;
+                    cHour.EndBreak = clinicalHours.EndBreak;
+                    cHour.ModifiedBy = clinicalHours.ModifiedBy;
+                    cHour.ModifiedDate = DateTime.UtcNow;
+                    cHour.IsDeleted = false;
+
+                    this._clinicalHour.Update(cHour);
+
+                    response = new BaseResponse() { Status = HttpStatusCode.OK, Message = "Successfully Updated", Body = cHour };
+                }
+                else
+                {
+                    response = new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "Data Not Found" };
+                }
+
+            }
+            else
+            {
+                var chour = AutoMapperHelper.MapSingleRow<ClinicalHoursVM, ClinicalHour>(clinicalHours);
+                chour.CreatedDate = DateTime.UtcNow;
+                this._clinicalHour.Insert(chour);
+
+                response = new BaseResponse() { Status = HttpStatusCode.OK, Message = "Successfully Created", Body = clinicalHours };
+            }
+            return response;
+        }
+
+        public BaseResponse DeleteClinicalHour(int Id, int userId)
+        {
+            var cHour = this._clinicalHour.Table.Where(x => x.ClinicalHourId == Id).FirstOrDefault();
+            if (cHour != null)
+            {
+                cHour.IsDeleted = true;
+                cHour.ModifiedBy = userId;
+                cHour.ModifiedDate = DateTime.UtcNow;
+                this._clinicalHour.Update(cHour);
+
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Deleted Successfully" };
+            }
+            else
+            {
+                return new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "Data Not Found" };
+            }
+        }
+
         #endregion
 
     }

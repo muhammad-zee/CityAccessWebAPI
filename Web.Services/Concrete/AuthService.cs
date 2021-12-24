@@ -186,7 +186,7 @@ namespace Web.Services.Concrete
 
         public string SaveUser(RegisterCredentialVM register)
         {
-          
+
             if (register.UserId > 0)
             {
                 var user = _userRepo.Table.Where(x => x.UserId == register.UserId && x.IsDeleted == false).FirstOrDefault();
@@ -254,7 +254,7 @@ namespace Web.Services.Concrete
 
                 var existingUserRelations = _userRelationRepo.Table.Where(x => x.UserIdFk == user.UserId && x.IsDeleted != true).ToList();
                 //existingUserRelations.ForEach(x => { x.IsDeleted = true; x.IsActive = false; x.ModifiedBy = user.ModifiedBy; x.ModifiedDate = DateTime.UtcNow; });
-                if (existingUserRelations.Count() > 0) 
+                if (existingUserRelations.Count() > 0)
                 {
                     _userRelationRepo.DeleteRange(existingUserRelations);
                 }

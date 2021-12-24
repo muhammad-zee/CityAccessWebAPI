@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using ElmahCore;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -39,6 +40,8 @@ namespace Web.API.Controllers
             }
             catch (Exception ex)
             {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
         }
@@ -54,6 +57,8 @@ namespace Web.API.Controllers
             }
             catch (Exception ex)
             {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
         }
@@ -69,6 +74,8 @@ namespace Web.API.Controllers
             }
             catch (Exception ex)
             {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
         }
@@ -83,6 +90,8 @@ namespace Web.API.Controllers
             }
             catch (Exception ex)
             {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
         }
@@ -98,6 +107,8 @@ namespace Web.API.Controllers
             }
             catch (Exception ex)
             {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
         }
@@ -113,6 +124,8 @@ namespace Web.API.Controllers
             }
             catch (Exception ex)
             {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
         }
@@ -129,18 +142,21 @@ namespace Web.API.Controllers
             try
             {
                 BaseResponse res = null;
-                if (OrganizationId != null) {
+                if (OrganizationId != null)
+                {
                     res = this._facilityService.GetAllDepartmentsByOrganizationId(Convert.ToInt32(OrganizationId));
                 }
                 else
                 {
-                res = this._facilityService.GetAllDepartments();
+                    res = this._facilityService.GetAllDepartments();
                 }
 
                 return res;
             }
             catch (Exception ex)
             {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
         }
@@ -156,6 +172,8 @@ namespace Web.API.Controllers
             }
             catch (Exception ex)
             {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
         }
@@ -171,6 +189,8 @@ namespace Web.API.Controllers
             }
             catch (Exception ex)
             {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
         }
@@ -186,13 +206,15 @@ namespace Web.API.Controllers
             }
             catch (Exception ex)
             {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
         }
 
         [Description("Delete Department")]
         [HttpGet("dpt/DeleteDepartment/{departmentId}/{userId}/{organizationId}")]
-        public BaseResponse DeleteDepartment(int departmentId, int userId,int organizationId)
+        public BaseResponse DeleteDepartment(int departmentId, int userId, int organizationId)
         {
             try
             {
@@ -201,6 +223,8 @@ namespace Web.API.Controllers
             }
             catch (Exception ex)
             {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
         }
@@ -220,6 +244,8 @@ namespace Web.API.Controllers
             }
             catch (Exception ex)
             {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
         }
@@ -235,6 +261,8 @@ namespace Web.API.Controllers
             }
             catch (Exception ex)
             {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
         }
@@ -250,11 +278,13 @@ namespace Web.API.Controllers
             }
             catch (Exception ex)
             {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
         }
 
-        [Description("Delete Department")]
+        [Description("Delete Organization")]
         [HttpGet("org/DeleteOrganization")]
         public BaseResponse DeleteOrganization(int Id, int userId)
         {
@@ -265,6 +295,100 @@ namespace Web.API.Controllers
             }
             catch (Exception ex)
             {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
+        #endregion
+
+
+
+        #region Clinical Hours
+
+        [Description("Get All Clinical Hours")]
+        [HttpGet("ClinicalHour/GetAllClinicalHours")]
+        public BaseResponse GetAllClinicalHours()
+        {
+            try
+            {
+                var res = _facilityService.GetAllClinicalHours();
+                return res;
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
+        [Description("Get Clinical Hours By Id")]
+        [HttpGet("ClinicalHour/GetClinicalHourById/{Id}")]
+        public BaseResponse GetClinicalHourById(int Id)
+        {
+            try
+            {
+                var res = _facilityService.GetClinicalHourById(Id);
+                return res;
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
+        [Description("Get Clinical Hours By Service Line Id")]
+        [HttpGet("ClinicalHour/GetClinicalHourByServiceLineId/{orgId}/{serviceLineId}")]
+        public BaseResponse GetClinicalHourByServiceLineId(int orgId, int serviceLineId)
+        {
+            try
+            {
+                var res = _facilityService.GetClinicalHourByServiceLineId(orgId, serviceLineId);
+                return res;
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
+
+        [Description("Add Or Update Clinical Hours")]
+        [HttpPost("ClinicalHour/AddOrUpdateClinicalHour")]
+        public BaseResponse AddOrUpdateClinicalHour([FromBody] ClinicalHoursVM clinicalHours)
+        {
+            try
+            {
+                var res = _facilityService.AddOrUpdateClinicalHour(clinicalHours);
+                return res;
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
+        [Description("Delete Clinical Hour")]
+        [HttpGet("ClinicalHour/DeleteClinicalHour")]
+        public BaseResponse DeleteClinicalHour(int Id, int userId)
+        {
+            try
+            {
+                var res = _facilityService.DeleteClinicalHour(Id, userId);
+                return res;
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
         }
