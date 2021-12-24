@@ -21,7 +21,7 @@ namespace Web.Services.Interfaces
         BaseResponse GetDepartmentById(int Id);
         BaseResponse GetDepartmentsByIds(string Ids);
         BaseResponse AddOrUpdateDepartment(DepartmentVM department);
-        BaseResponse DeleteDepartment(int departmentId, int userId,int organizationId);
+        BaseResponse DeleteDepartment(int departmentId, int userId, int organizationId);
         #endregion
 
         #region Organization
@@ -30,5 +30,16 @@ namespace Web.Services.Interfaces
         BaseResponse AddOrUpdateOrganization(OrganizationVM organization);
         BaseResponse DeleteOrganization(int Id, int userId);
         #endregion
+
+        #region Clinical Hours
+
+        BaseResponse GetAllClinicalHours();
+        BaseResponse GetClinicalHourById(int Id);
+        BaseResponse GetClinicalHourByServiceLineId(int orgId, int serviceLineId);
+        BaseResponse AddOrUpdateClinicalHour(ClinicalHoursVM clinicalHours);
+        BaseResponse DeleteClinicalHour(int Id, int userId);
+
+        #endregion
+
     }
 }
