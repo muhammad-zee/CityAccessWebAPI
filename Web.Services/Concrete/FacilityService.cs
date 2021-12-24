@@ -326,7 +326,7 @@ namespace Web.Services.Concrete
             {
                 item.State = states.Where(x => x.ControlListDetailId == item.StateIdFk).Select(x => x.Title).FirstOrDefault();
                 item.OrgType = types.Where(x => x.ControlListDetailId == item.OrganizationType).Select(x => x.Title).FirstOrDefault();
-                //item.Departments = dpts.Where(x => x.OrganizationIdFk == item.OrganizationId).ToList();
+                item.Departments = dpts.Where(x => x.OrganizationIdFk == item.OrganizationId).ToList();
             }
 
             return new BaseResponse()
