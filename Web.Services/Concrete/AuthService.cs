@@ -26,8 +26,8 @@ namespace Web.Services.Concrete
     {
         private readonly GenericRepository<User> _userRepo;
         private readonly GenericRepository<UserRole> _userRoleRepo;
-        private readonly IRepository<DepartmentService> _departmentServiceRepo;
-        private readonly IRepository<OrganizationDepartment> _organizationDepartmentRepo;
+        //private readonly IRepository<DepartmentService> _departmentServiceRepo;
+        //private readonly IRepository<OrganizationDepartment> _organizationDepartmentRepo;
         private readonly IRepository<UsersRelation> _userRelationRepo;
         private readonly ICommunicationService _communicationService;
         private readonly IAdminService _adminService;
@@ -40,8 +40,8 @@ namespace Web.Services.Concrete
             /*IUserAuthRepository userAuthRepository,*/
             IRepository<User> userRepo,
             IRepository<UserRole> userRoleRepo,
-            IRepository<DepartmentService> departmentServiceRepo,
-            IRepository<OrganizationDepartment> organizationDepartmentRepo,
+            //IRepository<DepartmentService> departmentServiceRepo,
+            //IRepository<OrganizationDepartment> organizationDepartmentRepo,
             IRepository<UsersRelation> userRelationRepo,
             ICommunicationService communicationService,
             IAdminService adminService)
@@ -51,8 +51,8 @@ namespace Web.Services.Concrete
             //_userAuthRepository = userAuthRepository;
             this._userRepo = (GenericRepository<User>)userRepo;
             this._userRoleRepo = (GenericRepository<UserRole>)userRoleRepo;
-            this._departmentServiceRepo = departmentServiceRepo;
-            this._organizationDepartmentRepo = organizationDepartmentRepo;
+            //this._departmentServiceRepo = departmentServiceRepo;
+            //this._organizationDepartmentRepo = organizationDepartmentRepo;
             this._userRelationRepo = userRelationRepo;
             this._communicationService = communicationService;
             this._adminService = adminService;
@@ -265,29 +265,29 @@ namespace Web.Services.Concrete
                 var serviceLineIds = register.serviceIds.ToIntList();
 
                 List<UsersRelation> userRelations = new List<UsersRelation>();
-                foreach (var item in orgIds)
-                {
-                    var dpt = this._organizationDepartmentRepo.Table.Where(x => x.OrganizationIdFk == item && dptIds.Contains(x.DepartmentIdFk)).Select(x => x.DepartmentIdFk).ToList();
-                    foreach (var dptId in dpt)
-                    {
-                        var serviceLines = this._departmentServiceRepo.Table.Where(x => x.DepartmentIdFk == dptId && serviceLineIds.Contains(x.ServiceIdFk)).Select(x => x.ServiceIdFk).ToList();
-                        foreach (var sl in serviceLines)
-                        {
-                            var relation = new UsersRelation()
-                            {
-                                UserIdFk = user.UserId,
-                                OrganizationIdFk = item,
-                                DepartmentIdFk = dptId,
-                                ServiceLineIdFk = sl,
-                                CreatedBy = register.ModifiedBy,
-                                CreatedDate = DateTime.UtcNow,
-                                IsActive = true,
-                                IsDeleted = false
-                            };
-                            userRelations.Add(relation);
-                        }
-                    }
-                }
+                //foreach (var item in orgIds)
+                //{
+                    //var dpt = this._organizationDepartmentRepo.Table.Where(x => x.OrganizationIdFk == item && dptIds.Contains(x.DepartmentIdFk)).Select(x => x.DepartmentIdFk).ToList();
+                    //foreach (var dptId in dpt)
+                    //{
+                    //    var serviceLines = this._departmentServiceRepo.Table.Where(x => x.DepartmentIdFk == dptId && serviceLineIds.Contains(x.ServiceIdFk)).Select(x => x.ServiceIdFk).ToList();
+                    //    foreach (var sl in serviceLines)
+                    //    {
+                    //        var relation = new UsersRelation()
+                    //        {
+                    //            UserIdFk = user.UserId,
+                    //            OrganizationIdFk = item,
+                    //            DepartmentIdFk = dptId,
+                    //            ServiceLineIdFk = sl,
+                    //            CreatedBy = register.ModifiedBy,
+                    //            CreatedDate = DateTime.UtcNow,
+                    //            IsActive = true,
+                    //            IsDeleted = false
+                    //        };
+                    //        userRelations.Add(relation);
+                    //    }
+                    //}
+                //}
                 if (userRelations.Count() > 0) 
                 {
                     this._userRelationRepo.Insert(userRelations);
@@ -365,29 +365,29 @@ namespace Web.Services.Concrete
                         var serviceLineIds = register.serviceIds.ToIntList();
 
                         List<UsersRelation> userRelations = new List<UsersRelation>();
-                        foreach (var item in orgIds)
-                        {
-                            var dpt = this._organizationDepartmentRepo.Table.Where(x => x.OrganizationIdFk == item && dptIds.Contains(x.DepartmentIdFk)).Select(x => x.DepartmentIdFk).ToList();
-                            foreach (var dptId in dpt)
-                            {
-                                var serviceLines = this._departmentServiceRepo.Table.Where(x => x.DepartmentIdFk == dptId && serviceLineIds.Contains(x.ServiceIdFk)).Select(x => x.ServiceIdFk).ToList();
-                                foreach (var sl in serviceLines)
-                                {
-                                    var relation = new UsersRelation()
-                                    {
-                                        UserIdFk = obj.UserId,
-                                        OrganizationIdFk = item,
-                                        DepartmentIdFk = dptId,
-                                        ServiceLineIdFk = sl,
-                                        CreatedBy = register.CreatedBy,
-                                        CreatedDate = DateTime.UtcNow,
-                                        IsActive = true,
-                                        IsDeleted = false
-                                    };
-                                    userRelations.Add(relation);
-                                }
-                            }
-                        }
+                        //foreach (var item in orgIds)
+                        //{
+                            //var dpt = this._organizationDepartmentRepo.Table.Where(x => x.OrganizationIdFk == item && dptIds.Contains(x.DepartmentIdFk)).Select(x => x.DepartmentIdFk).ToList();
+                            //foreach (var dptId in dpt)
+                            //{
+                            //    var serviceLines = this._departmentServiceRepo.Table.Where(x => x.DepartmentIdFk == dptId && serviceLineIds.Contains(x.ServiceIdFk)).Select(x => x.ServiceIdFk).ToList();
+                            //    foreach (var sl in serviceLines)
+                            //    {
+                            //        var relation = new UsersRelation()
+                            //        {
+                            //            UserIdFk = obj.UserId,
+                            //            OrganizationIdFk = item,
+                            //            DepartmentIdFk = dptId,
+                            //            ServiceLineIdFk = sl,
+                            //            CreatedBy = register.CreatedBy,
+                            //            CreatedDate = DateTime.UtcNow,
+                            //            IsActive = true,
+                            //            IsDeleted = false
+                            //        };
+                            //        userRelations.Add(relation);
+                            //    }
+                            //}
+                        //}
                         this._userRelationRepo.Insert(userRelations);
 
                         string sub = "Account Created.";

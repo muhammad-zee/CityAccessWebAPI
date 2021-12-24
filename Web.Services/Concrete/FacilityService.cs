@@ -20,8 +20,8 @@ namespace Web.Services.Concrete
         private IRepository<Department> _departmentRepo;
         private IRepository<Organization> _organizationRepo;
         private IRepository<ClinicalHour> _clinicalHour;
-        private IRepository<DepartmentService> _departmentServiceRepo;
-        private IRepository<OrganizationDepartment> _organizationDepartmentRepo;
+        //private IRepository<DepartmentService> _departmentServiceRepo;
+        //private IRepository<OrganizationDepartment> _organizationDepartmentRepo;
         private IRepository<ControlListDetail> _controlListDetails;
 
         public FacilityService(RAQ_DbContext dbContext,
@@ -29,8 +29,8 @@ namespace Web.Services.Concrete
             IRepository<Department> departmentRepo,
             IRepository<Organization> organizationRepo,
             IRepository<ClinicalHour> clinicalHour,
-            IRepository<DepartmentService> departmentServiceRepo,
-            IRepository<OrganizationDepartment> organizationDepartmentRepo,
+            //IRepository<DepartmentService> departmentServiceRepo,
+            //IRepository<OrganizationDepartment> organizationDepartmentRepo,
             IRepository<ControlListDetail> controlListDetails
             )
         {
@@ -39,8 +39,8 @@ namespace Web.Services.Concrete
             this._departmentRepo = departmentRepo;
             this._organizationRepo = organizationRepo;
             this._clinicalHour = clinicalHour;
-            this._departmentServiceRepo = departmentServiceRepo;
-            this._organizationDepartmentRepo = organizationDepartmentRepo;
+            //this._departmentServiceRepo = departmentServiceRepo;
+            //this._organizationDepartmentRepo = organizationDepartmentRepo;
             this._controlListDetails = controlListDetails;
         }
 
@@ -73,15 +73,7 @@ namespace Web.Services.Concrete
             if (!string.IsNullOrEmpty(Ids))
             {
                 var idsList = Ids.ToIntList();
-                var services = (from ds in _departmentServiceRepo.Table
-                                join s in _serviceRepo.Table on ds.ServiceIdFk equals s.ServiceLineId
-                                where idsList.Contains(ds.DepartmentIdFk) && s.IsDeleted != true
-                                select new ServiceLineVM()
-                                {
-                                    ServiceLineId = s.ServiceLineId,
-                                    ServiceName = s.ServiceName,
-                                    DepartmentIdFk = ds.DepartmentIdFk
-                                }).DistinctBy(x => x.ServiceName).ToList();
+                var services = this._serviceRepo.Table.Where(s => idsList.Contains(s.DepartmentIdFk) && s.IsDeleted != true).ToList();
 
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Found", Body = services };
             }
@@ -154,9 +146,8 @@ namespace Web.Services.Concrete
         {
             var departments = _departmentRepo.Table.Where(x => x.IsDeleted != true).ToList();
             var dpts = AutoMapperHelper.MapList<Department, DepartmentVM>(departments);
-            var dptServices = (from ds in _departmentServiceRepo.Table
-                               join s in _serviceRepo.Table on ds.ServiceIdFk equals s.ServiceLineId
-                               where dpts.Select(x => x.DepartmentId).Contains(ds.DepartmentIdFk) && s.IsDeleted != true
+            var dptServices = (from s in this._serviceRepo.Table                              
+                               //where dpts.Select(x => x.DepartmentId).Contains(ds.DepartmentIdFk) && s.IsDeleted != true
                                select new ServiceLineVM()
                                {
                                    ServiceLineId = s.ServiceLineId,
@@ -166,7 +157,7 @@ namespace Web.Services.Concrete
                                    CreatedDate = s.CreatedDate,
                                    ModifiedBy = s.ModifiedBy,
                                    ModifiedDate = s.ModifiedDate,
-                                   DepartmentIdFk = ds.DepartmentIdFk
+                                   DepartmentIdFk = s.DepartmentIdFk
                                }).Distinct().ToList();
 
             foreach (var item in dpts)
@@ -183,15 +174,10 @@ namespace Web.Services.Concrete
         }
         public BaseResponse GetAllDepartmentsByOrganizationId(int OrganizationId)
         {
-            var departments = (from d in this._departmentRepo.Table join
-                              od in this._organizationDepartmentRepo.Table 
-                              on d.DepartmentId equals od.DepartmentIdFk
-                              where od.OrganizationIdFk == OrganizationId
-                              select d).ToList();
+            var departments = this._departmentRepo.Table.Where(od => od.OrganizationIdFk == OrganizationId && od.IsDeleted != true).ToList();
             var dpts = AutoMapperHelper.MapList<Department, DepartmentVM>(departments);
-            var dptServices = (from ds in _departmentServiceRepo.Table
-                               join s in _serviceRepo.Table on ds.ServiceIdFk equals s.ServiceLineId
-                               where dpts.Select(x => x.DepartmentId).Contains(ds.DepartmentIdFk) && s.IsDeleted != true
+            var dptServices = (from s in this._serviceRepo.Table
+                               where dpts.Select(x => x.DepartmentId).Contains(s.DepartmentIdFk) && s.IsDeleted != true 
                                select new ServiceLineVM()
                                {
                                    ServiceLineId = s.ServiceLineId,
@@ -201,7 +187,7 @@ namespace Web.Services.Concrete
                                    CreatedDate = s.CreatedDate,
                                    ModifiedBy = s.ModifiedBy,
                                    ModifiedDate = s.ModifiedDate,
-                                   DepartmentIdFk = ds.DepartmentIdFk
+                                   DepartmentIdFk = s.DepartmentIdFk
                                }).Distinct().ToList();
 
             foreach (var item in dpts)
@@ -233,15 +219,16 @@ namespace Web.Services.Concrete
             if (!string.IsNullOrEmpty(Ids))
             {
                 var idsList = Ids.ToIntList();
-                var department = (from od in _organizationDepartmentRepo.Table
-                                  join d in _departmentRepo.Table on od.DepartmentIdFk equals d.DepartmentId
-                                  where d.IsDeleted != true && idsList.Contains(od.OrganizationIdFk)
-                                  select new DepartmentVM()
-                                  {
-                                      DepartmentId = d.DepartmentId,
-                                      DepartmentName = d.DepartmentName,
-                                      OrganizationIdFk = od.OrganizationIdFk
-                                  }).DistinctBy(x => x.DepartmentName).ToList();
+                var department = new DepartmentVM(); //this._departmentRepo.Table.Where(d=>d.IsDeleted!=true && idsList.Contains(d.OrganizationIdFk)).ToList()
+                //    (from od in _organizationDepartmentRepo.Table
+                //                  join d in _departmentRepo.Table on od.DepartmentIdFk equals d.DepartmentId
+                //                  where d.IsDeleted != true && idsList.Contains(od.OrganizationIdFk)
+                //                  select new DepartmentVM()
+                //                  {
+                //                      DepartmentId = d.DepartmentId,
+                //                      DepartmentName = d.DepartmentName,
+                //                      OrganizationIdFk = od.OrganizationIdFk
+                //                  }).DistinctBy(x => x.DepartmentName).ToList();
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Found", Body = department };
             }
             else
@@ -254,23 +241,15 @@ namespace Web.Services.Concrete
         {
             BaseResponse response = null;
 
-            List<DepartmentService> dptServices = new List<DepartmentService>();
             if (department.DepartmentId > 0)
             {
-                var dpt = _departmentRepo.Table.Where(x => (x.IsDeleted == false || x.IsDeleted == null) && x.DepartmentId == department.DepartmentId).FirstOrDefault();
+                var dpt = _departmentRepo.Table.Where(x => (x.IsDeleted != true) && x.DepartmentId == department.DepartmentId).FirstOrDefault();
                 if (dpt != null)
                 {
                     dpt.DepartmentName = department.DepartmentName;
                     dpt.ModifiedBy = department.ModifiedBy;
                     dpt.ModifiedDate = DateTime.UtcNow;
                     this._departmentRepo.Update(dpt);
-                    var deptOrgRelation = this._organizationDepartmentRepo.Table.FirstOrDefault(r => r.DepartmentIdFk == dpt.DepartmentId && r.OrganizationIdFk == department.OrganizationIdFk);
-                    if (deptOrgRelation == null)
-                    {
-                        deptOrgRelation = new OrganizationDepartment { DepartmentIdFk = dpt.DepartmentId, OrganizationIdFk = department.OrganizationIdFk };
-                        this._organizationDepartmentRepo.Insert(deptOrgRelation);
-                    }
-                    
                     response = new BaseResponse() { Status = HttpStatusCode.OK, Message = "Successfully Updated" };
                 }
                 else
@@ -280,19 +259,10 @@ namespace Web.Services.Concrete
             }
             else
             {
-                var dpt = this._departmentRepo.Table.FirstOrDefault(d => d.DepartmentName == department.DepartmentName && (d.IsDeleted == false || d.IsDeleted == null));
-                if (dpt== null)
-                {
-                    dpt = AutoMapperHelper.MapSingleRow<DepartmentVM, Department>(department);
+                var dpt =  AutoMapperHelper.MapSingleRow<DepartmentVM, Department>(department);
                     dpt.CreatedDate = DateTime.UtcNow;
                     this._departmentRepo.Insert(dpt);
-                }
-                var deptOrgRelation = this._organizationDepartmentRepo.Table.FirstOrDefault(r => r.DepartmentIdFk == dpt.DepartmentId && r.OrganizationIdFk == department.OrganizationIdFk);
-                 if(deptOrgRelation == null)
-                {
-                    deptOrgRelation = new OrganizationDepartment { DepartmentIdFk = dpt.DepartmentId, OrganizationIdFk = department.OrganizationIdFk };
-                    this._organizationDepartmentRepo.Insert(deptOrgRelation);
-                }
+               
                 response = new BaseResponse() { Status = HttpStatusCode.OK, Message = "Successfully Created" };
             }
             return response;
@@ -324,20 +294,9 @@ namespace Web.Services.Concrete
         {
             var organizations = _organizationRepo.Table.Where(x => x.IsDeleted == false).ToList();
             var orgs = AutoMapperHelper.MapList<Organization, OrganizationVM>(organizations);
-            var dpts = (from od in _organizationDepartmentRepo.Table
-                        join d in _departmentRepo.Table on od.DepartmentIdFk equals d.DepartmentId
-                        where d.IsDeleted != true && orgs.Select(x => x.OrganizationId).Contains(od.OrganizationIdFk)
-                        select new DepartmentVM()
-                        {
-                            DepartmentId = d.DepartmentId,
-                            DepartmentName = d.DepartmentName,
-                            CreatedBy = d.CreatedBy,
-                            CreatedDate = d.CreatedDate,
-                            ModifiedBy = d.ModifiedBy,
-                            ModifiedDate = d.ModifiedDate,
-                            IsDeleted = d.IsDeleted,
-                            OrganizationIdFk = od.OrganizationIdFk
-                        });
+            var departments = this._departmentRepo.Table.Where(d => d.IsDeleted != true && orgs.Select(x => x.OrganizationId).Contains(d.OrganizationIdFk)).ToList();
+            var dpts = AutoMapperHelper.MapList<Department, DepartmentVM>(departments);
+
             var types = _controlListDetails.Table.Where(x => x.ControlListIdFk == UCLEnums.OrgType.ToInt()).Select(x => new { x.ControlListDetailId, x.Title });
             var states = _controlListDetails.Table.Where(x => x.ControlListIdFk == UCLEnums.States.ToInt()).Select(x => new { x.ControlListDetailId, x.Title });
             foreach (var item in orgs)
