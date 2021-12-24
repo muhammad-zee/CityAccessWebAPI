@@ -143,9 +143,9 @@ namespace Web.Services.Concrete
             return response;
         }
 
-        public BaseResponse DeleteServiceLine(int Id, int userId)
+        public BaseResponse DeleteServiceLine(int serviceLineId, int userId)
         {
-            var service = _serviceRepo.Table.Where(x => x.ServiceLineId == Id).FirstOrDefault();
+            var service = _serviceRepo.Table.Where(x => x.ServiceLineId == serviceLineId).FirstOrDefault();
             if (service != null)
             {
                 service.IsDeleted = true;

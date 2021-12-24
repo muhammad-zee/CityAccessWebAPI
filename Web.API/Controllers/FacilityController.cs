@@ -123,12 +123,12 @@ namespace Web.API.Controllers
         }
 
         [Description("Delete Service Line")]
-        [HttpGet("service/DeleteServiceLine/{Id}/{userId}")]
-        public BaseResponse DeleteServiceLine(int Id, int userId)
+        [HttpGet("service/DeleteServiceLine/{serviceLineId}/{userId}")]
+        public BaseResponse DeleteServiceLine(int serviceLineId, int userId)
         {
             try
             {
-                var res = _facilityService.DeleteServiceLine(Id, userId);
+                var res = _facilityService.DeleteServiceLine(serviceLineId, userId);
                 return res;
             }
             catch (Exception ex)

@@ -12,7 +12,7 @@ namespace Web.Services.Interfaces
         BaseResponse GetServicesByIds(string Ids);
         BaseResponse GetServicesByOrganizationId(int OrganizationId);
         BaseResponse AddOrUpdateServiceLine(ServiceLineVM serviceLine);
-        BaseResponse DeleteServiceLine(int Id, int userId);
+        BaseResponse DeleteServiceLine(int serviceLineId, int userId);
         #endregion
 
         #region Department
