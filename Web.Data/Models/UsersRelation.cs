@@ -9,8 +9,6 @@ namespace Web.Data.Models
     {
         public int UsersRelationId { get; set; }
         public int UserIdFk { get; set; }
-        public int OrganizationIdFk { get; set; }
-        public int DepartmentIdFk { get; set; }
         public int ServiceLineIdFk { get; set; }
         public int CreatedBy { get; set; }
         public DateTime CreatedDate { get; set; }

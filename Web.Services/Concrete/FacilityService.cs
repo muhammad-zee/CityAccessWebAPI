@@ -56,7 +56,28 @@ namespace Web.Services.Concrete
                 Body = services
             };
         }
-
+        public BaseResponse GetAllServiceLinesByDepartmentId(int DepartmentId)
+        {
+            var services = _serviceRepo.Table.Where(x => x.IsDeleted == false && x.DepartmentIdFk ==  DepartmentId).ToList();
+            if (services.Count() > 0)
+            {
+                return new BaseResponse()
+                {
+                    Status = HttpStatusCode.OK,
+                    Message = "Data Found",
+                    Body = services
+                };
+            }
+            else
+            {
+            return new BaseResponse()
+            {
+                Status = HttpStatusCode.OK,
+                Message = "Services Not Found",
+                Body = services
+            };
+            }
+        }
         public BaseResponse GetServiceLineById(int Id)
         {
             var serviceLine = _serviceRepo.Table.Where(x => x.ServiceLineId == Id && x.IsDeleted == false).FirstOrDefault();

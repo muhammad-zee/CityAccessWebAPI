@@ -64,7 +64,7 @@ namespace Web.Data.Models
                     .WithMany(p => p.ClinicalHours)
                     .HasForeignKey(d => d.ServicelineIdFk)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_ClinicalHours_ServiceLine");
+                    .HasConstraintName("FK_ServiceLine_Departments");
             });
 
             modelBuilder.Entity<Component>(entity =>
@@ -171,6 +171,11 @@ namespace Web.Data.Models
                 entity.Property(e => e.DepartmentName).HasMaxLength(500);
 
                 entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+
+                entity.HasOne(d => d.OrganizationIdFkNavigation)
+                    .WithMany(p => p.Departments)
+                    .HasForeignKey(d => d.OrganizationIdFk)
+                    .HasConstraintName("FK_Departments_Organizations");
             });
 
             modelBuilder.Entity<ElmahError>(entity =>
@@ -324,6 +329,12 @@ namespace Web.Data.Models
                 entity.Property(e => e.ServiceName)
                     .IsRequired()
                     .HasMaxLength(500);
+
+                entity.HasOne(d => d.DepartmentIdFkNavigation)
+                    .WithMany(p => p.ServiceLines)
+                    .HasForeignKey(d => d.DepartmentIdFk)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Departments_ServiceLine");
             });
 
             modelBuilder.Entity<State>(entity =>

@@ -22,6 +22,7 @@ namespace Web.Data.Models
         public DateTime? ModifiedDate { get; set; }
         public bool IsDeleted { get; set; }
 
+        public virtual Department DepartmentIdFkNavigation { get; set; }
         public virtual ICollection<ClinicalHour> ClinicalHours { get; set; }
     }
 }

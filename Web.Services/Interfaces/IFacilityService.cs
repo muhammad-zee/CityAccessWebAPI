@@ -7,6 +7,7 @@ namespace Web.Services.Interfaces
     {
         #region Service Lines
         BaseResponse GetAllServiceLines();
+        BaseResponse GetAllServiceLinesByDepartmentId(int DepartmentId);
         BaseResponse GetServiceLineById(int Id);
         BaseResponse GetServicesByIds(string Ids);
         BaseResponse GetServicesByOrganizationId(int OrganizationId);
