@@ -94,7 +94,15 @@ namespace Web.Services.Concrete
             if (!string.IsNullOrEmpty(Ids))
             {
                 var idsList = Ids.ToIntList();
-                var services = this._serviceRepo.Table.Where(s => idsList.Contains(s.DepartmentIdFk) && s.IsDeleted != true).ToList();
+                var services = (from sl in _serviceRepo.Table
+                                join d in _departmentRepo.Table on sl.DepartmentIdFk equals d.DepartmentId
+                                join org in _organizationRepo.Table on d.OrganizationIdFk equals org.OrganizationId
+                                where idsList.Contains(sl.DepartmentIdFk) && sl.IsDeleted != true && d.IsDeleted != true && org.IsDeleted != true
+                                select new ServiceLineVM()
+                                {
+                                    ServiceLineId = sl.ServiceLineId,
+                                    ServiceName = idsList.Count > 1 ? sl.ServiceName + " / " + d.DepartmentName + " / " + org.OrganizationName : sl.ServiceName
+                                }).ToList();
 
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Found", Body = services };
             }
@@ -249,7 +257,7 @@ namespace Web.Services.Concrete
                 {
 
                     DepartmentId = x.DepartmentId,
-                    DepartmentName = idsList.Count > 0 ? (x.DepartmentName + " / " + _organizationRepo.Table.Where(x1 => x1.OrganizationId == x.OrganizationIdFk).Select(x1 => x1.OrganizationName).FirstOrDefault()) : x.DepartmentName
+                    DepartmentName = idsList.Count > 1 ? (x.DepartmentName + " / " + _organizationRepo.Table.Where(x1 => x1.OrganizationId == x.OrganizationIdFk).Select(x1 => x1.OrganizationName).FirstOrDefault()) : x.DepartmentName
 
                 }).ToList();
 

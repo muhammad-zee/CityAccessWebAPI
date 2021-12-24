@@ -26,6 +26,10 @@ namespace Web.Services.Concrete
         private IRepository<ComponentAccess> _componentAccess;
         private IRepository<UserAccess> _userAccess;
         private IRepository<UserRole> _userRole;
+
+        private IRepository<ServiceLine> _serviceRepo;
+        private IRepository<Department> _departmentRepo;
+        private IRepository<Organization> _organizationRepo;
         private IRepository<ControlList> _controlList;
         private IRepository<ControlListDetail> _controlListDetails;
         private readonly IRepository<UsersRelation> _userRelationRepo;
@@ -37,6 +41,9 @@ namespace Web.Services.Concrete
             IRepository<User> user,
             IRepository<Role> role,
             IRepository<UserRole> userRole,
+            IRepository<ServiceLine> serviceRepo,
+            IRepository<Department> departmentRepo,
+            IRepository<Organization> organizationRepo,
             IRepository<UserAccess> userAccess,
             IRepository<UsersRelation> userRelationRepo,
             IRepository<ControlList> controlList,
@@ -50,6 +57,9 @@ namespace Web.Services.Concrete
             this._user = user;
             this._role = role;
             this._userRole = userRole;
+            this._serviceRepo = serviceRepo;
+            this._departmentRepo = departmentRepo;
+            this._organizationRepo = organizationRepo;
             this._userAccess = userAccess;
             this._userRelationRepo = userRelationRepo;
             this._controlList = controlList;
@@ -87,7 +97,11 @@ namespace Web.Services.Concrete
 
                 //item.OrgIdsList = userRelationIds.Where(x => x.UserIdFk == item.UserId).Select(x => x.OrganizationIdFk).Distinct().ToList();
                 //item.DptIdsList = userRelationIds.Where(x => x.UserIdFk == item.UserId).Select(x => x.DepartmentIdFk).Distinct().ToList();
+                var dptids = _serviceRepo.Table.Where(x => userRelationIds.Where(x => x.UserIdFk == item.UserId).Select(x => x.ServiceLineIdFk).Distinct().Contains(x.ServiceLineId) && x.IsDeleted != true).Select(x => x.DepartmentIdFk).Distinct().ToList();
                 item.ServiceLineIdsList = userRelationIds.Where(x => x.UserIdFk == item.UserId).Select(x => x.ServiceLineIdFk).Distinct().ToList();
+                item.DptIdsList = dptids;
+                item.OrgIdsList = _departmentRepo.Table.Where(x => x.IsDeleted != true && dptids.Contains(x.DepartmentId)).Select(x => x.OrganizationIdFk.Value).Distinct().ToList();
+
             }
             return new BaseResponse { Status = HttpStatusCode.OK, Message = "Users List Returned", Body = users };
         }

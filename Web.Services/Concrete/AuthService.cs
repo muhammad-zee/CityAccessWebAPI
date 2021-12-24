@@ -369,36 +369,6 @@ namespace Web.Services.Concrete
                             _userRepo.Update(newAddedUser);
                         }
 
-                        //var orgIds = register.orgIds.ToIntList();
-                        //var dptIds = register.dptIds.ToIntList();
-                        //var serviceLineIds = register.serviceIds.ToIntList();
-
-                        //List<UsersRelation> userRelations = new List<UsersRelation>();
-                        //foreach (var item in orgIds)
-                        //{
-                        //var dpt = this._organizationDepartmentRepo.Table.Where(x => x.OrganizationIdFk == item && dptIds.Contains(x.DepartmentIdFk)).Select(x => x.DepartmentIdFk).ToList();
-                        //foreach (var dptId in dpt)
-                        //{
-                        //    var serviceLines = this._departmentServiceRepo.Table.Where(x => x.DepartmentIdFk == dptId && serviceLineIds.Contains(x.ServiceIdFk)).Select(x => x.ServiceIdFk).ToList();
-                        //    foreach (var sl in serviceLines)
-                        //    {
-                        //        var relation = new UsersRelation()
-                        //        {
-                        //            UserIdFk = obj.UserId,
-                        //            OrganizationIdFk = item,
-                        //            DepartmentIdFk = dptId,
-                        //            ServiceLineIdFk = sl,
-                        //            CreatedBy = register.CreatedBy,
-                        //            CreatedDate = DateTime.UtcNow,
-                        //            IsActive = true,
-                        //            IsDeleted = false
-                        //        };
-                        //        userRelations.Add(relation);
-                        //    }
-                        //}
-                        //}
-                        //this._userRelationRepo.Insert(userRelations);
-
                         string sub = "Account Created.";
                         string mailBody = $"<b>Hi! {obj.FirstName}, </b><br />" +
                             $"<p>Your account is created.</p></br />" +
