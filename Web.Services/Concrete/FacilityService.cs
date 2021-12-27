@@ -653,12 +653,8 @@ namespace Web.Services.Concrete
                 {
                     for (int i = 0; i < deleteIds.Count(); i++)
                     {
-                        var _clinicalId = deleteIds[i];
-                        var dClinicHour = this._clinicalHour.Table.Where(x => x.ClinicalHourId == _clinicalId).FirstOrDefault();
-                        if (dClinicHour != null)
-                        {
-                            this._clinicalHour.Delete(dClinicHour);
-                        }
+                        var deleteId = deleteIds[i];
+                        DeleteClinicalHour(deleteId, clinicalHours.LoggedInUserId);
                     }
 
                 }
@@ -670,7 +666,11 @@ namespace Web.Services.Concrete
                 var clinicHour = this._clinicalHour.Table.Where(x => x.ServicelineIdFk == clinicalHours.serviceId).ToList();
                 if (clinicHour != null && clinicHour.Count() > 0)
                 {
-                    this._clinicalHour.DeleteRange(clinicHour);
+                    for (int i = 0; i < clinicHour.Count(); i++)
+                    {
+                        var deleteId = clinicHour[i].ClinicalHourId;
+                        DeleteClinicalHour(deleteId, clinicalHours.LoggedInUserId);
+                    }
                 }
 
                 response = new BaseResponse() { Status = HttpStatusCode.OK, Message = "Successfully Deleted", Body = "" };
