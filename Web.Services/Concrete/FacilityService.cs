@@ -554,8 +554,8 @@ namespace Web.Services.Concrete
                     obj.day = item.WeekDayIdFk;
                     obj.startDate = item.StartDate;
                     obj.endDate = item.EndDate;
-                    obj.startTime = item.StartTime.ToEST();
-                    obj.endTime = item.EndTime.ToEST();
+                    obj.startTime = item.StartTime;
+                    obj.endTime = item.EndTime;
                     obj.startBreak = item.StartBreak;
                     obj.endBreak = item.EndBreak;
                     _List.Add(obj);
@@ -584,8 +584,11 @@ namespace Web.Services.Concrete
         {
             BaseResponse response = null;
             ClinicalHour chour;
-            if(clinicalHours != null && clinicalHours.organizationHours.Count > 0 )
+
+            if (clinicalHours != null && clinicalHours.organizationHours.Count > 0 )
             {
+                #region [Add or Update]
+
                 for (int i = 0; i < clinicalHours.organizationHours.Count(); i++)
                 {
                     var _clinicalHours = clinicalHours.organizationHours[i];
@@ -597,10 +600,10 @@ namespace Web.Services.Concrete
                         {
                             cHour.WeekDayIdFk = _clinicalHours.day;
                             cHour.ServicelineIdFk = clinicalHours.serviceId;
-                            cHour.StartDate = _clinicalHours.startDate;
+                            cHour.StartDate = DateTime.UtcNow;
                             cHour.StartTime = _clinicalHours.startTime;
                             cHour.StartBreak = _clinicalHours.startBreak;
-                            cHour.EndDate = _clinicalHours.endDate;
+                            cHour.EndDate = DateTime.UtcNow;
                             cHour.EndTime = _clinicalHours.endTime;
                             cHour.EndBreak = _clinicalHours.endBreak;
                             cHour.ModifiedBy = clinicalHours.LoggedInUserId;
@@ -625,8 +628,8 @@ namespace Web.Services.Concrete
                         chour.CreatedBy = clinicalHours.LoggedInUserId;
                         chour.CreatedDate = DateTime.UtcNow;
                         chour.IsDeleted = false;
-                        chour.StartDate = _clinicalHours.startDate.AddDays(1);
-                        chour.EndDate = _clinicalHours.endDate.AddDays(1);
+                        chour.StartDate = DateTime.UtcNow;
+                        chour.EndDate = DateTime.UtcNow;
                         chour.StartTime = _clinicalHours.startTime;
                         chour.EndTime = _clinicalHours.endTime;
                         chour.StartBreak = _clinicalHours.startBreak;
@@ -637,6 +640,30 @@ namespace Web.Services.Concrete
                         response = new BaseResponse() { Status = HttpStatusCode.OK, Message = "Successfully Created", Body = clinicalHours };
                     }
                 }
+
+                #endregion
+
+                #region [Delete]
+
+                List<int> clinicalhoursIds = clinicalHours.organizationHours.Select(x => x.id).ToList();
+                List<int> clinicalhoursDbIds = this._clinicalHour.Table.Where(x => x.IsDeleted != true && x.ServicelineIdFk == clinicalHours.serviceId).Select(x => x.ClinicalHourId).ToList();
+                List<int> deleteIds = clinicalhoursDbIds.Except(clinicalhoursIds).ToList();
+
+                if (deleteIds.Count() > 0)
+                {
+                    for (int i = 0; i < deleteIds.Count(); i++)
+                    {
+                        var _clinicalId = deleteIds[i];
+                        var dClinicHour = this._clinicalHour.Table.Where(x => x.ClinicalHourId == _clinicalId).FirstOrDefault();
+                        if (dClinicHour != null)
+                        {
+                            this._clinicalHour.Delete(dClinicHour);
+                        }
+                    }
+
+                }
+
+                #endregion
             }
             else
             {
@@ -650,7 +677,7 @@ namespace Web.Services.Concrete
             }
 
             
-            
+
             return response;
         }
 
