@@ -10,6 +10,7 @@ namespace Web.Data.Models
         public Organization()
         {
             Departments = new HashSet<Department>();
+            Roles = new HashSet<Role>();
         }
 
         public int OrganizationId { get; set; }
@@ -32,5 +33,6 @@ namespace Web.Data.Models
         public bool IsDeleted { get; set; }
 
         public virtual ICollection<Department> Departments { get; set; }
+        public virtual ICollection<Role> Roles { get; set; }
     }
 }
