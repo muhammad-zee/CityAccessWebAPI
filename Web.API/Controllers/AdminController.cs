@@ -144,11 +144,19 @@ namespace Web.API.Controllers
 
         // GET: api/<EmployeeController>
         [HttpGet("admin/GetAllRoles")]
-        public BaseResponse GetRoles()
+        public BaseResponse GetRoles(int? OrganizationID)
         {
             try
             {
-                var roleObj = _adminService.getRoleList();
+                IQueryable roleObj =null;
+                if(OrganizationID!= null)
+                {
+                 roleObj = _adminService.getRoleListByOrganizationId(OrganizationID.Value);
+                }
+                else
+                {
+                 roleObj = _adminService.getRoleList();
+                }
                 return new BaseResponse { Status = HttpStatusCode.OK, Message = "Roles List Returned", Body = roleObj };
 
             }

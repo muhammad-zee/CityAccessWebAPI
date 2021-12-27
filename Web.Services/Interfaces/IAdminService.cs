@@ -39,6 +39,7 @@ namespace Web.Services.Interfaces
 
         #region Roles
         IQueryable<Role> getRoleList();
+        IQueryable<Role> getRoleListByOrganizationId(int OrganizationId);
         IQueryable<UserRoleVM> getRoleListByUserId(int UserId);
         string SaveRole(RoleVM role);
         BaseResponse DeleteRole(int Id);

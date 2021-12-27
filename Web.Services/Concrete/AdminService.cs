@@ -190,6 +190,10 @@ namespace Web.Services.Concrete
         {
             return this._role.GetList().Where(item => !item.IsDeleted);
         }
+        public IQueryable<Role> getRoleListByOrganizationId(int OrganizationId)
+        {
+            return this._role.GetList().Where(item => item.OrganizationIdFk == OrganizationId && !item.IsDeleted );
+        }
         public IQueryable<UserRoleVM> getRoleListByUserId(int UserId)
         {
             var userRoleList = this._userRole.GetList().Where(item => item.UserIdFk == UserId);
@@ -213,7 +217,7 @@ namespace Web.Services.Concrete
             if (role.RoleId == 0)
             {
                 var newRole = AutoMapperHelper.MapSingleRow<RoleVM, Role>(role);
-                if (_role.Table.Count(r => r.RoleName == role.RoleName && !r.IsDeleted) == 0)
+                if (_role.Table.Count(r => r.RoleName == role.RoleName && r.OrganizationIdFk == role.OrganizationIdFk && !r.IsDeleted ) == 0)
                 {
                     _role.Insert(newRole);
                     response = StatusEnums.Success.ToString();
@@ -230,8 +234,10 @@ namespace Web.Services.Concrete
                 newRole.RoleName = role.RoleName;
                 newRole.RoleDescription = role.RoleDescription;
                 newRole.RoleDiscrimination = role.RoleDiscrimination;
+                newRole.OrganizationIdFk = role.OrganizationIdFk;
                 newRole.ModifiedDate = DateTime.UtcNow;
                 newRole.ModifiedBy = role.ModifiedBy;
+                
                 _role.Update(newRole);
                 response = StatusEnums.Success.ToString();
             }
