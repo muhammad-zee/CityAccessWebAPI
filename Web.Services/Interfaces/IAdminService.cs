@@ -28,6 +28,7 @@ namespace Web.Services.Interfaces
 
         #region Users
         BaseResponse GetAllUsers();
+        BaseResponse GetAllUsersByOrganizationId(int OrganizationId, int UserRoleId);
         BaseResponse GetUserById(int Id);
         BaseResponse DeleteUser(int Id);
 

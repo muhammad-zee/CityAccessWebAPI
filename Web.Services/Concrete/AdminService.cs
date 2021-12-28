@@ -107,6 +107,36 @@ namespace Web.Services.Concrete
             }
             return new BaseResponse { Status = HttpStatusCode.OK, Message = "Users List Returned", Body = users };
         }
+        public BaseResponse GetAllUsersByOrganizationId(int OrganizationId, int UserRoleId)
+        {
+            //var result = _user.Table.Where(x => x.IsDeleted == false).ToList();
+            var result = this._dbContext.LoadStoredProc("raq_getAllUsersByOrganizationId")
+                .WithSqlParam("@pOrganizationId", OrganizationId)
+                .WithSqlParam("@pUserRoleId", UserRoleId)
+                .ExecuteStoredProc<User>().Result;
+
+            var users = AutoMapperHelper.MapList<User, RegisterCredentialVM>(result);
+            var userRelationIds = this._userRelationRepo.GetList();
+            var genders = _controlListDetails.Table.Where(x => x.ControlListIdFk == UCLEnums.Genders.ToInt()).Select(x => new { x.ControlListDetailId, x.Title });
+            foreach (var item in users)
+            {
+
+                item.UserRole = getRoleListByUserId(item.UserId).ToList();
+                item.GenderId = Convert.ToInt32(item.Gender);
+                item.Gender = genders.Where(x => x.ControlListDetailId == item.GenderId).Select(x => x.Title).FirstOrDefault();
+                item.UserImage = String.IsNullOrEmpty(item.UserImage) ? "" : item.UserImage.Replace(Directory.GetCurrentDirectory() + "/", "");
+
+                //item.OrgIdsList = userRelationIds.Where(x => x.UserIdFk == item.UserId).Select(x => x.OrganizationIdFk).Distinct().ToList();
+                //item.DptIdsList = userRelationIds.Where(x => x.UserIdFk == item.UserId).Select(x => x.DepartmentIdFk).Distinct().ToList();
+                var dptids = _serviceRepo.Table.Where(x => userRelationIds.Where(x => x.UserIdFk == item.UserId).Select(x => x.ServiceLineIdFk).Distinct().Contains(x.ServiceLineId) && x.IsDeleted != true).Select(x => x.DepartmentIdFk).Distinct().ToList();
+                item.ServiceLineIdsList = userRelationIds.Where(x => x.UserIdFk == item.UserId).Select(x => x.ServiceLineIdFk).Distinct().ToList();
+                item.DptIdsList = dptids;
+                item.OrgIdsList = _departmentRepo.Table.Where(x => x.IsDeleted != true && dptids.Contains(x.DepartmentId)).Select(x => x.OrganizationIdFk.Value).Distinct().ToList();
+                //item.selectedNodes = item.ServiceLineIdsList.Select(x => new keysVM() { Key = x.ToString() }).ToList();
+                //item.selectedRoles = item.UserRole.Select(x => new keysVM() { Key = x.RoleId.ToString() }).ToList();
+            }
+            return new BaseResponse { Status = HttpStatusCode.OK, Message = "Users List Returned", Body = users };
+        }
 
         public BaseResponse GetUserById(int Id)
         {

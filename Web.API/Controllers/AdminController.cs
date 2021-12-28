@@ -59,11 +59,21 @@ namespace Web.API.Controllers
 
         [Description("Get Users List")]
         [HttpGet("admin/GetAllUsers")]
-        public async Task<BaseResponse> GetAllUsers()
+        public async Task<BaseResponse> GetAllUsers(int? OrganizationId,int? UserRoleId)
         {
             try
             {
-                var response = _adminService.GetAllUsers();
+                BaseResponse response = null;
+                if(OrganizationId!= null)
+                {
+                    response = _adminService.GetAllUsersByOrganizationId(OrganizationId.Value, UserRoleId.Value);
+
+                }
+                else
+                {
+                 response = _adminService.GetAllUsers();
+                }
+
                 return response;
 
             }
