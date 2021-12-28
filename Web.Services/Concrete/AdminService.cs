@@ -177,8 +177,8 @@ namespace Web.Services.Concrete
                 response = new BaseResponse()
                 {
                     Status = HttpStatusCode.NotFound,
-                    Message = "Data not Found",
-                    Body = null,
+                    Message = "Users not Found",
+                    Body = new List<string>()
                 };
             }
 
@@ -192,9 +192,15 @@ namespace Web.Services.Concrete
         {
             return this._role.GetList().Where(item => !item.IsDeleted);
         }
-        public IQueryable<Role> getRoleListByOrganizationId(int OrganizationId)
+        public IQueryable<Role> getRoleListByOrganizationId(int OrganizationId, int userRoleId)
         {
-            return this._role.GetList().Where(item => item.OrganizationIdFk == OrganizationId && !item.IsDeleted );
+            var rolesList = this._role.GetList().Where(item => item.OrganizationIdFk == OrganizationId && !item.IsDeleted);
+            if(userRoleId == 2)
+            {
+                var superAdminRole = this._role.GetList().Where(item => item.RoleId == userRoleId);
+                rolesList = superAdminRole.Union(rolesList);
+            }
+            return rolesList;
         }
         public IQueryable<UserRoleVM> getRoleListByUserId(int UserId)
         {

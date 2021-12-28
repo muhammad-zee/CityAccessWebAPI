@@ -144,14 +144,14 @@ namespace Web.API.Controllers
 
         // GET: api/<EmployeeController>
         [HttpGet("admin/GetAllRoles")]
-        public BaseResponse GetRoles(int? OrganizationID)
+        public BaseResponse GetRoles(int? OrganizationID,int? userRoleId)
         {
             try
             {
                 IQueryable roleObj =null;
                 if(OrganizationID!= null)
                 {
-                 roleObj = _adminService.getRoleListByOrganizationId(OrganizationID.Value);
+                 roleObj = _adminService.getRoleListByOrganizationId(OrganizationID.Value,userRoleId.Value);
                 }
                 else
                 {
