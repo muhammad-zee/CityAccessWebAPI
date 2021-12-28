@@ -427,8 +427,8 @@ namespace Web.API.Controllers
         #region Clinical Holidays
 
         [Description("Get Clinical Hours By Service Line Id")]
-        [HttpGet("ClinicalHour/GetClinicalHourByServiceLineId/{serviceLineId}")]
-        public BaseResponse GetClinicalHourByServiceLineId(int serviceLineId)
+        [HttpGet("ClinicalHour/GetClinicalHolidayByServiceLineId/{serviceLineId}")]
+        public BaseResponse GetClinicalHolidayByServiceLineId(int serviceLineId)
         {
             try
             {
