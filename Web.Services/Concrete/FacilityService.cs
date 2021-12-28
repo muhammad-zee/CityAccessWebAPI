@@ -562,7 +562,7 @@ namespace Web.Services.Concrete
 
         public BaseResponse GetClinicalHourByServiceLineId(int orgId, int serviceLineId)
         {
-            var cHours = (from ch in this._clinicalHour.Table
+            var cHours = (from ch in this._clinicalHourRepo.Table
                           join sl in this._serviceRepo.Table on ch.ServicelineIdFk equals sl.ServiceLineId
                           join d in this._departmentRepo.Table on sl.DepartmentIdFk equals d.DepartmentId
                           join org in this._organizationRepo.Table on d.OrganizationIdFk equals org.OrganizationId
