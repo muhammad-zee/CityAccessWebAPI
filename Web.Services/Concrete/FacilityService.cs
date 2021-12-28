@@ -588,8 +588,8 @@ namespace Web.Services.Concrete
                     obj.day = item.WeekDayIdFk;
                     obj.startDate = item.StartDate;
                     obj.endDate = item.EndDate;
-                    obj.startTime = item.StartTime.ToEST();
-                    obj.endTime = item.EndTime.ToEST();
+                    obj.startTime = item.StartTime;
+                    obj.endTime = item.EndTime;
                     obj.startBreak = item.StartBreak;
                     obj.endBreak = item.EndBreak;
                     _List.Add(obj);
@@ -622,6 +622,8 @@ namespace Web.Services.Concrete
             {
                 for (int i = 0; i < clinicalHours.organizationHours.Count(); i++)
                 {
+                    #region [Add or Update]
+
                     var _clinicalHours = clinicalHours.organizationHours[i];
                     if (_clinicalHours.id > 0)
                     {
@@ -649,7 +651,6 @@ namespace Web.Services.Concrete
                         {
                             response = new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "Data Not Found" };
                         }
-
                     }
                     else
                     {
@@ -672,6 +673,26 @@ namespace Web.Services.Concrete
 
                         response = new BaseResponse() { Status = HttpStatusCode.OK, Message = "Successfully Created", Body = clinicalHours };
                     }
+
+                    #endregion
+
+                    #region [Delete]
+
+                    List<int> clinicalhoursIds = clinicalHours.organizationHours.Select(x => x.id).ToList();
+                    List<int> clinicalhoursDbIds = this._clinicalHourRepo.Table.Where(x => x.IsDeleted != true && x.ServicelineIdFk == clinicalHours.serviceId).Select(x => x.ClinicalHourId).ToList();
+                    List<int> deleteIds = clinicalhoursDbIds.Except(clinicalhoursIds).ToList();
+
+                    if (deleteIds.Count() > 0)
+                    {
+                        for (int ii = 0; ii < deleteIds.Count(); ii++)
+                        {
+                            var deleteId = deleteIds[ii];
+                            DeleteClinicalHour(deleteId, clinicalHours.LoggedInUserId);
+                        }
+
+                    }
+
+                    #endregion
                 }
             }
             else
@@ -679,13 +700,15 @@ namespace Web.Services.Concrete
                 var clinicHour = this._clinicalHourRepo.Table.Where(x => x.ServicelineIdFk == clinicalHours.serviceId).ToList();
                 if (clinicHour != null && clinicHour.Count() > 0)
                 {
-                    this._clinicalHourRepo.DeleteRange(clinicHour);
+                    for (int ii = 0; ii < clinicHour.Count(); ii++)
+                    {
+                        var deleteId = clinicHour[ii];
+                        DeleteClinicalHour(deleteId.ClinicalHourId, clinicalHours.LoggedInUserId);
+                    }
                 }
 
                 response = new BaseResponse() { Status = HttpStatusCode.OK, Message = "Successfully Deleted", Body = "" };
             }
-
-
 
             return response;
         }
