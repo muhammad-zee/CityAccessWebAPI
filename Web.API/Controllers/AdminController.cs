@@ -178,6 +178,24 @@ namespace Web.API.Controllers
             }
 
         }
+
+        [HttpGet("admin/getRoleListByOrganizationIds/{Ids}")]
+        public BaseResponse GetRoleListByOrganizationIds(string Ids)
+        {
+            try
+            {
+                var response = _adminService.getRoleListByOrganizationIds(Ids).ToList();
+                return new BaseResponse { Status = HttpStatusCode.OK, Message = "Roles List Returned", Body = response };
+
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+
+        }
         [HttpGet("admin/GetRolesByUserId/{UserId}")]
         public BaseResponse GetRoles(int UserId)
         {
