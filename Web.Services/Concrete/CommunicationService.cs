@@ -250,6 +250,11 @@ namespace Web.Services.Concrete
             }
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Channels Deleted" };
         }
+        public BaseResponse getAllChatUsers()
+        {
+            var chatUsers = this._userRepo.Table.Where(u => u.IsDeleted != true && u.IsActive == true && !string.IsNullOrEmpty(u.UserChannelSid));
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Chat users found",Body= chatUsers };
+        }
 
         #endregion
     }

@@ -339,7 +339,7 @@ namespace Web.Services.Concrete
 
         #region Organization 
 
-        public BaseResponse GetAllOrganizations()
+        public BaseResponse GetAllOrganizations(int RoleId)
         {
             var organizations = _organizationRepo.Table.Where(x => x.IsDeleted == false).ToList();
             var orgs = AutoMapperHelper.MapList<Organization, OrganizationVM>(organizations);

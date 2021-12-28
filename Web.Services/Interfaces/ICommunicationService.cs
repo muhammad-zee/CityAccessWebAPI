@@ -9,6 +9,7 @@ namespace Web.Services.Interfaces
         BaseResponse sendPushNotification(ConversationMessageVM msg);
         BaseResponse saveUserChannelSid(int UserId, string ChannelSid);
         BaseResponse delateChatChannel(string ChannelSid);
+        BaseResponse getAllChatUsers();
         bool SendSms(string ToPhoneNumber, string SmsBody);
         bool SendEmail(string To, string Subject, string HtmlContent, byte[] ImageContent);
     }

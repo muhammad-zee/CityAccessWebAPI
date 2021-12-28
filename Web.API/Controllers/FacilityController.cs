@@ -244,11 +244,11 @@ namespace Web.API.Controllers
 
         [Description("Get All Organizations")]
         [HttpGet("org/GetAllOrganizations")]
-        public BaseResponse GetAllOrganizations()
+        public BaseResponse GetAllOrganizations(int RoleId)
         {
             try
             {
-                var res = _facilityService.GetAllOrganizations();
+                var res = _facilityService.GetAllOrganizations(RoleId);
                 return res;
             }
             catch (Exception ex)
@@ -462,7 +462,7 @@ namespace Web.API.Controllers
         }
 
         [Description("Delete Clinical Holidays")]
-        [HttpPost("ClinicalHour/DeleteClinicalHoliday")]
+        [HttpGet("ClinicalHour/DeleteClinicalHoliday")]
         public BaseResponse DeleteClinicalHoliday(int clinicalHolidayId)
         {
             try
