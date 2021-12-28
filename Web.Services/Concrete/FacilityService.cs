@@ -668,6 +668,8 @@ namespace Web.Services.Concrete
                         //var chour = AutoMapperHelper.MapSingleRow<clinicalHours, ClinicalHour>(_clinicalHours);
                         this._clinicalHourRepo.Insert(chour);
 
+                        clinicalHours.organizationHours[i].id = chour.ClinicalHourId;
+
                         response = new BaseResponse() { Status = HttpStatusCode.OK, Message = "Successfully Created", Body = clinicalHours };
                     }
                 }
