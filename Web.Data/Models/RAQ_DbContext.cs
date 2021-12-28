@@ -17,6 +17,7 @@ namespace Web.Data.Models
         {
         }
 
+        public virtual DbSet<ClinicalHoliday> ClinicalHolidays { get; set; }
         public virtual DbSet<ClinicalHour> ClinicalHours { get; set; }
         public virtual DbSet<Component> Components { get; set; }
         public virtual DbSet<ComponentAccess> ComponentAccesses { get; set; }
@@ -47,6 +48,29 @@ namespace Web.Data.Models
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasAnnotation("Relational:Collation", "SQL_Latin1_General_CP1_CI_AS");
+
+            modelBuilder.Entity<ClinicalHoliday>(entity =>
+            {
+                entity.ToTable("ClinicalHoliday");
+
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.Description)
+                    .HasMaxLength(500)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.EndDate).HasColumnType("datetime");
+
+                entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.StartDate).HasColumnType("datetime");
+
+                entity.HasOne(d => d.ServicelineIdFkNavigation)
+                    .WithMany(p => p.ClinicalHolidays)
+                    .HasForeignKey(d => d.ServicelineIdFk)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_ServiceLine_clinicalHoliday");
+            });
 
             modelBuilder.Entity<ClinicalHour>(entity =>
             {

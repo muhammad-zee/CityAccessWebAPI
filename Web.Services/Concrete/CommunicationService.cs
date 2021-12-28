@@ -214,6 +214,7 @@ namespace Web.Services.Concrete
         {
             TwilioClient.Init(this.Twilio_AccountSid, this.Twilio_AuthToken);
             var Notify = Twilio.Rest.Conversations.V1.Service.Conversation.MessageResource.Create(
+                                       author:msg.author,
                                        body: msg.body,
                                        attributes: msg.attributes,
                                        pathChatServiceSid: this.Twilio_ChatServiceSid,
