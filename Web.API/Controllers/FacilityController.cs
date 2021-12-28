@@ -276,6 +276,23 @@ namespace Web.API.Controllers
             }
         }
 
+        [Description("Get Organization Association Tree By Id")]
+        [HttpGet("org/GetOrganizationAssociationTreeByIds/{Ids}")]
+        public BaseResponse GetOrgAssociationTree(string Ids)
+        {
+            try
+            {
+                var res = _facilityService.GetOrgAssociationTree(Ids);
+                return res;
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
         [Description("Add Or Update Organization ")]
         [HttpPost("org/AddOrUpdateOrganization")]
         public BaseResponse AddOrUpdateOrganization([FromBody] OrganizationVM organization)

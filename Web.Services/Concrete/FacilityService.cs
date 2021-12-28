@@ -16,31 +16,29 @@ namespace Web.Services.Concrete
     public class FacilityService : IFacilityService
     {
         private RAQ_DbContext _dbContext;
+
+        private IRepository<Role> _role;
         private IRepository<ServiceLine> _serviceRepo;
         private IRepository<Department> _departmentRepo;
         private IRepository<Organization> _organizationRepo;
         private IRepository<ClinicalHour> _clinicalHour;
-        //private IRepository<DepartmentService> _departmentServiceRepo;
-        //private IRepository<OrganizationDepartment> _organizationDepartmentRepo;
         private IRepository<ControlListDetail> _controlListDetails;
 
         public FacilityService(RAQ_DbContext dbContext,
-            IRepository<ServiceLine> serviceRepo,
+        IRepository<Role> role,
+        IRepository<ServiceLine> serviceRepo,
             IRepository<Department> departmentRepo,
             IRepository<Organization> organizationRepo,
             IRepository<ClinicalHour> clinicalHour,
-            //IRepository<DepartmentService> departmentServiceRepo,
-            //IRepository<OrganizationDepartment> organizationDepartmentRepo,
             IRepository<ControlListDetail> controlListDetails
             )
         {
             this._dbContext = dbContext;
+            this._role = role;
             this._serviceRepo = serviceRepo;
             this._departmentRepo = departmentRepo;
             this._organizationRepo = organizationRepo;
             this._clinicalHour = clinicalHour;
-            //this._departmentServiceRepo = departmentServiceRepo;
-            //this._organizationDepartmentRepo = organizationDepartmentRepo;
             this._controlListDetails = controlListDetails;
         }
 
@@ -367,6 +365,39 @@ namespace Web.Services.Concrete
             };
         }
 
+        public BaseResponse GetOrgAssociationTree(string Ids)
+        {
+            if (!string.IsNullOrEmpty(Ids))
+            {
+                var treeList = _dbContext.LoadStoredProc("raq_getOrgAssociationList")
+                .WithSqlParam("@pOrganizationId", Ids)
+                .ExecuteStoredProc<TreeviewItemVM>().Result;
+
+                var orgTree = treeList.BuildTree();
+
+                var roleTreeList = _dbContext.LoadStoredProc("raq_getOrgsRole")
+                .WithSqlParam("@pOrganizationId", Ids)
+                .ExecuteStoredProc<TreeviewItemVM>().Result;
+
+                var roleTree = roleTreeList.BuildTree();
+
+                return new BaseResponse()
+                {
+                    Status = HttpStatusCode.OK,
+                    Message = "Data Found",
+                    Body = new { orgTree, roleTree }
+                };
+            }
+            else
+            {
+                return new BaseResponse()
+                {
+                    Status = HttpStatusCode.NotFound,
+                    Message = "Data Not Found"
+                };
+            }
+        }
+
         public BaseResponse AddOrUpdateOrganization(OrganizationVM organization)
         {
             BaseResponse response = null;
@@ -554,8 +585,8 @@ namespace Web.Services.Concrete
                     obj.day = item.WeekDayIdFk;
                     obj.startDate = item.StartDate;
                     obj.endDate = item.EndDate;
-                    obj.startTime = item.StartTime;
-                    obj.endTime = item.EndTime;
+                    obj.startTime = item.StartTime.ToEST();
+                    obj.endTime = item.EndTime.ToEST();
                     obj.startBreak = item.StartBreak;
                     obj.endBreak = item.EndBreak;
                     _List.Add(obj);
@@ -584,11 +615,8 @@ namespace Web.Services.Concrete
         {
             BaseResponse response = null;
             ClinicalHour chour;
-
-            if (clinicalHours != null && clinicalHours.organizationHours.Count > 0 )
+            if (clinicalHours != null && clinicalHours.organizationHours.Count > 0)
             {
-                #region [Add or Update]
-
                 for (int i = 0; i < clinicalHours.organizationHours.Count(); i++)
                 {
                     var _clinicalHours = clinicalHours.organizationHours[i];
@@ -600,10 +628,10 @@ namespace Web.Services.Concrete
                         {
                             cHour.WeekDayIdFk = _clinicalHours.day;
                             cHour.ServicelineIdFk = clinicalHours.serviceId;
-                            cHour.StartDate = DateTime.UtcNow;
+                            cHour.StartDate = _clinicalHours.startDate;
                             cHour.StartTime = _clinicalHours.startTime;
                             cHour.StartBreak = _clinicalHours.startBreak;
-                            cHour.EndDate = DateTime.UtcNow;
+                            cHour.EndDate = _clinicalHours.endDate;
                             cHour.EndTime = _clinicalHours.endTime;
                             cHour.EndBreak = _clinicalHours.endBreak;
                             cHour.ModifiedBy = clinicalHours.LoggedInUserId;
@@ -628,8 +656,8 @@ namespace Web.Services.Concrete
                         chour.CreatedBy = clinicalHours.LoggedInUserId;
                         chour.CreatedDate = DateTime.UtcNow;
                         chour.IsDeleted = false;
-                        chour.StartDate = DateTime.UtcNow;
-                        chour.EndDate = DateTime.UtcNow;
+                        chour.StartDate = _clinicalHours.startDate.AddDays(1);
+                        chour.EndDate = _clinicalHours.endDate.AddDays(1);
                         chour.StartTime = _clinicalHours.startTime;
                         chour.EndTime = _clinicalHours.endTime;
                         chour.StartBreak = _clinicalHours.startBreak;
@@ -640,43 +668,19 @@ namespace Web.Services.Concrete
                         response = new BaseResponse() { Status = HttpStatusCode.OK, Message = "Successfully Created", Body = clinicalHours };
                     }
                 }
-
-                #endregion
-
-                #region [Delete]
-
-                List<int> clinicalhoursIds = clinicalHours.organizationHours.Select(x => x.id).ToList();
-                List<int> clinicalhoursDbIds = this._clinicalHour.Table.Where(x => x.IsDeleted != true && x.ServicelineIdFk == clinicalHours.serviceId).Select(x => x.ClinicalHourId).ToList();
-                List<int> deleteIds = clinicalhoursDbIds.Except(clinicalhoursIds).ToList();
-
-                if (deleteIds.Count() > 0)
-                {
-                    for (int i = 0; i < deleteIds.Count(); i++)
-                    {
-                        var deleteId = deleteIds[i];
-                        DeleteClinicalHour(deleteId, clinicalHours.LoggedInUserId);
-                    }
-
-                }
-
-                #endregion
             }
             else
             {
                 var clinicHour = this._clinicalHour.Table.Where(x => x.ServicelineIdFk == clinicalHours.serviceId).ToList();
                 if (clinicHour != null && clinicHour.Count() > 0)
                 {
-                    for (int i = 0; i < clinicHour.Count(); i++)
-                    {
-                        var deleteId = clinicHour[i].ClinicalHourId;
-                        DeleteClinicalHour(deleteId, clinicalHours.LoggedInUserId);
-                    }
+                    this._clinicalHour.DeleteRange(clinicHour);
                 }
 
                 response = new BaseResponse() { Status = HttpStatusCode.OK, Message = "Successfully Deleted", Body = "" };
             }
 
-            
+
 
             return response;
         }

@@ -49,6 +49,14 @@ namespace Web.Model.Common
         public List<int> DptIdsList { get; set; }
         public List<int> ServiceLineIdsList { get; set; }
 
+        public List<keysVM> selectedNodes { get; set; }
+        public List<keysVM> selectedRoles { get; set; }
+
         public List<UserRoleVM> UserRole { get; set; }
+    }
+
+    public class keysVM 
+    {
+        public string Key { get; set; }
     }
 }

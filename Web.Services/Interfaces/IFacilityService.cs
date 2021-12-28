@@ -27,6 +27,7 @@ namespace Web.Services.Interfaces
         #region Organization
         BaseResponse GetAllOrganizations();
         BaseResponse GetOrganizationById(int Id);
+        BaseResponse GetOrgAssociationTree(string Ids);
         BaseResponse AddOrUpdateOrganization(OrganizationVM organization);
         BaseResponse DeleteOrganization(int Id, int userId);
         #endregion
