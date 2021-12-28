@@ -17,29 +17,32 @@ namespace Web.Services.Concrete
     {
         private RAQ_DbContext _dbContext;
 
-        private IRepository<Role> _role;
+        private IRepository<Role> _roleRepo;
         private IRepository<ServiceLine> _serviceRepo;
         private IRepository<Department> _departmentRepo;
         private IRepository<Organization> _organizationRepo;
-        private IRepository<ClinicalHour> _clinicalHour;
-        private IRepository<ControlListDetail> _controlListDetails;
+        private IRepository<ClinicalHour> _clinicalHourRepo;
+        private IRepository<ClinicalHoliday> _clinicalHolidayRepo;
+        private IRepository<ControlListDetail> _controlListDetailsRepo;
 
         public FacilityService(RAQ_DbContext dbContext,
-        IRepository<Role> role,
+        IRepository<Role> roleRepo,
         IRepository<ServiceLine> serviceRepo,
             IRepository<Department> departmentRepo,
             IRepository<Organization> organizationRepo,
-            IRepository<ClinicalHour> clinicalHour,
-            IRepository<ControlListDetail> controlListDetails
+            IRepository<ClinicalHour> clinicalHourRepo,
+            IRepository<ControlListDetail> controlListDetailsRepo,
+            IRepository<ClinicalHoliday> clinicalHolidayRepo
             )
         {
             this._dbContext = dbContext;
-            this._role = role;
+            this._roleRepo = roleRepo;
             this._serviceRepo = serviceRepo;
             this._departmentRepo = departmentRepo;
             this._organizationRepo = organizationRepo;
-            this._clinicalHour = clinicalHour;
-            this._controlListDetails = controlListDetails;
+            this._clinicalHourRepo = clinicalHourRepo;
+            this._controlListDetailsRepo = controlListDetailsRepo;
+            this._clinicalHolidayRepo = clinicalHolidayRepo;
         }
 
         #region Service Line
@@ -337,8 +340,8 @@ namespace Web.Services.Concrete
             var departments = this._departmentRepo.Table.Where(d => d.IsDeleted != true && orgs.Select(x => x.OrganizationId).Contains(d.OrganizationIdFk.Value)).ToList();
             var dpts = AutoMapperHelper.MapList<Department, DepartmentVM>(departments);
 
-            var types = _controlListDetails.Table.Where(x => x.ControlListIdFk == UCLEnums.OrgType.ToInt()).Select(x => new { x.ControlListDetailId, x.Title });
-            var states = _controlListDetails.Table.Where(x => x.ControlListIdFk == UCLEnums.States.ToInt()).Select(x => new { x.ControlListDetailId, x.Title });
+            var types = _controlListDetailsRepo.Table.Where(x => x.ControlListIdFk == UCLEnums.OrgType.ToInt()).Select(x => new { x.ControlListDetailId, x.Title });
+            var states = _controlListDetailsRepo.Table.Where(x => x.ControlListIdFk == UCLEnums.States.ToInt()).Select(x => new { x.ControlListDetailId, x.Title });
             foreach (var item in orgs)
             {
                 item.State = states.Where(x => x.ControlListDetailId == item.StateIdFk).Select(x => x.Title).FirstOrDefault();
@@ -524,7 +527,7 @@ namespace Web.Services.Concrete
 
         public BaseResponse GetAllClinicalHours()
         {
-            var cHour = this._clinicalHour.Table.Where(x => x.IsDeleted != true).ToList();
+            var cHour = this._clinicalHourRepo.Table.Where(x => x.IsDeleted != true).ToList();
 
             return new BaseResponse()
             {
@@ -536,7 +539,7 @@ namespace Web.Services.Concrete
 
         public BaseResponse GetClinicalHourById(int Id)
         {
-            var cHour = this._clinicalHour.Table.Where(x => x.ClinicalHourId == Id && x.IsDeleted == false).FirstOrDefault();
+            var cHour = this._clinicalHourRepo.Table.Where(x => x.ClinicalHourId == Id && x.IsDeleted == false).FirstOrDefault();
             if (cHour != null)
             {
                 return new BaseResponse()
@@ -623,7 +626,7 @@ namespace Web.Services.Concrete
                     if (_clinicalHours.id > 0)
                     {
 
-                        var cHour = this._clinicalHour.Table.Where(x => x.IsDeleted != true && x.ClinicalHourId == _clinicalHours.id).FirstOrDefault();
+                        var cHour = this._clinicalHourRepo.Table.Where(x => x.IsDeleted != true && x.ClinicalHourId == _clinicalHours.id).FirstOrDefault();
                         if (cHour != null)
                         {
                             cHour.WeekDayIdFk = _clinicalHours.day;
@@ -638,7 +641,7 @@ namespace Web.Services.Concrete
                             cHour.ModifiedDate = DateTime.UtcNow;
                             cHour.IsDeleted = false;
 
-                            this._clinicalHour.Update(cHour);
+                            this._clinicalHourRepo.Update(cHour);
 
                             response = new BaseResponse() { Status = HttpStatusCode.OK, Message = "Successfully Updated", Body = cHour };
                         }
@@ -663,7 +666,7 @@ namespace Web.Services.Concrete
                         chour.StartBreak = _clinicalHours.startBreak;
                         chour.EndBreak = _clinicalHours.endBreak;
                         //var chour = AutoMapperHelper.MapSingleRow<clinicalHours, ClinicalHour>(_clinicalHours);
-                        this._clinicalHour.Insert(chour);
+                        this._clinicalHourRepo.Insert(chour);
 
                         response = new BaseResponse() { Status = HttpStatusCode.OK, Message = "Successfully Created", Body = clinicalHours };
                     }
@@ -671,10 +674,10 @@ namespace Web.Services.Concrete
             }
             else
             {
-                var clinicHour = this._clinicalHour.Table.Where(x => x.ServicelineIdFk == clinicalHours.serviceId).ToList();
+                var clinicHour = this._clinicalHourRepo.Table.Where(x => x.ServicelineIdFk == clinicalHours.serviceId).ToList();
                 if (clinicHour != null && clinicHour.Count() > 0)
                 {
-                    this._clinicalHour.DeleteRange(clinicHour);
+                    this._clinicalHourRepo.DeleteRange(clinicHour);
                 }
 
                 response = new BaseResponse() { Status = HttpStatusCode.OK, Message = "Successfully Deleted", Body = "" };
@@ -687,13 +690,13 @@ namespace Web.Services.Concrete
 
         public BaseResponse DeleteClinicalHour(int Id, int userId)
         {
-            var cHour = this._clinicalHour.Table.Where(x => x.ClinicalHourId == Id).FirstOrDefault();
+            var cHour = this._clinicalHourRepo.Table.Where(x => x.ClinicalHourId == Id).FirstOrDefault();
             if (cHour != null)
             {
                 cHour.IsDeleted = true;
                 cHour.ModifiedBy = userId;
                 cHour.ModifiedDate = DateTime.UtcNow;
-                this._clinicalHour.Update(cHour);
+                this._clinicalHourRepo.Update(cHour);
 
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Deleted Successfully" };
             }
@@ -703,6 +706,93 @@ namespace Web.Services.Concrete
             }
         }
 
+        #endregion
+
+        #region Clinical Holidays
+
+        public BaseResponse GetClinicalHolidayByServiceLineId( int serviceLineId)
+        {
+            var _List = this._clinicalHolidayRepo.Table.Where(ch => ch.IsDeleted != true && ch.ServicelineIdFk == serviceLineId);
+            if (_List != null && _List.Count() > 0)
+            {              
+                return new BaseResponse()
+                {
+                    Status = HttpStatusCode.OK,
+                    Message = "Data Found",
+                    Body = _List
+                };
+            }
+            else
+            {
+                return new BaseResponse()
+                {
+                    Status = HttpStatusCode.NotFound,
+                    Message = "Data Not Found"
+                };
+            }
+
+        }
+
+
+        public BaseResponse SaveClinicalHoliday(ClinicalHolidayVM clinicalHoliday)
+        {
+            BaseResponse response = null;
+
+            if (clinicalHoliday.ClinicalHolidayId > 0)
+            {
+                //update
+                var holiday = this._clinicalHolidayRepo.Table.FirstOrDefault(h => h.IsDeleted != true && h.ClinicalHolidayId == clinicalHoliday.ClinicalHolidayId);
+                if (holiday != null)
+                {
+                    holiday.ServicelineIdFk = clinicalHoliday.ServicelineIdFk;
+                    holiday.StartDate = clinicalHoliday.StartDate;
+                    holiday.EndDate = clinicalHoliday.EndDate;
+                    holiday.Description = clinicalHoliday.Description;
+                    holiday.ModifiedBy = clinicalHoliday.ModifiedBy;
+                    holiday.ModifiedDate = DateTime.UtcNow;
+                    holiday.IsDeleted = false;
+
+                    this._clinicalHolidayRepo.Update(holiday);
+                    response = new BaseResponse() { Status = HttpStatusCode.OK, Message = "Successfully Updated", Body = "" };
+                }
+                else
+                {
+                    response = new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Not Found", Body = "" };
+                }
+            }
+            else
+            {
+                //insert
+                var holiday = AutoMapperHelper.MapSingleRow<ClinicalHolidayVM, ClinicalHoliday>(clinicalHoliday);
+                holiday.CreatedDate = DateTime.UtcNow;
+                holiday.IsDeleted = false;
+                this._clinicalHolidayRepo.Insert(holiday);
+                response = new BaseResponse() { Status = HttpStatusCode.OK, Message = "Saved Successfully", Body = "" };
+            }
+            return response;
+        }
+
+        public BaseResponse DeleteClinicalHoliday(int clinicalHolidayId)
+        {
+            BaseResponse response = null;
+
+            //update
+            var holiday = this._clinicalHolidayRepo.Table.FirstOrDefault(h => h.IsDeleted != true && h.ClinicalHolidayId == clinicalHolidayId);
+            if (holiday != null)
+            {
+                holiday.IsDeleted = true;
+
+                this._clinicalHolidayRepo.Update(holiday);
+                response = new BaseResponse() { Status = HttpStatusCode.OK, Message = "Successfully Deleted", Body = "" };
+            }
+            else
+            {
+                response = new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Not Found", Body = "" };
+            }
+
+
+            return response;
+        }
         #endregion
 
     }

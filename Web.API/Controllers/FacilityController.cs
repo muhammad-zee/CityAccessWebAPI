@@ -402,6 +402,9 @@ namespace Web.API.Controllers
             }
         }
 
+
+
+
         [Description("Delete Clinical Hour")]
         [HttpGet("ClinicalHour/DeleteClinicalHour")]
         public BaseResponse DeleteClinicalHour(int Id, int userId)
@@ -421,5 +424,59 @@ namespace Web.API.Controllers
 
         #endregion
 
+        #region Clinical Holidays
+
+        [Description("Get Clinical Hours By Service Line Id")]
+        [HttpGet("ClinicalHour/GetClinicalHourByServiceLineId/{serviceLineId}")]
+        public BaseResponse GetClinicalHourByServiceLineId(int serviceLineId)
+        {
+            try
+            {
+                var res = _facilityService.GetClinicalHolidayByServiceLineId(serviceLineId);
+                return res;
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
+
+        [Description("Add Or Update Clinical Holidays")]
+        [HttpPost("ClinicalHour/SaveClinicalHoliday")]
+        public BaseResponse SaveClinicalHoliday([FromBody] ClinicalHolidayVM clinicalHoliday)
+        {
+            try
+            {
+                var res = _facilityService.SaveClinicalHoliday(clinicalHoliday);
+                return res;
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
+        [Description("Delete Clinical Holidays")]
+        [HttpPost("ClinicalHour/DeleteClinicalHoliday")]
+        public BaseResponse DeleteClinicalHoliday(int clinicalHolidayId)
+        {
+            try
+            {
+                var res = _facilityService.DeleteClinicalHoliday(clinicalHolidayId);
+                return res;
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+        #endregion
     }
 }
