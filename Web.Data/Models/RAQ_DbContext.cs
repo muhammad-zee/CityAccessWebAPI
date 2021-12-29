@@ -37,6 +37,7 @@ namespace Web.Data.Models
         public virtual DbSet<UserAccess> UserAccesses { get; set; }
         public virtual DbSet<UserRole> UserRoles { get; set; }
         public virtual DbSet<UsersRelation> UsersRelations { get; set; }
+        public virtual DbSet<UsersSchedule> UsersSchedules { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -585,6 +586,25 @@ namespace Web.Data.Models
                     .HasForeignKey(d => d.UserIdFk)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_UsersRelation_Users");
+            });
+
+            modelBuilder.Entity<UsersSchedule>(entity =>
+            {
+                entity.ToTable("UsersSchedule");
+
+                entity.Property(e => e.CreatedDate)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.ScheduleDate).HasColumnType("datetime");
+
+                entity.HasOne(d => d.UserIdFkNavigation)
+                    .WithMany(p => p.UsersSchedules)
+                    .HasForeignKey(d => d.UserIdFk)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_UsersSchedule_Users");
             });
 
             OnModelCreatingPartial(modelBuilder);

@@ -13,6 +13,7 @@ namespace Web.Data.Models
             UserAccesses = new HashSet<UserAccess>();
             UserRoles = new HashSet<UserRole>();
             UsersRelations = new HashSet<UsersRelation>();
+            UsersSchedules = new HashSet<UsersSchedule>();
         }
 
         public int UserId { get; set; }
@@ -52,5 +53,6 @@ namespace Web.Data.Models
         public virtual ICollection<UserAccess> UserAccesses { get; set; }
         public virtual ICollection<UserRole> UserRoles { get; set; }
         public virtual ICollection<UsersRelation> UsersRelations { get; set; }
+        public virtual ICollection<UsersSchedule> UsersSchedules { get; set; }
     }
 }
