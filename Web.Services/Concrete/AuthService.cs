@@ -202,6 +202,7 @@ namespace Web.Services.Concrete
                         };
                     }
                 }
+
                 user.FirstName = register.FirstName;
                 user.MiddleName = register.MiddleName;
                 user.LastName = register.LastName;
@@ -238,24 +239,6 @@ namespace Web.Services.Concrete
                 }
                 _userRepo.Update(user);
 
-                //if (!string.IsNullOrEmpty(register.RoleIds))
-                //{
-                //    var roleIds = register.RoleIds.ToIntList();
-                //    var userRoles = _userRoleRepo.Table.Where(x => x.UserIdFk == register.UserId).ToList();
-                //    _userRoleRepo.DeleteRange(userRoles);
-
-                //    if (roleIds.Count() > 0)
-                //    {
-                //        List<UserRole> userRoleList = new List<UserRole>();
-                //        foreach (var item in roleIds)
-                //        {
-                //            userRoleList.Add(new UserRole() { UserIdFk = user.UserId, RoleIdFk = item });
-                //        }
-                //        _userRoleRepo.Insert(userRoleList);
-                //    }
-
-                //}
-
                 var existingUserRelations = _userRelationRepo.Table.Where(x => x.UserIdFk == user.UserId && x.IsDeleted != true).ToList();
                 //existingUserRelations.ForEach(x => { x.IsDeleted = true; x.IsActive = false; x.ModifiedBy = user.ModifiedBy; x.ModifiedDate = DateTime.UtcNow; });
                 if (existingUserRelations.Count() > 0)
@@ -263,39 +246,6 @@ namespace Web.Services.Concrete
                     _userRelationRepo.DeleteRange(existingUserRelations);
                 }
 
-
-                //var orgIds = register.orgIds.ToIntList();
-                //var dptIds = register.dptIds.ToIntList();
-                //var serviceLineIds = register.serviceIds.ToIntList();
-
-                //List<UsersRelation> userRelations = new List<UsersRelation>();
-                //foreach (var item in orgIds)
-                //{
-                //var dpt = this._organizationDepartmentRepo.Table.Where(x => x.OrganizationIdFk == item && dptIds.Contains(x.DepartmentIdFk)).Select(x => x.DepartmentIdFk).ToList();
-                //foreach (var dptId in dpt)
-                //{
-                //    var serviceLines = this._departmentServiceRepo.Table.Where(x => x.DepartmentIdFk == dptId && serviceLineIds.Contains(x.ServiceIdFk)).Select(x => x.ServiceIdFk).ToList();
-                //    foreach (var sl in serviceLines)
-                //    {
-                //        var relation = new UsersRelation()
-                //        {
-                //            UserIdFk = user.UserId,
-                //            OrganizationIdFk = item,
-                //            DepartmentIdFk = dptId,
-                //            ServiceLineIdFk = sl,
-                //            CreatedBy = register.ModifiedBy,
-                //            CreatedDate = DateTime.UtcNow,
-                //            IsActive = true,
-                //            IsDeleted = false
-                //        };
-                //        userRelations.Add(relation);
-                //    }
-                //}
-                //}
-                //if (userRelations.Count() > 0) 
-                //{
-                //    this._userRelationRepo.Insert(userRelations);
-                //}
 
                 return new BaseResponse()
                 {
@@ -319,11 +269,28 @@ namespace Web.Services.Concrete
                         {
                             randomString = HelperExtension.CreateRandomString();
                         }
+
+                        bool isMatched = true;
+                        int numOfLetters = 1;
+                        while (isMatched)
+                        {
+                            if (_userRepo.Table.Any(x => x.Initials == register.Initials))
+                            {
+                                numOfLetters++;
+                                register.Initials = (register.FirstName.Substring(0, numOfLetters - 1) + register.LastName.Substring(0, numOfLetters)).ToUpper();
+                            }
+                            else
+                            {
+                                isMatched = false;
+                            }
+                        }
+
                         var obj = new User()
                         {
                             FirstName = register.FirstName,
                             MiddleName = register.MiddleName,
                             LastName = register.LastName,
+                            Initials = register.Initials,
                             UserName = register.UserName,
                             Password = register.Password,
                             PrimaryEmail = register.PrimaryEmail,
