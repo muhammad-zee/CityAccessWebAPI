@@ -14,6 +14,8 @@ namespace Web.Model.Common
         public string MiddleName { get; set; } = "";
         [Required]
         public string LastName { get; set; }
+        public string Initials { get; set; }
+
         [Required]
         public string PrimaryEmail { get; set; }
         public string SecondaryEmail { get; set; } = "";
