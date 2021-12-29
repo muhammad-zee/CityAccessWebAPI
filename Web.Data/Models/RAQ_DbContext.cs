@@ -17,6 +17,8 @@ namespace Web.Data.Models
         {
         }
 
+        public virtual DbSet<ChannelsChat> ChannelsChats { get; set; }
+        public virtual DbSet<ChannelsMembersChat> ChannelsMembersChats { get; set; }
         public virtual DbSet<ClinicalHoliday> ClinicalHolidays { get; set; }
         public virtual DbSet<ClinicalHour> ClinicalHours { get; set; }
         public virtual DbSet<Component> Components { get; set; }
@@ -48,6 +50,56 @@ namespace Web.Data.Models
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasAnnotation("Relational:Collation", "SQL_Latin1_General_CP1_CI_AS");
+
+            modelBuilder.Entity<ChannelsChat>(entity =>
+            {
+                entity.ToTable("ChannelsChat");
+
+                entity.Property(e => e.CreatedDate)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.FriendlyName)
+                    .IsRequired()
+                    .HasMaxLength(256);
+
+                entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.UniqueName)
+                    .IsRequired()
+                    .HasMaxLength(256);
+            });
+
+            modelBuilder.Entity<ChannelsMembersChat>(entity =>
+            {
+                entity.ToTable("ChannelsMembersChat");
+
+                entity.Property(e => e.CreatedDate)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.FriendlyName)
+                    .IsRequired()
+                    .HasMaxLength(256);
+
+                entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.UniqueName)
+                    .IsRequired()
+                    .HasMaxLength(256);
+
+                entity.HasOne(d => d.ChannelsChatIdFkNavigation)
+                    .WithMany(p => p.ChannelsMembersChats)
+                    .HasForeignKey(d => d.ChannelsChatIdFk)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_ChannelsChat_Users");
+
+                entity.HasOne(d => d.UserIdFkNavigation)
+                    .WithMany(p => p.ChannelsMembersChats)
+                    .HasForeignKey(d => d.UserIdFk)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_ChannelsMembersChat_Users");
+            });
 
             modelBuilder.Entity<ClinicalHoliday>(entity =>
             {
@@ -410,6 +462,12 @@ namespace Web.Data.Models
                 entity.Property(e => e.HomeAddress)
                     .HasMaxLength(500)
                     .IsUnicode(false);
+
+                entity.Property(e => e.Initials)
+                    .IsRequired()
+                    .HasMaxLength(10)
+                    .HasDefaultValueSql("(' ')")
+                    .IsFixedLength(true);
 
                 entity.Property(e => e.IsActive).HasDefaultValueSql("((1))");
 
