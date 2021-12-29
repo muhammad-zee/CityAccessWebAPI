@@ -238,23 +238,23 @@ namespace Web.Services.Concrete
                 }
                 _userRepo.Update(user);
 
-                if (!string.IsNullOrEmpty(register.RoleIds))
-                {
-                    var roleIds = register.RoleIds.ToIntList();
-                    var userRoles = _userRoleRepo.Table.Where(x => x.UserIdFk == register.UserId).ToList();
-                    _userRoleRepo.DeleteRange(userRoles);
+                //if (!string.IsNullOrEmpty(register.RoleIds))
+                //{
+                //    var roleIds = register.RoleIds.ToIntList();
+                //    var userRoles = _userRoleRepo.Table.Where(x => x.UserIdFk == register.UserId).ToList();
+                //    _userRoleRepo.DeleteRange(userRoles);
 
-                    if (roleIds.Count() > 0)
-                    {
-                        List<UserRole> userRoleList = new List<UserRole>();
-                        foreach (var item in roleIds)
-                        {
-                            userRoleList.Add(new UserRole() { UserIdFk = user.UserId, RoleIdFk = item });
-                        }
-                        _userRoleRepo.Insert(userRoleList);
-                    }
+                //    if (roleIds.Count() > 0)
+                //    {
+                //        List<UserRole> userRoleList = new List<UserRole>();
+                //        foreach (var item in roleIds)
+                //        {
+                //            userRoleList.Add(new UserRole() { UserIdFk = user.UserId, RoleIdFk = item });
+                //        }
+                //        _userRoleRepo.Insert(userRoleList);
+                //    }
 
-                }
+                //}
 
                 var existingUserRelations = _userRelationRepo.Table.Where(x => x.UserIdFk == user.UserId && x.IsDeleted != true).ToList();
                 //existingUserRelations.ForEach(x => { x.IsDeleted = true; x.IsActive = false; x.ModifiedBy = user.ModifiedBy; x.ModifiedDate = DateTime.UtcNow; });
@@ -402,6 +402,24 @@ namespace Web.Services.Concrete
             var serviceLineIds = associate.serviceIds.ToIntList();
 
             List<UsersRelation> userRelations = new List<UsersRelation>();
+
+            if (!string.IsNullOrEmpty(associate.RoleIds))
+            {
+                var roleIds = associate.RoleIds.ToIntList();
+                var userRoles = _userRoleRepo.Table.Where(x => x.UserIdFk == associate.UserId).ToList();
+                _userRoleRepo.DeleteRange(userRoles);
+
+                if (roleIds.Count() > 0)
+                {
+                    List<UserRole> userRoleList = new List<UserRole>();
+                    foreach (var item in roleIds)
+                    {
+                        userRoleList.Add(new UserRole() { UserIdFk = associate.UserId, RoleIdFk = item });
+                    }
+                    _userRoleRepo.Insert(userRoleList);
+                }
+
+            }
 
             var relation = _userRelationRepo.Table.Where(x => x.UserIdFk == associate.UserId && x.IsDeleted != true).ToList();
             if (relation.Count() > 0)
