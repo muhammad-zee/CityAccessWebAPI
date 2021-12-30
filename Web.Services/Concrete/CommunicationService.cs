@@ -18,6 +18,7 @@ using Web.DLL.Generic_Repository;
 using Web.Model;
 using Web.Model.Common;
 using Web.Services.Enums;
+using Web.Services.Helper;
 using Web.Services.Interfaces;
 
 namespace Web.Services.Concrete
@@ -38,17 +39,19 @@ namespace Web.Services.Concrete
 
 
         private IConfiguration _config;
-
+        private RAQ_DbContext _dbContext;
         private readonly IRepository<User> _userRepo;
         private readonly IRepository<ConversationChannel> _conversationChannelsRepo;
         private readonly IRepository<ConversationParticipant> _conversationParticipantsRepo;
         public CommunicationService(IConfiguration config,
-            IRepository<User> userRepo,
+             RAQ_DbContext dbContext,
+        IRepository<User> userRepo,
             IRepository<ConversationChannel> conversationChannelsRepo,
             IRepository<ConversationParticipant> conversationParticipantsRepo)
         {
 
             this._config = config;
+            this._dbContext = dbContext;
             this.Twilio_AccountSid = this._config["Twilio:AccountSid"].ToString();
             this.Twilio_AuthToken = this._config["Twilio:AuthToken"].ToString();
             this.SendGrid_ApiKey = this._config["SendGrid:ApiKey"].ToString();
@@ -301,7 +304,7 @@ namespace Web.Services.Concrete
                     };
                     channelParticipantsList.Add(newParticipant);
                 }
-                    this._conversationParticipantsRepo.Insert(channelParticipantsList);
+                this._conversationParticipantsRepo.Insert(channelParticipantsList);
 
                 response.Status = HttpStatusCode.OK;
                 response.Message = "Channel Participants Saved";
@@ -318,16 +321,19 @@ namespace Web.Services.Concrete
         {
             BaseResponse response = new BaseResponse();
 
-            var channels = (from p in this._conversationParticipantsRepo.Table
-                           join c in this._conversationChannelsRepo.Table on
-                           p.ConversationChannelIdFk equals c.ConversationChannelId
-                           where p.UserIdFk != UserId && p.IsDeleted != true && c.IsDeleted != true
-                           select new ConversationChannelsListVM
-                           {
-                           }).ToList();
+            var channels = this._dbContext.LoadStoredProc("raq_getConversationChannelsByUserId")
+            .WithSqlParam("@pUserId", UserId)
+            .ExecuteStoredProc<ConversationChannelsListVM>().Result.ToList();
+            if(channels!= null) { 
             response.Status = HttpStatusCode.OK;
             response.Message = "Conversation Channels Found";
             response.Body = channels;
+            }
+            else
+            {
+                response.Status = HttpStatusCode.OK;
+                response.Message = "Conversation Channels Not Found";
+            }
             return response;
         }
 
@@ -344,14 +350,14 @@ namespace Web.Services.Concrete
                     dbChannel.IsDeleted = true;
                     this._conversationChannelsRepo.Update(dbChannel);
                     var channelParticipants = this._conversationParticipantsRepo.Table.Where(p => p.ConversationChannelIdFk == dbChannel.ConversationChannelId);
-                    foreach(var p in channelParticipants)
+                    foreach (var p in channelParticipants)
                     {
                         p.IsDeleted = true;
                     }
                     this._conversationParticipantsRepo.Update(channelParticipants);
                 }
             }
-            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Channels Deleted" };
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Channels Found" };
         }
         public BaseResponse getAllChatUsers()
         {

@@ -71,7 +71,7 @@ namespace Web.Services.Concrete
 
         public BaseResponse GetLabelCounts()
         {
-            var LabelCounts = _dbContext.LoadStoredProc("raq_getCountOfTablesForDashboard")
+            var LabelCounts = this._dbContext.LoadStoredProc("raq_getCountOfTablesForDashboard")
             .ExecuteStoredProc<TableCountsForDashBoardVM>().Result.FirstOrDefault();
 
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Found", Body = LabelCounts };
