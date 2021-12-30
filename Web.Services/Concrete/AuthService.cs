@@ -258,8 +258,7 @@ namespace Web.Services.Concrete
             {
                 //first validate the username and password from the db and then generate token
                 if (!string.IsNullOrEmpty(register.UserName) && !string.IsNullOrEmpty(register.Password)
-                    && !string.IsNullOrEmpty(register.PrimaryEmail) && !string.IsNullOrEmpty(register.GenderId.ToString())
-                    && !string.IsNullOrEmpty(register.RoleIds))
+                    && !string.IsNullOrEmpty(register.PrimaryEmail) && !string.IsNullOrEmpty(register.GenderId.ToString()) )
                 {
                     var alreadyExist = _userRepo.GetList().Where(x => x.UserName == register.UserName && x.PrimaryEmail == register.PrimaryEmail && x.IsDeleted == false).FirstOrDefault();
                     if (alreadyExist == null)
