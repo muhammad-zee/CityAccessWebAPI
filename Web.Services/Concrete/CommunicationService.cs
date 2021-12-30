@@ -343,12 +343,12 @@ namespace Web.Services.Concrete
                 {
                     dbChannel.IsDeleted = true;
                     this._conversationChannelsRepo.Update(dbChannel);
-                    var channelParticipants = this._conversationChannelParticipantsRepo.Table.Where(p => p.ChannelsChatIdFk == dbChannel.ChannelsChatId);
+                    var channelParticipants = this._conversationParticipantsRepo.Table.Where(p => p.ConversationChannelIdFk == dbChannel.ConversationChannelId);
                     foreach(var p in channelParticipants)
                     {
                         p.IsDeleted = true;
                     }
-                    this._conversationChannelParticipantsRepo.Update(channelParticipants);
+                    this._conversationParticipantsRepo.Update(channelParticipants);
                 }
             }
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Channels Deleted" };
