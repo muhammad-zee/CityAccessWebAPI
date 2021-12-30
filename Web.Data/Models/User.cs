@@ -9,7 +9,7 @@ namespace Web.Data.Models
     {
         public User()
         {
-            ChannelsMembersChats = new HashSet<ChannelsMembersChat>();
+            ConversationParticipants = new HashSet<ConversationParticipant>();
             UserAccesses = new HashSet<UserAccess>();
             UserRoles = new HashSet<UserRole>();
             UsersRelations = new HashSet<UsersRelation>();
@@ -49,7 +49,7 @@ namespace Web.Data.Models
         public string UserChannelSid { get; set; }
         public string UserUniqueId { get; set; }
 
-        public virtual ICollection<ChannelsMembersChat> ChannelsMembersChats { get; set; }
+        public virtual ICollection<ConversationParticipant> ConversationParticipants { get; set; }
         public virtual ICollection<UserAccess> UserAccesses { get; set; }
         public virtual ICollection<UserRole> UserRoles { get; set; }
         public virtual ICollection<UsersRelation> UsersRelations { get; set; }

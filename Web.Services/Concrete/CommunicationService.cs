@@ -40,7 +40,12 @@ namespace Web.Services.Concrete
         private IConfiguration _config;
 
         private readonly IRepository<User> _userRepo;
-        public CommunicationService(IConfiguration config, IRepository<User> userRepo)
+        private readonly IRepository<ConversationChannel> _conversationChannelsRepo;
+        private readonly IRepository<ConversationParticipant> _conversationParticipantsRepo;
+        public CommunicationService(IConfiguration config,
+            IRepository<User> userRepo,
+            IRepository<ConversationChannel> conversationChannelsRepo,
+            IRepository<ConversationParticipant> conversationParticipantsRepo)
         {
 
             this._config = config;
@@ -55,9 +60,11 @@ namespace Web.Services.Concrete
             this.Twilio_ChatApiKeySecret = this._config["Twilio:ChatApiKeySecret"].ToString();
 
             this._userRepo = userRepo;
+            this._conversationChannelsRepo = conversationChannelsRepo;
+            this._conversationParticipantsRepo = conversationParticipantsRepo;
         }
 
-        #region SMS sending
+        #region [SMS sending]
         public bool SendSms(string ToPhoneNumber, string SmsBody)
         {
             ToPhoneNumber = "+923327097498";
@@ -101,7 +108,7 @@ namespace Web.Services.Concrete
         }
         #endregion
 
-        #region Email Sending
+        #region [Email Sending]
 
         public bool SendEmail(string To, string Subject, string HtmlContent, byte[] ImageContent)
         {
@@ -183,7 +190,7 @@ namespace Web.Services.Concrete
         #endregion
 
 
-        #region Twilio Conversation
+        #region [Twilio Conversation]
 
         public BaseResponse generateConversationToken(string Identity)
         {
@@ -214,7 +221,7 @@ namespace Web.Services.Concrete
         {
             TwilioClient.Init(this.Twilio_AccountSid, this.Twilio_AuthToken);
             var Notify = Twilio.Rest.Conversations.V1.Service.Conversation.MessageResource.Create(
-                                       author:msg.author,
+                                       author: msg.author,
                                        body: msg.body,
                                        attributes: msg.attributes,
                                        pathChatServiceSid: this.Twilio_ChatServiceSid,
@@ -239,21 +246,117 @@ namespace Web.Services.Concrete
             response.Body = new { UserId = UserId, UserChannelSid = ChannelSid };
             return response;
         }
+        public BaseResponse saveConversationChannel(ConversationChannelVM channel)
+        {
+            BaseResponse response = new BaseResponse();
 
-        public BaseResponse delateChatChannel(string ChannelSid)
+            var channelNotExists = this._conversationChannelsRepo.Table.Count(ch => ch.ChannelSid == channel.ChannelSid && ch.IsDeleted != true) == 0;
+            if (channelNotExists)
+            {
+                var newChannel = new ConversationChannel
+                {
+                    FriendlyName = channel.FriendlyName,
+                    UniqueName = channel.UniqueName,
+                    ChannelSid = channel.ChannelSid,
+                    IsGroup = channel.IsGroup,
+                    CreatedBy = channel.CreatedBy,
+                    CreatedDate = DateTime.UtcNow,
+                    IsDeleted = false,
+                };
+                this._conversationChannelsRepo.Insert(newChannel);
+                response.Status = HttpStatusCode.OK;
+                response.Message = "Notificaiton Channel Saved Successfully";
+                response.Body = newChannel;
+            }
+            else
+            {
+                response.Status = HttpStatusCode.OK;
+                response.Message = "Channel Already Exists";
+            }
+            return response;
+        }
+        public BaseResponse saveConversationChannelParticipants(ConversationChannelParticipantsVM model)
+        {
+            BaseResponse response = new BaseResponse();
+
+            var channel = this._conversationChannelsRepo.Table.FirstOrDefault(ch => ch.ChannelSid == model.ChannelSid && ch.IsDeleted != true);
+            if (channel != null)
+            {
+                List<ConversationParticipant> channelParticipantsList = new List<ConversationParticipant>();
+                ConversationParticipant newParticipant = null;
+                User user = null;
+                foreach (var p in model.Participants)
+                {
+                    user = this._userRepo.Table.FirstOrDefault(u => u.IsDeleted != true && u.IsActive == true && u.UserUniqueId == p);
+                    newParticipant = new ConversationParticipant()
+                    {
+                        FriendlyName = user.FirstName + " " + user.LastName,
+                        UniqueName = p,
+                        UserIdFk = user.UserId,
+                        ConversationChannelIdFk = channel.ConversationChannelId,
+                        CreatedBy = model.CreatedBy,
+                        CreatedDate = DateTime.UtcNow,
+                        IsDeleted = false
+
+                    };
+                    channelParticipantsList.Add(newParticipant);
+                }
+                    this._conversationParticipantsRepo.Insert(channelParticipantsList);
+
+                response.Status = HttpStatusCode.OK;
+                response.Message = "Channel Participants Saved";
+                //response.Body = newChannel;
+            }
+            else
+            {
+                response.Status = HttpStatusCode.OK;
+                response.Message = "channgel not saved yet";
+            }
+            return response;
+        }
+        public BaseResponse getConversationChannels(int UserId)
+        {
+            BaseResponse response = new BaseResponse();
+
+            var channels = (from p in this._conversationParticipantsRepo.Table
+                           join c in this._conversationChannelsRepo.Table on
+                           p.ConversationChannelIdFk equals c.ConversationChannelId
+                           where p.UserIdFk != UserId && p.IsDeleted != true && c.IsDeleted != true
+                           select new ConversationChannelsListVM
+                           {
+                           }).ToList();
+            response.Status = HttpStatusCode.OK;
+            response.Message = "Conversation Channels Found";
+            response.Body = channels;
+            return response;
+        }
+
+        public BaseResponse deleteChatChannel(string ChannelSid)
         {
             TwilioClient.Init(this.Twilio_AccountSid, this.Twilio_AuthToken);
             var channels = ChannelResource.Read(pathServiceSid: this.Twilio_ChatServiceSid);
             foreach (var ch in channels)
             {
-                //var delete = ChannelResource.Delete(pathServiceSid: this.Twilio_ChatServiceSid, pathSid: ch.Sid);
+                var delete = ChannelResource.Delete(pathServiceSid: this.Twilio_ChatServiceSid, pathSid: ch.Sid);
+                var dbChannel = this._conversationChannelsRepo.Table.FirstOrDefault(c => c.ChannelSid == ch.Sid && c.IsDeleted != true);
+                if (dbChannel != null)
+                {
+                    dbChannel.IsDeleted = true;
+                    this._conversationChannelsRepo.Update(dbChannel);
+                    var channelParticipants = this._conversationChannelParticipantsRepo.Table.Where(p => p.ChannelsChatIdFk == dbChannel.ChannelsChatId);
+                    foreach(var p in channelParticipants)
+                    {
+                        p.IsDeleted = true;
+                    }
+                    this._conversationChannelParticipantsRepo.Update(channelParticipants);
+                }
             }
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Channels Deleted" };
         }
         public BaseResponse getAllChatUsers()
         {
             var chatUsers = this._userRepo.Table.Where(u => u.IsDeleted != true && u.IsActive == true && !string.IsNullOrEmpty(u.UserChannelSid));
-            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Chat users found",Body= chatUsers };
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Chat users found", Body = chatUsers };
         }
 
         #endregion

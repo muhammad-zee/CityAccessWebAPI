@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using System;
 using System.Net;
 using Web.API.Helper;
+using Web.Data.Models;
 using Web.Model;
 using Web.Model.Common;
 using Web.Services.Interfaces;
@@ -25,7 +26,7 @@ namespace Web.API.Controllers
             _logger = new Logger(_hostEnvironment);
         }
 
-        [HttpGet("Communication/generateConversationToken")]
+        [HttpGet("Conversation/generateConversationToken")]
         public BaseResponse generateConversationToken(string Identity)
         {
             try
@@ -40,7 +41,7 @@ namespace Web.API.Controllers
             }
         }
 
-        [HttpPost("Communication/sendPushNotification")]
+        [HttpPost("Conversation/sendPushNotification")]
         public BaseResponse sendPushNotification([FromBody] ConversationMessageVM msg)
         {
             try
@@ -54,7 +55,7 @@ namespace Web.API.Controllers
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
         }
-        [HttpGet("Communication/saveUserChannelSid")]
+        [HttpGet("Conversation/saveUserChannelSid")]
         public BaseResponse saveUserChannelSid(int UserId, string ChannelSid)
         {
             try
@@ -68,12 +69,12 @@ namespace Web.API.Controllers
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
         }
-        [HttpGet("Communication/daleteChannelBySid")]
+        [HttpGet("Conversation/daleteChannelBySid")]
         public BaseResponse daleteChannelBySid(string ChannelSid)
         {
             try
             {
-                return this._communicaitonService.delateChatChannel(ChannelSid);
+                return this._communicaitonService.deleteChatChannel(ChannelSid);
             }
             catch (Exception ex)
             {
@@ -84,12 +85,59 @@ namespace Web.API.Controllers
         }
 
 
-        [HttpGet("Communication/getAllChatUsers")]
+        [HttpGet("Conversation/getAllChatUsers")]
         public BaseResponse getAllChatUsers()
         {
             try
             {
                 return this._communicaitonService.getAllChatUsers();
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
+        [HttpPost("Conversation/SaveConversationChannel")]
+        public BaseResponse SaveConversationChannel([FromBody] ConversationChannelVM channel)
+        {
+            try
+            {
+                return this._communicaitonService.saveConversationChannel(channel);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
+        [HttpPost("Conversation/saveConversationChannelParticipants")]
+        public BaseResponse saveConversationChannelParticipants([FromBody] ConversationChannelParticipantsVM channel)
+        {
+            try
+            {
+                var state = ModelState;
+                return this._communicaitonService.saveConversationChannelParticipants(channel);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
+        [HttpGet("Conversation/getConversationChannels")]
+        public BaseResponse getConversationChannels(int UserId)
+        {
+            try
+            {
+                var state = ModelState;
+                return this._communicaitonService.getConversationChannels(UserId);
             }
             catch (Exception ex)
             {
