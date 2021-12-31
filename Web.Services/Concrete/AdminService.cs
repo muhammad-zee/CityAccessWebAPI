@@ -100,7 +100,7 @@ namespace Web.Services.Concrete
                 item.ServiceLineIdsList = userRelationIds.Where(x => x.UserIdFk == item.UserId).Select(x => x.ServiceLineIdFk).Distinct().ToList();
                 item.DptIdsList = dptids;
                 item.OrgIdsList = _departmentRepo.Table.Where(x => x.IsDeleted != true && dptids.Contains(x.DepartmentId)).Select(x => x.OrganizationIdFk.Value).Distinct().ToList();
-                
+
             }
             return new BaseResponse { Status = HttpStatusCode.OK, Message = "Users List Returned", Body = users };
         }
@@ -127,23 +127,23 @@ namespace Web.Services.Concrete
                 item.ServiceLineIdsList = userRelationIds.Where(x => x.UserIdFk == item.UserId).Select(x => x.ServiceLineIdFk).Distinct().ToList();
                 item.DptIdsList = dptids;
                 item.OrgIdsList = _departmentRepo.Table.Where(x => x.IsDeleted != true && dptids.Contains(x.DepartmentId)).Select(x => x.OrganizationIdFk.Value).Distinct().ToList();
-                
+
             }
             return new BaseResponse { Status = HttpStatusCode.OK, Message = "Users List Returned", Body = users };
         }
-        public BaseResponse GetAllUsersByServiceLineAndRoleId(int ServiceLineId,int RoleId)
+        public BaseResponse GetAllUsersByServiceLineAndRoleId(int ServiceLineId, int RoleId)
         {
             BaseResponse response = null;
             if (RoleId == 0 && ServiceLineId > 0)
             {
-                //get users by service id
+                // get users by service id
             }
-            else if(RoleId > 0 && ServiceLineId == 0)
+            else if (RoleId > 0 && ServiceLineId == 0)
             {
                 // get user by role id
                 response = GetUsersByRoleId(RoleId);
             }
-            else if(ServiceLineId > 0 && RoleId > 0)
+            else if (ServiceLineId > 0 && RoleId > 0)
             {
                 // get users by service id and role id
             }
@@ -254,7 +254,7 @@ namespace Web.Services.Concrete
         public IQueryable<Role> getRoleListByOrganizationId(int OrganizationId, int userRoleId)
         {
             var rolesList = this._role.GetList().Where(item => item.OrganizationIdFk == OrganizationId && !item.IsDeleted);
-            if(userRoleId == 2)
+            if (userRoleId == 2)
             {
                 var superAdminRole = this._role.GetList().Where(item => item.RoleId == userRoleId);
                 rolesList = superAdminRole.Union(rolesList);
@@ -262,7 +262,7 @@ namespace Web.Services.Concrete
             return rolesList;
         }
 
-        public IQueryable<Role> getRoleListByOrganizationIds(string OrganizationIds) 
+        public IQueryable<Role> getRoleListByOrganizationIds(string OrganizationIds)
         {
             var ids = OrganizationIds.ToIntList();
             var roleList = (from r in this._role.Table
@@ -303,7 +303,7 @@ namespace Web.Services.Concrete
             if (role.RoleId == 0)
             {
                 var newRole = AutoMapperHelper.MapSingleRow<RoleVM, Role>(role);
-                if (_role.Table.Count(r => r.RoleName == role.RoleName && r.OrganizationIdFk == role.OrganizationIdFk && !r.IsDeleted ) == 0)
+                if (_role.Table.Count(r => r.RoleName == role.RoleName && r.OrganizationIdFk == role.OrganizationIdFk && !r.IsDeleted) == 0)
                 {
                     _role.Insert(newRole);
                     response = StatusEnums.Success.ToString();
@@ -323,7 +323,7 @@ namespace Web.Services.Concrete
                 newRole.OrganizationIdFk = role.OrganizationIdFk;
                 newRole.ModifiedDate = DateTime.UtcNow;
                 newRole.ModifiedBy = role.ModifiedBy;
-                
+
                 _role.Update(newRole);
                 response = StatusEnums.Success.ToString();
             }
