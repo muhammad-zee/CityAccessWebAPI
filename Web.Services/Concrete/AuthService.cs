@@ -163,7 +163,9 @@ namespace Web.Services.Concrete
                 UserRole = UserRole,
                 IsRequirePasswordReset = user.IsRequirePasswordReset,
                 NotificationChannelSid = user.UserChannelSid,
-                UserUniqueId = user.UserUniqueId
+                UserUniqueId = user.UserUniqueId,
+                UserImage = user.UserImage
+                
 
             };
         }
