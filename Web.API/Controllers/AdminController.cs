@@ -85,6 +85,25 @@ namespace Web.API.Controllers
             }
         }
 
+        [Description("Get Users List")]
+        [HttpGet("admin/GetAllUsersByServiceAndRoleId")]
+        public async Task<BaseResponse> GetAllUsersByServiceAndRoleId(int ServiceId, int RoleId)
+        {
+            try
+            {
+                BaseResponse response = null;
+                response = _adminService.GetAllUsersByServiceAndRoleId(ServiceId, RoleId);
+return response;
+
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
         [Description("Get User By Id")]
         [HttpGet("admin/GetUserById/{Id}")]
         public async Task<BaseResponse> GetUserById(int Id)
