@@ -258,7 +258,7 @@ namespace Web.Services.Concrete
             {
                 //first validate the username and password from the db and then generate token
                 if (!string.IsNullOrEmpty(register.UserName) && !string.IsNullOrEmpty(register.Password)
-                    && !string.IsNullOrEmpty(register.PrimaryEmail) && !string.IsNullOrEmpty(register.GenderId.ToString()) )
+                    && !string.IsNullOrEmpty(register.PrimaryEmail) && !string.IsNullOrEmpty(register.GenderId.ToString()))
                 {
                     var alreadyExist = _userRepo.GetList().Where(x => x.UserName == register.UserName && x.PrimaryEmail == register.PrimaryEmail && x.IsDeleted == false).FirstOrDefault();
                     if (alreadyExist == null)
@@ -270,13 +270,26 @@ namespace Web.Services.Concrete
                         }
 
                         bool isMatched = true;
+                        bool from2ndName = true;
                         int numOfLetters = 1;
                         while (isMatched)
                         {
-                            if (_userRepo.Table.Any(x => x.Initials == register.Initials))
+                            if (_userRepo.Table.Any(x => x.Initials == register.Initials && !x.IsDeleted))
                             {
                                 numOfLetters++;
-                                register.Initials = (register.FirstName.Substring(0, numOfLetters - 1) + register.LastName.Substring(0, numOfLetters)).ToUpper();
+                                if (numOfLetters <= (register.FirstName.Length) && numOfLetters <= (register.LastName.Length) && from2ndName)
+                                {
+                                    register.Initials = (register.FirstName.Substring(0, numOfLetters - 1) + register.LastName.Substring(0, numOfLetters)).ToUpper();
+                                }
+                                if (numOfLetters <= (register.FirstName.Length) && numOfLetters <= (register.LastName.Length) && !from2ndName)
+                                {
+                                    register.Initials = (register.FirstName.Substring(0, numOfLetters) + register.LastName.Substring(0, numOfLetters - 1)).ToUpper();
+                                }
+                                if (numOfLetters > (register.FirstName.Length) && numOfLetters > (register.LastName.Length))
+                                {
+                                    numOfLetters = 1;
+                                    from2ndName = !from2ndName;
+                                }
                             }
                             else
                             {

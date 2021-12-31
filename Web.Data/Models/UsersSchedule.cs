@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 #nullable disable
 
@@ -9,8 +8,8 @@ namespace Web.Data.Models
     {
         public int UsersScheduleId { get; set; }
         public DateTime ScheduleDate { get; set; }
-        public TimeSpan ScheduleTimeStart { get; set; }
-        public TimeSpan ScheduleTimeEnd { get; set; }
+        public DateTime ScheduleTimeStart { get; set; }
+        public DateTime ScheduleTimeEnd { get; set; }
         public int UserIdFk { get; set; }
         public int CreatedBy { get; set; }
         public DateTime CreatedDate { get; set; }

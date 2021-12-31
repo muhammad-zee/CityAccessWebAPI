@@ -324,10 +324,11 @@ namespace Web.Services.Concrete
             var channels = this._dbContext.LoadStoredProc("raq_getConversationChannelsByUserId")
             .WithSqlParam("@pUserId", UserId)
             .ExecuteStoredProc<ConversationChannelsListVM>().Result.ToList();
-            if(channels!= null) { 
-            response.Status = HttpStatusCode.OK;
-            response.Message = "Conversation Channels Found";
-            response.Body = channels;
+            if (channels != null)
+            {
+                response.Status = HttpStatusCode.OK;
+                response.Message = "Conversation Channels Found";
+                response.Body = channels;
             }
             else
             {

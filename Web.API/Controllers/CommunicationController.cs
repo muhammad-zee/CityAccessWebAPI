@@ -5,7 +5,6 @@ using Microsoft.Extensions.Configuration;
 using System;
 using System.Net;
 using Web.API.Helper;
-using Web.Data.Models;
 using Web.Model;
 using Web.Model.Common;
 using Web.Services.Interfaces;

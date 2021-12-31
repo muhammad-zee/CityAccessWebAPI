@@ -57,7 +57,7 @@ namespace Web.Model.Common
         public List<UserRoleVM> UserRole { get; set; }
     }
 
-    public class keysVM 
+    public class keysVM
     {
         public string Key { get; set; }
     }

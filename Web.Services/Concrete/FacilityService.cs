@@ -741,11 +741,11 @@ namespace Web.Services.Concrete
 
         #region Clinical Holidays
 
-        public BaseResponse GetClinicalHolidayByServiceLineId( int serviceLineId)
+        public BaseResponse GetClinicalHolidayByServiceLineId(int serviceLineId)
         {
             var _List = this._clinicalHolidayRepo.Table.Where(ch => ch.IsDeleted != true && ch.ServicelineIdFk == serviceLineId);
             if (_List != null && _List.Count() > 0)
-            {              
+            {
                 return new BaseResponse()
                 {
                     Status = HttpStatusCode.OK,

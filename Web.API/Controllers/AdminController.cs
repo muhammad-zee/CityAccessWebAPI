@@ -59,19 +59,19 @@ namespace Web.API.Controllers
 
         [Description("Get Users List")]
         [HttpGet("admin/GetAllUsers")]
-        public async Task<BaseResponse> GetAllUsers(int? OrganizationId,int? UserRoleId)
+        public async Task<BaseResponse> GetAllUsers(int? OrganizationId, int? UserRoleId)
         {
             try
             {
                 BaseResponse response = null;
-                if(OrganizationId!= null)
+                if (OrganizationId != null)
                 {
                     response = _adminService.GetAllUsersByOrganizationId(OrganizationId.Value, UserRoleId.Value);
 
                 }
                 else
                 {
-                 response = _adminService.GetAllUsers();
+                    response = _adminService.GetAllUsers();
                 }
 
                 return response;
@@ -173,18 +173,18 @@ namespace Web.API.Controllers
 
         // GET: api/<EmployeeController>
         [HttpGet("admin/GetAllRoles")]
-        public BaseResponse GetRoles(int? OrganizationID,int? userRoleId)
+        public BaseResponse GetRoles(int? OrganizationID, int? userRoleId)
         {
             try
             {
-                IQueryable roleObj =null;
-                if(OrganizationID!= null)
+                IQueryable roleObj = null;
+                if (OrganizationID != null)
                 {
-                 roleObj = _adminService.getRoleListByOrganizationId(OrganizationID.Value,userRoleId.Value);
+                    roleObj = _adminService.getRoleListByOrganizationId(OrganizationID.Value, userRoleId.Value);
                 }
                 else
                 {
-                 roleObj = _adminService.getRoleList();
+                    roleObj = _adminService.getRoleList();
                 }
                 return new BaseResponse { Status = HttpStatusCode.OK, Message = "Roles List Returned", Body = roleObj };
 

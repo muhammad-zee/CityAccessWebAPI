@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Net;
-using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Web.API.Helper;
 using Web.Model;
@@ -91,24 +90,33 @@ namespace Web.API.Controllers
         [Description("Import Schedule")]
         [Route("Schedule/Upload")]
         [HttpPost, DisableRequestSizeLimit]
-        public async Task<BaseResponse> Upload()
+        public async Task<BaseResponse> Upload([FromBody] ImportCSVFileVM fileVM)
         {
             try
             {
                 var response = new BaseResponse();
-                var file = Request.Form.Files[0];
-                var folderName = Path.Combine("ImportSchecdule");
-                var pathToSave = Path.Combine(Directory.GetCurrentDirectory(), folderName);
-                if (file.Length > 0)
+                //var file = Request.Form.Files[0];
+
+                if (!string.IsNullOrEmpty(fileVM.Base64CSV))
                 {
-                    var fileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
+                    var folderName = Path.Combine("ImportSchecdule");
+                    var pathToSave = Path.Combine(this._hostEnvironment.WebRootPath, folderName);
+                    if (!Directory.Exists(pathToSave))
+                    {
+                        Directory.CreateDirectory(pathToSave);
+                    }
+                    var fileName = "ImportSchecduleFile_" + DateTime.UtcNow.ToString("MMddyyyyhhmmss") + ".csv"; //ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
                     var fullPath = Path.Combine(pathToSave, fileName);
                     var dbPath = Path.Combine(folderName, fileName);
-                    using (var stream = new FileStream(fullPath, FileMode.Create))
+                    var fileInBytes = Convert.FromBase64String(fileVM.Base64CSV.Split("base64,")[1]);
+                    using (var stream = new FileStream(fullPath, FileMode.Create, FileAccess.Write))
                     {
-                        file.CopyTo(stream);
+                        // file.CopyTo(stream);
+                        stream.Write(fileInBytes);
                     }
-                    response.Status = HttpStatusCode.OK;
+                    fileVM.FilePath = fullPath;
+
+                    response = _scheduleService.ImportCSV(fileVM);
                     return response;
                 }
                 else

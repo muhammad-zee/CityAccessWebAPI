@@ -329,8 +329,6 @@ namespace Web.API.Controllers
 
         #endregion
 
-
-
         #region Clinical Hours
 
         [Description("Get All Clinical Hours")]
@@ -387,7 +385,7 @@ namespace Web.API.Controllers
 
         [Description("Add Or Update Clinical Hours")]
         [HttpPost("ClinicalHour/AddOrUpdateClinicalHour")]
-        public BaseResponse AddOrUpdateClinicalHour([FromBody]OrganizationSchedule clinicalHours)
+        public BaseResponse AddOrUpdateClinicalHour([FromBody] OrganizationSchedule clinicalHours)
         {
             try
             {
@@ -478,5 +476,6 @@ namespace Web.API.Controllers
             }
         }
         #endregion
+
     }
 }
