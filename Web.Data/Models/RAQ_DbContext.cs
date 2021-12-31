@@ -593,7 +593,14 @@ namespace Web.Data.Models
 
                 entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
 
-                entity.Property(e => e.ScheduleDate).HasColumnType("datetime");
+                entity.Property(e => e.ScheduleDateEnd).HasColumnType("datetime");
+
+                entity.Property(e => e.ScheduleDateStart).HasColumnType("datetime");
+
+                entity.HasOne(d => d.ServiceLineIdFkNavigation)
+                    .WithMany(p => p.UsersSchedules)
+                    .HasForeignKey(d => d.ServiceLineIdFk)
+                    .HasConstraintName("FK_UsersSchedule_ServiceLine");
 
                 entity.HasOne(d => d.UserIdFkNavigation)
                     .WithMany(p => p.UsersSchedules)

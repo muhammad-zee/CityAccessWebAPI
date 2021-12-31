@@ -71,7 +71,7 @@ namespace Web.Services.Concrete
                 {
 
                     var ScheduleDate = Convert.ToDateTime(row[0]);
-                    var alreadyExist = _scheduleRepo.Table.Where(x => userIds.Contains(x.UserIdFk) && x.ScheduleDate.Date == ScheduleDate.Date && !x.IsDeleted).ToList();
+                    var alreadyExist = _scheduleRepo.Table.Where(x => userIds.Contains(x.UserIdFk) && x.ScheduleDateStart.Date == ScheduleDate.Date && !x.IsDeleted).ToList();
                     if (alreadyExist.Count > 0)
                     {
                         listToBeRemoved.AddRange(alreadyExist);
@@ -91,10 +91,10 @@ namespace Web.Services.Concrete
                     {
                         var obj = new UsersSchedule()
                         {
-                            ScheduleDate = ScheduleDate,
-                            ScheduleTimeStart = StartDateTime,
-                            ScheduleTimeEnd = EndDateTime,
+                            ScheduleDateStart = StartDateTime,
+                            ScheduleDateEnd = EndDateTime,
                             UserIdFk = u,
+                            ServiceLineIdFk = fileVM.ServiceLineId,
                             CreatedBy = fileVM.LoggedinUserId,
                             CreatedDate = DateTime.UtcNow,
                             IsDeleted = false
@@ -103,6 +103,17 @@ namespace Web.Services.Concrete
                     }
                 }
             }
+
+            if (listToBeRemoved.Count > 0)
+            {
+                _scheduleRepo.DeleteRange(listToBeRemoved);
+            }
+
+            if (listToBeInsert.Count > 0)
+            {
+                _scheduleRepo.Insert(listToBeInsert);
+            }
+
 
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Found", Body = new { dt = listToBeInsert } };
         }
