@@ -134,16 +134,16 @@ namespace Web.Services.Concrete
         public BaseResponse GetAllUsersByServiceLineAndRoleId(int ServiceLineId,int RoleId)
         {
             BaseResponse response = null;
-            if (RoleId == 0 && ServiceId > 0)
+            if (RoleId == 0 && ServiceLineId > 0)
             {
                 //get users by service id
             }
-            else if(RoleId > 0 && ServiceId == 0)
+            else if(RoleId > 0 && ServiceLineId == 0)
             {
                 // get user by role id
                 response = GetUsersByRoleId(RoleId);
             }
-            else if(ServiceId>0 && RoleId > 0)
+            else if(ServiceLineId > 0 && RoleId > 0)
             {
                 // get users by service id and role id
             }
