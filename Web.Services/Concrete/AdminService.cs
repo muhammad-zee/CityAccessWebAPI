@@ -131,13 +131,13 @@ namespace Web.Services.Concrete
             }
             return new BaseResponse { Status = HttpStatusCode.OK, Message = "Users List Returned", Body = users };
         }
-        public BaseResponse GetAllUsersByServiceLineAndRoleId(int ServiceLineId, int RoleId)
+        public BaseResponse GetAllUsersByServiceLineAndRoleId(int ServiceLineId, string RoleIds)
         {
             BaseResponse response = null;
 
             var users = _dbContext.LoadStoredProc("raq_getAllUsersByServiceLineIdAndRoleId")
                         .WithSqlParam("@serviceLineId", ServiceLineId)
-                        .WithSqlParam("@roleId", RoleId).ExecuteStoredProc<RegisterCredentialVM>().Result.Select(x => new { Id = x.UserId, Name = x.UserName }).ToList();
+                        .WithSqlParam("@roleId", RoleIds).ExecuteStoredProc<RegisterCredentialVM>().Result.Select(x => new { Id = x.UserId, Name = x.UserName }).ToList();
 
             return new BaseResponse { Status = HttpStatusCode.OK, Message = "Users List Returned", Body = users };
         }
