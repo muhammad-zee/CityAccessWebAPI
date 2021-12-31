@@ -154,7 +154,7 @@ namespace Web.Services.Concrete
             var GatherResponseUrl = $"{origin}/Call/PromptResponse";
 
             var gather = new Gather(numDigits: 1, timeout: 10, action: new Uri(GatherResponseUrl)).Pause(length: 3)
-                                          .Say("Press one to do  talk to Bilal.", language: "en").Pause(length: 1)
+                                          .Say("Press one to  talk to Bilal.", language: "en").Pause(length: 1)
                                           .Say("Press two to talk to an Zee.", language: "en").Pause(length: 1)
                                           .Say("Press three to send voice mail");
             response.Append(gather);
