@@ -13,7 +13,7 @@ namespace Web.Services.Interfaces
         BaseResponse getConversationChannels(int UserId);
 
         BaseResponse deleteChatChannel(string ChannelSid);
-        BaseResponse getAllChatUsers();
+        BaseResponse getAllConversationUsers();
         bool SendSms(string ToPhoneNumber, string SmsBody);
         bool SendEmail(string To, string Subject, string HtmlContent, byte[] ImageContent);
     }

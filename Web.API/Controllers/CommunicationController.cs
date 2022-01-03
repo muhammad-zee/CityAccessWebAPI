@@ -84,12 +84,12 @@ namespace Web.API.Controllers
         }
 
 
-        [HttpGet("Conversation/getAllChatUsers")]
+        [HttpGet("Conversation/getAllConversationUsers")]
         public BaseResponse getAllChatUsers()
         {
             try
             {
-                return this._communicaitonService.getAllChatUsers();
+                return this._communicaitonService.getAllConversationUsers();
             }
             catch (Exception ex)
             {
