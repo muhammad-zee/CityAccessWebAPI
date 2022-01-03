@@ -22,19 +22,23 @@ namespace Web.Services.Concrete
         IConfiguration _config;
         private readonly UnitOfWork unitorWork;
         private IHostingEnvironment _environment;
+        private RAQ_DbContext _dbContext;
+
         private readonly IRepository<UsersSchedule> _scheduleRepo;
         private readonly IRepository<User> _userRepo;
         private readonly IRepository<UsersRelation> _userRelationRepo;
         private readonly IRepository<ServiceLine> _serviceRepo;
 
 
-        public ScheduleService(IConfiguration configuration,
+        public ScheduleService(RAQ_DbContext dbContext,
+            IConfiguration configuration,
             IHostingEnvironment environment,
             IRepository<UsersSchedule> scheduleRepo,
             IRepository<User> userRepo,
             IRepository<UsersRelation> userRelationRepo,
             IRepository<ServiceLine> serviceRepo)
         {
+            this._dbContext = dbContext;
             this._config = configuration;
             this._environment = environment;
 
@@ -42,6 +46,14 @@ namespace Web.Services.Concrete
             this._userRepo = userRepo;
             this._userRelationRepo = userRelationRepo;
             this._serviceRepo = serviceRepo;
+        }
+
+        public BaseResponse getSchedule()
+        {
+            var scheduleList = this._dbContext.LoadStoredProc("raq_getSchedule")
+            .ExecuteStoredProc<ScheduleEventData>().Result.ToList();
+
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Found", Body = scheduleList };
         }
 
         public BaseResponse ImportCSV(ImportCSVFileVM fileVM)

@@ -38,18 +38,9 @@ namespace Web.API.Controllers
         {
             try
             {
-                List<ScheduleEventData> _list = new List<ScheduleEventData>();
-                ScheduleEventData obj = new ScheduleEventData();
+                var response = _scheduleService.getSchedule();
 
-                obj.Id = 1;
-                obj.Subject = "Muhammad Masud";
-                obj.IsAllDay = false;
-                obj.StartTime = DateTime.Now;
-                obj.EndTime = DateTime.Now.AddHours(8);
-                obj.OwnerId = 1;
-                _list.Add(obj);
-
-                return Json(_list);
+                return Json(response.Body);
             }
             catch (Exception ex)
             {
@@ -76,6 +67,8 @@ namespace Web.API.Controllers
                 obj.EndTime = DateTime.Now.AddHours(10);
                 obj.OwnerId = 1;
                 list.Add(obj);
+
+                //var response = _scheduleService.getSchedule();
 
                 return Json(list);
             }

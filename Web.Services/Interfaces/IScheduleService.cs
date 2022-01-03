@@ -5,6 +5,8 @@ namespace Web.Services.Interfaces
 {
     public interface IScheduleService
     {
+
+        BaseResponse getSchedule();
         BaseResponse ImportCSV(ImportCSVFileVM fileVM);
         BaseResponse GetScheduleTemplate(int serviceLine);
     }
