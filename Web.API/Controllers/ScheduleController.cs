@@ -59,8 +59,8 @@ namespace Web.API.Controllers
             }
         }
 
-        [Description("Update Schedule")]
-        [Route("Schedule/UpdateSchedule")]
+        [Description("Add Or Update Schedule")]
+        [Route("Schedule/AddOrUpdateSchedule")]
         [HttpPost, DisableRequestSizeLimit]
         public ActionResult UpdateSchedule([FromBody] EditParams param)
         {
@@ -123,6 +123,29 @@ namespace Web.API.Controllers
                 {
                     return response;
                 }
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse()
+                {
+                    Status = HttpStatusCode.BadRequest,
+                    Message = ex.ToString(),
+                    Body = null
+                };
+            }
+        }
+
+
+        [Description("Get Schedule Template")]
+        [HttpGet("Schedule/GetScheduleTemplate/{serviceLineId}")]
+        public BaseResponse GetScheduleTemplate(int serviceLineId) 
+        {
+            try
+            {
+                var response = this._scheduleService.GetScheduleTemplate(serviceLineId);
+                return response;
             }
             catch (Exception ex)
             {
