@@ -38,18 +38,9 @@ namespace Web.API.Controllers
         {
             try
             {
-                List<ScheduleEventData> _list = new List<ScheduleEventData>();
-                ScheduleEventData obj = new ScheduleEventData();
+                var response = _scheduleService.getSchedule();
 
-                obj.Id = 1;
-                obj.Subject = "Muhammad Masud";
-                obj.IsAllDay = false;
-                obj.StartTime = DateTime.Now;
-                obj.EndTime = DateTime.Now.AddHours(8);
-                obj.OwnerId = 1;
-                _list.Add(obj);
-
-                return Json(_list);
+                return Json(response.Body);
             }
             catch (Exception ex)
             {
@@ -59,8 +50,8 @@ namespace Web.API.Controllers
             }
         }
 
-        [Description("Update Schedule")]
-        [Route("Schedule/UpdateSchedule")]
+        [Description("Add Or Update Schedule")]
+        [Route("Schedule/AddOrUpdateSchedule")]
         [HttpPost, DisableRequestSizeLimit]
         public ActionResult UpdateSchedule([FromBody] EditParams param)
         {
@@ -76,6 +67,8 @@ namespace Web.API.Controllers
                 obj.EndTime = DateTime.Now.AddHours(10);
                 obj.OwnerId = 1;
                 list.Add(obj);
+
+                //var response = _scheduleService.getSchedule();
 
                 return Json(list);
             }
@@ -123,6 +116,29 @@ namespace Web.API.Controllers
                 {
                     return response;
                 }
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse()
+                {
+                    Status = HttpStatusCode.BadRequest,
+                    Message = ex.ToString(),
+                    Body = null
+                };
+            }
+        }
+
+
+        [Description("Get Schedule Template")]
+        [HttpGet("Schedule/GetScheduleTemplate/{serviceLineId}")]
+        public BaseResponse GetScheduleTemplate(int serviceLineId) 
+        {
+            try
+            {
+                var response = this._scheduleService.GetScheduleTemplate(serviceLineId);
+                return response;
             }
             catch (Exception ex)
             {

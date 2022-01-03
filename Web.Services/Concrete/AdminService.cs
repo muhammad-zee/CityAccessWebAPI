@@ -133,8 +133,6 @@ namespace Web.Services.Concrete
         }
         public BaseResponse GetAllUsersByServiceLineAndRoleId(int ServiceLineId, string RoleIds)
         {
-            BaseResponse response = null;
-
             var users = _dbContext.LoadStoredProc("raq_getAllUsersByServiceLineIdAndRoleId")
                         .WithSqlParam("@serviceLineId", ServiceLineId)
                         .WithSqlParam("@roleId", RoleIds).ExecuteStoredProc<RegisterCredentialVM>().Result.Select(x => new { Id = x.UserId, Name = x.UserName }).ToList();

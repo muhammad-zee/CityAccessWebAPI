@@ -37,12 +37,13 @@ namespace Web.API.Helper
             {
                 FileInfo logFileInfo = new FileInfo(logFile);
                 //FileAppender fileAppender = new FileAppender();
-                var RootPath = this._hostEnvironment.WebRootPath + "\\Logs";
+                var RootPath = this._hostEnvironment.WebRootPath;
+                RootPath = Path.Combine(RootPath, "Logs");
                 if (!Directory.Exists(RootPath))
                 {
                     Directory.CreateDirectory(RootPath);
                 }
-                string FilePath = $"\\log4net_{DateTime.UtcNow.ToString("dd-MM-yyyy")}.txt";
+                string FilePath = $"log4net_{DateTime.UtcNow.ToString("dd-MM-yyyy")}.txt";
                 var targetPath = Path.Combine(RootPath, FilePath);
                 //fileAppender.File = targetPath;
                 if (!File.Exists(targetPath))

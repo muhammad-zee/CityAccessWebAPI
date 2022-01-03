@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.IO;
 using System.Linq;
 using System.Net;
 using Web.Data.Models;
@@ -11,6 +12,7 @@ using Web.DLL;
 using Web.DLL.Generic_Repository;
 using Web.Model;
 using Web.Model.Common;
+using Web.Services.Helper;
 using Web.Services.Interfaces;
 
 namespace Web.Services.Concrete
@@ -20,19 +22,23 @@ namespace Web.Services.Concrete
         IConfiguration _config;
         private readonly UnitOfWork unitorWork;
         private IHostingEnvironment _environment;
+        private RAQ_DbContext _dbContext;
+
         private readonly IRepository<UsersSchedule> _scheduleRepo;
         private readonly IRepository<User> _userRepo;
         private readonly IRepository<UsersRelation> _userRelationRepo;
         private readonly IRepository<ServiceLine> _serviceRepo;
 
 
-        public ScheduleService(IConfiguration configuration,
+        public ScheduleService(RAQ_DbContext dbContext,
+            IConfiguration configuration,
             IHostingEnvironment environment,
             IRepository<UsersSchedule> scheduleRepo,
             IRepository<User> userRepo,
             IRepository<UsersRelation> userRelationRepo,
             IRepository<ServiceLine> serviceRepo)
         {
+            this._dbContext = dbContext;
             this._config = configuration;
             this._environment = environment;
 
@@ -42,93 +48,92 @@ namespace Web.Services.Concrete
             this._serviceRepo = serviceRepo;
         }
 
+        public BaseResponse getSchedule()
+        {
+            var scheduleList = this._dbContext.LoadStoredProc("raq_getSchedule")
+            .ExecuteStoredProc<ScheduleEventData>().Result.ToList();
+
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Found", Body = scheduleList };
+        }
+
         public BaseResponse ImportCSV(ImportCSVFileVM fileVM)
         {
-            var dt = new Helper.CSVReader().GetCSVAsDataTable(fileVM.FilePath);
+            var dt = new CSVReader().GetCSVAsDataTable(fileVM.FilePath);
 
             List<UsersSchedule> listToBeRemoved = new();
             List<UsersSchedule> listToBeInsert = new();
 
             List<string> error = new();
-            int index = 1;
+            int index = 0;
+            int colIndex = 0;
 
-            foreach (var item in dt.Rows)
+            foreach (var col in dt.Columns)
             {
-                try
+                if (colIndex > 0) 
                 {
-                    var row = (DataRow)item;
+                    var initials = col.ToString();
+                    var userId = (from ur in _userRelationRepo.Table
+                                  join u in _userRepo.Table on ur.UserIdFk equals u.UserId
+                                  where ur.ServiceLineIdFk == fileVM.ServiceLineId && !u.IsDeleted && u.Initials == initials
+                                  select u.UserId).FirstOrDefault();
 
-                    if (string.IsNullOrEmpty(row[0].ToString()))
+                    foreach (var item in dt.Rows)
                     {
-                        error.Add($"There is no Schedule Date at row: {index}");
-                    }
-                    if (string.IsNullOrEmpty(row[1].ToString()))
-                    {
-                        error.Add($"There is no Start Time for Schedule at row: {index}");
-                    }
-                    if (string.IsNullOrEmpty(row[2].ToString()))
-                    {
-                        error.Add($"There is no End Time for Schedule at row: {index}");
-                    }
-                    if (string.IsNullOrEmpty(row[3].ToString()))
-                    {
-                        error.Add($"User Initials not found at row: {index}");
-                    }
-
-                    index++;
-
-                    if (!string.IsNullOrEmpty(row[0].ToString()) && !string.IsNullOrEmpty(row[1].ToString()) && !string.IsNullOrEmpty(row[2].ToString()) && !string.IsNullOrEmpty(row[3].ToString()))
-                    {
-                        var initials = row[3].ToString();
-
-                        var userId = (from ur in _userRelationRepo.Table
-                                      join u in _userRepo.Table on ur.UserIdFk equals u.UserId
-                                      where ur.ServiceLineIdFk == fileVM.ServiceLineId && !u.IsDeleted && u.Initials == initials
-                                      select u.UserId).FirstOrDefault();
-
-                        if (userId > 0)
+                        try
                         {
-                            var ScheduleDate = Convert.ToDateTime(row[0]);
-                            var alreadyExist = _scheduleRepo.Table.Where(x => x.UserIdFk == userId && x.ScheduleDateStart.Date == ScheduleDate.Date && !x.IsDeleted).ToList();
-                            if (alreadyExist.Count > 0)
+                            var row = (DataRow)item;
+                            index++;
+
+                            if (!string.IsNullOrEmpty(row[0].ToString()) && !string.IsNullOrEmpty(row[1].ToString()))
                             {
-                                listToBeRemoved.AddRange(alreadyExist);
+                                if (userId > 0)
+                                {
+                                    var ScheduleDate = Convert.ToDateTime(row[0]);
+                                    var alreadyExist = _scheduleRepo.Table.Where(x => x.UserIdFk == userId && x.ScheduleDateStart.Date == ScheduleDate.Date && !x.IsDeleted).ToList();
+                                    if (alreadyExist.Count > 0)
+                                    {
+                                        listToBeRemoved.AddRange(alreadyExist);
+                                    }
+
+                                    var timeRange = row[1].ToString().Split("-").ToArray();
+
+                                    var StartDateTimeStr = row[0].ToString() + " " + timeRange[0];
+                                    var EndDateTimeStr = row[0].ToString() + " " + timeRange[1];
+
+                                    var StartDateTime = Convert.ToDateTime(StartDateTimeStr);
+                                    var EndDateTime = Convert.ToDateTime(EndDateTimeStr);
+                                    if (EndDateTime.TimeOfDay < StartDateTime.TimeOfDay)
+                                    {
+                                        EndDateTime = EndDateTime.AddDays(1);
+                                    }
+
+                                    var obj = new UsersSchedule()
+                                    {
+                                        ScheduleDateStart = StartDateTime,
+                                        ScheduleDateEnd = EndDateTime,
+                                        UserIdFk = userId,
+                                        ServiceLineIdFk = fileVM.ServiceLineId,
+                                        CreatedBy = fileVM.LoggedinUserId,
+                                        CreatedDate = DateTime.UtcNow,
+                                        IsDeleted = false
+                                    };
+                                    listToBeInsert.Add(obj);
+                                }
+                                else
+                                {
+                                    error.Add($"'{initials}' is not exist in selected service line.");
+                                }
+
                             }
-
-                            var StartDateTimeStr = row[0].ToString() + " " + row[1].ToString();
-                            var EndDateTimeStr = row[0].ToString() + " " + row[2].ToString();
-
-                            var StartDateTime = Convert.ToDateTime(StartDateTimeStr);
-                            var EndDateTime = Convert.ToDateTime(EndDateTimeStr);
-                            if (EndDateTime.TimeOfDay < StartDateTime.TimeOfDay)
-                            {
-                                EndDateTime = EndDateTime.AddDays(1);
-                            }
-
-                            var obj = new UsersSchedule()
-                            {
-                                ScheduleDateStart = StartDateTime,
-                                ScheduleDateEnd = EndDateTime,
-                                UserIdFk = userId,
-                                ServiceLineIdFk = fileVM.ServiceLineId,
-                                CreatedBy = fileVM.LoggedinUserId,
-                                CreatedDate = DateTime.UtcNow,
-                                IsDeleted = false
-                            };
-                            listToBeInsert.Add(obj);
                         }
-                        else 
+                        catch (Exception ex)
                         {
-                            error.Add($"'{initials}' is not exist in selected service line.");
+                            error.Add($"There is an exception at row: {index} \n Exception: {ex}");
+                            ElmahExtensions.RiseError(ex);
                         }
-
                     }
                 }
-                catch (Exception ex)
-                {
-                    error.Add($"There is an exception at row: {index} \n Exception: {ex}");
-                    ElmahExtensions.RiseError(ex);
-                }
+                colIndex++;
             }
 
             if (listToBeRemoved.Count > 0)
@@ -143,6 +148,65 @@ namespace Web.Services.Concrete
 
 
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Process Complete", Body = error.Distinct() };
+        }
+
+        public BaseResponse GetScheduleTemplate(int serviceLine) 
+        {
+            var serviceLineUsers = (from u in this._userRepo.Table
+                                    join ur in this._userRelationRepo.Table on u.UserId equals ur.UserIdFk
+                                    join s in this._serviceRepo.Table on ur.ServiceLineIdFk equals s.ServiceLineId
+                                    where s.ServiceLineId == serviceLine && !u.IsDeleted && !s.IsDeleted
+                                    select new
+                                    {
+                                        u.Initials,
+                                        s.ServiceName
+                                    }).Distinct().ToList();
+            if (serviceLineUsers.Count > 0)
+            {
+                int count = 0;
+                DataTable tbl = new DataTable();
+                foreach (var item in serviceLineUsers)
+                {
+                    if (count == 0)
+                    {
+                        DataColumn col = new DataColumn("Date", typeof(string));
+                        tbl.Columns.Add(col);
+                        col = new DataColumn(item.Initials, typeof(string));
+                        tbl.Columns.Add(col);
+                    }
+                    else
+                    {
+                        DataColumn col = new DataColumn(item.Initials, typeof(string));
+                        tbl.Columns.Add(col);
+                    }
+                    count++;
+                }
+
+                for (int i = 0; i < 7; i++)
+                {
+                    DataRow row = tbl.NewRow();
+                    row[0] = DateTime.Now.AddDays(i).ToString("dd/MM/yyyy");
+                    row[1] = "8:00-18:00";
+                    tbl.Rows.Add(row);
+                }
+
+                var folderName = Path.Combine("ScheduleTemplates");
+                var pathToSave = Path.Combine(this._environment.WebRootPath, folderName);
+                if (!Directory.Exists(pathToSave))
+                {
+                    Directory.CreateDirectory(pathToSave);
+                }
+                var fileName = $"Schedule Template For {serviceLineUsers.FirstOrDefault().ServiceName}.csv"; //ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
+                var fullPath = Path.Combine(pathToSave, fileName);
+                new CSVReader().WriteDataTableAsCSV(tbl, fullPath);
+
+
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Template ready", Body = new { path = fullPath.Replace(this._environment.WebRootPath, ""), fileName = fileName } };
+            }
+            else 
+            {
+                return new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "No user found in selected service line." };
+            }
         }
 
     }
