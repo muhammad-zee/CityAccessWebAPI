@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using ElmahCore;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -19,7 +20,6 @@ namespace Web.Services.Concrete
         IConfiguration _config;
         private readonly UnitOfWork unitorWork;
         private IHostingEnvironment _environment;
-
         private readonly IRepository<UsersSchedule> _scheduleRepo;
         private readonly IRepository<User> _userRepo;
         private readonly IRepository<UsersRelation> _userRelationRepo;
@@ -35,6 +35,7 @@ namespace Web.Services.Concrete
         {
             this._config = configuration;
             this._environment = environment;
+
             this._scheduleRepo = scheduleRepo;
             this._userRepo = userRepo;
             this._userRelationRepo = userRelationRepo;
@@ -45,62 +46,88 @@ namespace Web.Services.Concrete
         {
             var dt = new Helper.CSVReader().GetCSVAsDataTable(fileVM.FilePath);
 
-            List<UsersSchedule> listToBeRemoved = new List<UsersSchedule>();
-            List<UsersSchedule> listToBeInsert = new List<UsersSchedule>();
-            List<int> ids = new List<int>();
-            foreach (var item in dt.Rows)
-            {
-                var row = (DataRow)item;
-                if (!string.IsNullOrEmpty(row[3].ToString()))
-                {
-                    ids.Add(Convert.ToInt32(row[3]));
-                }
-            }
+            List<UsersSchedule> listToBeRemoved = new();
+            List<UsersSchedule> listToBeInsert = new();
 
-
-            var userIds = (from ur in _userRelationRepo.Table
-                           join u in _userRepo.Table on ur.UserIdFk equals u.UserId
-                           where ur.ServiceLineIdFk == fileVM.ServiceLineId && !u.IsDeleted && ids.Distinct().Contains(u.UserId)
-                           select u.UserId).ToList();
-
+            List<string> error = new();
+            int index = 1;
 
             foreach (var item in dt.Rows)
             {
-                var row = (DataRow)item;
-                if (!string.IsNullOrEmpty(row[0].ToString()) || !string.IsNullOrEmpty(row[1].ToString()) || !string.IsNullOrEmpty(row[2].ToString()) || !string.IsNullOrEmpty(row[3].ToString()))
+                try
                 {
+                    var row = (DataRow)item;
 
-                    var ScheduleDate = Convert.ToDateTime(row[0]);
-                    var alreadyExist = _scheduleRepo.Table.Where(x => userIds.Contains(x.UserIdFk) && x.ScheduleDateStart.Date == ScheduleDate.Date && !x.IsDeleted).ToList();
-                    if (alreadyExist.Count > 0)
+                    if (string.IsNullOrEmpty(row[0].ToString()))
                     {
-                        listToBeRemoved.AddRange(alreadyExist);
+                        error.Add($"There is no Schedule Date at row: {index}");
+                    }
+                    if (string.IsNullOrEmpty(row[1].ToString()))
+                    {
+                        error.Add($"There is no Start Time for Schedule at row: {index}");
+                    }
+                    if (string.IsNullOrEmpty(row[2].ToString()))
+                    {
+                        error.Add($"There is no End Time for Schedule at row: {index}");
+                    }
+                    if (string.IsNullOrEmpty(row[3].ToString()))
+                    {
+                        error.Add($"User Initials not found at row: {index}");
                     }
 
-                    var StartDateTimeStr = row[0].ToString() + " " + row[1].ToString();
-                    var EndDateTimeStr = row[0].ToString() + " " + row[2].ToString();
+                    index++;
 
-                    var StartDateTime = Convert.ToDateTime(StartDateTimeStr);
-                    var EndDateTime = Convert.ToDateTime(EndDateTimeStr);
-                    if (StartDateTime.TimeOfDay > EndDateTime.TimeOfDay)
+                    if (!string.IsNullOrEmpty(row[0].ToString()) && !string.IsNullOrEmpty(row[1].ToString()) && !string.IsNullOrEmpty(row[2].ToString()) && !string.IsNullOrEmpty(row[3].ToString()))
                     {
-                        EndDateTime = EndDateTime.AddDays(1);
-                    }
+                        var initials = row[3].ToString();
 
-                    foreach (var u in userIds)
-                    {
-                        var obj = new UsersSchedule()
+                        var userId = (from ur in _userRelationRepo.Table
+                                      join u in _userRepo.Table on ur.UserIdFk equals u.UserId
+                                      where ur.ServiceLineIdFk == fileVM.ServiceLineId && !u.IsDeleted && u.Initials == initials
+                                      select u.UserId).FirstOrDefault();
+
+                        if (userId > 0)
                         {
-                            ScheduleDateStart = StartDateTime,
-                            ScheduleDateEnd = EndDateTime,
-                            UserIdFk = u,
-                            ServiceLineIdFk = fileVM.ServiceLineId,
-                            CreatedBy = fileVM.LoggedinUserId,
-                            CreatedDate = DateTime.UtcNow,
-                            IsDeleted = false
-                        };
-                        listToBeInsert.Add(obj);
+                            var ScheduleDate = Convert.ToDateTime(row[0]);
+                            var alreadyExist = _scheduleRepo.Table.Where(x => x.UserIdFk == userId && x.ScheduleDateStart.Date == ScheduleDate.Date && !x.IsDeleted).ToList();
+                            if (alreadyExist.Count > 0)
+                            {
+                                listToBeRemoved.AddRange(alreadyExist);
+                            }
+
+                            var StartDateTimeStr = row[0].ToString() + " " + row[1].ToString();
+                            var EndDateTimeStr = row[0].ToString() + " " + row[2].ToString();
+
+                            var StartDateTime = Convert.ToDateTime(StartDateTimeStr);
+                            var EndDateTime = Convert.ToDateTime(EndDateTimeStr);
+                            if (EndDateTime.TimeOfDay < StartDateTime.TimeOfDay)
+                            {
+                                EndDateTime = EndDateTime.AddDays(1);
+                            }
+
+                            var obj = new UsersSchedule()
+                            {
+                                ScheduleDateStart = StartDateTime,
+                                ScheduleDateEnd = EndDateTime,
+                                UserIdFk = userId,
+                                ServiceLineIdFk = fileVM.ServiceLineId,
+                                CreatedBy = fileVM.LoggedinUserId,
+                                CreatedDate = DateTime.UtcNow,
+                                IsDeleted = false
+                            };
+                            listToBeInsert.Add(obj);
+                        }
+                        else 
+                        {
+                            error.Add($"'{initials}' is not exist in selected service line.");
+                        }
+
                     }
+                }
+                catch (Exception ex)
+                {
+                    error.Add($"There is an exception at row: {index} \n Exception: {ex}");
+                    ElmahExtensions.RiseError(ex);
                 }
             }
 
@@ -115,7 +142,7 @@ namespace Web.Services.Concrete
             }
 
 
-            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Found", Body = new { dt = listToBeInsert } };
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Process Complete", Body = error.Distinct() };
         }
 
     }
