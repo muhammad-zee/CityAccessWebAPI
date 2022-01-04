@@ -360,6 +360,23 @@ namespace Web.Services.Concrete
             }
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Channels Found" };
         }
+
+        public BaseResponse deleteConversationChannel(string ChannelSid)
+        {
+            var dbChannel = this._conversationChannelsRepo.Table.FirstOrDefault(c => c.ChannelSid == ChannelSid && c.IsDeleted != true);
+            if (dbChannel != null)
+            {
+                dbChannel.IsDeleted = true;
+                this._conversationChannelsRepo.Update(dbChannel);
+                var channelParticipants = this._conversationParticipantsRepo.Table.Where(p => p.ConversationChannelIdFk == dbChannel.ConversationChannelId);
+                foreach (var p in channelParticipants)
+                {
+                    p.IsDeleted = true;
+                }
+                this._conversationParticipantsRepo.Update(channelParticipants);
+            }
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Channel Deleted" };
+        }
         public BaseResponse getAllConversationUsers()
         {
             var chatUsers = this._userRepo.Table.Where(u => u.IsDeleted != true && u.IsActive == true && !string.IsNullOrEmpty(u.UserChannelSid));
