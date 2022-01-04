@@ -1,4 +1,5 @@
 ﻿using ElmahCore;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -11,6 +12,7 @@ using Web.Services.Interfaces;
 
 namespace Web.API.Controllers
 {
+    [Authorize]
     public class CommunicationController : Controller
     {
         private readonly ICommunicationService _communicaitonService;

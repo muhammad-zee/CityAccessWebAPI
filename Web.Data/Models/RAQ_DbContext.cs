@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 #nullable disable
 
@@ -31,6 +33,7 @@ namespace Web.Data.Models
         public virtual DbSet<Role> Roles { get; set; }
         public virtual DbSet<ServiceLine> ServiceLines { get; set; }
         public virtual DbSet<State> States { get; set; }
+        public virtual DbSet<TempTbl> TempTbls { get; set; }
         public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<UserAccess> UserAccesses { get; set; }
         public virtual DbSet<UserRole> UserRoles { get; set; }
@@ -209,6 +212,8 @@ namespace Web.Data.Models
                     .IsRequired()
                     .HasMaxLength(256);
 
+                entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+
                 entity.Property(e => e.UniqueName)
                     .IsRequired()
                     .HasMaxLength(256);
@@ -226,6 +231,8 @@ namespace Web.Data.Models
                 entity.Property(e => e.FriendlyName)
                     .IsRequired()
                     .HasMaxLength(256);
+
+                entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
 
                 entity.Property(e => e.UniqueName)
                     .IsRequired()
@@ -435,6 +442,29 @@ namespace Web.Data.Models
                 entity.Property(e => e.StateProvince)
                     .HasMaxLength(100)
                     .IsFixedLength(true);
+            });
+
+            modelBuilder.Entity<TempTbl>(entity =>
+            {
+                entity.HasNoKey();
+
+                entity.ToTable("temp_tbl");
+
+                entity.Property(e => e.EndDate)
+                    .HasMaxLength(10)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.EndTime)
+                    .HasMaxLength(8)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.StartDate)
+                    .HasMaxLength(10)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.StartTime)
+                    .HasMaxLength(8)
+                    .IsUnicode(false);
             });
 
             modelBuilder.Entity<User>(entity =>
