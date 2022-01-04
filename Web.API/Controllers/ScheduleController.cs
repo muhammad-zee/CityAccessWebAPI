@@ -53,30 +53,23 @@ namespace Web.API.Controllers
         [Description("Add Or Update Schedule")]
         [Route("Schedule/AddOrUpdateSchedule")]
         [HttpPost, DisableRequestSizeLimit]
-        public ActionResult UpdateSchedule([FromBody] EditParams param)
+        public BaseResponse UpdateSchedule([FromBody] ScheduleVM param)
         {
             try
             {
-                List<ScheduleEventData> list = new List<ScheduleEventData>();
-                ScheduleEventData obj = new ScheduleEventData();
-
-                obj.Id = 1;
-                obj.Subject = "Muhammad Masud";
-                obj.IsAllDay = false;
-                obj.StartTime = DateTime.Now;
-                obj.EndTime = DateTime.Now.AddHours(10);
-                obj.OwnerId = 1;
-                list.Add(obj);
-
-                //var response = _scheduleService.getSchedule();
-
-                return Json(list);
+                var response = _scheduleService.SaveSchedule(param);
+                return response;
             }
             catch (Exception ex)
             {
                 ElmahExtensions.RiseError(ex);
                 _logger.LogExceptions(ex);
-                return Json("");
+                return new BaseResponse()
+                {
+                    Status = HttpStatusCode.BadRequest,
+                    Message = ex.ToString(),
+                    Body = null
+                };
             }
         }
 

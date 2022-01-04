@@ -12,6 +12,7 @@ using Web.DLL;
 using Web.DLL.Generic_Repository;
 using Web.Model;
 using Web.Model.Common;
+using Web.Services.Extensions;
 using Web.Services.Helper;
 using Web.Services.Interfaces;
 
@@ -207,6 +208,166 @@ namespace Web.Services.Concrete
             {
                 return new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "No user found in selected service line." };
             }
+        }
+
+        public BaseResponse SaveSchedule(ScheduleVM schedule) 
+        {
+            if (schedule.ScheduleId > 0)
+            {
+                var row = _scheduleRepo.Table.Where(x => !x.IsDeleted && x.UsersScheduleId == schedule.ScheduleId).FirstOrDefault();
+                if (row != null)
+                {
+                    string startDateTimeStr = schedule.FromDate.ToString("dd-MM-yyyy") + schedule.StartTime.ToString("hh:mm:ss");
+                    string endDateTimeStr = schedule.ToDate.ToString("dd-MM-yyyy") + schedule.EndTime.ToString("hh:mm:ss");
+
+                    DateTime startDateTime = Convert.ToDateTime(startDateTimeStr);
+                    DateTime endDateTime = Convert.ToDateTime(endDateTimeStr);
+
+                    row.ScheduleDateStart = startDateTime;
+                    row.ScheduleDateEnd = endDateTime;
+                    row.ModifiedBy = schedule.ModifiedBy;
+                    row.ModifiedDate = DateTime.UtcNow;
+                    row.IsDeleted = false;
+
+                    _scheduleRepo.Update(row);
+
+                    return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Schedule Updated" };
+                }
+                else 
+                {
+                    return new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "Schedule Not Found" };
+                }
+            }
+            else 
+            {
+                List<UsersSchedule> usersSchedules = new();
+                var userIds = schedule.UserId.ToIntList();
+
+                if (schedule.DateRangeId == 1)
+                {
+                    DateTime now = DateTime.Now;
+                    var startDate = new DateTime(now.Year, now.Month, 1);
+                    var endDate = startDate.AddMonths(1).AddDays(-1);
+
+
+                    while (true)
+                    {
+                        if (startDate <= endDate)
+                        {
+                            string startDateTimeStr = startDate.ToString("dd-MM-yyyy") + " " + schedule.StartTime.ToString("hh:mm:ss");
+                            string endDateTimeStr = endDate.ToString("dd-MM-yyyy") + " " + schedule.EndTime.ToString("hh:mm:ss");
+
+                            DateTime StartDateTime = Convert.ToDateTime(startDateTimeStr);
+                            DateTime EndDateTime = Convert.ToDateTime(endDateTimeStr);
+
+                            foreach (var item in userIds)
+                            {
+                                var userSchedule = new UsersSchedule()
+                                {
+                                    ScheduleDateStart = StartDateTime,
+                                    ScheduleDateEnd = EndDateTime,
+                                    ServiceLineIdFk = schedule.ServiceLineId,
+                                    UserIdFk = item,
+                                    CreatedBy = schedule.CreatedBy,
+                                    CreatedDate = DateTime.UtcNow,
+                                    IsDeleted = false,
+                                };
+
+                                usersSchedules.Add(userSchedule);
+                            }
+                            startDate = startDate.AddDays(1);
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+
+                }
+                else if (schedule.DateRangeId == 2)
+                {
+                    int year = DateTime.Now.Year;
+                    DateTime startDate = new DateTime(year, 1, 1);
+                    DateTime endDate = new DateTime(year, 12, 31);
+
+                    while (true)
+                    {
+                        if (startDate <= endDate)
+                        {
+                            string startDateTimeStr = startDate.ToString("dd-MM-yyyy") + " " + schedule.StartTime.ToString("hh:mm:ss");
+                            string endDateTimeStr = endDate.ToString("dd-MM-yyyy") + " " + schedule.EndTime.ToString("hh:mm:ss");
+
+                            DateTime StartDateTime = Convert.ToDateTime(startDateTimeStr);
+                            DateTime EndDateTime = Convert.ToDateTime(endDateTimeStr);
+
+                            foreach (var item in userIds)
+                            {
+                                var userSchedule = new UsersSchedule()
+                                {
+                                    ScheduleDateStart = StartDateTime,
+                                    ScheduleDateEnd = EndDateTime,
+                                    ServiceLineIdFk = schedule.ServiceLineId,
+                                    UserIdFk = item,
+                                    CreatedBy = schedule.CreatedBy,
+                                    CreatedDate = DateTime.UtcNow,
+                                    IsDeleted = false,
+                                };
+
+                                usersSchedules.Add(userSchedule);
+                            }
+                            startDate = startDate.AddDays(1);
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                }
+                else 
+                {
+                    DateTime startDate = schedule.FromDate;
+                    DateTime endDate = schedule.ToDate;
+
+                    while (true)
+                    {
+                        if (startDate <= endDate)
+                        {
+                            string startDateTimeStr = startDate.ToString("dd-MM-yyyy") + " " + schedule.StartTime.ToString("hh:mm:ss");
+                            string endDateTimeStr = endDate.ToString("dd-MM-yyyy") + " " + schedule.EndTime.ToString("hh:mm:ss");
+
+                            DateTime StartDateTime = Convert.ToDateTime(startDateTimeStr);
+                            DateTime EndDateTime = Convert.ToDateTime(endDateTimeStr);
+
+                            foreach (var item in userIds)
+                            {
+                                var userSchedule = new UsersSchedule()
+                                {
+                                    ScheduleDateStart = StartDateTime,
+                                    ScheduleDateEnd = EndDateTime,
+                                    ServiceLineIdFk = schedule.ServiceLineId,
+                                    UserIdFk = item,
+                                    CreatedBy = schedule.CreatedBy,
+                                    CreatedDate = DateTime.UtcNow,
+                                    IsDeleted = false,
+                                };
+
+                                usersSchedules.Add(userSchedule);
+                            }
+                            startDate = startDate.AddDays(1);
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                }
+
+                _scheduleRepo.Insert(usersSchedules);
+
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Schedule Created" };
+            
+            }
+
         }
 
     }

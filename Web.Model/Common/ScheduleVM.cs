@@ -32,4 +32,23 @@ namespace Web.Model.Common
         public string Subject { get; set; }
 
     }
+
+    public class ScheduleVM
+    {
+        public int ScheduleId { get; set; }
+        public int ServiceLineId { get; set; }
+        public int OrganizationIdFk { get; set; }
+        public string RoleId { get; set; }
+        public string UserId { get; set; }
+        public int DateRangeId { get; set; }
+        public DateTime FromDate { get; set; }
+        public DateTime ToDate { get; set; }
+        public TimeSpan StartTime { get; set; }
+        public TimeSpan EndTime { get; set; }
+        public int CreatedBy { get; set; }
+        public DateTime CreatedDate { get; set; }
+        public int ModifiedBy { get; set; }
+        public DateTime ModifiedDate { get; set; }
+
+    }
 }
