@@ -259,7 +259,7 @@ namespace Web.Services.Concrete
 
                 if (schedule.DateRangeId == 1)
                 {
-                    DateTime now = DateTime.Now;
+                    DateTime now = DateTime.UtcNow;
                     var startDate = new DateTime(now.Year, now.Month, 1);
                     var endDate = startDate.AddMonths(1).AddDays(-1);
 
@@ -268,11 +268,16 @@ namespace Web.Services.Concrete
                     {
                         if (startDate <= endDate)
                         {
-                            string startDateTimeStr = startDate.ToString("dd-MM-yyyy") + " " + schedule.StartTime.ToString("hh:mm:ss");
-                            string endDateTimeStr = endDate.ToString("dd-MM-yyyy") + " " + schedule.EndTime.ToString("hh:mm:ss");
+                            string startDateTimeStr = startDate.ToString("MM-dd-yyyy") + " " + schedule.StartTime.ToString("hh:mm:ss tt");
+                            string endDateTimeStr = startDate.ToString("MM-dd-yyyy") + " " + schedule.EndTime.ToString("hh:mm:ss tt");
 
                             DateTime StartDateTime = Convert.ToDateTime(startDateTimeStr);
                             DateTime EndDateTime = Convert.ToDateTime(endDateTimeStr);
+
+                            if (StartDateTime.TimeOfDay > EndDateTime.TimeOfDay) 
+                            {
+                                EndDateTime = EndDateTime.AddDays(1);
+                            }
 
                             foreach (var item in userIds)
                             {
