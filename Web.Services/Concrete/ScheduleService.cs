@@ -57,6 +57,20 @@ namespace Web.Services.Concrete
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Found", Body = scheduleList };
         }
 
+        public BaseResponse GetScheduleList(ScheduleVM schedule) 
+        {
+            var scheduleList = this._dbContext.LoadStoredProc("raq_getScheduleListByFilterIds")
+                .WithSqlParam("@orgId", schedule.selectedOrganizationId)
+                .WithSqlParam("@serviceLineIds", schedule.selectedService)
+                .WithSqlParam("@roleIds", schedule.selectedRole)
+                .WithSqlParam("@userIds", schedule.selectedUser)
+                .WithSqlParam("@fromDate", schedule.selectedFromDate.ToString("yyyy-MM-dd"))
+                .WithSqlParam("@toDate", schedule.selectedToDate.ToString("yyyy-MM-dd"))
+            .ExecuteStoredProc<ScheduleListVM>().Result.ToList();
+
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Found", Body = scheduleList };
+        }
+
         public BaseResponse ImportCSV(ImportCSVFileVM fileVM)
         {
             var dt = new CSVReader().GetCSVAsDataTable(fileVM.FilePath);

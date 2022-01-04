@@ -7,6 +7,7 @@ namespace Web.Services.Interfaces
     {
 
         BaseResponse getSchedule();
+        BaseResponse GetScheduleList(ScheduleVM schedule);
         BaseResponse ImportCSV(ImportCSVFileVM fileVM);
         BaseResponse GetScheduleTemplate(int serviceLine);
         BaseResponse SaveSchedule(ScheduleVM schedule);

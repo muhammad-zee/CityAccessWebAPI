@@ -34,7 +34,7 @@ namespace Web.API.Controllers
         [Description("Load Schedule")]
         [Route("Schedule/LoadSchedule")]
         [HttpPost, DisableRequestSizeLimit]
-        public ActionResult LoadSchedule([FromBody] ScheduleVM param, bool readOnly = false)
+        public ActionResult LoadSchedule([FromBody] EditParams param, bool readOnly = false)
         {
             try
             {
@@ -48,6 +48,30 @@ namespace Web.API.Controllers
                 ElmahExtensions.RiseError(ex);
                 _logger.LogExceptions(ex);
                 return Json("");
+            }
+        }
+
+
+        [Description("Get Schedule")]
+        [Route("Schedule/GetScheduleList")]
+        [HttpPost, DisableRequestSizeLimit]
+        public BaseResponse GetScheduleList([FromBody] ScheduleVM param)
+        {
+            try
+            {
+                var response = _scheduleService.GetScheduleList(param);
+                return response;
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse()
+                {
+                    Status = HttpStatusCode.BadRequest,
+                    Message = ex.ToString(),
+                    Body = null
+                };
             }
         }
 
