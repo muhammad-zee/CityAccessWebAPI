@@ -50,5 +50,14 @@ namespace Web.Model.Common
         public int ModifiedBy { get; set; }
         public DateTime ModifiedDate { get; set; }
 
+
+        public int selectedOrganizationId { get; set; }
+        public string selectedService { get; set; }
+        public string selectedRole { get; set; }
+        public string selectedUser { get; set; }
+        public DateTime selectedFromDate { get; set; }
+        public DateTime selectedToDate { get; set; }
+
+
     }
 }
