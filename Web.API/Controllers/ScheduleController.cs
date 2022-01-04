@@ -82,6 +82,7 @@ namespace Web.API.Controllers
         {
             try
             {
+                var model = ModelState;
                 var response = _scheduleService.SaveSchedule(param);
                 return response;
             }

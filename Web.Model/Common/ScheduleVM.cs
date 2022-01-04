@@ -43,8 +43,8 @@ namespace Web.Model.Common
         public int DateRangeId { get; set; }
         public DateTime FromDate { get; set; }
         public DateTime ToDate { get; set; }
-        public TimeSpan StartTime { get; set; }
-        public TimeSpan EndTime { get; set; }
+        public DateTime StartTime { get; set; }
+        public DateTime EndTime { get; set; }
         public int CreatedBy { get; set; }
         public DateTime CreatedDate { get; set; }
         public int ModifiedBy { get; set; }
