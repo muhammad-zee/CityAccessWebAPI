@@ -413,5 +413,22 @@ namespace Web.Services.Concrete
 
         }
 
+        public BaseResponse DeleteSchedule(int scheduleId, int userId) 
+        {
+            var schedule = _scheduleRepo.Table.Where(x => x.UsersScheduleId == scheduleId && !x.IsDeleted).FirstOrDefault();
+            if (schedule != null)
+            {
+                schedule.IsDeleted = true;
+                schedule.ModifiedBy = userId;
+                schedule.ModifiedDate = DateTime.UtcNow;
+
+                _scheduleRepo.Update(schedule);
+
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Deleted." };
+            }
+            else {
+                return new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "No Schedule Found" };
+            }
+        }
     }
 }

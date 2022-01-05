@@ -171,5 +171,27 @@ namespace Web.API.Controllers
                 };
             }
         }
+
+        [Description("Delete Schedule")]
+        [HttpGet("Schedule/DeleteSchedule/{scheduleId}/{userId}")]
+        public BaseResponse GetScheduleTemplate(int scheduleId, int userId)
+        {
+            try
+            {
+                var response = this._scheduleService.DeleteSchedule(scheduleId, userId);
+                return response;
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse()
+                {
+                    Status = HttpStatusCode.BadRequest,
+                    Message = ex.ToString(),
+                    Body = null
+                };
+            }
+        }
     }
 }

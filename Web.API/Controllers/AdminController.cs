@@ -87,7 +87,7 @@ namespace Web.API.Controllers
 
         [Description("Get Users List")]
         [HttpGet("admin/GetAllUsersByServiceAndRoleId")]
-        public async Task<BaseResponse> GetAllUsersByServiceAndRoleId(int ServiceLineId, string RoleIds)
+        public async Task<BaseResponse> GetAllUsersByServiceAndRoleId(string ServiceLineId, string RoleIds)
         {
             try
             {

@@ -131,7 +131,7 @@ namespace Web.Services.Concrete
             }
             return new BaseResponse { Status = HttpStatusCode.OK, Message = "Users List Returned", Body = users };
         }
-        public BaseResponse GetAllUsersByServiceLineAndRoleId(int ServiceLineId, string RoleIds)
+        public BaseResponse GetAllUsersByServiceLineAndRoleId(string ServiceLineId, string RoleIds)
         {
             var users = _dbContext.LoadStoredProc("raq_getAllUsersByServiceLineIdAndRoleId")
                         .WithSqlParam("@serviceLineId", ServiceLineId)

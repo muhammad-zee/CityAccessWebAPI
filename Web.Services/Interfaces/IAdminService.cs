@@ -29,7 +29,7 @@ namespace Web.Services.Interfaces
         #region Users
         BaseResponse GetAllUsers();
         BaseResponse GetAllUsersByOrganizationId(int OrganizationId, int UserRoleId);
-        BaseResponse GetAllUsersByServiceLineAndRoleId(int ServiceLineId, string RoleIds);
+        BaseResponse GetAllUsersByServiceLineAndRoleId(string ServiceLineId, string RoleIds);
         BaseResponse GetUserById(int Id);
         BaseResponse DeleteUser(int Id);
 
