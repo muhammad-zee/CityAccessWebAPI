@@ -361,21 +361,41 @@ namespace Web.Services.Concrete
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Channels Found" };
         }
 
-        public BaseResponse deleteConversationChannel(string ChannelSid)
+        public BaseResponse deleteConversationChannel(string ChannelSid,int UserId)
         {
             var dbChannel = this._conversationChannelsRepo.Table.FirstOrDefault(c => c.ChannelSid == ChannelSid && c.IsDeleted != true);
             if (dbChannel != null)
             {
                 dbChannel.IsDeleted = true;
+                dbChannel.ModifiedBy = UserId;
+                dbChannel.ModifiedDate = DateTime.UtcNow;
+                
                 this._conversationChannelsRepo.Update(dbChannel);
-                var channelParticipants = this._conversationParticipantsRepo.Table.Where(p => p.ConversationChannelIdFk == dbChannel.ConversationChannelId);
+                var channelParticipants = this._conversationParticipantsRepo.Table.Where(p => p.ConversationChannelIdFk == dbChannel.ConversationChannelId && p.IsDeleted != true);
                 foreach (var p in channelParticipants)
                 {
                     p.IsDeleted = true;
+                    p.ModifiedBy = UserId;
+                    p.ModifiedDate = DateTime.UtcNow;
                 }
                 this._conversationParticipantsRepo.Update(channelParticipants);
             }
-            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Channel Deleted" };
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Conversation Deleted" };
+        }
+
+        public BaseResponse deleteConversationParticipant(string ChannelSid,string ParticipantUniqueName, int UserId)
+        {
+            var dbChannel = this._conversationChannelsRepo.Table.FirstOrDefault(c => c.ChannelSid == ChannelSid && c.IsDeleted != true);
+            if (dbChannel != null)
+            {
+                var participant = this._conversationParticipantsRepo.Table.FirstOrDefault(p => p.UniqueName == ParticipantUniqueName && p.ConversationChannelIdFk == dbChannel.ConversationChannelId && p.IsDeleted != true);
+                participant.IsDeleted = true;
+                participant.ModifiedBy = UserId;
+                participant.ModifiedDate = DateTime.UtcNow;
+
+                this._conversationParticipantsRepo.Update(participant);
+            }
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Participant Removed" };
         }
         public BaseResponse getAllConversationUsers()
         {

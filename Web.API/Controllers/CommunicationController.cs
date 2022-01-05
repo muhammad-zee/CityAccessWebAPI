@@ -137,8 +137,37 @@ namespace Web.API.Controllers
         {
             try
             {
-                var state = ModelState;
                 return this._communicaitonService.getConversationChannels(UserId);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
+        [HttpGet("Conversation/deleteConversationChannel")]
+        public BaseResponse deleteConversationChannel(string ChannelSid,int UserId)
+        {
+            try
+            {
+                return this._communicaitonService.deleteConversationChannel(ChannelSid,UserId);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
+        [HttpGet("Conversation/deleteConversationParticipant")]
+        public BaseResponse deleteConversationParticipant(string ChannelSid,string ParticipantUniqueName, int UserId)
+        {
+            try
+            {
+                return this._communicaitonService.deleteConversationParticipant(ChannelSid, ParticipantUniqueName, UserId);
             }
             catch (Exception ex)
             {
