@@ -10,12 +10,12 @@ namespace Web.Data.Models
         public Organization()
         {
             Departments = new HashSet<Department>();
-            Roles = new HashSet<Role>();
         }
 
         public int OrganizationId { get; set; }
         public string OrganizationName { get; set; }
         public int? OrganizationType { get; set; }
+        public int? TimeZoneIdFk { get; set; }
         public string PrimaryAddress { get; set; }
         public string PrimaryAddress2 { get; set; }
         public string PhoneNo { get; set; }
@@ -33,6 +33,5 @@ namespace Web.Data.Models
         public bool IsDeleted { get; set; }
 
         public virtual ICollection<Department> Departments { get; set; }
-        public virtual ICollection<Role> Roles { get; set; }
     }
 }

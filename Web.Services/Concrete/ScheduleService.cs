@@ -27,6 +27,7 @@ namespace Web.Services.Concrete
 
         private readonly IRepository<UsersSchedule> _scheduleRepo;
         private readonly IRepository<User> _userRepo;
+        private readonly IRepository<UserRole> _userRoleRepo;
         private readonly IRepository<UsersRelation> _userRelationRepo;
         private readonly IRepository<ServiceLine> _serviceRepo;
 
@@ -36,6 +37,7 @@ namespace Web.Services.Concrete
             IHostingEnvironment environment,
             IRepository<UsersSchedule> scheduleRepo,
             IRepository<User> userRepo,
+            IRepository<UserRole> userRoleRepo,
             IRepository<UsersRelation> userRelationRepo,
             IRepository<ServiceLine> serviceRepo)
         {
@@ -45,6 +47,7 @@ namespace Web.Services.Concrete
 
             this._scheduleRepo = scheduleRepo;
             this._userRepo = userRepo;
+            this._userRoleRepo = userRoleRepo;
             this._userRelationRepo = userRelationRepo;
             this._serviceRepo = serviceRepo;
         }
@@ -57,7 +60,7 @@ namespace Web.Services.Concrete
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Found", Body = scheduleList };
         }
 
-        public BaseResponse GetScheduleList(ScheduleVM schedule) 
+        public BaseResponse GetScheduleList(ScheduleVM schedule)
         {
             var scheduleList = this._dbContext.LoadStoredProc("raq_getScheduleListByFilterIds")
                 .WithSqlParam("@orgId", schedule.selectedOrganizationId)
@@ -84,7 +87,7 @@ namespace Web.Services.Concrete
 
             foreach (var col in dt.Columns)
             {
-                if (colIndex > 0) 
+                if (colIndex > 0)
                 {
                     var initials = col.ToString();
                     var userId = (from ur in _userRelationRepo.Table
@@ -165,7 +168,7 @@ namespace Web.Services.Concrete
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Process Complete", Body = error.Distinct() };
         }
 
-        public BaseResponse GetScheduleTemplate(int serviceLine) 
+        public BaseResponse GetScheduleTemplate(int serviceLine)
         {
             var serviceLineUsers = (from u in this._userRepo.Table
                                     join ur in this._userRelationRepo.Table on u.UserId equals ur.UserIdFk
@@ -218,13 +221,13 @@ namespace Web.Services.Concrete
 
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Template ready", Body = new { path = fullPath.Replace(this._environment.WebRootPath, ""), fileName = fileName } };
             }
-            else 
+            else
             {
                 return new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "No user found in selected service line." };
             }
         }
 
-        public BaseResponse SaveSchedule(ScheduleVM schedule) 
+        public BaseResponse SaveSchedule(ScheduleVM schedule)
         {
             if (schedule.ScheduleId > 0)
             {
@@ -247,16 +250,16 @@ namespace Web.Services.Concrete
 
                     return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Schedule Updated" };
                 }
-                else 
+                else
                 {
                     return new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "Schedule Not Found" };
                 }
             }
-            else 
+            else
             {
                 List<UsersSchedule> usersSchedules = new();
                 var userIds = schedule.UserId.ToIntList();
-
+                var roleIds = schedule.selectedRole.ToIntList();
                 if (schedule.DateRangeId == 1)
                 {
                     DateTime now = DateTime.UtcNow;
@@ -274,25 +277,32 @@ namespace Web.Services.Concrete
                             DateTime StartDateTime = Convert.ToDateTime(startDateTimeStr);
                             DateTime EndDateTime = Convert.ToDateTime(endDateTimeStr);
 
-                            if (StartDateTime.TimeOfDay > EndDateTime.TimeOfDay) 
+                            if (StartDateTime.TimeOfDay > EndDateTime.TimeOfDay)
                             {
                                 EndDateTime = EndDateTime.AddDays(1);
                             }
 
-                            foreach (var item in userIds)
+                            foreach (var user in userIds)
                             {
-                                var userSchedule = new UsersSchedule()
+                                foreach (var role in roleIds)
                                 {
-                                    ScheduleDateStart = StartDateTime,
-                                    ScheduleDateEnd = EndDateTime,
-                                    ServiceLineIdFk = schedule.ServiceLineId,
-                                    UserIdFk = item,
-                                    CreatedBy = schedule.CreatedBy,
-                                    CreatedDate = DateTime.UtcNow,
-                                    IsDeleted = false,
-                                };
+                                    if (_userRelationRepo.Table.Any(x => x.UserIdFk == user && x.ServiceLineIdFk == schedule.selectedService) && _userRoleRepo.Table.Any(x => x.UserIdFk == user && x.RoleIdFk == role))
+                                    {
+                                        var userSchedule = new UsersSchedule()
+                                        {
+                                            ScheduleDateStart = StartDateTime,
+                                            ScheduleDateEnd = EndDateTime,
+                                            ServiceLineIdFk = schedule.selectedService,
+                                            DateRangeId = schedule.DateRangeId,
+                                            UserIdFk = user,
+                                            CreatedBy = schedule.CreatedBy,
+                                            CreatedDate = DateTime.UtcNow,
+                                            IsDeleted = false,
+                                        };
 
-                                usersSchedules.Add(userSchedule);
+                                        usersSchedules.Add(userSchedule);
+                                    }
+                                }
                             }
                             startDate = startDate.AddDays(1);
                         }
@@ -319,20 +329,27 @@ namespace Web.Services.Concrete
                             DateTime StartDateTime = Convert.ToDateTime(startDateTimeStr);
                             DateTime EndDateTime = Convert.ToDateTime(endDateTimeStr);
 
-                            foreach (var item in userIds)
+                            foreach (var user in userIds)
                             {
-                                var userSchedule = new UsersSchedule()
+                                foreach (var role in roleIds)
                                 {
-                                    ScheduleDateStart = StartDateTime,
-                                    ScheduleDateEnd = EndDateTime,
-                                    ServiceLineIdFk = schedule.ServiceLineId,
-                                    UserIdFk = item,
-                                    CreatedBy = schedule.CreatedBy,
-                                    CreatedDate = DateTime.UtcNow,
-                                    IsDeleted = false,
-                                };
+                                    if (_userRelationRepo.Table.Any(x => x.UserIdFk == user && x.ServiceLineIdFk == schedule.selectedService) && _userRoleRepo.Table.Any(x => x.UserIdFk == user && x.RoleIdFk == role))
+                                    {
+                                        var userSchedule = new UsersSchedule()
+                                        {
+                                            ScheduleDateStart = StartDateTime,
+                                            ScheduleDateEnd = EndDateTime,
+                                            ServiceLineIdFk = schedule.selectedService,
+                                            DateRangeId = schedule.DateRangeId,
+                                            UserIdFk = user,
+                                            CreatedBy = schedule.CreatedBy,
+                                            CreatedDate = DateTime.UtcNow,
+                                            IsDeleted = false,
+                                        };
 
-                                usersSchedules.Add(userSchedule);
+                                        usersSchedules.Add(userSchedule);
+                                    }
+                                }
                             }
                             startDate = startDate.AddDays(1);
                         }
@@ -342,7 +359,7 @@ namespace Web.Services.Concrete
                         }
                     }
                 }
-                else 
+                else
                 {
                     DateTime startDate = schedule.FromDate;
                     DateTime endDate = schedule.ToDate;
@@ -357,20 +374,27 @@ namespace Web.Services.Concrete
                             DateTime StartDateTime = Convert.ToDateTime(startDateTimeStr);
                             DateTime EndDateTime = Convert.ToDateTime(endDateTimeStr);
 
-                            foreach (var item in userIds)
+                            foreach (var user in userIds)
                             {
-                                var userSchedule = new UsersSchedule()
+                                foreach (var role in roleIds)
                                 {
-                                    ScheduleDateStart = StartDateTime,
-                                    ScheduleDateEnd = EndDateTime,
-                                    ServiceLineIdFk = schedule.ServiceLineId,
-                                    UserIdFk = item,
-                                    CreatedBy = schedule.CreatedBy,
-                                    CreatedDate = DateTime.UtcNow,
-                                    IsDeleted = false,
-                                };
+                                    if (_userRelationRepo.Table.Any(x => x.UserIdFk == user && x.ServiceLineIdFk == schedule.selectedService) && _userRoleRepo.Table.Any(x => x.UserIdFk == user && x.RoleIdFk == role))
+                                    {
+                                        var userSchedule = new UsersSchedule()
+                                        {
+                                            ScheduleDateStart = StartDateTime,
+                                            ScheduleDateEnd = EndDateTime,
+                                            ServiceLineIdFk = schedule.selectedService,
+                                            DateRangeId = schedule.DateRangeId,
+                                            UserIdFk = user,
+                                            CreatedBy = schedule.CreatedBy,
+                                            CreatedDate = DateTime.UtcNow,
+                                            IsDeleted = false,
+                                        };
 
-                                usersSchedules.Add(userSchedule);
+                                        usersSchedules.Add(userSchedule);
+                                    }
+                                }
                             }
                             startDate = startDate.AddDays(1);
                         }
@@ -384,7 +408,7 @@ namespace Web.Services.Concrete
                 _scheduleRepo.Insert(usersSchedules);
 
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Schedule Created" };
-            
+
             }
 
         }

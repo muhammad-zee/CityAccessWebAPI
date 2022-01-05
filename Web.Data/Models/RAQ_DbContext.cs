@@ -403,11 +403,6 @@ namespace Web.Data.Models
                 entity.Property(e => e.RoleName)
                     .IsRequired()
                     .HasMaxLength(256);
-
-                entity.HasOne(d => d.OrganizationIdFkNavigation)
-                    .WithMany(p => p.Roles)
-                    .HasForeignKey(d => d.OrganizationIdFk)
-                    .HasConstraintName("FK_Roles_Organizations");
             });
 
             modelBuilder.Entity<ServiceLine>(entity =>
@@ -630,7 +625,7 @@ namespace Web.Data.Models
                 entity.HasOne(d => d.ServiceLineIdFkNavigation)
                     .WithMany(p => p.UsersSchedules)
                     .HasForeignKey(d => d.ServiceLineIdFk)
-                    .HasConstraintName("FK_UsersSchedule_ServiceLine");
+                    .HasConstraintName("FK_UsersSchedule_Serviceline");
 
                 entity.HasOne(d => d.UserIdFkNavigation)
                     .WithMany(p => p.UsersSchedules)
