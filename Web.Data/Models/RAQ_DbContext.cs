@@ -625,17 +625,6 @@ namespace Web.Data.Models
                 entity.Property(e => e.ScheduleDateEnd).HasColumnType("datetime");
 
                 entity.Property(e => e.ScheduleDateStart).HasColumnType("datetime");
-
-                entity.HasOne(d => d.ServiceLineIdFkNavigation)
-                    .WithMany(p => p.UsersSchedules)
-                    .HasForeignKey(d => d.ServiceLineIdFk)
-                    .HasConstraintName("FK_UsersSchedule_Serviceline");
-
-                entity.HasOne(d => d.UserIdFkNavigation)
-                    .WithMany(p => p.UsersSchedules)
-                    .HasForeignKey(d => d.UserIdFk)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_UsersSchedule_Users");
             });
 
             OnModelCreatingPartial(modelBuilder);

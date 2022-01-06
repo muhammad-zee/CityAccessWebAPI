@@ -12,7 +12,6 @@ namespace Web.Data.Models
             ClinicalHolidays = new HashSet<ClinicalHoliday>();
             ClinicalHours = new HashSet<ClinicalHour>();
             UsersRelations = new HashSet<UsersRelation>();
-            UsersSchedules = new HashSet<UsersSchedule>();
         }
 
         public int ServiceLineId { get; set; }
@@ -29,6 +28,5 @@ namespace Web.Data.Models
         public virtual ICollection<ClinicalHoliday> ClinicalHolidays { get; set; }
         public virtual ICollection<ClinicalHour> ClinicalHours { get; set; }
         public virtual ICollection<UsersRelation> UsersRelations { get; set; }
-        public virtual ICollection<UsersSchedule> UsersSchedules { get; set; }
     }
 }
