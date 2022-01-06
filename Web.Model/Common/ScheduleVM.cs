@@ -52,7 +52,7 @@ namespace Web.Model.Common
 
 
         public int selectedOrganizationId { get; set; }
-        public int selectedService { get; set; }
+        public string selectedService { get; set; }
         public string selectedRole { get; set; }
         public string selectedUser { get; set; }
         public DateTime selectedFromDate { get; set; }

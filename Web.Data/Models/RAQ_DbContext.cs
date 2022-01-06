@@ -1,6 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
+﻿using Microsoft.EntityFrameworkCore;
 
 #nullable disable
 
@@ -16,6 +14,8 @@ namespace Web.Data.Models
             : base(options)
         {
         }
+
+
 
         public virtual DbSet<ClinicalHoliday> ClinicalHolidays { get; set; }
         public virtual DbSet<ClinicalHour> ClinicalHours { get; set; }

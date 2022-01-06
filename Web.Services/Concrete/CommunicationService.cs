@@ -361,7 +361,7 @@ namespace Web.Services.Concrete
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Channels Found" };
         }
 
-        public BaseResponse deleteConversationChannel(string ChannelSid,int UserId)
+        public BaseResponse deleteConversationChannel(string ChannelSid, int UserId)
         {
             var dbChannel = this._conversationChannelsRepo.Table.FirstOrDefault(c => c.ChannelSid == ChannelSid && c.IsDeleted != true);
             if (dbChannel != null)
@@ -369,7 +369,7 @@ namespace Web.Services.Concrete
                 dbChannel.IsDeleted = true;
                 dbChannel.ModifiedBy = UserId;
                 dbChannel.ModifiedDate = DateTime.UtcNow;
-                
+
                 this._conversationChannelsRepo.Update(dbChannel);
                 var channelParticipants = this._conversationParticipantsRepo.Table.Where(p => p.ConversationChannelIdFk == dbChannel.ConversationChannelId && p.IsDeleted != true);
                 foreach (var p in channelParticipants)
@@ -383,7 +383,7 @@ namespace Web.Services.Concrete
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Conversation Deleted" };
         }
 
-        public BaseResponse deleteConversationParticipant(string ChannelSid,string ParticipantUniqueName, int UserId)
+        public BaseResponse deleteConversationParticipant(string ChannelSid, string ParticipantUniqueName, int UserId)
         {
             var dbChannel = this._conversationChannelsRepo.Table.FirstOrDefault(c => c.ChannelSid == ChannelSid && c.IsDeleted != true);
             if (dbChannel != null)

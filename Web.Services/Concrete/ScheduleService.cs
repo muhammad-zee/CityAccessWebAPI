@@ -21,6 +21,7 @@ namespace Web.Services.Concrete
     public class ScheduleService : IScheduleService
     {
         IConfiguration _config;
+        private string conStr;
         private readonly UnitOfWork unitorWork;
         private IHostingEnvironment _environment;
         private RAQ_DbContext _dbContext;
@@ -44,6 +45,8 @@ namespace Web.Services.Concrete
             this._dbContext = dbContext;
             this._config = configuration;
             this._environment = environment;
+            this.conStr = _config["ConnectionStrings:DefaultConnection"].ToString();
+
 
             this._scheduleRepo = scheduleRepo;
             this._userRepo = userRepo;
@@ -54,22 +57,31 @@ namespace Web.Services.Concrete
 
         public BaseResponse getSchedule()
         {
-            var scheduleList = this._dbContext.LoadStoredProc("raq_getSchedule")
-            .ExecuteStoredProc<ScheduleEventData>().Result.ToList();
+            var scheduleList = this._dbContext.LoadStoredProcedure("raq_getSchedule")
+            .ExecuteStoredProc<ScheduleEventData>();
 
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Found", Body = scheduleList };
         }
 
         public BaseResponse GetScheduleList(ScheduleVM schedule)
         {
-            var scheduleList = this._dbContext.LoadStoredProc("raq_getScheduleListByFilterIds")
-                .WithSqlParam("@orgId", schedule.selectedOrganizationId)
-                .WithSqlParam("@serviceLineIds", schedule.selectedService)
-                .WithSqlParam("@roleIds", schedule.selectedRole)
-                .WithSqlParam("@userIds", schedule.selectedUser)
-                .WithSqlParam("@fromDate", schedule.selectedFromDate.ToString("yyyy-MM-dd"))
-                .WithSqlParam("@toDate", schedule.selectedToDate.ToString("yyyy-MM-dd"))
-            .ExecuteStoredProc<ScheduleListVM>().Result.ToList();
+            //var scheduleList = this._dbContext.LoadStoredProc("raq_getScheduleListByFilterIds")
+            //    .WithSqlParam("@orgId", schedule.selectedOrganizationId)
+            //    .WithSqlParam("@serviceLineIds", schedule.selectedService)
+            //    .WithSqlParam("@roleIds", schedule.selectedRole)
+            //    .WithSqlParam("@userIds", schedule.selectedUser)
+            //    .WithSqlParam("@fromDate", schedule.selectedFromDate.ToString("yyyy-MM-dd"))
+            //    .WithSqlParam("@toDate", schedule.selectedToDate.ToString("yyyy-MM-dd"))
+            //.ExecuteStoredProc<ScheduleListVM>().Result.ToList();
+
+            var scheduleList = this._dbContext.LoadStoredProcedure("raq_getScheduleListByFilterIds")
+                        .WithSqlParam("@orgId", schedule.selectedOrganizationId)
+                        .WithSqlParam("@serviceLineIds", schedule.selectedService)
+                        .WithSqlParam("@roleIds", schedule.selectedRole)
+                        .WithSqlParam("@userIds", schedule.selectedUser)
+                        .WithSqlParam("@fromDate", schedule.selectedFromDate.ToString("yyyy-MM-dd"))
+                        .WithSqlParam("@toDate", schedule.selectedToDate.ToString("yyyy-MM-dd"))
+                        .ExecuteStoredProc<ScheduleListVM>();
 
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Found", Body = scheduleList };
         }
@@ -259,7 +271,7 @@ namespace Web.Services.Concrete
             {
                 List<UsersSchedule> usersSchedules = new();
                 var userIds = schedule.UserId.ToIntList();
-                var roleIds = schedule.selectedRole.ToIntList();
+                var roleIds = schedule.RoleId.ToIntList();
                 if (schedule.DateRangeId == 1)
                 {
                     DateTime now = DateTime.UtcNow;
@@ -286,13 +298,13 @@ namespace Web.Services.Concrete
                             {
                                 foreach (var role in roleIds)
                                 {
-                                    if (_userRelationRepo.Table.Any(x => x.UserIdFk == user && x.ServiceLineIdFk == schedule.selectedService) && _userRoleRepo.Table.Any(x => x.UserIdFk == user && x.RoleIdFk == role))
+                                    if (_userRelationRepo.Table.Any(x => x.UserIdFk == user && x.ServiceLineIdFk == schedule.ServiceLineId) && _userRoleRepo.Table.Any(x => x.UserIdFk == user && x.RoleIdFk == role))
                                     {
                                         var userSchedule = new UsersSchedule()
                                         {
                                             ScheduleDateStart = StartDateTime,
                                             ScheduleDateEnd = EndDateTime,
-                                            ServiceLineIdFk = schedule.selectedService,
+                                            ServiceLineIdFk = schedule.ServiceLineId,
                                             DateRangeId = schedule.DateRangeId,
                                             UserIdFk = user,
                                             CreatedBy = schedule.CreatedBy,
@@ -323,8 +335,8 @@ namespace Web.Services.Concrete
                     {
                         if (startDate <= endDate)
                         {
-                            string startDateTimeStr = startDate.ToString("dd-MM-yyyy") + " " + schedule.StartTime.ToString("hh:mm:ss");
-                            string endDateTimeStr = endDate.ToString("dd-MM-yyyy") + " " + schedule.EndTime.ToString("hh:mm:ss");
+                            string startDateTimeStr = startDate.ToString("MM-dd-yyyy") + " " + schedule.StartTime.ToString("hh:mm:ss tt");
+                            string endDateTimeStr = endDate.ToString("MM-dd-yyyy") + " " + schedule.EndTime.ToString("hh:mm:ss tt");
 
                             DateTime StartDateTime = Convert.ToDateTime(startDateTimeStr);
                             DateTime EndDateTime = Convert.ToDateTime(endDateTimeStr);
@@ -333,13 +345,13 @@ namespace Web.Services.Concrete
                             {
                                 foreach (var role in roleIds)
                                 {
-                                    if (_userRelationRepo.Table.Any(x => x.UserIdFk == user && x.ServiceLineIdFk == schedule.selectedService) && _userRoleRepo.Table.Any(x => x.UserIdFk == user && x.RoleIdFk == role))
+                                    if (_userRelationRepo.Table.Any(x => x.UserIdFk == user && x.ServiceLineIdFk == schedule.ServiceLineId) && _userRoleRepo.Table.Any(x => x.UserIdFk == user && x.RoleIdFk == role))
                                     {
                                         var userSchedule = new UsersSchedule()
                                         {
                                             ScheduleDateStart = StartDateTime,
                                             ScheduleDateEnd = EndDateTime,
-                                            ServiceLineIdFk = schedule.selectedService,
+                                            ServiceLineIdFk = schedule.ServiceLineId,
                                             DateRangeId = schedule.DateRangeId,
                                             UserIdFk = user,
                                             CreatedBy = schedule.CreatedBy,
@@ -368,8 +380,8 @@ namespace Web.Services.Concrete
                     {
                         if (startDate <= endDate)
                         {
-                            string startDateTimeStr = startDate.ToString("dd-MM-yyyy") + " " + schedule.StartTime.ToString("hh:mm:ss");
-                            string endDateTimeStr = endDate.ToString("dd-MM-yyyy") + " " + schedule.EndTime.ToString("hh:mm:ss");
+                            string startDateTimeStr = startDate.ToString("MM-dd-yyyy") + " " + schedule.StartTime.ToString("hh:mm:ss tt");
+                            string endDateTimeStr = endDate.ToString("MM-dd-yyyy") + " " + schedule.EndTime.ToString("hh:mm:ss tt");
 
                             DateTime StartDateTime = Convert.ToDateTime(startDateTimeStr);
                             DateTime EndDateTime = Convert.ToDateTime(endDateTimeStr);
@@ -378,13 +390,13 @@ namespace Web.Services.Concrete
                             {
                                 foreach (var role in roleIds)
                                 {
-                                    if (_userRelationRepo.Table.Any(x => x.UserIdFk == user && x.ServiceLineIdFk == schedule.selectedService) && _userRoleRepo.Table.Any(x => x.UserIdFk == user && x.RoleIdFk == role))
+                                    if (_userRelationRepo.Table.Any(x => x.UserIdFk == user && x.ServiceLineIdFk == schedule.ServiceLineId) && _userRoleRepo.Table.Any(x => x.UserIdFk == user && x.RoleIdFk == role))
                                     {
                                         var userSchedule = new UsersSchedule()
                                         {
                                             ScheduleDateStart = StartDateTime,
                                             ScheduleDateEnd = EndDateTime,
-                                            ServiceLineIdFk = schedule.selectedService,
+                                            ServiceLineIdFk = schedule.ServiceLineId,
                                             DateRangeId = schedule.DateRangeId,
                                             UserIdFk = user,
                                             CreatedBy = schedule.CreatedBy,
@@ -413,7 +425,7 @@ namespace Web.Services.Concrete
 
         }
 
-        public BaseResponse DeleteSchedule(int scheduleId, int userId) 
+        public BaseResponse DeleteSchedule(int scheduleId, int userId)
         {
             var schedule = _scheduleRepo.Table.Where(x => x.UsersScheduleId == scheduleId && !x.IsDeleted).FirstOrDefault();
             if (schedule != null)
@@ -426,7 +438,8 @@ namespace Web.Services.Concrete
 
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Deleted." };
             }
-            else {
+            else
+            {
                 return new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "No Schedule Found" };
             }
         }

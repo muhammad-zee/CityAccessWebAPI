@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Net;
@@ -152,7 +151,7 @@ namespace Web.API.Controllers
 
         [Description("Get Schedule Template")]
         [HttpGet("Schedule/GetScheduleTemplate/{serviceLineId}")]
-        public BaseResponse GetScheduleTemplate(int serviceLineId) 
+        public BaseResponse GetScheduleTemplate(int serviceLineId)
         {
             try
             {
@@ -174,7 +173,7 @@ namespace Web.API.Controllers
 
         [Description("Delete Schedule")]
         [HttpGet("Schedule/DeleteSchedule/{scheduleId}/{userId}")]
-        public BaseResponse GetScheduleTemplate(int scheduleId, int userId)
+        public BaseResponse DeleteSchedule(int scheduleId, int userId)
         {
             try
             {

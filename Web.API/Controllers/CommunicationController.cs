@@ -148,11 +148,11 @@ namespace Web.API.Controllers
         }
 
         [HttpGet("Conversation/deleteConversationChannel")]
-        public BaseResponse deleteConversationChannel(string ChannelSid,int UserId)
+        public BaseResponse deleteConversationChannel(string ChannelSid, int UserId)
         {
             try
             {
-                return this._communicaitonService.deleteConversationChannel(ChannelSid,UserId);
+                return this._communicaitonService.deleteConversationChannel(ChannelSid, UserId);
             }
             catch (Exception ex)
             {
@@ -163,7 +163,7 @@ namespace Web.API.Controllers
         }
 
         [HttpGet("Conversation/deleteConversationParticipant")]
-        public BaseResponse deleteConversationParticipant(string ChannelSid,string ParticipantUniqueName, int UserId)
+        public BaseResponse deleteConversationParticipant(string ChannelSid, string ParticipantUniqueName, int UserId)
         {
             try
             {

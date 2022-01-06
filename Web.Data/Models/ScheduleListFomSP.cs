@@ -1,6 +1,9 @@
-﻿namespace Web.Model.Common
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace Web.Data.Models
 {
-    public class ScheduleListVM
+    [NotMapped]
+    public class ScheduleListFomSP
     {
         public int Id { get; set; }
         public int RoleIdFk { get; set; }

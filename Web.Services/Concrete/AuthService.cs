@@ -165,7 +165,7 @@ namespace Web.Services.Concrete
                 NotificationChannelSid = user.UserChannelSid,
                 UserUniqueId = user.UserUniqueId,
                 UserImage = user.UserImage
-                
+
 
             };
         }

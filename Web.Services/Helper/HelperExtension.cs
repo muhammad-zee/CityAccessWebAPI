@@ -1,6 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.Common;
 using System.IO;
 using System.Linq;
@@ -258,6 +260,106 @@ namespace Web.Services.Helper
             }
             return cipherText;
         }
+
+
+        #region Execute Procedure With SQL DataAdaptor
+
+        public static SqlCommand LoadStoredProcedure(
+          this DbContext context, string procedureName)
+        {
+            var cmd = (SqlCommand)context.Database.GetDbConnection().CreateCommand();
+            cmd.CommandText = procedureName;
+            cmd.CommandType = CommandType.StoredProcedure;
+            return cmd;
+        }
+
+        public static SqlCommand WithSqlParam(
+           this SqlCommand cmd, string paramName, object paramValue)
+        {
+            if (string.IsNullOrEmpty(cmd.CommandText))
+                throw new InvalidOperationException(
+                  "Call LoadStoredProc before using this method");
+            var param = cmd.CreateParameter();
+            param.ParameterName = paramName;
+            param.Value = paramValue;
+            cmd.Parameters.Add(param);
+            return cmd;
+        }
+
+        public static List<T> ExecuteStoredProc<T>(this SqlCommand command)
+        {
+            using (command)
+            {
+                if (command.Connection.State == ConnectionState.Closed)
+                    command.Connection.Open();
+                try
+                {
+                    DataSet ds = new DataSet();
+                    SqlDataAdapter da = new SqlDataAdapter();
+                    da.SelectCommand = command;
+
+                    da.Fill(ds);
+
+                    if (ds.Tables[0].Rows.Count > 0)
+                    {
+                        return ds.MapToList<T>();
+                    }
+                    else
+                    {
+                        return new List<T>();
+                    }
+                    //using (var reader = await command.ExecuteReaderAsync())
+                    //{
+                    //    return reader.MapToList<T>();
+                    //}
+                }
+                catch (Exception ex)
+                {
+                    throw (ex);
+                }
+                finally
+                {
+                    command.Connection.Close();
+                }
+            }
+        }
+
+        private static List<T> MapToList<T>(this DataSet ds)
+        {
+            var objList = new List<T>();
+            var props = typeof(T).GetRuntimeProperties();
+            var dr = ds.Tables[0];
+            var colMapping = dr.Columns.Cast<DataColumn>()
+              .Where(x => props.Any(y => y.Name.ToLower() == x.ColumnName.ToLower()))
+              .ToDictionary(key => key.ColumnName.ToLower());
+
+            if (dr.Rows.Count > 0)
+            {
+                foreach (var rows in dr.Rows)
+                {
+                    var row = (DataRow)rows;
+                    T obj = Activator.CreateInstance<T>();
+                    foreach (var prop in props)
+                    {
+                        try
+                        {
+                            var columnName = colMapping[prop.Name.ToLower()];
+                            string colName = colMapping[prop.Name.ToLower()].ColumnName;
+                            var val = row[colName];
+                            prop.SetValue(obj, val == DBNull.Value ? null : val);
+                        }
+                        catch
+                        {
+                            prop.SetValue(obj, null);
+                        }
+                    }
+                    objList.Add(obj);
+                }
+            }
+            return objList;
+        }
+
+        #endregion
 
 
     }
