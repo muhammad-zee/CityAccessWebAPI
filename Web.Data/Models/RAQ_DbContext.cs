@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 #nullable disable
 
@@ -14,8 +16,6 @@ namespace Web.Data.Models
             : base(options)
         {
         }
-
-
 
         public virtual DbSet<ClinicalHoliday> ClinicalHolidays { get; set; }
         public virtual DbSet<ClinicalHour> ClinicalHours { get; set; }
@@ -203,6 +203,8 @@ namespace Web.Data.Models
             modelBuilder.Entity<ConversationChannel>(entity =>
             {
                 entity.Property(e => e.ChannelSid).HasMaxLength(256);
+
+                entity.Property(e => e.ConversationImage).HasMaxLength(200);
 
                 entity.Property(e => e.CreatedDate)
                     .HasColumnType("datetime")
@@ -617,6 +619,8 @@ namespace Web.Data.Models
                     .HasDefaultValueSql("(getdate())");
 
                 entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.ScheduleDate).HasColumnType("date");
 
                 entity.Property(e => e.ScheduleDateEnd).HasColumnType("datetime");
 

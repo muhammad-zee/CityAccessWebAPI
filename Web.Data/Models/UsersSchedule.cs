@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 #nullable disable
 
@@ -7,6 +8,7 @@ namespace Web.Data.Models
     public partial class UsersSchedule
     {
         public int UsersScheduleId { get; set; }
+        public DateTime? ScheduleDate { get; set; }
         public DateTime ScheduleDateStart { get; set; }
         public DateTime ScheduleDateEnd { get; set; }
         public int UserIdFk { get; set; }

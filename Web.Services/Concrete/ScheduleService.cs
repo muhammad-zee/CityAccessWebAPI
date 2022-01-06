@@ -67,15 +67,6 @@ namespace Web.Services.Concrete
 
         public BaseResponse GetScheduleList(ScheduleVM schedule)
         {
-            //var scheduleList = this._dbContext.LoadStoredProc("raq_getScheduleListByFilterIds")
-            //    .WithSqlParam("@orgId", schedule.selectedOrganizationId)
-            //    .WithSqlParam("@serviceLineIds", schedule.selectedService)
-            //    .WithSqlParam("@roleIds", schedule.selectedRole)
-            //    .WithSqlParam("@userIds", schedule.selectedUser)
-            //    .WithSqlParam("@fromDate", schedule.selectedFromDate.ToString("yyyy-MM-dd"))
-            //    .WithSqlParam("@toDate", schedule.selectedToDate.ToString("yyyy-MM-dd"))
-            //.ExecuteStoredProc<ScheduleListVM>().Result.ToList();
-
             var scheduleList = this._dbContext.LoadStoredProcedure("raq_getScheduleListByFilterIds")
                         .WithSqlParam("@orgId", schedule.selectedOrganizationId)
                         .WithSqlParam("@serviceLineIds", schedule.selectedService)
@@ -304,6 +295,7 @@ namespace Web.Services.Concrete
                                     {
                                         var userSchedule = new UsersSchedule()
                                         {
+                                            ScheduleDate = StartDateTime.Date,
                                             ScheduleDateStart = StartDateTime,
                                             ScheduleDateEnd = EndDateTime,
                                             ServiceLineIdFk = schedule.ServiceLineId,
@@ -338,7 +330,7 @@ namespace Web.Services.Concrete
                         if (startDate <= endDate)
                         {
                             string startDateTimeStr = startDate.ToString("MM-dd-yyyy") + " " + schedule.StartTime.ToString("hh:mm:ss tt");
-                            string endDateTimeStr = endDate.ToString("MM-dd-yyyy") + " " + schedule.EndTime.ToString("hh:mm:ss tt");
+                            string endDateTimeStr = startDate.ToString("MM-dd-yyyy") + " " + schedule.EndTime.ToString("hh:mm:ss tt");
 
                             DateTime StartDateTime = Convert.ToDateTime(startDateTimeStr);
                             DateTime EndDateTime = Convert.ToDateTime(endDateTimeStr);
@@ -351,6 +343,7 @@ namespace Web.Services.Concrete
                                     {
                                         var userSchedule = new UsersSchedule()
                                         {
+                                            ScheduleDate = StartDateTime.Date,
                                             ScheduleDateStart = StartDateTime,
                                             ScheduleDateEnd = EndDateTime,
                                             ServiceLineIdFk = schedule.ServiceLineId,
@@ -383,7 +376,7 @@ namespace Web.Services.Concrete
                         if (startDate <= endDate)
                         {
                             string startDateTimeStr = startDate.ToString("MM-dd-yyyy") + " " + schedule.StartTime.ToString("hh:mm:ss tt");
-                            string endDateTimeStr = endDate.ToString("MM-dd-yyyy") + " " + schedule.EndTime.ToString("hh:mm:ss tt");
+                            string endDateTimeStr = startDate.ToString("MM-dd-yyyy") + " " + schedule.EndTime.ToString("hh:mm:ss tt");
 
                             DateTime StartDateTime = Convert.ToDateTime(startDateTimeStr);
                             DateTime EndDateTime = Convert.ToDateTime(endDateTimeStr);
@@ -396,6 +389,7 @@ namespace Web.Services.Concrete
                                     {
                                         var userSchedule = new UsersSchedule()
                                         {
+                                            ScheduleDate = StartDateTime.Date,
                                             ScheduleDateStart = StartDateTime,
                                             ScheduleDateEnd = EndDateTime,
                                             ServiceLineIdFk = schedule.ServiceLineId,

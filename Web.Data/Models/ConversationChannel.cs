@@ -17,6 +17,7 @@ namespace Web.Data.Models
         public string UniqueName { get; set; }
         public string ChannelSid { get; set; }
         public bool? IsGroup { get; set; }
+        public string ConversationImage { get; set; }
         public int CreatedBy { get; set; }
         public DateTime CreatedDate { get; set; }
         public int? ModifiedBy { get; set; }
