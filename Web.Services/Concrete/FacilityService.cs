@@ -122,9 +122,9 @@ namespace Web.Services.Concrete
 
         public BaseResponse GetServicesByOrganizationId(int OrganizationId)
         {
-            var services = _dbContext.LoadStoredProc("raq_getAllServicesByOrganizationId")
+            var services = _dbContext.LoadStoredProcedure("raq_getAllServicesByOrganizationId")
                 .WithSqlParam("@pOrganizationId", OrganizationId)
-            .ExecuteStoredProc<ServiceLineVM>().Result.ToList();
+            .ExecuteStoredProc<ServiceLineVM>();
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Found", Body = services };
 
         }
@@ -378,15 +378,15 @@ namespace Web.Services.Concrete
         {
             if (!string.IsNullOrEmpty(Ids))
             {
-                var treeList = _dbContext.LoadStoredProc("raq_getOrgAssociationList")
+                var treeList = _dbContext.LoadStoredProcedure("raq_getOrgAssociationList")
                 .WithSqlParam("@pOrganizationId", Ids)
-                .ExecuteStoredProc<TreeviewItemVM>().Result;
+                .ExecuteStoredProc<TreeviewItemVM>();
 
                 var orgTree = treeList.BuildTree();
 
-                var roleTreeList = _dbContext.LoadStoredProc("raq_getOrgsRole")
+                var roleTreeList = _dbContext.LoadStoredProcedure("raq_getOrgsRole")
                 .WithSqlParam("@pOrganizationId", Ids)
-                .ExecuteStoredProc<TreeviewItemVM>().Result;
+                .ExecuteStoredProc<TreeviewItemVM>();
 
                 var roleTree = roleTreeList.BuildTree();
 

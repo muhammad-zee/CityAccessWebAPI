@@ -321,9 +321,9 @@ namespace Web.Services.Concrete
         {
             BaseResponse response = new BaseResponse();
 
-            var channels = this._dbContext.LoadStoredProc("raq_getConversationChannelsByUserId")
+            var channels = this._dbContext.LoadStoredProcedure("raq_getConversationChannelsByUserId")
             .WithSqlParam("@pUserId", UserId)
-            .ExecuteStoredProc<ConversationChannelsListVM>().Result.ToList();
+            .ExecuteStoredProc<ConversationChannelsListVM>();
             if (channels != null)
             {
                 response.Status = HttpStatusCode.OK;

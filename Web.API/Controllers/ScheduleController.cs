@@ -38,7 +38,7 @@ namespace Web.API.Controllers
             try
             {
                 var model = ModelState;
-                var response = _scheduleService.getSchedule();
+                var response = _scheduleService.getSchedule(param);
 
                 return Json(response.Body);
             }

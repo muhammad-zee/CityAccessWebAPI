@@ -55,9 +55,11 @@ namespace Web.Services.Concrete
             this._serviceRepo = serviceRepo;
         }
 
-        public BaseResponse getSchedule()
+        public BaseResponse getSchedule(EditParams param)
         {
             var scheduleList = this._dbContext.LoadStoredProcedure("raq_getSchedule")
+                .WithSqlParam("@startDate", param.StartDate.ToString("yyyy-MM-dd"))
+                .WithSqlParam("@enddate", param.EndDate.ToString("yyyy-MM-dd"))
             .ExecuteStoredProc<ScheduleEventData>();
 
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Found", Body = scheduleList };

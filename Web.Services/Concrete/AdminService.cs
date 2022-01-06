@@ -71,8 +71,8 @@ namespace Web.Services.Concrete
 
         public BaseResponse GetLabelCounts()
         {
-            var LabelCounts = this._dbContext.LoadStoredProc("raq_getCountOfTablesForDashboard")
-            .ExecuteStoredProc<TableCountsForDashBoardVM>().Result.FirstOrDefault();
+            var LabelCounts = this._dbContext.LoadStoredProcedure("raq_getCountOfTablesForDashboard")
+            .ExecuteStoredProc<TableCountsForDashBoardVM>().FirstOrDefault();
 
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Found", Body = LabelCounts };
         }
@@ -107,10 +107,10 @@ namespace Web.Services.Concrete
         public BaseResponse GetAllUsersByOrganizationId(int OrganizationId, int UserRoleId)
         {
             //var result = _user.Table.Where(x => x.IsDeleted == false).ToList();
-            var result = this._dbContext.LoadStoredProc("raq_getAllUsersByOrganizationId")
+            var result = this._dbContext.LoadStoredProcedure("raq_getAllUsersByOrganizationId")
                 .WithSqlParam("@pOrganizationId", OrganizationId)
                 .WithSqlParam("@pUserRoleId", UserRoleId)
-                .ExecuteStoredProc<User>().Result;
+                .ExecuteStoredProc<User>();
 
             var users = AutoMapperHelper.MapList<User, RegisterCredentialVM>(result);
             var userRelationIds = this._userRelationRepo.GetList();
@@ -133,9 +133,9 @@ namespace Web.Services.Concrete
         }
         public BaseResponse GetAllUsersByServiceLineAndRoleId(string ServiceLineId, string RoleIds)
         {
-            var users = _dbContext.LoadStoredProc("raq_getAllUsersByServiceLineIdAndRoleId")
+            var users = _dbContext.LoadStoredProcedure("raq_getAllUsersByServiceLineIdAndRoleId")
                         .WithSqlParam("@serviceLineId", ServiceLineId)
-                        .WithSqlParam("@roleId", RoleIds).ExecuteStoredProc<RegisterCredentialVM>().Result.Select(x => new { Id = x.UserId, Name = x.UserName }).ToList();
+                        .WithSqlParam("@roleId", RoleIds).ExecuteStoredProc<RegisterCredentialVM>().Select(x => new { Id = x.UserId, Name = x.UserName }).ToList();
 
             return new BaseResponse { Status = HttpStatusCode.OK, Message = "Users List Returned", Body = users };
         }
@@ -584,10 +584,10 @@ namespace Web.Services.Concrete
         {
             BaseResponse response = null;
 
-            var RCAresultData = _dbContext.LoadStoredProc("raq_getComponentAccessByUserAndRole")
+            var RCAresultData = _dbContext.LoadStoredProcedure("raq_getComponentAccessByUserAndRole")
              .WithSqlParam("@pUserId", userId)
              .WithSqlParam("@pRoleId", roleId)
-             .ExecuteStoredProc<ComponentAccessByRoleAndUserVM>().Result;
+             .ExecuteStoredProc<ComponentAccessByRoleAndUserVM>();
 
             var treeItems = RCAresultData.Select(x => new ComponentAccessByRoleAndUserTreeVM()
             {
