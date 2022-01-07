@@ -58,6 +58,7 @@ namespace Web.API.Controllers
         {
             try
             {
+                var model = ModelState;
                 var response = _scheduleService.GetScheduleList(param);
                 return response;
             }
