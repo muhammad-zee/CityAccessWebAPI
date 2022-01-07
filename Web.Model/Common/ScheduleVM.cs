@@ -36,10 +36,10 @@ namespace Web.Model.Common
     public class ScheduleVM
     {
         public int ScheduleId { get; set; }
-        public int ServiceLineId { get; set; }
+        public int ServiceLineIdFk { get; set; }
         public int OrganizationIdFk { get; set; }
-        public string RoleId { get; set; }
-        public string UserId { get; set; }
+        public string RoleIdFk { get; set; }
+        public string UserIdFk { get; set; }
         public int DateRangeId { get; set; }
         public DateTime FromDate { get; set; }
         public DateTime ToDate { get; set; }

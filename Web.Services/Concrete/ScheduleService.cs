@@ -263,8 +263,8 @@ namespace Web.Services.Concrete
             else
             {
                 List<UsersSchedule> usersSchedules = new();
-                var userIds = schedule.UserId.ToIntList();
-                var roleIds = schedule.RoleId.ToIntList();
+                var userIds = schedule.UserIdFk.ToIntList();
+                var roleIds = schedule.RoleIdFk.ToIntList();
                 if (schedule.DateRangeId == 1)
                 {
                     DateTime now = DateTime.UtcNow;
@@ -291,14 +291,14 @@ namespace Web.Services.Concrete
                             {
                                 foreach (var role in roleIds)
                                 {
-                                    if (_userRelationRepo.Table.Any(x => x.UserIdFk == user && x.ServiceLineIdFk == schedule.ServiceLineId) && _userRoleRepo.Table.Any(x => x.UserIdFk == user && x.RoleIdFk == role))
+                                    if (_userRelationRepo.Table.Any(x => x.UserIdFk == user && x.ServiceLineIdFk == schedule.ServiceLineIdFk) && _userRoleRepo.Table.Any(x => x.UserIdFk == user && x.RoleIdFk == role))
                                     {
                                         var userSchedule = new UsersSchedule()
                                         {
                                             ScheduleDate = StartDateTime.Date,
                                             ScheduleDateStart = StartDateTime,
                                             ScheduleDateEnd = EndDateTime,
-                                            ServiceLineIdFk = schedule.ServiceLineId,
+                                            ServiceLineIdFk = schedule.ServiceLineIdFk,
                                             DateRangeId = schedule.DateRangeId,
                                             UserIdFk = user,
                                             CreatedBy = schedule.CreatedBy,
@@ -339,14 +339,14 @@ namespace Web.Services.Concrete
                             {
                                 foreach (var role in roleIds)
                                 {
-                                    if (_userRelationRepo.Table.Any(x => x.UserIdFk == user && x.ServiceLineIdFk == schedule.ServiceLineId) && _userRoleRepo.Table.Any(x => x.UserIdFk == user && x.RoleIdFk == role))
+                                    if (_userRelationRepo.Table.Any(x => x.UserIdFk == user && x.ServiceLineIdFk == schedule.ServiceLineIdFk) && _userRoleRepo.Table.Any(x => x.UserIdFk == user && x.RoleIdFk == role))
                                     {
                                         var userSchedule = new UsersSchedule()
                                         {
                                             ScheduleDate = StartDateTime.Date,
                                             ScheduleDateStart = StartDateTime,
                                             ScheduleDateEnd = EndDateTime,
-                                            ServiceLineIdFk = schedule.ServiceLineId,
+                                            ServiceLineIdFk = schedule.ServiceLineIdFk,
                                             DateRangeId = schedule.DateRangeId,
                                             UserIdFk = user,
                                             CreatedBy = schedule.CreatedBy,
@@ -385,14 +385,14 @@ namespace Web.Services.Concrete
                             {
                                 foreach (var role in roleIds)
                                 {
-                                    if (_userRelationRepo.Table.Any(x => x.UserIdFk == user && x.ServiceLineIdFk == schedule.ServiceLineId) && _userRoleRepo.Table.Any(x => x.UserIdFk == user && x.RoleIdFk == role))
+                                    if (_userRelationRepo.Table.Any(x => x.UserIdFk == user && x.ServiceLineIdFk == schedule.ServiceLineIdFk) && _userRoleRepo.Table.Any(x => x.UserIdFk == user && x.RoleIdFk == role))
                                     {
                                         var userSchedule = new UsersSchedule()
                                         {
                                             ScheduleDate = StartDateTime.Date,
                                             ScheduleDateStart = StartDateTime,
                                             ScheduleDateEnd = EndDateTime,
-                                            ServiceLineIdFk = schedule.ServiceLineId,
+                                            ServiceLineIdFk = schedule.ServiceLineIdFk,
                                             DateRangeId = schedule.DateRangeId,
                                             UserIdFk = user,
                                             CreatedBy = schedule.CreatedBy,
