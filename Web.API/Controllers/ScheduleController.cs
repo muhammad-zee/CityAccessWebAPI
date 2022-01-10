@@ -59,25 +59,18 @@ namespace Web.API.Controllers
             try
             {
 
-                if (param.action == "insert" || (param.action == "batch" && param.added != null)) // this block of code will execute while inserting the appointments
+                if (param.action == "batch" && param.added != null && param.added.Count > 0) // this block of code will execute while inserting the appointments
                 {
 
                 }
-                if (param.action == "update" || (param.action == "batch" && param.changed != null)) // this block of code will execute while updating the appointment
+                if (param.action == "batch" && param.changed != null && param.changed.Count > 0) // this block of code will execute while updating the appointment
                 {
                 }
-                if (param.action == "remove" || (param.action == "batch" && param.deleted != null)) // this block of code will execute while removing the appointment
+                if (param.action == "batch" && param.deleted != null && param.deleted.Count > 0) // this block of code will execute while removing the appointment
                 {
-                    if (param.action == "remove")
+                    foreach (var apps in param.deleted)
                     {
 
-                    }
-                    else
-                    {
-                        foreach (var apps in param.deleted)
-                        {
-
-                        }
                     }
                 }
 

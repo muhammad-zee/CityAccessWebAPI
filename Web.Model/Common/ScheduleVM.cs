@@ -25,7 +25,7 @@ namespace Web.Model.Common
         public int id { get; set; }
         public DateTime endTime { get; set; }
         public DateTime startTime { get; set; }
-        public int ownerId { get; set; }
+        public string ownerId { get; set; }
         public string subject { get; set; }
     }
 
