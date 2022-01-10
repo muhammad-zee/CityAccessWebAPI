@@ -243,15 +243,20 @@ namespace Web.Services.Concrete
                 var row = _scheduleRepo.Table.Where(x => !x.IsDeleted && x.UsersScheduleId == schedule.ScheduleId).FirstOrDefault();
                 if (row != null)
                 {
-                    string startDateTimeStr = row.ScheduleDateStart.ToString("dd-MM-yyyy") + schedule.StartTime.ToString("hh:mm:ss");
-                    string endDateTimeStr = row.ScheduleDateEnd.ToString("dd-MM-yyyy") + schedule.EndTime.ToString("hh:mm:ss");
+                    string startDateTimeStr = row.ScheduleDateStart.ToString("MM-dd-yyyy") +" "+ schedule.StartTime.ToString("hh:mm:ss tt");
+                    string endDateTimeStr = row.ScheduleDateEnd.ToString("MM-dd-yyyy") +" "+ schedule.EndTime.ToString("hh:mm:ss tt");
 
                     DateTime startDateTime = Convert.ToDateTime(startDateTimeStr);
                     DateTime endDateTime = Convert.ToDateTime(endDateTimeStr);
 
+                    if (startDateTime.TimeOfDay > endDateTime.TimeOfDay) 
+                    {
+                        endDateTime.AddDays(1);
+                    }
+
                     //row.ScheduleDate = startDateTime.Date;
-                    row.ScheduleDateStart = startDateTime;
-                    row.ScheduleDateEnd = endDateTime;
+                    row.ScheduleDateStart = startDateTime.ToUniversalTime();
+                    row.ScheduleDateEnd = endDateTime.ToUniversalTime();
                     row.ModifiedBy = schedule.ModifiedBy;
                     row.ModifiedDate = DateTime.UtcNow;
                     row.IsDeleted = false;
@@ -300,9 +305,9 @@ namespace Web.Services.Concrete
                                     {
                                         var userSchedule = new UsersSchedule()
                                         {
-                                            ScheduleDate = StartDateTime.Date,
-                                            ScheduleDateStart = StartDateTime,
-                                            ScheduleDateEnd = EndDateTime,
+                                            ScheduleDate = StartDateTime.ToUniversalTime().Date,
+                                            ScheduleDateStart = StartDateTime.ToUniversalTime(),
+                                            ScheduleDateEnd = EndDateTime.ToUniversalTime(),
                                             ServiceLineIdFk = schedule.ServiceLineIdFk,
                                             DateRangeId = schedule.DateRangeId,
                                             UserIdFk = user,
@@ -339,7 +344,10 @@ namespace Web.Services.Concrete
 
                             DateTime StartDateTime = Convert.ToDateTime(startDateTimeStr);
                             DateTime EndDateTime = Convert.ToDateTime(endDateTimeStr);
-
+                            if (StartDateTime.TimeOfDay > EndDateTime.TimeOfDay)
+                            {
+                                EndDateTime = EndDateTime.AddDays(1);
+                            }
                             foreach (var user in userIds)
                             {
                                 foreach (var role in roleIds)
@@ -348,9 +356,9 @@ namespace Web.Services.Concrete
                                     {
                                         var userSchedule = new UsersSchedule()
                                         {
-                                            ScheduleDate = StartDateTime.Date,
-                                            ScheduleDateStart = StartDateTime,
-                                            ScheduleDateEnd = EndDateTime,
+                                            ScheduleDate = StartDateTime.ToUniversalTime().Date,
+                                            ScheduleDateStart = StartDateTime.ToUniversalTime(),
+                                            ScheduleDateEnd = EndDateTime.ToUniversalTime(),
                                             ServiceLineIdFk = schedule.ServiceLineIdFk,
                                             DateRangeId = schedule.DateRangeId,
                                             UserIdFk = user,
@@ -386,6 +394,10 @@ namespace Web.Services.Concrete
                             DateTime StartDateTime = Convert.ToDateTime(startDateTimeStr);
                             DateTime EndDateTime = Convert.ToDateTime(endDateTimeStr);
 
+                            if (StartDateTime.TimeOfDay > EndDateTime.TimeOfDay)
+                            {
+                                EndDateTime = EndDateTime.AddDays(1);
+                            }
                             foreach (var user in userIds)
                             {
                                 foreach (var role in roleIds)
@@ -394,9 +406,9 @@ namespace Web.Services.Concrete
                                     {
                                         var userSchedule = new UsersSchedule()
                                         {
-                                            ScheduleDate = StartDateTime.Date,
-                                            ScheduleDateStart = StartDateTime,
-                                            ScheduleDateEnd = EndDateTime,
+                                            ScheduleDate = StartDateTime.ToUniversalTime().Date,
+                                            ScheduleDateStart = StartDateTime.ToUniversalTime(),
+                                            ScheduleDateEnd = EndDateTime.ToUniversalTime(),
                                             ServiceLineIdFk = schedule.ServiceLineIdFk,
                                             DateRangeId = schedule.DateRangeId,
                                             UserIdFk = user,

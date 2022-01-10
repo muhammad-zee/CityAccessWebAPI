@@ -17,6 +17,7 @@ using Web.Data.Models;
 using Web.DLL;
 using Web.DLL.Generic_Repository;
 using Web.Services.Concrete;
+using Web.Services.Helper;
 using Web.Services.Interfaces;
 
 namespace Web.API
@@ -38,7 +39,12 @@ namespace Web.API
               options.UseSqlServer(
                  Configuration.GetConnectionString("DefaultConnection")));
 
-            services.AddControllers().AddJsonOptions(x => x.JsonSerializerOptions.IgnoreNullValues = true); ;
+            services.AddControllers()
+                .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.IgnoreNullValues = true;
+                    options.JsonSerializerOptions.Converters.Add(new DateTimeConverter());
+                });
             services.AddCors();
             services.AddSwaggerGen(c =>
             {
