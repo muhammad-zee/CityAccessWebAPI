@@ -27,7 +27,6 @@ namespace Web.Model.Common
         public DateTime startTime { get; set; }
         public int ownerId { get; set; }
         public string subject { get; set; }
-
     }
 
     public class ScheduleVM
