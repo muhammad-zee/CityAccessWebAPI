@@ -60,6 +60,10 @@ namespace Web.Services.Concrete
             var scheduleList = this._dbContext.LoadStoredProcedure("raq_getSchedule")
                 .WithSqlParam("@startDate", param.StartDate)
                 .WithSqlParam("@endDate", param.EndDate)
+                .WithSqlParam("@serviceLineIds",param.ServiceLineIds)
+                .WithSqlParam("@organizationId", param.OrganizationId)
+                .WithSqlParam("@roleIds", param.RoleIds)
+                .WithSqlParam("@userIds", param.UserIds)
             .ExecuteStoredProc<ScheduleEventData>();
 
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Found", Body = scheduleList };

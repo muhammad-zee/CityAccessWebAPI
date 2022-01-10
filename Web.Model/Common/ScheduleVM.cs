@@ -9,8 +9,10 @@ namespace Web.Model.Common
         public string action { get; set; }
         public DateTime EndDate { get; set; }
         public DateTime StartDate { get; set; }
-
-        public string selectedServiceId { get; set; }
+        public string ServiceLineIds { get; set; }
+        public int OrganizationId { get; set; }
+        public string RoleIds { get; set; }
+        public string UserIds { get; set; }
         public List<ScheduleEventData> added { get; set; }
         public List<ScheduleEventData> changed { get; set; }
         public List<ScheduleEventData> deleted { get; set; }

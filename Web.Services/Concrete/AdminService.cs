@@ -135,7 +135,7 @@ namespace Web.Services.Concrete
         {
             var users = _dbContext.LoadStoredProcedure("raq_getAllUsersByServiceLineIdAndRoleId")
                         .WithSqlParam("@serviceLineId", ServiceLineId)
-                        .WithSqlParam("@roleId", RoleIds).ExecuteStoredProc<RegisterCredentialVM>().Select(x => new { Id = x.UserId, Name = x.UserName }).ToList();
+                        .WithSqlParam("@roleId", RoleIds).ExecuteStoredProc<UserListVm>().ToList();
 
             return new BaseResponse { Status = HttpStatusCode.OK, Message = "Users List Returned", Body = users };
         }
