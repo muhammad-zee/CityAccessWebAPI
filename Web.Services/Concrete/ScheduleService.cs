@@ -296,9 +296,9 @@ namespace Web.Services.Concrete
                                     {
                                         var userSchedule = new UsersSchedule()
                                         {
-                                            ScheduleDate = StartDateTime.Date,
-                                            ScheduleDateStart = StartDateTime,
-                                            ScheduleDateEnd = EndDateTime,
+                                            ScheduleDate = StartDateTime.ToUniversalTime().Date,
+                                            ScheduleDateStart = StartDateTime.ToUniversalTime(),
+                                            ScheduleDateEnd = EndDateTime.ToUniversalTime(),
                                             ServiceLineIdFk = schedule.ServiceLineIdFk,
                                             DateRangeId = schedule.DateRangeId,
                                             UserIdFk = user,
@@ -335,7 +335,10 @@ namespace Web.Services.Concrete
 
                             DateTime StartDateTime = Convert.ToDateTime(startDateTimeStr);
                             DateTime EndDateTime = Convert.ToDateTime(endDateTimeStr);
-
+                            if (StartDateTime.TimeOfDay > EndDateTime.TimeOfDay)
+                            {
+                                EndDateTime = EndDateTime.AddDays(1);
+                            }
                             foreach (var user in userIds)
                             {
                                 foreach (var role in roleIds)
@@ -344,9 +347,9 @@ namespace Web.Services.Concrete
                                     {
                                         var userSchedule = new UsersSchedule()
                                         {
-                                            ScheduleDate = StartDateTime.Date,
-                                            ScheduleDateStart = StartDateTime,
-                                            ScheduleDateEnd = EndDateTime,
+                                            ScheduleDate = StartDateTime.ToUniversalTime().Date,
+                                            ScheduleDateStart = StartDateTime.ToUniversalTime(),
+                                            ScheduleDateEnd = EndDateTime.ToUniversalTime(),
                                             ServiceLineIdFk = schedule.ServiceLineIdFk,
                                             DateRangeId = schedule.DateRangeId,
                                             UserIdFk = user,
@@ -382,6 +385,10 @@ namespace Web.Services.Concrete
                             DateTime StartDateTime = Convert.ToDateTime(startDateTimeStr);
                             DateTime EndDateTime = Convert.ToDateTime(endDateTimeStr);
 
+                            if (StartDateTime.TimeOfDay > EndDateTime.TimeOfDay) 
+                            {
+                                EndDateTime = EndDateTime.AddDays(1);
+                            }
                             foreach (var user in userIds)
                             {
                                 foreach (var role in roleIds)
@@ -390,9 +397,9 @@ namespace Web.Services.Concrete
                                     {
                                         var userSchedule = new UsersSchedule()
                                         {
-                                            ScheduleDate = StartDateTime.Date,
-                                            ScheduleDateStart = StartDateTime,
-                                            ScheduleDateEnd = EndDateTime,
+                                            ScheduleDate = StartDateTime.ToUniversalTime().Date,
+                                            ScheduleDateStart = StartDateTime.ToUniversalTime(),
+                                            ScheduleDateEnd = EndDateTime.ToUniversalTime(),
                                             ServiceLineIdFk = schedule.ServiceLineIdFk,
                                             DateRangeId = schedule.DateRangeId,
                                             UserIdFk = user,
