@@ -74,7 +74,9 @@ namespace Web.API.Controllers
                     }
                 }
 
-                return Json(true);
+
+                var response = _scheduleService.getSchedule(param);
+                return ((ActionResult)response.Body);
             }
             catch (Exception ex)
             {
