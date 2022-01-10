@@ -40,7 +40,8 @@ namespace Web.API
                  Configuration.GetConnectionString("DefaultConnection")));
 
             services.AddControllers()
-                .AddJsonOptions(options => {
+                .AddJsonOptions(options =>
+                {
                     options.JsonSerializerOptions.IgnoreNullValues = true;
                     options.JsonSerializerOptions.Converters.Add(new DateTimeConverter());
                 });

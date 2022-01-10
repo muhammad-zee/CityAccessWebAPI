@@ -61,7 +61,7 @@ namespace Web.API.Controllers
 
                 if (param.action == "insert" || (param.action == "batch" && param.added != null)) // this block of code will execute while inserting the appointments
                 {
-                  
+
                 }
                 if (param.action == "update" || (param.action == "batch" && param.changed != null)) // this block of code will execute while updating the appointment
                 {
@@ -70,13 +70,13 @@ namespace Web.API.Controllers
                 {
                     if (param.action == "remove")
                     {
-                        
+
                     }
                     else
                     {
                         foreach (var apps in param.deleted)
                         {
-                           
+
                         }
                     }
                 }
