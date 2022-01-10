@@ -51,6 +51,47 @@ namespace Web.API.Controllers
         }
 
 
+        [Description("Load Schedule")]
+        [Route("Schedule/AddOrUpdateScheduleFromSchedule")]
+        [HttpPost, DisableRequestSizeLimit]
+        public ActionResult AddOrUpdateScheduleFromSchedule([FromBody] EditParams param)
+        {
+            try
+            {
+
+                if (param.action == "insert" || (param.action == "batch" && param.added != null)) // this block of code will execute while inserting the appointments
+                {
+                  
+                }
+                if (param.action == "update" || (param.action == "batch" && param.changed != null)) // this block of code will execute while updating the appointment
+                {
+                }
+                if (param.action == "remove" || (param.action == "batch" && param.deleted != null)) // this block of code will execute while removing the appointment
+                {
+                    if (param.action == "remove")
+                    {
+                        
+                    }
+                    else
+                    {
+                        foreach (var apps in param.deleted)
+                        {
+                           
+                        }
+                    }
+                }
+
+                return Json(true);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return Json("");
+            }
+        }
+
+
         [Description("Get Schedule")]
         [Route("Schedule/GetScheduleList")]
         [HttpPost, DisableRequestSizeLimit]

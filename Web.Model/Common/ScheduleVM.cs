@@ -20,13 +20,11 @@ namespace Web.Model.Common
 
     public class ScheduleEventData
     {
-
-        public int Id { get; set; }
-        public DateTime EndTime { get; set; }
-        public DateTime StartTime { get; set; }
- 
-        public int OwnerId { get; set; }
-        public string Subject { get; set; }
+        public int id { get; set; }
+        public DateTime endTime { get; set; }
+        public DateTime startTime { get; set; }
+        public int ownerId { get; set; }
+        public string subject { get; set; }
 
     }
 
