@@ -17,6 +17,8 @@ namespace Web.Model.Common
         public List<ScheduleEventData> changed { get; set; }
         public List<ScheduleEventData> deleted { get; set; }
         public ScheduleEventData value { get; set; }
+        public int CreatedBy { get; set; }
+        public int ModifiedBy { get; set; }
     }
 
 

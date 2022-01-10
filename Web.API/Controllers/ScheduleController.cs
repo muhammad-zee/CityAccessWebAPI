@@ -3,11 +3,13 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Net;
 using System.Threading.Tasks;
 using Web.API.Helper;
+using Web.Data.Models;
 using Web.Model;
 using Web.Model.Common;
 using Web.Services.Interfaces;
@@ -54,35 +56,23 @@ namespace Web.API.Controllers
         [Description("Load Schedule")]
         [Route("Schedule/AddOrUpdateScheduleFromSchedule")]
         [HttpPost, DisableRequestSizeLimit]
-        public ActionResult AddOrUpdateScheduleFromSchedule([FromBody] EditParams param)
+        public BaseResponse AddOrUpdateScheduleFromSchedule([FromBody] EditParams param)
         {
             try
             {
-
-                if (param.action == "batch" && param.added != null && param.added.Count > 0) // this block of code will execute while inserting the appointments
-                {
-
-                }
-                if (param.action == "batch" && param.changed != null && param.changed.Count > 0) // this block of code will execute while updating the appointment
-                {
-                }
-                if (param.action == "batch" && param.deleted != null && param.deleted.Count > 0) // this block of code will execute while removing the appointment
-                {
-                    foreach (var apps in param.deleted)
-                    {
-
-                    }
-                }
-
-
-                var response = _scheduleService.getSchedule(param);
-                return ((ActionResult)response.Body);
+                return this._scheduleService.AddUpdateUserSchedule(param);
             }
             catch (Exception ex)
             {
                 ElmahExtensions.RiseError(ex);
                 _logger.LogExceptions(ex);
-                return Json("");
+                //return Json("");
+                return new BaseResponse()
+                {
+                    Status = HttpStatusCode.BadRequest,
+                    Message = ex.ToString(),
+                    Body = null
+                };
             }
         }
 

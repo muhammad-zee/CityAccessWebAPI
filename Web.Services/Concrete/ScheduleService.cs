@@ -236,6 +236,92 @@ namespace Web.Services.Concrete
             }
         }
 
+        public BaseResponse AddUpdateUserSchedule(EditParams param)
+        {
+            UsersSchedule schedule = null;
+            List<UsersSchedule> scheduleList = new List<UsersSchedule>();
+
+            BaseResponse response = new BaseResponse();
+            if (param.action == "batch" && param.added != null && param.added.Count > 0) // this block of code will execute while inserting the appointments
+            {
+
+                scheduleList = (from u in param.added
+                                select new UsersSchedule
+                                {
+                                    ScheduleDate = u.startTime.ToUniversalTime(),
+                                    ScheduleDateStart = u.startTime.ToUniversalTime(),
+                                    ScheduleDateEnd = u.endTime.ToUniversalTime(),
+                                    UserIdFk = Convert.ToInt32(u.ownerId),
+                                    //RoleIdFk = 0,
+                                    DateRangeId = 3,
+                                    ServiceLineIdFk = Convert.ToInt32(param.ServiceLineIds),
+                                    CreatedBy = param.CreatedBy,
+                                    CreatedDate = DateTime.UtcNow,
+                                    IsDeleted = false
+                                }).ToList();
+                this._scheduleRepo.Insert(scheduleList);
+
+                response.Status = HttpStatusCode.OK;
+                response.Message = "Schedule Saved";
+                response.Body = scheduleList;
+            }
+            if (param.action == "batch" && param.changed != null && param.changed.Count > 0) // this block of code will execute while updating the appointment
+            {
+                var changedSchedule = param.changed.FirstOrDefault();
+                schedule = this._scheduleRepo.Table.FirstOrDefault(s => s.UsersScheduleId == changedSchedule.id);
+                if (schedule != null)
+                {
+                    schedule.ScheduleDate = changedSchedule.startTime.ToUniversalTime();
+                    schedule.ScheduleDateStart = changedSchedule.startTime.ToUniversalTime();
+                    schedule.ScheduleDateEnd = changedSchedule.endTime.ToUniversalTime();
+                    schedule.UserIdFk = Convert.ToInt32(changedSchedule.ownerId);
+                    //schedule.RoleIdFk = 0;
+                    schedule.DateRangeId = 3;
+                    schedule.ServiceLineIdFk = Convert.ToInt32(param.ServiceLineIds);
+                    schedule.ModifiedBy = param.ModifiedBy;
+                    schedule.ModifiedDate = DateTime.UtcNow;
+                    schedule.IsDeleted = false;
+                    this._scheduleRepo.Update(schedule);
+
+                    response.Status = HttpStatusCode.OK;
+                    response.Message = "Schedule Updated";
+                    response.Body = schedule;
+
+                }
+                else
+                {
+                    response.Status = HttpStatusCode.NotFound;
+                    response.Message = "Schedule Not Found";
+                }
+
+
+            }
+            if (param.action == "batch" && param.deleted != null && param.deleted.Count > 0) // this block of code will execute while removing the appointment
+            {
+                var deletedSchedule = param.deleted.FirstOrDefault();
+                schedule = this._scheduleRepo.Table.FirstOrDefault(s => s.UsersScheduleId == deletedSchedule.id);
+                if (schedule != null)
+                {
+                    schedule.ModifiedBy = param.ModifiedBy;
+                    schedule.ModifiedDate = DateTime.UtcNow;
+                    schedule.IsDeleted = true;
+                    this._scheduleRepo.Update(schedule);
+
+                    response.Status = HttpStatusCode.OK;
+                    response.Message = "Schedule Deleted";
+                }
+                else
+                {
+                    response.Status = HttpStatusCode.NotFound;
+                    response.Message = "Schedule Not Found";
+                    response.Body = schedule;
+
+                }
+            }
+
+            return response;
+        }
+
         public BaseResponse SaveSchedule(ScheduleVM schedule)
         {
             if (schedule.ScheduleId > 0)

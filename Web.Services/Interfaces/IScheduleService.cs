@@ -11,6 +11,7 @@ namespace Web.Services.Interfaces
         BaseResponse ImportCSV(ImportCSVFileVM fileVM);
         BaseResponse GetScheduleTemplate(int serviceLine);
         BaseResponse SaveSchedule(ScheduleVM schedule);
+        BaseResponse AddUpdateUserSchedule(EditParams param);
         BaseResponse DeleteSchedule(int scheduleId, int userId);
     }
 }
