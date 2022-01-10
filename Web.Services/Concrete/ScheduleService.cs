@@ -60,7 +60,7 @@ namespace Web.Services.Concrete
             var scheduleList = this._dbContext.LoadStoredProcedure("raq_getSchedule")
                 .WithSqlParam("@startDate", param.StartDate)
                 .WithSqlParam("@endDate", param.EndDate)
-                .WithSqlParam("@serviceLineIds",param.ServiceLineIds)
+                .WithSqlParam("@serviceLineIds", param.ServiceLineIds)
                 .WithSqlParam("@organizationId", param.OrganizationId)
                 .WithSqlParam("@roleIds", param.RoleIds)
                 .WithSqlParam("@userIds", param.UserIds)
@@ -430,10 +430,15 @@ namespace Web.Services.Concrete
                     }
                 }
 
-                _scheduleRepo.Insert(usersSchedules);
-
-                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Schedule Created" };
-
+                if (usersSchedules.Count > 0)
+                {
+                    _scheduleRepo.Insert(usersSchedules);
+                    return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Schedule Created" };
+                }
+                else
+                {
+                    return new BaseResponse() { Status = HttpStatusCode.NotModified, Message = "Schedule Not Created" };
+                }
             }
 
         }
