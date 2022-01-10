@@ -33,7 +33,7 @@ namespace Web.API.Controllers
         [Description("Load Schedule")]
         [Route("Schedule/LoadSchedule")]
         [HttpPost, DisableRequestSizeLimit]
-        public ActionResult LoadSchedule([FromBody] EditParams param, bool readOnly = false)
+        public ActionResult LoadSchedule([FromBody] EditParams param)
         {
             try
             {
