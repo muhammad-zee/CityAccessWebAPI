@@ -338,18 +338,18 @@ namespace Web.Services.Helper
                 {
                     var row = (DataRow)rows;
                     T obj = Activator.CreateInstance<T>();
-                    foreach (var prop in props)
+                    foreach (var col in colMapping)
                     {
                         try
                         {
-                            var columnName = colMapping[prop.Name.ToLower()];
-                            string colName = colMapping[prop.Name.ToLower()].ColumnName;
-                            var val = row[colName];
-                            prop.SetValue(obj, val == DBNull.Value ? null : val);
+                            string columnName = props.Where(x => x.Name.ToLower() == col.Key.ToLower()).Select(x => x.Name).FirstOrDefault(); //colMapping[prop.Name.ToLower()];
+                            //string colName = colMapping[prop.Name.ToLower()].ColumnName;
+                            var val = row[columnName];
+                            props.Where(x => x.Name.ToLower() == col.Key.ToLower()).FirstOrDefault().SetValue(obj, val == DBNull.Value ? null : val);
                         }
                         catch
                         {
-                            prop.SetValue(obj, null);
+                            props.Where(x => x.Name.ToLower() == col.Key.ToLower()).FirstOrDefault().SetValue(obj, null);
                         }
                     }
                     objList.Add(obj);

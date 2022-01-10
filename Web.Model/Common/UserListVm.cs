@@ -11,5 +11,8 @@ namespace Web.Model.Common
         public int UserId { get; set; }
         public string FullName { get; set; }
 
+        public string MyProperty { get; set; }
+        public int MyPropertyid { get; set; }
+
     }
 }
