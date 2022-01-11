@@ -28,6 +28,10 @@ namespace Web.Model.Common
         public DateTime endTime { get; set; }
         public DateTime startTime { get; set; }
         public string userId { get; set; }
+
+        public string serviceLineId { get; set; }
+
+        public string roleId { get; set; }
         public string subject { get; set; }
     }
 
