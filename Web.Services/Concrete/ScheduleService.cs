@@ -58,7 +58,7 @@ namespace Web.Services.Concrete
         public BaseResponse getSchedule(EditParams param)
         {
             var scheduleList = this._dbContext.LoadStoredProcedure("raq_getSchedule")
-                .WithSqlParam("@startDate", param.StartDate)
+                .WithSqlParam("@startDate", param.StartDate.AddDays(-1))
                 .WithSqlParam("@endDate", param.EndDate)
                 .WithSqlParam("@serviceLineIds", param.ServiceLineIds)
                 .WithSqlParam("@organizationId", param.OrganizationId)
