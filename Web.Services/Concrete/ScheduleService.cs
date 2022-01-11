@@ -251,8 +251,9 @@ namespace Web.Services.Concrete
                                     ScheduleDate = u.startTime.ToUniversalTime(),
                                     ScheduleDateStart = u.startTime.ToUniversalTime(),
                                     ScheduleDateEnd = u.endTime.ToUniversalTime(),
-                                    UserIdFk = Convert.ToInt32(u.userId),
+                                    UserIdFk = Convert.ToInt32(u.ownerId),
                                     RoleIdFk = u.roleId.ToInt(),
+
                                     DateRangeId = 3,
                                     ServiceLineIdFk =param.ServiceLineIds.ToInt(),
                                     CreatedBy = param.CreatedBy,
@@ -274,8 +275,10 @@ namespace Web.Services.Concrete
                     schedule.ScheduleDate = changedSchedule.startTime.ToUniversalTime();
                     schedule.ScheduleDateStart = changedSchedule.startTime.ToUniversalTime();
                     schedule.ScheduleDateEnd = changedSchedule.endTime.ToUniversalTime();
-                    schedule.UserIdFk = Convert.ToInt32(changedSchedule.userId);
+
+                    schedule.UserIdFk = Convert.ToInt32(changedSchedule.ownerId);
                     schedule.RoleIdFk = changedSchedule.roleId.ToInt();
+
                     schedule.DateRangeId = 3;
                     schedule.ServiceLineIdFk = Convert.ToInt32(param.ServiceLineIds);
                     schedule.ModifiedBy = param.ModifiedBy;
