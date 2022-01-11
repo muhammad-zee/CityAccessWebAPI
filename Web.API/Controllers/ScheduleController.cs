@@ -56,23 +56,18 @@ namespace Web.API.Controllers
         [Description("Load Schedule")]
         [Route("Schedule/AddOrUpdateScheduleFromSchedule")]
         [HttpPost, DisableRequestSizeLimit]
-        public BaseResponse AddOrUpdateScheduleFromSchedule([FromBody] EditParams param)
+        public ActionResult AddOrUpdateScheduleFromSchedule([FromBody] EditParams param)
         {
             try
             {
-                return this._scheduleService.AddUpdateUserSchedule(param);
+                BaseResponse response =  this._scheduleService.AddUpdateUserSchedule(param);
+                return Json(response.Body);
             }
             catch (Exception ex)
             {
                 ElmahExtensions.RiseError(ex);
                 _logger.LogExceptions(ex);
-                //return Json("");
-                return new BaseResponse()
-                {
-                    Status = HttpStatusCode.BadRequest,
-                    Message = ex.ToString(),
-                    Body = null
-                };
+                return Json("");
             }
         }
 
