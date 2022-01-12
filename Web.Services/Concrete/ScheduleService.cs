@@ -371,7 +371,7 @@ namespace Web.Services.Concrete
                 {
                     //DateTime startOfWeek = DateTime.Today.AddDays(-1 * (int)(DateTime.Today.DayOfWeek)).AddDays(1);
                     var startDate = today;
-                    var endDate = today.AddDays(DayOfWeek.Sunday - today.DayOfWeek).Date;
+                    var endDate = today.AddDays(DayOfWeek.Saturday - today.DayOfWeek).Date;
 
                     while (true)
                     {

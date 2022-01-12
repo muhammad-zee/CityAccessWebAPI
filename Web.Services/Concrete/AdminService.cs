@@ -226,11 +226,11 @@ namespace Web.Services.Concrete
         public IQueryable<Role> getRoleListByOrganizationId(int OrganizationId, int userRoleId)
         {
             var rolesList = this._role.GetList().Where(item => item.OrganizationIdFk == OrganizationId && !item.IsDeleted);
-            if (userRoleId == 2)
-            {
-                var superAdminRole = this._role.GetList().Where(item => item.RoleId == userRoleId);
-                rolesList = superAdminRole.Union(rolesList);
-            }
+            //if (ApplicationSettings.isSuperAdmin)
+            //{
+            //    var superAdminRole = this._role.GetList().Where(item => item.RoleId == userRoleId);
+            //    rolesList = superAdminRole.Union(rolesList);
+            //}
             return rolesList;
         }
 
