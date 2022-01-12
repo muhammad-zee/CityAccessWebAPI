@@ -36,7 +36,7 @@ namespace Web.API.Controllers
         }
 
 
-
+        [AllowAnonymous]
         [Description("Load Schedule")]
         [Route("Schedule/LoadSchedule")]
         [HttpPost, DisableRequestSizeLimit]
@@ -57,7 +57,7 @@ namespace Web.API.Controllers
             }
         }
 
-
+        [AllowAnonymous]
         [Description("Load Schedule")]
         [Route("Schedule/AddOrUpdateScheduleFromSchedule")]
         [HttpPost, DisableRequestSizeLimit]
@@ -66,7 +66,8 @@ namespace Web.API.Controllers
             try
             {
                 BaseResponse response = this._scheduleService.AddUpdateUserSchedule(param);
-                return Json(response.Body);
+                var jsonResponse = Json(response.Body);
+                return jsonResponse;
             }
             catch (Exception ex)
             {
