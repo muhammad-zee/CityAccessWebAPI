@@ -1,6 +1,7 @@
 ﻿using ElmahCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -25,6 +26,7 @@ namespace Web.Services.Concrete
         private readonly UnitOfWork unitorWork;
         private IHostingEnvironment _environment;
         private RAQ_DbContext _dbContext;
+        private readonly IOptions<ApplicationSettings> _appSettings;
 
         private readonly IRepository<UsersSchedule> _scheduleRepo;
         private readonly IRepository<User> _userRepo;
@@ -35,6 +37,7 @@ namespace Web.Services.Concrete
 
         public ScheduleService(RAQ_DbContext dbContext,
             IConfiguration configuration,
+            IOptions<ApplicationSettings> appSettings,
             IHostingEnvironment environment,
             IRepository<UsersSchedule> scheduleRepo,
             IRepository<User> userRepo,
@@ -44,6 +47,7 @@ namespace Web.Services.Concrete
         {
             this._dbContext = dbContext;
             this._config = configuration;
+            this._appSettings = appSettings;
             this._environment = environment;
             this.conStr = _config["ConnectionStrings:DefaultConnection"].ToString();
 
@@ -72,13 +76,13 @@ namespace Web.Services.Concrete
         public BaseResponse GetScheduleList(ScheduleVM schedule)
         {
             var scheduleList = this._dbContext.LoadStoredProcedure("raq_getScheduleListByFilterIds")
-                        .WithSqlParam("@orgId", schedule.selectedOrganizationId)
-                        .WithSqlParam("@serviceLineIds", schedule.selectedService)
-                        .WithSqlParam("@roleIds", schedule.selectedRole)
-                        .WithSqlParam("@userIds", schedule.selectedUser)
-                        .WithSqlParam("@fromDate", schedule.selectedFromDate.ToString("yyyy-MM-dd"))
-                        .WithSqlParam("@toDate", schedule.selectedToDate.ToString("yyyy-MM-dd"))
-                        .ExecuteStoredProc<ScheduleListVM>();
+                            .WithSqlParam("@orgId", schedule.selectedOrganizationId)
+                            .WithSqlParam("@serviceLineIds", schedule.selectedService)
+                            .WithSqlParam("@roleIds", schedule.selectedRole)
+                            .WithSqlParam("@userIds", schedule.selectedUser)
+                            .WithSqlParam("@fromDate", schedule.selectedFromDate.ToString("yyyy-MM-dd"))
+                            .WithSqlParam("@toDate", schedule.selectedToDate.ToString("yyyy-MM-dd"))
+                            .ExecuteStoredProc<ScheduleListVM>();
 
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Found", Body = scheduleList };
         }

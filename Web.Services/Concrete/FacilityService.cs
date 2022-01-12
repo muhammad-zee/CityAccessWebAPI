@@ -341,6 +341,8 @@ namespace Web.Services.Concrete
 
         public BaseResponse GetAllOrganizations(int RoleId)
         {
+            if (ApplicationSettings.isSuperAdmin) { }
+
             var organizations = _organizationRepo.Table.Where(x => x.IsDeleted == false).ToList();
             var orgs = AutoMapperHelper.MapList<Organization, OrganizationVM>(organizations);
             var departments = this._departmentRepo.Table.Where(d => d.IsDeleted != true && orgs.Select(x => x.OrganizationId).Contains(d.OrganizationIdFk.Value)).ToList();

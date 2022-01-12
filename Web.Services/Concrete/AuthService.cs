@@ -130,10 +130,13 @@ namespace Web.Services.Concrete
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Secret"]));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-
+            List<UserRoleVM> UserRole = this._adminService.getRoleListByUserId(user.UserId).ToList();
             var claims = new[]
             {
                     new Claim(JwtRegisteredClaimNames.Sub, user.PrimaryEmail),
+                    new Claim("UserId",user.UserId.ToString()),
+                    new Claim("RoleIds",string.Join(",",UserRole.Select(x => x.RoleId).ToList())),
+                    new Claim("isSuperAdmin",UserRole.Any(x =>x.RoleId == 2).ToString()),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
 
             };
@@ -149,7 +152,7 @@ namespace Web.Services.Concrete
             {
                 user.TwoFactorEnabled = false;
             }
-            List<UserRoleVM> UserRole = this._adminService.getRoleListByUserId(user.UserId).ToList();
+            
             return new
             {
                 token = new JwtSecurityTokenHandler().WriteToken(token),
@@ -164,9 +167,7 @@ namespace Web.Services.Concrete
                 IsRequirePasswordReset = user.IsRequirePasswordReset,
                 NotificationChannelSid = user.UserChannelSid,
                 UserUniqueId = user.UserUniqueId,
-                UserImage = user.UserImage
-
-
+                UserImage = user.UserImage,
             };
         }
 
