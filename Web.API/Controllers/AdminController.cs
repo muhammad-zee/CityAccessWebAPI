@@ -20,6 +20,7 @@ using Web.Services.Interfaces;
 namespace Web.API.Controllers
 {
     [Authorize]
+    [RequestHandler]
     public class AdminController : Controller
     {
         private readonly IAdminService _adminService;

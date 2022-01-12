@@ -13,6 +13,7 @@ using Web.Services.Interfaces;
 namespace Web.API.Controllers
 {
     [Authorize]
+    [RequestHandler]
     public class CommunicationController : Controller
     {
         private readonly ICommunicationService _communicaitonService;

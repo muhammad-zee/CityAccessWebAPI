@@ -9,6 +9,7 @@ using System.Net;
 using Web.API.Helper;
 using Web.Model;
 using Web.Model.Common;
+using Web.Services;
 using Web.Services.Interfaces;
 
 namespace Web.API.Controllers
@@ -90,6 +91,7 @@ namespace Web.API.Controllers
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
         }
+
         [Description("Get Services By Organization ID")]
         [HttpGet("service/GetServicesByOrganizationId/{OrganizationId}")]
         public BaseResponse GetServicesByOrganizationId(int OrganizationId)
@@ -153,9 +155,9 @@ namespace Web.API.Controllers
             try
             {
                 BaseResponse res = null;
-                if (OrganizationId != null)
+                if (OrganizationId != null && !ApplicationSettings.isSuperAdmin)
                 {
-                    res = this._facilityService.GetAllDepartmentsByOrganizationId(Convert.ToInt32(OrganizationId));
+                    res = this._facilityService.GetAllDepartmentsByOrganizationId(OrganizationId.Value);
                 }
                 else
                 {

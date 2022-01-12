@@ -1,4 +1,5 @@
 ﻿using ElmahCore;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -13,7 +14,8 @@ using Web.Services.Interfaces;
 
 namespace Web.API.Controllers
 {
-    //[Authorize]
+    [Authorize]
+    [RequestHandler]
     public class CallController : TwilioController
     {
         private readonly ICallService _callService;

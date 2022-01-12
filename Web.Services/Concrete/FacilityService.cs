@@ -18,6 +18,7 @@ namespace Web.Services.Concrete
         private RAQ_DbContext _dbContext;
 
         private IRepository<Role> _roleRepo;
+        private IRepository<UsersRelation> _userRelationRepo;
         private IRepository<ServiceLine> _serviceRepo;
         private IRepository<Department> _departmentRepo;
         private IRepository<Organization> _organizationRepo;
@@ -26,8 +27,9 @@ namespace Web.Services.Concrete
         private IRepository<ControlListDetail> _controlListDetailsRepo;
 
         public FacilityService(RAQ_DbContext dbContext,
-        IRepository<Role> roleRepo,
-        IRepository<ServiceLine> serviceRepo,
+            IRepository<Role> roleRepo,
+            IRepository<UsersRelation> userRelationRepo,
+            IRepository<ServiceLine> serviceRepo,
             IRepository<Department> departmentRepo,
             IRepository<Organization> organizationRepo,
             IRepository<ClinicalHour> clinicalHourRepo,
@@ -37,6 +39,7 @@ namespace Web.Services.Concrete
         {
             this._dbContext = dbContext;
             this._roleRepo = roleRepo;
+            this._userRelationRepo = userRelationRepo;
             this._serviceRepo = serviceRepo;
             this._departmentRepo = departmentRepo;
             this._organizationRepo = organizationRepo;
@@ -341,9 +344,20 @@ namespace Web.Services.Concrete
 
         public BaseResponse GetAllOrganizations(int RoleId)
         {
-            if (ApplicationSettings.isSuperAdmin) { }
-
-            var organizations = _organizationRepo.Table.Where(x => x.IsDeleted == false).ToList();
+            var organizations = new List<Organization>();
+            if (ApplicationSettings.isSuperAdmin)
+            {
+                organizations = _organizationRepo.Table.Where(x => x.IsDeleted == false).ToList();
+            }
+            else
+            {
+                organizations = (from ur in _userRelationRepo.Table
+                                 join s in _serviceRepo.Table on ur.ServiceLineIdFk equals s.ServiceLineId
+                                 join d in _departmentRepo.Table on s.DepartmentIdFk equals d.DepartmentId
+                                 join o in _organizationRepo.Table on d.OrganizationIdFk equals o.OrganizationId
+                                 where ur.UserIdFk == ApplicationSettings.UserId && !o.IsDeleted && !d.IsDeleted && !s.IsDeleted
+                                 select o).Distinct().ToList();
+            }
             var orgs = AutoMapperHelper.MapList<Organization, OrganizationVM>(organizations);
             var departments = this._departmentRepo.Table.Where(d => d.IsDeleted != true && orgs.Select(x => x.OrganizationId).Contains(d.OrganizationIdFk.Value)).ToList();
             var dpts = AutoMapperHelper.MapList<Department, DepartmentVM>(departments);

@@ -152,7 +152,7 @@ namespace Web.Services.Concrete
             {
                 user.TwoFactorEnabled = false;
             }
-            
+
             return new
             {
                 token = new JwtSecurityTokenHandler().WriteToken(token),
