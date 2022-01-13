@@ -255,9 +255,8 @@ namespace Web.Services.Concrete
                                     ScheduleDate = u.startTime.ToUniversalTime(),
                                     ScheduleDateStart = u.startTime.ToUniversalTime(),
                                     ScheduleDateEnd = u.endTime.ToUniversalTime(),
-                                    UserIdFk = Convert.ToInt32(u.scheduleUserId),
+                                    UserIdFk = param.selectedUserId.ToInt(),
                                     RoleIdFk = u.roleId.ToInt(),
-
                                     ServiceLineIdFk = param.ServiceLineIds.ToInt(),
                                     CreatedBy = param.CreatedBy,
                                     CreatedDate = DateTime.UtcNow,
@@ -279,10 +278,10 @@ namespace Web.Services.Concrete
                     schedule.ScheduleDateStart = changedSchedule.startTime.ToUniversalTime();
                     schedule.ScheduleDateEnd = changedSchedule.endTime.ToUniversalTime();
 
-                    schedule.UserIdFk = Convert.ToInt32(changedSchedule.scheduleUserId);
+                    schedule.UserIdFk = Convert.ToInt32(changedSchedule.userId);
                     schedule.RoleIdFk = changedSchedule.roleId.ToInt();
 
-                    schedule.ServiceLineIdFk = Convert.ToInt32(param.ServiceLineIds);
+                    schedule.ServiceLineIdFk = Convert.ToInt32(changedSchedule.serviceLineId);
                     schedule.ModifiedBy = param.ModifiedBy;
                     schedule.ModifiedDate = DateTime.UtcNow;
                     schedule.IsDeleted = false;
@@ -314,6 +313,7 @@ namespace Web.Services.Concrete
 
                     response.Status = HttpStatusCode.OK;
                     response.Message = "Schedule Deleted";
+                    response.Body = schedule;
                 }
                 else
                 {
