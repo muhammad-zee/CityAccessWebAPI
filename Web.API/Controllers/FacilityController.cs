@@ -155,7 +155,7 @@ namespace Web.API.Controllers
             try
             {
                 BaseResponse res = null;
-                if (OrganizationId != null && !ApplicationSettings.isSuperAdmin)
+                if (OrganizationId != null)
                 {
                     res = this._facilityService.GetAllDepartmentsByOrganizationId(OrganizationId.Value);
                 }
