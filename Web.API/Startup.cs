@@ -7,9 +7,11 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System.IO;
 using System.Text;
 using Web.API.Helper;
 using Web.Data;
@@ -171,7 +173,17 @@ namespace Web.API
               .AllowAnyHeader()
               .AllowCredentials());
 
-            app.UseStaticFiles();
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                ServeUnknownFileTypes = true,
+            })
+            .UseDirectoryBrowser()
+            .UseRequestLocalization();
+
+            //app.UseStaticFiles(new StaticFileOptions
+            //{
+            //    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "UserProfiles"))
+            //});
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
