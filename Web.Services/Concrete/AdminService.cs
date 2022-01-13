@@ -117,7 +117,6 @@ namespace Web.Services.Concrete
             var genders = _controlListDetails.Table.Where(x => x.ControlListIdFk == UCLEnums.Genders.ToInt()).Select(x => new { x.ControlListDetailId, x.Title });
             foreach (var item in users)
             {
-
                 item.UserRole = getRoleListByUserId(item.UserId).ToList();
                 item.GenderId = Convert.ToInt32(item.Gender);
                 item.Gender = genders.Where(x => x.ControlListDetailId == item.GenderId).Select(x => x.Title).FirstOrDefault();
@@ -126,7 +125,7 @@ namespace Web.Services.Concrete
                 var dptids = _serviceRepo.Table.Where(x => userRelationIds.Where(x => x.UserIdFk == item.UserId).Select(x => x.ServiceLineIdFk).Distinct().ToList().Contains(x.ServiceLineId) && x.IsDeleted != true).Select(x => x.DepartmentIdFk).Distinct().ToList();
                 item.ServiceLineIdsList = userRelationIds.Where(x => x.UserIdFk == item.UserId).Select(x => x.ServiceLineIdFk).Distinct().ToList();
                 item.DptIdsList = dptids;
-                item.OrgIdsList = _departmentRepo.Table.Where(x => x.IsDeleted != true && dptids.Contains(x.DepartmentId)).Select(x => x.OrganizationIdFk.Value).Distinct().ToList();
+                item.OrgIdsList = item.ServiceLineIdsList.Count > 0 ? _departmentRepo.Table.Where(x => x.IsDeleted != true && dptids.Contains(x.DepartmentId)).Select(x => x.OrganizationIdFk.Value).Distinct().ToList() : this._role.Table.Where(x => item.UserRole.Select(r => r.RoleId).Contains(x.RoleId) && !x.IsDeleted && x.OrganizationIdFk.HasValue).Select(x => x.OrganizationIdFk.Value).Distinct().ToList();
 
             }
             return new BaseResponse { Status = HttpStatusCode.OK, Message = "Users List Returned", Body = users };
@@ -246,7 +245,7 @@ namespace Web.Services.Concrete
                                 RoleName = ids.Count > 1 ? org.OrganizationName + " | " + r.RoleName : r.RoleName,
                                 RoleDescription = r.RoleDescription,
                                 IsDeleted = r.IsDeleted
-                            });
+                            }).OrderBy(x => x.RoleName);
             //this._role.Table.Where(x => ids.Contains(x.OrganizationIdFk.Value) && x.IsDeleted != true);
             return roleList;
         }
