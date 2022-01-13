@@ -391,7 +391,7 @@ namespace Web.Services.Concrete
                             {
                                 foreach (var role in roleIds)
                                 {
-                                    var alreadyExist = _scheduleRepo.Table.Where(x => x.UserIdFk == user && x.RoleIdFk == role && x.ScheduleDate.Value.Date == StartDateTime.ToUniversalTime().Date && !x.IsDeleted).ToList();
+                                    var alreadyExist = _scheduleRepo.Table.Where(x => x.UserIdFk == user && x.RoleIdFk == role && x.ServiceLineIdFk == schedule.ServiceLineIdFk && x.ScheduleDate.Value.Date == StartDateTime.ToUniversalTime().Date && !x.IsDeleted).ToList();
                                     if (alreadyExist.Count > 0) 
                                     {
                                         alreadyExist.ForEach(x => { x.IsDeleted = true; x.ModifiedBy = schedule.CreatedBy; x.ModifiedDate = DateTime.UtcNow; });
@@ -407,7 +407,7 @@ namespace Web.Services.Concrete
                                             ScheduleDateEnd = EndDateTime.ToUniversalTime(),
                                             ServiceLineIdFk = schedule.ServiceLineIdFk,
                                             UserIdFk = user,
-                                            RoleIdFk = role,
+                                            RoleIdFk = role, 
                                             CreatedBy = schedule.CreatedBy,
                                             CreatedDate = DateTime.UtcNow,
                                             IsDeleted = false,
@@ -452,7 +452,7 @@ namespace Web.Services.Concrete
                             {
                                 foreach (var role in roleIds)
                                 {
-                                    var alreadyExist = _scheduleRepo.Table.Where(x => x.UserIdFk == user && x.RoleIdFk == role && x.ScheduleDate.Value.Date == StartDateTime.ToUniversalTime().Date && !x.IsDeleted).ToList();
+                                    var alreadyExist = _scheduleRepo.Table.Where(x => x.UserIdFk == user && x.RoleIdFk == role && x.ServiceLineIdFk == schedule.ServiceLineIdFk && x.ScheduleDate.Value.Date == StartDateTime.ToUniversalTime().Date && !x.IsDeleted).ToList();
                                     if (alreadyExist.Count > 0)
                                     {
                                         alreadyExist.ForEach(x => { x.IsDeleted = true; x.ModifiedBy = schedule.CreatedBy; x.ModifiedDate = DateTime.UtcNow; });
@@ -509,7 +509,7 @@ namespace Web.Services.Concrete
                             {
                                 foreach (var role in roleIds)
                                 {
-                                    var alreadyExist = _scheduleRepo.Table.Where(x => x.UserIdFk == user && x.RoleIdFk == role && x.ScheduleDate.Value.Date == StartDateTime.ToUniversalTime().Date && !x.IsDeleted).ToList();
+                                    var alreadyExist = _scheduleRepo.Table.Where(x => x.UserIdFk == user && x.RoleIdFk == role && x.ServiceLineIdFk == schedule.ServiceLineIdFk && x.ScheduleDate.Value.Date == StartDateTime.ToUniversalTime().Date && !x.IsDeleted).ToList();
                                     if (alreadyExist.Count > 0)
                                     {
                                         alreadyExist.ForEach(x => { x.IsDeleted = true; x.ModifiedBy = schedule.CreatedBy; x.ModifiedDate = DateTime.UtcNow; });
