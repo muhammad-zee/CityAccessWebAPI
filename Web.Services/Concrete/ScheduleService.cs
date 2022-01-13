@@ -257,7 +257,7 @@ namespace Web.Services.Concrete
                                     ScheduleDateEnd = u.endTime.ToUniversalTime(),
                                     UserIdFk = param.selectedUserId.ToInt(),
                                     RoleIdFk = u.roleId.ToInt(),
-                                    ServiceLineIdFk = param.ServiceLineIds.ToInt(),
+                                    ServiceLineIdFk = u.serviceLineId.ToInt(),
                                     CreatedBy = param.CreatedBy,
                                     CreatedDate = DateTime.UtcNow,
                                     IsDeleted = false
