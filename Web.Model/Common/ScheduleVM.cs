@@ -10,8 +10,9 @@ namespace Web.Model.Common
         public string selectedUserId { get; set; }
         public DateTime EndDate { get; set; }
         public DateTime StartDate { get; set; }
-        public string ServiceLineIds { get; set; }
         public int OrganizationId { get; set; }
+        public string departmentIds { get; set; }
+        public string ServiceLineIds { get; set; }
         public string RoleIds { get; set; }
         public string UserIds { get; set; }
         public List<ScheduleEventData> added { get; set; }
@@ -31,7 +32,6 @@ namespace Web.Model.Common
         public string ownerId { get; set; }
         public string scheduleUserId { get; set; }
         public string userId { get; set; }
-
 
         public string serviceLineId { get; set; }
 

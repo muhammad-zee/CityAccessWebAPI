@@ -111,7 +111,15 @@ namespace Web.Services.Concrete
         {
             var response = new VoiceResponse();
             var dial = new Dial(callerId: Twilio_PhoneNumber/*, record: Dial.RecordEnum.RecordFromAnswer*/);
+            if (phoneNumber.Contains("client"))
+            {
+                dial.Client(phoneNumber.Replace("client:", ""));
+            }
+            else
+            {
             dial.Number(phoneNumber);
+            }
+
             response.Append(dial);
             return TwiML(response);
         }

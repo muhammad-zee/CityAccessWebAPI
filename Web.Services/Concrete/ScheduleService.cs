@@ -64,8 +64,9 @@ namespace Web.Services.Concrete
             var scheduleList = this._dbContext.LoadStoredProcedure("raq_getSchedule")
                 .WithSqlParam("@startDate", param.StartDate.AddDays(-1))
                 .WithSqlParam("@endDate", param.EndDate)
-                .WithSqlParam("@serviceLineIds", param.ServiceLineIds)
                 .WithSqlParam("@organizationId", param.OrganizationId)
+                .WithSqlParam("@departmentIds", param.departmentIds)
+                .WithSqlParam("@serviceLineIds", param.ServiceLineIds)
                 .WithSqlParam("@roleIds", param.RoleIds)
                 .WithSqlParam("@userIds", param.UserIds)
             .ExecuteStoredProc<ScheduleEventData>();
