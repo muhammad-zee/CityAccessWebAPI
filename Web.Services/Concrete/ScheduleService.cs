@@ -369,7 +369,73 @@ namespace Web.Services.Concrete
                 var roleIds = schedule.RoleIdFk.ToIntList();
                 int count = 0;
                 var weekDays = schedule.WeekDays.Split(",");
-                if (schedule.DateRangeId == 3)
+                if (schedule.DateRangeId == 2) 
+                {
+                    DateTime loopFirstDate = schedule.FromDate;
+                    DateTime startDate = schedule.FromDate;
+                    DateTime endDate = schedule.ToDate;
+
+                    while (true)
+                    {
+                        if (startDate <= endDate)
+                        {
+                            if (loopFirstDate.Date != startDate.Date && schedule.RepeatEvery > 1)
+                            {
+                                startDate = startDate.AddDays((schedule.RepeatEvery - 1));
+                                if (startDate > endDate) 
+                                {
+                                    break;    
+                                }
+                            }
+
+                            string startDateTimeStr = startDate.ToString("MM-dd-yyyy") + " " + schedule.StartTime.ToString("hh:mm:ss tt");
+                            string endDateTimeStr = startDate.ToString("MM-dd-yyyy") + " " + schedule.EndTime.ToString("hh:mm:ss tt");
+
+                            DateTime StartDateTime = Convert.ToDateTime(startDateTimeStr);
+                            DateTime EndDateTime = Convert.ToDateTime(endDateTimeStr);
+
+                            if (StartDateTime.TimeOfDay > EndDateTime.TimeOfDay)
+                            {
+                                EndDateTime = EndDateTime.AddDays(1);
+                            }
+                            foreach (var user in userIds)
+                            {
+                                foreach (var role in roleIds)
+                                {
+                                    var alreadyExist = _scheduleRepo.Table.Where(x => x.UserIdFk == user && x.RoleIdFk == role && x.ServiceLineIdFk == schedule.ServiceLineIdFk && x.ScheduleDate.Value.Date == StartDateTime.ToUniversalTime().Date && !x.IsDeleted).ToList();
+                                    if (alreadyExist.Count > 0)
+                                    {
+                                        alreadyExist.ForEach(x => { x.IsDeleted = true; x.ModifiedBy = schedule.CreatedBy; x.ModifiedDate = DateTime.UtcNow; });
+                                        _scheduleRepo.Update(alreadyExist);
+                                    }
+                                    if (_userRelationRepo.Table.Any(x => x.UserIdFk == user && x.ServiceLineIdFk == schedule.ServiceLineIdFk) && _userRoleRepo.Table.Any(x => x.UserIdFk == user && x.RoleIdFk == role))
+                                    {
+                                        var userSchedule = new UsersSchedule()
+                                        {
+                                            ScheduleDate = StartDateTime.ToUniversalTime().Date,
+                                            ScheduleDateStart = StartDateTime.ToUniversalTime(),
+                                            ScheduleDateEnd = EndDateTime.ToUniversalTime(),
+                                            ServiceLineIdFk = schedule.ServiceLineIdFk,
+                                            UserIdFk = user,
+                                            RoleIdFk = role,
+                                            CreatedBy = schedule.CreatedBy,
+                                            CreatedDate = DateTime.UtcNow,
+                                            IsDeleted = false,
+                                        };
+
+                                        usersSchedules.Add(userSchedule);
+                                    }
+                                }
+                            }
+                            startDate = startDate.AddDays(1);
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                }
+                else if (schedule.DateRangeId == 3)
                 {
                     //DateTime startOfWeek = DateTime.Today.AddDays(-1 * (int)(DateTime.Today.DayOfWeek)).AddDays(1);
                     var loopFirstDate = schedule.FromDate;
@@ -388,7 +454,7 @@ namespace Web.Services.Concrete
                                 if (loopFirstDate.Date != startDate.Date && schedule.RepeatEvery > 1 && startDate.DayOfWeek.ToString() == weekDays[0])
                                 {
                                     startDate = startDate.AddDays((schedule.RepeatEvery - 1) * 7);
-                                    if (startDate > endDate) 
+                                    if (startDate > endDate)
                                     {
                                         break;
                                     }
@@ -562,65 +628,49 @@ namespace Web.Services.Concrete
                 }
                 else
                 {
-                    DateTime loopFirstDate = schedule.FromDate;
+                    
                     DateTime startDate = schedule.FromDate;
-                    DateTime endDate = schedule.FromDate;
 
-                    while (true)
+                    string startDateTimeStr = startDate.ToString("MM-dd-yyyy") + " " + schedule.StartTime.ToString("hh:mm:ss tt");
+                    string endDateTimeStr = startDate.ToString("MM-dd-yyyy") + " " + schedule.EndTime.ToString("hh:mm:ss tt");
+
+                    DateTime StartDateTime = Convert.ToDateTime(startDateTimeStr);
+                    DateTime EndDateTime = Convert.ToDateTime(endDateTimeStr);
+
+                    if (StartDateTime.TimeOfDay > EndDateTime.TimeOfDay)
                     {
-                        if (startDate <= endDate)
+                        EndDateTime = EndDateTime.AddDays(1);
+                    }
+                    foreach (var user in userIds)
+                    {
+                        foreach (var role in roleIds)
                         {
-                            if (loopFirstDate.Date != startDate.Date && schedule.RepeatEvery > 1)
+                            var alreadyExist = _scheduleRepo.Table.Where(x => x.UserIdFk == user && x.RoleIdFk == role && x.ServiceLineIdFk == schedule.ServiceLineIdFk && x.ScheduleDate.Value.Date == StartDateTime.ToUniversalTime().Date && !x.IsDeleted).ToList();
+                            if (alreadyExist.Count > 0)
                             {
-                                startDate = startDate.AddDays(schedule.RepeatEvery - 1);
+                                alreadyExist.ForEach(x => { x.IsDeleted = true; x.ModifiedBy = schedule.CreatedBy; x.ModifiedDate = DateTime.UtcNow; });
+                                _scheduleRepo.Update(alreadyExist);
                             }
-
-                            string startDateTimeStr = startDate.ToString("MM-dd-yyyy") + " " + schedule.StartTime.ToString("hh:mm:ss tt");
-                            string endDateTimeStr = startDate.ToString("MM-dd-yyyy") + " " + schedule.EndTime.ToString("hh:mm:ss tt");
-
-                            DateTime StartDateTime = Convert.ToDateTime(startDateTimeStr);
-                            DateTime EndDateTime = Convert.ToDateTime(endDateTimeStr);
-
-                            if (StartDateTime.TimeOfDay > EndDateTime.TimeOfDay)
+                            if (_userRelationRepo.Table.Any(x => x.UserIdFk == user && x.ServiceLineIdFk == schedule.ServiceLineIdFk) && _userRoleRepo.Table.Any(x => x.UserIdFk == user && x.RoleIdFk == role))
                             {
-                                EndDateTime = EndDateTime.AddDays(1);
-                            }
-                            foreach (var user in userIds)
-                            {
-                                foreach (var role in roleIds)
+                                var userSchedule = new UsersSchedule()
                                 {
-                                    var alreadyExist = _scheduleRepo.Table.Where(x => x.UserIdFk == user && x.RoleIdFk == role && x.ServiceLineIdFk == schedule.ServiceLineIdFk && x.ScheduleDate.Value.Date == StartDateTime.ToUniversalTime().Date && !x.IsDeleted).ToList();
-                                    if (alreadyExist.Count > 0)
-                                    {
-                                        alreadyExist.ForEach(x => { x.IsDeleted = true; x.ModifiedBy = schedule.CreatedBy; x.ModifiedDate = DateTime.UtcNow; });
-                                        _scheduleRepo.Update(alreadyExist);
-                                    }
-                                    if (_userRelationRepo.Table.Any(x => x.UserIdFk == user && x.ServiceLineIdFk == schedule.ServiceLineIdFk) && _userRoleRepo.Table.Any(x => x.UserIdFk == user && x.RoleIdFk == role))
-                                    {
-                                        var userSchedule = new UsersSchedule()
-                                        {
-                                            ScheduleDate = StartDateTime.ToUniversalTime().Date,
-                                            ScheduleDateStart = StartDateTime.ToUniversalTime(),
-                                            ScheduleDateEnd = EndDateTime.ToUniversalTime(),
-                                            ServiceLineIdFk = schedule.ServiceLineIdFk,
-                                            UserIdFk = user,
-                                            RoleIdFk = role,
-                                            CreatedBy = schedule.CreatedBy,
-                                            CreatedDate = DateTime.UtcNow,
-                                            IsDeleted = false,
-                                        };
+                                    ScheduleDate = StartDateTime.ToUniversalTime().Date,
+                                    ScheduleDateStart = StartDateTime.ToUniversalTime(),
+                                    ScheduleDateEnd = EndDateTime.ToUniversalTime(),
+                                    ServiceLineIdFk = schedule.ServiceLineIdFk,
+                                    UserIdFk = user,
+                                    RoleIdFk = role,
+                                    CreatedBy = schedule.CreatedBy,
+                                    CreatedDate = DateTime.UtcNow,
+                                    IsDeleted = false,
+                                };
 
-                                        usersSchedules.Add(userSchedule);
-                                    }
-                                }
+                                usersSchedules.Add(userSchedule);
                             }
-                            startDate = startDate.AddDays(1);
-                        }
-                        else
-                        {
-                            break;
                         }
                     }
+
                 }
 
                 if (usersSchedules.Count > 0)
