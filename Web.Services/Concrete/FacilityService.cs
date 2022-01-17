@@ -25,6 +25,7 @@ namespace Web.Services.Concrete
         private IRepository<ClinicalHour> _clinicalHourRepo;
         private IRepository<ClinicalHoliday> _clinicalHolidayRepo;
         private IRepository<ControlListDetail> _controlListDetailsRepo;
+        private IRepository<UserRole> _userRoleRepo;
 
         public FacilityService(RAQ_DbContext dbContext,
             IRepository<Role> roleRepo,
@@ -34,7 +35,8 @@ namespace Web.Services.Concrete
             IRepository<Organization> organizationRepo,
             IRepository<ClinicalHour> clinicalHourRepo,
             IRepository<ControlListDetail> controlListDetailsRepo,
-            IRepository<ClinicalHoliday> clinicalHolidayRepo
+            IRepository<ClinicalHoliday> clinicalHolidayRepo,
+            IRepository<UserRole> userRoleRepo
             )
         {
             this._dbContext = dbContext;
@@ -46,6 +48,7 @@ namespace Web.Services.Concrete
             this._clinicalHourRepo = clinicalHourRepo;
             this._controlListDetailsRepo = controlListDetailsRepo;
             this._clinicalHolidayRepo = clinicalHolidayRepo;
+            this._userRoleRepo = userRoleRepo;
         }
 
         #region Service Line
@@ -320,7 +323,7 @@ namespace Web.Services.Concrete
             return response;
         }
 
-        public BaseResponse DeleteDepartment(int departmentId, int userId, int organizationId)
+        public BaseResponse DeleteDepartment(int departmentId, int userId)
         {
             var dpt = _departmentRepo.Table.Where(x => x.DepartmentId == departmentId && x.IsDeleted != true).FirstOrDefault();
             //var deptOrgRelation = this._organizationDepartmentRepo.Table.FirstOrDefault(r => r.DepartmentIdFk == departmentId && r.OrganizationIdFk == organizationId);
@@ -351,16 +354,41 @@ namespace Web.Services.Concrete
             }
             else
             {
-                organizations = (from ur in _userRelationRepo.Table
-                                 join s in _serviceRepo.Table on ur.ServiceLineIdFk equals s.ServiceLineId
-                                 join d in _departmentRepo.Table on s.DepartmentIdFk equals d.DepartmentId
-                                 join o in _organizationRepo.Table on d.OrganizationIdFk equals o.OrganizationId
-                                 where ur.UserIdFk == ApplicationSettings.UserId && !o.IsDeleted && !d.IsDeleted && !s.IsDeleted
+                //organizations = (from ur in _userRelationRepo.Table
+                //                 join s in _serviceRepo.Table on ur.ServiceLineIdFk equals s.ServiceLineId
+                //                 join d in _departmentRepo.Table on s.DepartmentIdFk equals d.DepartmentId
+                //                 join o in _organizationRepo.Table on d.OrganizationIdFk equals o.OrganizationId
+                //                 where ur.UserIdFk == ApplicationSettings.UserId && !o.IsDeleted && !d.IsDeleted && !s.IsDeleted
+                //                 select o).Distinct().ToList();
+
+                organizations = (from ur in this._userRoleRepo.Table
+                                 join r in this._roleRepo.Table on ur.RoleIdFk equals r.RoleId
+                                 join o in this._organizationRepo.Table on r.OrganizationIdFk equals o.OrganizationId
+                                 where ur.UserIdFk == ApplicationSettings.UserId && !o.IsDeleted  && !r.IsDeleted
                                  select o).Distinct().ToList();
             }
             var orgs = AutoMapperHelper.MapList<Organization, OrganizationVM>(organizations);
             var departments = this._departmentRepo.Table.Where(d => d.IsDeleted != true && orgs.Select(x => x.OrganizationId).Contains(d.OrganizationIdFk.Value)).ToList();
             var dpts = AutoMapperHelper.MapList<Department, DepartmentVM>(departments);
+
+            var dptServices = (from s in this._serviceRepo.Table
+                               where dpts.Select(x => x.DepartmentId).Contains(s.DepartmentIdFk) && s.IsDeleted != true
+                               select new ServiceLineVM()
+                               {
+                                   ServiceLineId = s.ServiceLineId,
+                                   ServiceName = s.ServiceName,
+                                   ServiceType = s.ServiceType,
+                                   CreatedBy = s.CreatedBy,
+                                   CreatedDate = s.CreatedDate,
+                                   ModifiedBy = s.ModifiedBy,
+                                   ModifiedDate = s.ModifiedDate,
+                                   DepartmentIdFk = s.DepartmentIdFk
+                               }).Distinct().ToList();
+
+            foreach (var item in dpts)
+            {
+                item.ServiceLines = dptServices.Where(x => x.DepartmentIdFk == item.DepartmentId).ToList();
+            }
 
             var types = _controlListDetailsRepo.Table.Where(x => x.ControlListIdFk == UCLEnums.OrgType.ToInt()).Select(x => new { x.ControlListDetailId, x.Title });
             var states = _controlListDetailsRepo.Table.Where(x => x.ControlListIdFk == UCLEnums.States.ToInt()).Select(x => new { x.ControlListDetailId, x.Title });

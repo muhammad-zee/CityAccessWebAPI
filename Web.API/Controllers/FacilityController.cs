@@ -226,12 +226,12 @@ namespace Web.API.Controllers
         }
 
         [Description("Delete Department")]
-        [HttpGet("dpt/DeleteDepartment/{departmentId}/{userId}/{organizationId}")]
-        public BaseResponse DeleteDepartment(int departmentId, int userId, int organizationId)
+        [HttpGet("dpt/DeleteDepartment/{departmentId}/{userId}")]
+        public BaseResponse DeleteDepartment(int departmentId, int userId)
         {
             try
             {
-                var res = _facilityService.DeleteDepartment(departmentId, userId, organizationId);
+                var res = _facilityService.DeleteDepartment(departmentId, userId);
                 return res;
             }
             catch (Exception ex)
