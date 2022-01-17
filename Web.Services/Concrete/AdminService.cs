@@ -150,6 +150,14 @@ namespace Web.Services.Concrete
                 user.GenderId = Convert.ToInt32(user.Gender);
                 user.Gender = genders.Where(x => x.ControlListDetailId == user.GenderId).Select(x => x.Title).FirstOrDefault();
                 user.UserImage = user.UserImage.Replace(Directory.GetCurrentDirectory() + "/", "");
+                user.State = _controlListDetails.Table.Where(x => x.ControlListDetailId == user.StateKey).Select(x => x.Title).FirstOrDefault();
+                user.UserServices = (from us in _userRelationRepo.Table
+                                     join s in _serviceRepo.Table on us.ServiceLineIdFk equals s.ServiceLineId
+                                     where us.UserIdFk == user.UserId && !s.IsDeleted
+                                     select new ServiceLineVM() { ServiceLineId = s.ServiceLineId, ServiceName = s.ServiceName, DepartmentIdFk = s.DepartmentIdFk }).ToList();
+                user.Departments = _departmentRepo.Table.Where(x => user.UserServices.Select(y => y.DepartmentIdFk).Contains(x.DepartmentId) && !x.IsDeleted).Select(x => new DepartmentVM() { DepartmentId = x.DepartmentId, DepartmentName = x.DepartmentName, OrganizationIdFk = x.OrganizationIdFk }).ToList();
+                user.Organizations = _organizationRepo.Table.Where(x => user.Departments.Select(z => z.OrganizationIdFk).Contains(x.OrganizationId)).Select(x => new OrganizationVM() { OrganizationId = x.OrganizationId, OrganizationName = x.OrganizationName }).ToList();
+                
                 return new BaseResponse { Status = HttpStatusCode.OK, Message = "User Found", Body = user };
             }
             else
@@ -224,7 +232,7 @@ namespace Web.Services.Concrete
         }
         public IQueryable<Role> getRoleListByOrganizationId(int OrganizationId, int userRoleId)
         {
-            var rolesList = this._role.GetList().Where(item => item.OrganizationIdFk == OrganizationId && !item.IsDeleted);
+            var rolesList = this._role.Table.Where(item => item.OrganizationIdFk == OrganizationId && item.IsScheduleRequired && !item.IsDeleted);
             //if (ApplicationSettings.isSuperAdmin)
             //{
             //    var superAdminRole = this._role.GetList().Where(item => item.RoleId == userRoleId);
@@ -291,6 +299,7 @@ namespace Web.Services.Concrete
                 newRole.RoleName = role.RoleName;
                 newRole.RoleDescription = role.RoleDescription;
                 newRole.RoleDiscrimination = role.RoleDiscrimination;
+                newRole.IsScheduleRequired = role.IsScheduleRequired;
                 newRole.OrganizationIdFk = role.OrganizationIdFk;
                 newRole.ModifiedDate = DateTime.UtcNow;
                 newRole.ModifiedBy = role.ModifiedBy;

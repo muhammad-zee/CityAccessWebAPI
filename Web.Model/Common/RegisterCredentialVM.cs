@@ -37,6 +37,7 @@ namespace Web.Model.Common
         public bool IsDeleted { get; set; } = false;
         public string City { get; set; } = "";
         public int? StateKey { get; set; } = 0;
+        public string State { get; set; } = "";
         public string Zip { get; set; } = "";
         public bool TwoFactorEnabled { get; set; }
         public bool IsActive { get; set; }
@@ -46,6 +47,9 @@ namespace Web.Model.Common
         public string orgIds { get; set; } = "";
         public string dptIds { get; set; } = "";
         public string serviceIds { get; set; } = "";
+        public List<ServiceLineVM> UserServices { get; set; }
+        public List<DepartmentVM> Departments { get; set; }
+        public List<OrganizationVM> Organizations { get; set; }
 
         public List<int> OrgIdsList { get; set; }
         public List<int> DptIdsList { get; set; }
