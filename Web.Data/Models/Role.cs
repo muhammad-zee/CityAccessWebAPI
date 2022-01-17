@@ -12,6 +12,7 @@ namespace Web.Data.Models
             ComponentAccesses = new HashSet<ComponentAccess>();
             UserAccesses = new HashSet<UserAccess>();
             UserRoles = new HashSet<UserRole>();
+            UsersSchedules = new HashSet<UsersSchedule>();
         }
 
         public int RoleId { get; set; }
@@ -24,9 +25,11 @@ namespace Web.Data.Models
         public int? ModifiedBy { get; set; }
         public DateTime? ModifiedDate { get; set; }
         public bool IsDeleted { get; set; }
+        public bool IsScheduleRequired { get; set; }
 
         public virtual ICollection<ComponentAccess> ComponentAccesses { get; set; }
         public virtual ICollection<UserAccess> UserAccesses { get; set; }
         public virtual ICollection<UserRole> UserRoles { get; set; }
+        public virtual ICollection<UsersSchedule> UsersSchedules { get; set; }
     }
 }

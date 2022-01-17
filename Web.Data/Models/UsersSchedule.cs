@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 #nullable disable
 
@@ -12,6 +13,7 @@ namespace Web.Data.Models
         public DateTime ScheduleDateEnd { get; set; }
         public int UserIdFk { get; set; }
         public int RoleIdFk { get; set; }
+        public int? DateRangeId { get; set; }
         public int? ServiceLineIdFk { get; set; }
         public int CreatedBy { get; set; }
         public DateTime CreatedDate { get; set; }
@@ -19,6 +21,7 @@ namespace Web.Data.Models
         public DateTime? ModifiedDate { get; set; }
         public bool IsDeleted { get; set; }
 
+        public virtual Role RoleIdFkNavigation { get; set; }
         public virtual ServiceLine ServiceLineIdFkNavigation { get; set; }
         public virtual User UserIdFkNavigation { get; set; }
     }

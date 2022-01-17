@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 #nullable disable
 
@@ -599,6 +601,12 @@ namespace Web.Data.Models
                 entity.Property(e => e.ScheduleDateEnd).HasColumnType("datetime");
 
                 entity.Property(e => e.ScheduleDateStart).HasColumnType("datetime");
+
+                entity.HasOne(d => d.RoleIdFkNavigation)
+                    .WithMany(p => p.UsersSchedules)
+                    .HasForeignKey(d => d.RoleIdFk)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_UsersSchedule_Roles");
 
                 entity.HasOne(d => d.ServiceLineIdFkNavigation)
                     .WithMany(p => p.UsersSchedules)
