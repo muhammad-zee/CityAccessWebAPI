@@ -61,6 +61,25 @@ namespace Web.Services.Concrete
 
         public BaseResponse getSchedule(EditParams param)
         {
+            if (param.ShowAllSchedule == "false")
+            {
+                var schedule = (from us in _scheduleRepo.Table
+                                join u in _userRepo.Table on us.UserIdFk equals u.UserId
+                                where us.UserIdFk == param.CreatedBy && us.ScheduleDate >= DateTime.UtcNow.Date && !us.IsDeleted && !u.IsDeleted
+                                select new ScheduleEventData()
+                                {
+                                    id = us.UsersScheduleId,
+                                    subject = u.FirstName + " " + u.LastName,
+                                    startTime = us.ScheduleDateStart,
+                                    endTime = us.ScheduleDateEnd,
+                                    scheduleUserId = u.UserId.ToString(),
+                                    userId = u.UserId.ToString(),
+                                    roleId = us.RoleIdFk.ToString(),
+                                    serviceLineId = us.ServiceLineIdFk.ToString()
+                                }).ToList();
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Found", Body = schedule };
+            }
+
             var scheduleList = this._dbContext.LoadStoredProcedure("raq_getSchedule")
                 .WithSqlParam("@startDate", param.StartDate.AddDays(-1))
                 .WithSqlParam("@endDate", param.EndDate)
@@ -369,7 +388,7 @@ namespace Web.Services.Concrete
                 var roleIds = schedule.RoleIdFk.ToIntList();
                 int count = 0;
                 var weekDays = schedule.WeekDays.Split(",");
-                if (schedule.DateRangeId == 2) 
+                if (schedule.DateRangeId == 2)
                 {
                     DateTime loopFirstDate = schedule.FromDate;
                     DateTime startDate = schedule.FromDate;
@@ -382,9 +401,9 @@ namespace Web.Services.Concrete
                             if (loopFirstDate.Date != startDate.Date && schedule.RepeatEvery > 1)
                             {
                                 startDate = startDate.AddDays((schedule.RepeatEvery - 1));
-                                if (startDate > endDate) 
+                                if (startDate > endDate)
                                 {
-                                    break;    
+                                    break;
                                 }
                             }
 
@@ -628,7 +647,7 @@ namespace Web.Services.Concrete
                 }
                 else
                 {
-                    
+
                     DateTime startDate = schedule.FromDate;
 
                     string startDateTimeStr = startDate.ToString("MM-dd-yyyy") + " " + schedule.StartTime.ToString("hh:mm:ss tt");

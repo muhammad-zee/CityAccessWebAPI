@@ -53,7 +53,7 @@ namespace Web.API.Controllers
             {
                 ElmahExtensions.RiseError(ex);
                 _logger.LogExceptions(ex);
-                return Json("");
+                return Json(param);
             }
         }
 

@@ -15,6 +15,7 @@ namespace Web.Model.Common
         public string ServiceLineIds { get; set; }
         public string RoleIds { get; set; }
         public string UserIds { get; set; }
+        public string ShowAllSchedule { get; set; }
         public List<ScheduleEventData> added { get; set; }
         public List<ScheduleEventData> changed { get; set; }
         public List<ScheduleEventData> deleted { get; set; }
