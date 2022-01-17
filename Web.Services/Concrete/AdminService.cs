@@ -232,7 +232,7 @@ namespace Web.Services.Concrete
         }
         public IQueryable<Role> getRoleListByOrganizationId(int OrganizationId, int userRoleId)
         {
-            var rolesList = this._role.Table.Where(item => item.OrganizationIdFk == OrganizationId && item.IsScheduleRequired && !item.IsDeleted);
+            var rolesList = this._role.Table.Where(item => item.OrganizationIdFk == OrganizationId && !item.IsDeleted && !item.IsSuperAdmin);
             //if (ApplicationSettings.isSuperAdmin)
             //{
             //    var superAdminRole = this._role.GetList().Where(item => item.RoleId == userRoleId);

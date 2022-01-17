@@ -26,6 +26,7 @@ namespace Web.Data.Models
         public DateTime? ModifiedDate { get; set; }
         public bool IsDeleted { get; set; }
         public bool IsScheduleRequired { get; set; }
+        public bool IsSuperAdmin { get; set; }
 
         public virtual ICollection<ComponentAccess> ComponentAccesses { get; set; }
         public virtual ICollection<UserAccess> UserAccesses { get; set; }
