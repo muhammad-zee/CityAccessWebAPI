@@ -445,6 +445,7 @@ namespace Web.Services.Concrete
                     org.OrganizationName = organization.OrganizationName;
                     org.ModifiedBy = organization.ModifiedBy;
                     org.ModifiedDate = DateTime.UtcNow;
+                    org.TimeZoneIdFk = organization.TimeZoneIdFk;
                     _organizationRepo.Update(org);
 
                     //var alreadyExistDpts = _organizationDepartmentRepo.Table.Where(x => x.OrganizationIdFk == organization.OrganizationId).ToList();

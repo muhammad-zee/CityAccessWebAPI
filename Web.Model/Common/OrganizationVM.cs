@@ -26,6 +26,8 @@ namespace Web.Model.Common
         public string OrgType { get; set; }
         public string State { get; set; }
 
+        public int TimeZoneIdFk { get; set; }
+
         public string DepartmentIdsFk { get; set; }
         public List<DepartmentVM> Departments { get; set; }
 
