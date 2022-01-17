@@ -388,6 +388,10 @@ namespace Web.Services.Concrete
                                 if (loopFirstDate.Date != startDate.Date && schedule.RepeatEvery > 1 && startDate.DayOfWeek.ToString() == weekDays[0])
                                 {
                                     startDate = startDate.AddDays((schedule.RepeatEvery - 1) * 7);
+                                    if (startDate > endDate) 
+                                    {
+                                        break;
+                                    }
                                     count = 0;
                                 }
                                 string startDateTimeStr = startDate.ToString("MM-dd-yyyy") + " " + schedule.StartTime.ToString("hh:mm:ss tt");
