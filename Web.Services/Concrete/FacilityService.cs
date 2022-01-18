@@ -676,9 +676,9 @@ namespace Web.Services.Concrete
             BaseResponse response = null;
             ClinicalHour chour;
 
-            if (clinicalHours.scheduleId > 0)
+            if (clinicalHours.clinicalHourId > 0)
             {
-                var cHour = this._clinicalHourRepo.Table.Where(x => x.IsDeleted != true && x.ClinicalHourId == clinicalHours.scheduleId).FirstOrDefault();
+                var cHour = this._clinicalHourRepo.Table.Where(x => x.IsDeleted != true && x.ClinicalHourId == clinicalHours.clinicalHourId).FirstOrDefault();
                 if (cHour != null)
                 {
                     chour = new ClinicalHour();
