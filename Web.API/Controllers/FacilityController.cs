@@ -77,12 +77,12 @@ namespace Web.API.Controllers
         }
 
         [Description("Get Services By Ids")]
-        [HttpGet("service/GetServicesByIds/{Ids}")]
-        public BaseResponse GetServicesByIds(string Ids)
+        [HttpGet("service/getServicesByDepartmentIds/{departmentIds}")]
+        public BaseResponse getServicesByDepartmentIds(string departmentIds)
         {
             try
             {
-                var res = _facilityService.GetServicesByIds(Ids);
+                var res = _facilityService.getServicesByDepartmentIds(departmentIds);
                 return res;
             }
             catch (Exception ex)

@@ -139,6 +139,15 @@ namespace Web.Services.Concrete
 
             return new BaseResponse { Status = HttpStatusCode.OK, Message = "Users List Returned", Body = users };
         }
+        public BaseResponse getAllScheduleUsersByServiceAndRoleId(string OrganizationId, string ServiceLineId, string RoleIds)
+        {
+            var users = _dbContext.LoadStoredProcedure("raq_getAllScheduleUsersByServiceLineIdAndRoleId")
+                        .WithSqlParam("@organizationId", OrganizationId)
+                        .WithSqlParam("@serviceLineId", ServiceLineId)
+                        .WithSqlParam("@roleId", RoleIds).ExecuteStoredProc<UserListVm>().ToList();
+
+            return new BaseResponse { Status = HttpStatusCode.OK, Message = "Users List Returned", Body = users };
+        }
 
         public BaseResponse GetUserById(int Id)
         {
@@ -231,9 +240,19 @@ namespace Web.Services.Concrete
         {
             return this._role.GetList().Where(item => !item.IsDeleted);
         }
-        public IQueryable<Role> getRoleListByOrganizationId(int OrganizationId, int userRoleId)
+        public IQueryable<Role> getRoleListByOrganizationId(int OrganizationId)
         {
             var rolesList = this._role.Table.Where(item => item.OrganizationIdFk == OrganizationId && !item.IsDeleted && !item.IsSuperAdmin);
+            //if (ApplicationSettings.isSuperAdmin)
+            //{
+            //    var superAdminRole = this._role.GetList().Where(item => item.RoleId == userRoleId);
+            //    rolesList = superAdminRole.Union(rolesList);
+            //}
+            return rolesList;
+        }
+        public IQueryable<Role> getScheduleRoleListByOrganizationId(int OrganizationId)
+        {
+            var rolesList = this._role.Table.Where(item => item.OrganizationIdFk == OrganizationId && !item.IsDeleted && !item.IsSuperAdmin && item.IsScheduleRequired);
             //if (ApplicationSettings.isSuperAdmin)
             //{
             //    var superAdminRole = this._role.GetList().Where(item => item.RoleId == userRoleId);

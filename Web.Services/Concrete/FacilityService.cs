@@ -96,11 +96,11 @@ namespace Web.Services.Concrete
             };
         }
 
-        public BaseResponse GetServicesByIds(string Ids)
+        public BaseResponse getServicesByDepartmentIds(string departmentIds)
         {
-            if (!string.IsNullOrEmpty(Ids))
+            if (!string.IsNullOrEmpty(departmentIds))
             {
-                var idsList = Ids.ToIntList();
+                var idsList = departmentIds.ToIntList();
                 var services = _serviceRepo.Table.Where(x => idsList.Contains(x.DepartmentIdFk) && x.IsDeleted != true).Select(x => new ServiceLineVM()
                 {
                     ServiceLineId = x.ServiceLineId,

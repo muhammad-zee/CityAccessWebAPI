@@ -104,6 +104,25 @@ namespace Web.API.Controllers
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
         }
+        
+        [Description("Get Schedule Users List")]
+        [HttpGet("admin/getAllScheduleUsersByServiceAndRoleId")]
+        public async Task<BaseResponse> getAllScheduleUsersByServiceAndRoleId(string OrganizationId, string ServiceLineId, string RoleIds)
+        {
+            try
+            {
+                BaseResponse response = null;
+                response = _adminService.getAllScheduleUsersByServiceAndRoleId(OrganizationId,ServiceLineId, RoleIds);
+                return response;
+
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
 
         [Description("Get User By Id")]
         [HttpGet("admin/GetUserById/{Id}")]
@@ -174,19 +193,37 @@ namespace Web.API.Controllers
 
         // GET: api/<EmployeeController>
         [HttpGet("admin/GetAllRoles")]
-        public BaseResponse GetRoles(int? OrganizationID, int? userRoleId)
+        public BaseResponse GetRoles(int? OrganizationID)
         {
             try
             {
                 IQueryable roleObj = null;
                 if (OrganizationID != null)
                 {
-                    roleObj = _adminService.getRoleListByOrganizationId(OrganizationID.Value, userRoleId.Value);
+                    roleObj = _adminService.getRoleListByOrganizationId(OrganizationID.Value);
                 }
                 else
                 {
                     roleObj = _adminService.getRoleList();
                 }
+                return new BaseResponse { Status = HttpStatusCode.OK, Message = "Roles List Returned", Body = roleObj };
+
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+
+        }
+
+        [HttpGet("admin/GetAllScheduleRoles")]
+        public BaseResponse GetAllScheduleRoles(int? OrganizationID)
+        {
+            try
+            {
+                IQueryable roleObj = _adminService.getScheduleRoleListByOrganizationId(OrganizationID.Value);
                 return new BaseResponse { Status = HttpStatusCode.OK, Message = "Roles List Returned", Body = roleObj };
 
             }

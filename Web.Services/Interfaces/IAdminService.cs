@@ -30,6 +30,7 @@ namespace Web.Services.Interfaces
         BaseResponse GetAllUsers();
         BaseResponse GetAllUsersByOrganizationId(int OrganizationId, int UserRoleId);
         BaseResponse GetAllUsersByServiceLineAndRoleId(string OrganizationId, string ServiceLineId, string RoleIds);
+        BaseResponse getAllScheduleUsersByServiceAndRoleId(string OrganizationId, string ServiceLineId, string RoleIds);
         BaseResponse GetUserById(int Id);
         BaseResponse DeleteUser(int Id);
 
@@ -41,7 +42,8 @@ namespace Web.Services.Interfaces
 
         #region Roles
         IQueryable<Role> getRoleList();
-        IQueryable<Role> getRoleListByOrganizationId(int OrganizationId, int userRoleId);
+        IQueryable<Role> getRoleListByOrganizationId(int OrganizationId);
+        IQueryable<Role> getScheduleRoleListByOrganizationId(int OrganizationId);
         IQueryable<Role> getRoleListByOrganizationIds(string OrganizationIds);
         IQueryable<UserRoleVM> getRoleListByUserId(int UserId);
         string SaveRole(RoleVM role);
