@@ -462,11 +462,11 @@ namespace Web.API.Controllers
 
         [Description("Delete Clinical Holidays")]
         [HttpGet("ClinicalHour/DeleteClinicalHoliday")]
-        public BaseResponse DeleteClinicalHoliday(int clinicalHolidayId)
+        public BaseResponse DeleteClinicalHoliday(int clinicalHolidayId,int userId)
         {
             try
             {
-                var res = _facilityService.DeleteClinicalHoliday(clinicalHolidayId);
+                var res = _facilityService.DeleteClinicalHoliday(clinicalHolidayId, userId);
                 return res;
             }
             catch (Exception ex)
