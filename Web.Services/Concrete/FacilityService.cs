@@ -676,9 +676,9 @@ namespace Web.Services.Concrete
             BaseResponse response = null;
             ClinicalHour chour;
 
-            if (clinicalHours.scheduleId > 0)
+            if (clinicalHours.clinicalHourId > 0)
             {
-                var cHour = this._clinicalHourRepo.Table.Where(x => x.IsDeleted != true && x.ClinicalHourId == clinicalHours.scheduleId).FirstOrDefault();
+                var cHour = this._clinicalHourRepo.Table.Where(x => x.IsDeleted != true && x.ClinicalHourId == clinicalHours.clinicalHourId).FirstOrDefault();
                 if (cHour != null)
                 {
                     chour = new ClinicalHour();
@@ -691,38 +691,40 @@ namespace Web.Services.Concrete
 
                     response = new BaseResponse() { Status = HttpStatusCode.OK, Message = "Successfully Updated", Body = cHour };
                 }
-                else
+                
+            }
+            else
+            {
+
+                string[] serviceLineIds = clinicalHours.serviceLineIdFk.Split(",");
+                foreach (var service in serviceLineIds)
                 {
-                    
-                    string[] serviceLineIds = clinicalHours.serviceLineIdFk.Split(",");
-                    foreach (var service in serviceLineIds)
+                    string[] weekDays = clinicalHours.weekDays.Split(",");
+                    foreach (var item in weekDays)
                     {
-                        string[] weekDays = clinicalHours.weekDays.Split(",");
-                        foreach (var item in weekDays)
+                        var alreadExist = this._clinicalHourRepo.Table.Where(x => x.IsDeleted != true && x.ServicelineIdFk == service.ToInt() && x.WeekDayIdFk == item.ToInt()).FirstOrDefault();
+                        if (alreadExist != null)
                         {
-                            var alreadExist = this._clinicalHourRepo.Table.Where(x => x.IsDeleted != true && x.ServicelineIdFk == service.ToInt() && x.WeekDayIdFk == item.ToInt()).FirstOrDefault();
-                            if(alreadExist != null)
-                            {
-                                DeleteClinicalHour(alreadExist.ClinicalHourId, clinicalHours.createdBy);
-                            }
-
-                            chour = new ClinicalHour();
-                            chour.ServicelineIdFk = service.ToInt();
-                            cHour.WeekDayIdFk = item.ToInt();
-                            cHour.StartTime = clinicalHours.startTime;
-                            cHour.EndTime = clinicalHours.endTime;
-                            cHour.CreatedBy = clinicalHours.createdBy;
-                            cHour.CreatedDate = DateTime.UtcNow;
-                            cHour.IsDeleted = false;
-                            this._clinicalHourRepo.Insert(cHour);
+                            DeleteClinicalHour(alreadExist.ClinicalHourId, clinicalHours.createdBy);
                         }
-                    }
-                   
-                    response = new BaseResponse() { Status = HttpStatusCode.OK, Message = "Successfully Updated", Body = clinicalHours };
 
+                        chour = new ClinicalHour();
+                        chour.ServicelineIdFk = service.ToInt();
+                        chour.WeekDayIdFk = item.ToInt();
+                        chour.StartTime = clinicalHours.startTime;
+                        chour.EndTime = clinicalHours.endTime;
+                        chour.CreatedBy = clinicalHours.createdBy;
+                        chour.CreatedDate = DateTime.UtcNow;
+                        chour.IsDeleted = false;
+                        this._clinicalHourRepo.Insert(chour);
+                    }
                 }
+
+                response = new BaseResponse() { Status = HttpStatusCode.OK, Message = "Successfully Updated", Body = clinicalHours };
+
             }
 
+            #region [commented]
 
             //if (clinicalHours != null && clinicalHours.organizationHours.Count > 0)
             //{
@@ -815,6 +817,8 @@ namespace Web.Services.Concrete
 
             //    response = new BaseResponse() { Status = HttpStatusCode.OK, Message = "Successfully Deleted", Body = "" };
             //}
+
+            #endregion
 
             return response;
         }

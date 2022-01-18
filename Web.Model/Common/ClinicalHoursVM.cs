@@ -9,12 +9,10 @@ namespace Web.Model.Common
     {
 
 
-        public int scheduleId { get; set; }
+        public int clinicalHourId { get; set; }
         public int OrganizationIdFk { get; set; }
 
         public string serviceLineIdFk { get; set; }
-
-        public int LoggedInUserId { get; set; }
 
         public string weekDays { get; set; }
 
@@ -22,11 +20,8 @@ namespace Web.Model.Common
         public DateTime endTime { get; set; }
 
         public int createdBy { get; set; }
+
         public int modifiedBy { get; set; }
-        public DateTime? CreatedDate { get; set; }
-        public int? ModifiedBy { get; set; }
-        public DateTime? ModifiedDate { get; set; }
-        public bool IsDeleted { get; set; }
 
     }
 
