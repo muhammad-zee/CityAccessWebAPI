@@ -715,6 +715,10 @@ namespace Web.Services.Concrete
                         chour.EndTime = clinicalHours.endTime;
                         chour.CreatedBy = clinicalHours.createdBy;
                         chour.CreatedDate = DateTime.UtcNow;
+                        chour.StartDate = DateTime.UtcNow;
+                        chour.EndDate = DateTime.UtcNow;
+                        chour.StartBreak = null;
+                        chour.EndBreak = null;
                         chour.IsDeleted = false;
                         this._clinicalHourRepo.Insert(chour);
                     }
