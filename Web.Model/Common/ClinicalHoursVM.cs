@@ -7,15 +7,23 @@ namespace Web.Model.Common
 
     public class OrganizationSchedule
     {
-        public int organizationId { get; set; }
 
-        public int serviceId { get; set; }
+
+        public int scheduleId { get; set; }
+        public int OrganizationIdFk { get; set; }
+
+        public string serviceLineIdFk { get; set; }
 
         public int LoggedInUserId { get; set; }
 
-        public List<clinicalHours> organizationHours { get; set; }
-        public int CreatedBy { get; set; }
-        public DateTime CreatedDate { get; set; }
+        public string weekDays { get; set; }
+
+        public DateTime startTime { get; set; }
+        public DateTime endTime { get; set; }
+
+        public int createdBy { get; set; }
+        public int modifiedBy { get; set; }
+        public DateTime? CreatedDate { get; set; }
         public int? ModifiedBy { get; set; }
         public DateTime? ModifiedDate { get; set; }
         public bool IsDeleted { get; set; }

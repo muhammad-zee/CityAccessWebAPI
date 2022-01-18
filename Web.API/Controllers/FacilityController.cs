@@ -404,9 +404,6 @@ namespace Web.API.Controllers
             }
         }
 
-
-
-
         [Description("Delete Clinical Hour")]
         [HttpGet("ClinicalHour/DeleteClinicalHour")]
         public BaseResponse DeleteClinicalHour(int Id, int userId)
