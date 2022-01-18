@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Net;
 using Web.API.Helper;
@@ -111,11 +112,11 @@ namespace Web.API.Controllers
 
         [Description("Add Or Update Service Line")]
         [HttpPost("service/AddOrUpdateServiceLine")]
-        public BaseResponse AddOrUpdateServiceLine([FromBody] ServiceLineVM serviceLine)
+        public BaseResponse AddOrUpdateServiceLine([FromBody] List<ServiceLineVM> serviceLines)
         {
             try
             {
-                var res = _facilityService.AddOrUpdateServiceLine(serviceLine);
+                var res = _facilityService.AddOrUpdateServiceLine(serviceLines);
                 return res;
             }
             catch (Exception ex)
@@ -210,11 +211,11 @@ namespace Web.API.Controllers
 
         [Description("Add Or Update Department ")]
         [HttpPost("dpt/AddOrUpdateDepartment")]
-        public BaseResponse AddOrUpdateDepartment([FromBody] DepartmentVM department)
+        public BaseResponse AddOrUpdateDepartment([FromBody] List<DepartmentVM> departments)
         {
             try
             {
-                var res = _facilityService.AddOrUpdateDepartment(department);
+                var res = _facilityService.AddOrUpdateDepartment(departments);
                 return res;
             }
             catch (Exception ex)

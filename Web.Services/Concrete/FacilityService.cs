@@ -135,10 +135,10 @@ namespace Web.Services.Concrete
 
         }
 
-        public BaseResponse AddOrUpdateServiceLine(ServiceLineVM serviceLine)
+        public BaseResponse AddOrUpdateServiceLine(List<ServiceLineVM> serviceLines)
         {
             BaseResponse response = null;
-
+            foreach(var serviceLine in serviceLines) { 
             if (serviceLine.ServiceLineId > 0)
             {
                 var service = _serviceRepo.Table.Where(x => x.IsDeleted != true && x.ServiceLineId == serviceLine.ServiceLineId).FirstOrDefault();
@@ -158,9 +158,11 @@ namespace Web.Services.Concrete
             else
             {
                 serviceLine.CreatedDate = DateTime.UtcNow;
+
                 var service = AutoMapperHelper.MapSingleRow<ServiceLineVM, ServiceLine>(serviceLine);
                 _serviceRepo.Insert(service);
                 response = new BaseResponse() { Status = HttpStatusCode.OK, Message = "Successfully Created", Body = serviceLine };
+            }
             }
             return response;
         }
@@ -292,33 +294,37 @@ namespace Web.Services.Concrete
             }
         }
 
-        public BaseResponse AddOrUpdateDepartment(DepartmentVM department)
+        public BaseResponse AddOrUpdateDepartment(List<DepartmentVM> departments)
         {
             BaseResponse response = null;
-
-            if (department.DepartmentId > 0)
+            foreach(var department in departments)
             {
-                var dpt = _departmentRepo.Table.Where(x => (x.IsDeleted != true) && x.DepartmentId == department.DepartmentId).FirstOrDefault();
-                if (dpt != null)
+
+                if (department.DepartmentId > 0)
                 {
-                    dpt.DepartmentName = department.DepartmentName;
-                    dpt.ModifiedBy = department.ModifiedBy;
-                    dpt.ModifiedDate = DateTime.UtcNow;
-                    this._departmentRepo.Update(dpt);
-                    response = new BaseResponse() { Status = HttpStatusCode.OK, Message = "Successfully Updated" };
+                    var dpt = _departmentRepo.Table.Where(x => (x.IsDeleted != true) && x.DepartmentId == department.DepartmentId).FirstOrDefault();
+                    if (dpt != null)
+                    {
+                        dpt.DepartmentName = department.DepartmentName;
+                        dpt.ModifiedBy = department.ModifiedBy;
+                        dpt.ModifiedDate = DateTime.UtcNow;
+                        this._departmentRepo.Update(dpt);
+                        response = new BaseResponse() { Status = HttpStatusCode.OK, Message = "Successfully Updated" };
+                    }
+                    else
+                    {
+                        response = new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "Data Not Found" };
+                    }
                 }
                 else
                 {
-                    response = new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "Data Not Found" };
-                }
-            }
-            else
-            {
-                var dpt = AutoMapperHelper.MapSingleRow<DepartmentVM, Department>(department);
-                dpt.CreatedDate = DateTime.UtcNow;
-                this._departmentRepo.Insert(dpt);
+                    var dpt = AutoMapperHelper.MapSingleRow<DepartmentVM, Department>(department);
+                    dpt.CreatedDate = DateTime.UtcNow;
+                    dpt.CreatedBy = department.CreatedBy;
+                    this._departmentRepo.Insert(dpt);
 
-                response = new BaseResponse() { Status = HttpStatusCode.OK, Message = "Successfully Created" };
+                    response = new BaseResponse() { Status = HttpStatusCode.OK, Message = "Successfully Created" };
+                }
             }
             return response;
         }

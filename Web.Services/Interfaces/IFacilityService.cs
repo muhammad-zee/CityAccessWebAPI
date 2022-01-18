@@ -1,4 +1,5 @@
-﻿using Web.Model;
+﻿using System.Collections.Generic;
+using Web.Model;
 using Web.Model.Common;
 
 namespace Web.Services.Interfaces
@@ -11,7 +12,7 @@ namespace Web.Services.Interfaces
         BaseResponse GetServiceLineById(int Id);
         BaseResponse GetServicesByIds(string Ids);
         BaseResponse GetServicesByOrganizationId(int OrganizationId);
-        BaseResponse AddOrUpdateServiceLine(ServiceLineVM serviceLine);
+        BaseResponse AddOrUpdateServiceLine(List<ServiceLineVM> serviceLines);
         BaseResponse DeleteServiceLine(int serviceLineId, int userId);
         #endregion
 
@@ -20,7 +21,7 @@ namespace Web.Services.Interfaces
         BaseResponse GetAllDepartmentsByOrganizationId(int OrganizationId);
         BaseResponse GetDepartmentById(int Id);
         BaseResponse GetDepartmentsByIds(string Ids);
-        BaseResponse AddOrUpdateDepartment(DepartmentVM department);
+        BaseResponse AddOrUpdateDepartment(List<DepartmentVM> departments);
         BaseResponse DeleteDepartment(int departmentId, int userId);
         #endregion
 
