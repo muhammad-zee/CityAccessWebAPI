@@ -404,11 +404,11 @@ namespace Web.Services.Concrete
                 item.OrgType = types.Where(x => x.ControlListDetailId == item.OrganizationType).Select(x => x.Title).FirstOrDefault();
                 item.Departments = dpts.Where(x => x.OrganizationIdFk == item.OrganizationId).ToList();
             }
-
+            
             return new BaseResponse()
             {
                 Status = HttpStatusCode.OK,
-                Message = "Data Found",
+                Message = orgs.Count() == 0 ? "Organization Not Found": "Data Found",
                 Body = orgs
             };
         }
