@@ -450,6 +450,10 @@ namespace Web.Data.Models
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
+                entity.Property(e => e.Dob)
+                    .HasColumnType("date")
+                    .HasColumnName("DOB");
+
                 entity.Property(e => e.FirstName)
                     .HasMaxLength(256)
                     .IsUnicode(false);
@@ -596,7 +600,7 @@ namespace Web.Data.Models
 
                 entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
 
-                entity.Property(e => e.ScheduleDate).HasColumnType("date");
+                entity.Property(e => e.ScheduleDate).HasColumnType("datetime");
 
                 entity.Property(e => e.ScheduleDateEnd).HasColumnType("datetime");
 

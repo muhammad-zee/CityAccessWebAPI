@@ -27,6 +27,7 @@ namespace Web.Data.Models
         public string Password { get; set; }
         public string OfficePhoneNumber { get; set; }
         public string PersonalMobileNumber { get; set; }
+        public DateTime? Dob { get; set; }
         public string Gender { get; set; }
         public string OfficeAddress { get; set; }
         public string HomeAddress { get; set; }
