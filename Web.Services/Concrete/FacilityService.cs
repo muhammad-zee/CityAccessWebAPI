@@ -118,11 +118,20 @@ namespace Web.Services.Concrete
                 //                    DepartmentIdFk = d.DepartmentId
                 //                }).ToList();
 
-                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Found", Body = services };
+                return new BaseResponse()
+                {
+                    Status = HttpStatusCode.OK,
+                    Message = services.Count() == 0 ? "Service Lines Not Found" : "Data Found",
+                    Body = services
+                };
             }
             else
             {
-                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Select at least one Department" };
+                return new BaseResponse()
+                {
+                    Status = HttpStatusCode.OK,
+                    Message = "Select at least one Department"
+                };
             }
         }
 
@@ -131,7 +140,12 @@ namespace Web.Services.Concrete
             var services = _dbContext.LoadStoredProcedure("raq_getAllServicesByOrganizationId")
                 .WithSqlParam("@pOrganizationId", OrganizationId)
             .ExecuteStoredProc<ServiceLineVM>();
-            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Found", Body = services };
+            return new BaseResponse()
+            {
+                Status = HttpStatusCode.OK,
+                Message = services.Count() == 0 ? "Service Lines Not Found" : "Data Found",
+                Body = services
+            };
 
         }
 
