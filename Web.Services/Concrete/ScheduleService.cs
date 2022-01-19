@@ -273,9 +273,9 @@ namespace Web.Services.Concrete
                 scheduleList = (from u in param.added
                                 select new UsersSchedule
                                 {
-                                    ScheduleDate = u.startTime.ToUniversalTime(),
-                                    ScheduleDateStart = u.startTime.ToUniversalTime(),
-                                    ScheduleDateEnd = u.endTime.ToUniversalTime(),
+                                    ScheduleDate = u.startTime,
+                                    ScheduleDateStart = u.startTime,
+                                    ScheduleDateEnd = u.endTime,
                                     UserIdFk = param.selectedUserId.ToInt(),
                                     RoleIdFk = u.roleId.ToInt(),
                                     ServiceLineIdFk = u.serviceLineId.ToInt(),
@@ -295,9 +295,9 @@ namespace Web.Services.Concrete
                 schedule = this._scheduleRepo.Table.FirstOrDefault(s => s.UsersScheduleId == changedSchedule.id);
                 if (schedule != null)
                 {
-                    schedule.ScheduleDate = changedSchedule.startTime.ToUniversalTime();
-                    schedule.ScheduleDateStart = changedSchedule.startTime.ToUniversalTime();
-                    schedule.ScheduleDateEnd = changedSchedule.endTime.ToUniversalTime();
+                    schedule.ScheduleDate = changedSchedule.startTime;
+                    schedule.ScheduleDateStart = changedSchedule.startTime;
+                    schedule.ScheduleDateEnd = changedSchedule.endTime;
 
                     schedule.UserIdFk = Convert.ToInt32(changedSchedule.userId);
                     schedule.RoleIdFk = changedSchedule.roleId.ToInt();
