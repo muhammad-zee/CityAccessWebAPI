@@ -710,8 +710,8 @@ namespace Web.Services.Concrete
                 if (cHour != null)
                 {
                     chour = new ClinicalHour();
-                    cHour.StartTime = clinicalHours.startTime;
-                    cHour.EndTime = clinicalHours.endTime;
+                    cHour.StartTime = clinicalHours.startTime.ToUniversalTime();
+                    cHour.EndTime = clinicalHours.endTime.ToUniversalTime();
                     cHour.ModifiedBy = clinicalHours.modifiedBy;
                     cHour.ModifiedDate = DateTime.UtcNow;
                     cHour.IsDeleted = false;
@@ -739,8 +739,8 @@ namespace Web.Services.Concrete
                         chour = new ClinicalHour();
                         chour.ServicelineIdFk = service.ToInt();
                         chour.WeekDayIdFk = item.ToInt();
-                        chour.StartTime = clinicalHours.startTime;
-                        chour.EndTime = clinicalHours.endTime;
+                        chour.StartTime = clinicalHours.startTime.ToUniversalTime();
+                        chour.EndTime = clinicalHours.endTime.ToUniversalTime();
                         chour.CreatedBy = clinicalHours.createdBy;
                         chour.CreatedDate = DateTime.UtcNow;
                         chour.StartDate = DateTime.UtcNow;
