@@ -30,6 +30,7 @@ namespace Web.Model.Common
         public int id { get; set; }
         public int day { get; set; }
         public int ServicelineIdFk { get; set; }
+        public int OrganizationId { get; set; }
         public DateTime startDate { get; set; }
         public DateTime endDate { get; set; }
         public DateTime startTime { get; set; }

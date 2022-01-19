@@ -649,6 +649,7 @@ namespace Web.Services.Concrete
                           { 
                             id = ch.ClinicalHourId,
                             ServicelineIdFk = ch.ServicelineIdFk,
+                            OrganizationId = org.OrganizationId,
                             day = ch.WeekDayIdFk,
                             startTime = ch.StartTime,
                             endTime = ch.EndTime,
