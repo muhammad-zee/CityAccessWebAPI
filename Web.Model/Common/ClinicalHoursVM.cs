@@ -41,5 +41,7 @@ namespace Web.Model.Common
         public int? ModifiedBy { get; set; }
         public DateTime? ModifiedDate { get; set; }
         public bool IsDeleted { get; set; }
+        public string WeekDay { get; set; }
+        public List<ServiceLineVM> serviceLines { get; set; }
     }
 }

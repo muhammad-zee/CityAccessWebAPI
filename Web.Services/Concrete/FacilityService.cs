@@ -634,6 +634,7 @@ namespace Web.Services.Concrete
         public BaseResponse GetClinicalHourByServiceLineId(int orgId, int serviceLineId)
         {
             var cHours = (from ch in this._clinicalHourRepo.Table
+                          join w in this._controlListDetailsRepo.Table on ch.WeekDayIdFk equals w.ControlListDetailId
                           join sl in this._serviceRepo.Table on ch.ServicelineIdFk equals sl.ServiceLineId
                           join d in this._departmentRepo.Table on sl.DepartmentIdFk equals d.DepartmentId
                           join org in this._organizationRepo.Table on d.OrganizationIdFk equals org.OrganizationId
@@ -644,33 +645,44 @@ namespace Web.Services.Concrete
                           && d.IsDeleted != true
                           && sl.IsDeleted != true
                           && ch.IsDeleted != true
-                          select ch).ToList();
+                          select new clinicalHours() 
+                          { 
+                            id = ch.ClinicalHourId,
+                            ServicelineIdFk = ch.ServicelineIdFk,
+                            day = ch.WeekDayIdFk,
+                            startTime = ch.StartTime,
+                            endTime = ch.EndTime,
+                            startBreak = ch.StartBreak,
+                            endBreak = ch.EndBreak,
+                            WeekDay = w.Title
+
+                          }).Distinct().ToList();
 
             //this._clinicalHour.Table.Where(x => x.ServicelineIdFk == serviceLineId && x.IsDeleted == false).ToList();
             if (cHours != null && cHours.Count() > 0)
             {
-                List<clinicalHours> _List = new List<clinicalHours>();
-                clinicalHours obj;
-                foreach (var item in cHours)
-                {
-                    obj = new clinicalHours();
-                    obj.ServicelineIdFk = item.ServicelineIdFk;
-                    obj.id = item.ClinicalHourId;
-                    obj.day = item.WeekDayIdFk;
-                    obj.startDate = item.StartDate;
-                    obj.endDate = item.EndDate;
-                    obj.startTime = item.StartTime;
-                    obj.endTime = item.EndTime;
-                    obj.startBreak = item.StartBreak;
-                    obj.endBreak = item.EndBreak;
-                    _List.Add(obj);
-                }
+                //List<clinicalHours> _List = new List<clinicalHours>();
+                //clinicalHours obj;
+                //foreach (var item in cHours)
+                //{
+                //    obj = new clinicalHours();
+                //    obj.ServicelineIdFk = item.ServicelineIdFk;
+                //    obj.id = item.ClinicalHourId;
+                //    obj.day = item.WeekDayIdFk;
+                //    obj.startDate = item.StartDate;
+                //    obj.endDate = item.EndDate;
+                //    obj.startTime = item.StartTime;
+                //    obj.endTime = item.EndTime;
+                //    obj.startBreak = item.StartBreak;
+                //    obj.endBreak = item.EndBreak;
+                //    _List.Add(obj);
+                //}
 
                 return new BaseResponse()
                 {
                     Status = HttpStatusCode.OK,
                     Message = "Data Found",
-                    Body = _List
+                    Body = cHours
                 };
             }
             else
