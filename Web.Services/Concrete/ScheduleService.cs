@@ -160,8 +160,9 @@ namespace Web.Services.Concrete
 
                                     var obj = new UsersSchedule()
                                     {
-                                        ScheduleDateStart = StartDateTime,
-                                        ScheduleDateEnd = EndDateTime,
+                                        ScheduleDate = StartDateTime.Date.ToUniversalTime(),
+                                        ScheduleDateStart = StartDateTime.ToUniversalTime(),
+                                        ScheduleDateEnd = EndDateTime.ToUniversalTime(),
                                         UserIdFk = userId,
                                         ServiceLineIdFk = fileVM.ServiceLineId,
                                         CreatedBy = fileVM.LoggedinUserId,
@@ -365,7 +366,7 @@ namespace Web.Services.Concrete
                         endDateTime.AddDays(1);
                     }
 
-                    //row.ScheduleDate = startDateTime.Date;
+                    row.ScheduleDate = startDateTime.Date.ToUniversalTime();
                     row.ScheduleDateStart = startDateTime.ToUniversalTime();
                     row.ScheduleDateEnd = endDateTime.ToUniversalTime();
                     row.ModifiedBy = schedule.ModifiedBy;
