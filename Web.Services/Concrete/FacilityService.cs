@@ -654,7 +654,9 @@ namespace Web.Services.Concrete
                             endTime = ch.EndTime,
                             startBreak = ch.StartBreak,
                             endBreak = ch.EndBreak,
-                            WeekDay = w.Title
+                            WeekDay = w.Title,
+                            CreatedBy = ch.CreatedBy,
+                            CreatedDate = ch.CreatedDate
 
                           }).Distinct().ToList();
 
