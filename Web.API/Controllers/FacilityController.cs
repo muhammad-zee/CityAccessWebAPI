@@ -10,7 +10,6 @@ using System.Net;
 using Web.API.Helper;
 using Web.Model;
 using Web.Model.Common;
-using Web.Services;
 using Web.Services.Interfaces;
 
 namespace Web.API.Controllers
@@ -464,7 +463,7 @@ namespace Web.API.Controllers
 
         [Description("Delete Clinical Holidays")]
         [HttpGet("ClinicalHour/DeleteClinicalHoliday")]
-        public BaseResponse DeleteClinicalHoliday(int clinicalHolidayId,int userId)
+        public BaseResponse DeleteClinicalHoliday(int clinicalHolidayId, int userId)
         {
             try
             {

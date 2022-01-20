@@ -6,5 +6,8 @@
         //public int UserId { get; set; }
         public int RoleId { get; set; }
         public string RoleName { get; set; }
+        public int? OrganizationIdFk { get; set; }
+        public string OrganizationName { get; set; }
+
     }
 }

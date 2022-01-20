@@ -46,7 +46,7 @@ namespace Web.Services.Interfaces
         #region Cinical Holidays
         BaseResponse GetClinicalHolidayByServiceLineId(int serviceLineId);
         BaseResponse SaveClinicalHoliday(ClinicalHolidayVM clinicalHoliday);
-        BaseResponse DeleteClinicalHoliday(int clinicalHolidayId,int userId);
+        BaseResponse DeleteClinicalHoliday(int clinicalHolidayId, int userId);
         #endregion
 
     }

@@ -167,7 +167,7 @@ namespace Web.Services.Concrete
                                      select new ServiceLineVM() { ServiceLineId = s.ServiceLineId, ServiceName = s.ServiceName, DepartmentIdFk = s.DepartmentIdFk }).ToList();
                 user.Departments = _departmentRepo.Table.Where(x => user.UserServices.Select(y => y.DepartmentIdFk).Contains(x.DepartmentId) && !x.IsDeleted).Select(x => new DepartmentVM() { DepartmentId = x.DepartmentId, DepartmentName = x.DepartmentName, OrganizationIdFk = x.OrganizationIdFk }).ToList();
                 user.Organizations = _organizationRepo.Table.Where(x => user.Departments.Select(z => z.OrganizationIdFk).Contains(x.OrganizationId)).Select(x => new OrganizationVM() { OrganizationId = x.OrganizationId, OrganizationName = x.OrganizationName }).ToList();
-                
+
                 return new BaseResponse { Status = HttpStatusCode.OK, Message = "User Found", Body = user };
             }
             else
@@ -272,28 +272,33 @@ namespace Web.Services.Concrete
                                 RoleId = r.RoleId,
                                 RoleName = ids.Count > 1 ? org.OrganizationName + " | " + r.RoleName : r.RoleName,
                                 RoleDescription = r.RoleDescription,
-                                IsDeleted = r.IsDeleted
+                                IsDeleted = r.IsDeleted,
+                                OrganizationIdFk = r.OrganizationIdFk
                             }).OrderBy(x => x.RoleName);
             //this._role.Table.Where(x => ids.Contains(x.OrganizationIdFk.Value) && x.IsDeleted != true);
             return roleList;
         }
 
 
-        public IQueryable<UserRoleVM> getRoleListByUserId(int UserId)
+        public List<UserRoleVM> getRoleListByUserId(int UserId)
         {
-            var userRoleList = this._userRole.GetList().Where(item => item.UserIdFk == UserId);
-            var roleList = this._role.GetList().Where(item => !item.IsDeleted);
-            var userRoles = (from ur in userRoleList
-                             join r in roleList
-                             on ur.RoleIdFk equals r.RoleId
+            var userRoles = (from ur in this._userRole.Table
+                             join r in this._role.Table on ur.RoleIdFk equals r.RoleId
+                             where ur.UserIdFk == UserId && !r.IsDeleted
                              select new UserRoleVM
                              {
                                  //UserRoleId = ur.UserRoleId,
                                  //UserId = ur.UserIdFK,
                                  RoleId = ur.RoleIdFk,
-                                 RoleName = r.RoleName
-                             }
-                              );
+                                 RoleName = r.RoleName,
+                                 OrganizationIdFk = r.OrganizationIdFk
+                             }).ToList();
+            foreach (var item in userRoles)
+            {
+                string orgName = this._organizationRepo.Table.Where(x => x.OrganizationId == item.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
+                if (!string.IsNullOrEmpty(orgName) && !string.IsNullOrWhiteSpace(orgName))
+                    item.RoleName = item.RoleName + " | " + orgName;
+            }
             return userRoles;
         }
         public string SaveRole(RoleVM role)

@@ -93,7 +93,7 @@ namespace Web.API.Controllers
             try
             {
                 BaseResponse response = null;
-                response = _adminService.GetAllUsersByServiceLineAndRoleId(OrganizationId,ServiceLineId, RoleIds);
+                response = _adminService.GetAllUsersByServiceLineAndRoleId(OrganizationId, ServiceLineId, RoleIds);
                 return response;
 
             }
@@ -104,7 +104,7 @@ namespace Web.API.Controllers
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
         }
-        
+
         [Description("Get Schedule Users List")]
         [HttpGet("admin/getAllScheduleUsersByServiceAndRoleId")]
         public async Task<BaseResponse> getAllScheduleUsersByServiceAndRoleId(string OrganizationId, string ServiceLineId, string RoleIds)
@@ -112,7 +112,7 @@ namespace Web.API.Controllers
             try
             {
                 BaseResponse response = null;
-                response = _adminService.getAllScheduleUsersByServiceAndRoleId(OrganizationId,ServiceLineId, RoleIds);
+                response = _adminService.getAllScheduleUsersByServiceAndRoleId(OrganizationId, ServiceLineId, RoleIds);
                 return response;
 
             }

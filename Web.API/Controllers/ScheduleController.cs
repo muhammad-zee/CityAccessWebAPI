@@ -3,8 +3,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
-using Microsoft.Extensions.Primitives;
 using System;
 using System.ComponentModel;
 using System.IO;
@@ -13,7 +11,6 @@ using System.Threading.Tasks;
 using Web.API.Helper;
 using Web.Model;
 using Web.Model.Common;
-using Web.Services;
 using Web.Services.Interfaces;
 
 namespace Web.API.Controllers
