@@ -152,31 +152,32 @@ namespace Web.Services.Concrete
         public BaseResponse AddOrUpdateServiceLine(List<ServiceLineVM> serviceLines)
         {
             BaseResponse response = null;
-            foreach(var serviceLine in serviceLines) { 
-            if (serviceLine.ServiceLineId > 0)
+            foreach (var serviceLine in serviceLines)
             {
-                var service = _serviceRepo.Table.Where(x => x.IsDeleted != true && x.ServiceLineId == serviceLine.ServiceLineId).FirstOrDefault();
-                if (service != null)
+                if (serviceLine.ServiceLineId > 0)
                 {
-                    service.ServiceName = serviceLine.ServiceName;
-                    service.ModifiedBy = serviceLine.ModifiedBy;
-                    service.ModifiedDate = DateTime.UtcNow;
-                    _serviceRepo.Update(service);
-                    response = new BaseResponse() { Status = HttpStatusCode.OK, Message = "Successfully Updated", Body = serviceLine };
+                    var service = _serviceRepo.Table.Where(x => x.IsDeleted != true && x.ServiceLineId == serviceLine.ServiceLineId).FirstOrDefault();
+                    if (service != null)
+                    {
+                        service.ServiceName = serviceLine.ServiceName;
+                        service.ModifiedBy = serviceLine.ModifiedBy;
+                        service.ModifiedDate = DateTime.UtcNow;
+                        _serviceRepo.Update(service);
+                        response = new BaseResponse() { Status = HttpStatusCode.OK, Message = "Successfully Updated", Body = serviceLine };
+                    }
+                    else
+                    {
+                        response = new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "Data Not Found" };
+                    }
                 }
                 else
                 {
-                    response = new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "Data Not Found" };
-                }
-            }
-            else
-            {
-                serviceLine.CreatedDate = DateTime.UtcNow;
+                    serviceLine.CreatedDate = DateTime.UtcNow;
 
-                var service = AutoMapperHelper.MapSingleRow<ServiceLineVM, ServiceLine>(serviceLine);
-                _serviceRepo.Insert(service);
-                response = new BaseResponse() { Status = HttpStatusCode.OK, Message = "Successfully Created", Body = serviceLine };
-            }
+                    var service = AutoMapperHelper.MapSingleRow<ServiceLineVM, ServiceLine>(serviceLine);
+                    _serviceRepo.Insert(service);
+                    response = new BaseResponse() { Status = HttpStatusCode.OK, Message = "Successfully Created", Body = serviceLine };
+                }
             }
             return response;
         }
@@ -311,7 +312,7 @@ namespace Web.Services.Concrete
         public BaseResponse AddOrUpdateDepartment(List<DepartmentVM> departments)
         {
             BaseResponse response = null;
-            foreach(var department in departments)
+            foreach (var department in departments)
             {
 
                 if (department.DepartmentId > 0)
@@ -384,7 +385,7 @@ namespace Web.Services.Concrete
                 organizations = (from ur in this._userRoleRepo.Table
                                  join r in this._roleRepo.Table on ur.RoleIdFk equals r.RoleId
                                  join o in this._organizationRepo.Table on r.OrganizationIdFk equals o.OrganizationId
-                                 where ur.UserIdFk == ApplicationSettings.UserId && !o.IsDeleted  && !r.IsDeleted
+                                 where ur.UserIdFk == ApplicationSettings.UserId && !o.IsDeleted && !r.IsDeleted
                                  select o).Distinct().ToList();
             }
             var orgs = AutoMapperHelper.MapList<Organization, OrganizationVM>(organizations);
@@ -418,11 +419,11 @@ namespace Web.Services.Concrete
                 item.OrgType = types.Where(x => x.ControlListDetailId == item.OrganizationType).Select(x => x.Title).FirstOrDefault();
                 item.Departments = dpts.Where(x => x.OrganizationIdFk == item.OrganizationId).ToList();
             }
-            
+
             return new BaseResponse()
             {
                 Status = HttpStatusCode.OK,
-                Message = orgs.Count() == 0 ? "Organization Not Found": "Data Found",
+                Message = orgs.Count() == 0 ? "Organization Not Found" : "Data Found",
                 Body = orgs
             };
         }
@@ -613,6 +614,8 @@ namespace Web.Services.Concrete
             var cHour = this._clinicalHourRepo.Table.Where(x => x.ClinicalHourId == Id && x.IsDeleted == false).FirstOrDefault();
             if (cHour != null)
             {
+                cHour.StartTime = cHour.StartTime.ToTimezoneFromUtc("Eastern Standard Time");
+                cHour.EndTime = cHour.EndTime.ToTimezoneFromUtc("Eastern Standard Time");
                 return new BaseResponse()
                 {
                     Status = HttpStatusCode.OK,
@@ -645,41 +648,30 @@ namespace Web.Services.Concrete
                           && d.IsDeleted != true
                           && sl.IsDeleted != true
                           && ch.IsDeleted != true
-                          select new clinicalHours() 
-                          { 
-                            id = ch.ClinicalHourId,
-                            ServicelineIdFk = ch.ServicelineIdFk,
-                            OrganizationId = org.OrganizationId,
-                            day = ch.WeekDayIdFk,
-                            startTime = ch.StartTime,
-                            endTime = ch.EndTime,
-                            startBreak = ch.StartBreak,
-                            endBreak = ch.EndBreak,
-                            WeekDay = w.Title,
-                            CreatedBy = ch.CreatedBy,
-                            CreatedDate = ch.CreatedDate
+                          select new clinicalHours()
+                          {
+                              id = ch.ClinicalHourId,
+                              ServicelineIdFk = ch.ServicelineIdFk,
+                              OrganizationId = org.OrganizationId,
+                              day = ch.WeekDayIdFk,
+                              startTime = ch.StartTime,
+                              endTime = ch.EndTime,
+                              startBreak = ch.StartBreak,
+                              endBreak = ch.EndBreak,
+                              WeekDay = w.Title,
+                              CreatedBy = ch.CreatedBy,
+                              CreatedDate = ch.CreatedDate
 
                           }).Distinct().ToList();
 
             //this._clinicalHour.Table.Where(x => x.ServicelineIdFk == serviceLineId && x.IsDeleted == false).ToList();
             if (cHours != null && cHours.Count() > 0)
             {
-                //List<clinicalHours> _List = new List<clinicalHours>();
-                //clinicalHours obj;
-                //foreach (var item in cHours)
-                //{
-                //    obj = new clinicalHours();
-                //    obj.ServicelineIdFk = item.ServicelineIdFk;
-                //    obj.id = item.ClinicalHourId;
-                //    obj.day = item.WeekDayIdFk;
-                //    obj.startDate = item.StartDate;
-                //    obj.endDate = item.EndDate;
-                //    obj.startTime = item.StartTime;
-                //    obj.endTime = item.EndTime;
-                //    obj.startBreak = item.StartBreak;
-                //    obj.endBreak = item.EndBreak;
-                //    _List.Add(obj);
-                //}
+                foreach (var item in cHours)
+                {
+                    item.startTime = item.startTime.ToTimezoneFromUtc("Eastern Standard Time");
+                    item.endTime = item.endTime.ToTimezoneFromUtc("Eastern Standard Time");
+                }
 
                 return new BaseResponse()
                 {
@@ -711,8 +703,17 @@ namespace Web.Services.Concrete
                 if (cHour != null)
                 {
                     chour = new ClinicalHour();
-                    cHour.StartTime = clinicalHours.startTime.ToUniversalTime();
-                    cHour.EndTime = clinicalHours.endTime.ToUniversalTime();
+
+                    string startDateTimeStr = clinicalHours.startTime.ToString("MM-dd-yyyy") + " " + clinicalHours.startTime.ToString("hh:mm:ss tt");
+                    string endDateTimeStr = clinicalHours.endTime.ToString("MM-dd-yyyy") + " " + clinicalHours.endTime.ToString("hh:mm:ss tt");
+
+                    DateTime? StartDateTime = Convert.ToDateTime(startDateTimeStr);
+                    DateTime? EndDateTime = Convert.ToDateTime(endDateTimeStr);
+
+
+
+                    cHour.StartTime = StartDateTime.Value.ToUniversalTimeZone();
+                    cHour.EndTime = EndDateTime.Value.ToUniversalTimeZone();
                     cHour.ModifiedBy = clinicalHours.modifiedBy;
                     cHour.ModifiedDate = DateTime.UtcNow;
                     cHour.IsDeleted = false;
@@ -720,7 +721,7 @@ namespace Web.Services.Concrete
 
                     response = new BaseResponse() { Status = HttpStatusCode.OK, Message = "Successfully Updated", Body = cHour };
                 }
-                
+
             }
             else
             {
@@ -737,15 +738,23 @@ namespace Web.Services.Concrete
                             DeleteClinicalHour(alreadExist.ClinicalHourId, clinicalHours.createdBy);
                         }
 
+
+                        string startDateTimeStr = clinicalHours.startTime.ToString("MM-dd-yyyy") + " " + clinicalHours.startTime.ToString("hh:mm:ss tt");
+                        string endDateTimeStr = clinicalHours.endTime.ToString("MM-dd-yyyy") + " " + clinicalHours.endTime.ToString("hh:mm:ss tt");
+
+                        DateTime? StartDateTime = Convert.ToDateTime(startDateTimeStr);
+                        DateTime? EndDateTime = Convert.ToDateTime(endDateTimeStr);
+
+
                         chour = new ClinicalHour();
                         chour.ServicelineIdFk = service.ToInt();
                         chour.WeekDayIdFk = item.ToInt();
-                        chour.StartTime = clinicalHours.startTime.ToUniversalTime();
-                        chour.EndTime = clinicalHours.endTime.ToUniversalTime();
+                        chour.StartTime = StartDateTime.Value.ToUniversalTimeZone();
+                        chour.EndTime = EndDateTime.Value.ToUniversalTimeZone();
                         chour.CreatedBy = clinicalHours.createdBy;
                         chour.CreatedDate = DateTime.UtcNow;
-                        chour.StartDate = DateTime.UtcNow;
-                        chour.EndDate = DateTime.UtcNow;
+                        chour.StartDate = StartDateTime.Value.ToUniversalTimeZone();
+                        chour.EndDate = EndDateTime.Value.ToUniversalTimeZone();
                         chour.StartBreak = null;
                         chour.EndBreak = null;
                         chour.IsDeleted = false;
@@ -912,9 +921,11 @@ namespace Web.Services.Concrete
                 var holiday = this._clinicalHolidayRepo.Table.FirstOrDefault(h => h.IsDeleted != true && h.ClinicalHolidayId == clinicalHoliday.ClinicalHolidayId);
                 if (holiday != null)
                 {
+
+
                     holiday.ServicelineIdFk = clinicalHoliday.ServicelineIdFk;
                     holiday.StartDate = clinicalHoliday.StartDate;
-                    holiday.EndDate = clinicalHoliday.EndDate;
+                    holiday.EndDate = clinicalHoliday.EndDate ;
                     holiday.Description = clinicalHoliday.Description;
                     holiday.ModifiedBy = clinicalHoliday.ModifiedBy;
                     holiday.ModifiedDate = DateTime.UtcNow;
@@ -931,6 +942,10 @@ namespace Web.Services.Concrete
             else
             {
                 //insert
+
+
+                
+
                 var holiday = AutoMapperHelper.MapSingleRow<ClinicalHolidayVM, ClinicalHoliday>(clinicalHoliday);
                 holiday.CreatedDate = DateTime.UtcNow;
                 holiday.IsDeleted = false;
@@ -940,7 +955,7 @@ namespace Web.Services.Concrete
             return response;
         }
 
-        public BaseResponse DeleteClinicalHoliday(int clinicalHolidayId,int userId )
+        public BaseResponse DeleteClinicalHoliday(int clinicalHolidayId, int userId)
         {
             BaseResponse response = null;
 
