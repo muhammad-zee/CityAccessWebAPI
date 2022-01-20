@@ -432,9 +432,9 @@ namespace Web.Services.Concrete
                                     {
                                         var userSchedule = new UsersSchedule()
                                         {
-                                            ScheduleDate = StartDateTime.Value.ToUniversalTime(),
-                                            ScheduleDateStart = StartDateTime.Value.ToUniversalTime(),
-                                            ScheduleDateEnd = EndDateTime.Value.ToUniversalTime(),
+                                            ScheduleDate = StartDateTime.Value.ToUniversalTimeZone(),
+                                            ScheduleDateStart = StartDateTime.Value.ToUniversalTimeZone(),
+                                            ScheduleDateEnd = EndDateTime.Value.ToUniversalTimeZone(),
                                             ServiceLineIdFk = schedule.ServiceLineIdFk,
                                             UserIdFk = user,
                                             RoleIdFk = role,
@@ -505,9 +505,9 @@ namespace Web.Services.Concrete
                                         {
                                             var userSchedule = new UsersSchedule()
                                             {
-                                                ScheduleDate = StartDateTime.Value.ToUniversalTime(),
-                                                ScheduleDateStart = StartDateTime.Value.ToUniversalTime(),
-                                                ScheduleDateEnd = EndDateTime.Value.ToUniversalTime(),
+                                                ScheduleDate = StartDateTime.Value.ToUniversalTimeZone(),
+                                                ScheduleDateStart = StartDateTime.Value.ToUniversalTimeZone(),
+                                                ScheduleDateEnd = EndDateTime.Value.ToUniversalTimeZone(),
                                                 ServiceLineIdFk = schedule.ServiceLineIdFk,
                                                 UserIdFk = user,
                                                 RoleIdFk = role,
@@ -566,9 +566,9 @@ namespace Web.Services.Concrete
                                     {
                                         var userSchedule = new UsersSchedule()
                                         {
-                                            ScheduleDate = StartDateTime.Value.ToUniversalTime(),
-                                            ScheduleDateStart = StartDateTime.Value.ToUniversalTime(),
-                                            ScheduleDateEnd = EndDateTime.Value.ToUniversalTime(),
+                                            ScheduleDate = StartDateTime.Value.ToUniversalTimeZone(),
+                                            ScheduleDateStart = StartDateTime.Value.ToUniversalTimeZone(),
+                                            ScheduleDateEnd = EndDateTime.Value.ToUniversalTimeZone(),
                                             ServiceLineIdFk = schedule.ServiceLineIdFk,
                                             UserIdFk = user,
                                             RoleIdFk = role,
@@ -623,9 +623,9 @@ namespace Web.Services.Concrete
                                     {
                                         var userSchedule = new UsersSchedule()
                                         {
-                                            ScheduleDate = StartDateTime.Value.ToUniversalTime(),
-                                            ScheduleDateStart = StartDateTime.Value.ToUniversalTime(),
-                                            ScheduleDateEnd = EndDateTime.Value.ToUniversalTime(),
+                                            ScheduleDate = StartDateTime.Value.ToUniversalTimeZone(),
+                                            ScheduleDateStart = StartDateTime.Value.ToUniversalTimeZone(),
+                                            ScheduleDateEnd = EndDateTime.Value.ToUniversalTimeZone(),
                                             ServiceLineIdFk = schedule.ServiceLineIdFk,
                                             UserIdFk = user,
                                             RoleIdFk = role,
@@ -675,9 +675,9 @@ namespace Web.Services.Concrete
                             {
                                 var userSchedule = new UsersSchedule()
                                 {
-                                    ScheduleDate = StartDateTime.Value.ToUniversalTime(),
-                                    ScheduleDateStart = StartDateTime.Value.ToUniversalTime(),
-                                    ScheduleDateEnd = EndDateTime.Value.ToUniversalTime(),
+                                    ScheduleDate = StartDateTime.Value.ToUniversalTimeZone(),
+                                    ScheduleDateStart = StartDateTime.Value.ToUniversalTimeZone(),
+                                    ScheduleDateEnd = EndDateTime.Value.ToUniversalTimeZone(),
                                     ServiceLineIdFk = schedule.ServiceLineIdFk,
                                     UserIdFk = user,
                                     RoleIdFk = role,
