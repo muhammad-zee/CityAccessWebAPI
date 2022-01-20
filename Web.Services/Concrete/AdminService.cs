@@ -166,7 +166,7 @@ namespace Web.Services.Concrete
                                      where us.UserIdFk == user.UserId && !s.IsDeleted
                                      select new ServiceLineVM() { ServiceLineId = s.ServiceLineId, ServiceName = s.ServiceName, DepartmentIdFk = s.DepartmentIdFk }).ToList();
                 user.Departments = _departmentRepo.Table.Where(x => user.UserServices.Select(y => y.DepartmentIdFk).Contains(x.DepartmentId) && !x.IsDeleted).Select(x => new DepartmentVM() { DepartmentId = x.DepartmentId, DepartmentName = x.DepartmentName, OrganizationIdFk = x.OrganizationIdFk }).ToList();
-                user.Organizations = _organizationRepo.Table.Where(x => user.Departments.Select(z => z.OrganizationIdFk).Contains(x.OrganizationId)).Select(x => new OrganizationVM() { OrganizationId = x.OrganizationId, OrganizationName = x.OrganizationName }).ToList();
+                user.Organizations = user.Departments.Count > 0 ? _organizationRepo.Table.Where(x => user.Departments.Select(z => z.OrganizationIdFk).Contains(x.OrganizationId)).Select(x => new OrganizationVM() { OrganizationId = x.OrganizationId, OrganizationName = x.OrganizationName }).ToList() : this._organizationRepo.Table.Where(x => this._role.Table.Where(r => user.UserRole.Select(id => id.RoleId).Contains(r.RoleId) && !r.IsDeleted).Select(r => r.OrganizationIdFk).Contains(x.OrganizationId) && !x.IsDeleted).Select(x => new OrganizationVM() { OrganizationId = x.OrganizationId, OrganizationName = x.OrganizationName }).ToList();
 
                 return new BaseResponse { Status = HttpStatusCode.OK, Message = "User Found", Body = user };
             }
