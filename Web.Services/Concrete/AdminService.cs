@@ -118,6 +118,7 @@ namespace Web.Services.Concrete
             foreach (var item in users)
             {
                 item.UserRole = getRoleListByUserId(item.UserId).ToList();
+                item.DOB = result.Where(x => x.UserId == item.UserId).Select(x => x.Dob).FirstOrDefault();
                 item.GenderId = Convert.ToInt32(item.Gender);
                 item.Gender = genders.Where(x => x.ControlListDetailId == item.GenderId).Select(x => x.Title).FirstOrDefault();
                 item.UserImage = String.IsNullOrEmpty(item.UserImage) ? "" : item.UserImage.Replace(Directory.GetCurrentDirectory() + "/", "");
@@ -157,6 +158,7 @@ namespace Web.Services.Concrete
             {
                 var user = AutoMapperHelper.MapSingleRow<User, RegisterCredentialVM>(USER);
                 user.UserRole = getRoleListByUserId(Id).ToList();
+                user.DOB = USER.Dob;
                 user.GenderId = Convert.ToInt32(user.Gender);
                 user.Gender = genders.Where(x => x.ControlListDetailId == user.GenderId).Select(x => x.Title).FirstOrDefault();
                 user.UserImage = user.UserImage.Replace(Directory.GetCurrentDirectory() + "/", "");

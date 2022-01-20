@@ -212,6 +212,7 @@ namespace Web.Services.Concrete
                 user.UserName = register.UserName;
                 user.PrimaryEmail = register.PrimaryEmail;
                 user.StateKey = register.StateKey;
+                user.Dob = register.DOB;
                 user.Gender = register.GenderId.ToString();
                 user.HomeAddress = register.HomeAddress;
                 user.City = register.City;
@@ -310,6 +311,7 @@ namespace Web.Services.Concrete
                             PrimaryEmail = register.PrimaryEmail,
                             PersonalMobileNumber = register.PersonalMobileNumber,
                             Gender = register.GenderId.ToString(),
+                            Dob = register.DOB,
                             HomeAddress = register.HomeAddress,
                             City = register.City,
                             Zip = register.Zip,
