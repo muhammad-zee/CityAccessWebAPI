@@ -377,6 +377,7 @@ namespace Web.API.Controllers
             try
             {
                 var res = _facilityService.GetClinicalHourByServiceLineId(orgId, serviceLineId);
+
                 return res;
             }
             catch (Exception ex)

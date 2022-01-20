@@ -160,9 +160,9 @@ namespace Web.Services.Concrete
 
                                     var obj = new UsersSchedule()
                                     {
-                                        ScheduleDate = StartDateTime.Date.ToUniversalTime(),
-                                        ScheduleDateStart = StartDateTime.ToUniversalTime(),
-                                        ScheduleDateEnd = EndDateTime.ToUniversalTime(),
+                                        ScheduleDate = StartDateTime.Date.ToUniversalTimeZone(),
+                                        ScheduleDateStart = StartDateTime.ToUniversalTimeZone(),
+                                        ScheduleDateEnd = EndDateTime.ToUniversalTimeZone(),
                                         UserIdFk = userId,
                                         ServiceLineIdFk = fileVM.ServiceLineId,
                                         CreatedBy = fileVM.LoggedinUserId,
