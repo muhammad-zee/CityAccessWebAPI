@@ -355,27 +355,34 @@ namespace Web.Services.Concrete
                 var row = _scheduleRepo.Table.Where(x => !x.IsDeleted && x.UsersScheduleId == schedule.ScheduleId).FirstOrDefault();
                 if (row != null)
                 {
-                    string startDateTimeStr = row.ScheduleDateStart.ToString("MM-dd-yyyy") + " " + schedule.StartTime.ToString("hh:mm:ss tt");
-                    string endDateTimeStr = row.ScheduleDateEnd.ToString("MM-dd-yyyy") + " " + schedule.EndTime.ToString("hh:mm:ss tt");
-
-                    DateTime? startDateTime = Convert.ToDateTime(startDateTimeStr);
-                    DateTime? endDateTime = Convert.ToDateTime(endDateTimeStr);
-
-                    if (startDateTime.Value.TimeOfDay > endDateTime.Value.TimeOfDay)
+                    if (_scheduleRepo.Table.Any(x => x.ScheduleDate.Value.Date == schedule.FromDate.Date && !x.IsDeleted))
                     {
-                        endDateTime.Value.AddDays(1);
+                        string startDateTimeStr = schedule.FromDate.ToString("MM-dd-yyyy") + " " + schedule.StartTime.ToString("hh:mm:ss tt");
+                        string endDateTimeStr = schedule.ToDate.ToString("MM-dd-yyyy") + " " + schedule.EndTime.ToString("hh:mm:ss tt");
+
+                        DateTime? startDateTime = Convert.ToDateTime(startDateTimeStr);
+                        DateTime? endDateTime = Convert.ToDateTime(endDateTimeStr);
+
+                        if (startDateTime.Value.TimeOfDay > endDateTime.Value.TimeOfDay)
+                        {
+                            endDateTime.Value.AddDays(1);
+                        }
+
+                        row.ScheduleDate = startDateTime.Value.ToUniversalTimeZone();
+                        row.ScheduleDateStart = startDateTime.Value.ToUniversalTimeZone();
+                        row.ScheduleDateEnd = endDateTime.Value.ToUniversalTimeZone();
+                        row.ModifiedBy = schedule.ModifiedBy;
+                        row.ModifiedDate = DateTime.UtcNow;
+                        row.IsDeleted = false;
+
+                        _scheduleRepo.Update(row);
+
+                        return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Schedule Updated" };
                     }
-
-                    row.ScheduleDate = startDateTime.Value.ToUniversalTimeZone();
-                    row.ScheduleDateStart = startDateTime.Value.ToUniversalTimeZone();
-                    row.ScheduleDateEnd = endDateTime.Value.ToUniversalTimeZone();
-                    row.ModifiedBy = schedule.ModifiedBy;
-                    row.ModifiedDate = DateTime.UtcNow;
-                    row.IsDeleted = false;
-
-                    _scheduleRepo.Update(row);
-
-                    return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Schedule Updated" };
+                    else 
+                    {
+                        return new BaseResponse() { Status = HttpStatusCode.NotModified, Message = "Schedule Already Exist on this date" };
+                    }
                 }
                 else
                 {
