@@ -355,8 +355,8 @@ namespace Web.Services.Concrete
                 var row = _scheduleRepo.Table.Where(x => !x.IsDeleted && x.UsersScheduleId == schedule.ScheduleId).FirstOrDefault();
                 if (row != null)
                 {
-                    string startDateTimeStr = row.ScheduleDateStart.ToString("MM-dd-yyyy") + " " + schedule.StartTime.ToString("hh:mm:ss tt");
-                    string endDateTimeStr = row.ScheduleDateEnd.ToString("MM-dd-yyyy") + " " + schedule.EndTime.ToString("hh:mm:ss tt");
+                    string startDateTimeStr = schedule.FromDate.ToString("MM-dd-yyyy") + " " + schedule.StartTime.ToString("hh:mm:ss tt");
+                    string endDateTimeStr = schedule.ToDate.ToString("MM-dd-yyyy") + " " + schedule.EndTime.ToString("hh:mm:ss tt");
 
                     DateTime? startDateTime = Convert.ToDateTime(startDateTimeStr);
                     DateTime? endDateTime = Convert.ToDateTime(endDateTimeStr);
