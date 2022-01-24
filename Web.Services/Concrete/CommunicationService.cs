@@ -37,17 +37,30 @@ namespace Web.Services.Concrete
         private string Twilio_ChatApiKey;
         private string Twilio_ChatApiKeySecret;
 
+        private IRepository<Role> _role;
+        private IRepository<UserRole> _userRole;
+
+
 
         private IConfiguration _config;
         private RAQ_DbContext _dbContext;
         private readonly IRepository<User> _userRepo;
         private readonly IRepository<ConversationChannel> _conversationChannelsRepo;
         private readonly IRepository<ConversationParticipant> _conversationParticipantsRepo;
+        private IRepository<UsersRelation> _userRelationRepo;
+        private IRepository<ServiceLine> _serviceLineRepo;
+
+
         public CommunicationService(IConfiguration config,
-             RAQ_DbContext dbContext,
-        IRepository<User> userRepo,
+            RAQ_DbContext dbContext,
+            IRepository<User> userRepo,
             IRepository<ConversationChannel> conversationChannelsRepo,
-            IRepository<ConversationParticipant> conversationParticipantsRepo)
+            IRepository<ConversationParticipant> conversationParticipantsRepo,
+            IRepository<Role> role,
+            IRepository<UserRole> userRole,
+            IRepository<UsersRelation> userRelationRepo,
+            IRepository<ServiceLine> serviceLineRepo
+            )
         {
 
             this._config = config;
@@ -65,6 +78,13 @@ namespace Web.Services.Concrete
             this._userRepo = userRepo;
             this._conversationChannelsRepo = conversationChannelsRepo;
             this._conversationParticipantsRepo = conversationParticipantsRepo;
+
+
+            this._role = role;
+            this._userRole = userRole;
+            this._userRelationRepo = userRelationRepo;
+            this._serviceLineRepo = serviceLineRepo;
+
         }
 
         #region [SMS sending]
@@ -400,10 +420,33 @@ namespace Web.Services.Concrete
         public BaseResponse getAllConversationUsers()
         {
 
-            var chatUsers = this._userRepo.Table.Where(u => u.IsDeleted != true && u.IsActive == true && !string.IsNullOrEmpty(u.UserChannelSid));
-            //   var chatUsers = this._dbContext.LoadStoredProcedure("raq_getAllConversationUsers")
-            //.WithSqlParam("@pRoleId", ApplicationSettings.RoleIds)
-            //.ExecuteStoredProc<User>().AsQueryable();
+            //var chatusers = this._userrepo.table.where(u => u.isdeleted != true && u.isactive == true && !string.isnullorempty(u.userchannelsid));
+            var chatUsers = this._dbContext.LoadStoredProcedure("raq_getAllConversationUsers")
+         .WithSqlParam("@proleid", ApplicationSettings.RoleIds)
+         .ExecuteStoredProc<ChatUsersVM>();
+            foreach (var user in chatUsers)
+            {
+                user.UserRoles = (from ur in this._userRole.Table
+                                  join r in this._role.Table on ur.RoleIdFk equals r.RoleId
+                                  where ur.UserIdFk == user.UserId && !r.IsDeleted
+                                  select new UserRoleVM
+                                  {
+                                      RoleId = ur.RoleIdFk,
+                                      RoleName = r.RoleName,
+                                      OrganizationIdFk = r.OrganizationIdFk
+                                  }).ToList();
+
+                user.ServiceLines = (from sl in this._serviceLineRepo.Table
+                                     join ur in this._userRelationRepo.Table
+                                     on sl.ServiceLineId equals ur.ServiceLineIdFk
+                                     where sl.IsDeleted != true && ur.UserIdFk == user.UserId
+                                     select new ServiceLineVM
+                                     {
+                                         ServiceLineId = sl.ServiceLineId,
+                                         ServiceName = sl.ServiceName,
+                                     }).ToList();
+            }
+
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Chat users found", Body = chatUsers };
         }
 
