@@ -400,10 +400,10 @@ namespace Web.Services.Concrete
         public BaseResponse getAllConversationUsers()
         {
 
-            //var chatUsers = this._userRepo.Table.Where(u => u.IsDeleted != true && u.IsActive == true && !string.IsNullOrEmpty(u.UserChannelSid));
-            var chatUsers = this._dbContext.LoadStoredProcedure("raq_getAllConversationUsers")
-         .WithSqlParam("@pRoleId", ApplicationSettings.RoleIds)
-         .ExecuteStoredProc<User>().AsQueryable();
+            var chatUsers = this._userRepo.Table.Where(u => u.IsDeleted != true && u.IsActive == true && !string.IsNullOrEmpty(u.UserChannelSid));
+            //   var chatUsers = this._dbContext.LoadStoredProcedure("raq_getAllConversationUsers")
+            //.WithSqlParam("@pRoleId", ApplicationSettings.RoleIds)
+            //.ExecuteStoredProc<User>().AsQueryable();
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Chat users found", Body = chatUsers };
         }
 
