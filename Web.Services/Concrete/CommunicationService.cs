@@ -451,6 +451,34 @@ namespace Web.Services.Concrete
         }
 
         #endregion
+
+
+        #region [Video Call]
+        public BaseResponse GenerateVideoCallToken(string identity)
+        {
+            BaseResponse response = new BaseResponse();
+            TwilioClient.Init(this.Twilio_AccountSid, this.Twilio_AuthToken);
+         
+
+
+            // Create a video grant for the token
+            var grant = new VideoGrant();
+            grant.Room = null;//Request.QueryString["room"];
+            var grants = new HashSet<IGrant> { grant };
+
+            // Create an Access Token generator
+            var token = new Token(this.Twilio_AccountSid, 
+                this.Twilio_ChatApiKey, 
+                this.Twilio_ChatApiKeySecret, 
+                identity: identity, 
+                grants: grants);
+
+            response.Status = HttpStatusCode.OK;
+            response.Message = "Token Generated";
+            response.Body = new { identity = identity, token = token.ToJwt() };
+            return response;
+        }
+        #endregion
     }
 
 
