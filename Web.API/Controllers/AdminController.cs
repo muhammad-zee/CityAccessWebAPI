@@ -272,7 +272,7 @@ namespace Web.API.Controllers
         }
 
         [HttpPost("admin/SaveRole")]
-        public BaseResponse SaveRole([FromBody] RoleVM role)
+        public BaseResponse SaveRole([FromBody] List<RoleVM> role)
         {
             try
             {
