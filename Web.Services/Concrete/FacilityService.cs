@@ -375,13 +375,6 @@ namespace Web.Services.Concrete
             }
             else
             {
-                //organizations = (from ur in _userRelationRepo.Table
-                //                 join s in _serviceRepo.Table on ur.ServiceLineIdFk equals s.ServiceLineId
-                //                 join d in _departmentRepo.Table on s.DepartmentIdFk equals d.DepartmentId
-                //                 join o in _organizationRepo.Table on d.OrganizationIdFk equals o.OrganizationId
-                //                 where ur.UserIdFk == ApplicationSettings.UserId && !o.IsDeleted && !d.IsDeleted && !s.IsDeleted
-                //                 select o).Distinct().ToList();
-
                 organizations = (from ur in this._userRoleRepo.Table
                                  join r in this._roleRepo.Table on ur.RoleIdFk equals r.RoleId
                                  join o in this._organizationRepo.Table on r.OrganizationIdFk equals o.OrganizationId
@@ -925,7 +918,7 @@ namespace Web.Services.Concrete
 
                     holiday.ServicelineIdFk = clinicalHoliday.ServicelineIdFk;
                     holiday.StartDate = clinicalHoliday.StartDate;
-                    holiday.EndDate = clinicalHoliday.EndDate ;
+                    holiday.EndDate = clinicalHoliday.EndDate;
                     holiday.Description = clinicalHoliday.Description;
                     holiday.ModifiedBy = clinicalHoliday.ModifiedBy;
                     holiday.ModifiedDate = DateTime.UtcNow;
@@ -944,7 +937,7 @@ namespace Web.Services.Concrete
                 //insert
 
 
-                
+
 
                 var holiday = AutoMapperHelper.MapSingleRow<ClinicalHolidayVM, ClinicalHoliday>(clinicalHoliday);
                 holiday.CreatedDate = DateTime.UtcNow;

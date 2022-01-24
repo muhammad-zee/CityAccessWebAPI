@@ -56,14 +56,17 @@ namespace Web.Model.Common
         public List<int> DptIdsList { get; set; }
         public List<int> ServiceLineIdsList { get; set; }
 
-        public List<keysVM> selectedNodes { get; set; }
-        public List<keysVM> selectedRoles { get; set; }
-
+        public List<UserProfileSchedulesVM> UserProfileSchedules { get; set; }
         public List<UserRoleVM> UserRole { get; set; }
     }
 
-    public class keysVM
+    public class UserProfileSchedulesVM
     {
-        public string Key { get; set; }
+        public string RoleName { get; set; }
+        public string ServiceLine { get; set; }
+        public DateTime? ScheduleDate { get; set; }
+        public DateTime? StartTime { get; set; }
+        public DateTime? EndTime { get; set; }
+        public string DayOfWeek { get; set; }
     }
 }
