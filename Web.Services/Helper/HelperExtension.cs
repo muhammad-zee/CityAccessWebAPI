@@ -55,6 +55,7 @@ namespace Web.Services.Helper
             if (source.ContainsKey(node.key))
             {
                 node.children = source[node.key];
+                node.expanded = false;
                 for (int i = 0; i < node.children.Count; i++)
                     AddChildren(node.children[i], source);
             }

@@ -321,37 +321,42 @@ namespace Web.Services.Concrete
             }
             return userRoles;
         }
-        public string SaveRole(RoleVM role)
+        public string SaveRole(List<RoleVM> roles)
         {
             string response = string.Empty;
-            if (role.RoleId == 0)
+
+            foreach (var role in roles)
             {
-                var newRole = AutoMapperHelper.MapSingleRow<RoleVM, Role>(role);
-                if (_role.Table.Count(r => r.RoleName == role.RoleName && r.OrganizationIdFk == role.OrganizationIdFk && !r.IsDeleted) == 0)
+                if (role.RoleId == 0)
                 {
-                    _role.Insert(newRole);
-                    response = StatusEnums.Success.ToString();
+                    var newRole = AutoMapperHelper.MapSingleRow<RoleVM, Role>(role);
+                    if (_role.Table.Count(r => r.RoleName == role.RoleName && r.OrganizationIdFk == role.OrganizationIdFk && !r.IsDeleted) == 0)
+                    {
+                        _role.Insert(newRole);
+                        response = StatusEnums.Success.ToString();
+                    }
+                    else
+                    {
+                        response = StatusEnums.AlreadyExist.ToString();
+                    }
+
                 }
                 else
                 {
-                    response = StatusEnums.AlreadyExist.ToString();
+                    var newRole = _role.Table.Where(r => r.RoleId == role.RoleId && !r.IsDeleted).FirstOrDefault();
+                    newRole.RoleName = role.RoleName;
+                    newRole.RoleDescription = role.RoleDescription;
+                    newRole.RoleDiscrimination = role.RoleDiscrimination;
+                    newRole.IsScheduleRequired = role.IsScheduleRequired;
+                    newRole.OrganizationIdFk = role.OrganizationIdFk;
+                    newRole.ModifiedDate = DateTime.UtcNow;
+                    newRole.IsScheduleRequired = role.IsScheduleRequired;
+                    newRole.ModifiedBy = role.ModifiedBy;
+
+                    _role.Update(newRole);
+                    response = StatusEnums.Success.ToString();
                 }
 
-            }
-            else
-            {
-                var newRole = _role.Table.Where(r => r.RoleId == role.RoleId && !r.IsDeleted).FirstOrDefault();
-                newRole.RoleName = role.RoleName;
-                newRole.RoleDescription = role.RoleDescription;
-                newRole.RoleDiscrimination = role.RoleDiscrimination;
-                newRole.IsScheduleRequired = role.IsScheduleRequired;
-                newRole.OrganizationIdFk = role.OrganizationIdFk;
-                newRole.ModifiedDate = DateTime.UtcNow;
-                newRole.IsScheduleRequired = role.IsScheduleRequired;
-                newRole.ModifiedBy = role.ModifiedBy;
-
-                _role.Update(newRole);
-                response = StatusEnums.Success.ToString();
             }
 
             return response;

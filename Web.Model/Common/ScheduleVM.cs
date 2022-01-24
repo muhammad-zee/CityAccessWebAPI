@@ -60,7 +60,7 @@ namespace Web.Model.Common
         public DateTime CreatedDate { get; set; }
         public int ModifiedBy { get; set; }
         public DateTime ModifiedDate { get; set; }
-
+        public List<DateTime> SelectiveDates { get; set; }
 
         public int selectedOrganizationId { get; set; }
         public string selectedService { get; set; }

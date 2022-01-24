@@ -539,17 +539,12 @@ namespace Web.Services.Concrete
                 }
                 else if (schedule.DateRangeId == 4)
                 {
-                    //DateTime now = DateTime.UtcNow;
-                    var startDate = schedule.FromDate;//new DateTime(now.Year, now.Month, 1);
-                    var endDate = startDate.AddMonths(1).AddDays(-1);
-
-
-                    while (true)
+                    if (schedule.SelectiveDates.Count > 0)
                     {
-                        if (startDate <= endDate)
+                        foreach (var item in schedule.SelectiveDates)
                         {
-                            string startDateTimeStr = startDate.ToString("MM-dd-yyyy") + " " + schedule.StartTime.ToString("hh:mm:ss tt");
-                            string endDateTimeStr = startDate.ToString("MM-dd-yyyy") + " " + schedule.EndTime.ToString("hh:mm:ss tt");
+                            string startDateTimeStr = item.ToString("MM-dd-yyyy") + " " + schedule.StartTime.ToString("hh:mm:ss tt");
+                            string endDateTimeStr = item.ToString("MM-dd-yyyy") + " " + schedule.EndTime.ToString("hh:mm:ss tt");
 
                             DateTime? StartDateTime = Convert.ToDateTime(startDateTimeStr);
                             DateTime? EndDateTime = Convert.ToDateTime(endDateTimeStr);
@@ -588,14 +583,68 @@ namespace Web.Services.Concrete
                                     }
                                 }
                             }
-                            startDate = startDate.AddDays(1);
-                        }
-                        else
-                        {
-                            break;
                         }
                     }
+                    else 
+                    {
+                        //DateTime now = DateTime.UtcNow;
+                        var startDate = schedule.FromDate;//new DateTime(now.Year, now.Month, 1);
+                        var endDate = schedule.ToDate;
 
+
+                        while (true)
+                        {
+                            if (startDate <= endDate)
+                            {
+                                string startDateTimeStr = startDate.ToString("MM-dd-yyyy") + " " + schedule.StartTime.ToString("hh:mm:ss tt");
+                                string endDateTimeStr = startDate.ToString("MM-dd-yyyy") + " " + schedule.EndTime.ToString("hh:mm:ss tt");
+
+                                DateTime? StartDateTime = Convert.ToDateTime(startDateTimeStr);
+                                DateTime? EndDateTime = Convert.ToDateTime(endDateTimeStr);
+
+                                if (StartDateTime.Value.TimeOfDay > EndDateTime.Value.TimeOfDay)
+                                {
+                                    EndDateTime = EndDateTime.Value.AddDays(1);
+                                }
+
+                                foreach (var user in userIds)
+                                {
+                                    foreach (var role in roleIds)
+                                    {
+                                        var alreadyExist = _scheduleRepo.Table.Where(x => x.UserIdFk == user && x.RoleIdFk == role && x.ServiceLineIdFk == schedule.ServiceLineIdFk && x.ScheduleDate.Value.Date == StartDateTime.Value.Date && !x.IsDeleted).ToList();
+                                        if (alreadyExist.Count > 0)
+                                        {
+                                            alreadyExist.ForEach(x => { x.IsDeleted = true; x.ModifiedBy = schedule.CreatedBy; x.ModifiedDate = DateTime.UtcNow; });
+                                            _scheduleRepo.Update(alreadyExist);
+                                        }
+                                        if (_userRelationRepo.Table.Any(x => x.UserIdFk == user && x.ServiceLineIdFk == schedule.ServiceLineIdFk) && _userRoleRepo.Table.Any(x => x.UserIdFk == user && x.RoleIdFk == role))
+                                        {
+                                            var userSchedule = new UsersSchedule()
+                                            {
+                                                ScheduleDate = StartDateTime.Value.ToUniversalTimeZone(),
+                                                ScheduleDateStart = StartDateTime.Value.ToUniversalTimeZone(),
+                                                ScheduleDateEnd = EndDateTime.Value.ToUniversalTimeZone(),
+                                                ServiceLineIdFk = schedule.ServiceLineIdFk,
+                                                UserIdFk = user,
+                                                RoleIdFk = role,
+                                                CreatedBy = schedule.CreatedBy,
+                                                CreatedDate = DateTime.UtcNow,
+                                                IsDeleted = false,
+                                            };
+
+                                            usersSchedules.Add(userSchedule);
+                                        }
+                                    }
+                                }
+                                startDate = startDate.AddDays(1);
+                            }
+                            else
+                            {
+                                break;
+                            }
+                        }
+
+                    }
                 }
                 else if (schedule.DateRangeId == 5)
                 {
