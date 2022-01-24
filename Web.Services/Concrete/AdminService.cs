@@ -26,6 +26,7 @@ namespace Web.Services.Concrete
         private IRepository<ComponentAccess> _componentAccess;
         private IRepository<UserAccess> _userAccess;
         private IRepository<UserRole> _userRole;
+        private IRepository<UsersSchedule> _userScheduleRepo;
 
         private IRepository<ServiceLine> _serviceRepo;
         private IRepository<Department> _departmentRepo;
@@ -41,6 +42,7 @@ namespace Web.Services.Concrete
             IRepository<User> user,
             IRepository<Role> role,
             IRepository<UserRole> userRole,
+            IRepository<UsersSchedule> userScheduleRepo,
             IRepository<ServiceLine> serviceRepo,
             IRepository<Department> departmentRepo,
             IRepository<Organization> organizationRepo,
@@ -57,6 +59,7 @@ namespace Web.Services.Concrete
             this._user = user;
             this._role = role;
             this._userRole = userRole;
+            this._userScheduleRepo = userScheduleRepo;
             this._serviceRepo = serviceRepo;
             this._departmentRepo = departmentRepo;
             this._organizationRepo = organizationRepo;
@@ -167,6 +170,23 @@ namespace Web.Services.Concrete
                                      select new ServiceLineVM() { ServiceLineId = s.ServiceLineId, ServiceName = s.ServiceName, DepartmentIdFk = s.DepartmentIdFk }).ToList();
                 user.Departments = _departmentRepo.Table.Where(x => user.UserServices.Select(y => y.DepartmentIdFk).Contains(x.DepartmentId) && !x.IsDeleted).Select(x => new DepartmentVM() { DepartmentId = x.DepartmentId, DepartmentName = x.DepartmentName, OrganizationIdFk = x.OrganizationIdFk }).ToList();
                 user.Organizations = user.Departments.Count > 0 ? _organizationRepo.Table.Where(x => user.Departments.Select(z => z.OrganizationIdFk).Contains(x.OrganizationId)).Select(x => new OrganizationVM() { OrganizationId = x.OrganizationId, OrganizationName = x.OrganizationName }).ToList() : this._organizationRepo.Table.Where(x => this._role.Table.Where(r => user.UserRole.Select(id => id.RoleId).Contains(r.RoleId) && !r.IsDeleted).Select(r => r.OrganizationIdFk).Contains(x.OrganizationId) && !x.IsDeleted).Select(x => new OrganizationVM() { OrganizationId = x.OrganizationId, OrganizationName = x.OrganizationName }).ToList();
+
+                var schedule = this._userScheduleRepo.Table.Where(x => user.UserRole.Select(r => r.RoleId).Contains(x.RoleIdFk) && user.UserServices.Select(u => u.ServiceLineId).Contains(x.ServiceLineIdFk.Value) && x.UserIdFk == Id && x.ScheduleDate.Value.Date >= DateTime.UtcNow.Date && !x.IsDeleted).ToList();
+
+                List<UserProfileSchedulesVM> UserProfileSchedules = new();
+                foreach (var item in schedule)
+                {
+                    UserProfileSchedulesVM userProfile = new();
+                    userProfile.RoleName = user.UserRole.Where(x => x.RoleId == item.RoleIdFk).Select(x => x.RoleName).FirstOrDefault();
+                    userProfile.ServiceLine = user.UserServices.Where(x => x.ServiceLineId == item.ServiceLineIdFk).Select(x => x.ServiceName).FirstOrDefault();
+                    userProfile.ScheduleDate = item.ScheduleDate;
+                    userProfile.StartTime = item.ScheduleDateStart;
+                    userProfile.EndTime = item.ScheduleDateEnd;
+                    userProfile.DayOfWeek = item.ScheduleDate.Value.Date == DateTime.UtcNow.Date ? "Today" : (item.ScheduleDate.Value.Date == DateTime.UtcNow.AddDays(1).Date ? "Tomorrow" : item.ScheduleDate.Value.DayOfWeek.ToString());
+                    UserProfileSchedules.Add(userProfile);
+                }
+
+                user.UserProfileSchedules = UserProfileSchedules;
 
                 return new BaseResponse { Status = HttpStatusCode.OK, Message = "User Found", Body = user };
             }
