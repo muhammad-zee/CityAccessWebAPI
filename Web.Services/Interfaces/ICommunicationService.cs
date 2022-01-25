@@ -14,6 +14,7 @@ namespace Web.Services.Interfaces
         BaseResponse deleteChatChannel(string ChannelSid);
         BaseResponse deleteConversationChannel(string ChannelSid, int UserId);
         BaseResponse deleteConversationParticipant(string ChannelSid, string ParticipantUniqueName, int UserId);
+        BaseResponse addUserToChannelUsingApi(string ChannelUniqueName, string ParticipantUniqueName, int UserId);
         BaseResponse getAllConversationUsers();
         bool SendSms(string ToPhoneNumber, string SmsBody);
         bool SendEmail(string To, string Subject, string HtmlContent, byte[] ImageContent);

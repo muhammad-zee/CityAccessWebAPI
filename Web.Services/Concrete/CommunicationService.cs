@@ -12,6 +12,9 @@ using Twilio.AspNet.Common;
 using Twilio.Jwt.AccessToken;
 using Twilio.Rest.Api.V2010.Account;
 using Twilio.Rest.Chat.V2.Service;
+using Twilio.Rest.Chat.V2.Service.Channel;
+using Twilio.Rest.Conversations.V1;
+using Twilio.Rest.Conversations.V1.Conversation;
 using Twilio.Types;
 using Web.Data.Models;
 using Web.DLL.Generic_Repository;
@@ -20,6 +23,7 @@ using Web.Model.Common;
 using Web.Services.Enums;
 using Web.Services.Helper;
 using Web.Services.Interfaces;
+using conversationResource = Twilio.Rest.Conversations.V1;
 
 namespace Web.Services.Concrete
 {
@@ -49,7 +53,6 @@ namespace Web.Services.Concrete
         private readonly IRepository<ConversationParticipant> _conversationParticipantsRepo;
         private IRepository<UsersRelation> _userRelationRepo;
         private IRepository<ServiceLine> _serviceLineRepo;
-
 
         public CommunicationService(IConfiguration config,
             RAQ_DbContext dbContext,
@@ -114,7 +117,7 @@ namespace Web.Services.Concrete
             try
             {
                 TwilioClient.Init(this.Twilio_AccountSid, this.Twilio_AuthToken);
-                var messageResource = await MessageResource.CreateAsync(
+                var messageResource = await Twilio.Rest.Api.V2010.Account.MessageResource.CreateAsync(
                     to: new PhoneNumber(sr.To),
                     from: new PhoneNumber(sr.From),
                     body: sr.Body
@@ -243,7 +246,7 @@ namespace Web.Services.Concrete
         public BaseResponse sendPushNotification(ConversationMessageVM msg)
         {
             TwilioClient.Init(this.Twilio_AccountSid, this.Twilio_AuthToken);
-            var Notify = Twilio.Rest.Conversations.V1.Service.Conversation.MessageResource.Create(
+            var Notify = conversationResource.Service.Conversation.MessageResource.Create(
                                        author: msg.author,
                                        body: msg.body,
                                        attributes: msg.attributes,
@@ -423,6 +426,44 @@ namespace Web.Services.Concrete
                 }
             }
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Participant Removed" };
+        }
+        public BaseResponse addUserToChannelUsingApi(string ChannelUniqueName, string ParticipantUniqueName, int UserId)
+        {
+            var dbChannel = this._conversationChannelsRepo.Table.FirstOrDefault(c => c.UniqueName == ChannelUniqueName && c.IsDeleted != true);
+            if (dbChannel != null)
+            {
+                var participant = this._userRepo.Table.FirstOrDefault(u => u.IsDeleted != true && u.UserUniqueId == ParticipantUniqueName);
+               TwilioClient.Init(this.Twilio_AccountSid, this.Twilio_AuthToken);
+
+                //var conversations = ConversationResource.Fetch(pathSid: dbChannel.ChannelSid);
+                var channel = ChannelResource.Fetch(pathServiceSid: this.Twilio_ChatServiceSid, pathSid: dbChannel.ChannelSid);
+
+
+                //         var addParticipant = ParticipantResource.Create(
+                //    identity: ParticipantUniqueName,
+                //    pathConversationSid: conversations.Sid
+                //);
+                var addParticipant = MemberResource.Create(
+                            identity: ParticipantUniqueName,
+                            pathServiceSid: this.Twilio_ChatServiceSid,
+                            pathChannelSid: channel.Sid
+                );
+
+                var newParticipant = new ConversationChannelParticipantsVM
+                {
+                    UserId = participant.UserId,
+                    Participants = new List<string> { participant.UserUniqueId },
+                    ChannelSid = channel.Sid,
+                    CreatedBy = UserId
+                };
+                var insertParticipantIntoDb = this.saveConversationChannelParticipants(newParticipant);
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Participant Added" };
+            }
+            else
+            {
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = "Channel Not Found" };
+            }
+            
         }
         public BaseResponse getAllConversationUsers()
         {
