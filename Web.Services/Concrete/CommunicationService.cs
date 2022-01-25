@@ -311,18 +311,23 @@ namespace Web.Services.Concrete
                 foreach (var p in model.Participants)
                 {
                     user = this._userRepo.Table.FirstOrDefault(u => u.IsDeleted != true && u.IsActive == true && u.UserUniqueId == p);
-                    newParticipant = new ConversationParticipant()
+                    bool participantExists = this._conversationParticipantsRepo.Table.Count(cp => cp.IsDeleted != true && cp.UserIdFk == user.UserId && cp.ConversationChannelIdFk == channel.ConversationChannelId && cp.UniqueName == p) > 0;
+                    if (!participantExists)
                     {
-                        FriendlyName = user.FirstName + " " + user.LastName,
-                        UniqueName = p,
-                        UserIdFk = user.UserId,
-                        ConversationChannelIdFk = channel.ConversationChannelId,
-                        CreatedBy = model.CreatedBy,
-                        CreatedDate = DateTime.UtcNow,
-                        IsDeleted = false
+                        newParticipant = new ConversationParticipant()
+                        {
+                            FriendlyName = user.FirstName + " " + user.LastName,
+                            UniqueName = p,
+                            UserIdFk = user.UserId,
+                            ConversationChannelIdFk = channel.ConversationChannelId,
+                            CreatedBy = model.CreatedBy,
+                            CreatedDate = DateTime.UtcNow,
+                            IsDeleted = false
 
-                    };
-                    channelParticipantsList.Add(newParticipant);
+                        };
+
+                        channelParticipantsList.Add(newParticipant);
+                    }
                 }
                 this._conversationParticipantsRepo.Insert(channelParticipantsList);
 
@@ -409,11 +414,13 @@ namespace Web.Services.Concrete
             if (dbChannel != null)
             {
                 var participant = this._conversationParticipantsRepo.Table.FirstOrDefault(p => p.UniqueName == ParticipantUniqueName && p.ConversationChannelIdFk == dbChannel.ConversationChannelId && p.IsDeleted != true);
+                if(participant!= null)
+                {
                 participant.IsDeleted = true;
                 participant.ModifiedBy = UserId;
                 participant.ModifiedDate = DateTime.UtcNow;
-
                 this._conversationParticipantsRepo.Update(participant);
+                }
             }
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Participant Removed" };
         }
