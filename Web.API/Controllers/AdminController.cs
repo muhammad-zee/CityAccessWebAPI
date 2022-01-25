@@ -70,6 +70,23 @@ namespace Web.API.Controllers
             }
 
         }
+
+        [Description("Get Users For Dashboard")]
+        [HttpPost("admin/GetSchedulesForCurrentDate")]
+        public BaseResponse GetSchedulesForCurrentDate([FromBody] ScheduleVM schedule) 
+        {
+            try
+            {
+                return _adminService.GetSchedulesForCurrentDate(schedule);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = ex.ToString() };
+            }
+        }
+
         #endregion
 
         #region Users

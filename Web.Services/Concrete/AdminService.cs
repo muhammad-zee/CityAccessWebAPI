@@ -144,13 +144,18 @@ namespace Web.Services.Concrete
             }
         }
 
-        //public BaseResponse GetSchedulesForCurrentDate() 
-        //{
-        //    if (ApplicationSettings.isSuperAdmin) 
-        //    { 
-                
-        //    }
-        //}
+        public BaseResponse GetSchedulesForCurrentDate(ScheduleVM schedule)
+        {
+            var scheduleList = this._dbContext.LoadStoredProcedure("raq_getScheduleListForDashboard")
+                            .WithSqlParam("@orgId", schedule.selectedOrganizationId)
+                            .WithSqlParam("@serviceLineIds", schedule.selectedService)
+                            .WithSqlParam("@roleIds", schedule.selectedRole)
+                            .WithSqlParam("@userIds", schedule.selectedUser)
+                            .ExecuteStoredProc<ScheduleListVM>();
+
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Found", Body = scheduleList };
+        }
+
 
         #endregion
 
