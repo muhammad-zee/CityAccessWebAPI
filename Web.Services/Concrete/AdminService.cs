@@ -82,6 +82,56 @@ namespace Web.Services.Concrete
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Found", Body = LabelCounts };
         }
 
+        public BaseResponse GetUsersForDashBoard() 
+        {
+            if (ApplicationSettings.isSuperAdmin)
+            {
+                var users = (from u in _user.Table
+                             join ur in _userRole.Table on u.UserId equals ur.UserIdFk
+                             join r in _role.Table on ur.RoleIdFk equals r.RoleId
+                             where !u.IsDeleted && !r.IsDeleted && !r.IsSuperAdmin && r.IsScheduleRequired
+                             select new RegisterCredentialVM() { UserId = u.UserId, FirstName = u.FirstName, LastName = u.LastName, UserImage = u.UserImage }).Distinct().ToList();
+
+                
+                users.ForEach(x => x.UserRole = (from ur in _userRole.Table
+                                                 join r in _role.Table on ur.RoleIdFk equals r.RoleId
+                                                 join o in _organizationRepo.Table on r.OrganizationIdFk equals o.OrganizationId
+                                                 where ur.UserIdFk == x.UserId && !r.IsDeleted && !o.IsDeleted
+                                                 select new UserRoleVM()
+                                                 {
+                                                     RoleId = r.RoleId,
+                                                     RoleName = r.RoleName + " | " + o.OrganizationName
+                                                 }).Distinct().ToList());
+
+                return new BaseResponse { Status = HttpStatusCode.OK, Message = "Users List Returned", Body = users };
+            }
+            else 
+            {
+                var orgIds = (from r in _role.Table
+                              join ur in _userRole.Table on r.RoleId equals ur.RoleIdFk
+                              where ur.UserIdFk == ApplicationSettings.UserId && !r.IsDeleted && !r.IsSuperAdmin && r.IsScheduleRequired
+                              select r.OrganizationIdFk).Distinct().ToList();
+
+                var users = (from u in _user.Table
+                             join ur in _userRole.Table on u.UserId equals ur.UserIdFk
+                             join r in _role.Table on ur.RoleIdFk equals r.RoleId
+                             where orgIds.Contains(r.OrganizationIdFk) && !u.IsDeleted && !r.IsDeleted && !r.IsSuperAdmin && r.IsScheduleRequired
+                             select new RegisterCredentialVM() { UserId = u.UserId, FirstName = u.FirstName, LastName = u.LastName, UserImage = u.UserImage }).Distinct().ToList();
+
+                users.ForEach(x => x.UserRole = (from ur in _userRole.Table
+                                                 join r in _role.Table on ur.RoleIdFk equals r.RoleId
+                                                 join o in _organizationRepo.Table on r.OrganizationIdFk equals o.OrganizationId
+                                                 where ur.UserIdFk == x.UserId && !r.IsDeleted && !o.IsDeleted
+                                                 select new UserRoleVM()
+                                                 {
+                                                     RoleId = r.RoleId,
+                                                     RoleName = r.RoleName + " | " + o.OrganizationName
+                                                 }).Distinct().ToList());
+
+                return new BaseResponse { Status = HttpStatusCode.OK, Message = "Users List Returned", Body = users };
+            }
+        }
+
         #endregion
 
 
