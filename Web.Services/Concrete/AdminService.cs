@@ -92,16 +92,22 @@ namespace Web.Services.Concrete
                              where !u.IsDeleted && !r.IsDeleted && !r.IsSuperAdmin && r.IsScheduleRequired
                              select new RegisterCredentialVM() { UserId = u.UserId, FirstName = u.FirstName, LastName = u.LastName, UserImage = u.UserImage }).Distinct().ToList();
 
-                
-                users.ForEach(x => x.UserRole = (from ur in _userRole.Table
-                                                 join r in _role.Table on ur.RoleIdFk equals r.RoleId
-                                                 join o in _organizationRepo.Table on r.OrganizationIdFk equals o.OrganizationId
-                                                 where ur.UserIdFk == x.UserId && !r.IsDeleted && !o.IsDeleted
-                                                 select new UserRoleVM()
-                                                 {
-                                                     RoleId = r.RoleId,
-                                                     RoleName = r.RoleName + " | " + o.OrganizationName
-                                                 }).Distinct().ToList());
+
+                users.ForEach(x => {
+                    x.UserRole = (from ur in _userRole.Table
+                                  join r in _role.Table on ur.RoleIdFk equals r.RoleId
+                                  join o in _organizationRepo.Table on r.OrganizationIdFk equals o.OrganizationId
+                                  where ur.UserIdFk == x.UserId && !r.IsDeleted && !o.IsDeleted
+                                  select new UserRoleVM()
+                                  {
+                                      RoleId = r.RoleId,
+                                      RoleName = r.RoleName + " | " + o.OrganizationName
+                                  }).Distinct().ToList();
+                    x.UserServices = (from ur in _userRelationRepo.Table
+                                      join s in _serviceRepo.Table on ur.ServiceLineIdFk equals s.ServiceLineId
+                                      where ur.UserIdFk == x.UserId && !s.IsDeleted
+                                      select new ServiceLineVM() { ServiceLineId = s.ServiceLineId, ServiceName = s.ServiceName }).Distinct().ToList();
+                });
 
                 return new BaseResponse { Status = HttpStatusCode.OK, Message = "Users List Returned", Body = users };
             }
@@ -118,19 +124,33 @@ namespace Web.Services.Concrete
                              where orgIds.Contains(r.OrganizationIdFk) && !u.IsDeleted && !r.IsDeleted && !r.IsSuperAdmin && r.IsScheduleRequired
                              select new RegisterCredentialVM() { UserId = u.UserId, FirstName = u.FirstName, LastName = u.LastName, UserImage = u.UserImage }).Distinct().ToList();
 
-                users.ForEach(x => x.UserRole = (from ur in _userRole.Table
-                                                 join r in _role.Table on ur.RoleIdFk equals r.RoleId
-                                                 join o in _organizationRepo.Table on r.OrganizationIdFk equals o.OrganizationId
-                                                 where ur.UserIdFk == x.UserId && !r.IsDeleted && !o.IsDeleted
-                                                 select new UserRoleVM()
-                                                 {
-                                                     RoleId = r.RoleId,
-                                                     RoleName = r.RoleName + " | " + o.OrganizationName
-                                                 }).Distinct().ToList());
+                users.ForEach(x => {
+                    x.UserRole = (from ur in _userRole.Table
+                                  join r in _role.Table on ur.RoleIdFk equals r.RoleId
+                                  join o in _organizationRepo.Table on r.OrganizationIdFk equals o.OrganizationId
+                                  where ur.UserIdFk == x.UserId && !r.IsDeleted && !o.IsDeleted
+                                  select new UserRoleVM()
+                                  {
+                                      RoleId = r.RoleId,
+                                      RoleName = r.RoleName + " | " + o.OrganizationName
+                                  }).Distinct().ToList();
+                    x.UserServices = (from ur in _userRelationRepo.Table
+                                      join s in _serviceRepo.Table on ur.ServiceLineIdFk equals s.ServiceLineId
+                                      where ur.UserIdFk == x.UserId && !s.IsDeleted
+                                      select new ServiceLineVM() { ServiceLineId = s.ServiceLineId, ServiceName = s.ServiceName }).Distinct().ToList();
+                });
 
                 return new BaseResponse { Status = HttpStatusCode.OK, Message = "Users List Returned", Body = users };
             }
         }
+
+        //public BaseResponse GetSchedulesForCurrentDate() 
+        //{
+        //    if (ApplicationSettings.isSuperAdmin) 
+        //    { 
+                
+        //    }
+        //}
 
         #endregion
 
