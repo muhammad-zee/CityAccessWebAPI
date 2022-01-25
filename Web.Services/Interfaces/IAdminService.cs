@@ -10,6 +10,8 @@ namespace Web.Services.Interfaces
     {
         #region Dashboard
         BaseResponse GetLabelCounts();
+        BaseResponse GetUsersForDashBoard();
+        BaseResponse GetSchedulesForCurrentDate(ScheduleVM schedule);
 
         #endregion
 
