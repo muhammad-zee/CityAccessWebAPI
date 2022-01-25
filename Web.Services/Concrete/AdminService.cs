@@ -75,7 +75,9 @@ namespace Web.Services.Concrete
         public BaseResponse GetLabelCounts()
         {
             var LabelCounts = this._dbContext.LoadStoredProcedure("raq_getCountOfTablesForDashboard")
-            .ExecuteStoredProc<TableCountsForDashBoardVM>().FirstOrDefault();
+                    .WithSqlParam("@is_SuperAdmin", ApplicationSettings.isSuperAdmin)
+                    .WithSqlParam("@userId", ApplicationSettings.UserId)
+                    .ExecuteStoredProc<TableCountsForDashBoardVM>().FirstOrDefault();
 
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Found", Body = LabelCounts };
         }
