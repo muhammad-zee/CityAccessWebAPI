@@ -191,5 +191,19 @@ namespace Web.API.Controllers
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
         }
+        [HttpGet("Conversation/updateConversationGroup")]
+        public BaseResponse updateConversationGroup(string FriendlyName, string ChannelSid)
+        {
+            try
+            {
+                return this._communicaitonService.updateConversationGroup(FriendlyName, ChannelSid);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
     }
 }

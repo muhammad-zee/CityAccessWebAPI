@@ -465,6 +465,23 @@ namespace Web.Services.Concrete
             }
             
         }
+        public BaseResponse updateConversationGroup(string FriendlyName, string ChannelSid)
+        {
+            var dbChannel = this._conversationChannelsRepo.Table.FirstOrDefault(c => c.ChannelSid == ChannelSid && c.IsDeleted != true);
+            if (dbChannel != null)
+            {
+                dbChannel.FriendlyName = FriendlyName;
+                dbChannel.ModifiedBy = ApplicationSettings.UserId;
+                dbChannel.ModifiedDate = DateTime.UtcNow;
+                this._conversationChannelsRepo.Update(dbChannel);
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Group Updated Successfully" };
+            }
+            else
+            {
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = "Channel Not Found" };
+            }
+            
+        }
         public BaseResponse getAllConversationUsers()
         {
 
