@@ -239,7 +239,7 @@ namespace Web.Services.Concrete
                 user.UserRole = getRoleListByUserId(Id).ToList();
                 user.GenderId = Convert.ToInt32(user.Gender);
                 user.Gender = genders.Where(x => x.ControlListDetailId == user.GenderId).Select(x => x.Title).FirstOrDefault();
-                user.UserImage = user.UserImage.Replace(Directory.GetCurrentDirectory() + "/", "");
+                user.UserImage = user.UserImage?.Replace(Directory.GetCurrentDirectory() + "/", "");
                 user.State = _controlListDetails.Table.Where(x => x.ControlListDetailId == user.StateKey).Select(x => x.Title).FirstOrDefault();
                 user.UserServices = (from us in _userRelationRepo.Table
                                      join s in _serviceRepo.Table on us.ServiceLineIdFk equals s.ServiceLineId
