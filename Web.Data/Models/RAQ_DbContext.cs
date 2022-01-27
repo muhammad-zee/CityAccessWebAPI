@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 #nullable disable
 
@@ -220,9 +222,6 @@ namespace Web.Data.Models
 
             modelBuilder.Entity<ConversationParticipant>(entity =>
             {
-                entity.HasKey(e => e.ChannelsMembersChatId)
-                    .HasName("PK_dbo.AspNetChannelsMembersChat");
-
                 entity.Property(e => e.CreatedDate)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");

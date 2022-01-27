@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 #nullable disable
 
@@ -6,7 +7,7 @@ namespace Web.Data.Models
 {
     public partial class ConversationParticipant
     {
-        public int ChannelsMembersChatId { get; set; }
+        public int ConversationParticipantId { get; set; }
         public string FriendlyName { get; set; }
         public string UniqueName { get; set; }
         public int UserIdFk { get; set; }
