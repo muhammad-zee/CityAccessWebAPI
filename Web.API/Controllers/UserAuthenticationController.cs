@@ -83,6 +83,7 @@ namespace Web.API.Controllers
         }
 
         [Authorize]
+        [RequestHandler]
         [Description("Add or Update User")]
         [HttpPost("auth/SaveUser")]
         public BaseResponse SaveUser([FromBody] RegisterCredentialVM register)
@@ -127,6 +128,7 @@ namespace Web.API.Controllers
 
 
         [Authorize]
+        [RequestHandler]
         [Description("Add or Update Association User")]
         [HttpPost("auth/addOrUpdateAssociation")]
         public BaseResponse AssociationUser([FromBody] RegisterCredentialVM associate)
@@ -146,6 +148,26 @@ namespace Web.API.Controllers
 
 
         #region Reset Password
+
+        [Authorize]
+        [RequestHandler]
+        [Description("Change Password")]
+        [HttpPost("auth/ChangePassword")]
+        public BaseResponse ChangePassword([FromBody] ChangePasswordVM changePassword) 
+        {
+            try
+            {
+                var response = _jwtAuth.ChangePassword(changePassword);
+                return response;
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
         [AllowAnonymous]
         [Description("Send Mail on Forget Password")]
         [HttpPost("auth/ForgetPassword")]

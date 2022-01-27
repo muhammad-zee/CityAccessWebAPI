@@ -437,6 +437,38 @@ namespace Web.Services.Concrete
         }
 
         #region Reset Password
+
+        public BaseResponse ChangePassword(ChangePasswordVM changePassword) 
+        {
+            if (changePassword.isFromProfile)
+            {
+                var user = _userRepo.Table.Where(x => !x.IsDeleted && x.UserId == changePassword.UserId).FirstOrDefault();
+                var userOldPass = Encryption.decryptData(user.Password, this._encryptionKey);
+                var oldPass = Encryption.decryptData(changePassword.OldPassword, this._encryptionKey);
+                if (userOldPass == oldPass)
+                {
+                    user.Password = changePassword.NewPassword;
+                    user.ModifiedBy = ApplicationSettings.UserId;
+                    user.ModifiedDate = DateTime.UtcNow;
+                    _userRepo.Update(user);
+                    return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Password Change Successfully" };
+                }
+                else
+                {
+                    return new BaseResponse() { Status = HttpStatusCode.NotModified, Message = "Old Password is not correct. Please write correct old password" };
+                }
+            }
+            else
+            {
+                var user = _userRepo.Table.Where(x => !x.IsDeleted && x.UserId == changePassword.UserId).FirstOrDefault();
+                user.Password = changePassword.NewPassword;
+                user.ModifiedBy = ApplicationSettings.UserId;
+                user.ModifiedDate = DateTime.UtcNow;
+                _userRepo.Update(user);
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Password Change Successfully" };
+            }
+        }
+
         public string SendResetPasswordMail(string email, string url)
         {
             try

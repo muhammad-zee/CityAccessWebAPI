@@ -11,6 +11,7 @@ namespace Web.Services.Interfaces
         BaseResponse ConfirmPassword(UserCredentialVM modelUser);
         BaseResponse SaveUser(RegisterCredentialVM register);
         BaseResponse AssociationUser(RegisterCredentialVM associate);
+        BaseResponse ChangePassword(ChangePasswordVM changePassword);
         string SendResetPasswordMail(string email, string url);
         string ResetPassword(UserCredentialVM credential);
     }
