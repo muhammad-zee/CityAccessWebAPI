@@ -13,5 +13,9 @@
         public string EndDate { get; set; }
         public string StartTime { get; set; }
         public string EndTime { get; set; }
+
+        public string ServiceName { get; set; }
+
+        public string DepartmentName { get; set; }
     }
 }
