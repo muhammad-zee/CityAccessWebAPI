@@ -40,6 +40,9 @@ namespace Web.Model.Common
         public string subject { get; set; }
 
         public string selectedUserId { get; set; }
+        public string RoleName { get; set; }
+        public string ServiceName { get; set; }
+
     }
 
     public class ScheduleVM

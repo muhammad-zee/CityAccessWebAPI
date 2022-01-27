@@ -33,7 +33,7 @@ namespace Web.Services.Concrete
         private readonly IRepository<UserRole> _userRoleRepo;
         private readonly IRepository<UsersRelation> _userRelationRepo;
         private readonly IRepository<ServiceLine> _serviceRepo;
-
+        private readonly IRepository<Role> _roleRepo;
 
         public ScheduleService(RAQ_DbContext dbContext,
             IConfiguration configuration,
@@ -41,6 +41,7 @@ namespace Web.Services.Concrete
             IHostingEnvironment environment,
             IRepository<UsersSchedule> scheduleRepo,
             IRepository<User> userRepo,
+            IRepository<Role> roleRepo,
             IRepository<UserRole> userRoleRepo,
             IRepository<UsersRelation> userRelationRepo,
             IRepository<ServiceLine> serviceRepo)
@@ -54,6 +55,7 @@ namespace Web.Services.Concrete
 
             this._scheduleRepo = scheduleRepo;
             this._userRepo = userRepo;
+            this._roleRepo = roleRepo;
             this._userRoleRepo = userRoleRepo;
             this._userRelationRepo = userRelationRepo;
             this._serviceRepo = serviceRepo;
@@ -75,7 +77,9 @@ namespace Web.Services.Concrete
                                     scheduleUserId = u.UserId.ToString(),
                                     userId = u.UserId.ToString(),
                                     roleId = us.RoleIdFk.ToString(),
-                                    serviceLineId = us.ServiceLineIdFk.ToString()
+                                    serviceLineId = us.ServiceLineIdFk.ToString(),
+                                    RoleName = this._roleRepo.Table.Where(x => !x.IsDeleted && x.RoleId == us.RoleIdFk).Select(x => x.RoleName).FirstOrDefault(),
+                                    ServiceName = this._serviceRepo.Table.Where(x => !x.IsDeleted && x.ServiceLineId == us.ServiceLineIdFk).Select(x => x.ServiceName).FirstOrDefault()
                                 }).ToList();
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Found", Body = schedule };
             }
