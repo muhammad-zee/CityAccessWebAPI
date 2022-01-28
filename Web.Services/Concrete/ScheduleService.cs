@@ -354,13 +354,12 @@ namespace Web.Services.Concrete
 
         public BaseResponse SaveSchedule(ScheduleVM schedule)
         {
-            var timeZone = ApplicationSettings.TimeZone;
             if (schedule.ScheduleId > 0)
             {
                 var row = _scheduleRepo.Table.Where(x => !x.IsDeleted && x.UsersScheduleId == schedule.ScheduleId).FirstOrDefault();
                 if (row != null)
                 {
-                    if (_scheduleRepo.Table.Any(x => x.ScheduleDate.Value.Date == schedule.FromDate.Date && !x.IsDeleted))
+                    if (_scheduleRepo.Table.Any(x => x.ScheduleDate.Value.Date == schedule.FromDate.Date && !x.IsDeleted && schedule.ScheduleId != x.UsersScheduleId ))
                     {
                         string startDateTimeStr = schedule.FromDate.ToString("MM-dd-yyyy") + " " + schedule.StartTime.ToString("hh:mm:ss tt");
                         string endDateTimeStr = schedule.ToDate.ToString("MM-dd-yyyy") + " " + schedule.EndTime.ToString("hh:mm:ss tt");
