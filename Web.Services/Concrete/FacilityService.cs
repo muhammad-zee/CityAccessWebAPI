@@ -381,6 +381,7 @@ namespace Web.Services.Concrete
                                  where ur.UserIdFk == ApplicationSettings.UserId && !o.IsDeleted && !r.IsDeleted
                                  select o).Distinct().ToList();
             }
+
             var orgs = AutoMapperHelper.MapList<Organization, OrganizationVM>(organizations);
             var departments = this._departmentRepo.Table.Where(d => d.IsDeleted != true && orgs.Select(x => x.OrganizationId).Contains(d.OrganizationIdFk.Value)).ToList();
             var dpts = AutoMapperHelper.MapList<Department, DepartmentVM>(departments);

@@ -56,7 +56,7 @@ namespace Web.API.Controllers
 
         [Description("Get Users For Dashboard")]
         [HttpGet("admin/GetUsersForDashBoard")]
-        public BaseResponse GetUsersForDashBoard() 
+        public BaseResponse GetUsersForDashBoard()
         {
             try
             {
@@ -73,7 +73,7 @@ namespace Web.API.Controllers
 
         [Description("Get Users For Dashboard")]
         [HttpPost("admin/GetSchedulesForCurrentDate")]
-        public BaseResponse GetSchedulesForCurrentDate([FromBody] ScheduleVM schedule) 
+        public BaseResponse GetSchedulesForCurrentDate([FromBody] ScheduleVM schedule)
         {
             try
             {

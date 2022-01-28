@@ -10,11 +10,8 @@ using System.Threading.Tasks;
 using Twilio;
 using Twilio.AspNet.Common;
 using Twilio.Jwt.AccessToken;
-using Twilio.Rest.Api.V2010.Account;
 using Twilio.Rest.Chat.V2.Service;
 using Twilio.Rest.Chat.V2.Service.Channel;
-using Twilio.Rest.Conversations.V1;
-using Twilio.Rest.Conversations.V1.Conversation;
 using Twilio.Types;
 using Web.Data.Models;
 using Web.DLL.Generic_Repository;
@@ -417,12 +414,12 @@ namespace Web.Services.Concrete
             if (dbChannel != null)
             {
                 var participant = this._conversationParticipantsRepo.Table.FirstOrDefault(p => p.UniqueName == ParticipantUniqueName && p.ConversationChannelIdFk == dbChannel.ConversationChannelId && p.IsDeleted != true);
-                if(participant!= null)
+                if (participant != null)
                 {
-                participant.IsDeleted = true;
-                participant.ModifiedBy = UserId;
-                participant.ModifiedDate = DateTime.UtcNow;
-                this._conversationParticipantsRepo.Update(participant);
+                    participant.IsDeleted = true;
+                    participant.ModifiedBy = UserId;
+                    participant.ModifiedDate = DateTime.UtcNow;
+                    this._conversationParticipantsRepo.Update(participant);
                 }
             }
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Participant Removed" };
@@ -433,7 +430,7 @@ namespace Web.Services.Concrete
             if (dbChannel != null)
             {
                 var participant = this._userRepo.Table.FirstOrDefault(u => u.IsDeleted != true && u.UserUniqueId == ParticipantUniqueName);
-               TwilioClient.Init(this.Twilio_AccountSid, this.Twilio_AuthToken);
+                TwilioClient.Init(this.Twilio_AccountSid, this.Twilio_AuthToken);
 
                 //var conversations = ConversationResource.Fetch(pathSid: dbChannel.ChannelSid);
                 var channel = ChannelResource.Fetch(pathServiceSid: this.Twilio_ChatServiceSid, pathSid: dbChannel.ChannelSid);
@@ -463,7 +460,7 @@ namespace Web.Services.Concrete
             {
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = "Channel Not Found" };
             }
-            
+
         }
         public BaseResponse updateConversationGroup(string FriendlyName, string ChannelSid)
         {
@@ -480,7 +477,7 @@ namespace Web.Services.Concrete
             {
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = "Channel Not Found" };
             }
-            
+
         }
         public BaseResponse getAllConversationUsers()
         {
@@ -523,7 +520,7 @@ namespace Web.Services.Concrete
         {
             BaseResponse response = new BaseResponse();
             TwilioClient.Init(this.Twilio_AccountSid, this.Twilio_AuthToken);
-         
+
 
 
             // Create a video grant for the token
@@ -532,10 +529,10 @@ namespace Web.Services.Concrete
             var grants = new HashSet<IGrant> { grant };
 
             // Create an Access Token generator
-            var token = new Token(this.Twilio_AccountSid, 
-                this.Twilio_ChatApiKey, 
-                this.Twilio_ChatApiKeySecret, 
-                identity: identity, 
+            var token = new Token(this.Twilio_AccountSid,
+                this.Twilio_ChatApiKey,
+                this.Twilio_ChatApiKeySecret,
+                identity: identity,
                 grants: grants);
 
             response.Status = HttpStatusCode.OK;

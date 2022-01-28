@@ -354,6 +354,7 @@ namespace Web.Services.Concrete
 
         public BaseResponse SaveSchedule(ScheduleVM schedule)
         {
+            var timeZone = ApplicationSettings.TimeZone;
             if (schedule.ScheduleId > 0)
             {
                 var row = _scheduleRepo.Table.Where(x => !x.IsDeleted && x.UsersScheduleId == schedule.ScheduleId).FirstOrDefault();
@@ -383,7 +384,7 @@ namespace Web.Services.Concrete
 
                         return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Schedule Updated" };
                     }
-                    else 
+                    else
                     {
                         return new BaseResponse() { Status = HttpStatusCode.NotModified, Message = "Schedule Already Exist on this date" };
                     }
@@ -589,7 +590,7 @@ namespace Web.Services.Concrete
                             }
                         }
                     }
-                    else 
+                    else
                     {
                         //DateTime now = DateTime.UtcNow;
                         var startDate = schedule.FromDate;//new DateTime(now.Year, now.Month, 1);

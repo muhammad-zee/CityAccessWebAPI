@@ -242,14 +242,6 @@ namespace Web.Services.Concrete
                 }
                 _userRepo.Update(user);
 
-                var existingUserRelations = _userRelationRepo.Table.Where(x => x.UserIdFk == user.UserId && x.IsDeleted != true).ToList();
-                //existingUserRelations.ForEach(x => { x.IsDeleted = true; x.IsActive = false; x.ModifiedBy = user.ModifiedBy; x.ModifiedDate = DateTime.UtcNow; });
-                if (existingUserRelations.Count() > 0)
-                {
-                    _userRelationRepo.DeleteRange(existingUserRelations);
-                }
-
-
                 return new BaseResponse()
                 {
                     Status = HttpStatusCode.OK,
@@ -438,7 +430,7 @@ namespace Web.Services.Concrete
 
         #region Reset Password
 
-        public BaseResponse ChangePassword(ChangePasswordVM changePassword) 
+        public BaseResponse ChangePassword(ChangePasswordVM changePassword)
         {
             if (changePassword.isFromProfile)
             {

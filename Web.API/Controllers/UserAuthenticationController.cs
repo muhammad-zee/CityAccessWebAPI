@@ -153,7 +153,7 @@ namespace Web.API.Controllers
         [RequestHandler]
         [Description("Change Password")]
         [HttpPost("auth/ChangePassword")]
-        public BaseResponse ChangePassword([FromBody] ChangePasswordVM changePassword) 
+        public BaseResponse ChangePassword([FromBody] ChangePasswordVM changePassword)
         {
             try
             {

@@ -12,7 +12,7 @@
         public string Url { get; set; }
     }
 
-    public class ChangePasswordVM 
+    public class ChangePasswordVM
     {
         public int UserId { get; set; }
         public string OldPassword { get; set; }

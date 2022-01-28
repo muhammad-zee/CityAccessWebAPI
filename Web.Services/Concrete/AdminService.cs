@@ -82,7 +82,7 @@ namespace Web.Services.Concrete
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Found", Body = LabelCounts };
         }
 
-        public BaseResponse GetUsersForDashBoard() 
+        public BaseResponse GetUsersForDashBoard()
         {
             var users = this._dbContext.LoadStoredProcedure("raq_getUsersForDashBoard")
                     .WithSqlParam("@is_SuperAdmin", ApplicationSettings.isSuperAdmin)
@@ -95,7 +95,7 @@ namespace Web.Services.Concrete
                 x.UserRole = (from ur in _userRole.Table
                               join r in _role.Table on ur.RoleIdFk equals r.RoleId
                               //join o in _organizationRepo.Table on r.OrganizationIdFk equals o.OrganizationId
-                              where ur.UserIdFk == x.UserId && !r.IsDeleted 
+                              where ur.UserIdFk == x.UserId && !r.IsDeleted
                               //&& !o.IsDeleted
                               select new UserRoleVM()
                               {
