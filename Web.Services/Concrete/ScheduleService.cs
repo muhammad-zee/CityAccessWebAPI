@@ -274,6 +274,12 @@ namespace Web.Services.Concrete
             if (param.action == "batch" && param.added != null && param.added.Count > 0) // this block of code will execute while inserting the appointments
             {
 
+                foreach (var u in param.added)
+                {
+                    u.startTime = DateTime.Parse(u.startTime.ToString("F")).ToUniversalTimeZone();
+                    u.endTime = DateTime.Parse(u.endTime.ToString("F")).ToUniversalTimeZone();
+                }
+
                 scheduleList = (from u in param.added
                                 select new UsersSchedule
                                 {
@@ -354,12 +360,17 @@ namespace Web.Services.Concrete
 
         public BaseResponse SaveSchedule(ScheduleVM schedule)
         {
+            schedule.FromDate = DateTime.Parse(schedule.FromDateStr); //Convert.ToDateTime(schedule.FromDateStr);
+            schedule.ToDate = DateTime.Parse(schedule.ToDateStr); //Convert.ToDateTime(schedule.ToDateStr);
+            schedule.StartTime = DateTime.Parse(schedule.StartTimeStr); //Convert.ToDateTime(schedule.StartTimeStr);
+            schedule.EndTime = DateTime.Parse(schedule.EndTimeStr); //Convert.ToDateTime(schedule.EndTimeStr);
+
             if (schedule.ScheduleId > 0)
             {
                 var row = _scheduleRepo.Table.Where(x => !x.IsDeleted && x.UsersScheduleId == schedule.ScheduleId).FirstOrDefault();
                 if (row != null)
                 {
-                    if (_scheduleRepo.Table.Any(x => x.ScheduleDate.Value.Date == schedule.FromDate.Date && !x.IsDeleted && schedule.ScheduleId != x.UsersScheduleId ))
+                    if (_scheduleRepo.Table.Any(x => x.ScheduleDate.Value.Date == schedule.FromDate.Date && !x.IsDeleted && schedule.ScheduleId != x.UsersScheduleId))
                     {
                         string startDateTimeStr = schedule.FromDate.ToString("MM-dd-yyyy") + " " + schedule.StartTime.ToString("hh:mm:ss tt");
                         string endDateTimeStr = schedule.ToDate.ToString("MM-dd-yyyy") + " " + schedule.EndTime.ToString("hh:mm:ss tt");
@@ -402,6 +413,7 @@ namespace Web.Services.Concrete
                 var weekDays = schedule.WeekDays.Split(",");
                 if (schedule.DateRangeId == 2)
                 {
+
                     DateTime loopFirstDate = schedule.FromDate;
                     DateTime startDate = schedule.FromDate;
                     DateTime endDate = schedule.ToDate;

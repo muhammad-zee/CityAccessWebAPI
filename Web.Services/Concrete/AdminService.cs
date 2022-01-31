@@ -401,7 +401,6 @@ namespace Web.Services.Concrete
                     newRole.IsScheduleRequired = role.IsScheduleRequired;
                     newRole.OrganizationIdFk = role.OrganizationIdFk;
                     newRole.ModifiedDate = DateTime.UtcNow;
-                    newRole.IsScheduleRequired = role.IsScheduleRequired;
                     newRole.ModifiedBy = role.ModifiedBy;
 
                     _role.Update(newRole);
