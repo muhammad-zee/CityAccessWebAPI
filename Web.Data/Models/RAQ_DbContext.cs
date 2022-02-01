@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 #nullable disable
 
@@ -25,6 +27,7 @@ namespace Web.Data.Models
         public virtual DbSet<ConversationParticipant> ConversationParticipants { get; set; }
         public virtual DbSet<Department> Departments { get; set; }
         public virtual DbSet<ElmahError> ElmahErrors { get; set; }
+        public virtual DbSet<FavouriteTeam> FavouriteTeams { get; set; }
         public virtual DbSet<InteractiveVoiceResponse> InteractiveVoiceResponses { get; set; }
         public virtual DbSet<Ivrsetting> Ivrsettings { get; set; }
         public virtual DbSet<Organization> Organizations { get; set; }
@@ -301,6 +304,29 @@ namespace Web.Data.Models
                 entity.Property(e => e.User)
                     .IsRequired()
                     .HasMaxLength(50);
+            });
+
+            modelBuilder.Entity<FavouriteTeam>(entity =>
+            {
+                entity.ToTable("FavouriteTeam");
+
+                entity.Property(e => e.CreatedDate)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+
+                entity.HasOne(d => d.ServiceLineIdFkNavigation)
+                    .WithMany(p => p.FavouriteTeams)
+                    .HasForeignKey(d => d.ServiceLineIdFk)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_FavouriteTeam_ServiceLine");
+
+                entity.HasOne(d => d.UserIdFkNavigation)
+                    .WithMany(p => p.FavouriteTeams)
+                    .HasForeignKey(d => d.UserIdFk)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_FavouriteTeam_Users");
             });
 
             modelBuilder.Entity<InteractiveVoiceResponse>(entity =>

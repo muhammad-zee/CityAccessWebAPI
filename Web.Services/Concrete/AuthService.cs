@@ -26,9 +26,8 @@ namespace Web.Services.Concrete
     {
         private readonly GenericRepository<User> _userRepo;
         private readonly GenericRepository<UserRole> _userRoleRepo;
-        //private readonly IRepository<DepartmentService> _departmentServiceRepo;
-        //private readonly IRepository<OrganizationDepartment> _organizationDepartmentRepo;
         private readonly IRepository<UsersRelation> _userRelationRepo;
+        private readonly IRepository<FavouriteTeam> _userFavouriteTeamRepo;
         private readonly ICommunicationService _communicationService;
         private readonly IAdminService _adminService;
         IConfiguration _config;
@@ -37,23 +36,19 @@ namespace Web.Services.Concrete
         private IHostingEnvironment _environment;
         public AuthService(IConfiguration config,
             IHostingEnvironment environment,
-            /*IUserAuthRepository userAuthRepository,*/
             IRepository<User> userRepo,
             IRepository<UserRole> userRoleRepo,
-            //IRepository<DepartmentService> departmentServiceRepo,
-            //IRepository<OrganizationDepartment> organizationDepartmentRepo,
             IRepository<UsersRelation> userRelationRepo,
+            IRepository<FavouriteTeam> userFavouriteTeamRepo,
             ICommunicationService communicationService,
             IAdminService adminService)
         {
             this._config = config;
             this._environment = environment;
-            //_userAuthRepository = userAuthRepository;
             this._userRepo = (GenericRepository<User>)userRepo;
             this._userRoleRepo = (GenericRepository<UserRole>)userRoleRepo;
-            //this._departmentServiceRepo = departmentServiceRepo;
-            //this._organizationDepartmentRepo = organizationDepartmentRepo;
             this._userRelationRepo = userRelationRepo;
+            this._userFavouriteTeamRepo = userFavouriteTeamRepo;
             this._communicationService = communicationService;
             this._adminService = adminService;
             this._encryptionKey = this._config["Encryption:key"].ToString();
@@ -427,6 +422,50 @@ namespace Web.Services.Concrete
                 Message = "Saved",
             };
         }
+
+        public BaseResponse AddOrUpdateFavouriteTeam(RegisterCredentialVM FavTeam)
+        {
+            var serviceLineIds = FavTeam.serviceIds.ToIntList();
+
+            List<FavouriteTeam> favTeam = new List<FavouriteTeam>();
+
+            var relation = _userFavouriteTeamRepo.Table.Where(x => x.UserIdFk == FavTeam.UserId && x.IsDeleted != true).ToList();
+            if (relation.Count() > 0)
+            {
+                _userFavouriteTeamRepo.DeleteRange(relation);
+            }
+
+            foreach (var item in serviceLineIds)
+            {
+                var userRelation = new FavouriteTeam()
+                {
+                    UserIdFk = FavTeam.UserId,
+                    ServiceLineIdFk = item,
+                    CreatedBy = FavTeam.CreatedBy,
+                    CreatedDate = DateTime.UtcNow,
+                    IsDeleted = false,
+                };
+
+                favTeam.Add(userRelation);
+            }
+
+            if (favTeam.Count > 0)
+            {
+                _userFavouriteTeamRepo.Insert(favTeam);
+                return new BaseResponse()
+                {
+                    Status = HttpStatusCode.OK,
+                    Message = "Saved",
+                };
+            }
+
+            return new BaseResponse()
+            {
+                Status = HttpStatusCode.OK,
+                Message = "No Record Saved",
+            };
+        }
+
 
         #region Reset Password
 

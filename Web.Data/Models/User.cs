@@ -10,6 +10,7 @@ namespace Web.Data.Models
         public User()
         {
             ConversationParticipants = new HashSet<ConversationParticipant>();
+            FavouriteTeams = new HashSet<FavouriteTeam>();
             UserAccesses = new HashSet<UserAccess>();
             UserRoles = new HashSet<UserRole>();
             UsersRelations = new HashSet<UsersRelation>();
@@ -51,6 +52,7 @@ namespace Web.Data.Models
         public string UserUniqueId { get; set; }
 
         public virtual ICollection<ConversationParticipant> ConversationParticipants { get; set; }
+        public virtual ICollection<FavouriteTeam> FavouriteTeams { get; set; }
         public virtual ICollection<UserAccess> UserAccesses { get; set; }
         public virtual ICollection<UserRole> UserRoles { get; set; }
         public virtual ICollection<UsersRelation> UsersRelations { get; set; }

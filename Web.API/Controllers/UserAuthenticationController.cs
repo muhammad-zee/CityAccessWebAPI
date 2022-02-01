@@ -146,6 +146,24 @@ namespace Web.API.Controllers
             }
         }
 
+        [Authorize]
+        [RequestHandler]
+        [Description("Add or Update Favourite Team")]
+        [HttpPost("auth/addOrUpdateFavouriteTeam")]
+        public BaseResponse AddOrUpdateFavouriteTeam([FromBody] RegisterCredentialVM FavTeam) 
+        {
+            try
+            {
+                var response = _jwtAuth.AddOrUpdateFavouriteTeam(FavTeam);
+                return response;
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
 
         #region Reset Password
 
