@@ -34,6 +34,8 @@ namespace Web.Services.Concrete
         private IRepository<ControlList> _controlList;
         private IRepository<ControlListDetail> _controlListDetails;
         private readonly IRepository<UsersRelation> _userRelationRepo;
+        private readonly IRepository<FavouriteTeam> _favouriteTeam;
+
         IConfiguration _config;
         public AdminService(RAQ_DbContext dbContext,
             IConfiguration config,
@@ -49,6 +51,7 @@ namespace Web.Services.Concrete
             IRepository<UserAccess> userAccess,
             IRepository<UsersRelation> userRelationRepo,
             IRepository<ControlList> controlList,
+            IRepository<FavouriteTeam> favouriteTeam,
             IRepository<ControlListDetail> controlListDetails)
         {
             this._dbContext = dbContext;
@@ -65,6 +68,7 @@ namespace Web.Services.Concrete
             this._organizationRepo = organizationRepo;
             this._userAccess = userAccess;
             this._userRelationRepo = userRelationRepo;
+            this._favouriteTeam = favouriteTeam;
             this._controlList = controlList;
             this._controlListDetails = controlListDetails;
         }
@@ -180,7 +184,9 @@ namespace Web.Services.Concrete
                 item.ServiceLineIdsList = userRelationIds.Where(x => x.UserIdFk == item.UserId).Select(x => x.ServiceLineIdFk).Distinct().ToList();
                 item.DptIdsList = dptids;
                 item.OrgIdsList = item.ServiceLineIdsList.Count > 0 ? _departmentRepo.Table.Where(x => x.IsDeleted != true && dptids.Contains(x.DepartmentId)).Select(x => x.OrganizationIdFk.Value).Distinct().ToList() : this._role.Table.Where(x => item.UserRole.Select(r => r.RoleId).Contains(x.RoleId) && !x.IsDeleted && x.OrganizationIdFk.HasValue).Select(x => x.OrganizationIdFk.Value).Distinct().ToList();
-
+                item.serviceIdsFT = _favouriteTeam.Table.Where(x => x.UserIdFk == item.UserId).Select(x=>x.ServiceLineIdFk).ToList();
+                item.dptIdsFT = _serviceRepo.Table.Where(x => item.serviceIdsFT.Contains(x.ServiceLineId) && !x.IsDeleted).Select(x => x.DepartmentIdFk).ToList();
+                item.orgIdsFT = _departmentRepo.Table.Where(x => item.dptIdsFT.Contains(x.DepartmentId) && !x.IsDeleted).Select(x => x.OrganizationIdFk).ToList();
             }
             return new BaseResponse { Status = HttpStatusCode.OK, Message = "Users List Returned", Body = users };
         }
