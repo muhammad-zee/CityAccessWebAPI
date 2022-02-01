@@ -185,8 +185,8 @@ namespace Web.Services.Concrete
                 item.DptIdsList = dptids;
                 item.OrgIdsList = item.ServiceLineIdsList.Count > 0 ? _departmentRepo.Table.Where(x => x.IsDeleted != true && dptids.Contains(x.DepartmentId)).Select(x => x.OrganizationIdFk.Value).Distinct().ToList() : this._role.Table.Where(x => item.UserRole.Select(r => r.RoleId).Contains(x.RoleId) && !x.IsDeleted && x.OrganizationIdFk.HasValue).Select(x => x.OrganizationIdFk.Value).Distinct().ToList();
                 item.serviceIdsFT = _favouriteTeam.Table.Where(x => x.UserIdFk == item.UserId).Select(x=>x.ServiceLineIdFk).ToList();
-                item.dptIdsFT = _serviceRepo.Table.Where(x => item.serviceIdsFT.Contains(x.ServiceLineId) && !x.IsDeleted).Select(x => x.DepartmentIdFk).ToList();
-                item.orgIdsFT = _departmentRepo.Table.Where(x => item.dptIdsFT.Contains(x.DepartmentId) && !x.IsDeleted).Select(x => x.OrganizationIdFk).ToList();
+                item.dptIdsFT = _serviceRepo.Table.Where(x => item.serviceIdsFT.Contains(x.ServiceLineId) && !x.IsDeleted).Select(x => x.DepartmentIdFk).Distinct().ToList();
+                item.orgIdsFT = _departmentRepo.Table.Where(x => item.dptIdsFT.Contains(x.DepartmentId) && !x.IsDeleted).Select(x => x.OrganizationIdFk).Distinct().ToList();
             }
             return new BaseResponse { Status = HttpStatusCode.OK, Message = "Users List Returned", Body = users };
         }
