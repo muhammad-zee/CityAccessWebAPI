@@ -47,6 +47,9 @@ namespace Web.Model.Common
         public string RoleIds { get; set; } = "";
         public string orgIds { get; set; } = "";
         public string dptIds { get; set; } = "";
+        public List<int> serviceIdsFT { get; set; }
+        public List<int> dptIdsFT { get; set; }
+        public List<int?> orgIdsFT { get; set; }
         public string serviceIds { get; set; } = "";
         public List<ServiceLineVM> UserServices { get; set; }
         public List<DepartmentVM> Departments { get; set; }
