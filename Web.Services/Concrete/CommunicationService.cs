@@ -479,6 +479,22 @@ namespace Web.Services.Concrete
             }
 
         }
+        public BaseResponse updateConversationUserSid(string UserSid)
+        {
+            BaseResponse response = new BaseResponse();
+
+            var user = this._userRepo.Table.FirstOrDefault(u => u.UserId == ApplicationSettings.UserId && !u.IsDeleted);
+            if (user != null)
+            {
+                user.ConversationUserSid = UserSid;
+                this._userRepo.Update(user);
+            }
+            response.Status = HttpStatusCode.OK;
+            response.Message = "User Sid Saved Successfully";
+            response.Body = new { UserId = ApplicationSettings.UserId, UserChannelSid = UserSid };
+            return response;
+
+        }
         public BaseResponse getAllConversationUsers()
         {
 
@@ -512,6 +528,28 @@ namespace Web.Services.Concrete
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Chat users found", Body = chatUsers };
         }
 
+        public ChannelResource createConversationChannel(string FriendlyName, string UniqueName)
+        {
+            TwilioClient.Init(this.Twilio_AccountSid, this.Twilio_AuthToken);
+            var channel = ChannelResource.Create(pathServiceSid: this.Twilio_ChatServiceSid, friendlyName: FriendlyName, uniqueName: UniqueName);
+            //var channel = Twilio.Rest.Conversations.V1.ConversationResource.Create(pathServiceSid: this.Twilio_ChatServiceSid,friendlyName:FriendlyName,uniqueName: UniqueName);
+            return channel;
+        }
+
+        public UserResource createConversationUser(string Identity, string FriendlyName)
+        {
+            TwilioClient.Init(this.Twilio_AccountSid, this.Twilio_AuthToken);
+            var user = UserResource.Create(pathServiceSid: this.Twilio_ChatServiceSid, identity: Identity, friendlyName: FriendlyName);
+            return user;
+
+        }
+        public MemberResource addNewUserToConversationChannel(string ChannelSid, string ParticipantUniqueName)
+        {
+            TwilioClient.Init(this.Twilio_AccountSid, this.Twilio_AuthToken);
+            var addParticipant = MemberResource.Create(identity: ParticipantUniqueName, pathServiceSid: this.Twilio_ChatServiceSid, pathChannelSid: ChannelSid);
+            return addParticipant;
+
+        }
         #endregion
 
 

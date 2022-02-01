@@ -160,8 +160,10 @@ namespace Web.Services.Concrete
                 UserRole = UserRole,
                 IsRequirePasswordReset = user.IsRequirePasswordReset,
                 NotificationChannelSid = user.UserChannelSid,
+                conversationUserSid = user.ConversationUserSid,
                 UserUniqueId = user.UserUniqueId,
                 UserImage = user.UserImage,
+
             };
         }
 
@@ -287,6 +289,10 @@ namespace Web.Services.Concrete
                             }
                         }
 
+
+                        var notificationChannel = this._communicationService.createConversationChannel(register.FirstName + " " + register.LastName, randomString);
+                        var conversationUser = this._communicationService.createConversationUser(randomString, register.FirstName + " " + register.LastName);
+                        var addConversationUserToChannel = this._communicationService.addNewUserToConversationChannel(notificationChannel.Sid, randomString);
                         var obj = new User()
                         {
                             FirstName = register.FirstName,
@@ -308,6 +314,8 @@ namespace Web.Services.Concrete
                             CreatedBy = register.CreatedBy,
                             CreatedDate = DateTime.UtcNow,
                             UserUniqueId = randomString,
+                            UserChannelSid = notificationChannel.Sid,
+                            ConversationUserSid = conversationUser.Sid,
                             IsDeleted = false,
                             IsRequirePasswordReset = true
                         };

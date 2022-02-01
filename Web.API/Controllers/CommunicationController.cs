@@ -205,5 +205,19 @@ namespace Web.API.Controllers
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
         }
+        [HttpGet("Conversation/updateConversationUserSid")]
+        public BaseResponse updateConversationUserSid(string UserSid)
+        {
+            try
+            {
+                return this._communicaitonService.updateConversationUserSid(UserSid);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
     }
 }
