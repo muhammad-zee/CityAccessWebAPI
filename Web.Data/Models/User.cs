@@ -50,6 +50,7 @@ namespace Web.Data.Models
         public bool? IsActive { get; set; }
         public string UserChannelSid { get; set; }
         public string UserUniqueId { get; set; }
+        public string ConversationUserSid { get; set; }
 
         public virtual ICollection<ConversationParticipant> ConversationParticipants { get; set; }
         public virtual ICollection<FavouriteTeam> FavouriteTeams { get; set; }

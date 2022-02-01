@@ -14,6 +14,7 @@ namespace Web.Model.Common
         public string UserImage { get; set; }
         public string UserChannelSid { get; set; }
         public string UserUniqueId { get; set; }
+        public string OnCallServiceLines { get; set; }
 
         public List<UserRoleVM> UserRoles { get; set; }
         public List<ServiceLineVM> ServiceLines { get; set; }

@@ -467,6 +467,8 @@ namespace Web.Data.Models
 
                 entity.Property(e => e.CodeExpiryTime).HasColumnType("datetime");
 
+                entity.Property(e => e.ConversationUserSid).HasMaxLength(50);
+
                 entity.Property(e => e.CreatedDate)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
@@ -525,9 +527,7 @@ namespace Web.Data.Models
 
                 entity.Property(e => e.TwoFactorExpiryDate).HasColumnType("datetime");
 
-                entity.Property(e => e.UserChannelSid)
-                    .HasMaxLength(50)
-                    .HasColumnName("UserChannelSId");
+                entity.Property(e => e.UserChannelSid).HasMaxLength(50);
 
                 entity.Property(e => e.UserImage)
                     .HasMaxLength(200)
