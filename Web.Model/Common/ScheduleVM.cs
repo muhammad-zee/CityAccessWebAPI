@@ -30,6 +30,7 @@ namespace Web.Model.Common
         public int id { get; set; }
         public DateTime endTime { get; set; }
         public DateTime startTime { get; set; }
+
         public string ownerId { get; set; }
         public string scheduleUserId { get; set; }
         public string userId { get; set; }
@@ -57,6 +58,12 @@ namespace Web.Model.Common
         public DateTime ToDate { get; set; }
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
+
+        public string FromDateStr { get; set; }
+        public string ToDateStr { get; set; }
+        public string StartTimeStr { get; set; }
+        public string EndTimeStr { get; set; }
+
         public int RepeatEvery { get; set; }
         public string WeekDays { get; set; }
         public int CreatedBy { get; set; }

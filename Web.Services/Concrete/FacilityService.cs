@@ -690,7 +690,8 @@ namespace Web.Services.Concrete
         {
             BaseResponse response = null;
             ClinicalHour chour;
-
+            clinicalHours.startTime = DateTime.Parse(clinicalHours.startTimeStr); //Convert.ToDateTime(schedule.StartTimeStr);
+            clinicalHours.endTime = DateTime.Parse(clinicalHours.endTimeStr); //Convert.ToDateTime(schedule.EndTimeStr);
             if (clinicalHours.clinicalHourId > 0)
             {
                 var cHour = this._clinicalHourRepo.Table.Where(x => x.IsDeleted != true && x.ClinicalHourId == clinicalHours.clinicalHourId).FirstOrDefault();

@@ -19,6 +19,9 @@ namespace Web.Model.Common
         public DateTime startTime { get; set; }
         public DateTime endTime { get; set; }
 
+        public string startTimeStr { get; set; }
+        public string endTimeStr { get; set; }
+
         public int createdBy { get; set; }
 
         public int modifiedBy { get; set; }
