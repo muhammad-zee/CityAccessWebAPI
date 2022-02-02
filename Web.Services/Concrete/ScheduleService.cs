@@ -276,8 +276,8 @@ namespace Web.Services.Concrete
 
                 foreach (var u in param.added)
                 {
-                    u.startTime = DateTime.Parse(u.startTime.ToString("F")).ToUniversalTimeZone();
-                    u.endTime = DateTime.Parse(u.endTime.ToString("F")).ToUniversalTimeZone();
+                    u.startTime = DateTime.Parse(u.startTimeStr).ToUniversalTimeZone();
+                    u.endTime = DateTime.Parse(u.endTimeStr).ToUniversalTimeZone();
                 }
 
                 scheduleList = (from u in param.added
@@ -305,6 +305,12 @@ namespace Web.Services.Concrete
                 schedule = this._scheduleRepo.Table.FirstOrDefault(s => s.UsersScheduleId == changedSchedule.id);
                 if (schedule != null)
                 {
+                    foreach (var u in param.changed)
+                    {
+                        u.startTime = DateTime.Parse(u.startTimeStr).ToUniversalTimeZone();
+                        u.endTime = DateTime.Parse(u.endTimeStr).ToUniversalTimeZone();
+                    }
+
                     schedule.ScheduleDate = changedSchedule.startTime;
                     schedule.ScheduleDateStart = changedSchedule.startTime;
                     schedule.ScheduleDateEnd = changedSchedule.endTime;

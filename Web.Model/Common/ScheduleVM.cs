@@ -30,7 +30,8 @@ namespace Web.Model.Common
         public int id { get; set; }
         public DateTime endTime { get; set; }
         public DateTime startTime { get; set; }
-
+        public string endTimeStr { get; set; }
+        public string startTimeStr { get; set; }
         public string ownerId { get; set; }
         public string scheduleUserId { get; set; }
         public string userId { get; set; }
