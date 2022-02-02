@@ -76,21 +76,23 @@ namespace Web.Services.Concrete
 
         #region Dashboard Data
 
-        public BaseResponse GetLabelCounts()
+        public BaseResponse GetLabelCounts(int orgId)
         {
             var LabelCounts = this._dbContext.LoadStoredProcedure("raq_getCountOfTablesForDashboard")
-                    .WithSqlParam("@is_SuperAdmin", ApplicationSettings.isSuperAdmin)
-                    .WithSqlParam("@userId", ApplicationSettings.UserId)
+                    //.WithSqlParam("@is_SuperAdmin", ApplicationSettings.isSuperAdmin)
+                    //.WithSqlParam("@userId", ApplicationSettings.UserId)
+                    .WithSqlParam("@orgId", orgId)
                     .ExecuteStoredProc<TableCountsForDashBoardVM>().FirstOrDefault();
 
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Found", Body = LabelCounts };
         }
 
-        public BaseResponse GetUsersForDashBoard()
+        public BaseResponse GetUsersForDashBoard(int orgId)
         {
             var users = this._dbContext.LoadStoredProcedure("raq_getUsersForDashBoard")
                     .WithSqlParam("@is_SuperAdmin", ApplicationSettings.isSuperAdmin)
                     .WithSqlParam("@userId", ApplicationSettings.UserId)
+                    .WithSqlParam("@orgId", orgId)
                     .ExecuteStoredProc<RegisterCredentialVM>();
 
 

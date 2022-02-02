@@ -39,12 +39,12 @@ namespace Web.API.Controllers
         #region DashBoard
 
         [Description("Get Label Counts")]
-        [HttpGet("admin/GetLabelCounts")]
-        public BaseResponse GetLabelCounts()
+        [HttpGet("admin/GetLabelCounts/{orgId}")]
+        public BaseResponse GetLabelCounts(int orgId)
         {
             try
             {
-                return _adminService.GetLabelCounts();
+                return _adminService.GetLabelCounts(orgId);
             }
             catch (Exception ex)
             {
@@ -55,12 +55,12 @@ namespace Web.API.Controllers
         }
 
         [Description("Get Users For Dashboard")]
-        [HttpGet("admin/GetUsersForDashBoard")]
-        public BaseResponse GetUsersForDashBoard()
+        [HttpGet("admin/GetUsersForDashBoard/{orgId}")]
+        public BaseResponse GetUsersForDashBoard(int orgId)
         {
             try
             {
-                return _adminService.GetUsersForDashBoard();
+                return _adminService.GetUsersForDashBoard(orgId);
             }
             catch (Exception ex)
             {

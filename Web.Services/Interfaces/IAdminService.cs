@@ -9,8 +9,8 @@ namespace Web.Services.Interfaces
     public interface IAdminService
     {
         #region Dashboard
-        BaseResponse GetLabelCounts();
-        BaseResponse GetUsersForDashBoard();
+        BaseResponse GetLabelCounts(int orgId);
+        BaseResponse GetUsersForDashBoard(int orgId);
         BaseResponse GetSchedulesForCurrentDate(ScheduleVM schedule);
 
         #endregion
