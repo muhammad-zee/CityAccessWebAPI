@@ -234,5 +234,19 @@ namespace Web.API.Controllers
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
         }
+        [HttpGet("Conversation/getConversationUsersStatus")]
+        public BaseResponse getConversationUsersStatus(string UserSid)
+        {
+            try
+            {
+                return this._communicaitonService.getConversationUsersStatus(UserSid);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
     }
 }

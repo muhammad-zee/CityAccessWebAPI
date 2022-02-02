@@ -554,6 +554,41 @@ namespace Web.Services.Concrete
             return addParticipant;
 
         }
+        public BaseResponse getConversationUsersStatus(string UserSid)
+        {
+            List<ConversationUserStatus> statusList = new();
+            string[] userSidList = UserSid.Split(",");
+            var status = false;
+            foreach(var sid in userSidList)
+            {
+               if(sid!= "")
+                {
+                    status = conversationUserIsOnline(sid);
+                    statusList.Add(new ConversationUserStatus() { ConversationUserSid = sid, IsOnline = status });
+                }
+            }
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Chat users found", Body = statusList };
+        }
+        public bool conversationUserIsOnline(string UserSid)
+        {
+            try
+            {
+                TwilioClient.Init(this.Twilio_AccountSid, this.Twilio_AuthToken);
+                var user = UserResource.Fetch(this.Twilio_ChatServiceSid, UserSid);
+                if (user.IsOnline == null)
+                {
+                    return false;
+                }
+                else
+                {
+                    return user.IsOnline.Value;
+                }
+            }
+            catch(Exception e)
+            {
+                return false;
+            }
+        }
         #endregion
 
 
