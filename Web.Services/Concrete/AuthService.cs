@@ -61,13 +61,13 @@ namespace Web.Services.Concrete
             BaseResponse response = new BaseResponse();
             if (!string.IsNullOrEmpty(login.username) && !string.IsNullOrEmpty(login.password))
             {
-                var user = this._userRepo.Table.Where(x => (x.UserName == login.username) && !x.IsDeleted).FirstOrDefault();
+                var user = this._userRepo.Table.Where(x => (x.UserName == login.username) && x.IsDeleted!= true).FirstOrDefault();
                 if (user != null)
                 {
                     if (string.IsNullOrEmpty(user.UserUniqueId))
                     {
                         var randomString = HelperExtension.CreateRandomString();
-                        while (_userRepo.Table.Count(u => u.UserUniqueId == randomString && !u.IsDeleted) > 0)
+                        while (_userRepo.Table.Count(u => u.UserUniqueId == randomString && u.IsDeleted != true) > 0)
                         {
                             randomString = HelperExtension.CreateRandomString();
                         }
@@ -105,7 +105,7 @@ namespace Web.Services.Concrete
 
 
             BaseResponse response = new BaseResponse();
-            var user = _userRepo.Table.Where(u => u.UserId == UserId && !u.IsDeleted).FirstOrDefault();
+            var user = _userRepo.Table.Where(u => u.UserId == UserId && u.IsDeleted != true).FirstOrDefault();
             if (user != null)
             {
                 var AuthorizationToken = GenerateJSONWebToken(user);
@@ -169,7 +169,7 @@ namespace Web.Services.Concrete
 
         public BaseResponse ConfirmPassword(UserCredentialVM modelUser)
         {
-            var user = _userRepo.Table.Where(x => x.UserName == modelUser.username).FirstOrDefault();
+            var user = _userRepo.Table.Where(x => x.UserName == modelUser.username && x.IsDeleted != true).FirstOrDefault();
             if (user != null)
             {
                 user.IsRequirePasswordReset = false;

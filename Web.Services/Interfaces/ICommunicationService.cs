@@ -9,6 +9,7 @@ namespace Web.Services.Interfaces
     {
         BaseResponse generateConversationToken(string Identity);
         BaseResponse sendPushNotification(ConversationMessageVM msg);
+        BaseResponse ConversationCallbackEvent(string EventType);
         BaseResponse saveUserChannelSid(int UserId, string ChannelSid);
         BaseResponse saveConversationChannel(ConversationChannelVM channel);
         BaseResponse saveConversationChannelParticipants(ConversationChannelParticipantsVM channel);

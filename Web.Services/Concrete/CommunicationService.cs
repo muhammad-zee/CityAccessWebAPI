@@ -252,6 +252,10 @@ namespace Web.Services.Concrete
                                        );
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Notification Sent", Body = Notify };
         }
+        public BaseResponse ConversationCallbackEvent(string EventType)
+        {
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Event Received"};
+        }
 
 
         public BaseResponse saveUserChannelSid(int UserId, string ChannelSid)

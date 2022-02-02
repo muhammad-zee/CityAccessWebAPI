@@ -57,6 +57,21 @@ namespace Web.API.Controllers
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
         }
+
+        [HttpPost("Conversation/ConversationCallbackEvent")]
+        public BaseResponse ConversationCallbackEvent(string EventType)
+        {
+            try
+            {
+                return this._communicaitonService.ConversationCallbackEvent(EventType);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
         [HttpGet("Conversation/saveUserChannelSid")]
         public BaseResponse saveUserChannelSid(int UserId, string ChannelSid)
         {
