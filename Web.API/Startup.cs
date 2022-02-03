@@ -157,10 +157,6 @@ namespace Web.API
 
             app.UseAuthorization();
 
-            //app.UseElmahIo();
-            app.UseElmah();
-            app.UseElmahExceptionPage();
-
             // global error handler
             app.UseMiddleware<ErrorHandlerMiddleware>();
 
@@ -176,6 +172,10 @@ namespace Web.API
             })
             .UseDirectoryBrowser()
             .UseRequestLocalization();
+
+            //app.UseElmahIo();
+            app.UseElmah();
+            app.UseElmahExceptionPage();
 
             //app.UseStaticFiles(new StaticFileOptions
             //{
