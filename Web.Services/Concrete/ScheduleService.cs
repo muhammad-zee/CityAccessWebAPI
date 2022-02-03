@@ -376,7 +376,7 @@ namespace Web.Services.Concrete
                 var row = _scheduleRepo.Table.Where(x => !x.IsDeleted && x.UsersScheduleId == schedule.ScheduleId).FirstOrDefault();
                 if (row != null)
                 {
-                    if (_scheduleRepo.Table.Any(x => x.ScheduleDate.Value.Date == schedule.FromDate.Date && !x.IsDeleted && schedule.ScheduleId != x.UsersScheduleId))
+                    if (!_scheduleRepo.Table.Any(x => x.ScheduleDate.Value.Date == schedule.FromDate.Date && !x.IsDeleted && schedule.ScheduleId != x.UsersScheduleId))
                     {
                         string startDateTimeStr = schedule.FromDate.ToString("MM-dd-yyyy") + " " + schedule.StartTime.ToString("hh:mm:ss tt");
                         string endDateTimeStr = schedule.ToDate.ToString("MM-dd-yyyy") + " " + schedule.EndTime.ToString("hh:mm:ss tt");
@@ -616,7 +616,7 @@ namespace Web.Services.Concrete
 
                         while (true)
                         {
-                            if (startDate <= endDate)
+                            if (startDate.Date <= endDate.Date)
                             {
                                 string startDateTimeStr = startDate.ToString("MM-dd-yyyy") + " " + schedule.StartTime.ToString("hh:mm:ss tt");
                                 string endDateTimeStr = startDate.ToString("MM-dd-yyyy") + " " + schedule.EndTime.ToString("hh:mm:ss tt");
