@@ -218,25 +218,25 @@ namespace Web.Services.Concrete
                 user.IsActive = register.IsActive;
                 user.ModifiedBy = register.ModifiedBy;
                 user.ModifiedDate = DateTime.UtcNow;
-                if (!string.IsNullOrEmpty(register.UserImage))
-                {
-                    //var outPath = Directory.GetCurrentDirectory();
-                    var RootPath = this._environment.WebRootPath;
-                    string FilePath = "UserProfiles\\";
-                    var targetPath = Path.Combine(RootPath, FilePath);
+                //if (!string.IsNullOrEmpty(register.UserImage))
+                //{
+                //    //var outPath = Directory.GetCurrentDirectory();
+                //    var RootPath = this._environment.WebRootPath;
+                //    string FilePath = "UserProfiles\\";
+                //    var targetPath = Path.Combine(RootPath, FilePath);
 
-                    if (!Directory.Exists(targetPath))
-                    {
-                        Directory.CreateDirectory(targetPath);
-                    }
-                    register.UserImageByte = Convert.FromBase64String(register.UserImage.Split("base64,")[1]);
-                    targetPath += $"{user.FirstName}-{user.LastName}_{user.UserId}.png";
-                    using (FileStream fs = new FileStream(targetPath, FileMode.Create, FileAccess.Write))
-                    {
-                        fs.Write(register.UserImageByte);
-                    }
-                    user.UserImage = targetPath.Replace(RootPath, "").Replace("\\", "/");
-                }
+                //    if (!Directory.Exists(targetPath))
+                //    {
+                //        Directory.CreateDirectory(targetPath);
+                //    }
+                //    register.UserImageByte = Convert.FromBase64String(register.UserImage.Split("base64,")[1]);
+                //    targetPath += $"{user.FirstName}-{user.LastName}_{user.UserId}.png";
+                //    using (FileStream fs = new FileStream(targetPath, FileMode.Create, FileAccess.Write))
+                //    {
+                //        fs.Write(register.UserImageByte);
+                //    }
+                //    user.UserImage = targetPath.Replace(RootPath, "").Replace("\\", "/");
+                //}
                 _userRepo.Update(user);
 
                 return new BaseResponse()
