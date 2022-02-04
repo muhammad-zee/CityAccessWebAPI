@@ -276,7 +276,10 @@ namespace Web.Services.Concrete
         public BaseResponse saveConversationChannel(ConversationChannelVM channel)
         {
             BaseResponse response = new BaseResponse();
-
+            if(!channel.IsGroup.Value  && !channel.FriendlyName.Contains("S_"))
+            {
+                channel.IsGroup = true;
+            }
             var channelNotExists = this._conversationChannelsRepo.Table.Count(ch => ch.ChannelSid == channel.ChannelSid && ch.IsDeleted != true) == 0;
             if (channelNotExists)
             {
