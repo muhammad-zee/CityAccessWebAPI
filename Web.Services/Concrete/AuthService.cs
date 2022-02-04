@@ -28,6 +28,7 @@ namespace Web.Services.Concrete
         private readonly GenericRepository<UserRole> _userRoleRepo;
         private readonly IRepository<UsersRelation> _userRelationRepo;
         private readonly IRepository<FavouriteTeam> _userFavouriteTeamRepo;
+        private IRepository<ControlListDetail> _controlListDetails;
         private readonly ICommunicationService _communicationService;
         private readonly IAdminService _adminService;
         IConfiguration _config;
@@ -40,6 +41,7 @@ namespace Web.Services.Concrete
             IRepository<UserRole> userRoleRepo,
             IRepository<UsersRelation> userRelationRepo,
             IRepository<FavouriteTeam> userFavouriteTeamRepo,
+            IRepository<ControlListDetail> controlListDetails,
             ICommunicationService communicationService,
             IAdminService adminService)
         {
@@ -49,6 +51,7 @@ namespace Web.Services.Concrete
             this._userRoleRepo = (GenericRepository<UserRole>)userRoleRepo;
             this._userRelationRepo = userRelationRepo;
             this._userFavouriteTeamRepo = userFavouriteTeamRepo;
+            this._controlListDetails = controlListDetails;
             this._communicationService = communicationService;
             this._adminService = adminService;
             this._encryptionKey = this._config["Encryption:key"].ToString();
@@ -163,7 +166,7 @@ namespace Web.Services.Concrete
                 conversationUserSid = user.ConversationUserSid,
                 UserUniqueId = user.UserUniqueId,
                 UserImage = user.UserImage,
-
+                Gender = this._controlListDetails.Table.Where(x => x.ControlListDetailId == user.Gender.ToInt()).Select(x => x.Title).FirstOrDefault()
             };
         }
 

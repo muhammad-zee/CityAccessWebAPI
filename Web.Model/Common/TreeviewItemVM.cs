@@ -9,6 +9,7 @@ namespace Web.Model.Common
         public string data { get; set; }
         public string icon { get; set; }
         public int? ParentKey { get; set; }
+        public int? sortOrder { get; set; }
         public List<TreeviewItemVM> children { get; set; }
         public List<string> ActiosList { get; set; }
         public bool? @checked { get; set; }

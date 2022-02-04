@@ -629,9 +629,10 @@ namespace Web.Services.Concrete
                 key = x.ComponentId.ToString(),
                 ParentKey = x.ParentComponentId,
                 label = x.ComModuleName,
+                sortOrder = x.SortOrder,
                 icon = x.ModuleImage,
                 expanded = true,
-            }).ToList();
+            }).OrderBy(x => x.sortOrder).ToList();
             var treeViewItems = treeItems.BuildTree();
             var selectedRoleAccessIds = _componentAccess.Table.Where(x => x.RoleIdFk == Id && x.IsActive == true).Select(x => new { key = x.ComponentIdFk.ToString() }).ToList();
 
@@ -666,9 +667,10 @@ namespace Web.Services.Concrete
                 key = x.ComponentId.ToString(),
                 ParentKey = x.ParentComponentId,
                 label = x.ComModuleName,
+                sortOrder = x.SortOrder,
                 icon = x.ModuleImage,
                 expanded = true,
-            }).ToList();
+            }).OrderBy(x => x.sortOrder).ToList();
             var treeViewItems = treeItems.BuildTree();
             //<--------Make a join of ComponentAccess Table with Component to get List of Accessible Components By Role and user Id----------->
             var selectedUserRoleAccessIds = _componentAccess.Table.Where(x => x.RoleIdFk == roleId && x.IsActive == true).Select(x => new { key = x.ComponentIdFk.ToString() }).ToList();
