@@ -916,11 +916,11 @@ namespace Web.Services.Concrete
                 var holiday = this._clinicalHolidayRepo.Table.FirstOrDefault(h => h.IsDeleted != true && h.ClinicalHolidayId == clinicalHoliday.ClinicalHolidayId);
                 if (holiday != null)
                 {
-
+                    var date = DateTime.Parse(clinicalHoliday.SelectedDateStr.ElementAt(0));
 
                     holiday.ServicelineIdFk = clinicalHoliday.ServicelineIdFk;
-                    holiday.StartDate = clinicalHoliday.StartDate;
-                    holiday.EndDate = clinicalHoliday.EndDate;
+                    holiday.StartDate = date.ToUniversalTimeZone().Date;
+                    holiday.EndDate = date.ToUniversalTimeZone().Date;
                     holiday.Description = clinicalHoliday.Description;
                     holiday.ModifiedBy = clinicalHoliday.ModifiedBy;
                     holiday.ModifiedDate = DateTime.UtcNow;
@@ -937,14 +937,33 @@ namespace Web.Services.Concrete
             else
             {
                 //insert
+                List<ClinicalHoliday> clinicalHolidays = new();
+                foreach (var item in clinicalHoliday.SelectedDateStr)
+                {
+                    ClinicalHoliday holiday = new ClinicalHoliday();
+
+                    var date = DateTime.Parse(item);
+
+                    holiday.ServicelineIdFk = clinicalHoliday.ServicelineIdFk;
+                    holiday.StartDate = date.ToUniversalTimeZone();
+                    holiday.EndDate = date.ToUniversalTimeZone();
+                    holiday.Description = clinicalHoliday.Description;
+                    holiday.CreatedBy = clinicalHoliday.CreatedBy;
+                    holiday.CreatedDate = DateTime.UtcNow;
+                    holiday.IsDeleted = false;
+                    clinicalHolidays.Add(holiday);
+                }
+
+                if (clinicalHolidays.Count > 0) 
+                {
+                    this._clinicalHolidayRepo.Insert(clinicalHolidays);  
+                }
 
 
-
-
-                var holiday = AutoMapperHelper.MapSingleRow<ClinicalHolidayVM, ClinicalHoliday>(clinicalHoliday);
-                holiday.CreatedDate = DateTime.UtcNow;
-                holiday.IsDeleted = false;
-                this._clinicalHolidayRepo.Insert(holiday);
+                //var holiday = AutoMapperHelper.MapSingleRow<ClinicalHolidayVM, ClinicalHoliday>(clinicalHoliday);
+                //holiday.CreatedDate = DateTime.UtcNow;
+                //holiday.IsDeleted = false;
+                //this._clinicalHolidayRepo.Insert(holiday);
                 response = new BaseResponse() { Status = HttpStatusCode.OK, Message = "Saved Successfully", Body = "" };
             }
             return response;

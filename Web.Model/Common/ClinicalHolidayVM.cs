@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Web.Model.Common
 {
@@ -8,6 +9,8 @@ namespace Web.Model.Common
         public int ServicelineIdFk { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime? EndDate { get; set; }
+        public List<DateTime> SelectiveDates { get; set; }
+        public List<string> SelectedDateStr { get; set; }
         public string Description { get; set; }
         public int CreatedBy { get; set; }
         public DateTime CreatedDate { get; set; }
