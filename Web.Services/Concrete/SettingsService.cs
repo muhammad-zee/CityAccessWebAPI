@@ -29,7 +29,17 @@ namespace Web.Services.Concrete
 
         public BaseResponse GetSettingsByOrgId(int OrgId)
         {
-            var settings = this._settingRepo.Table.Where(x => x.OrganizationIdFk == OrgId && !x.IsDeleted).FirstOrDefault();
+            var settings = this._settingRepo.Table.Where(x => x.OrganizationIdFk == OrgId && !x.IsDeleted).Select(x => new SettingsVM()
+            {
+                SettingId = x.SettingId,
+                OrganizationIdFk = x.OrganizationIdFk,
+                OrganizationEmail = x.OrganizationEmail,
+                TwoFactorAuthenticationExpiryMinutes = x.TwoFactorAuthenticationExpiryMinutes,
+                TwoFactorEnable = x.TwoFactorEnable,
+                VerifyForFutureDays = x.VerifyForFutureDays,
+                TokenExpiryTime = x.TokenExpiryTime,
+                IsDeleted = x.IsDeleted
+            }).FirstOrDefault();
             if (settings != null)
             {
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Found", Body = settings };
