@@ -47,8 +47,9 @@ namespace Web.API.Controllers
 
         [Description("Add or Update Org Settings")]
         [HttpPost("settings/AddOrUpdateOrgSettings")]
-        public BaseResponse AddOrUpdateOrgSettings(SettingsVM settings)
+        public BaseResponse AddOrUpdateOrgSettings([FromBody] SettingsVM settings)
         {
+            var state = ModelState;
             try
             {
                 return _settingService.AddOrUpdateOrgSettings(settings);

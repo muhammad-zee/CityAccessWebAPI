@@ -34,9 +34,9 @@ namespace Web.Services.Concrete
                 SettingId = x.SettingId,
                 OrganizationIdFk = x.OrganizationIdFk,
                 OrganizationEmail = x.OrganizationEmail,
-                TwoFactorAuthenticationExpiryMinutes = x.TwoFactorAuthenticationExpiryMinutes,
-                TwoFactorEnable = x.TwoFactorEnable,
-                VerifyForFutureDays = x.VerifyForFutureDays,
+                TwoFactorCodeExpiry = x.TwoFactorAuthenticationExpiryMinutes,
+                TwoFactorEnabled = x.TwoFactorEnable,
+                VerifyCodeForFutureDays = x.VerifyForFutureDays,
                 TokenExpiryTime = x.TokenExpiryTime,
                 IsDeleted = x.IsDeleted
             }).FirstOrDefault();
@@ -56,9 +56,9 @@ namespace Web.Services.Concrete
             if (settings.SettingId > 0)
             {
                 var setting = this._settingRepo.Table.Where(x => x.SettingId == settings.SettingId && !x.IsDeleted).FirstOrDefault();
-                setting.TwoFactorEnable = settings.TwoFactorEnable;
-                setting.TwoFactorAuthenticationExpiryMinutes = settings.TwoFactorAuthenticationExpiryMinutes;
-                setting.VerifyForFutureDays = settings.VerifyForFutureDays;
+                setting.TwoFactorEnable = settings.TwoFactorEnabled;
+                setting.TwoFactorAuthenticationExpiryMinutes = settings.TwoFactorCodeExpiry;
+                setting.VerifyForFutureDays = settings.VerifyCodeForFutureDays;
                 setting.TokenExpiryTime = settings.TokenExpiryTime;
                 setting.OrganizationEmail = settings.OrganizationEmail;
                 setting.ModifiedBy = settings.ModifiedBy;
@@ -70,9 +70,9 @@ namespace Web.Services.Concrete
                 var setting = new Setting()
                 {
                     OrganizationIdFk = settings.OrganizationIdFk,
-                    TwoFactorEnable = settings.TwoFactorEnable,
-                    TwoFactorAuthenticationExpiryMinutes = settings.TwoFactorAuthenticationExpiryMinutes,
-                    VerifyForFutureDays = settings.VerifyForFutureDays,
+                    TwoFactorEnable = settings.TwoFactorEnabled,
+                    TwoFactorAuthenticationExpiryMinutes = settings.TwoFactorCodeExpiry,
+                    VerifyForFutureDays = settings.VerifyCodeForFutureDays,
                     TokenExpiryTime = settings.TokenExpiryTime,
                     OrganizationEmail = settings.OrganizationEmail,
                     CreatedBy = settings.CreatedBy,
