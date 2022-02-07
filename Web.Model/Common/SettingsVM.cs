@@ -1,10 +1,8 @@
 ﻿using System;
 
-#nullable disable
-
-namespace Web.Data.Models
+namespace Web.Model.Common
 {
-    public partial class Setting
+    public class SettingsVM
     {
         public int SettingId { get; set; }
         public int OrganizationIdFk { get; set; }
@@ -19,6 +17,5 @@ namespace Web.Data.Models
         public DateTime? ModifiedDate { get; set; }
         public bool IsDeleted { get; set; }
 
-        public virtual Organization OrganizationIdFkNavigation { get; set; }
     }
 }

@@ -64,7 +64,7 @@ namespace Web.Services.Concrete
             BaseResponse response = new BaseResponse();
             if (!string.IsNullOrEmpty(login.username) && !string.IsNullOrEmpty(login.password))
             {
-                var user = this._userRepo.Table.Where(x => (x.UserName == login.username) && x.IsDeleted!= true).FirstOrDefault();
+                var user = this._userRepo.Table.Where(x => (x.UserName == login.username) && x.IsDeleted != true).FirstOrDefault();
                 if (user != null)
                 {
                     if (string.IsNullOrEmpty(user.UserUniqueId))

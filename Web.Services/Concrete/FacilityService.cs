@@ -954,9 +954,9 @@ namespace Web.Services.Concrete
                     clinicalHolidays.Add(holiday);
                 }
 
-                if (clinicalHolidays.Count > 0) 
+                if (clinicalHolidays.Count > 0)
                 {
-                    this._clinicalHolidayRepo.Insert(clinicalHolidays);  
+                    this._clinicalHolidayRepo.Insert(clinicalHolidays);
                 }
 
 

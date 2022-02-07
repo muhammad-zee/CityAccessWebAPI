@@ -150,7 +150,7 @@ namespace Web.API.Controllers
         [RequestHandler]
         [Description("Add or Update Favourite Team")]
         [HttpPost("auth/addOrUpdateFavouriteTeam")]
-        public BaseResponse AddOrUpdateFavouriteTeam([FromBody] RegisterCredentialVM FavTeam) 
+        public BaseResponse AddOrUpdateFavouriteTeam([FromBody] RegisterCredentialVM FavTeam)
         {
             try
             {
