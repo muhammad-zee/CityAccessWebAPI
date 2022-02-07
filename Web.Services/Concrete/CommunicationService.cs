@@ -605,7 +605,7 @@ namespace Web.Services.Concrete
 
 
         #region [Video Call]
-        public BaseResponse GenerateVideoCallToken(string identity)
+        public BaseResponse generateVideoCallToken(string identity)
         {
             BaseResponse response = new BaseResponse();
             TwilioClient.Init(this.Twilio_AccountSid, this.Twilio_AuthToken);

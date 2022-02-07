@@ -248,5 +248,23 @@ namespace Web.API.Controllers
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
         }
+
+
+
+
+        [HttpGet("VideoCall/generateVideoCallToken")]
+        public BaseResponse generateVideoCallToken(string Identity)
+        {
+            try
+            {
+                return this._communicaitonService.generateVideoCallToken(Identity);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
     }
 }

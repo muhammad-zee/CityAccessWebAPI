@@ -7,6 +7,7 @@ namespace Web.Services.Interfaces
 {
     public interface ICommunicationService
     {
+
         BaseResponse generateConversationToken(string Identity);
         BaseResponse sendPushNotification(ConversationMessageVM msg);
         BaseResponse ConversationCallbackEvent(string EventType);
@@ -26,6 +27,11 @@ namespace Web.Services.Interfaces
         ChannelResource createConversationChannel(string FriendlyName, string UniqueName);
  UserResource createConversationUser(string Identity, string FriendlyName);
 MemberResource addNewUserToConversationChannel(string ChannelSid, string ParticipantUniqueName);
+
+
+        #region [Video Call]
+        BaseResponse generateVideoCallToken(string identity);
+        #endregion
 
         bool SendSms(string ToPhoneNumber, string SmsBody);
         bool SendEmail(string To, string Subject, string HtmlContent, byte[] ImageContent);
