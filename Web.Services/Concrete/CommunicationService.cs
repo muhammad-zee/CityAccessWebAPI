@@ -507,8 +507,8 @@ namespace Web.Services.Concrete
 
             //var chatusers = this._userrepo.table.where(u => u.isdeleted != true && u.isactive == true && !string.isnullorempty(u.userchannelsid));
             var chatUsers = this._dbContext.LoadStoredProcedure("raq_getAllConversationUsers")
-         .WithSqlParam("@proleid", ApplicationSettings.RoleIds)
-         .ExecuteStoredProc<ChatUsersVM>();
+             .WithSqlParam("@proleid", ApplicationSettings.RoleIds)
+             .ExecuteStoredProc<ChatUsersVM>();
             foreach (var user in chatUsers)
             {
                 user.UserRoles = (from ur in this._userRole.Table

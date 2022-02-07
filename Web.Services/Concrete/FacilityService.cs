@@ -663,8 +663,8 @@ namespace Web.Services.Concrete
             {
                 foreach (var item in cHours)
                 {
-                    item.startTime = item.startTime.ToTimezoneFromUtc("Eastern Standard Time");
-                    item.endTime = item.endTime.ToTimezoneFromUtc("Eastern Standard Time");
+                    item.startTimeStr = item.startTime.ToTimezoneFromUtc("Eastern Standard Time").ToString("yyyy-MM-dd hh:mm:ss tt");
+                    item.endTimeStr = item.endTime.ToTimezoneFromUtc("Eastern Standard Time").ToString("yyyy-MM-dd hh:mm:ss tt");
                 }
 
                 return new BaseResponse()

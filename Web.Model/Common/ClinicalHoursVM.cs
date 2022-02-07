@@ -38,6 +38,8 @@ namespace Web.Model.Common
         public DateTime endDate { get; set; }
         public DateTime startTime { get; set; }
         public DateTime endTime { get; set; }
+        public string startTimeStr { get; set; }
+        public string endTimeStr { get; set; }
         public DateTime? startBreak { get; set; }
         public DateTime? endBreak { get; set; }
         public int CreatedBy { get; set; }
