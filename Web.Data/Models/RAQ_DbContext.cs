@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 #nullable disable
 
@@ -447,8 +449,6 @@ namespace Web.Data.Models
 
             modelBuilder.Entity<Setting>(entity =>
             {
-                entity.HasNoKey();
-
                 entity.HasIndex(e => e.OrganizationIdFk, "OrganizationIdFk_UK")
                     .IsUnique();
 
@@ -461,7 +461,7 @@ namespace Web.Data.Models
                     .HasMaxLength(50);
 
                 entity.HasOne(d => d.OrganizationIdFkNavigation)
-                    .WithOne()
+                    .WithOne(p => p.Setting)
                     .HasForeignKey<Setting>(d => d.OrganizationIdFk)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Settings_Organizations");

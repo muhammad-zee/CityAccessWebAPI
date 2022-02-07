@@ -32,6 +32,7 @@ namespace Web.Data.Models
         public bool IsActive { get; set; }
         public bool IsDeleted { get; set; }
 
+        public virtual Setting Setting { get; set; }
         public virtual ICollection<Department> Departments { get; set; }
     }
 }
