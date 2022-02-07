@@ -33,6 +33,7 @@ namespace Web.Data.Models
         public virtual DbSet<Organization> Organizations { get; set; }
         public virtual DbSet<Role> Roles { get; set; }
         public virtual DbSet<ServiceLine> ServiceLines { get; set; }
+        public virtual DbSet<Setting> Settings { get; set; }
         public virtual DbSet<State> States { get; set; }
         public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<UserAccess> UserAccesses { get; set; }
@@ -444,6 +445,21 @@ namespace Web.Data.Models
                     .HasForeignKey(d => d.DepartmentIdFk)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Departments_ServiceLine");
+            });
+
+            modelBuilder.Entity<Setting>(entity =>
+            {
+                entity.HasNoKey();
+
+                entity.Property(e => e.OrganizationEmail)
+                    .IsRequired()
+                    .HasMaxLength(50);
+
+                entity.HasOne(d => d.OrganizationIdFkNavigation)
+                    .WithMany()
+                    .HasForeignKey(d => d.OrganizationIdFk)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Settings_Organizations");
             });
 
             modelBuilder.Entity<State>(entity =>

@@ -19,6 +19,8 @@ namespace Web.Model.Common
 
         public List<UserRoleVM> UserRoles { get; set; }
         public List<ServiceLineVM> ServiceLines { get; set; }
+        public List<DepartmentVM> Departments { get; set; }
+        public List<OrganizationVM> Organizations { get; set; }
     }
 
     public class ConversationUserStatus

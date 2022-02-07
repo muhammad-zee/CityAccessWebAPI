@@ -50,6 +50,8 @@ namespace Web.Services.Concrete
         private readonly IRepository<ConversationParticipant> _conversationParticipantsRepo;
         private IRepository<UsersRelation> _userRelationRepo;
         private IRepository<ServiceLine> _serviceLineRepo;
+        private IRepository<Department> _dptRepo;
+        private IRepository<Organization> _orgRepo;
 
         public CommunicationService(IConfiguration config,
             RAQ_DbContext dbContext,
@@ -59,7 +61,9 @@ namespace Web.Services.Concrete
             IRepository<Role> role,
             IRepository<UserRole> userRole,
             IRepository<UsersRelation> userRelationRepo,
-            IRepository<ServiceLine> serviceLineRepo
+            IRepository<ServiceLine> serviceLineRepo,
+            IRepository<Department> dptRepo,
+            IRepository<Organization> orgRepo
             )
         {
 
@@ -84,6 +88,8 @@ namespace Web.Services.Concrete
             this._userRole = userRole;
             this._userRelationRepo = userRelationRepo;
             this._serviceLineRepo = serviceLineRepo;
+            this._dptRepo = dptRepo;
+            this._orgRepo = orgRepo;
 
         }
 
@@ -254,7 +260,7 @@ namespace Web.Services.Concrete
         }
         public BaseResponse ConversationCallbackEvent(string EventType)
         {
-            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Event Received"};
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Event Received" };
         }
 
 
@@ -276,7 +282,7 @@ namespace Web.Services.Concrete
         public BaseResponse saveConversationChannel(ConversationChannelVM channel)
         {
             BaseResponse response = new BaseResponse();
-            if(!channel.IsGroup.Value  && !channel.FriendlyName.Contains("S_"))
+            if (!channel.IsGroup.Value && !channel.FriendlyName.Contains("S_"))
             {
                 channel.IsGroup = true;
             }
@@ -529,7 +535,10 @@ namespace Web.Services.Concrete
                                      {
                                          ServiceLineId = sl.ServiceLineId,
                                          ServiceName = sl.ServiceName,
+                                         DepartmentIdFk = sl.DepartmentIdFk,
                                      }).ToList();
+                user.Departments = this._dptRepo.Table.Where(x => !x.IsDeleted && user.ServiceLines.Select(y => y.DepartmentIdFk).Contains(x.DepartmentId)).Select(x => new DepartmentVM() { DepartmentId = x.DepartmentId, DepartmentName = x.DepartmentName, OrganizationIdFk = x.OrganizationIdFk }).ToList();
+                user.Organizations = user.Departments.Count > 0 ? this._orgRepo.Table.Where(x => !x.IsDeleted && user.Departments.Select(y => y.OrganizationIdFk).Contains(x.OrganizationId)).Select(x => new OrganizationVM() { OrganizationId = x.OrganizationId, OrganizationName = x.OrganizationName }).ToList() : this._orgRepo.Table.Where(x => !x.IsDeleted && user.UserRoles.Select(y => y.OrganizationIdFk).Contains(x.OrganizationId)).Select(x => new OrganizationVM() { OrganizationId = x.OrganizationId, OrganizationName = x.OrganizationName }).ToList();
             }
 
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Chat users found", Body = chatUsers };
@@ -562,9 +571,9 @@ namespace Web.Services.Concrete
             List<ConversationUserStatus> statusList = new();
             string[] userSidList = UserSid.Split(",");
             var status = false;
-            foreach(var sid in userSidList)
+            foreach (var sid in userSidList)
             {
-               if(sid!= "")
+                if (sid != "")
                 {
                     status = conversationUserIsOnline(sid);
                     statusList.Add(new ConversationUserStatus() { ConversationUserSid = sid, IsOnline = status });
@@ -587,7 +596,7 @@ namespace Web.Services.Concrete
                     return user.IsOnline.Value;
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 return false;
             }
