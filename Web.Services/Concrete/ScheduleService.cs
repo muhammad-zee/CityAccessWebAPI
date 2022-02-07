@@ -26,7 +26,6 @@ namespace Web.Services.Concrete
         private readonly UnitOfWork unitorWork;
         private IHostingEnvironment _environment;
         private RAQ_DbContext _dbContext;
-        private readonly IOptions<ApplicationSettings> _appSettings;
 
         private readonly IRepository<UsersSchedule> _scheduleRepo;
         private readonly IRepository<User> _userRepo;
@@ -48,7 +47,6 @@ namespace Web.Services.Concrete
         {
             this._dbContext = dbContext;
             this._config = configuration;
-            this._appSettings = appSettings;
             this._environment = environment;
             this.conStr = _config["ConnectionStrings:DefaultConnection"].ToString();
 

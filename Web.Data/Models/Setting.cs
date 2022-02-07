@@ -14,6 +14,11 @@ namespace Web.Data.Models
         public string OrganizationEmail { get; set; }
         public int TwoFactorAuthenticationExpiryMinutes { get; set; }
         public int VerifyForFutureDays { get; set; }
+        public int CreatedBy { get; set; }
+        public DateTime CreatedDate { get; set; }
+        public int? ModifiedBy { get; set; }
+        public DateTime? ModifiedDate { get; set; }
+        public bool IsDeleted { get; set; }
 
         public virtual Organization OrganizationIdFkNavigation { get; set; }
     }
