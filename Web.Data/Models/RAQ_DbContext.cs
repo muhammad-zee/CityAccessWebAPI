@@ -449,15 +449,20 @@ namespace Web.Data.Models
 
             modelBuilder.Entity<Setting>(entity =>
             {
-                entity.HasNoKey();
+                entity.HasIndex(e => e.OrganizationIdFk, "OrganizationIdFk_UK")
+                    .IsUnique();
+
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
 
                 entity.Property(e => e.OrganizationEmail)
                     .IsRequired()
                     .HasMaxLength(50);
 
                 entity.HasOne(d => d.OrganizationIdFkNavigation)
-                    .WithMany()
-                    .HasForeignKey(d => d.OrganizationIdFk)
+                    .WithOne(p => p.Setting)
+                    .HasForeignKey<Setting>(d => d.OrganizationIdFk)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Settings_Organizations");
             });
