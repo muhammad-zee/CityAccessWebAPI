@@ -64,6 +64,7 @@ namespace Web.Services.Concrete
                 setting.ModifiedBy = settings.ModifiedBy;
                 setting.ModifiedDate = DateTime.UtcNow;
                 setting.IsDeleted = false;
+                this._settingRepo.Update(setting);
             }
             else
             {
