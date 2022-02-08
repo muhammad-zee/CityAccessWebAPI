@@ -73,6 +73,7 @@ namespace Web.Services.Concrete
                               where ocf.OrganizationIdFk == OrgId && !ocf.IsDeleted && !cf.IsDeleted
                               select new
                               {
+                                  cf.FieldLabel,
                                   cf.FieldName,
                                   cf.FieldType,
                                   cf.FieldDataType,
