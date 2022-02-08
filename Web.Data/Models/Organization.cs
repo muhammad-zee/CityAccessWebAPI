@@ -10,6 +10,7 @@ namespace Web.Data.Models
         public Organization()
         {
             Departments = new HashSet<Department>();
+            OrganizationConsultFields = new HashSet<OrganizationConsultField>();
         }
 
         public int OrganizationId { get; set; }
@@ -34,5 +35,6 @@ namespace Web.Data.Models
 
         public virtual Setting Setting { get; set; }
         public virtual ICollection<Department> Departments { get; set; }
+        public virtual ICollection<OrganizationConsultField> OrganizationConsultFields { get; set; }
     }
 }

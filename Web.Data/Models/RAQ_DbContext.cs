@@ -21,6 +21,9 @@ namespace Web.Data.Models
         public virtual DbSet<ClinicalHour> ClinicalHours { get; set; }
         public virtual DbSet<Component> Components { get; set; }
         public virtual DbSet<ComponentAccess> ComponentAccesses { get; set; }
+        public virtual DbSet<Consult> Consults { get; set; }
+        public virtual DbSet<ConsultAcknowledgment> ConsultAcknowledgments { get; set; }
+        public virtual DbSet<ConsultField> ConsultFields { get; set; }
         public virtual DbSet<ControlList> ControlLists { get; set; }
         public virtual DbSet<ControlListDetail> ControlListDetails { get; set; }
         public virtual DbSet<ConversationChannel> ConversationChannels { get; set; }
@@ -31,6 +34,7 @@ namespace Web.Data.Models
         public virtual DbSet<InteractiveVoiceResponse> InteractiveVoiceResponses { get; set; }
         public virtual DbSet<Ivrsetting> Ivrsettings { get; set; }
         public virtual DbSet<Organization> Organizations { get; set; }
+        public virtual DbSet<OrganizationConsultField> OrganizationConsultFields { get; set; }
         public virtual DbSet<Role> Roles { get; set; }
         public virtual DbSet<ServiceLine> ServiceLines { get; set; }
         public virtual DbSet<Setting> Settings { get; set; }
@@ -156,6 +160,55 @@ namespace Web.Data.Models
                     .HasForeignKey(d => d.RoleIdFk)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_ComponentAccess");
+            });
+
+            modelBuilder.Entity<Consult>(entity =>
+            {
+                entity.Property(e => e.ConsultType)
+                    .IsRequired()
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.DateOfBirth).HasColumnType("datetime");
+
+                entity.Property(e => e.Location).HasMaxLength(500);
+
+                entity.Property(e => e.MedicalRecordNumber).HasMaxLength(100);
+
+                entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.PatientFirstName)
+                    .IsRequired()
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.PatientLastName)
+                    .IsRequired()
+                    .HasMaxLength(50);
+
+                entity.HasOne(d => d.ServiceLineIdFkNavigation)
+                    .WithMany(p => p.Consults)
+                    .HasForeignKey(d => d.ServiceLineIdFk)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Consults_ServiceLine");
+            });
+
+            modelBuilder.Entity<ConsultAcknowledgment>(entity =>
+            {
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+            });
+
+            modelBuilder.Entity<ConsultField>(entity =>
+            {
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.FieldName)
+                    .IsRequired()
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
             });
 
             modelBuilder.Entity<ControlList>(entity =>
@@ -409,6 +462,27 @@ namespace Web.Data.Models
                 entity.Property(e => e.PrimaryMobileNo2).HasMaxLength(15);
 
                 entity.Property(e => e.Zip).HasMaxLength(100);
+            });
+
+            modelBuilder.Entity<OrganizationConsultField>(entity =>
+            {
+                entity.HasKey(e => e.OrgConsultFieldId);
+
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+
+                entity.HasOne(d => d.ConsultFieldIdFkNavigation)
+                    .WithMany(p => p.OrganizationConsultFields)
+                    .HasForeignKey(d => d.ConsultFieldIdFk)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_OrganizationConsultFields_ConsultFields");
+
+                entity.HasOne(d => d.OrganizationIdFkNavigation)
+                    .WithMany(p => p.OrganizationConsultFields)
+                    .HasForeignKey(d => d.OrganizationIdFk)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_OrganizationConsultFields_Organizations");
             });
 
             modelBuilder.Entity<Role>(entity =>

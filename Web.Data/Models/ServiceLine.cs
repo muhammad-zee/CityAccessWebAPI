@@ -11,6 +11,7 @@ namespace Web.Data.Models
         {
             ClinicalHolidays = new HashSet<ClinicalHoliday>();
             ClinicalHours = new HashSet<ClinicalHour>();
+            Consults = new HashSet<Consult>();
             FavouriteTeams = new HashSet<FavouriteTeam>();
             UsersRelations = new HashSet<UsersRelation>();
             UsersSchedules = new HashSet<UsersSchedule>();
@@ -29,6 +30,7 @@ namespace Web.Data.Models
         public virtual Department DepartmentIdFkNavigation { get; set; }
         public virtual ICollection<ClinicalHoliday> ClinicalHolidays { get; set; }
         public virtual ICollection<ClinicalHour> ClinicalHours { get; set; }
+        public virtual ICollection<Consult> Consults { get; set; }
         public virtual ICollection<FavouriteTeam> FavouriteTeams { get; set; }
         public virtual ICollection<UsersRelation> UsersRelations { get; set; }
         public virtual ICollection<UsersSchedule> UsersSchedules { get; set; }

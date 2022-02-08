@@ -10,6 +10,7 @@ namespace Web.Data.Models
         public int ConversationParticipantId { get; set; }
         public string FriendlyName { get; set; }
         public string UniqueName { get; set; }
+        public bool IsAdmin { get; set; }
         public int UserIdFk { get; set; }
         public int ConversationChannelIdFk { get; set; }
         public int CreatedBy { get; set; }
