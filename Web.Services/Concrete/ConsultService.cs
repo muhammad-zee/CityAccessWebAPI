@@ -17,7 +17,7 @@ using Web.Services.Interfaces;
 
 namespace Web.Services.Concrete
 {
-    public class ConsultService: IConsultService
+    public class ConsultService : IConsultService
     {
         private RAQ_DbContext _dbContext;
         private IRepository<ConsultField> _consultFieldRepo;
@@ -38,21 +38,35 @@ namespace Web.Services.Concrete
 
         #region Consult Fields
 
-        public BaseResponse GetAllConsultFields() 
+        public BaseResponse GetAllConsultFields()
         {
             var consultFields = this._consultFieldRepo.Table.Where(x => !x.IsDeleted).ToList();
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Found", Body = consultFields };
         }
 
-        public BaseResponse GetConsultFeildsForOrg(int OrgId) 
+        public BaseResponse GetConsultFeildsForOrg(int OrgId)
         {
             var consultFields = this._consultFieldRepo.Table.Where(x => !x.IsDeleted).ToList();
             var selectedConsultFields = this._orgConsultRepo.Table.Where(x => x.OrganizationIdFk == OrgId && !x.IsDeleted).Select(x => x.ConsultFieldIdFk).ToList();
 
-            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Found", Body = new { consultFields, selectedConsultFields } };
+            var consultFieldVM = AutoMapperHelper.MapList<ConsultField, ConsultFieldsVM>(consultFields);
+
+            foreach (var item in consultFieldVM)
+            {
+                if (selectedConsultFields.Contains(item.ConsultFieldId))
+                {
+                    item.IsSelected = true;
+                }
+                else
+                {
+                    item.IsSelected = false;
+                }
+            }
+
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Found", Body = consultFieldVM };
         }
 
-        public BaseResponse AddOrUpdateConsultFeilds(ConsultFieldsVM consultField) 
+        public BaseResponse AddOrUpdateConsultFeilds(ConsultFieldsVM consultField)
         {
             if (consultField.ConsultFieldId > 0)
             {
@@ -72,7 +86,7 @@ namespace Web.Services.Concrete
                 }
                 return new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "Record Not Found" };
             }
-            else 
+            else
             {
                 var consultFields = new ConsultField()
                 {
@@ -95,7 +109,7 @@ namespace Web.Services.Concrete
 
         #region Organization Consult Fields
 
-        public BaseResponse AddOrUpdateOrgConsultFeilds(List<OrgConsultFieldsVM> orgConsultFields) 
+        public BaseResponse AddOrUpdateOrgConsultFeilds(List<OrgConsultFieldsVM> orgConsultFields)
         {
 
             var duplicateObj = orgConsultFields;
