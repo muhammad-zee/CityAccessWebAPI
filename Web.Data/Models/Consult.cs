@@ -16,7 +16,7 @@ namespace Web.Data.Models
         public DateTime? DateOfBirth { get; set; }
         public string MedicalRecordNumber { get; set; }
         public bool IsCallbackRequired { get; set; }
-        public int? CallbackNumber { get; set; }
+        public string CallbackNumber { get; set; }
         public string Location { get; set; }
         public string ConsultType { get; set; }
         public string ConsultReason { get; set; }

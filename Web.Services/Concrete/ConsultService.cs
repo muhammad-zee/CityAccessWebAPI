@@ -66,6 +66,21 @@ namespace Web.Services.Concrete
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Found", Body = consultFieldVM };
         }
 
+        public BaseResponse GetConsultFormFieldByOrgId(int OrgId) 
+        {
+            var formFields = (from cf in this._consultFieldRepo.Table
+                              join ocf in this._orgConsultRepo.Table on cf.ConsultFieldId equals ocf.ConsultFieldIdFk
+                              where ocf.OrganizationIdFk == OrgId && !ocf.IsDeleted && !cf.IsDeleted
+                              select new
+                              {
+                                  cf.FieldName,
+                                  cf.FieldType,
+                                  cf.FieldDataType,
+                                  cf.FieldDataLength
+                              }).Distinct().ToList();
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Found", Body = formFields };
+        }
+
         public BaseResponse AddOrUpdateConsultFeilds(ConsultFieldsVM consultField)
         {
             if (consultField.ConsultFieldId > 0)
@@ -73,6 +88,7 @@ namespace Web.Services.Concrete
                 var consultFeilds = this._consultFieldRepo.Table.Where(x => x.ConsultFieldId == consultField.ConsultFieldId && !x.IsDeleted).FirstOrDefault();
                 if (consultFeilds != null)
                 {
+                    consultFeilds.FieldLabel = consultField.FieldLabel;
                     consultFeilds.FieldName = consultField.FieldName;
                     consultFeilds.FieldType = consultField.FieldType;
                     consultFeilds.FieldDataType = consultField.FieldDataType;
@@ -90,6 +106,7 @@ namespace Web.Services.Concrete
             {
                 var consultFields = new ConsultField()
                 {
+                    FieldLabel = consultField.FieldLabel,
                     FieldName = consultField.FieldName,
                     FieldType = consultField.FieldType,
                     FieldDataType = consultField.FieldDataType,

@@ -13,6 +13,7 @@ namespace Web.Services.Interfaces
         #region Consult Feilds
         BaseResponse GetAllConsultFields();
         BaseResponse GetConsultFeildsForOrg(int OrgId);
+        BaseResponse GetConsultFormFieldByOrgId(int OrgId);
         BaseResponse AddOrUpdateConsultFeilds(ConsultFieldsVM consultField);
         #endregion
 

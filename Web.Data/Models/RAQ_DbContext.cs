@@ -164,6 +164,8 @@ namespace Web.Data.Models
 
             modelBuilder.Entity<Consult>(entity =>
             {
+                entity.Property(e => e.CallbackNumber).HasMaxLength(15);
+
                 entity.Property(e => e.ConsultType)
                     .IsRequired()
                     .HasMaxLength(50);
@@ -204,7 +206,17 @@ namespace Web.Data.Models
             {
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");
 
+                entity.Property(e => e.FieldDataType)
+                    .IsRequired()
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.FieldLabel).HasMaxLength(50);
+
                 entity.Property(e => e.FieldName)
+                    .IsRequired()
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.FieldType)
                     .IsRequired()
                     .HasMaxLength(50);
 

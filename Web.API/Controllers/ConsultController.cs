@@ -69,6 +69,22 @@ namespace Web.API.Controllers
         }
 
         [Description("Get Consult Feilds For Org")]
+        [HttpGet("consult/GetConsultFormFieldByOrgId/{OrgId}")]
+        public BaseResponse GetConsultFormFieldByOrgId(int OrgId) 
+        {
+            try
+            {
+                return _consultService.GetConsultFormFieldByOrgId(OrgId);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = ex.ToString() };
+            }
+        }
+
+        [Description("Get Consult Feilds For Org")]
         [HttpPost("consult/AddOrUpdateConsultFeilds")]
         public BaseResponse AddOrUpdateConsultFeilds([FromBody] ConsultFieldsVM consultField)
         {
@@ -104,7 +120,6 @@ namespace Web.API.Controllers
             }
 
         }
-
         #endregion
 
     }
