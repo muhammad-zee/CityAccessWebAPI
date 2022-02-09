@@ -6,14 +6,10 @@ using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Net;
-using System.Reflection;
-using System.Threading.Tasks;
 using Web.API.Helper;
 using Web.Model;
 using Web.Model.Common;
-using Web.Services.Enums;
 using Web.Services.Interfaces;
 
 
@@ -70,7 +66,7 @@ namespace Web.API.Controllers
 
         [Description("Get Consult Feilds For Org")]
         [HttpGet("consult/GetConsultFormFieldByOrgId/{OrgId}")]
-        public BaseResponse GetConsultFormFieldByOrgId(int OrgId) 
+        public BaseResponse GetConsultFormFieldByOrgId(int OrgId)
         {
             try
             {
@@ -84,7 +80,7 @@ namespace Web.API.Controllers
             }
         }
 
-        [Description("Get Consult Feilds For Org")]
+        [Description("Add Or Update Consult Feilds")]
         [HttpPost("consult/AddOrUpdateConsultFeilds")]
         public BaseResponse AddOrUpdateConsultFeilds([FromBody] ConsultFieldsVM consultField)
         {
@@ -106,7 +102,7 @@ namespace Web.API.Controllers
 
         [Description("Get Consult Feilds For Org")]
         [HttpPost("consult/AddOrUpdateOrgConsultFeilds")]
-        public BaseResponse AddOrUpdateOrgConsultFeilds([FromBody] List<OrgConsultFieldsVM> orgConsultFields) 
+        public BaseResponse AddOrUpdateOrgConsultFeilds([FromBody] List<OrgConsultFieldsVM> orgConsultFields)
         {
             try
             {

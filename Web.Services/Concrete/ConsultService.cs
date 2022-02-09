@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Net;
@@ -10,8 +9,6 @@ using Web.Data.Models;
 using Web.DLL.Generic_Repository;
 using Web.Model;
 using Web.Model.Common;
-using Web.Services.Enums;
-using Web.Services.Extensions;
 using Web.Services.Helper;
 using Web.Services.Interfaces;
 
@@ -66,7 +63,7 @@ namespace Web.Services.Concrete
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Found", Body = consultFieldVM };
         }
 
-        public BaseResponse GetConsultFormFieldByOrgId(int OrgId) 
+        public BaseResponse GetConsultFormFieldByOrgId(int OrgId)
         {
             var formFields = (from cf in this._consultFieldRepo.Table
                               join ocf in this._orgConsultRepo.Table on cf.ConsultFieldId equals ocf.ConsultFieldIdFk

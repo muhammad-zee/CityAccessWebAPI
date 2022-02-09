@@ -1,6 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
+﻿using Microsoft.EntityFrameworkCore;
 
 #nullable disable
 
@@ -19,6 +17,10 @@ namespace Web.Data.Models
 
         public virtual DbSet<ClinicalHoliday> ClinicalHolidays { get; set; }
         public virtual DbSet<ClinicalHour> ClinicalHours { get; set; }
+        public virtual DbSet<CodeSepsi> CodeSepses { get; set; }
+        public virtual DbSet<CodeStemi> CodeStemis { get; set; }
+        public virtual DbSet<CodeStroke> CodeStrokes { get; set; }
+        public virtual DbSet<CodeTrauma> CodeTraumas { get; set; }
         public virtual DbSet<Component> Components { get; set; }
         public virtual DbSet<ComponentAccess> ComponentAccesses { get; set; }
         public virtual DbSet<Consult> Consults { get; set; }
@@ -106,6 +108,134 @@ namespace Web.Data.Models
                     .HasForeignKey(d => d.ServicelineIdFk)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_ServiceLine_Departments");
+            });
+
+            modelBuilder.Entity<CodeSepsi>(entity =>
+            {
+                entity.HasKey(e => e.CodeSepsisId);
+
+                entity.ToTable("CodeSepsis");
+
+                entity.Property(e => e.ChiefComplant)
+                    .IsRequired()
+                    .HasMaxLength(200);
+
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.Dob)
+                    .HasColumnType("datetime")
+                    .HasColumnName("DOB");
+
+                entity.Property(e => e.FamilyContactNumber)
+                    .IsRequired()
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.Hpi)
+                    .IsRequired()
+                    .HasMaxLength(15)
+                    .HasColumnName("HPI");
+
+                entity.Property(e => e.LastKnownWell).HasColumnType("datetime");
+
+                entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.PatientName)
+                    .IsRequired()
+                    .HasMaxLength(100);
+            });
+
+            modelBuilder.Entity<CodeStemi>(entity =>
+            {
+                entity.ToTable("CodeSTEMIs");
+
+                entity.Property(e => e.CodeStemiid).HasColumnName("CodeSTEMIId");
+
+                entity.Property(e => e.ChiefComplant)
+                    .IsRequired()
+                    .HasMaxLength(200);
+
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.Dob)
+                    .HasColumnType("datetime")
+                    .HasColumnName("DOB");
+
+                entity.Property(e => e.FamilyContactNumber)
+                    .IsRequired()
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.Hpi)
+                    .IsRequired()
+                    .HasMaxLength(15)
+                    .HasColumnName("HPI");
+
+                entity.Property(e => e.LastKnownWell).HasColumnType("datetime");
+
+                entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.PatientName)
+                    .IsRequired()
+                    .HasMaxLength(100);
+            });
+
+            modelBuilder.Entity<CodeStroke>(entity =>
+            {
+                entity.Property(e => e.ChiefComplant)
+                    .IsRequired()
+                    .HasMaxLength(200);
+
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.Dob)
+                    .HasColumnType("datetime")
+                    .HasColumnName("DOB");
+
+                entity.Property(e => e.FamilyContactNumber)
+                    .IsRequired()
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.Hpi)
+                    .IsRequired()
+                    .HasMaxLength(15)
+                    .HasColumnName("HPI");
+
+                entity.Property(e => e.LastKnownWell).HasColumnType("datetime");
+
+                entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.PatientName)
+                    .IsRequired()
+                    .HasMaxLength(100);
+            });
+
+            modelBuilder.Entity<CodeTrauma>(entity =>
+            {
+                entity.Property(e => e.ChiefComplant)
+                    .IsRequired()
+                    .HasMaxLength(200);
+
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.Dob)
+                    .HasColumnType("datetime")
+                    .HasColumnName("DOB");
+
+                entity.Property(e => e.FamilyContactNumber)
+                    .IsRequired()
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.Hpi)
+                    .IsRequired()
+                    .HasMaxLength(15)
+                    .HasColumnName("HPI");
+
+                entity.Property(e => e.LastKnownWell).HasColumnType("datetime");
+
+                entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.PatientName)
+                    .IsRequired()
+                    .HasMaxLength(100);
             });
 
             modelBuilder.Entity<Component>(entity =>

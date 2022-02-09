@@ -75,7 +75,7 @@ namespace Web.Services.Concrete
 
 
         #region Dashboard Data
-         
+
         public BaseResponse GetLabelCounts(int orgId)
         {
             var LabelCounts = this._dbContext.LoadStoredProcedure("raq_getCountOfTablesForDashboard")
