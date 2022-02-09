@@ -134,9 +134,7 @@ namespace Web.Data.Models
 
                 entity.ToTable("CodeSepsis");
 
-                entity.Property(e => e.ChiefComplant)
-                    .IsRequired()
-                    .HasMaxLength(200);
+                entity.Property(e => e.ChiefComplant).HasMaxLength(200);
 
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");
 
@@ -146,12 +144,9 @@ namespace Web.Data.Models
 
                 entity.Property(e => e.FamilyContactName).HasMaxLength(100);
 
-                entity.Property(e => e.FamilyContactNumber)
-                    .IsRequired()
-                    .HasMaxLength(50);
+                entity.Property(e => e.FamilyContactNumber).HasMaxLength(50);
 
                 entity.Property(e => e.Hpi)
-                    .IsRequired()
                     .HasMaxLength(15)
                     .HasColumnName("HPI");
 
@@ -161,9 +156,7 @@ namespace Web.Data.Models
 
                 entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
 
-                entity.Property(e => e.PatientName)
-                    .IsRequired()
-                    .HasMaxLength(100);
+                entity.Property(e => e.PatientName).HasMaxLength(100);
             });
 
             modelBuilder.Entity<CodeStemi>(entity =>
@@ -172,9 +165,7 @@ namespace Web.Data.Models
 
                 entity.Property(e => e.CodeStemiid).HasColumnName("CodeSTEMIId");
 
-                entity.Property(e => e.ChiefComplant)
-                    .IsRequired()
-                    .HasMaxLength(200);
+                entity.Property(e => e.ChiefComplant).HasMaxLength(200);
 
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");
 
@@ -184,12 +175,9 @@ namespace Web.Data.Models
 
                 entity.Property(e => e.FamilyContactName).HasMaxLength(100);
 
-                entity.Property(e => e.FamilyContactNumber)
-                    .IsRequired()
-                    .HasMaxLength(50);
+                entity.Property(e => e.FamilyContactNumber).HasMaxLength(50);
 
                 entity.Property(e => e.Hpi)
-                    .IsRequired()
                     .HasMaxLength(15)
                     .HasColumnName("HPI");
 
@@ -199,16 +187,12 @@ namespace Web.Data.Models
 
                 entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
 
-                entity.Property(e => e.PatientName)
-                    .IsRequired()
-                    .HasMaxLength(100);
+                entity.Property(e => e.PatientName).HasMaxLength(100);
             });
 
             modelBuilder.Entity<CodeStroke>(entity =>
             {
-                entity.Property(e => e.ChiefComplant)
-                    .IsRequired()
-                    .HasMaxLength(200);
+                entity.Property(e => e.ChiefComplant).HasMaxLength(200);
 
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");
 
@@ -218,12 +202,9 @@ namespace Web.Data.Models
 
                 entity.Property(e => e.FamilyContactName).HasMaxLength(100);
 
-                entity.Property(e => e.FamilyContactNumber)
-                    .IsRequired()
-                    .HasMaxLength(50);
+                entity.Property(e => e.FamilyContactNumber).HasMaxLength(50);
 
                 entity.Property(e => e.Hpi)
-                    .IsRequired()
                     .HasMaxLength(15)
                     .HasColumnName("HPI");
 
@@ -233,16 +214,12 @@ namespace Web.Data.Models
 
                 entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
 
-                entity.Property(e => e.PatientName)
-                    .IsRequired()
-                    .HasMaxLength(100);
+                entity.Property(e => e.PatientName).HasMaxLength(100);
             });
 
             modelBuilder.Entity<CodeTrauma>(entity =>
             {
-                entity.Property(e => e.ChiefComplant)
-                    .IsRequired()
-                    .HasMaxLength(200);
+                entity.Property(e => e.ChiefComplant).HasMaxLength(200);
 
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");
 
@@ -252,12 +229,9 @@ namespace Web.Data.Models
 
                 entity.Property(e => e.FamilyContactName).HasMaxLength(100);
 
-                entity.Property(e => e.FamilyContactNumber)
-                    .IsRequired()
-                    .HasMaxLength(50);
+                entity.Property(e => e.FamilyContactNumber).HasMaxLength(50);
 
                 entity.Property(e => e.Hpi)
-                    .IsRequired()
                     .HasMaxLength(15)
                     .HasColumnName("HPI");
 
@@ -267,9 +241,7 @@ namespace Web.Data.Models
 
                 entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
 
-                entity.Property(e => e.PatientName)
-                    .IsRequired()
-                    .HasMaxLength(100);
+                entity.Property(e => e.PatientName).HasMaxLength(100);
             });
 
             modelBuilder.Entity<Component>(entity =>
