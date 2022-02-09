@@ -31,6 +31,22 @@ namespace Web.API.Controllers
         }
 
 
+        [Description("Get Activated Codes By Org Id")]
+        [HttpGet("activecode/GetActivatedCodesByOrgId/{orgId}")]
+        public BaseResponse GetActivatedCodesByOrgId(int orgId) 
+        {
+            try
+            {
+                return _activeCodesService.GetActivatedCodesByOrgId(orgId);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = ex.ToString() };
+            }
+        }
+
         [Description("Add Or Update Stroke")]
         [HttpPost("activecode/MapActiveCodes")]
         public BaseResponse MapActiveCodes([FromBody] List<ActiveCodeVM> activeCode)

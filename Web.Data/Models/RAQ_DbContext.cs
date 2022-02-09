@@ -144,6 +144,8 @@ namespace Web.Data.Models
                     .HasColumnType("datetime")
                     .HasColumnName("DOB");
 
+                entity.Property(e => e.FamilyContactName).HasMaxLength(100);
+
                 entity.Property(e => e.FamilyContactNumber)
                     .IsRequired()
                     .HasMaxLength(50);
@@ -180,6 +182,8 @@ namespace Web.Data.Models
                     .HasColumnType("datetime")
                     .HasColumnName("DOB");
 
+                entity.Property(e => e.FamilyContactName).HasMaxLength(100);
+
                 entity.Property(e => e.FamilyContactNumber)
                     .IsRequired()
                     .HasMaxLength(50);
@@ -212,6 +216,8 @@ namespace Web.Data.Models
                     .HasColumnType("datetime")
                     .HasColumnName("DOB");
 
+                entity.Property(e => e.FamilyContactName).HasMaxLength(100);
+
                 entity.Property(e => e.FamilyContactNumber)
                     .IsRequired()
                     .HasMaxLength(50);
@@ -243,6 +249,8 @@ namespace Web.Data.Models
                 entity.Property(e => e.Dob)
                     .HasColumnType("datetime")
                     .HasColumnName("DOB");
+
+                entity.Property(e => e.FamilyContactName).HasMaxLength(100);
 
                 entity.Property(e => e.FamilyContactNumber)
                     .IsRequired()

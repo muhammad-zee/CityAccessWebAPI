@@ -23,5 +23,6 @@ namespace Web.Data.Models
         public bool IsDeleted { get; set; }
         public bool IsEms { get; set; }
         public bool IsCompleted { get; set; }
+        public string FamilyContactName { get; set; }
     }
 }

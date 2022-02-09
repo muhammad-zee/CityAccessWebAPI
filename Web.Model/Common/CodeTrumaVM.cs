@@ -12,6 +12,7 @@ namespace Web.Model.Common
         public DateTime LastKnownWell { get; set; }
         public string Hpi { get; set; }
         public int BloodThinners { get; set; }
+        public string FamilyContactName { get; set; }
         public string FamilyContactNumber { get; set; }
         public bool IsEms { get; set; }
         public bool IsCompleted { get; set; }

@@ -6,8 +6,11 @@ namespace Web.Services.Interfaces
 {
     public interface IActiveCodeService
     {
+        #region Active Codes
+        BaseResponse GetActivatedCodesByOrgId(int orgId);
         BaseResponse MapActiveCodes(List<ActiveCodeVM> activeCodes);
         BaseResponse DetachActiveCodes(int activeCodeId);
+        #endregion
 
         #region Code Stroke
         BaseResponse GetAllStrokeCode();

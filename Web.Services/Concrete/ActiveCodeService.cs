@@ -8,6 +8,7 @@ using Web.Data.Models;
 using Web.DLL.Generic_Repository;
 using Web.Model;
 using Web.Model.Common;
+using Web.Services.Extensions;
 using Web.Services.Helper;
 using Web.Services.Interfaces;
 
@@ -16,6 +17,9 @@ namespace Web.Services.Concrete
     public class ActiveCodeService : IActiveCodeService
     {
         private RAQ_DbContext _dbContext;
+        private IRepository<Organization> _orgRepo;
+        private IRepository<ServiceLine> _serviceLineRepo;
+        private IRepository<ControlListDetail> _controlListDetailsRepo;
         private IRepository<ActiveCode> _activeCodeRepo;
         private IRepository<CodeStroke> _codeStrokeRepo;
         private IRepository<CodeSepsi> _codeSepsisRepo;
@@ -40,6 +44,31 @@ namespace Web.Services.Concrete
 
         #region Active Code
 
+        public BaseResponse GetActivatedCodesByOrgId(int orgId) 
+        {
+            var codes = (from c in this._activeCodeRepo.Table
+                         join ucl in this._controlListDetailsRepo.Table on c.CodeIdFk equals ucl.ControlListDetailId
+                         where c.OrganizationIdFk == orgId && !c.IsDeleted
+                         select new ActiveCodeVM()
+                         {
+
+                             ActiveCodeId = c.ActiveCodeId,
+                             OrganizationIdFk = c.OrganizationIdFk,
+                             ActiveCodeName = ucl.Title,
+                             CodeIdFk = c.CodeIdFk,
+                             ServiceLineIds = c.ServiceLineIds,
+                             serviceLines = this._serviceLineRepo.Table.Where(x => !x.IsDeleted && c.ServiceLineIds.ToIntList().Contains(x.ServiceLineId)).Select(x => new ServiceLineVM() { ServiceLineId = x.ServiceLineId, ServiceName = x.ServiceName }).ToList()
+
+                         }).Distinct().ToList();
+            if (codes.Count > 0)
+            {
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = codes };
+            }
+            else 
+            {
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "No Active Code Found", Body = codes };
+            }
+        }
 
         public BaseResponse MapActiveCodes(List<ActiveCodeVM> activeCodes)
         {
@@ -120,6 +149,7 @@ namespace Web.Services.Concrete
                 row.LastKnownWell = codeStroke.LastKnownWell;
                 row.Hpi = codeStroke.Hpi;
                 row.BloodThinners = codeStroke.BloodThinners;
+                row.FamilyContactName = codeStroke.FamilyContactName;
                 row.FamilyContactNumber = codeStroke.FamilyContactNumber;
                 row.IsEms = codeStroke.IsEms;
                 row.IsCompleted = codeStroke.IsCompleted;
@@ -186,6 +216,7 @@ namespace Web.Services.Concrete
                 row.LastKnownWell = codeSepsis.LastKnownWell;
                 row.Hpi = codeSepsis.Hpi;
                 row.BloodThinners = codeSepsis.BloodThinners;
+                row.FamilyContactName = codeSepsis.FamilyContactName;
                 row.FamilyContactNumber = codeSepsis.FamilyContactNumber;
                 row.IsEms = codeSepsis.IsEms;
                 row.IsCompleted = codeSepsis.IsCompleted;
@@ -253,6 +284,7 @@ namespace Web.Services.Concrete
                 row.LastKnownWell = codeSTEMI.LastKnownWell;
                 row.Hpi = codeSTEMI.Hpi;
                 row.BloodThinners = codeSTEMI.BloodThinners;
+                row.FamilyContactName = codeSTEMI.FamilyContactName;
                 row.FamilyContactNumber = codeSTEMI.FamilyContactNumber;
                 row.IsEms = codeSTEMI.IsEms;
                 row.IsCompleted = codeSTEMI.IsCompleted;
@@ -320,6 +352,7 @@ namespace Web.Services.Concrete
                 row.LastKnownWell = codeTruma.LastKnownWell;
                 row.Hpi = codeTruma.Hpi;
                 row.BloodThinners = codeTruma.BloodThinners;
+                row.FamilyContactName = codeTruma.FamilyContactName;
                 row.FamilyContactNumber = codeTruma.FamilyContactNumber;
                 row.IsEms = codeTruma.IsEms;
                 row.IsCompleted = codeTruma.IsCompleted;
