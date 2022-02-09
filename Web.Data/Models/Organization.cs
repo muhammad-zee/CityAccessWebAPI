@@ -9,6 +9,7 @@ namespace Web.Data.Models
     {
         public Organization()
         {
+            ActiveCodes = new HashSet<ActiveCode>();
             Departments = new HashSet<Department>();
             OrganizationConsultFields = new HashSet<OrganizationConsultField>();
         }
@@ -34,6 +35,7 @@ namespace Web.Data.Models
         public bool IsDeleted { get; set; }
 
         public virtual Setting Setting { get; set; }
+        public virtual ICollection<ActiveCode> ActiveCodes { get; set; }
         public virtual ICollection<Department> Departments { get; set; }
         public virtual ICollection<OrganizationConsultField> OrganizationConsultFields { get; set; }
     }

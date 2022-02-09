@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Net;
@@ -15,6 +16,7 @@ namespace Web.Services.Concrete
     public class ActiveCodeService : IActiveCodeService
     {
         private RAQ_DbContext _dbContext;
+        private IRepository<ActiveCode> _activeCodeRepo;
         private IRepository<CodeStroke> _codeStrokeRepo;
         private IRepository<CodeSepsi> _codeSepsisRepo;
         private IRepository<CodeStemi> _codeSTEMIRepo;
@@ -22,17 +24,70 @@ namespace Web.Services.Concrete
         IConfiguration _config;
         public ActiveCodeService(RAQ_DbContext dbContext,
             IConfiguration config,
+            IRepository<ActiveCode> activeCodeRepo,
             IRepository<CodeStroke> codeStrokeRepo,
             IRepository<CodeSepsi> codeSepsisRepo,
             IRepository<CodeStemi> codeSTEMIRepo,
             IRepository<CodeTrauma> codeTrumaRepo)
         {
             this._config = config;
+            this._activeCodeRepo = activeCodeRepo;
             this._codeStrokeRepo = codeStrokeRepo;
             this._codeSepsisRepo = codeSepsisRepo;
             this._codeSTEMIRepo = codeSTEMIRepo;
             this._codeTrumaRepo = codeTrumaRepo;
         }
+
+        #region Active Code
+
+
+        public BaseResponse MapActiveCodes(List<ActiveCodeVM> activeCodes)
+        {
+            List<ActiveCode> update = new();
+            List<ActiveCode> insert = new();
+            foreach (var item in activeCodes)
+            {
+                if (item.ActiveCodeId > 0)
+                {
+                    var row = this._activeCodeRepo.Table.Where(x => x.ActiveCodeId == item.ActiveCodeId && !x.IsDeleted).FirstOrDefault();
+                    row.ServiceLineIds = item.ServiceLineIds;
+                    row.ModifiedBy = item.ModifiedBy;
+                    row.ModifiedDate = DateTime.Now;
+                    row.IsDeleted = false;
+                    update.Add(row);
+                }
+                else
+                {
+                    item.CreatedDate = DateTime.UtcNow;
+                    var row = AutoMapperHelper.MapSingleRow<ActiveCodeVM, ActiveCode>(item);
+                    insert.Add(row);
+                }
+
+            }
+            if (update.Count > 0)
+            {
+                this._activeCodeRepo.Update(update);
+            }
+            if (insert.Count > 0)
+            {
+                this._activeCodeRepo.Insert(insert);
+            }
+
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Saved" };
+        }
+
+        public BaseResponse DetachActiveCodes(int activeCodeId)
+        {
+            var row = this._activeCodeRepo.Table.Where(x => x.ActiveCodeId == activeCodeId && !x.IsDeleted).FirstOrDefault();
+            row.ModifiedBy = ApplicationSettings.UserId;
+            row.ModifiedDate = DateTime.UtcNow;
+            row.IsDeleted = true;
+            this._activeCodeRepo.Update(row);
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Deleted" };
+        }
+
+
+        #endregion
 
         #region Code Stroke
 
@@ -66,6 +121,8 @@ namespace Web.Services.Concrete
                 row.Hpi = codeStroke.Hpi;
                 row.BloodThinners = codeStroke.BloodThinners;
                 row.FamilyContactNumber = codeStroke.FamilyContactNumber;
+                row.IsEms = codeStroke.IsEms;
+                row.IsCompleted = codeStroke.IsCompleted;
                 row.ModifiedBy = codeStroke.ModifiedBy;
                 row.ModifiedDate = DateTime.UtcNow;
                 row.IsDeleted = false;
@@ -130,6 +187,8 @@ namespace Web.Services.Concrete
                 row.Hpi = codeSepsis.Hpi;
                 row.BloodThinners = codeSepsis.BloodThinners;
                 row.FamilyContactNumber = codeSepsis.FamilyContactNumber;
+                row.IsEms = codeSepsis.IsEms;
+                row.IsCompleted = codeSepsis.IsCompleted;
                 row.ModifiedBy = codeSepsis.ModifiedBy;
                 row.ModifiedDate = DateTime.UtcNow;
                 row.IsDeleted = false;
@@ -195,6 +254,8 @@ namespace Web.Services.Concrete
                 row.Hpi = codeSTEMI.Hpi;
                 row.BloodThinners = codeSTEMI.BloodThinners;
                 row.FamilyContactNumber = codeSTEMI.FamilyContactNumber;
+                row.IsEms = codeSTEMI.IsEms;
+                row.IsCompleted = codeSTEMI.IsCompleted;
                 row.ModifiedBy = codeSTEMI.ModifiedBy;
                 row.ModifiedDate = DateTime.UtcNow;
                 row.IsDeleted = false;
@@ -260,6 +321,8 @@ namespace Web.Services.Concrete
                 row.Hpi = codeTruma.Hpi;
                 row.BloodThinners = codeTruma.BloodThinners;
                 row.FamilyContactNumber = codeTruma.FamilyContactNumber;
+                row.IsEms = codeTruma.IsEms;
+                row.IsCompleted = codeTruma.IsCompleted;
                 row.ModifiedBy = codeTruma.ModifiedBy;
                 row.ModifiedDate = DateTime.UtcNow;
                 row.IsDeleted = false;

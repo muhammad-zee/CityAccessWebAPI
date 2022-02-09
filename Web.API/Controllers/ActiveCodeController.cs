@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Net;
 using Web.API.Helper;
@@ -27,6 +28,39 @@ namespace Web.API.Controllers
             _config = config;
             _hostEnvironment = environment;
             _logger = new Logger(_hostEnvironment);
+        }
+
+
+        [Description("Add Or Update Stroke")]
+        [HttpPost("activecode/MapActiveCodes")]
+        public BaseResponse MapActiveCodes([FromBody] List<ActiveCodeVM> activeCode)
+        {
+            try
+            {
+                return _activeCodesService.MapActiveCodes(activeCode);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = ex.ToString() };
+            }
+        }
+
+        [Description("Add Or Update Stroke")]
+        [HttpGet("activecode/DetachActiveCodes/{activeCodeId}")]
+        public BaseResponse DetachActiveCodes(int activeCodeId)
+        {
+            try
+            {
+                return _activeCodesService.DetachActiveCodes(activeCodeId);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = ex.ToString() };
+            }
         }
 
         #region Code Stroke

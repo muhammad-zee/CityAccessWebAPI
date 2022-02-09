@@ -1,10 +1,14 @@
-﻿using Web.Model;
+﻿using System.Collections.Generic;
+using Web.Model;
 using Web.Model.Common;
 
 namespace Web.Services.Interfaces
 {
     public interface IActiveCodeService
     {
+        BaseResponse MapActiveCodes(List<ActiveCodeVM> activeCodes);
+        BaseResponse DetachActiveCodes(int activeCodeId);
+
         #region Code Stroke
         BaseResponse GetAllStrokeCode();
         BaseResponse GetStrokeDataById(int strokeId);

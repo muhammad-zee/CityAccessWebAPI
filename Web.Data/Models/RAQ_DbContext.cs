@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 #nullable disable
 
@@ -15,6 +17,7 @@ namespace Web.Data.Models
         {
         }
 
+        public virtual DbSet<ActiveCode> ActiveCodes { get; set; }
         public virtual DbSet<ClinicalHoliday> ClinicalHolidays { get; set; }
         public virtual DbSet<ClinicalHour> ClinicalHours { get; set; }
         public virtual DbSet<CodeSepsi> CodeSepses { get; set; }
@@ -59,6 +62,21 @@ namespace Web.Data.Models
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasAnnotation("Relational:Collation", "SQL_Latin1_General_CP1_CI_AS");
+
+            modelBuilder.Entity<ActiveCode>(entity =>
+            {
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.ServiceLineIds).IsRequired();
+
+                entity.HasOne(d => d.OrganizationIdFkNavigation)
+                    .WithMany(p => p.ActiveCodes)
+                    .HasForeignKey(d => d.OrganizationIdFk)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_ActiveCodes_Organizations");
+            });
 
             modelBuilder.Entity<ClinicalHoliday>(entity =>
             {
@@ -135,6 +153,8 @@ namespace Web.Data.Models
                     .HasMaxLength(15)
                     .HasColumnName("HPI");
 
+                entity.Property(e => e.IsEms).HasColumnName("IsEMS");
+
                 entity.Property(e => e.LastKnownWell).HasColumnType("datetime");
 
                 entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
@@ -169,6 +189,8 @@ namespace Web.Data.Models
                     .HasMaxLength(15)
                     .HasColumnName("HPI");
 
+                entity.Property(e => e.IsEms).HasColumnName("IsEMS");
+
                 entity.Property(e => e.LastKnownWell).HasColumnType("datetime");
 
                 entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
@@ -199,6 +221,8 @@ namespace Web.Data.Models
                     .HasMaxLength(15)
                     .HasColumnName("HPI");
 
+                entity.Property(e => e.IsEms).HasColumnName("IsEMS");
+
                 entity.Property(e => e.LastKnownWell).HasColumnType("datetime");
 
                 entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
@@ -228,6 +252,8 @@ namespace Web.Data.Models
                     .IsRequired()
                     .HasMaxLength(15)
                     .HasColumnName("HPI");
+
+                entity.Property(e => e.IsEms).HasColumnName("IsEMS");
 
                 entity.Property(e => e.LastKnownWell).HasColumnType("datetime");
 
