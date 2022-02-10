@@ -38,6 +38,7 @@ namespace Web.Services.Concrete
             IRepository<CodeTrauma> codeTrumaRepo)
         {
             this._config = config;
+            this._dbContext = dbContext;
             this._orgRepo = orgRepo;
             this._serviceLineRepo = serviceLineRepo;
             this._controlListDetailsRepo = controlListDetailsRepo;
@@ -52,20 +53,28 @@ namespace Web.Services.Concrete
 
         public BaseResponse GetActivatedCodesByOrgId(int orgId)
         {
-            var codes = (from c in this._activeCodeRepo.Table
-                         join ucl in this._controlListDetailsRepo.Table on c.CodeIdFk equals ucl.ControlListDetailId
-                         where c.OrganizationIdFk == orgId && !c.IsDeleted
-                         select new ActiveCodeVM()
-                         {
+            //var codes = (from c in this._activeCodeRepo.Table
+            //             join ucl in this._controlListDetailsRepo.Table on c.CodeIdFk equals ucl.ControlListDetailId
+            //             where c.OrganizationIdFk == orgId && !c.IsDeleted
+            //             select new ActiveCodeVM()
+            //             {
 
-                             ActiveCodeId = c.ActiveCodeId,
-                             OrganizationIdFk = c.OrganizationIdFk,
-                             ActiveCodeName = ucl.Title,
-                             CodeIdFk = c.CodeIdFk,
-                             ServiceLineIds = c.ServiceLineIds,
-                             serviceLines = this._serviceLineRepo.Table.Where(x => !x.IsDeleted && c.ServiceLineIds.ToIntList().Contains(x.ServiceLineId)).Select(x => new ServiceLineVM() { ServiceLineId = x.ServiceLineId, ServiceName = x.ServiceName }).ToList()
+            //                 ActiveCodeId = c.ActiveCodeId,
+            //                 OrganizationIdFk = c.OrganizationIdFk,
+            //                 ActiveCodeName = ucl.Title,
+            //                 CodeIdFk = c.CodeIdFk,
+            //                 ServiceLineIds = c.ServiceLineIds,
+            //                 //serviceLines = this._serviceLineRepo.Table.Where(x => !x.IsDeleted && c.ServiceLineIds.ToIntList().Contains(x.ServiceLineId)).Select(x => new ServiceLineVM() { ServiceLineId = x.ServiceLineId, ServiceName = x.ServiceName }).ToList()
 
-                         }).Distinct().ToList();
+            //             }).Distinct().ToList();
+
+            var codes = this._dbContext.LoadStoredProcedure("raq_getActivatedCodesForOrg")
+                .WithSqlParam("@pOrgId", orgId)
+                .ExecuteStoredProc<ActiveCodeVM>();
+            foreach (var item in codes)
+            {
+                item.serviceLines = this._serviceLineRepo.Table.Where(x => !x.IsDeleted && item.ServiceLineIds.ToIntList().Contains(x.ServiceLineId)).Select(x => new ServiceLineVM() { ServiceLineId = x.ServiceLineId, ServiceName = x.ServiceName }).ToList();
+            }
             if (codes.Count > 0)
             {
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = codes };
