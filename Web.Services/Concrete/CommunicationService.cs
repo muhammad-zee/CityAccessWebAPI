@@ -622,7 +622,8 @@ namespace Web.Services.Concrete
                 this.Twilio_ChatApiKey,
                 this.Twilio_ChatApiKeySecret,
                 identity: identity,
-                grants: grants);
+                grants: grants,
+                expiration: DateTime.Now.AddHours(2));
 
             response.Status = HttpStatusCode.OK;
             response.Message = "Token Generated";
