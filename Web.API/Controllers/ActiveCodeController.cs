@@ -33,7 +33,7 @@ namespace Web.API.Controllers
 
         [Description("Get Activated Codes By Org Id")]
         [HttpGet("activecode/GetActivatedCodesByOrgId/{orgId}")]
-        public BaseResponse GetActivatedCodesByOrgId(int orgId) 
+        public BaseResponse GetActivatedCodesByOrgId(int orgId)
         {
             try
             {

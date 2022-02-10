@@ -1,6 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
+﻿using Microsoft.EntityFrameworkCore;
 
 #nullable disable
 
@@ -384,6 +382,8 @@ namespace Web.Data.Models
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");
 
                 entity.Property(e => e.Description).HasMaxLength(300);
+
+                entity.Property(e => e.ImageHtml).IsUnicode(false);
 
                 entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
 

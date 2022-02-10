@@ -50,7 +50,7 @@ namespace Web.Services.Concrete
 
         #region Active Code
 
-        public BaseResponse GetActivatedCodesByOrgId(int orgId) 
+        public BaseResponse GetActivatedCodesByOrgId(int orgId)
         {
             var codes = (from c in this._activeCodeRepo.Table
                          join ucl in this._controlListDetailsRepo.Table on c.CodeIdFk equals ucl.ControlListDetailId
@@ -70,7 +70,7 @@ namespace Web.Services.Concrete
             {
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = codes };
             }
-            else 
+            else
             {
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "No Active Code Found", Body = codes };
             }
@@ -370,7 +370,7 @@ namespace Web.Services.Concrete
 
         public BaseResponse GetTrumaDataById(int TrumaId)
         {
-            var TrumaData = this._codeTrumaRepo.Table.Where(x => x.CodeTraumaId == TrumaId && !x.IsDeleted).FirstOrDefault();            
+            var TrumaData = this._codeTrumaRepo.Table.Where(x => x.CodeTraumaId == TrumaId && !x.IsDeleted).FirstOrDefault();
             if (TrumaData != null)
             {
                 var TrumaDataVM = AutoMapperHelper.MapSingleRow<CodeTrauma, CodeTrumaVM>(TrumaData);
