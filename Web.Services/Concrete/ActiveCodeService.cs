@@ -123,7 +123,13 @@ namespace Web.Services.Concrete
         public BaseResponse GetAllStrokeCode()
         {
             var strokeData = this._codeStrokeRepo.Table.Where(x => !x.IsDeleted).ToList();
-            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = strokeData };
+            var strokeDataVM = AutoMapperHelper.MapList<CodeStroke, CodeStrokeVM>(strokeData);
+            strokeDataVM.ForEach(x =>
+            {
+                x.GenderTitle = _controlListDetailsRepo.Table.Where(g => g.ControlListDetailId == x.Gender).Select(g => g.Title).FirstOrDefault();
+                x.BloodThinnersTitle = _controlListDetailsRepo.Table.Where(b => b.ControlListDetailId == x.BloodThinners).Select(b => b.Title).FirstOrDefault();
+            });
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = strokeDataVM };
         }
 
         public BaseResponse GetStrokeDataById(int strokeId)
@@ -131,7 +137,10 @@ namespace Web.Services.Concrete
             var strokeData = this._codeStrokeRepo.Table.Where(x => x.CodeStrokeId == strokeId && !x.IsDeleted).FirstOrDefault();
             if (strokeData != null)
             {
-                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Found", Body = strokeData };
+                var StrokeDataVM = AutoMapperHelper.MapSingleRow<CodeStroke, CodeStrokeVM>(strokeData);
+                StrokeDataVM.GenderTitle = _controlListDetailsRepo.Table.Where(g => g.ControlListDetailId == StrokeDataVM.Gender).Select(g => g.Title).FirstOrDefault();
+                StrokeDataVM.BloodThinnersTitle = _controlListDetailsRepo.Table.Where(b => b.ControlListDetailId == StrokeDataVM.BloodThinners).Select(b => b.Title).FirstOrDefault();
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Found", Body = StrokeDataVM };
             }
             return new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "Record Not Found" };
         }
@@ -190,7 +199,13 @@ namespace Web.Services.Concrete
         public BaseResponse GetAllSepsisCode()
         {
             var SepsisData = this._codeSepsisRepo.Table.Where(x => !x.IsDeleted).ToList();
-            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = SepsisData };
+            var SepsisDataVM = AutoMapperHelper.MapList<CodeSepsi, CodeSepsisVM>(SepsisData);
+            SepsisDataVM.ForEach(x =>
+            {
+                x.GenderTitle = _controlListDetailsRepo.Table.Where(g => g.ControlListDetailId == x.Gender).Select(g => g.Title).FirstOrDefault();
+                x.BloodThinnersTitle = _controlListDetailsRepo.Table.Where(b => b.ControlListDetailId == x.BloodThinners).Select(b => b.Title).FirstOrDefault();
+            });
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = SepsisDataVM };
         }
 
         public BaseResponse GetSepsisDataById(int SepsisId)
@@ -198,7 +213,10 @@ namespace Web.Services.Concrete
             var SepsisData = this._codeSepsisRepo.Table.Where(x => x.CodeSepsisId == SepsisId && !x.IsDeleted).FirstOrDefault();
             if (SepsisData != null)
             {
-                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Found", Body = SepsisData };
+                var SepsisDataVM = AutoMapperHelper.MapSingleRow<CodeSepsi, CodeSepsisVM>(SepsisData);
+                SepsisDataVM.GenderTitle = _controlListDetailsRepo.Table.Where(g => g.ControlListDetailId == SepsisDataVM.Gender).Select(g => g.Title).FirstOrDefault();
+                SepsisDataVM.BloodThinnersTitle = _controlListDetailsRepo.Table.Where(b => b.ControlListDetailId == SepsisDataVM.BloodThinners).Select(b => b.Title).FirstOrDefault();
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Found", Body = SepsisDataVM };
             }
             return new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "Record Not Found" };
         }
@@ -258,7 +276,13 @@ namespace Web.Services.Concrete
         public BaseResponse GetAllSTEMICode()
         {
             var STEMIData = this._codeSTEMIRepo.Table.Where(x => !x.IsDeleted).ToList();
-            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = STEMIData };
+            var STEMIDataVM = AutoMapperHelper.MapList<CodeStemi, CodeSTEMIVM>(STEMIData);
+            STEMIDataVM.ForEach(x =>
+            {
+                x.GenderTitle = _controlListDetailsRepo.Table.Where(g => g.ControlListDetailId == x.Gender).Select(g => g.Title).FirstOrDefault();
+                x.BloodThinnersTitle = _controlListDetailsRepo.Table.Where(b => b.ControlListDetailId == x.BloodThinners).Select(b => b.Title).FirstOrDefault();
+            });
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = STEMIDataVM };
         }
 
         public BaseResponse GetSTEMIDataById(int STEMIId)
@@ -266,7 +290,10 @@ namespace Web.Services.Concrete
             var STEMIData = this._codeSTEMIRepo.Table.Where(x => x.CodeStemiid == STEMIId && !x.IsDeleted).FirstOrDefault();
             if (STEMIData != null)
             {
-                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Found", Body = STEMIData };
+                var STEMIDataVM = AutoMapperHelper.MapSingleRow<CodeStemi, CodeSTEMIVM>(STEMIData);
+                STEMIDataVM.GenderTitle = _controlListDetailsRepo.Table.Where(g => g.ControlListDetailId == STEMIDataVM.Gender).Select(g => g.Title).FirstOrDefault();
+                STEMIDataVM.BloodThinnersTitle = _controlListDetailsRepo.Table.Where(b => b.ControlListDetailId == STEMIDataVM.BloodThinners).Select(b => b.Title).FirstOrDefault();
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Found", Body = STEMIDataVM };
             }
             return new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "Record Not Found" };
         }
@@ -326,15 +353,24 @@ namespace Web.Services.Concrete
         public BaseResponse GetAllTrumaCode()
         {
             var TrumaData = this._codeTrumaRepo.Table.Where(x => !x.IsDeleted).ToList();
-            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = TrumaData };
+            var TrumaDataVM = AutoMapperHelper.MapList<CodeTrauma, CodeTrumaVM>(TrumaData);
+            TrumaDataVM.ForEach(x =>
+            {
+                x.GenderTitle = _controlListDetailsRepo.Table.Where(g => g.ControlListDetailId == x.Gender).Select(g => g.Title).FirstOrDefault();
+                x.BloodThinnersTitle = _controlListDetailsRepo.Table.Where(b => b.ControlListDetailId == x.BloodThinners).Select(b => b.Title).FirstOrDefault();
+            });
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = TrumaDataVM };
         }
 
         public BaseResponse GetTrumaDataById(int TrumaId)
         {
-            var TrumaData = this._codeTrumaRepo.Table.Where(x => x.CodeTraumaId == TrumaId && !x.IsDeleted).FirstOrDefault();
+            var TrumaData = this._codeTrumaRepo.Table.Where(x => x.CodeTraumaId == TrumaId && !x.IsDeleted).FirstOrDefault();            
             if (TrumaData != null)
             {
-                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Found", Body = TrumaData };
+                var TrumaDataVM = AutoMapperHelper.MapSingleRow<CodeTrauma, CodeTrumaVM>(TrumaData);
+                TrumaDataVM.GenderTitle = _controlListDetailsRepo.Table.Where(g => g.ControlListDetailId == TrumaDataVM.Gender).Select(g => g.Title).FirstOrDefault();
+                TrumaDataVM.BloodThinnersTitle = _controlListDetailsRepo.Table.Where(b => b.ControlListDetailId == TrumaDataVM.BloodThinners).Select(b => b.Title).FirstOrDefault();
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Found", Body = TrumaDataVM };
             }
             return new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "Record Not Found" };
         }
