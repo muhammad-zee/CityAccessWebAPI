@@ -17,6 +17,7 @@ namespace Web.Model.Common
         public string City { get; set; }
         public int? StateIdFk { get; set; }
         public string Zip { get; set; }
+        public string ActiveCodes { get; set; }
         public int CreatedBy { get; set; }
         public DateTime CreatedDate { get; set; }
         public int? ModifiedBy { get; set; }

@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 #nullable disable
 
@@ -70,7 +72,7 @@ namespace Web.Data.Models
                 entity.Property(e => e.ServiceLineIds).IsRequired();
 
                 entity.HasOne(d => d.OrganizationIdFkNavigation)
-                    .WithMany(p => p.ActiveCodes)
+                    .WithMany(p => p.ActiveCodesNavigation)
                     .HasForeignKey(d => d.OrganizationIdFk)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_ActiveCodes_Organizations");
@@ -587,6 +589,8 @@ namespace Web.Data.Models
 
             modelBuilder.Entity<Organization>(entity =>
             {
+                entity.Property(e => e.ActiveCodes).HasMaxLength(50);
+
                 entity.Property(e => e.City).HasMaxLength(50);
 
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");

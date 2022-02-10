@@ -470,8 +470,6 @@ namespace Web.Services.Concrete
         {
             BaseResponse response = null;
 
-            //var dptIds = organization.DepartmentIdsFk.ToIntList();
-            //List<OrganizationDepartment> orgDpt = new List<OrganizationDepartment>();
             if (organization.OrganizationId > 0)
             {
                 var org = _organizationRepo.Table.Where(x => x.IsDeleted != true && x.OrganizationId == organization.OrganizationId).FirstOrDefault();
@@ -486,51 +484,11 @@ namespace Web.Services.Concrete
                     org.PrimaryAddress2 = organization.PrimaryAddress2;
                     org.StateIdFk = organization.StateIdFk;
                     org.OrganizationName = organization.OrganizationName;
+                    org.ActiveCodes = organization.ActiveCodes;
                     org.ModifiedBy = organization.ModifiedBy;
                     org.ModifiedDate = DateTime.UtcNow;
                     org.TimeZoneIdFk = organization.TimeZoneIdFk;
                     _organizationRepo.Update(org);
-
-                    //var alreadyExistDpts = _organizationDepartmentRepo.Table.Where(x => x.OrganizationIdFk == organization.OrganizationId).ToList();
-                    //_organizationDepartmentRepo.DeleteRange(alreadyExistDpts);
-                    //foreach (var item in dptIds)
-                    //{
-                    //    orgDpt.Add(new OrganizationDepartment() { OrganizationIdFk = org.OrganizationId, DepartmentIdFk = item });
-                    //}
-                    //_organizationDepartmentRepo.Insert(orgDpt);
-
-                    //if (organization.ClinicalHours != null && organization.ClinicalHours.Count() > 0)
-                    //{
-                    //    List<ClinicalHour> ClinicalHour = new List<ClinicalHour>();
-                    //    foreach (var item in organization.ClinicalHours.Where(x => x.ClinicalHourId != 0))
-                    //    {
-                    //        var cHours = org.ClinicalHours.Where(x => x.OrganizationIdFk == organization.OrganizationId && x.IsDeleted != true).FirstOrDefault();
-                    //        if (cHours != null)
-                    //        {
-                    //            cHours.WeekDayIdFk = item.WeekDayIdFk;
-                    //            cHours.StartDate = item.StartDate;
-                    //            cHours.EndDate = item.EndDate;
-                    //            cHours.StartTime = item.StartTime;
-                    //            cHours.EndTime = item.EndTime;
-                    //            cHours.ModifiedDate = DateTime.UtcNow;
-                    //            cHours.ModifiedBy = item.ModifiedBy;
-                    //            ClinicalHour.Add(cHours);
-                    //        }
-                    //    }
-                    //    _clinicalHour.Update(ClinicalHour);
-                    //    if (organization.ClinicalHours.Where(x => x.ClinicalHourId == 0).Count() > 0)
-                    //    {
-                    //        ClinicalHour = new List<ClinicalHour>();
-                    //        foreach (var item in organization.ClinicalHours.Where(x => x.ClinicalHourId == 0))
-                    //        {
-                    //            var clinicalHours = AutoMapperHelper.MapSingleRow<ClinicalHoursVM, ClinicalHour>(item);
-                    //            clinicalHours.OrganizationIdFk = org.OrganizationId;
-                    //            clinicalHours.CreatedDate = DateTime.UtcNow;
-                    //            ClinicalHour.Add(clinicalHours);
-                    //        }
-                    //        _clinicalHour.Insert(ClinicalHour);
-                    //    }
-                    //}
 
                     response = new BaseResponse() { Status = HttpStatusCode.OK, Message = "Successfully Updated", Body = organization };
                 }
@@ -545,24 +503,6 @@ namespace Web.Services.Concrete
                 var org = AutoMapperHelper.MapSingleRow<OrganizationVM, Organization>(organization);
                 org.CreatedDate = DateTime.UtcNow;
                 _organizationRepo.Insert(org);
-                //foreach (var item in dptIds)
-                //{
-                //    orgDpt.Add(new OrganizationDepartment() { OrganizationIdFk = org.OrganizationId, DepartmentIdFk = item });
-                //}
-                //_organizationDepartmentRepo.Insert(orgDpt);
-
-                //if (organization.ClinicalHours != null && organization.ClinicalHours.Count() > 0)
-                //{
-                //    List<ClinicalHour> ClinicalHour = new List<ClinicalHour>();
-                //    foreach (var item in organization.ClinicalHours)
-                //    {
-                //        var clinicalHours = AutoMapperHelper.MapSingleRow<ClinicalHoursVM, ClinicalHour>(item);
-                //        clinicalHours.OrganizationIdFk = org.OrganizationId;
-                //        clinicalHours.CreatedDate = DateTime.Now;
-                //        ClinicalHour.Add(clinicalHours);
-                //    }
-                //    _clinicalHour.Insert(ClinicalHour);
-                //}
 
                 response = new BaseResponse() { Status = HttpStatusCode.OK, Message = "Successfully Created", Body = organization };
             }
