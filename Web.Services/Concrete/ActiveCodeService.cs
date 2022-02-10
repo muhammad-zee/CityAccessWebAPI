@@ -28,6 +28,9 @@ namespace Web.Services.Concrete
         IConfiguration _config;
         public ActiveCodeService(RAQ_DbContext dbContext,
             IConfiguration config,
+            IRepository<Organization> orgRepo,
+            IRepository<ServiceLine> serviceLineRepo,
+            IRepository<ControlListDetail> controlListDetailsRepo,
             IRepository<ActiveCode> activeCodeRepo,
             IRepository<CodeStroke> codeStrokeRepo,
             IRepository<CodeSepsi> codeSepsisRepo,
@@ -35,6 +38,9 @@ namespace Web.Services.Concrete
             IRepository<CodeTrauma> codeTrumaRepo)
         {
             this._config = config;
+            this._orgRepo = orgRepo;
+            this._serviceLineRepo = serviceLineRepo;
+            this._controlListDetailsRepo = controlListDetailsRepo;
             this._activeCodeRepo = activeCodeRepo;
             this._codeStrokeRepo = codeStrokeRepo;
             this._codeSepsisRepo = codeSepsisRepo;
