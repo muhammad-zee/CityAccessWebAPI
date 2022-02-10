@@ -134,6 +134,10 @@ namespace Web.Data.Models
 
                 entity.ToTable("CodeSepsis");
 
+                entity.Property(e => e.Attachments).HasMaxLength(500);
+
+                entity.Property(e => e.Audio).HasMaxLength(500);
+
                 entity.Property(e => e.ChiefComplant).HasMaxLength(200);
 
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");
@@ -157,6 +161,8 @@ namespace Web.Data.Models
                 entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
 
                 entity.Property(e => e.PatientName).HasMaxLength(100);
+
+                entity.Property(e => e.Video).HasMaxLength(500);
             });
 
             modelBuilder.Entity<CodeStemi>(entity =>
@@ -165,6 +171,10 @@ namespace Web.Data.Models
 
                 entity.Property(e => e.CodeStemiid).HasColumnName("CodeSTEMIId");
 
+                entity.Property(e => e.Attachments).HasMaxLength(500);
+
+                entity.Property(e => e.Audio).HasMaxLength(500);
+
                 entity.Property(e => e.ChiefComplant).HasMaxLength(200);
 
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");
@@ -188,10 +198,16 @@ namespace Web.Data.Models
                 entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
 
                 entity.Property(e => e.PatientName).HasMaxLength(100);
+
+                entity.Property(e => e.Video).HasMaxLength(500);
             });
 
             modelBuilder.Entity<CodeStroke>(entity =>
             {
+                entity.Property(e => e.Attachments).HasMaxLength(500);
+
+                entity.Property(e => e.Audio).HasMaxLength(500);
+
                 entity.Property(e => e.ChiefComplant).HasMaxLength(200);
 
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");
@@ -215,10 +231,16 @@ namespace Web.Data.Models
                 entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
 
                 entity.Property(e => e.PatientName).HasMaxLength(100);
+
+                entity.Property(e => e.Video).HasMaxLength(500);
             });
 
             modelBuilder.Entity<CodeTrauma>(entity =>
             {
+                entity.Property(e => e.Attachments).HasMaxLength(500);
+
+                entity.Property(e => e.Audio).HasMaxLength(500);
+
                 entity.Property(e => e.ChiefComplant).HasMaxLength(200);
 
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");
@@ -242,6 +264,8 @@ namespace Web.Data.Models
                 entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
 
                 entity.Property(e => e.PatientName).HasMaxLength(100);
+
+                entity.Property(e => e.Video).HasMaxLength(500);
             });
 
             modelBuilder.Entity<Component>(entity =>

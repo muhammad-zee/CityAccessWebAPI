@@ -24,5 +24,9 @@ namespace Web.Data.Models
         public bool? IsEms { get; set; }
         public bool? IsCompleted { get; set; }
         public string FamilyContactName { get; set; }
+        public int OrganizationIdFk { get; set; }
+        public string Audio { get; set; }
+        public string Video { get; set; }
+        public string Attachments { get; set; }
     }
 }

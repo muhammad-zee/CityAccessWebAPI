@@ -8,6 +8,7 @@ namespace Web.Model.Common
         public string PatientName { get; set; }
         public DateTime? Dob { get; set; }
         public int? Gender { get; set; }
+        public int OrganizationIdFk { get; set; }
         public string GenderTitle { get; set; }
         public string ChiefComplant { get; set; }
         public DateTime? LastKnownWell { get; set; }
@@ -23,5 +24,9 @@ namespace Web.Model.Common
         public int? ModifiedBy { get; set; }
         public DateTime? ModifiedDate { get; set; }
         public bool? IsDeleted { get; set; }
+        public string Audio { get; set; }
+        public string Video { get; set; }
+        public string Attachments { get; set; }
+
     }
 }
