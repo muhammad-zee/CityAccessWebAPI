@@ -883,7 +883,8 @@ namespace Web.Services.Concrete
                                   ParetntTitle = ucl.ControlListTitle,
                                   Id = ucld.ControlListDetailId,
                                   Title = ucld.Title,
-                                  Description = ucld.Description
+                                  Description = ucld.Description,
+                                  ImageHtml = ucld.ImageHtml
                               }).ToList();
 
             Dictionary<string, object> keyValues = new Dictionary<string, object>();
