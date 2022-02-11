@@ -117,6 +117,8 @@ namespace Web.API.Controllers
 
         }
 
+        [Description("Get Consult Forms For Org")]
+        [HttpGet("consult/GetConsultFormByOrgId/{orgId}")]
         public BaseResponse GetConsultFormByOrgId(int orgId)
         {
             try

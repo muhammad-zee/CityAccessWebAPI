@@ -169,6 +169,17 @@ namespace Web.Services.Concrete
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = consultFields };
         }
 
+
+        //public BaseResponse AddOrUpdateConsult(IDictionary<string, object> keyValues) 
+        //{
+        //    var keys = keyValues.Keys.ToList();
+        //    var values = keyValues.Values.ToList();
+
+        //    string query = "INSERT INTO [dbo].[Consults] (";
+
+            
+        //}
+
         #endregion
     }
 }
