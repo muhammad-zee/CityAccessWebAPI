@@ -15,6 +15,7 @@ namespace Web.Services.Interfaces
 
         #region Organization Consult Fields
         BaseResponse AddOrUpdateOrgConsultFeilds(List<OrgConsultFieldsVM> orgConsultFields);
+        BaseResponse GetConsultFormByOrgId(int orgId);
         #endregion
     }
 }

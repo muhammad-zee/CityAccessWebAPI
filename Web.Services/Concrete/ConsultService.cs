@@ -146,7 +146,27 @@ namespace Web.Services.Concrete
             deletedOnes.ForEach(x => { x.ModifiedBy = ModifiedBy; x.ModifiedDate = DateTime.UtcNow; x.IsDeleted = true; });
             this._orgConsultRepo.Update(deletedOnes);
 
-            return new BaseResponse();
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message="Saved Successfully"};
+        }
+
+
+        public BaseResponse GetConsultFormByOrgId(int orgId) 
+        {
+            var consultFields = (from c in this._consultFieldRepo.Table
+                                 join oc in this._orgConsultRepo.Table on c.ConsultFieldId equals oc.ConsultFieldIdFk
+                                 where oc.OrganizationIdFk == orgId && !c.IsDeleted && !oc.IsDeleted
+                                 select new ConsultFieldsVM()
+                                 {
+                                     ConsultFieldId = c.ConsultFieldId,
+                                     FieldLabel = c.FieldLabel,
+                                     FieldName = c.FieldName,
+                                     FieldType = c.FieldType,
+                                     FieldDataType = c.FieldDataType,
+                                     FieldDataLength = c.FieldDataLength,
+                                     SortOrder = oc.SortOrder,
+                                 }).Distinct().OrderBy(x => x.SortOrder).ToList();
+
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = consultFields };
         }
 
         #endregion

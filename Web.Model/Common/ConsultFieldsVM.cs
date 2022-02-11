@@ -16,6 +16,7 @@ namespace Web.Model.Common
         public DateTime? ModifiedDate { get; set; }
         public bool IsDeleted { get; set; }
 
+        public int? SortOrder { get; set; }
         public bool IsSelected { get; set; }
 
     }

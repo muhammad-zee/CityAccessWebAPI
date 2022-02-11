@@ -1026,7 +1026,6 @@ namespace Web.Services.Concrete
 
         #endregion
 
-
         #region Code STEMI
 
         public BaseResponse GetAllSTEMICode()
@@ -1469,7 +1468,6 @@ namespace Web.Services.Concrete
 
 
         #endregion
-
 
         #region Code Truma
 
