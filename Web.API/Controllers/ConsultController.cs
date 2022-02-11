@@ -132,6 +132,22 @@ namespace Web.API.Controllers
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
         }
+
+        [Description("Add or Update Consult Form")]
+        [HttpPost("consult/AddOrUpdateConsult")]
+        public BaseResponse AddOrUpdateConsult(IDictionary<string, object> keyValues) 
+        {
+            try
+            {
+                return _consultService.AddOrUpdateConsult(keyValues);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
         #endregion
 
     }
