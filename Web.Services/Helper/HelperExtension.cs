@@ -359,6 +359,64 @@ namespace Web.Services.Helper
             return objList;
         }
 
+
+        public static IDictionary<string, object> ExecuteStoredProc_ToDictionary(this SqlCommand command)
+        {
+            using (command)
+            {
+                if (command.Connection.State == ConnectionState.Closed)
+                    command.Connection.Open();
+                try
+                {
+                    DataSet ds = new DataSet();
+                    SqlDataAdapter da = new SqlDataAdapter();
+                    da.SelectCommand = command;
+
+                    da.Fill(ds);
+
+                    if (ds.Tables[0].Rows.Count > 0)
+                    {
+                        var objList = new Dictionary<string, object>();
+                        var dr = ds.Tables[0];
+                        var colMapping = dr.Columns.Cast<DataColumn>().ToDictionary(key => key.ColumnName.ToLower());
+
+                        if (dr.Rows.Count > 0)
+                        {
+                            foreach (var rows in dr.Rows)
+                            {
+                                var row = (DataRow)rows;
+                                foreach (var col in colMapping)
+                                {
+                                    try
+                                    {                                                                                                                  //string colName = colMapping[prop.Name.ToLower()].ColumnName;
+                                        var val = row[col.Key];
+                                        objList.Add(col.Key, val);
+                                    }
+                                    catch
+                                    {
+                                        objList.Add(col.Key, null);
+                                    }
+                                }
+                            }
+                        }
+                        return objList;
+                    }
+                    else
+                    {
+                        return new Dictionary<string, object>();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw (ex);
+                }
+                finally
+                {
+                    command.Connection.Close();
+                }
+            }
+        }
+
         #endregion
 
 

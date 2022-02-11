@@ -150,7 +150,6 @@ namespace Web.Services.Concrete
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Saved Successfully" };
         }
 
-
         public BaseResponse GetConsultFormByOrgId(int orgId)
         {
             var consultFields = (from c in this._consultFieldRepo.Table
@@ -170,6 +169,26 @@ namespace Web.Services.Concrete
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = consultFields };
         }
 
+        #endregion
+
+
+        #region Consults
+
+        public BaseResponse GetAllConsults()
+        {
+            var consultData = _dbContext.LoadStoredProcedure("raq_getAllConsults").ExecuteStoredProc_ToDictionary();
+
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = consultData };
+        }
+
+        public BaseResponse GetConsultById(int Id)
+        {
+            var consultData = _dbContext.LoadStoredProcedure("raq_getConsultById")
+                .WithSqlParam("@consultId", Id)
+                .ExecuteStoredProc_ToDictionary();
+
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = consultData };
+        }
 
         public BaseResponse AddOrUpdateConsult(IDictionary<string, object> keyValues)
         {
@@ -256,6 +275,7 @@ namespace Web.Services.Concrete
             }
             return new BaseResponse() { Status = HttpStatusCode.NotModified, Message = "Consult Id Column is not exist" };
         }
+
 
         #endregion
     }

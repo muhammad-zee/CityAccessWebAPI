@@ -133,9 +133,45 @@ namespace Web.API.Controllers
             }
         }
 
+        #endregion
+
+        #region Consults
+
+        [Description("Get All Consults")]
+        [HttpGet("consult/GetAllConsults")]
+        public BaseResponse GetAllConsults() 
+        {
+            try
+            {
+                return _consultService.GetAllConsults();
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
+        [Description("Get All Consult By Id")]
+        [HttpGet("consult/GetConsultById/{Id}")]
+        public BaseResponse GetConsultById(int Id)
+        {
+            try
+            {
+                return _consultService.GetConsultById(Id);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
         [Description("Add or Update Consult Form")]
         [HttpPost("consult/AddOrUpdateConsult")]
-        public BaseResponse AddOrUpdateConsult(IDictionary<string, object> keyValues) 
+        public BaseResponse AddOrUpdateConsult(IDictionary<string, object> keyValues)
         {
             try
             {
@@ -148,7 +184,7 @@ namespace Web.API.Controllers
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
         }
-        #endregion
 
+        #endregion
     }
 }
