@@ -139,7 +139,7 @@ namespace Web.API.Controllers
 
         [Description("Get All Consults")]
         [HttpGet("consult/GetAllConsults")]
-        public BaseResponse GetAllConsults() 
+        public BaseResponse GetAllConsults()
         {
             try
             {

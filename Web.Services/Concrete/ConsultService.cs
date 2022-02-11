@@ -202,11 +202,13 @@ namespace Web.Services.Concrete
 
                 for (int i = 0; i < keys.Count(); i++)
                 {
-                    if (keys[i] != "ConsultId")
+                    if (keys[i] != "ConsultId" && keys[i] != "CreatedBy" && keys[i] != "CreatedDate")
                     {
                         query += $"[{keys[i]}]";
                         if ((i + 1) == keys.Count)
                         {
+                            query += ",CreatedBy";
+                            query += ",CreatedDate";
                             query += ")";
                         }
                         else
@@ -220,11 +222,13 @@ namespace Web.Services.Concrete
 
                 for (int i = 0; i < values.Count; i++)
                 {
-                    if (keys[i] != "ConsultId")
+                    if (keys[i] != "ConsultId" && keys[i] != "CreatedBy" && keys[i] != "CreatedDate")
                     {
                         query += values[i];
                         if ((i + 1) == values.Count)
                         {
+                            query += $",{ApplicationSettings.UserId}";
+                            query += $",{DateTime.UtcNow}";
                             query += ")";
                         }
                         else
@@ -249,9 +253,9 @@ namespace Web.Services.Concrete
                 string ConsultId = keyValues["ConsultId"].ToString();
                 string query = "UPDATE [dbo].[Consults] SET ";
 
-                for (int i = 0; i < keys.Count(); i++)
+                for (int i = 0; i < keys.Count; i++)
                 {
-                    if (keys[i] != "ConsultId")
+                    if (keys[i] != "ConsultId" && keys[i] != "ModifiedBy" && keys[i] != "ModifiedDate")
                     {
                         query += $"[{keys[i]}] = {values[i]}";
                         if (i < keys.Count)
@@ -260,7 +264,7 @@ namespace Web.Services.Concrete
                         }
                     }
                 }
-
+                query += $", ModifiedBy = {ApplicationSettings.UserId}, ModifiedDate = {DateTime.UtcNow}";
                 query += $" WHERE ConsultId = {ConsultId.ToInt()}";
 
                 int rowsEffect = this._dbContext.Database.ExecuteSqlRaw(query);

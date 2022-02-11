@@ -244,7 +244,7 @@ namespace Web.Services.Concrete
                         }
 
                     }
-                    if (FileRoot != null && FileRoot != "") 
+                    if (FileRoot != null && FileRoot != "")
                     {
                         codeStroke.AttachmentsFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
                     }
