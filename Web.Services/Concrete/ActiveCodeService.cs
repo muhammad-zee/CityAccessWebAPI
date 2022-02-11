@@ -244,7 +244,10 @@ namespace Web.Services.Concrete
                         }
 
                     }
-                    codeStroke.AttachmentsFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
+                    if (FileRoot != null && FileRoot != "") 
+                    {
+                        codeStroke.AttachmentsFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
+                    }
                 }
                 if (codeStroke.Video != null && codeStroke.Video.Count > 0)
                 {
@@ -303,7 +306,10 @@ namespace Web.Services.Concrete
                         }
 
                     }
-                    codeStroke.VideoFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
+                    if (FileRoot != null && FileRoot != "")
+                    {
+                        codeStroke.VideoFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
+                    }
                 }
                 if (codeStroke.Audio != null && codeStroke.Audio.Count > 0)
                 {
@@ -362,7 +368,10 @@ namespace Web.Services.Concrete
                         }
 
                     }
-                    codeStroke.AudioFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
+                    if (FileRoot != null && FileRoot != "")
+                    {
+                        codeStroke.AudioFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
+                    }
                 }
 
                 row.Attachments = codeStroke.AttachmentsFolderRoot;
@@ -436,7 +445,10 @@ namespace Web.Services.Concrete
                         }
 
                     }
-                    codeStroke.AttachmentsFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
+                    if (FileRoot != null && FileRoot != "")
+                    {
+                        codeStroke.AttachmentsFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
+                    }
                 }
                 if (codeStroke.Video != null && codeStroke.Video.Count > 0)
                 {
@@ -495,7 +507,10 @@ namespace Web.Services.Concrete
                         }
 
                     }
-                    codeStroke.VideoFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
+                    if (FileRoot != null && FileRoot != "")
+                    {
+                        codeStroke.VideoFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
+                    }
                 }
                 if (codeStroke.Audio != null && codeStroke.Audio.Count > 0)
                 {
@@ -554,7 +569,10 @@ namespace Web.Services.Concrete
                         }
 
                     }
-                    codeStroke.AudioFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
+                    if (FileRoot != null && FileRoot != "")
+                    {
+                        codeStroke.AudioFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
+                    }
                 }
 
                 stroke.Attachments = codeStroke.AttachmentsFolderRoot;
@@ -687,7 +705,10 @@ namespace Web.Services.Concrete
                         }
 
                     }
-                    codeSepsis.AttachmentsFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
+                    if (FileRoot != null && FileRoot != "")
+                    {
+                        codeSepsis.AttachmentsFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
+                    }
                 }
                 if (codeSepsis.Video != null && codeSepsis.Video.Count > 0)
                 {
@@ -746,7 +767,10 @@ namespace Web.Services.Concrete
                         }
 
                     }
-                    codeSepsis.VideoFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
+                    if (FileRoot != null && FileRoot != "")
+                    {
+                        codeSepsis.VideoFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
+                    }
                 }
                 if (codeSepsis.Audio != null && codeSepsis.Audio.Count > 0)
                 {
@@ -805,7 +829,10 @@ namespace Web.Services.Concrete
                         }
 
                     }
-                    codeSepsis.AudioFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
+                    if (FileRoot != null && FileRoot != "")
+                    {
+                        codeSepsis.AudioFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
+                    }
                 }
 
                 row.Attachments = codeSepsis.AttachmentsFolderRoot;
@@ -881,7 +908,10 @@ namespace Web.Services.Concrete
                         }
 
                     }
-                    codeSepsis.AttachmentsFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
+                    if (FileRoot != null && FileRoot != "")
+                    {
+                        codeSepsis.AttachmentsFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
+                    }
                 }
                 if (codeSepsis.Video != null && codeSepsis.Video.Count > 0)
                 {
@@ -940,7 +970,10 @@ namespace Web.Services.Concrete
                         }
 
                     }
-                    codeSepsis.VideoFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
+                    if (FileRoot != null && FileRoot != "")
+                    {
+                        codeSepsis.VideoFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
+                    }
                 }
                 if (codeSepsis.Audio != null && codeSepsis.Audio.Count > 0)
                 {
@@ -999,7 +1032,10 @@ namespace Web.Services.Concrete
                         }
 
                     }
-                    codeSepsis.AudioFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
+                    if (FileRoot != null && FileRoot != "")
+                    {
+                        codeSepsis.AudioFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
+                    }
                 }
 
                 Sepsis.Attachments = codeSepsis.AttachmentsFolderRoot;
@@ -1132,7 +1168,10 @@ namespace Web.Services.Concrete
                         }
 
                     }
-                    codeSTEMI.AttachmentsFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
+                    if (FileRoot != null && FileRoot != "")
+                    {
+                        codeSTEMI.AttachmentsFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
+                    }
                 }
                 if (codeSTEMI.Video != null && codeSTEMI.Video.Count > 0)
                 {
@@ -1191,7 +1230,10 @@ namespace Web.Services.Concrete
                         }
 
                     }
-                    codeSTEMI.VideoFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
+                    if (FileRoot != null && FileRoot != "")
+                    {
+                        codeSTEMI.VideoFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
+                    }
                 }
                 if (codeSTEMI.Audio != null && codeSTEMI.Audio.Count > 0)
                 {
@@ -1250,7 +1292,10 @@ namespace Web.Services.Concrete
                         }
 
                     }
-                    codeSTEMI.AudioFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
+                    if (FileRoot != null && FileRoot != "")
+                    {
+                        codeSTEMI.AudioFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
+                    }
                 }
 
                 row.Attachments = codeSTEMI.AttachmentsFolderRoot;
@@ -1324,7 +1369,10 @@ namespace Web.Services.Concrete
                         }
 
                     }
-                    codeSTEMI.AttachmentsFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
+                    if (FileRoot != null && FileRoot != "")
+                    {
+                        codeSTEMI.AttachmentsFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
+                    }
                 }
                 if (codeSTEMI.Video != null && codeSTEMI.Video.Count > 0)
                 {
@@ -1383,7 +1431,10 @@ namespace Web.Services.Concrete
                         }
 
                     }
-                    codeSTEMI.VideoFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
+                    if (FileRoot != null && FileRoot != "")
+                    {
+                        codeSTEMI.VideoFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
+                    }
                 }
                 if (codeSTEMI.Audio != null && codeSTEMI.Audio.Count > 0)
                 {
@@ -1442,7 +1493,10 @@ namespace Web.Services.Concrete
                         }
 
                     }
-                    codeSTEMI.AudioFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
+                    if (FileRoot != null && FileRoot != "")
+                    {
+                        codeSTEMI.AudioFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
+                    }
                 }
 
                 STEMI.Attachments = codeSTEMI.AttachmentsFolderRoot;
@@ -1575,7 +1629,10 @@ namespace Web.Services.Concrete
                         }
 
                     }
-                    codeTruma.AttachmentsFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
+                    if (FileRoot != null && FileRoot != "")
+                    {
+                        codeTruma.AttachmentsFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
+                    }
                 }
                 if (codeTruma.Video != null && codeTruma.Video.Count > 0)
                 {
@@ -1634,7 +1691,10 @@ namespace Web.Services.Concrete
                         }
 
                     }
-                    codeTruma.VideoFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
+                    if (FileRoot != null && FileRoot != "")
+                    {
+                        codeTruma.VideoFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
+                    }
                 }
                 if (codeTruma.Audio != null && codeTruma.Audio.Count > 0)
                 {
@@ -1693,7 +1753,10 @@ namespace Web.Services.Concrete
                         }
 
                     }
-                    codeTruma.AudioFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
+                    if (FileRoot != null && FileRoot != "")
+                    {
+                        codeTruma.AudioFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
+                    }
                 }
 
                 row.Attachments = codeTruma.AttachmentsFolderRoot;
@@ -1768,7 +1831,10 @@ namespace Web.Services.Concrete
                         }
 
                     }
-                    codeTruma.AttachmentsFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
+                    if (FileRoot != null && FileRoot != "")
+                    {
+                        codeTruma.AttachmentsFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
+                    }
                 }
                 if (codeTruma.Video != null && codeTruma.Video.Count > 0)
                 {
@@ -1827,7 +1893,10 @@ namespace Web.Services.Concrete
                         }
 
                     }
-                    codeTruma.VideoFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
+                    if (FileRoot != null && FileRoot != "")
+                    {
+                        codeTruma.VideoFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
+                    }
                 }
                 if (codeTruma.Audio != null && codeTruma.Audio.Count > 0)
                 {
@@ -1886,7 +1955,10 @@ namespace Web.Services.Concrete
                         }
 
                     }
-                    codeTruma.AudioFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
+                    if (FileRoot != null && FileRoot != "")
+                    {
+                        codeTruma.AudioFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
+                    }
                 }
 
                 Truma.Attachments = codeTruma.AttachmentsFolderRoot;

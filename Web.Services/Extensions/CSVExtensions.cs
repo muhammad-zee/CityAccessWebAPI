@@ -171,6 +171,8 @@ namespace Web.Services.Extensions
         {
             if (extenstion.Contains("image/jpg"))
                 return ".jpg";
+            if (extenstion.Contains("image/jpeg"))
+                return ".jpeg";
             if (extenstion.Contains("image/png"))
                 return ".png";
             if (extenstion.Contains("audio/mpeg"))
