@@ -187,7 +187,7 @@ namespace Web.Services.Concrete
                 row.ModifiedDate = DateTime.UtcNow;
                 row.IsDeleted = false;
 
-                if (codeStroke.Attachments.Count > 0)
+                if (codeStroke.Attachments != null && codeStroke.Attachments.Count > 0)
                 {
                     var RootPath = this._environment.WebRootPath;
                     string FileRoot = null;
@@ -246,7 +246,7 @@ namespace Web.Services.Concrete
                     }
                     codeStroke.AttachmentsFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
                 }
-                if (codeStroke.Video.Count > 0)
+                if (codeStroke.Video != null && codeStroke.Video.Count > 0)
                 {
                     var RootPath = this._environment.WebRootPath;
                     string FileRoot = null;
@@ -305,7 +305,7 @@ namespace Web.Services.Concrete
                     }
                     codeStroke.VideoFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
                 }
-                if (codeStroke.Audio.Count > 0)
+                if (codeStroke.Audio != null && codeStroke.Audio.Count > 0)
                 {
                     var RootPath = this._environment.WebRootPath;
                     string FileRoot = null;
@@ -379,7 +379,7 @@ namespace Web.Services.Concrete
                 codeStroke.CreatedDate = DateTime.UtcNow;
                 var stroke = AutoMapperHelper.MapSingleRow<CodeStrokeVM, CodeStroke>(codeStroke);
 
-                if (codeStroke.Attachments.Count > 0)
+                if (codeStroke.Attachments != null && codeStroke.Attachments.Count > 0)
                 {
                     var RootPath = this._environment.WebRootPath;
                     string FileRoot = null;
@@ -438,7 +438,7 @@ namespace Web.Services.Concrete
                     }
                     codeStroke.AttachmentsFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
                 }
-                if (codeStroke.Video.Count > 0)
+                if (codeStroke.Video != null && codeStroke.Video.Count > 0)
                 {
                     var RootPath = this._environment.WebRootPath;
                     string FileRoot = null;
@@ -497,7 +497,7 @@ namespace Web.Services.Concrete
                     }
                     codeStroke.VideoFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
                 }
-                if (codeStroke.Audio.Count > 0)
+                if (codeStroke.Audio != null && codeStroke.Audio.Count > 0)
                 {
                     var RootPath = this._environment.WebRootPath;
                     string FileRoot = null;
@@ -630,7 +630,7 @@ namespace Web.Services.Concrete
                 row.IsDeleted = false;
 
 
-                if (codeSepsis.Attachments.Count > 0)
+                if (codeSepsis.Attachments != null && codeSepsis.Attachments.Count > 0)
                 {
                     var RootPath = this._environment.WebRootPath;
                     string FileRoot = null;
@@ -689,7 +689,7 @@ namespace Web.Services.Concrete
                     }
                     codeSepsis.AttachmentsFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
                 }
-                if (codeSepsis.Video.Count > 0)
+                if (codeSepsis.Video != null && codeSepsis.Video.Count > 0)
                 {
                     var RootPath = this._environment.WebRootPath;
                     string FileRoot = null;
@@ -748,7 +748,7 @@ namespace Web.Services.Concrete
                     }
                     codeSepsis.VideoFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
                 }
-                if (codeSepsis.Audio.Count > 0)
+                if (codeSepsis.Audio != null && codeSepsis.Audio.Count > 0)
                 {
                     var RootPath = this._environment.WebRootPath;
                     string FileRoot = null;
@@ -824,7 +824,7 @@ namespace Web.Services.Concrete
                 codeSepsis.CreatedDate = DateTime.UtcNow;
                 var Sepsis = AutoMapperHelper.MapSingleRow<CodeSepsisVM, CodeSepsi>(codeSepsis);
 
-                if (codeSepsis.Attachments.Count > 0)
+                if (codeSepsis.Attachments != null && codeSepsis.Attachments.Count > 0)
                 {
                     var RootPath = this._environment.WebRootPath;
                     string FileRoot = null;
@@ -883,7 +883,7 @@ namespace Web.Services.Concrete
                     }
                     codeSepsis.AttachmentsFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
                 }
-                if (codeSepsis.Video.Count > 0)
+                if (codeSepsis.Video != null && codeSepsis.Video.Count > 0)
                 {
                     var RootPath = this._environment.WebRootPath;
                     string FileRoot = null;
@@ -942,7 +942,7 @@ namespace Web.Services.Concrete
                     }
                     codeSepsis.VideoFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
                 }
-                if (codeSepsis.Audio.Count > 0)
+                if (codeSepsis.Audio != null && codeSepsis.Audio.Count > 0)
                 {
                     var RootPath = this._environment.WebRootPath;
                     string FileRoot = null;
@@ -1075,7 +1075,7 @@ namespace Web.Services.Concrete
                 row.IsDeleted = false;
 
 
-                if (codeSTEMI.Attachments.Count > 0)
+                if (codeSTEMI.Attachments != null && codeSTEMI.Attachments.Count > 0)
                 {
                     var RootPath = this._environment.WebRootPath;
                     string FileRoot = null;
@@ -1134,7 +1134,7 @@ namespace Web.Services.Concrete
                     }
                     codeSTEMI.AttachmentsFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
                 }
-                if (codeSTEMI.Video.Count > 0)
+                if (codeSTEMI.Video != null && codeSTEMI.Video.Count > 0)
                 {
                     var RootPath = this._environment.WebRootPath;
                     string FileRoot = null;
@@ -1193,7 +1193,7 @@ namespace Web.Services.Concrete
                     }
                     codeSTEMI.VideoFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
                 }
-                if (codeSTEMI.Audio.Count > 0)
+                if (codeSTEMI.Audio != null && codeSTEMI.Audio.Count > 0)
                 {
                     var RootPath = this._environment.WebRootPath;
                     string FileRoot = null;
@@ -1267,7 +1267,7 @@ namespace Web.Services.Concrete
                 codeSTEMI.CreatedDate = DateTime.UtcNow;
                 var STEMI = AutoMapperHelper.MapSingleRow<CodeSTEMIVM, CodeStemi>(codeSTEMI);
 
-                if (codeSTEMI.Attachments.Count > 0)
+                if (codeSTEMI.Attachments != null && codeSTEMI.Attachments.Count > 0)
                 {
                     var RootPath = this._environment.WebRootPath;
                     string FileRoot = null;
@@ -1326,7 +1326,7 @@ namespace Web.Services.Concrete
                     }
                     codeSTEMI.AttachmentsFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
                 }
-                if (codeSTEMI.Video.Count > 0)
+                if (codeSTEMI.Video != null && codeSTEMI.Video.Count > 0)
                 {
                     var RootPath = this._environment.WebRootPath;
                     string FileRoot = null;
@@ -1385,7 +1385,7 @@ namespace Web.Services.Concrete
                     }
                     codeSTEMI.VideoFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
                 }
-                if (codeSTEMI.Audio.Count > 0)
+                if (codeSTEMI.Audio != null && codeSTEMI.Audio.Count > 0)
                 {
                     var RootPath = this._environment.WebRootPath;
                     string FileRoot = null;
@@ -1518,7 +1518,7 @@ namespace Web.Services.Concrete
                 row.IsDeleted = false;
 
 
-                if (codeTruma.Attachments.Count > 0)
+                if (codeTruma.Attachments != null && codeTruma.Attachments.Count > 0)
                 {
                     var RootPath = this._environment.WebRootPath;
                     string FileRoot = null;
@@ -1577,7 +1577,7 @@ namespace Web.Services.Concrete
                     }
                     codeTruma.AttachmentsFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
                 }
-                if (codeTruma.Video.Count > 0)
+                if (codeTruma.Video != null && codeTruma.Video.Count > 0)
                 {
                     var RootPath = this._environment.WebRootPath;
                     string FileRoot = null;
@@ -1636,7 +1636,7 @@ namespace Web.Services.Concrete
                     }
                     codeTruma.VideoFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
                 }
-                if (codeTruma.Audio.Count > 0)
+                if (codeTruma.Audio != null && codeTruma.Audio.Count > 0)
                 {
                     var RootPath = this._environment.WebRootPath;
                     string FileRoot = null;
@@ -1711,7 +1711,7 @@ namespace Web.Services.Concrete
                 var Truma = AutoMapperHelper.MapSingleRow<CodeTrumaVM, CodeTrauma>(codeTruma);
 
 
-                if (codeTruma.Attachments.Count > 0)
+                if (codeTruma.Attachments != null && codeTruma.Attachments.Count > 0)
                 {
                     var RootPath = this._environment.WebRootPath;
                     string FileRoot = null;
@@ -1770,7 +1770,7 @@ namespace Web.Services.Concrete
                     }
                     codeTruma.AttachmentsFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
                 }
-                if (codeTruma.Video.Count > 0)
+                if (codeTruma.Video != null && codeTruma.Video.Count > 0)
                 {
                     var RootPath = this._environment.WebRootPath;
                     string FileRoot = null;
@@ -1829,7 +1829,7 @@ namespace Web.Services.Concrete
                     }
                     codeTruma.VideoFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
                 }
-                if (codeTruma.Audio.Count > 0)
+                if (codeTruma.Audio != null && codeTruma.Audio.Count > 0)
                 {
                     var RootPath = this._environment.WebRootPath;
                     string FileRoot = null;
