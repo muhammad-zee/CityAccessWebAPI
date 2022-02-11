@@ -1,6 +1,8 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Net;
@@ -17,6 +19,7 @@ namespace Web.Services.Concrete
     public class ActiveCodeService : IActiveCodeService
     {
         private RAQ_DbContext _dbContext;
+        private IHostingEnvironment _environment;
         private IRepository<Organization> _orgRepo;
         private IRepository<ServiceLine> _serviceLineRepo;
         private IRepository<ControlListDetail> _controlListDetailsRepo;
@@ -28,6 +31,7 @@ namespace Web.Services.Concrete
         IConfiguration _config;
         public ActiveCodeService(RAQ_DbContext dbContext,
             IConfiguration config,
+            IHostingEnvironment environment,
             IRepository<Organization> orgRepo,
             IRepository<ServiceLine> serviceLineRepo,
             IRepository<ControlListDetail> controlListDetailsRepo,
@@ -39,6 +43,7 @@ namespace Web.Services.Concrete
         {
             this._config = config;
             this._dbContext = dbContext;
+            this._environment = environment;
             this._orgRepo = orgRepo;
             this._serviceLineRepo = serviceLineRepo;
             this._controlListDetailsRepo = controlListDetailsRepo;
@@ -166,6 +171,7 @@ namespace Web.Services.Concrete
             {
                 var row = this._codeStrokeRepo.Table.Where(x => x.CodeStrokeId == codeStroke.CodeStrokeId && !x.IsDeleted).FirstOrDefault();
 
+                row.OrganizationIdFk = codeStroke.OrganizationIdFk;
                 row.PatientName = codeStroke.PatientName;
                 row.Dob = codeStroke.Dob;
                 row.Gender = codeStroke.Gender;
@@ -180,6 +186,189 @@ namespace Web.Services.Concrete
                 row.ModifiedBy = codeStroke.ModifiedBy;
                 row.ModifiedDate = DateTime.UtcNow;
                 row.IsDeleted = false;
+
+                if (codeStroke.Attachments.Count > 0)
+                {
+                    var RootPath = this._environment.WebRootPath;
+                    string FileRoot = null;
+                    List<string> Attachments = new();
+                    int fileNo = 1;
+                    foreach (var item in codeStroke.Attachments)
+                    {
+                        if (!string.IsNullOrEmpty(item))
+                        {
+                            //var outPath = Directory.GetCurrentDirectory();
+
+                            FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeStroke.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
+                            FileRoot = Path.Combine(RootPath, FileRoot);
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, "Stroke");
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, row.CodeStrokeId.ToString());
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, "Attachments");
+
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            else
+                            {
+                                DirectoryInfo dir = new DirectoryInfo(FileRoot);
+                                foreach (FileInfo fi in dir.GetFiles())
+                                {
+                                    fi.Delete();
+                                }
+                            }
+                            var fileInfo = item.Split("base64,");
+                            string fileExtension = fileInfo[0].GetFileExtenstion();
+                            if (fileExtension != null)
+                            {
+                                var ByteFile = Convert.FromBase64String(fileInfo[1]);
+                                string FilePath = FileRoot + $"{row.PatientName}_{fileNo}{fileExtension}";
+                                using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                {
+                                    fs.Write(ByteFile);
+                                }
+
+                            }
+                        }
+
+                    }
+                    codeStroke.AttachmentsFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
+                }
+                if (codeStroke.Video.Count > 0)
+                {
+                    var RootPath = this._environment.WebRootPath;
+                    string FileRoot = null;
+                    List<string> Attachments = new();
+                    int fileNo = 1;
+                    foreach (var item in codeStroke.Video)
+                    {
+                        if (!string.IsNullOrEmpty(item))
+                        {
+                            //var outPath = Directory.GetCurrentDirectory();
+
+                            FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeStroke.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
+                            FileRoot = Path.Combine(RootPath, FileRoot);
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, "Stroke");
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, row.CodeStrokeId.ToString());
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, "Videos");
+
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            else
+                            {
+                                DirectoryInfo dir = new DirectoryInfo(FileRoot);
+                                foreach (FileInfo fi in dir.GetFiles())
+                                {
+                                    fi.Delete();
+                                }
+                            }
+                            var fileInfo = item.Split("base64,");
+                            string fileExtension = fileInfo[0].GetFileExtenstion();
+                            if (fileExtension != null)
+                            {
+                                var ByteFile = Convert.FromBase64String(fileInfo[1]);
+                                string FilePath = FileRoot + $"{row.PatientName}_{fileNo}{fileExtension}";
+                                using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                {
+                                    fs.Write(ByteFile);
+                                }
+
+                            }
+                        }
+
+                    }
+                    codeStroke.VideoFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
+                }
+                if (codeStroke.Audio.Count > 0)
+                {
+                    var RootPath = this._environment.WebRootPath;
+                    string FileRoot = null;
+                    List<string> Attachments = new();
+                    int fileNo = 1;
+                    foreach (var item in codeStroke.Audio)
+                    {
+                        if (!string.IsNullOrEmpty(item))
+                        {
+                            //var outPath = Directory.GetCurrentDirectory();
+
+                            FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeStroke.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
+                            FileRoot = Path.Combine(RootPath, FileRoot);
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, "Stroke");
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, row.CodeStrokeId.ToString());
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, "Audios");
+
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            else
+                            {
+                                DirectoryInfo dir = new DirectoryInfo(FileRoot);
+                                foreach (FileInfo fi in dir.GetFiles())
+                                {
+                                    fi.Delete();
+                                }
+                            }
+                            var fileInfo = item.Split("base64,");
+                            string fileExtension = fileInfo[0].GetFileExtenstion();
+                            if (fileExtension != null)
+                            {
+                                var ByteFile = Convert.FromBase64String(fileInfo[1]);
+                                string FilePath = FileRoot + $"{row.PatientName}_{fileNo}{fileExtension}";
+                                using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                {
+                                    fs.Write(ByteFile);
+                                }
+
+                            }
+                        }
+
+                    }
+                    codeStroke.AudioFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
+                }
+
+                row.Attachments = codeStroke.AttachmentsFolderRoot;
+                row.Video = codeStroke.VideoFolderRoot;
+                row.Audio = codeStroke.AudioFolderRoot;
+
                 this._codeStrokeRepo.Update(row);
 
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Modified", Body = row };
@@ -189,6 +378,189 @@ namespace Web.Services.Concrete
 
                 codeStroke.CreatedDate = DateTime.UtcNow;
                 var stroke = AutoMapperHelper.MapSingleRow<CodeStrokeVM, CodeStroke>(codeStroke);
+
+                if (codeStroke.Attachments.Count > 0)
+                {
+                    var RootPath = this._environment.WebRootPath;
+                    string FileRoot = null;
+                    List<string> Attachments = new();
+                    int fileNo = 1;
+                    foreach (var item in codeStroke.Attachments)
+                    {
+                        if (!string.IsNullOrEmpty(item))
+                        {
+                            //var outPath = Directory.GetCurrentDirectory();
+
+                            FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeStroke.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
+                            FileRoot = Path.Combine(RootPath, FileRoot);
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, "Stroke");
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, stroke.CodeStrokeId.ToString());
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, "Attachments");
+
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            else
+                            {
+                                DirectoryInfo dir = new DirectoryInfo(FileRoot);
+                                foreach (FileInfo fi in dir.GetFiles())
+                                {
+                                    fi.Delete();
+                                }
+                            }
+                            var fileInfo = item.Split("base64,");
+                            string fileExtension = fileInfo[0].GetFileExtenstion();
+                            if (fileExtension != null)
+                            {
+                                var ByteFile = Convert.FromBase64String(fileInfo[1]);
+                                string FilePath = FileRoot + $"{stroke.PatientName}_{fileNo}{fileExtension}";
+                                using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                {
+                                    fs.Write(ByteFile);
+                                }
+
+                            }
+                        }
+
+                    }
+                    codeStroke.AttachmentsFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
+                }
+                if (codeStroke.Video.Count > 0)
+                {
+                    var RootPath = this._environment.WebRootPath;
+                    string FileRoot = null;
+                    List<string> Attachments = new();
+                    int fileNo = 1;
+                    foreach (var item in codeStroke.Video)
+                    {
+                        if (!string.IsNullOrEmpty(item))
+                        {
+                            //var outPath = Directory.GetCurrentDirectory();
+
+                            FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeStroke.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
+                            FileRoot = Path.Combine(RootPath, FileRoot);
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, "Stroke");
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, stroke.CodeStrokeId.ToString());
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, "Videos");
+
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            else
+                            {
+                                DirectoryInfo dir = new DirectoryInfo(FileRoot);
+                                foreach (FileInfo fi in dir.GetFiles())
+                                {
+                                    fi.Delete();
+                                }
+                            }
+                            var fileInfo = item.Split("base64,");
+                            string fileExtension = fileInfo[0].GetFileExtenstion();
+                            if (fileExtension != null)
+                            {
+                                var ByteFile = Convert.FromBase64String(fileInfo[1]);
+                                string FilePath = FileRoot + $"{stroke.PatientName}_{fileNo}{fileExtension}";
+                                using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                {
+                                    fs.Write(ByteFile);
+                                }
+
+                            }
+                        }
+
+                    }
+                    codeStroke.VideoFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
+                }
+                if (codeStroke.Audio.Count > 0)
+                {
+                    var RootPath = this._environment.WebRootPath;
+                    string FileRoot = null;
+                    List<string> Attachments = new();
+                    int fileNo = 1;
+                    foreach (var item in codeStroke.Audio)
+                    {
+                        if (!string.IsNullOrEmpty(item))
+                        {
+                            //var outPath = Directory.GetCurrentDirectory();
+
+                            FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeStroke.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
+                            FileRoot = Path.Combine(RootPath, FileRoot);
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, "Stroke");
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, stroke.CodeStrokeId.ToString());
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, "Audios");
+
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            else
+                            {
+                                DirectoryInfo dir = new DirectoryInfo(FileRoot);
+                                foreach (FileInfo fi in dir.GetFiles())
+                                {
+                                    fi.Delete();
+                                }
+                            }
+                            var fileInfo = item.Split("base64,");
+                            string fileExtension = fileInfo[0].GetFileExtenstion();
+                            if (fileExtension != null)
+                            {
+                                var ByteFile = Convert.FromBase64String(fileInfo[1]);
+                                string FilePath = FileRoot + $"{stroke.PatientName}_{fileNo}{fileExtension}";
+                                using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                {
+                                    fs.Write(ByteFile);
+                                }
+
+                            }
+                        }
+
+                    }
+                    codeStroke.AudioFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
+                }
+
+                stroke.Attachments = codeStroke.AttachmentsFolderRoot;
+                stroke.Video = codeStroke.VideoFolderRoot;
+                stroke.Audio = codeStroke.AudioFolderRoot;
+
                 this._codeStrokeRepo.Insert(stroke);
 
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Added", Body = stroke };
@@ -256,6 +628,192 @@ namespace Web.Services.Concrete
                 row.ModifiedBy = codeSepsis.ModifiedBy;
                 row.ModifiedDate = DateTime.UtcNow;
                 row.IsDeleted = false;
+
+
+                if (codeSepsis.Attachments.Count > 0)
+                {
+                    var RootPath = this._environment.WebRootPath;
+                    string FileRoot = null;
+                    List<string> Attachments = new();
+                    int fileNo = 1;
+                    foreach (var item in codeSepsis.Attachments)
+                    {
+                        if (!string.IsNullOrEmpty(item))
+                        {
+                            //var outPath = Directory.GetCurrentDirectory();
+
+                            FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeSepsis.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
+                            FileRoot = Path.Combine(RootPath, FileRoot);
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, "Sepsis");
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, row.CodeSepsisId.ToString());
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, "Attachments");
+
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            else
+                            {
+                                DirectoryInfo dir = new DirectoryInfo(FileRoot);
+                                foreach (FileInfo fi in dir.GetFiles())
+                                {
+                                    fi.Delete();
+                                }
+                            }
+                            var fileInfo = item.Split("base64,");
+                            string fileExtension = fileInfo[0].GetFileExtenstion();
+                            if (fileExtension != null)
+                            {
+                                var ByteFile = Convert.FromBase64String(fileInfo[1]);
+                                string FilePath = FileRoot + $"{row.PatientName}_{fileNo}{fileExtension}";
+                                using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                {
+                                    fs.Write(ByteFile);
+                                }
+
+                            }
+                        }
+
+                    }
+                    codeSepsis.AttachmentsFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
+                }
+                if (codeSepsis.Video.Count > 0)
+                {
+                    var RootPath = this._environment.WebRootPath;
+                    string FileRoot = null;
+                    List<string> Attachments = new();
+                    int fileNo = 1;
+                    foreach (var item in codeSepsis.Video)
+                    {
+                        if (!string.IsNullOrEmpty(item))
+                        {
+                            //var outPath = Directory.GetCurrentDirectory();
+
+                            FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeSepsis.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
+                            FileRoot = Path.Combine(RootPath, FileRoot);
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, "Sepsis");
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, row.CodeSepsisId.ToString());
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, "Videos");
+
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            else
+                            {
+                                DirectoryInfo dir = new DirectoryInfo(FileRoot);
+                                foreach (FileInfo fi in dir.GetFiles())
+                                {
+                                    fi.Delete();
+                                }
+                            }
+                            var fileInfo = item.Split("base64,");
+                            string fileExtension = fileInfo[0].GetFileExtenstion();
+                            if (fileExtension != null)
+                            {
+                                var ByteFile = Convert.FromBase64String(fileInfo[1]);
+                                string FilePath = FileRoot + $"{row.PatientName}_{fileNo}{fileExtension}";
+                                using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                {
+                                    fs.Write(ByteFile);
+                                }
+
+                            }
+                        }
+
+                    }
+                    codeSepsis.VideoFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
+                }
+                if (codeSepsis.Audio.Count > 0)
+                {
+                    var RootPath = this._environment.WebRootPath;
+                    string FileRoot = null;
+                    List<string> Attachments = new();
+                    int fileNo = 1;
+                    foreach (var item in codeSepsis.Audio)
+                    {
+                        if (!string.IsNullOrEmpty(item))
+                        {
+                            //var outPath = Directory.GetCurrentDirectory();
+
+                            FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeSepsis.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
+                            FileRoot = Path.Combine(RootPath, FileRoot);
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, "Sepsis");
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, row.CodeSepsisId.ToString());
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, "Audios");
+
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            else
+                            {
+                                DirectoryInfo dir = new DirectoryInfo(FileRoot);
+                                foreach (FileInfo fi in dir.GetFiles())
+                                {
+                                    fi.Delete();
+                                }
+                            }
+                            var fileInfo = item.Split("base64,");
+                            string fileExtension = fileInfo[0].GetFileExtenstion();
+                            if (fileExtension != null)
+                            {
+                                var ByteFile = Convert.FromBase64String(fileInfo[1]);
+                                string FilePath = FileRoot + $"{row.PatientName}_{fileNo}{fileExtension}";
+                                using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                {
+                                    fs.Write(ByteFile);
+                                }
+
+                            }
+                        }
+
+                    }
+                    codeSepsis.AudioFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
+                }
+
+                row.Attachments = codeSepsis.AttachmentsFolderRoot;
+                row.Video = codeSepsis.VideoFolderRoot;
+                row.Audio = codeSepsis.AudioFolderRoot;
+
+
+
                 this._codeSepsisRepo.Update(row);
 
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Modified", Body = row };
@@ -265,6 +823,189 @@ namespace Web.Services.Concrete
 
                 codeSepsis.CreatedDate = DateTime.UtcNow;
                 var Sepsis = AutoMapperHelper.MapSingleRow<CodeSepsisVM, CodeSepsi>(codeSepsis);
+
+                if (codeSepsis.Attachments.Count > 0)
+                {
+                    var RootPath = this._environment.WebRootPath;
+                    string FileRoot = null;
+                    List<string> Attachments = new();
+                    int fileNo = 1;
+                    foreach (var item in codeSepsis.Attachments)
+                    {
+                        if (!string.IsNullOrEmpty(item))
+                        {
+                            //var outPath = Directory.GetCurrentDirectory();
+
+                            FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeSepsis.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
+                            FileRoot = Path.Combine(RootPath, FileRoot);
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, "Sepsis");
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, Sepsis.CodeSepsisId.ToString());
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, "Attachments");
+
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            else
+                            {
+                                DirectoryInfo dir = new DirectoryInfo(FileRoot);
+                                foreach (FileInfo fi in dir.GetFiles())
+                                {
+                                    fi.Delete();
+                                }
+                            }
+                            var fileInfo = item.Split("base64,");
+                            string fileExtension = fileInfo[0].GetFileExtenstion();
+                            if (fileExtension != null)
+                            {
+                                var ByteFile = Convert.FromBase64String(fileInfo[1]);
+                                string FilePath = FileRoot + $"{Sepsis.PatientName}_{fileNo}{fileExtension}";
+                                using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                {
+                                    fs.Write(ByteFile);
+                                }
+
+                            }
+                        }
+
+                    }
+                    codeSepsis.AttachmentsFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
+                }
+                if (codeSepsis.Video.Count > 0)
+                {
+                    var RootPath = this._environment.WebRootPath;
+                    string FileRoot = null;
+                    List<string> Attachments = new();
+                    int fileNo = 1;
+                    foreach (var item in codeSepsis.Video)
+                    {
+                        if (!string.IsNullOrEmpty(item))
+                        {
+                            //var outPath = Directory.GetCurrentDirectory();
+
+                            FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeSepsis.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
+                            FileRoot = Path.Combine(RootPath, FileRoot);
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, "Sepsis");
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, Sepsis.CodeSepsisId.ToString());
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, "Videos");
+
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            else
+                            {
+                                DirectoryInfo dir = new DirectoryInfo(FileRoot);
+                                foreach (FileInfo fi in dir.GetFiles())
+                                {
+                                    fi.Delete();
+                                }
+                            }
+                            var fileInfo = item.Split("base64,");
+                            string fileExtension = fileInfo[0].GetFileExtenstion();
+                            if (fileExtension != null)
+                            {
+                                var ByteFile = Convert.FromBase64String(fileInfo[1]);
+                                string FilePath = FileRoot + $"{Sepsis.PatientName}_{fileNo}{fileExtension}";
+                                using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                {
+                                    fs.Write(ByteFile);
+                                }
+
+                            }
+                        }
+
+                    }
+                    codeSepsis.VideoFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
+                }
+                if (codeSepsis.Audio.Count > 0)
+                {
+                    var RootPath = this._environment.WebRootPath;
+                    string FileRoot = null;
+                    List<string> Attachments = new();
+                    int fileNo = 1;
+                    foreach (var item in codeSepsis.Audio)
+                    {
+                        if (!string.IsNullOrEmpty(item))
+                        {
+                            //var outPath = Directory.GetCurrentDirectory();
+
+                            FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeSepsis.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
+                            FileRoot = Path.Combine(RootPath, FileRoot);
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, "Sepsis");
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, Sepsis.CodeSepsisId.ToString());
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, "Audios");
+
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            else
+                            {
+                                DirectoryInfo dir = new DirectoryInfo(FileRoot);
+                                foreach (FileInfo fi in dir.GetFiles())
+                                {
+                                    fi.Delete();
+                                }
+                            }
+                            var fileInfo = item.Split("base64,");
+                            string fileExtension = fileInfo[0].GetFileExtenstion();
+                            if (fileExtension != null)
+                            {
+                                var ByteFile = Convert.FromBase64String(fileInfo[1]);
+                                string FilePath = FileRoot + $"{Sepsis.PatientName}_{fileNo}{fileExtension}";
+                                using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                {
+                                    fs.Write(ByteFile);
+                                }
+
+                            }
+                        }
+
+                    }
+                    codeSepsis.AudioFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
+                }
+
+                Sepsis.Attachments = codeSepsis.AttachmentsFolderRoot;
+                Sepsis.Video = codeSepsis.VideoFolderRoot;
+                Sepsis.Audio = codeSepsis.AudioFolderRoot;
+
                 this._codeSepsisRepo.Insert(Sepsis);
 
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Added", Body = Sepsis };
@@ -333,6 +1074,190 @@ namespace Web.Services.Concrete
                 row.ModifiedBy = codeSTEMI.ModifiedBy;
                 row.ModifiedDate = DateTime.UtcNow;
                 row.IsDeleted = false;
+
+
+                if (codeSTEMI.Attachments.Count > 0)
+                {
+                    var RootPath = this._environment.WebRootPath;
+                    string FileRoot = null;
+                    List<string> Attachments = new();
+                    int fileNo = 1;
+                    foreach (var item in codeSTEMI.Attachments)
+                    {
+                        if (!string.IsNullOrEmpty(item))
+                        {
+                            //var outPath = Directory.GetCurrentDirectory();
+
+                            FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeSTEMI.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
+                            FileRoot = Path.Combine(RootPath, FileRoot);
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, "STEMI");
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, row.CodeStemiid.ToString());
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, "Attachments");
+
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            else
+                            {
+                                DirectoryInfo dir = new DirectoryInfo(FileRoot);
+                                foreach (FileInfo fi in dir.GetFiles())
+                                {
+                                    fi.Delete();
+                                }
+                            }
+                            var fileInfo = item.Split("base64,");
+                            string fileExtension = fileInfo[0].GetFileExtenstion();
+                            if (fileExtension != null)
+                            {
+                                var ByteFile = Convert.FromBase64String(fileInfo[1]);
+                                string FilePath = FileRoot + $"{row.PatientName}_{fileNo}{fileExtension}";
+                                using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                {
+                                    fs.Write(ByteFile);
+                                }
+
+                            }
+                        }
+
+                    }
+                    codeSTEMI.AttachmentsFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
+                }
+                if (codeSTEMI.Video.Count > 0)
+                {
+                    var RootPath = this._environment.WebRootPath;
+                    string FileRoot = null;
+                    List<string> Attachments = new();
+                    int fileNo = 1;
+                    foreach (var item in codeSTEMI.Video)
+                    {
+                        if (!string.IsNullOrEmpty(item))
+                        {
+                            //var outPath = Directory.GetCurrentDirectory();
+
+                            FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeSTEMI.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
+                            FileRoot = Path.Combine(RootPath, FileRoot);
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, "STEMI");
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, row.CodeStemiid.ToString());
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, "Videos");
+
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            else
+                            {
+                                DirectoryInfo dir = new DirectoryInfo(FileRoot);
+                                foreach (FileInfo fi in dir.GetFiles())
+                                {
+                                    fi.Delete();
+                                }
+                            }
+                            var fileInfo = item.Split("base64,");
+                            string fileExtension = fileInfo[0].GetFileExtenstion();
+                            if (fileExtension != null)
+                            {
+                                var ByteFile = Convert.FromBase64String(fileInfo[1]);
+                                string FilePath = FileRoot + $"{row.PatientName}_{fileNo}{fileExtension}";
+                                using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                {
+                                    fs.Write(ByteFile);
+                                }
+
+                            }
+                        }
+
+                    }
+                    codeSTEMI.VideoFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
+                }
+                if (codeSTEMI.Audio.Count > 0)
+                {
+                    var RootPath = this._environment.WebRootPath;
+                    string FileRoot = null;
+                    List<string> Attachments = new();
+                    int fileNo = 1;
+                    foreach (var item in codeSTEMI.Audio)
+                    {
+                        if (!string.IsNullOrEmpty(item))
+                        {
+                            //var outPath = Directory.GetCurrentDirectory();
+
+                            FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeSTEMI.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
+                            FileRoot = Path.Combine(RootPath, FileRoot);
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, "STEMI");
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, row.CodeStemiid.ToString());
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, "Audios");
+
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            else
+                            {
+                                DirectoryInfo dir = new DirectoryInfo(FileRoot);
+                                foreach (FileInfo fi in dir.GetFiles())
+                                {
+                                    fi.Delete();
+                                }
+                            }
+                            var fileInfo = item.Split("base64,");
+                            string fileExtension = fileInfo[0].GetFileExtenstion();
+                            if (fileExtension != null)
+                            {
+                                var ByteFile = Convert.FromBase64String(fileInfo[1]);
+                                string FilePath = FileRoot + $"{row.PatientName}_{fileNo}{fileExtension}";
+                                using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                {
+                                    fs.Write(ByteFile);
+                                }
+
+                            }
+                        }
+
+                    }
+                    codeSTEMI.AudioFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
+                }
+
+                row.Attachments = codeSTEMI.AttachmentsFolderRoot;
+                row.Video = codeSTEMI.VideoFolderRoot;
+                row.Audio = codeSTEMI.AudioFolderRoot;
+
                 this._codeSTEMIRepo.Update(row);
 
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Modified", Body = row };
@@ -342,6 +1267,189 @@ namespace Web.Services.Concrete
 
                 codeSTEMI.CreatedDate = DateTime.UtcNow;
                 var STEMI = AutoMapperHelper.MapSingleRow<CodeSTEMIVM, CodeStemi>(codeSTEMI);
+
+                if (codeSTEMI.Attachments.Count > 0)
+                {
+                    var RootPath = this._environment.WebRootPath;
+                    string FileRoot = null;
+                    List<string> Attachments = new();
+                    int fileNo = 1;
+                    foreach (var item in codeSTEMI.Attachments)
+                    {
+                        if (!string.IsNullOrEmpty(item))
+                        {
+                            //var outPath = Directory.GetCurrentDirectory();
+
+                            FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeSTEMI.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
+                            FileRoot = Path.Combine(RootPath, FileRoot);
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, "STEMI");
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, STEMI.CodeStemiid.ToString());
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, "Attachments");
+
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            else
+                            {
+                                DirectoryInfo dir = new DirectoryInfo(FileRoot);
+                                foreach (FileInfo fi in dir.GetFiles())
+                                {
+                                    fi.Delete();
+                                }
+                            }
+                            var fileInfo = item.Split("base64,");
+                            string fileExtension = fileInfo[0].GetFileExtenstion();
+                            if (fileExtension != null)
+                            {
+                                var ByteFile = Convert.FromBase64String(fileInfo[1]);
+                                string FilePath = FileRoot + $"{STEMI.PatientName}_{fileNo}{fileExtension}";
+                                using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                {
+                                    fs.Write(ByteFile);
+                                }
+
+                            }
+                        }
+
+                    }
+                    codeSTEMI.AttachmentsFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
+                }
+                if (codeSTEMI.Video.Count > 0)
+                {
+                    var RootPath = this._environment.WebRootPath;
+                    string FileRoot = null;
+                    List<string> Attachments = new();
+                    int fileNo = 1;
+                    foreach (var item in codeSTEMI.Video)
+                    {
+                        if (!string.IsNullOrEmpty(item))
+                        {
+                            //var outPath = Directory.GetCurrentDirectory();
+
+                            FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeSTEMI.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
+                            FileRoot = Path.Combine(RootPath, FileRoot);
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, "STEMI");
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, STEMI.CodeStemiid.ToString());
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, "Videos");
+
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            else
+                            {
+                                DirectoryInfo dir = new DirectoryInfo(FileRoot);
+                                foreach (FileInfo fi in dir.GetFiles())
+                                {
+                                    fi.Delete();
+                                }
+                            }
+                            var fileInfo = item.Split("base64,");
+                            string fileExtension = fileInfo[0].GetFileExtenstion();
+                            if (fileExtension != null)
+                            {
+                                var ByteFile = Convert.FromBase64String(fileInfo[1]);
+                                string FilePath = FileRoot + $"{STEMI.PatientName}_{fileNo}{fileExtension}";
+                                using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                {
+                                    fs.Write(ByteFile);
+                                }
+
+                            }
+                        }
+
+                    }
+                    codeSTEMI.VideoFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
+                }
+                if (codeSTEMI.Audio.Count > 0)
+                {
+                    var RootPath = this._environment.WebRootPath;
+                    string FileRoot = null;
+                    List<string> Attachments = new();
+                    int fileNo = 1;
+                    foreach (var item in codeSTEMI.Audio)
+                    {
+                        if (!string.IsNullOrEmpty(item))
+                        {
+                            //var outPath = Directory.GetCurrentDirectory();
+
+                            FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeSTEMI.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
+                            FileRoot = Path.Combine(RootPath, FileRoot);
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, "STEMI");
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, STEMI.CodeStemiid.ToString());
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, "Audios");
+
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            else
+                            {
+                                DirectoryInfo dir = new DirectoryInfo(FileRoot);
+                                foreach (FileInfo fi in dir.GetFiles())
+                                {
+                                    fi.Delete();
+                                }
+                            }
+                            var fileInfo = item.Split("base64,");
+                            string fileExtension = fileInfo[0].GetFileExtenstion();
+                            if (fileExtension != null)
+                            {
+                                var ByteFile = Convert.FromBase64String(fileInfo[1]);
+                                string FilePath = FileRoot + $"{STEMI.PatientName}_{fileNo}{fileExtension}";
+                                using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                {
+                                    fs.Write(ByteFile);
+                                }
+
+                            }
+                        }
+
+                    }
+                    codeSTEMI.AudioFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
+                }
+
+                STEMI.Attachments = codeSTEMI.AttachmentsFolderRoot;
+                STEMI.Video = codeSTEMI.VideoFolderRoot;
+                STEMI.Audio = codeSTEMI.AudioFolderRoot;
+
                 this._codeSTEMIRepo.Insert(STEMI);
 
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Added", Body = STEMI };
@@ -410,6 +1518,190 @@ namespace Web.Services.Concrete
                 row.ModifiedBy = codeTruma.ModifiedBy;
                 row.ModifiedDate = DateTime.UtcNow;
                 row.IsDeleted = false;
+
+
+                if (codeTruma.Attachments.Count > 0)
+                {
+                    var RootPath = this._environment.WebRootPath;
+                    string FileRoot = null;
+                    List<string> Attachments = new();
+                    int fileNo = 1;
+                    foreach (var item in codeTruma.Attachments)
+                    {
+                        if (!string.IsNullOrEmpty(item))
+                        {
+                            //var outPath = Directory.GetCurrentDirectory();
+
+                            FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeTruma.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
+                            FileRoot = Path.Combine(RootPath, FileRoot);
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, "Truma");
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, row.CodeTraumaId.ToString());
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, "Attachments");
+
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            else
+                            {
+                                DirectoryInfo dir = new DirectoryInfo(FileRoot);
+                                foreach (FileInfo fi in dir.GetFiles())
+                                {
+                                    fi.Delete();
+                                }
+                            }
+                            var fileInfo = item.Split("base64,");
+                            string fileExtension = fileInfo[0].GetFileExtenstion();
+                            if (fileExtension != null)
+                            {
+                                var ByteFile = Convert.FromBase64String(fileInfo[1]);
+                                string FilePath = FileRoot + $"{row.PatientName}_{fileNo}{fileExtension}";
+                                using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                {
+                                    fs.Write(ByteFile);
+                                }
+
+                            }
+                        }
+
+                    }
+                    codeTruma.AttachmentsFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
+                }
+                if (codeTruma.Video.Count > 0)
+                {
+                    var RootPath = this._environment.WebRootPath;
+                    string FileRoot = null;
+                    List<string> Attachments = new();
+                    int fileNo = 1;
+                    foreach (var item in codeTruma.Video)
+                    {
+                        if (!string.IsNullOrEmpty(item))
+                        {
+                            //var outPath = Directory.GetCurrentDirectory();
+
+                            FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeTruma.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
+                            FileRoot = Path.Combine(RootPath, FileRoot);
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, "Truma");
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, row.CodeTraumaId.ToString());
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, "Videos");
+
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            else
+                            {
+                                DirectoryInfo dir = new DirectoryInfo(FileRoot);
+                                foreach (FileInfo fi in dir.GetFiles())
+                                {
+                                    fi.Delete();
+                                }
+                            }
+                            var fileInfo = item.Split("base64,");
+                            string fileExtension = fileInfo[0].GetFileExtenstion();
+                            if (fileExtension != null)
+                            {
+                                var ByteFile = Convert.FromBase64String(fileInfo[1]);
+                                string FilePath = FileRoot + $"{row.PatientName}_{fileNo}{fileExtension}";
+                                using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                {
+                                    fs.Write(ByteFile);
+                                }
+
+                            }
+                        }
+
+                    }
+                    codeTruma.VideoFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
+                }
+                if (codeTruma.Audio.Count > 0)
+                {
+                    var RootPath = this._environment.WebRootPath;
+                    string FileRoot = null;
+                    List<string> Attachments = new();
+                    int fileNo = 1;
+                    foreach (var item in codeTruma.Audio)
+                    {
+                        if (!string.IsNullOrEmpty(item))
+                        {
+                            //var outPath = Directory.GetCurrentDirectory();
+
+                            FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeTruma.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
+                            FileRoot = Path.Combine(RootPath, FileRoot);
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, "Truma");
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, row.CodeTraumaId.ToString());
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, "Audios");
+
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            else
+                            {
+                                DirectoryInfo dir = new DirectoryInfo(FileRoot);
+                                foreach (FileInfo fi in dir.GetFiles())
+                                {
+                                    fi.Delete();
+                                }
+                            }
+                            var fileInfo = item.Split("base64,");
+                            string fileExtension = fileInfo[0].GetFileExtenstion();
+                            if (fileExtension != null)
+                            {
+                                var ByteFile = Convert.FromBase64String(fileInfo[1]);
+                                string FilePath = FileRoot + $"{row.PatientName}_{fileNo}{fileExtension}";
+                                using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                {
+                                    fs.Write(ByteFile);
+                                }
+
+                            }
+                        }
+
+                    }
+                    codeTruma.AudioFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
+                }
+
+                row.Attachments = codeTruma.AttachmentsFolderRoot;
+                row.Video = codeTruma.VideoFolderRoot;
+                row.Audio = codeTruma.AudioFolderRoot;
+
                 this._codeTrumaRepo.Update(row);
 
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Modified", Body = row };
@@ -419,6 +1711,190 @@ namespace Web.Services.Concrete
 
                 codeTruma.CreatedDate = DateTime.UtcNow;
                 var Truma = AutoMapperHelper.MapSingleRow<CodeTrumaVM, CodeTrauma>(codeTruma);
+
+
+                if (codeTruma.Attachments.Count > 0)
+                {
+                    var RootPath = this._environment.WebRootPath;
+                    string FileRoot = null;
+                    List<string> Attachments = new();
+                    int fileNo = 1;
+                    foreach (var item in codeTruma.Attachments)
+                    {
+                        if (!string.IsNullOrEmpty(item))
+                        {
+                            //var outPath = Directory.GetCurrentDirectory();
+
+                            FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeTruma.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
+                            FileRoot = Path.Combine(RootPath, FileRoot);
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, "Truma");
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, Truma.CodeTraumaId.ToString());
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, "Attachments");
+
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            else
+                            {
+                                DirectoryInfo dir = new DirectoryInfo(FileRoot);
+                                foreach (FileInfo fi in dir.GetFiles())
+                                {
+                                    fi.Delete();
+                                }
+                            }
+                            var fileInfo = item.Split("base64,");
+                            string fileExtension = fileInfo[0].GetFileExtenstion();
+                            if (fileExtension != null)
+                            {
+                                var ByteFile = Convert.FromBase64String(fileInfo[1]);
+                                string FilePath = FileRoot + $"{Truma.PatientName}_{fileNo}{fileExtension}";
+                                using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                {
+                                    fs.Write(ByteFile);
+                                }
+
+                            }
+                        }
+
+                    }
+                    codeTruma.AttachmentsFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
+                }
+                if (codeTruma.Video.Count > 0)
+                {
+                    var RootPath = this._environment.WebRootPath;
+                    string FileRoot = null;
+                    List<string> Attachments = new();
+                    int fileNo = 1;
+                    foreach (var item in codeTruma.Video)
+                    {
+                        if (!string.IsNullOrEmpty(item))
+                        {
+                            //var outPath = Directory.GetCurrentDirectory();
+
+                            FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeTruma.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
+                            FileRoot = Path.Combine(RootPath, FileRoot);
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, "Truma");
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, Truma.CodeTraumaId.ToString());
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, "Videos");
+
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            else
+                            {
+                                DirectoryInfo dir = new DirectoryInfo(FileRoot);
+                                foreach (FileInfo fi in dir.GetFiles())
+                                {
+                                    fi.Delete();
+                                }
+                            }
+                            var fileInfo = item.Split("base64,");
+                            string fileExtension = fileInfo[0].GetFileExtenstion();
+                            if (fileExtension != null)
+                            {
+                                var ByteFile = Convert.FromBase64String(fileInfo[1]);
+                                string FilePath = FileRoot + $"{Truma.PatientName}_{fileNo}{fileExtension}";
+                                using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                {
+                                    fs.Write(ByteFile);
+                                }
+
+                            }
+                        }
+
+                    }
+                    codeTruma.VideoFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
+                }
+                if (codeTruma.Audio.Count > 0)
+                {
+                    var RootPath = this._environment.WebRootPath;
+                    string FileRoot = null;
+                    List<string> Attachments = new();
+                    int fileNo = 1;
+                    foreach (var item in codeTruma.Audio)
+                    {
+                        if (!string.IsNullOrEmpty(item))
+                        {
+                            //var outPath = Directory.GetCurrentDirectory();
+
+                            FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeTruma.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
+                            FileRoot = Path.Combine(RootPath, FileRoot);
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, "Truma");
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, Truma.CodeTraumaId.ToString());
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, "Audios");
+
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            else
+                            {
+                                DirectoryInfo dir = new DirectoryInfo(FileRoot);
+                                foreach (FileInfo fi in dir.GetFiles())
+                                {
+                                    fi.Delete();
+                                }
+                            }
+                            var fileInfo = item.Split("base64,");
+                            string fileExtension = fileInfo[0].GetFileExtenstion();
+                            if (fileExtension != null)
+                            {
+                                var ByteFile = Convert.FromBase64String(fileInfo[1]);
+                                string FilePath = FileRoot + $"{Truma.PatientName}_{fileNo}{fileExtension}";
+                                using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                {
+                                    fs.Write(ByteFile);
+                                }
+
+                            }
+                        }
+
+                    }
+                    codeTruma.AudioFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
+                }
+
+                Truma.Attachments = codeTruma.AttachmentsFolderRoot;
+                Truma.Video = codeTruma.VideoFolderRoot;
+                Truma.Audio = codeTruma.AudioFolderRoot;
+
                 this._codeTrumaRepo.Insert(Truma);
 
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Added", Body = Truma };

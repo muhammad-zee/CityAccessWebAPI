@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Web.Model.Common
 {
@@ -24,9 +25,13 @@ namespace Web.Model.Common
         public int? ModifiedBy { get; set; }
         public DateTime? ModifiedDate { get; set; }
         public bool? IsDeleted { get; set; }
-        public string Audio { get; set; }
-        public string Video { get; set; }
-        public string Attachments { get; set; }
+        public List<string> Audio { get; set; }
+        public List<string> Video { get; set; }
+        public List<string> Attachments { get; set; }
+
+        public string AudioFolderRoot { get; set; }
+        public string VideoFolderRoot { get; set; }
+        public string AttachmentsFolderRoot { get; set; }
 
     }
 }
