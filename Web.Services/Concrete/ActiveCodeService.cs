@@ -286,43 +286,41 @@ namespace Web.Services.Concrete
                     var RootPath = this._environment.WebRootPath;
                     string FileRoot = null;
                     List<string> Attachments = new();
+                    FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeStroke.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
+                    FileRoot = Path.Combine(RootPath, FileRoot);
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, "Stroke");
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, row.CodeStrokeId.ToString());
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, "Videos");
 
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    //else
+                    //{
+                    //    DirectoryInfo dir = new DirectoryInfo(FileRoot);
+                    //    foreach (FileInfo fi in dir.GetFiles())
+                    //    {
+                    //        fi.Delete();
+                    //    }
+                    //}
                     foreach (var item in codeStroke.Videos)
                     {
                         if (!string.IsNullOrEmpty(item.Base64Str))
                         {
-                            //var outPath = Directory.GetCurrentDirectory();
-
-                            FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeStroke.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
-                            FileRoot = Path.Combine(RootPath, FileRoot);
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            FileRoot = Path.Combine(FileRoot, "Stroke");
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            FileRoot = Path.Combine(FileRoot, row.CodeStrokeId.ToString());
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            FileRoot = Path.Combine(FileRoot, "Videos");
-
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            else
-                            {
-                                DirectoryInfo dir = new DirectoryInfo(FileRoot);
-                                foreach (FileInfo fi in dir.GetFiles())
-                                {
-                                    fi.Delete();
-                                }
-                            }
+                            
                             var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             if (fileExtension != null)
@@ -349,42 +347,41 @@ namespace Web.Services.Concrete
                     string FileRoot = null;
                     List<string> Attachments = new();
 
+                    FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeStroke.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
+                    FileRoot = Path.Combine(RootPath, FileRoot);
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, "Stroke");
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, row.CodeStrokeId.ToString());
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, "Audios");
+
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    //else
+                    //{
+                    //    DirectoryInfo dir = new DirectoryInfo(FileRoot);
+                    //    foreach (FileInfo fi in dir.GetFiles())
+                    //    {
+                    //        fi.Delete();
+                    //    }
+                    //}
                     foreach (var item in codeStroke.Audios)
                     {
                         if (!string.IsNullOrEmpty(item.Base64Str))
                         {
-                            //var outPath = Directory.GetCurrentDirectory();
-
-                            FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeStroke.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
-                            FileRoot = Path.Combine(RootPath, FileRoot);
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            FileRoot = Path.Combine(FileRoot, "Stroke");
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            FileRoot = Path.Combine(FileRoot, row.CodeStrokeId.ToString());
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            FileRoot = Path.Combine(FileRoot, "Audios");
-
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            else
-                            {
-                                DirectoryInfo dir = new DirectoryInfo(FileRoot);
-                                foreach (FileInfo fi in dir.GetFiles())
-                                {
-                                    fi.Delete();
-                                }
-                            }
+                            
                             var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             if (fileExtension != null)
@@ -427,42 +424,42 @@ namespace Web.Services.Concrete
                     string FileRoot = null;
                     List<string> Attachments = new();
 
+
+                    FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeStroke.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
+                    FileRoot = Path.Combine(RootPath, FileRoot);
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, "Stroke");
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, stroke.CodeStrokeId.ToString());
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, "Attachments");
+
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    //else
+                    //{
+                    //    DirectoryInfo dir = new DirectoryInfo(FileRoot);
+                    //    foreach (FileInfo fi in dir.GetFiles())
+                    //    {
+                    //        fi.Delete();
+                    //    }
+                    //}
                     foreach (var item in codeStroke.Attachment)
                     {
                         if (!string.IsNullOrEmpty(item.Base64Str))
                         {
-                            //var outPath = Directory.GetCurrentDirectory();
-
-                            FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeStroke.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
-                            FileRoot = Path.Combine(RootPath, FileRoot);
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            FileRoot = Path.Combine(FileRoot, "Stroke");
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            FileRoot = Path.Combine(FileRoot, stroke.CodeStrokeId.ToString());
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            FileRoot = Path.Combine(FileRoot, "Attachments");
-
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            else
-                            {
-                                DirectoryInfo dir = new DirectoryInfo(FileRoot);
-                                foreach (FileInfo fi in dir.GetFiles())
-                                {
-                                    fi.Delete();
-                                }
-                            }
+                           
                             var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             if (fileExtension != null)
@@ -489,43 +486,43 @@ namespace Web.Services.Concrete
                     var RootPath = this._environment.WebRootPath;
                     string FileRoot = null;
                     List<string> Attachments = new();
+                    
 
+                    FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeStroke.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
+                    FileRoot = Path.Combine(RootPath, FileRoot);
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, "Stroke");
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, stroke.CodeStrokeId.ToString());
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, "Videos");
+
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    //else
+                    //{
+                    //    DirectoryInfo dir = new DirectoryInfo(FileRoot);
+                    //    foreach (FileInfo fi in dir.GetFiles())
+                    //    {
+                    //        fi.Delete();
+                    //    }
+                    //}
                     foreach (var item in codeStroke.Videos)
                     {
                         if (!string.IsNullOrEmpty(item.Base64Str))
                         {
-                            //var outPath = Directory.GetCurrentDirectory();
-
-                            FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeStroke.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
-                            FileRoot = Path.Combine(RootPath, FileRoot);
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            FileRoot = Path.Combine(FileRoot, "Stroke");
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            FileRoot = Path.Combine(FileRoot, stroke.CodeStrokeId.ToString());
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            FileRoot = Path.Combine(FileRoot, "Videos");
-
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            else
-                            {
-                                DirectoryInfo dir = new DirectoryInfo(FileRoot);
-                                foreach (FileInfo fi in dir.GetFiles())
-                                {
-                                    fi.Delete();
-                                }
-                            }
+                            
                             var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             if (fileExtension != null)
@@ -553,42 +550,42 @@ namespace Web.Services.Concrete
                     string FileRoot = null;
                     List<string> Attachments = new();
 
+
+                    FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeStroke.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
+                    FileRoot = Path.Combine(RootPath, FileRoot);
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, "Stroke");
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, stroke.CodeStrokeId.ToString());
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, "Audios");
+
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    //else
+                    //{
+                    //    DirectoryInfo dir = new DirectoryInfo(FileRoot);
+                    //    foreach (FileInfo fi in dir.GetFiles())
+                    //    {
+                    //        fi.Delete();
+                    //    }
+                    //}
                     foreach (var item in codeStroke.Audios)
                     {
                         if (!string.IsNullOrEmpty(item.Base64Str))
                         {
-                            //var outPath = Directory.GetCurrentDirectory();
-
-                            FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeStroke.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
-                            FileRoot = Path.Combine(RootPath, FileRoot);
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            FileRoot = Path.Combine(FileRoot, "Stroke");
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            FileRoot = Path.Combine(FileRoot, stroke.CodeStrokeId.ToString());
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            FileRoot = Path.Combine(FileRoot, "Audios");
-
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            else
-                            {
-                                DirectoryInfo dir = new DirectoryInfo(FileRoot);
-                                foreach (FileInfo fi in dir.GetFiles())
-                                {
-                                    fi.Delete();
-                                }
-                            }
+                           
                             var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             if (fileExtension != null)
@@ -689,43 +686,42 @@ namespace Web.Services.Concrete
                     var RootPath = this._environment.WebRootPath;
                     string FileRoot = null;
                     List<string> Attachments = new();
+                    
+                    FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeSepsis.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
+                    FileRoot = Path.Combine(RootPath, FileRoot);
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, "Sepsis");
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, row.CodeSepsisId.ToString());
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, "Attachments");
 
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    //else
+                    //{
+                    //    DirectoryInfo dir = new DirectoryInfo(FileRoot);
+                    //    foreach (FileInfo fi in dir.GetFiles())
+                    //    {
+                    //        fi.Delete();
+                    //    }
+                    //}
                     foreach (var item in codeSepsis.Attachment)
                     {
                         if (!string.IsNullOrEmpty(item.Base64Str))
                         {
-                            //var outPath = Directory.GetCurrentDirectory();
-
-                            FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeSepsis.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
-                            FileRoot = Path.Combine(RootPath, FileRoot);
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            FileRoot = Path.Combine(FileRoot, "Sepsis");
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            FileRoot = Path.Combine(FileRoot, row.CodeSepsisId.ToString());
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            FileRoot = Path.Combine(FileRoot, "Attachments");
-
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            else
-                            {
-                                DirectoryInfo dir = new DirectoryInfo(FileRoot);
-                                foreach (FileInfo fi in dir.GetFiles())
-                                {
-                                    fi.Delete();
-                                }
-                            }
+                            
                             var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             if (fileExtension != null)
@@ -752,43 +748,43 @@ namespace Web.Services.Concrete
                     var RootPath = this._environment.WebRootPath;
                     string FileRoot = null;
                     List<string> Attachments = new();
+                    
 
+                    FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeSepsis.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
+                    FileRoot = Path.Combine(RootPath, FileRoot);
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, "Sepsis");
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, row.CodeSepsisId.ToString());
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, "Videos");
+
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    //else
+                    //{
+                    //    DirectoryInfo dir = new DirectoryInfo(FileRoot);
+                    //    foreach (FileInfo fi in dir.GetFiles())
+                    //    {
+                    //        fi.Delete();
+                    //    }
+                    //}
                     foreach (var item in codeSepsis.Videos)
                     {
                         if (!string.IsNullOrEmpty(item.Base64Str))
                         {
-                            //var outPath = Directory.GetCurrentDirectory();
-
-                            FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeSepsis.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
-                            FileRoot = Path.Combine(RootPath, FileRoot);
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            FileRoot = Path.Combine(FileRoot, "Sepsis");
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            FileRoot = Path.Combine(FileRoot, row.CodeSepsisId.ToString());
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            FileRoot = Path.Combine(FileRoot, "Videos");
-
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            else
-                            {
-                                DirectoryInfo dir = new DirectoryInfo(FileRoot);
-                                foreach (FileInfo fi in dir.GetFiles())
-                                {
-                                    fi.Delete();
-                                }
-                            }
+                            
                             var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             if (fileExtension != null)
@@ -814,43 +810,43 @@ namespace Web.Services.Concrete
                     var RootPath = this._environment.WebRootPath;
                     string FileRoot = null;
                     List<string> Attachments = new();
+                    //var outPath = Directory.GetCurrentDirectory();
 
+                    FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeSepsis.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
+                    FileRoot = Path.Combine(RootPath, FileRoot);
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, "Sepsis");
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, row.CodeSepsisId.ToString());
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, "Audios");
+
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    //else
+                    //{
+                    //    DirectoryInfo dir = new DirectoryInfo(FileRoot);
+                    //    foreach (FileInfo fi in dir.GetFiles())
+                    //    {
+                    //        fi.Delete();
+                    //    }
+                    //}
                     foreach (var item in codeSepsis.Audios)
                     {
                         if (!string.IsNullOrEmpty(item.Base64Str))
                         {
-                            //var outPath = Directory.GetCurrentDirectory();
-
-                            FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeSepsis.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
-                            FileRoot = Path.Combine(RootPath, FileRoot);
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            FileRoot = Path.Combine(FileRoot, "Sepsis");
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            FileRoot = Path.Combine(FileRoot, row.CodeSepsisId.ToString());
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            FileRoot = Path.Combine(FileRoot, "Audios");
-
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            else
-                            {
-                                DirectoryInfo dir = new DirectoryInfo(FileRoot);
-                                foreach (FileInfo fi in dir.GetFiles())
-                                {
-                                    fi.Delete();
-                                }
-                            }
+                            
                             var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             if (fileExtension != null)
@@ -895,42 +891,42 @@ namespace Web.Services.Concrete
                     string FileRoot = null;
                     List<string> Attachments = new();
 
+
+                    FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeSepsis.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
+                    FileRoot = Path.Combine(RootPath, FileRoot);
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, "Sepsis");
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, Sepsis.CodeSepsisId.ToString());
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, "Attachments");
+
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    //else
+                    //{
+                    //    DirectoryInfo dir = new DirectoryInfo(FileRoot);
+                    //    foreach (FileInfo fi in dir.GetFiles())
+                    //    {
+                    //        fi.Delete();
+                    //    }
+                    //}
                     foreach (var item in codeSepsis.Attachment)
                     {
                         if (!string.IsNullOrEmpty(item.Base64Str))
                         {
-                            //var outPath = Directory.GetCurrentDirectory();
-
-                            FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeSepsis.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
-                            FileRoot = Path.Combine(RootPath, FileRoot);
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            FileRoot = Path.Combine(FileRoot, "Sepsis");
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            FileRoot = Path.Combine(FileRoot, Sepsis.CodeSepsisId.ToString());
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            FileRoot = Path.Combine(FileRoot, "Attachments");
-
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            else
-                            {
-                                DirectoryInfo dir = new DirectoryInfo(FileRoot);
-                                foreach (FileInfo fi in dir.GetFiles())
-                                {
-                                    fi.Delete();
-                                }
-                            }
+                           
                             var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             if (fileExtension != null)
@@ -957,42 +953,42 @@ namespace Web.Services.Concrete
                     string FileRoot = null;
                     List<string> Attachments = new();
 
+
+                    FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeSepsis.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
+                    FileRoot = Path.Combine(RootPath, FileRoot);
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, "Sepsis");
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, Sepsis.CodeSepsisId.ToString());
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, "Videos");
+
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    //else
+                    //{
+                    //    DirectoryInfo dir = new DirectoryInfo(FileRoot);
+                    //    foreach (FileInfo fi in dir.GetFiles())
+                    //    {
+                    //        fi.Delete();
+                    //    }
+                    //}
                     foreach (var item in codeSepsis.Videos)
                     {
                         if (!string.IsNullOrEmpty(item.Base64Str))
                         {
-                            //var outPath = Directory.GetCurrentDirectory();
-
-                            FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeSepsis.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
-                            FileRoot = Path.Combine(RootPath, FileRoot);
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            FileRoot = Path.Combine(FileRoot, "Sepsis");
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            FileRoot = Path.Combine(FileRoot, Sepsis.CodeSepsisId.ToString());
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            FileRoot = Path.Combine(FileRoot, "Videos");
-
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            else
-                            {
-                                DirectoryInfo dir = new DirectoryInfo(FileRoot);
-                                foreach (FileInfo fi in dir.GetFiles())
-                                {
-                                    fi.Delete();
-                                }
-                            }
+                            
                             var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             if (fileExtension != null)
@@ -1018,43 +1014,43 @@ namespace Web.Services.Concrete
                     var RootPath = this._environment.WebRootPath;
                     string FileRoot = null;
                     List<string> Attachments = new();
+                    //var outPath = Directory.GetCurrentDirectory();
 
+                    FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeSepsis.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
+                    FileRoot = Path.Combine(RootPath, FileRoot);
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, "Sepsis");
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, Sepsis.CodeSepsisId.ToString());
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, "Audios");
+
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    //else
+                    //{
+                    //    DirectoryInfo dir = new DirectoryInfo(FileRoot);
+                    //    foreach (FileInfo fi in dir.GetFiles())
+                    //    {
+                    //        fi.Delete();
+                    //    }
+                    //}
                     foreach (var item in codeSepsis.Audios)
                     {
                         if (!string.IsNullOrEmpty(item.Base64Str))
                         {
-                            //var outPath = Directory.GetCurrentDirectory();
-
-                            FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeSepsis.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
-                            FileRoot = Path.Combine(RootPath, FileRoot);
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            FileRoot = Path.Combine(FileRoot, "Sepsis");
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            FileRoot = Path.Combine(FileRoot, Sepsis.CodeSepsisId.ToString());
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            FileRoot = Path.Combine(FileRoot, "Audios");
-
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            else
-                            {
-                                DirectoryInfo dir = new DirectoryInfo(FileRoot);
-                                foreach (FileInfo fi in dir.GetFiles())
-                                {
-                                    fi.Delete();
-                                }
-                            }
+                            
                             var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             if (fileExtension != null)
@@ -1154,43 +1150,43 @@ namespace Web.Services.Concrete
                     var RootPath = this._environment.WebRootPath;
                     string FileRoot = null;
                     List<string> Attachments = new();
+                    //var outPath = Directory.GetCurrentDirectory();
 
+                    FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeSTEMI.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
+                    FileRoot = Path.Combine(RootPath, FileRoot);
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, "STEMI");
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, row.CodeStemiid.ToString());
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, "Attachments");
+
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    //else
+                    //{
+                    //    DirectoryInfo dir = new DirectoryInfo(FileRoot);
+                    //    foreach (FileInfo fi in dir.GetFiles())
+                    //    {
+                    //        fi.Delete();
+                    //    }
+                    //}
                     foreach (var item in codeSTEMI.Attachment)
                     {
                         if (!string.IsNullOrEmpty(item.Base64Str))
                         {
-                            //var outPath = Directory.GetCurrentDirectory();
-
-                            FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeSTEMI.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
-                            FileRoot = Path.Combine(RootPath, FileRoot);
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            FileRoot = Path.Combine(FileRoot, "STEMI");
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            FileRoot = Path.Combine(FileRoot, row.CodeStemiid.ToString());
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            FileRoot = Path.Combine(FileRoot, "Attachments");
-
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            else
-                            {
-                                DirectoryInfo dir = new DirectoryInfo(FileRoot);
-                                foreach (FileInfo fi in dir.GetFiles())
-                                {
-                                    fi.Delete();
-                                }
-                            }
+                           
                             var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             if (fileExtension != null)
@@ -1216,43 +1212,43 @@ namespace Web.Services.Concrete
                     var RootPath = this._environment.WebRootPath;
                     string FileRoot = null;
                     List<string> Attachments = new();
+                    //var outPath = Directory.GetCurrentDirectory();
 
+                    FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeSTEMI.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
+                    FileRoot = Path.Combine(RootPath, FileRoot);
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, "STEMI");
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, row.CodeStemiid.ToString());
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, "Videos");
+
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    //else
+                    //{
+                    //    DirectoryInfo dir = new DirectoryInfo(FileRoot);
+                    //    foreach (FileInfo fi in dir.GetFiles())
+                    //    {
+                    //        fi.Delete();
+                    //    }
+                    //}
                     foreach (var item in codeSTEMI.Videos)
                     {
                         if (!string.IsNullOrEmpty(item.Base64Str))
                         {
-                            //var outPath = Directory.GetCurrentDirectory();
-
-                            FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeSTEMI.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
-                            FileRoot = Path.Combine(RootPath, FileRoot);
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            FileRoot = Path.Combine(FileRoot, "STEMI");
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            FileRoot = Path.Combine(FileRoot, row.CodeStemiid.ToString());
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            FileRoot = Path.Combine(FileRoot, "Videos");
-
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            else
-                            {
-                                DirectoryInfo dir = new DirectoryInfo(FileRoot);
-                                foreach (FileInfo fi in dir.GetFiles())
-                                {
-                                    fi.Delete();
-                                }
-                            }
+                            
                             var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             if (fileExtension != null)
@@ -1278,43 +1274,43 @@ namespace Web.Services.Concrete
                     var RootPath = this._environment.WebRootPath;
                     string FileRoot = null;
                     List<string> Attachments = new();
+                    //var outPath = Directory.GetCurrentDirectory();
 
+                    FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeSTEMI.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
+                    FileRoot = Path.Combine(RootPath, FileRoot);
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, "STEMI");
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, row.CodeStemiid.ToString());
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, "Audios");
+
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    //else
+                    //{
+                    //    DirectoryInfo dir = new DirectoryInfo(FileRoot);
+                    //    foreach (FileInfo fi in dir.GetFiles())
+                    //    {
+                    //        fi.Delete();
+                    //    }
+                    //}
                     foreach (var item in codeSTEMI.Audios)
                     {
                         if (!string.IsNullOrEmpty(item.Base64Str))
                         {
-                            //var outPath = Directory.GetCurrentDirectory();
-
-                            FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeSTEMI.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
-                            FileRoot = Path.Combine(RootPath, FileRoot);
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            FileRoot = Path.Combine(FileRoot, "STEMI");
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            FileRoot = Path.Combine(FileRoot, row.CodeStemiid.ToString());
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            FileRoot = Path.Combine(FileRoot, "Audios");
-
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            else
-                            {
-                                DirectoryInfo dir = new DirectoryInfo(FileRoot);
-                                foreach (FileInfo fi in dir.GetFiles())
-                                {
-                                    fi.Delete();
-                                }
-                            }
+                           
                             var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             if (fileExtension != null)
@@ -1355,43 +1351,43 @@ namespace Web.Services.Concrete
                     var RootPath = this._environment.WebRootPath;
                     string FileRoot = null;
                     List<string> Attachments = new();
+                    //var outPath = Directory.GetCurrentDirectory();
 
+                    FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeSTEMI.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
+                    FileRoot = Path.Combine(RootPath, FileRoot);
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, "STEMI");
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, STEMI.CodeStemiid.ToString());
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, "Attachments");
+
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    //else
+                    //{
+                    //    DirectoryInfo dir = new DirectoryInfo(FileRoot);
+                    //    foreach (FileInfo fi in dir.GetFiles())
+                    //    {
+                    //        fi.Delete();
+                    //    }
+                    //}
                     foreach (var item in codeSTEMI.Attachment)
                     {
                         if (!string.IsNullOrEmpty(item.Base64Str))
                         {
-                            //var outPath = Directory.GetCurrentDirectory();
-
-                            FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeSTEMI.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
-                            FileRoot = Path.Combine(RootPath, FileRoot);
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            FileRoot = Path.Combine(FileRoot, "STEMI");
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            FileRoot = Path.Combine(FileRoot, STEMI.CodeStemiid.ToString());
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            FileRoot = Path.Combine(FileRoot, "Attachments");
-
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            else
-                            {
-                                DirectoryInfo dir = new DirectoryInfo(FileRoot);
-                                foreach (FileInfo fi in dir.GetFiles())
-                                {
-                                    fi.Delete();
-                                }
-                            }
+                           
                             var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             if (fileExtension != null)
@@ -1417,43 +1413,43 @@ namespace Web.Services.Concrete
                     var RootPath = this._environment.WebRootPath;
                     string FileRoot = null;
                     List<string> Attachments = new();
+                    //var outPath = Directory.GetCurrentDirectory();
 
+                    FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeSTEMI.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
+                    FileRoot = Path.Combine(RootPath, FileRoot);
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, "STEMI");
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, STEMI.CodeStemiid.ToString());
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, "Videos");
+
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    //else
+                    //{
+                    //    DirectoryInfo dir = new DirectoryInfo(FileRoot);
+                    //    foreach (FileInfo fi in dir.GetFiles())
+                    //    {
+                    //        fi.Delete();
+                    //    }
+                    //}
                     foreach (var item in codeSTEMI.Videos)
                     {
                         if (!string.IsNullOrEmpty(item.Base64Str))
                         {
-                            //var outPath = Directory.GetCurrentDirectory();
-
-                            FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeSTEMI.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
-                            FileRoot = Path.Combine(RootPath, FileRoot);
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            FileRoot = Path.Combine(FileRoot, "STEMI");
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            FileRoot = Path.Combine(FileRoot, STEMI.CodeStemiid.ToString());
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            FileRoot = Path.Combine(FileRoot, "Videos");
-
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            else
-                            {
-                                DirectoryInfo dir = new DirectoryInfo(FileRoot);
-                                foreach (FileInfo fi in dir.GetFiles())
-                                {
-                                    fi.Delete();
-                                }
-                            }
+                            
                             var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             if (fileExtension != null)
@@ -1480,42 +1476,43 @@ namespace Web.Services.Concrete
                     string FileRoot = null;
                     List<string> Attachments = new();
 
+                    //var outPath = Directory.GetCurrentDirectory();
+
+                    FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeSTEMI.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
+                    FileRoot = Path.Combine(RootPath, FileRoot);
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, "STEMI");
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, STEMI.CodeStemiid.ToString());
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, "Audios");
+
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    //else
+                    //{
+                    //    DirectoryInfo dir = new DirectoryInfo(FileRoot);
+                    //    foreach (FileInfo fi in dir.GetFiles())
+                    //    {
+                    //        fi.Delete();
+                    //    }
+                    //}
                     foreach (var item in codeSTEMI.Audios)
                     {
                         if (!string.IsNullOrEmpty(item.Base64Str))
                         {
-                            //var outPath = Directory.GetCurrentDirectory();
-
-                            FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeSTEMI.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
-                            FileRoot = Path.Combine(RootPath, FileRoot);
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            FileRoot = Path.Combine(FileRoot, "STEMI");
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            FileRoot = Path.Combine(FileRoot, STEMI.CodeStemiid.ToString());
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            FileRoot = Path.Combine(FileRoot, "Audios");
-
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            else
-                            {
-                                DirectoryInfo dir = new DirectoryInfo(FileRoot);
-                                foreach (FileInfo fi in dir.GetFiles())
-                                {
-                                    fi.Delete();
-                                }
-                            }
+                            
                             var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             if (fileExtension != null)
@@ -1615,43 +1612,43 @@ namespace Web.Services.Concrete
                     var RootPath = this._environment.WebRootPath;
                     string FileRoot = null;
                     List<string> Attachments = new();
+                    //var outPath = Directory.GetCurrentDirectory();
 
+                    FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeTruma.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
+                    FileRoot = Path.Combine(RootPath, FileRoot);
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, "Truma");
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, row.CodeTraumaId.ToString());
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, "Attachments");
+
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    //else
+                    //{
+                    //    DirectoryInfo dir = new DirectoryInfo(FileRoot);
+                    //    foreach (FileInfo fi in dir.GetFiles())
+                    //    {
+                    //        fi.Delete();
+                    //    }
+                    //}
                     foreach (var item in codeTruma.Attachment)
                     {
                         if (!string.IsNullOrEmpty(item.Base64Str))
                         {
-                            //var outPath = Directory.GetCurrentDirectory();
-
-                            FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeTruma.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
-                            FileRoot = Path.Combine(RootPath, FileRoot);
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            FileRoot = Path.Combine(FileRoot, "Truma");
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            FileRoot = Path.Combine(FileRoot, row.CodeTraumaId.ToString());
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            FileRoot = Path.Combine(FileRoot, "Attachments");
-
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            else
-                            {
-                                DirectoryInfo dir = new DirectoryInfo(FileRoot);
-                                foreach (FileInfo fi in dir.GetFiles())
-                                {
-                                    fi.Delete();
-                                }
-                            }
+                           
                             var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             if (fileExtension != null)
@@ -1677,43 +1674,43 @@ namespace Web.Services.Concrete
                     var RootPath = this._environment.WebRootPath;
                     string FileRoot = null;
                     List<string> Attachments = new();
+                    //var outPath = Directory.GetCurrentDirectory();
 
+                    FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeTruma.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
+                    FileRoot = Path.Combine(RootPath, FileRoot);
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, "Truma");
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, row.CodeTraumaId.ToString());
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, "Videos");
+
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    //else
+                    //{
+                    //    DirectoryInfo dir = new DirectoryInfo(FileRoot);
+                    //    foreach (FileInfo fi in dir.GetFiles())
+                    //    {
+                    //        fi.Delete();
+                    //    }
+                    //}
                     foreach (var item in codeTruma.Videos)
                     {
                         if (!string.IsNullOrEmpty(item.Base64Str))
                         {
-                            //var outPath = Directory.GetCurrentDirectory();
-
-                            FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeTruma.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
-                            FileRoot = Path.Combine(RootPath, FileRoot);
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            FileRoot = Path.Combine(FileRoot, "Truma");
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            FileRoot = Path.Combine(FileRoot, row.CodeTraumaId.ToString());
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            FileRoot = Path.Combine(FileRoot, "Videos");
-
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            else
-                            {
-                                DirectoryInfo dir = new DirectoryInfo(FileRoot);
-                                foreach (FileInfo fi in dir.GetFiles())
-                                {
-                                    fi.Delete();
-                                }
-                            }
+                            
                             var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             if (fileExtension != null)
@@ -1739,43 +1736,43 @@ namespace Web.Services.Concrete
                     var RootPath = this._environment.WebRootPath;
                     string FileRoot = null;
                     List<string> Attachments = new();
+                    //var outPath = Directory.GetCurrentDirectory();
 
+                    FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeTruma.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
+                    FileRoot = Path.Combine(RootPath, FileRoot);
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, "Truma");
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, row.CodeTraumaId.ToString());
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, "Audios");
+
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    //else
+                    //{
+                    //    DirectoryInfo dir = new DirectoryInfo(FileRoot);
+                    //    foreach (FileInfo fi in dir.GetFiles())
+                    //    {
+                    //        fi.Delete();
+                    //    }
+                    //}
                     foreach (var item in codeTruma.Audios)
                     {
                         if (!string.IsNullOrEmpty(item.Base64Str))
                         {
-                            //var outPath = Directory.GetCurrentDirectory();
-
-                            FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeTruma.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
-                            FileRoot = Path.Combine(RootPath, FileRoot);
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            FileRoot = Path.Combine(FileRoot, "Truma");
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            FileRoot = Path.Combine(FileRoot, row.CodeTraumaId.ToString());
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            FileRoot = Path.Combine(FileRoot, "Audios");
-
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            else
-                            {
-                                DirectoryInfo dir = new DirectoryInfo(FileRoot);
-                                foreach (FileInfo fi in dir.GetFiles())
-                                {
-                                    fi.Delete();
-                                }
-                            }
+                           
                             var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             if (fileExtension != null)
@@ -1817,43 +1814,43 @@ namespace Web.Services.Concrete
                     var RootPath = this._environment.WebRootPath;
                     string FileRoot = null;
                     List<string> Attachments = new();
+                    //var outPath = Directory.GetCurrentDirectory();
 
+                    FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeTruma.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
+                    FileRoot = Path.Combine(RootPath, FileRoot);
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, "Truma");
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, Truma.CodeTraumaId.ToString());
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, "Attachments");
+
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    //else
+                    //{
+                    //    DirectoryInfo dir = new DirectoryInfo(FileRoot);
+                    //    foreach (FileInfo fi in dir.GetFiles())
+                    //    {
+                    //        fi.Delete();
+                    //    }
+                    //}
                     foreach (var item in codeTruma.Attachment)
                     {
                         if (!string.IsNullOrEmpty(item.Base64Str))
                         {
-                            //var outPath = Directory.GetCurrentDirectory();
-
-                            FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeTruma.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
-                            FileRoot = Path.Combine(RootPath, FileRoot);
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            FileRoot = Path.Combine(FileRoot, "Truma");
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            FileRoot = Path.Combine(FileRoot, Truma.CodeTraumaId.ToString());
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            FileRoot = Path.Combine(FileRoot, "Attachments");
-
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            else
-                            {
-                                DirectoryInfo dir = new DirectoryInfo(FileRoot);
-                                foreach (FileInfo fi in dir.GetFiles())
-                                {
-                                    fi.Delete();
-                                }
-                            }
+                           
                             var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             if (fileExtension != null)
@@ -1879,43 +1876,43 @@ namespace Web.Services.Concrete
                     var RootPath = this._environment.WebRootPath;
                     string FileRoot = null;
                     List<string> Attachments = new();
+                    //var outPath = Directory.GetCurrentDirectory();
 
+                    FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeTruma.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
+                    FileRoot = Path.Combine(RootPath, FileRoot);
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, "Truma");
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, Truma.CodeTraumaId.ToString());
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, "Videos");
+
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    //else
+                    //{
+                    //    DirectoryInfo dir = new DirectoryInfo(FileRoot);
+                    //    foreach (FileInfo fi in dir.GetFiles())
+                    //    {
+                    //        fi.Delete();
+                    //    }
+                    //}
                     foreach (var item in codeTruma.Videos)
                     {
                         if (!string.IsNullOrEmpty(item.Base64Str))
                         {
-                            //var outPath = Directory.GetCurrentDirectory();
-
-                            FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeTruma.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
-                            FileRoot = Path.Combine(RootPath, FileRoot);
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            FileRoot = Path.Combine(FileRoot, "Truma");
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            FileRoot = Path.Combine(FileRoot, Truma.CodeTraumaId.ToString());
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            FileRoot = Path.Combine(FileRoot, "Videos");
-
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            else
-                            {
-                                DirectoryInfo dir = new DirectoryInfo(FileRoot);
-                                foreach (FileInfo fi in dir.GetFiles())
-                                {
-                                    fi.Delete();
-                                }
-                            }
+                            
                             var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             if (fileExtension != null)
@@ -1941,43 +1938,43 @@ namespace Web.Services.Concrete
                     var RootPath = this._environment.WebRootPath;
                     string FileRoot = null;
                     List<string> Attachments = new();
+                    //var outPath = Directory.GetCurrentDirectory();
 
+                    FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeTruma.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
+                    FileRoot = Path.Combine(RootPath, FileRoot);
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, "Truma");
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, Truma.CodeTraumaId.ToString());
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, "Audios");
+
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    //else
+                    //{
+                    //    DirectoryInfo dir = new DirectoryInfo(FileRoot);
+                    //    foreach (FileInfo fi in dir.GetFiles())
+                    //    {
+                    //        fi.Delete();
+                    //    }
+                    //}
                     foreach (var item in codeTruma.Audios)
                     {
                         if (!string.IsNullOrEmpty(item.Base64Str))
                         {
-                            //var outPath = Directory.GetCurrentDirectory();
-
-                            FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeTruma.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
-                            FileRoot = Path.Combine(RootPath, FileRoot);
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            FileRoot = Path.Combine(FileRoot, "Truma");
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            FileRoot = Path.Combine(FileRoot, Truma.CodeTraumaId.ToString());
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            FileRoot = Path.Combine(FileRoot, "Audios");
-
-                            if (!Directory.Exists(FileRoot))
-                            {
-                                Directory.CreateDirectory(FileRoot);
-                            }
-                            else
-                            {
-                                DirectoryInfo dir = new DirectoryInfo(FileRoot);
-                                foreach (FileInfo fi in dir.GetFiles())
-                                {
-                                    fi.Delete();
-                                }
-                            }
+                           
                             var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             if (fileExtension != null)
