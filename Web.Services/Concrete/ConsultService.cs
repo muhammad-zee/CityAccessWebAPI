@@ -18,13 +18,13 @@ namespace Web.Services.Concrete
     public class ConsultService : IConsultService
     {
         private RAQ_DbContext _dbContext;
-        private CommunicationService _communicationService;
+        private ICommunicationService _communicationService;
         private IRepository<ConsultField> _consultFieldRepo;
         private IRepository<OrganizationConsultField> _orgConsultRepo;
         private IRepository<ConsultAcknowledgment> _consultAcknowledgmentRepo;
         IConfiguration _config;
         public ConsultService(RAQ_DbContext dbContext,
-            CommunicationService communicationService,
+            ICommunicationService communicationService,
             IConfiguration config,
             IRepository<ConsultField> consultFieldRepo,
             IRepository<OrganizationConsultField> orgConsultRepo,
