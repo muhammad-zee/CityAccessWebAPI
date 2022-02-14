@@ -12,6 +12,10 @@ namespace Web.Services.Interfaces
         BaseResponse DetachActiveCodes(int activeCodeId);
         #endregion
 
+        #region Delete Files
+        BaseResponse DeleteFile(FilesVM files);
+        #endregion
+
         #region Code Stroke
         BaseResponse GetAllStrokeCode();
         BaseResponse GetStrokeDataById(int strokeId);

@@ -131,19 +131,19 @@ namespace Web.Services.Concrete
         public BaseResponse AddOrUpdateOrgConsultFeilds(List<OrgConsultFieldsVM> orgConsultFields)
         {
 
-            var duplicateObj = orgConsultFields;
+            var duplicateObj = orgConsultFields.Select(x => new { x.OrganizationIdFk, x.ConsultFieldIdFk }).ToList();
 
-            var alreadyExistFields = this._orgConsultRepo.Table.Where(x => duplicateObj.Select(y => y.ConsultFieldIdFk).Contains(x.ConsultFieldIdFk) && duplicateObj.Select(y => y.OrganizationIdFk).Contains(x.OrganizationIdFk) && !x.IsDeleted).Select(x => x.OrgConsultFieldId).ToList();
-            duplicateObj.RemoveAll(r => alreadyExistFields.Contains(r.OrgConsultFieldId));
+            var alreadyExistFields = this._orgConsultRepo.Table.Where(x => duplicateObj.Select(y => y.ConsultFieldIdFk).Contains(x.ConsultFieldIdFk) && duplicateObj.Select(y => y.OrganizationIdFk).Contains(x.OrganizationIdFk) && !x.IsDeleted).Select(x => x.ConsultFieldIdFk).Distinct().ToList();
+            duplicateObj.RemoveAll(r => alreadyExistFields.Contains(r.ConsultFieldIdFk));
 
-            var orgConsults = AutoMapperHelper.MapList<OrgConsultFieldsVM, OrganizationConsultField>(duplicateObj);
+            var orgConsults = AutoMapperHelper.MapList<OrgConsultFieldsVM, OrganizationConsultField>(orgConsultFields.Where(x => duplicateObj.Select(c => c.ConsultFieldIdFk).Contains(x.ConsultFieldIdFk)).ToList());
 
             this._orgConsultRepo.Insert(orgConsults);
 
-            alreadyExistFields = this._orgConsultRepo.Table.Where(x => duplicateObj.Select(y => y.ConsultFieldIdFk).Contains(x.ConsultFieldIdFk) && duplicateObj.Select(y => y.OrganizationIdFk).Contains(x.OrganizationIdFk) && !x.IsDeleted).Select(x => x.OrgConsultFieldId).ToList();
-            duplicateObj.RemoveAll(r => alreadyExistFields.Contains(r.OrgConsultFieldId));
+            alreadyExistFields = this._orgConsultRepo.Table.Where(x => duplicateObj.Select(y => y.ConsultFieldIdFk).Contains(x.ConsultFieldIdFk) && duplicateObj.Select(y => y.OrganizationIdFk).Contains(x.OrganizationIdFk) && !x.IsDeleted).Select(x => x.ConsultFieldIdFk).Distinct().ToList();
+            duplicateObj.RemoveAll(r => alreadyExistFields.Contains(r.ConsultFieldIdFk));
 
-            var deletedOnes = this._orgConsultRepo.Table.Where(x => !(orgConsultFields.Select(y => y.ConsultFieldIdFk).Contains(x.ConsultFieldIdFk) && orgConsultFields.Select(y => y.OrganizationIdFk).Contains(x.OrganizationIdFk) && !x.IsDeleted)).ToList();
+            var deletedOnes = this._orgConsultRepo.Table.Where(x => !(orgConsultFields.Select(y => y.ConsultFieldIdFk).Contains(x.ConsultFieldIdFk)) && orgConsultFields.Select(y => y.OrganizationIdFk).Contains(x.OrganizationIdFk) && !x.IsDeleted).ToList();
 
             int? ModifiedBy = orgConsultFields.Select(x => x.ModifiedBy).FirstOrDefault();
 
@@ -197,11 +197,12 @@ namespace Web.Services.Concrete
         {
             var keys = keyValues.Keys.ToList();
             var values = keyValues.Values.ToList();
-
+            
             bool isConsultIdExist = keyValues.ContainsKey("ConsultId");
             if (isConsultIdExist && keyValues["ConsultId"].ToString() == "0")
             {
-                string consultNumber = "";
+                var Consult_Counter = _dbContext.LoadStoredProcedure("raq_getMDRouteCounter").WithSqlParam("@C_Initails", "CC").ExecuteStoredProc<MDRoute_CounterVM>().FirstOrDefault();
+                
                 string query = "INSERT INTO [dbo].[Consults] (";
 
                 for (int i = 0; i < keys.Count(); i++)
@@ -232,8 +233,8 @@ namespace Web.Services.Concrete
                         query += values[i];
                         if ((i + 1) == values.Count)
                         {
-                            consultNumber = HelperExtension.CreateRandomString();
-                            query += $",{consultNumber}";
+                            
+                            query += $",{Consult_Counter.Counter_Value}";
                             query += $",{ApplicationSettings.UserId}";
                             query += $",{DateTime.UtcNow}";
                             query += ")";
@@ -262,7 +263,7 @@ namespace Web.Services.Concrete
                             {
                                 if (keyValues["ConsultType"].ToString() == "Urgent")
                                 {
-                                    var channel = _communicationService.createConversationChannel($"Consult_{consultNumber}_{keyValues["ConsultType"].ToString()}", consultNumber);
+                                    var channel = _communicationService.createConversationChannel($"{keyValues["PatientName"].ToString()}_{Consult_Counter.Counter_Value}_{keyValues["ConsultType"].ToString()}", Consult_Counter.Counter_Value.ToString());
                                     foreach (var item in users)
                                     {
                                         _communicationService.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
@@ -272,7 +273,7 @@ namespace Web.Services.Concrete
                         }
                         else if (users != null && users.Count > 0)
                         {
-                            var channel = _communicationService.createConversationChannel($"Consult_{consultNumber}_{keyValues["ConsultType"].ToString()}", consultNumber);
+                            var channel = _communicationService.createConversationChannel($"{keyValues["PatientName"].ToString()}_{Consult_Counter.Counter_Value}_{keyValues["ConsultType"].ToString()}", Consult_Counter.Counter_Value.ToString());
                             foreach (var item in users)
                             {
                                 _communicationService.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
