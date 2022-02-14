@@ -79,6 +79,28 @@ namespace Web.API.Controllers
             }
         }
 
+
+        #region Delete Files
+
+
+        [Description("Delete File")]
+        [HttpPost("activecode/DeleteFile")]
+        public BaseResponse DeleteFile(FilesVM files) 
+        {
+            try
+            {
+                return _activeCodesService.DeleteFile(files);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
+        #endregion  
+
         #region Code Stroke
 
         [Description("Get All Stroke Data")]
