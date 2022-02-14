@@ -51,6 +51,10 @@ namespace Web.Model.Common
         public List<int> dptIdsFT { get; set; }
         public List<int?> orgIdsFT { get; set; }
         public string serviceIds { get; set; } = "";
+
+        public bool IsAfterHours { get; set; }
+        public string UserUniqueId { get; set; }
+
         public List<ServiceLineVM> UserServices { get; set; }
         public List<DepartmentVM> Departments { get; set; }
         public List<OrganizationVM> Organizations { get; set; }
