@@ -269,12 +269,27 @@ namespace Web.API.Controllers
         }
 
         [HttpPost("VideoCall/VideoRoomCallbackEvent")]
-
         public BaseResponse VideoRoomCallbackEvent(string EventType)
         {
             try
             {
                 return this._communicaitonService.VideoRoomCallbackEvent(EventType);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
+        [HttpPost("VideoCall/dialVideoCall")]
+        public BaseResponse dialVideoCall([FromBody] DialVideoCallVM model)
+        {
+            try
+            {
+                
+                return this._communicaitonService.dialVideoCall(model);
             }
             catch (Exception ex)
             {

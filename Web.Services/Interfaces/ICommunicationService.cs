@@ -33,6 +33,7 @@ namespace Web.Services.Interfaces
         BaseResponse generateVideoCallToken(string identity);
 
         BaseResponse VideoRoomCallbackEvent(string EventType);
+        BaseResponse dialVideoCall(DialVideoCallVM model);
         #endregion
 
         bool SendSms(string ToPhoneNumber, string SmsBody);

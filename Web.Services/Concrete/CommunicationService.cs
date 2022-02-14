@@ -1,5 +1,6 @@
 ﻿using ElmahCore;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using SendGrid;
 using SendGrid.Helpers.Mail;
 using System;
@@ -634,6 +635,27 @@ namespace Web.Services.Concrete
         public BaseResponse VideoRoomCallbackEvent(string EventType)
         {
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Event Received" };
+        }
+
+        public BaseResponse dialVideoCall(DialVideoCallVM model)
+        {
+            string UserChannelSid = this._userRepo.Table.FirstOrDefault(u => u.UserUniqueId == model.to && u.IsDeleted != true).UserChannelSid;
+
+            var attributes = JsonConvert.SerializeObject(new Dictionary<string, Object>()
+                                    {
+                                        {"from", model.from},
+                                        {"isVideo", model.isVideo},
+                                        {"roomName", model.roomName},
+                                        {"type", "Video Call"}
+                                    }, Formatting.Indented);
+            this.sendPushNotification(new ConversationMessageVM
+            {
+                author = AuthorEnums.VideoCallController,
+                body = "Video Call",
+                attributes= attributes,
+                channelSid = UserChannelSid
+            });
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Call Dialed" };
         }
         #endregion
     }
