@@ -13,6 +13,7 @@ using Twilio.AspNet.Common;
 using Twilio.Jwt.AccessToken;
 using Twilio.Rest.Chat.V2.Service;
 using Twilio.Rest.Chat.V2.Service.Channel;
+using Twilio.Rest.Video.V1;
 using Twilio.Types;
 using Web.Data.Models;
 using Web.DLL.Generic_Repository;
@@ -646,6 +647,7 @@ namespace Web.Services.Concrete
                                         {"from", model.from},
                                         {"isVideo", model.isVideo},
                                         {"roomName", model.roomName},
+                                        {"roomSid", model.roomSid},
                                         {"type", "Video Call"}
                                     }, Formatting.Indented);
             this.sendPushNotification(new ConversationMessageVM
@@ -656,6 +658,15 @@ namespace Web.Services.Concrete
                 channelSid = UserChannelSid
             });
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Call Dialed" };
+        }
+        public BaseResponse rejectIncomingCall(string roomSid)
+        {
+            var room = RoomResource.Update(
+            status: RoomResource.RoomStatusEnum.Completed,
+            pathSid: roomSid
+        );
+
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Room Completed" };
         }
         #endregion
     }
