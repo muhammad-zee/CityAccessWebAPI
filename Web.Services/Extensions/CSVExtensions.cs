@@ -164,5 +164,36 @@ namespace Web.Services.Extensions
         public int Order { get; private set; }
         public ColumnOrderAttribute(int order) { Order = order; }
     }
+
+    public static class FilesExtensions
+    {
+        public static string GetFileExtenstion(this string extenstion)
+        {
+            if (extenstion.Contains("image/jpg"))
+                return ".jpg";
+            if (extenstion.Contains("image/jpeg"))
+                return ".jpeg";
+            if (extenstion.Contains("image/png"))
+                return ".png";
+            if (extenstion.Contains("audio/mpeg"))
+                return ".mp3";
+            if (extenstion.Contains("video/mp4"))
+                return ".mp4";
+            if (extenstion.Contains("video/x-matroska"))
+                return ".mkv";
+            if (extenstion.Contains("application/octet-stream"))
+                return ".flv";
+            if (extenstion.Contains("application/pdf"))
+                return ".pdf";
+            if (extenstion.Contains("application/msword"))
+                return ".doc";
+            if (extenstion.Contains("application/vnd.openxmlformats-officedocument.wordprocessingml.document"))
+                return ".docx";
+            if (extenstion.Contains("application/vnd.ms-excel"))
+                return ".xls";
+            else
+                return null;
+        }
+    }
 }
 

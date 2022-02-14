@@ -44,7 +44,7 @@ namespace Web.API.Controllers
             {
                 ElmahExtensions.RiseError(ex);
                 _logger.LogExceptions(ex);
-                return new BaseResponse() { Status = HttpStatusCode.OK, Message = ex.ToString() };
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
         }
 
@@ -60,7 +60,7 @@ namespace Web.API.Controllers
             {
                 ElmahExtensions.RiseError(ex);
                 _logger.LogExceptions(ex);
-                return new BaseResponse() { Status = HttpStatusCode.OK, Message = ex.ToString() };
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
         }
 
@@ -76,7 +76,7 @@ namespace Web.API.Controllers
             {
                 ElmahExtensions.RiseError(ex);
                 _logger.LogExceptions(ex);
-                return new BaseResponse() { Status = HttpStatusCode.OK, Message = ex.ToString() };
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
         }
 
@@ -92,7 +92,7 @@ namespace Web.API.Controllers
             {
                 ElmahExtensions.RiseError(ex);
                 _logger.LogExceptions(ex);
-                return new BaseResponse() { Status = HttpStatusCode.OK, Message = ex.ToString() };
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
         }
 
@@ -112,11 +112,79 @@ namespace Web.API.Controllers
             {
                 ElmahExtensions.RiseError(ex);
                 _logger.LogExceptions(ex);
-                return new BaseResponse() { Status = HttpStatusCode.OK, Message = ex.ToString() };
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
 
         }
+
+        [Description("Get Consult Forms For Org")]
+        [HttpGet("consult/GetConsultFormByOrgId/{orgId}")]
+        public BaseResponse GetConsultFormByOrgId(int orgId)
+        {
+            try
+            {
+                return _consultService.GetConsultFormByOrgId(orgId);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
         #endregion
 
+        #region Consults
+
+        [Description("Get All Consults")]
+        [HttpGet("consult/GetAllConsults")]
+        public BaseResponse GetAllConsults()
+        {
+            try
+            {
+                return _consultService.GetAllConsults();
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
+        [Description("Get All Consult By Id")]
+        [HttpGet("consult/GetConsultById/{Id}")]
+        public BaseResponse GetConsultById(int Id)
+        {
+            try
+            {
+                return _consultService.GetConsultById(Id);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
+        [Description("Add or Update Consult Form")]
+        [HttpPost("consult/AddOrUpdateConsult")]
+        public BaseResponse AddOrUpdateConsult(IDictionary<string, object> keyValues)
+        {
+            try
+            {
+                return _consultService.AddOrUpdateConsult(keyValues);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
+        #endregion
     }
 }

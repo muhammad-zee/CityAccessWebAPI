@@ -59,7 +59,7 @@ namespace Web.API.Controllers
             {
                 ElmahExtensions.RiseError(ex);
                 _logger.LogExceptions(ex);
-                return new BaseResponse() { Status = HttpStatusCode.OK, Message = ex.ToString() };
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
         }
 
@@ -75,7 +75,7 @@ namespace Web.API.Controllers
             {
                 ElmahExtensions.RiseError(ex);
                 _logger.LogExceptions(ex);
-                return new BaseResponse() { Status = HttpStatusCode.OK, Message = ex.ToString() };
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
         }
 
@@ -93,7 +93,7 @@ namespace Web.API.Controllers
             {
                 ElmahExtensions.RiseError(ex);
                 _logger.LogExceptions(ex);
-                return new BaseResponse() { Status = HttpStatusCode.OK, Message = ex.ToString() };
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
         }
 
@@ -109,7 +109,7 @@ namespace Web.API.Controllers
             {
                 ElmahExtensions.RiseError(ex);
                 _logger.LogExceptions(ex);
-                return new BaseResponse() { Status = HttpStatusCode.OK, Message = ex.ToString() };
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
         }
 
@@ -126,7 +126,7 @@ namespace Web.API.Controllers
             {
                 ElmahExtensions.RiseError(ex);
                 _logger.LogExceptions(ex);
-                return new BaseResponse() { Status = HttpStatusCode.OK, Message = ex.ToString() };
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
         }
 
@@ -143,7 +143,7 @@ namespace Web.API.Controllers
             {
                 ElmahExtensions.RiseError(ex);
                 _logger.LogExceptions(ex);
-                return new BaseResponse() { Status = HttpStatusCode.OK, Message = ex.ToString() };
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
         }
 
@@ -164,7 +164,7 @@ namespace Web.API.Controllers
             {
                 ElmahExtensions.RiseError(ex);
                 _logger.LogExceptions(ex);
-                return new BaseResponse() { Status = HttpStatusCode.OK, Message = ex.ToString() };
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
         }
 
@@ -180,7 +180,7 @@ namespace Web.API.Controllers
             {
                 ElmahExtensions.RiseError(ex);
                 _logger.LogExceptions(ex);
-                return new BaseResponse() { Status = HttpStatusCode.OK, Message = ex.ToString() };
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
         }
 
@@ -197,7 +197,7 @@ namespace Web.API.Controllers
             {
                 ElmahExtensions.RiseError(ex);
                 _logger.LogExceptions(ex);
-                return new BaseResponse() { Status = HttpStatusCode.OK, Message = ex.ToString() };
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
         }
 
@@ -214,7 +214,7 @@ namespace Web.API.Controllers
             {
                 ElmahExtensions.RiseError(ex);
                 _logger.LogExceptions(ex);
-                return new BaseResponse() { Status = HttpStatusCode.OK, Message = ex.ToString() };
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
         }
 
@@ -235,7 +235,7 @@ namespace Web.API.Controllers
             {
                 ElmahExtensions.RiseError(ex);
                 _logger.LogExceptions(ex);
-                return new BaseResponse() { Status = HttpStatusCode.OK, Message = ex.ToString() };
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
         }
 
@@ -251,7 +251,7 @@ namespace Web.API.Controllers
             {
                 ElmahExtensions.RiseError(ex);
                 _logger.LogExceptions(ex);
-                return new BaseResponse() { Status = HttpStatusCode.OK, Message = ex.ToString() };
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
         }
 
@@ -268,7 +268,7 @@ namespace Web.API.Controllers
             {
                 ElmahExtensions.RiseError(ex);
                 _logger.LogExceptions(ex);
-                return new BaseResponse() { Status = HttpStatusCode.OK, Message = ex.ToString() };
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
         }
 
@@ -285,7 +285,7 @@ namespace Web.API.Controllers
             {
                 ElmahExtensions.RiseError(ex);
                 _logger.LogExceptions(ex);
-                return new BaseResponse() { Status = HttpStatusCode.OK, Message = ex.ToString() };
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
         }
 
@@ -306,7 +306,7 @@ namespace Web.API.Controllers
             {
                 ElmahExtensions.RiseError(ex);
                 _logger.LogExceptions(ex);
-                return new BaseResponse() { Status = HttpStatusCode.OK, Message = ex.ToString() };
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
         }
 
@@ -322,7 +322,7 @@ namespace Web.API.Controllers
             {
                 ElmahExtensions.RiseError(ex);
                 _logger.LogExceptions(ex);
-                return new BaseResponse() { Status = HttpStatusCode.OK, Message = ex.ToString() };
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
         }
 
@@ -339,7 +339,7 @@ namespace Web.API.Controllers
             {
                 ElmahExtensions.RiseError(ex);
                 _logger.LogExceptions(ex);
-                return new BaseResponse() { Status = HttpStatusCode.OK, Message = ex.ToString() };
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
         }
 
@@ -356,7 +356,7 @@ namespace Web.API.Controllers
             {
                 ElmahExtensions.RiseError(ex);
                 _logger.LogExceptions(ex);
-                return new BaseResponse() { Status = HttpStatusCode.OK, Message = ex.ToString() };
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
         }
 

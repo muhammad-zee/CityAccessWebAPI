@@ -9,6 +9,7 @@ using Web.Data.Models;
 using Web.DLL.Generic_Repository;
 using Web.Model;
 using Web.Model.Common;
+using Web.Services.Extensions;
 using Web.Services.Helper;
 using Web.Services.Interfaces;
 
@@ -146,8 +147,139 @@ namespace Web.Services.Concrete
             deletedOnes.ForEach(x => { x.ModifiedBy = ModifiedBy; x.ModifiedDate = DateTime.UtcNow; x.IsDeleted = true; });
             this._orgConsultRepo.Update(deletedOnes);
 
-            return new BaseResponse();
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Saved Successfully" };
         }
+
+        public BaseResponse GetConsultFormByOrgId(int orgId)
+        {
+            var consultFields = (from c in this._consultFieldRepo.Table
+                                 join oc in this._orgConsultRepo.Table on c.ConsultFieldId equals oc.ConsultFieldIdFk
+                                 where oc.OrganizationIdFk == orgId && !c.IsDeleted && !oc.IsDeleted
+                                 select new ConsultFieldsVM()
+                                 {
+                                     ConsultFieldId = c.ConsultFieldId,
+                                     FieldLabel = c.FieldLabel,
+                                     FieldName = c.FieldName,
+                                     FieldType = c.FieldType,
+                                     FieldDataType = c.FieldDataType,
+                                     FieldDataLength = c.FieldDataLength,
+                                     SortOrder = oc.SortOrder,
+                                 }).Distinct().OrderBy(x => x.SortOrder).ToList();
+
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = consultFields };
+        }
+
+        #endregion
+
+
+        #region Consults
+
+        public BaseResponse GetAllConsults()
+        {
+            var consultData = _dbContext.LoadStoredProcedure("raq_getAllConsults").ExecuteStoredProc_ToDictionary();
+
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = consultData };
+        }
+
+        public BaseResponse GetConsultById(int Id)
+        {
+            var consultData = _dbContext.LoadStoredProcedure("raq_getConsultById")
+                .WithSqlParam("@consultId", Id)
+                .ExecuteStoredProc_ToDictionary();
+
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = consultData };
+        }
+
+        public BaseResponse AddOrUpdateConsult(IDictionary<string, object> keyValues)
+        {
+            var keys = keyValues.Keys.ToList();
+            var values = keyValues.Values.ToList();
+
+            bool isConsultIdExist = keyValues.ContainsKey("ConsultId");
+            if (isConsultIdExist && keyValues["ConsultId"].ToString() == "0")
+            {
+                string query = "INSERT INTO [dbo].[Consults] (";
+
+                for (int i = 0; i < keys.Count(); i++)
+                {
+                    if (keys[i] != "ConsultId" && keys[i] != "CreatedBy" && keys[i] != "CreatedDate")
+                    {
+                        query += $"[{keys[i]}]";
+                        if ((i + 1) == keys.Count)
+                        {
+                            query += ",CreatedBy";
+                            query += ",CreatedDate";
+                            query += ")";
+                        }
+                        else
+                        {
+                            query += ",";
+                        }
+                    }
+                }
+
+                query += "VALUES (";
+
+                for (int i = 0; i < values.Count; i++)
+                {
+                    if (keys[i] != "ConsultId" && keys[i] != "CreatedBy" && keys[i] != "CreatedDate")
+                    {
+                        query += values[i];
+                        if ((i + 1) == values.Count)
+                        {
+                            query += $",{ApplicationSettings.UserId}";
+                            query += $",{DateTime.UtcNow}";
+                            query += ")";
+                        }
+                        else
+                        {
+                            query += ",";
+                        }
+                    }
+                }
+
+                int rowsEffect = this._dbContext.Database.ExecuteSqlRaw(query);
+                if (rowsEffect > 0)
+                {
+                    return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Added Successfully" };
+                }
+                else
+                {
+                    return new BaseResponse() { Status = HttpStatusCode.OK, Message = "No Record Added" };
+                }
+            }
+            if (isConsultIdExist && keyValues["ConsultId"].ToString() != "0")
+            {
+                string ConsultId = keyValues["ConsultId"].ToString();
+                string query = "UPDATE [dbo].[Consults] SET ";
+
+                for (int i = 0; i < keys.Count; i++)
+                {
+                    if (keys[i] != "ConsultId" && keys[i] != "ModifiedBy" && keys[i] != "ModifiedDate")
+                    {
+                        query += $"[{keys[i]}] = {values[i]}";
+                        if (i < keys.Count)
+                        {
+                            query += ",";
+                        }
+                    }
+                }
+                query += $", ModifiedBy = {ApplicationSettings.UserId}, ModifiedDate = {DateTime.UtcNow}";
+                query += $" WHERE ConsultId = {ConsultId.ToInt()}";
+
+                int rowsEffect = this._dbContext.Database.ExecuteSqlRaw(query);
+                if (rowsEffect > 0)
+                {
+                    return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Updated Successfully" };
+                }
+                else
+                {
+                    return new BaseResponse() { Status = HttpStatusCode.OK, Message = "No Record Updated" };
+                }
+            }
+            return new BaseResponse() { Status = HttpStatusCode.NotModified, Message = "Consult Id Column is not exist" };
+        }
+
 
         #endregion
     }

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 #nullable disable
 
@@ -9,6 +8,7 @@ namespace Web.Data.Models
     {
         public int CodeStrokeId { get; set; }
         public string PatientName { get; set; }
+        public int OrganizationIdFk { get; set; }
         public DateTime? Dob { get; set; }
         public int? Gender { get; set; }
         public string ChiefComplant { get; set; }
@@ -24,5 +24,8 @@ namespace Web.Data.Models
         public bool? IsEms { get; set; }
         public bool? IsCompleted { get; set; }
         public string FamilyContactName { get; set; }
+        public string Audio { get; set; }
+        public string Video { get; set; }
+        public string Attachments { get; set; }
     }
 }
