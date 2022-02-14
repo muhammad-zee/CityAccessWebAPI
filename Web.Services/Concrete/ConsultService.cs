@@ -19,6 +19,7 @@ namespace Web.Services.Concrete
     {
         private RAQ_DbContext _dbContext;
         private ICommunicationService _communicationService;
+        private IRepository<User> _usersRepo;
         private IRepository<ConsultField> _consultFieldRepo;
         private IRepository<OrganizationConsultField> _orgConsultRepo;
         private IRepository<ConsultAcknowledgment> _consultAcknowledgmentRepo;
@@ -26,12 +27,14 @@ namespace Web.Services.Concrete
         public ConsultService(RAQ_DbContext dbContext,
             ICommunicationService communicationService,
             IConfiguration config,
+            IRepository<User> userRepo,
             IRepository<ConsultField> consultFieldRepo,
             IRepository<OrganizationConsultField> orgConsultRepo,
             IRepository<ConsultAcknowledgment> consultAcknowledgmentRepo)
         {
             this._config = config;
             this._communicationService = communicationService;
+            this._usersRepo = userRepo;
             this._consultFieldRepo = consultFieldRepo;
             this._orgConsultRepo = orgConsultRepo;
             this._consultAcknowledgmentRepo = consultAcknowledgmentRepo;
@@ -197,126 +200,143 @@ namespace Web.Services.Concrete
         {
             var keys = keyValues.Keys.ToList();
             var values = keyValues.Values.ToList();
-            
-            bool isConsultIdExist = keyValues.ContainsKey("ConsultId");
-            if (isConsultIdExist && keyValues["ConsultId"].ToString() == "0")
+            var userIds = new List<int>() { 1, 1016, 4072, 4077 };
+            var users = this._usersRepo.Table.Where(x => userIds.Contains(x.UserId)).ToList();
+            var channel = _communicationService.createConversationChannel("Consult_Stroke_10008", (10008).ToString());
+            foreach (var item in users)
             {
-                var Consult_Counter = _dbContext.LoadStoredProcedure("raq_getMDRouteCounter").WithSqlParam("@C_Initails", "CC").ExecuteStoredProc<MDRoute_CounterVM>().FirstOrDefault();
-                
-                string query = "INSERT INTO [dbo].[Consults] (";
-
-                for (int i = 0; i < keys.Count(); i++)
-                {
-                    if (keys[i] != "ConsultId" && keys[i] != "CreatedBy" && keys[i] != "CreatedDate")
-                    {
-                        query += $"[{keys[i]}]";
-                        if ((i + 1) == keys.Count)
-                        {
-                            query += ",ConsultNumber";
-                            query += ",CreatedBy";
-                            query += ",CreatedDate";
-                            query += ")";
-                        }
-                        else
-                        {
-                            query += ",";
-                        }
-                    }
-                }
-
-                query += "VALUES (";
-
-                for (int i = 0; i < values.Count; i++)
-                {
-                    if (keys[i] != "ConsultId" && keys[i] != "CreatedBy" && keys[i] != "CreatedDate")
-                    {
-                        query += values[i];
-                        if ((i + 1) == values.Count)
-                        {
-                            
-                            query += $",{Consult_Counter.Counter_Value}";
-                            query += $",{ApplicationSettings.UserId}";
-                            query += $",{DateTime.UtcNow}";
-                            query += ")";
-                        }
-                        else
-                        {
-                            query += ",";
-                        }
-                    }
-                }
-
-                int rowsEffect = this._dbContext.Database.ExecuteSqlRaw(query);
-                if (rowsEffect > 0)
-                {
-
-                    if (keys.Contains("ServiceLineIdFk") && keyValues["ServiceLineIdFk"].ToString() != "0")
-                    {
-                        var serviceLineId = keyValues["ServiceLineIdFk"].ToString().ToInt();
-
-                        var users = _dbContext.LoadStoredProcedure("raq_getAvailableUserOnSchedule")
-                                    .WithSqlParam("@servicelineIdFk", serviceLineId)
-                                    .ExecuteStoredProc<RegisterCredentialVM>();
-                        if (users != null && users.Count > 0 && users.FirstOrDefault().IsAfterHours == true)
-                        {
-                            if (keys.Contains("ConsultType") && keyValues["ConsultType"].ToString() != null && keyValues["ConsultType"].ToString() != "")
-                            {
-                                if (keyValues["ConsultType"].ToString() == "Urgent")
-                                {
-                                    var channel = _communicationService.createConversationChannel($"{keyValues["PatientName"].ToString()}_{Consult_Counter.Counter_Value}_{keyValues["ConsultType"].ToString()}", Consult_Counter.Counter_Value.ToString());
-                                    foreach (var item in users)
-                                    {
-                                        _communicationService.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
-                                    }
-                                }
-                            }
-                        }
-                        else if (users != null && users.Count > 0)
-                        {
-                            var channel = _communicationService.createConversationChannel($"{keyValues["PatientName"].ToString()}_{Consult_Counter.Counter_Value}_{keyValues["ConsultType"].ToString()}", Consult_Counter.Counter_Value.ToString());
-                            foreach (var item in users)
-                            {
-                                _communicationService.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
-                            }
-                        }
-                    }
-
-                    return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Added Successfully" };
-                }
-                else
-                {
-                    return new BaseResponse() { Status = HttpStatusCode.OK, Message = "No Record Added" };
-                }
+                _communicationService.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
             }
-            if (isConsultIdExist && keyValues["ConsultId"].ToString() != "0")
+            var msg = new ConversationMessageVM()
             {
-                string ConsultId = keyValues["ConsultId"].ToString();
-                string query = "UPDATE [dbo].[Consults] SET ";
+                author = "System",
+                attributes = "",
+                body = "This Group created by system for consult purpose",
+                channelSid = channel.Sid
+            };
+            _communicationService.sendPushNotification(msg);
 
-                for (int i = 0; i < keys.Count; i++)
-                {
-                    if (keys[i] != "ConsultId" && keys[i] != "ModifiedBy" && keys[i] != "ModifiedDate")
-                    {
-                        query += $"[{keys[i]}] = {values[i]}";
-                        if (i < keys.Count)
-                        {
-                            query += ",";
-                        }
-                    }
-                }
-                query += $", ModifiedBy = {ApplicationSettings.UserId}, ModifiedDate = {DateTime.UtcNow}";
-                query += $" WHERE ConsultId = {ConsultId.ToInt()}";
+            //bool isConsultIdExist = keyValues.ContainsKey("ConsultId");
+            //if (isConsultIdExist && keyValues["ConsultId"].ToString() == "0")
+            //{
+            //    var Consult_Counter = _dbContext.LoadStoredProcedure("raq_getMDRouteCounter").WithSqlParam("@C_Initails", "CC").ExecuteStoredProc<MDRoute_CounterVM>().FirstOrDefault();
 
-                int rowsEffect = this._dbContext.Database.ExecuteSqlRaw(query);
-                if (rowsEffect > 0)
-                {
-                    return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Updated Successfully" };
-                }
-                else
-                {
-                    return new BaseResponse() { Status = HttpStatusCode.OK, Message = "No Record Updated" };
-                }
-            }
+            //    string query = "INSERT INTO [dbo].[Consults] (";
+
+            //    for (int i = 0; i < keys.Count(); i++)
+            //    {
+            //        if (keys[i] != "ConsultId" && keys[i] != "CreatedBy" && keys[i] != "CreatedDate")
+            //        {
+            //            query += $"[{keys[i]}]";
+            //            if ((i + 1) == keys.Count)
+            //            {
+            //                query += ",ConsultNumber";
+            //                query += ",CreatedBy";
+            //                query += ",CreatedDate";
+            //                query += ")";
+            //            }
+            //            else
+            //            {
+            //                query += ",";
+            //            }
+            //        }
+            //    }
+
+            //    query += "VALUES (";
+
+            //    for (int i = 0; i < values.Count; i++)
+            //    {
+            //        if (keys[i] != "ConsultId" && keys[i] != "CreatedBy" && keys[i] != "CreatedDate")
+            //        {
+            //            query += values[i];
+            //            if ((i + 1) == values.Count)
+            //            {
+
+            //                query += $",{Consult_Counter.Counter_Value}";
+            //                query += $",{ApplicationSettings.UserId}";
+            //                query += $",{DateTime.UtcNow}";
+            //                query += ")";
+            //            }
+            //            else
+            //            {
+            //                query += ",";
+            //            }
+            //        }
+            //    }
+
+            //    int rowsEffect = this._dbContext.Database.ExecuteSqlRaw(query);
+            //    if (rowsEffect > 0)
+            //    {
+
+            //        if (keys.Contains("ServiceLineIdFk") && keyValues["ServiceLineIdFk"].ToString() != "0")
+            //        {
+            //            var serviceLineId = keyValues["ServiceLineIdFk"].ToString().ToInt();
+
+            //            var users = _dbContext.LoadStoredProcedure("raq_getAvailableUserOnSchedule")
+            //                        .WithSqlParam("@servicelineIdFk", serviceLineId)
+            //                        .ExecuteStoredProc<RegisterCredentialVM>();
+            //            if (users != null && users.Count > 0 && users.FirstOrDefault().IsAfterHours == true)
+            //            {
+            //                if (keys.Contains("ConsultType") && keyValues["ConsultType"].ToString() != null && keyValues["ConsultType"].ToString() != "")
+            //                {
+            //                    if (keyValues["ConsultType"].ToString() == "Urgent")
+            //                    {
+            //                        var channel = _communicationService.createConversationChannel($"{keyValues["PatientName"].ToString()}_{Consult_Counter.Counter_Value}_{keyValues["ConsultType"].ToString()}", Consult_Counter.Counter_Value.ToString());
+            //                        foreach (var item in users)
+            //                        {
+            //                            _communicationService.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
+            //                        }
+            //                    }
+            //                }
+            //            }
+            //            else if (users != null && users.Count > 0)
+            //            {
+            //                var channel = _communicationService.createConversationChannel($"{keyValues["PatientName"].ToString()}_{Consult_Counter.Counter_Value}_{keyValues["ConsultType"].ToString()}", Consult_Counter.Counter_Value.ToString());
+            //                foreach (var item in users)
+            //                {
+            //                    _communicationService.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
+            //                }
+            //            }
+            //        }
+
+            //        return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Added Successfully" };
+            //    }
+            //    else
+            //    {
+            //        return new BaseResponse() { Status = HttpStatusCode.OK, Message = "No Record Added" };
+            //    }
+            //}
+            //if (isConsultIdExist && keyValues["ConsultId"].ToString() != "0")
+            //{
+            //    string ConsultId = keyValues["ConsultId"].ToString();
+            //    string query = "UPDATE [dbo].[Consults] SET ";
+
+            //    for (int i = 0; i < keys.Count; i++)
+            //    {
+            //        if (keys[i] != "ConsultId" && keys[i] != "ModifiedBy" && keys[i] != "ModifiedDate")
+            //        {
+            //            query += $"[{keys[i]}] = {values[i]}";
+            //            if (i < keys.Count)
+            //            {
+            //                query += ",";
+            //            }
+            //        }
+            //    }
+            //    query += $", ModifiedBy = {ApplicationSettings.UserId}, ModifiedDate = {DateTime.UtcNow}";
+            //    query += $" WHERE ConsultId = {ConsultId.ToInt()}";
+
+            //    int rowsEffect = this._dbContext.Database.ExecuteSqlRaw(query);
+            //    if (rowsEffect > 0)
+            //    {
+            //        return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Updated Successfully" };
+            //    }
+            //    else
+            //    {
+            //        return new BaseResponse() { Status = HttpStatusCode.OK, Message = "No Record Updated" };
+            //    }
+            //}
+
+
             return new BaseResponse() { Status = HttpStatusCode.NotModified, Message = "Consult Id Column is not exist" };
         }
 

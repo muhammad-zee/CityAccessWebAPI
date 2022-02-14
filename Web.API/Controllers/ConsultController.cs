@@ -171,7 +171,7 @@ namespace Web.API.Controllers
 
         [Description("Add or Update Consult Form")]
         [HttpPost("consult/AddOrUpdateConsult")]
-        public BaseResponse AddOrUpdateConsult(IDictionary<string, object> keyValues)
+        public BaseResponse AddOrUpdateConsult([FromBody] IDictionary<string, object> keyValues)
         {
             try
             {
