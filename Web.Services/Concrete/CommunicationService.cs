@@ -630,6 +630,11 @@ namespace Web.Services.Concrete
             response.Body = new { identity = identity, token = token.ToJwt() };
             return response;
         }
+
+        public BaseResponse VideoRoomCallbackEvent(string EventType)
+        {
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Event Received" };
+        }
         #endregion
     }
 

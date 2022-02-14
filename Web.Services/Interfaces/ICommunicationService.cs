@@ -31,6 +31,8 @@ namespace Web.Services.Interfaces
 
         #region [Video Call]
         BaseResponse generateVideoCallToken(string identity);
+
+        BaseResponse VideoRoomCallbackEvent(string EventType);
         #endregion
 
         bool SendSms(string ToPhoneNumber, string SmsBody);
