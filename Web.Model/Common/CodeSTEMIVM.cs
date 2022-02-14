@@ -25,9 +25,13 @@ namespace Web.Model.Common
         public DateTime? ModifiedDate { get; set; }
         public bool? IsDeleted { get; set; }
         public int OrganizationIdFk { get; set; }
-        public List<FilesVM> Audio { get; set; }
-        public List<FilesVM> Video { get; set; }
-        public List<FilesVM> Attachments { get; set; }
+        public List<FilesVM> Audios { get; set; }
+        public List<FilesVM> Videos { get; set; }
+        public List<FilesVM> Attachment { get; set; }
+
+        public string Audio { get; set; }
+        public string Video { get; set; }
+        public string Attachments { get; set; }
 
         public string AudioFolderRoot { get; set; }
         public string VideoFolderRoot { get; set; }
