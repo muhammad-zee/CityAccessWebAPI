@@ -298,7 +298,7 @@ namespace Web.API.Controllers
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
         }
-        [HttpPost("VideoCall/rejectIncomingCall")]
+        [HttpGet("VideoCall/rejectIncomingCall")]
         public BaseResponse rejectIncomingCall(string roomSid)
         {
             try
