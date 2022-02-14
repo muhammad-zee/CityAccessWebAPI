@@ -18,17 +18,20 @@ namespace Web.Services.Concrete
     public class ConsultService : IConsultService
     {
         private RAQ_DbContext _dbContext;
+        private ICommunicationService _communicationService;
         private IRepository<ConsultField> _consultFieldRepo;
         private IRepository<OrganizationConsultField> _orgConsultRepo;
         private IRepository<ConsultAcknowledgment> _consultAcknowledgmentRepo;
         IConfiguration _config;
         public ConsultService(RAQ_DbContext dbContext,
+            ICommunicationService communicationService,
             IConfiguration config,
             IRepository<ConsultField> consultFieldRepo,
             IRepository<OrganizationConsultField> orgConsultRepo,
             IRepository<ConsultAcknowledgment> consultAcknowledgmentRepo)
         {
             this._config = config;
+            this._communicationService = communicationService;
             this._consultFieldRepo = consultFieldRepo;
             this._orgConsultRepo = orgConsultRepo;
             this._consultAcknowledgmentRepo = consultAcknowledgmentRepo;
@@ -198,6 +201,7 @@ namespace Web.Services.Concrete
             bool isConsultIdExist = keyValues.ContainsKey("ConsultId");
             if (isConsultIdExist && keyValues["ConsultId"].ToString() == "0")
             {
+                string consultNumber = "";
                 string query = "INSERT INTO [dbo].[Consults] (";
 
                 for (int i = 0; i < keys.Count(); i++)
@@ -207,6 +211,7 @@ namespace Web.Services.Concrete
                         query += $"[{keys[i]}]";
                         if ((i + 1) == keys.Count)
                         {
+                            query += ",ConsultNumber";
                             query += ",CreatedBy";
                             query += ",CreatedDate";
                             query += ")";
@@ -227,6 +232,8 @@ namespace Web.Services.Concrete
                         query += values[i];
                         if ((i + 1) == values.Count)
                         {
+                            consultNumber = HelperExtension.CreateRandomString();
+                            query += $",{consultNumber}";
                             query += $",{ApplicationSettings.UserId}";
                             query += $",{DateTime.UtcNow}";
                             query += ")";
@@ -241,6 +248,38 @@ namespace Web.Services.Concrete
                 int rowsEffect = this._dbContext.Database.ExecuteSqlRaw(query);
                 if (rowsEffect > 0)
                 {
+
+                    if (keys.Contains("ServiceLineIdFk") && keyValues["ServiceLineIdFk"].ToString() != "0")
+                    {
+                        var serviceLineId = keyValues["ServiceLineIdFk"].ToString().ToInt();
+
+                        var users = _dbContext.LoadStoredProcedure("raq_getAvailableUserOnSchedule")
+                                    .WithSqlParam("@servicelineIdFk", serviceLineId)
+                                    .ExecuteStoredProc<RegisterCredentialVM>();
+                        if (users != null && users.Count > 0 && users.FirstOrDefault().IsAfterHours == true)
+                        {
+                            if (keys.Contains("ConsultType") && keyValues["ConsultType"].ToString() != null && keyValues["ConsultType"].ToString() != "")
+                            {
+                                if (keyValues["ConsultType"].ToString() == "Urgent")
+                                {
+                                    var channel = _communicationService.createConversationChannel($"Consult_{consultNumber}_{keyValues["ConsultType"].ToString()}", consultNumber);
+                                    foreach (var item in users)
+                                    {
+                                        _communicationService.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
+                                    }
+                                }
+                            }
+                        }
+                        else if (users != null && users.Count > 0)
+                        {
+                            var channel = _communicationService.createConversationChannel($"Consult_{consultNumber}_{keyValues["ConsultType"].ToString()}", consultNumber);
+                            foreach (var item in users)
+                            {
+                                _communicationService.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
+                            }
+                        }
+                    }
+
                     return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Added Successfully" };
                 }
                 else

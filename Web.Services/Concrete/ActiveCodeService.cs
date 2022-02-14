@@ -192,10 +192,10 @@ namespace Web.Services.Concrete
                     var RootPath = this._environment.WebRootPath;
                     string FileRoot = null;
                     List<string> Attachments = new();
-                    int fileNo = 1;
+
                     foreach (var item in codeStroke.Attachments)
                     {
-                        if (!string.IsNullOrEmpty(item))
+                        if (!string.IsNullOrEmpty(item.Base64Str))
                         {
                             //var outPath = Directory.GetCurrentDirectory();
 
@@ -229,12 +229,12 @@ namespace Web.Services.Concrete
                                     fi.Delete();
                                 }
                             }
-                            var fileInfo = item.Split("base64,");
+                            var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             if (fileExtension != null)
                             {
                                 var ByteFile = Convert.FromBase64String(fileInfo[1]);
-                                string FilePath = FileRoot + $"{row.PatientName}_{fileNo}{fileExtension}";
+                                string FilePath = Path.Combine(FileRoot, item.FileName);
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
                                     fs.Write(ByteFile);
@@ -254,10 +254,10 @@ namespace Web.Services.Concrete
                     var RootPath = this._environment.WebRootPath;
                     string FileRoot = null;
                     List<string> Attachments = new();
-                    int fileNo = 1;
+
                     foreach (var item in codeStroke.Video)
                     {
-                        if (!string.IsNullOrEmpty(item))
+                        if (!string.IsNullOrEmpty(item.Base64Str))
                         {
                             //var outPath = Directory.GetCurrentDirectory();
 
@@ -291,12 +291,12 @@ namespace Web.Services.Concrete
                                     fi.Delete();
                                 }
                             }
-                            var fileInfo = item.Split("base64,");
+                            var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             if (fileExtension != null)
                             {
                                 var ByteFile = Convert.FromBase64String(fileInfo[1]);
-                                string FilePath = FileRoot + $"{row.PatientName}_{fileNo}{fileExtension}";
+                                string FilePath = Path.Combine(FileRoot, item.FileName);
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
                                     fs.Write(ByteFile);
@@ -316,10 +316,10 @@ namespace Web.Services.Concrete
                     var RootPath = this._environment.WebRootPath;
                     string FileRoot = null;
                     List<string> Attachments = new();
-                    int fileNo = 1;
+
                     foreach (var item in codeStroke.Audio)
                     {
-                        if (!string.IsNullOrEmpty(item))
+                        if (!string.IsNullOrEmpty(item.Base64Str))
                         {
                             //var outPath = Directory.GetCurrentDirectory();
 
@@ -353,12 +353,12 @@ namespace Web.Services.Concrete
                                     fi.Delete();
                                 }
                             }
-                            var fileInfo = item.Split("base64,");
+                            var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             if (fileExtension != null)
                             {
                                 var ByteFile = Convert.FromBase64String(fileInfo[1]);
-                                string FilePath = FileRoot + $"{row.PatientName}_{fileNo}{fileExtension}";
+                                string FilePath = Path.Combine(FileRoot, item.FileName);
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
                                     fs.Write(ByteFile);
@@ -366,6 +366,7 @@ namespace Web.Services.Concrete
 
                             }
                         }
+
 
                     }
                     if (FileRoot != null && FileRoot != "")
@@ -393,10 +394,10 @@ namespace Web.Services.Concrete
                     var RootPath = this._environment.WebRootPath;
                     string FileRoot = null;
                     List<string> Attachments = new();
-                    int fileNo = 1;
+
                     foreach (var item in codeStroke.Attachments)
                     {
-                        if (!string.IsNullOrEmpty(item))
+                        if (!string.IsNullOrEmpty(item.Base64Str))
                         {
                             //var outPath = Directory.GetCurrentDirectory();
 
@@ -430,12 +431,12 @@ namespace Web.Services.Concrete
                                     fi.Delete();
                                 }
                             }
-                            var fileInfo = item.Split("base64,");
+                            var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             if (fileExtension != null)
                             {
                                 var ByteFile = Convert.FromBase64String(fileInfo[1]);
-                                string FilePath = FileRoot + $"{stroke.PatientName}_{fileNo}{fileExtension}";
+                                string FilePath = Path.Combine(FileRoot, item.FileName);
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
                                     fs.Write(ByteFile);
@@ -443,6 +444,7 @@ namespace Web.Services.Concrete
 
                             }
                         }
+
 
                     }
                     if (FileRoot != null && FileRoot != "")
@@ -455,10 +457,10 @@ namespace Web.Services.Concrete
                     var RootPath = this._environment.WebRootPath;
                     string FileRoot = null;
                     List<string> Attachments = new();
-                    int fileNo = 1;
+
                     foreach (var item in codeStroke.Video)
                     {
-                        if (!string.IsNullOrEmpty(item))
+                        if (!string.IsNullOrEmpty(item.Base64Str))
                         {
                             //var outPath = Directory.GetCurrentDirectory();
 
@@ -492,12 +494,12 @@ namespace Web.Services.Concrete
                                     fi.Delete();
                                 }
                             }
-                            var fileInfo = item.Split("base64,");
+                            var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             if (fileExtension != null)
                             {
                                 var ByteFile = Convert.FromBase64String(fileInfo[1]);
-                                string FilePath = FileRoot + $"{stroke.PatientName}_{fileNo}{fileExtension}";
+                                string FilePath = Path.Combine(FileRoot, item.FileName);
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
                                     fs.Write(ByteFile);
@@ -505,6 +507,7 @@ namespace Web.Services.Concrete
 
                             }
                         }
+
 
                     }
                     if (FileRoot != null && FileRoot != "")
@@ -517,10 +520,10 @@ namespace Web.Services.Concrete
                     var RootPath = this._environment.WebRootPath;
                     string FileRoot = null;
                     List<string> Attachments = new();
-                    int fileNo = 1;
+
                     foreach (var item in codeStroke.Audio)
                     {
-                        if (!string.IsNullOrEmpty(item))
+                        if (!string.IsNullOrEmpty(item.Base64Str))
                         {
                             //var outPath = Directory.GetCurrentDirectory();
 
@@ -554,12 +557,12 @@ namespace Web.Services.Concrete
                                     fi.Delete();
                                 }
                             }
-                            var fileInfo = item.Split("base64,");
+                            var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             if (fileExtension != null)
                             {
                                 var ByteFile = Convert.FromBase64String(fileInfo[1]);
-                                string FilePath = FileRoot + $"{stroke.PatientName}_{fileNo}{fileExtension}";
+                                string FilePath = Path.Combine(FileRoot, item.FileName);
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
                                     fs.Write(ByteFile);
@@ -567,6 +570,7 @@ namespace Web.Services.Concrete
 
                             }
                         }
+
 
                     }
                     if (FileRoot != null && FileRoot != "")
@@ -653,10 +657,10 @@ namespace Web.Services.Concrete
                     var RootPath = this._environment.WebRootPath;
                     string FileRoot = null;
                     List<string> Attachments = new();
-                    int fileNo = 1;
+
                     foreach (var item in codeSepsis.Attachments)
                     {
-                        if (!string.IsNullOrEmpty(item))
+                        if (!string.IsNullOrEmpty(item.Base64Str))
                         {
                             //var outPath = Directory.GetCurrentDirectory();
 
@@ -690,12 +694,12 @@ namespace Web.Services.Concrete
                                     fi.Delete();
                                 }
                             }
-                            var fileInfo = item.Split("base64,");
+                            var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             if (fileExtension != null)
                             {
                                 var ByteFile = Convert.FromBase64String(fileInfo[1]);
-                                string FilePath = FileRoot + $"{row.PatientName}_{fileNo}{fileExtension}";
+                                string FilePath = Path.Combine(FileRoot, item.FileName);
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
                                     fs.Write(ByteFile);
@@ -703,6 +707,7 @@ namespace Web.Services.Concrete
 
                             }
                         }
+
 
                     }
                     if (FileRoot != null && FileRoot != "")
@@ -715,10 +720,10 @@ namespace Web.Services.Concrete
                     var RootPath = this._environment.WebRootPath;
                     string FileRoot = null;
                     List<string> Attachments = new();
-                    int fileNo = 1;
+
                     foreach (var item in codeSepsis.Video)
                     {
-                        if (!string.IsNullOrEmpty(item))
+                        if (!string.IsNullOrEmpty(item.Base64Str))
                         {
                             //var outPath = Directory.GetCurrentDirectory();
 
@@ -752,12 +757,12 @@ namespace Web.Services.Concrete
                                     fi.Delete();
                                 }
                             }
-                            var fileInfo = item.Split("base64,");
+                            var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             if (fileExtension != null)
                             {
                                 var ByteFile = Convert.FromBase64String(fileInfo[1]);
-                                string FilePath = FileRoot + $"{row.PatientName}_{fileNo}{fileExtension}";
+                                string FilePath = Path.Combine(FileRoot, item.FileName);
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
                                     fs.Write(ByteFile);
@@ -777,10 +782,10 @@ namespace Web.Services.Concrete
                     var RootPath = this._environment.WebRootPath;
                     string FileRoot = null;
                     List<string> Attachments = new();
-                    int fileNo = 1;
+
                     foreach (var item in codeSepsis.Audio)
                     {
-                        if (!string.IsNullOrEmpty(item))
+                        if (!string.IsNullOrEmpty(item.Base64Str))
                         {
                             //var outPath = Directory.GetCurrentDirectory();
 
@@ -814,12 +819,12 @@ namespace Web.Services.Concrete
                                     fi.Delete();
                                 }
                             }
-                            var fileInfo = item.Split("base64,");
+                            var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             if (fileExtension != null)
                             {
                                 var ByteFile = Convert.FromBase64String(fileInfo[1]);
-                                string FilePath = FileRoot + $"{row.PatientName}_{fileNo}{fileExtension}";
+                                string FilePath = Path.Combine(FileRoot, item.FileName);
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
                                     fs.Write(ByteFile);
@@ -827,6 +832,7 @@ namespace Web.Services.Concrete
 
                             }
                         }
+
 
                     }
                     if (FileRoot != null && FileRoot != "")
@@ -856,10 +862,10 @@ namespace Web.Services.Concrete
                     var RootPath = this._environment.WebRootPath;
                     string FileRoot = null;
                     List<string> Attachments = new();
-                    int fileNo = 1;
+
                     foreach (var item in codeSepsis.Attachments)
                     {
-                        if (!string.IsNullOrEmpty(item))
+                        if (!string.IsNullOrEmpty(item.Base64Str))
                         {
                             //var outPath = Directory.GetCurrentDirectory();
 
@@ -893,12 +899,12 @@ namespace Web.Services.Concrete
                                     fi.Delete();
                                 }
                             }
-                            var fileInfo = item.Split("base64,");
+                            var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             if (fileExtension != null)
                             {
                                 var ByteFile = Convert.FromBase64String(fileInfo[1]);
-                                string FilePath = FileRoot + $"{Sepsis.PatientName}_{fileNo}{fileExtension}";
+                                string FilePath = Path.Combine(FileRoot, item.FileName);
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
                                     fs.Write(ByteFile);
@@ -918,10 +924,10 @@ namespace Web.Services.Concrete
                     var RootPath = this._environment.WebRootPath;
                     string FileRoot = null;
                     List<string> Attachments = new();
-                    int fileNo = 1;
+
                     foreach (var item in codeSepsis.Video)
                     {
-                        if (!string.IsNullOrEmpty(item))
+                        if (!string.IsNullOrEmpty(item.Base64Str))
                         {
                             //var outPath = Directory.GetCurrentDirectory();
 
@@ -955,12 +961,12 @@ namespace Web.Services.Concrete
                                     fi.Delete();
                                 }
                             }
-                            var fileInfo = item.Split("base64,");
+                            var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             if (fileExtension != null)
                             {
                                 var ByteFile = Convert.FromBase64String(fileInfo[1]);
-                                string FilePath = FileRoot + $"{Sepsis.PatientName}_{fileNo}{fileExtension}";
+                                string FilePath = Path.Combine(FileRoot, item.FileName);
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
                                     fs.Write(ByteFile);
@@ -980,10 +986,10 @@ namespace Web.Services.Concrete
                     var RootPath = this._environment.WebRootPath;
                     string FileRoot = null;
                     List<string> Attachments = new();
-                    int fileNo = 1;
+
                     foreach (var item in codeSepsis.Audio)
                     {
-                        if (!string.IsNullOrEmpty(item))
+                        if (!string.IsNullOrEmpty(item.Base64Str))
                         {
                             //var outPath = Directory.GetCurrentDirectory();
 
@@ -1017,12 +1023,12 @@ namespace Web.Services.Concrete
                                     fi.Delete();
                                 }
                             }
-                            var fileInfo = item.Split("base64,");
+                            var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             if (fileExtension != null)
                             {
                                 var ByteFile = Convert.FromBase64String(fileInfo[1]);
-                                string FilePath = FileRoot + $"{Sepsis.PatientName}_{fileNo}{fileExtension}";
+                                string FilePath = Path.Combine(FileRoot, item.FileName);
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
                                     fs.Write(ByteFile);
@@ -1116,10 +1122,10 @@ namespace Web.Services.Concrete
                     var RootPath = this._environment.WebRootPath;
                     string FileRoot = null;
                     List<string> Attachments = new();
-                    int fileNo = 1;
+
                     foreach (var item in codeSTEMI.Attachments)
                     {
-                        if (!string.IsNullOrEmpty(item))
+                        if (!string.IsNullOrEmpty(item.Base64Str))
                         {
                             //var outPath = Directory.GetCurrentDirectory();
 
@@ -1153,12 +1159,12 @@ namespace Web.Services.Concrete
                                     fi.Delete();
                                 }
                             }
-                            var fileInfo = item.Split("base64,");
+                            var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             if (fileExtension != null)
                             {
                                 var ByteFile = Convert.FromBase64String(fileInfo[1]);
-                                string FilePath = FileRoot + $"{row.PatientName}_{fileNo}{fileExtension}";
+                                string FilePath = Path.Combine(FileRoot, item.FileName);
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
                                     fs.Write(ByteFile);
@@ -1178,10 +1184,10 @@ namespace Web.Services.Concrete
                     var RootPath = this._environment.WebRootPath;
                     string FileRoot = null;
                     List<string> Attachments = new();
-                    int fileNo = 1;
+
                     foreach (var item in codeSTEMI.Video)
                     {
-                        if (!string.IsNullOrEmpty(item))
+                        if (!string.IsNullOrEmpty(item.Base64Str))
                         {
                             //var outPath = Directory.GetCurrentDirectory();
 
@@ -1215,12 +1221,12 @@ namespace Web.Services.Concrete
                                     fi.Delete();
                                 }
                             }
-                            var fileInfo = item.Split("base64,");
+                            var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             if (fileExtension != null)
                             {
                                 var ByteFile = Convert.FromBase64String(fileInfo[1]);
-                                string FilePath = FileRoot + $"{row.PatientName}_{fileNo}{fileExtension}";
+                                string FilePath = Path.Combine(FileRoot, item.FileName);
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
                                     fs.Write(ByteFile);
@@ -1240,10 +1246,10 @@ namespace Web.Services.Concrete
                     var RootPath = this._environment.WebRootPath;
                     string FileRoot = null;
                     List<string> Attachments = new();
-                    int fileNo = 1;
+
                     foreach (var item in codeSTEMI.Audio)
                     {
-                        if (!string.IsNullOrEmpty(item))
+                        if (!string.IsNullOrEmpty(item.Base64Str))
                         {
                             //var outPath = Directory.GetCurrentDirectory();
 
@@ -1277,12 +1283,12 @@ namespace Web.Services.Concrete
                                     fi.Delete();
                                 }
                             }
-                            var fileInfo = item.Split("base64,");
+                            var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             if (fileExtension != null)
                             {
                                 var ByteFile = Convert.FromBase64String(fileInfo[1]);
-                                string FilePath = FileRoot + $"{row.PatientName}_{fileNo}{fileExtension}";
+                                string FilePath = Path.Combine(FileRoot, item.FileName);
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
                                     fs.Write(ByteFile);
@@ -1317,10 +1323,10 @@ namespace Web.Services.Concrete
                     var RootPath = this._environment.WebRootPath;
                     string FileRoot = null;
                     List<string> Attachments = new();
-                    int fileNo = 1;
+
                     foreach (var item in codeSTEMI.Attachments)
                     {
-                        if (!string.IsNullOrEmpty(item))
+                        if (!string.IsNullOrEmpty(item.Base64Str))
                         {
                             //var outPath = Directory.GetCurrentDirectory();
 
@@ -1354,12 +1360,12 @@ namespace Web.Services.Concrete
                                     fi.Delete();
                                 }
                             }
-                            var fileInfo = item.Split("base64,");
+                            var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             if (fileExtension != null)
                             {
                                 var ByteFile = Convert.FromBase64String(fileInfo[1]);
-                                string FilePath = FileRoot + $"{STEMI.PatientName}_{fileNo}{fileExtension}";
+                                string FilePath = Path.Combine(FileRoot, item.FileName);
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
                                     fs.Write(ByteFile);
@@ -1379,10 +1385,10 @@ namespace Web.Services.Concrete
                     var RootPath = this._environment.WebRootPath;
                     string FileRoot = null;
                     List<string> Attachments = new();
-                    int fileNo = 1;
+
                     foreach (var item in codeSTEMI.Video)
                     {
-                        if (!string.IsNullOrEmpty(item))
+                        if (!string.IsNullOrEmpty(item.Base64Str))
                         {
                             //var outPath = Directory.GetCurrentDirectory();
 
@@ -1416,12 +1422,12 @@ namespace Web.Services.Concrete
                                     fi.Delete();
                                 }
                             }
-                            var fileInfo = item.Split("base64,");
+                            var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             if (fileExtension != null)
                             {
                                 var ByteFile = Convert.FromBase64String(fileInfo[1]);
-                                string FilePath = FileRoot + $"{STEMI.PatientName}_{fileNo}{fileExtension}";
+                                string FilePath = Path.Combine(FileRoot, item.FileName);
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
                                     fs.Write(ByteFile);
@@ -1441,10 +1447,10 @@ namespace Web.Services.Concrete
                     var RootPath = this._environment.WebRootPath;
                     string FileRoot = null;
                     List<string> Attachments = new();
-                    int fileNo = 1;
+
                     foreach (var item in codeSTEMI.Audio)
                     {
-                        if (!string.IsNullOrEmpty(item))
+                        if (!string.IsNullOrEmpty(item.Base64Str))
                         {
                             //var outPath = Directory.GetCurrentDirectory();
 
@@ -1478,12 +1484,12 @@ namespace Web.Services.Concrete
                                     fi.Delete();
                                 }
                             }
-                            var fileInfo = item.Split("base64,");
+                            var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             if (fileExtension != null)
                             {
                                 var ByteFile = Convert.FromBase64String(fileInfo[1]);
-                                string FilePath = FileRoot + $"{STEMI.PatientName}_{fileNo}{fileExtension}";
+                                string FilePath = Path.Combine(FileRoot, item.FileName);
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
                                     fs.Write(ByteFile);
@@ -1577,10 +1583,10 @@ namespace Web.Services.Concrete
                     var RootPath = this._environment.WebRootPath;
                     string FileRoot = null;
                     List<string> Attachments = new();
-                    int fileNo = 1;
+
                     foreach (var item in codeTruma.Attachments)
                     {
-                        if (!string.IsNullOrEmpty(item))
+                        if (!string.IsNullOrEmpty(item.Base64Str))
                         {
                             //var outPath = Directory.GetCurrentDirectory();
 
@@ -1614,12 +1620,12 @@ namespace Web.Services.Concrete
                                     fi.Delete();
                                 }
                             }
-                            var fileInfo = item.Split("base64,");
+                            var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             if (fileExtension != null)
                             {
                                 var ByteFile = Convert.FromBase64String(fileInfo[1]);
-                                string FilePath = FileRoot + $"{row.PatientName}_{fileNo}{fileExtension}";
+                                string FilePath = Path.Combine(FileRoot, item.FileName);
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
                                     fs.Write(ByteFile);
@@ -1639,10 +1645,10 @@ namespace Web.Services.Concrete
                     var RootPath = this._environment.WebRootPath;
                     string FileRoot = null;
                     List<string> Attachments = new();
-                    int fileNo = 1;
+
                     foreach (var item in codeTruma.Video)
                     {
-                        if (!string.IsNullOrEmpty(item))
+                        if (!string.IsNullOrEmpty(item.Base64Str))
                         {
                             //var outPath = Directory.GetCurrentDirectory();
 
@@ -1676,12 +1682,12 @@ namespace Web.Services.Concrete
                                     fi.Delete();
                                 }
                             }
-                            var fileInfo = item.Split("base64,");
+                            var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             if (fileExtension != null)
                             {
                                 var ByteFile = Convert.FromBase64String(fileInfo[1]);
-                                string FilePath = FileRoot + $"{row.PatientName}_{fileNo}{fileExtension}";
+                                string FilePath = Path.Combine(FileRoot, item.FileName);
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
                                     fs.Write(ByteFile);
@@ -1701,10 +1707,10 @@ namespace Web.Services.Concrete
                     var RootPath = this._environment.WebRootPath;
                     string FileRoot = null;
                     List<string> Attachments = new();
-                    int fileNo = 1;
+
                     foreach (var item in codeTruma.Audio)
                     {
-                        if (!string.IsNullOrEmpty(item))
+                        if (!string.IsNullOrEmpty(item.Base64Str))
                         {
                             //var outPath = Directory.GetCurrentDirectory();
 
@@ -1738,12 +1744,12 @@ namespace Web.Services.Concrete
                                     fi.Delete();
                                 }
                             }
-                            var fileInfo = item.Split("base64,");
+                            var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             if (fileExtension != null)
                             {
                                 var ByteFile = Convert.FromBase64String(fileInfo[1]);
-                                string FilePath = FileRoot + $"{row.PatientName}_{fileNo}{fileExtension}";
+                                string FilePath = Path.Combine(FileRoot, item.FileName);
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
                                     fs.Write(ByteFile);
@@ -1779,10 +1785,10 @@ namespace Web.Services.Concrete
                     var RootPath = this._environment.WebRootPath;
                     string FileRoot = null;
                     List<string> Attachments = new();
-                    int fileNo = 1;
+
                     foreach (var item in codeTruma.Attachments)
                     {
-                        if (!string.IsNullOrEmpty(item))
+                        if (!string.IsNullOrEmpty(item.Base64Str))
                         {
                             //var outPath = Directory.GetCurrentDirectory();
 
@@ -1816,12 +1822,12 @@ namespace Web.Services.Concrete
                                     fi.Delete();
                                 }
                             }
-                            var fileInfo = item.Split("base64,");
+                            var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             if (fileExtension != null)
                             {
                                 var ByteFile = Convert.FromBase64String(fileInfo[1]);
-                                string FilePath = FileRoot + $"{Truma.PatientName}_{fileNo}{fileExtension}";
+                                string FilePath = Path.Combine(FileRoot, item.FileName);
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
                                     fs.Write(ByteFile);
@@ -1841,10 +1847,10 @@ namespace Web.Services.Concrete
                     var RootPath = this._environment.WebRootPath;
                     string FileRoot = null;
                     List<string> Attachments = new();
-                    int fileNo = 1;
+
                     foreach (var item in codeTruma.Video)
                     {
-                        if (!string.IsNullOrEmpty(item))
+                        if (!string.IsNullOrEmpty(item.Base64Str))
                         {
                             //var outPath = Directory.GetCurrentDirectory();
 
@@ -1878,12 +1884,12 @@ namespace Web.Services.Concrete
                                     fi.Delete();
                                 }
                             }
-                            var fileInfo = item.Split("base64,");
+                            var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             if (fileExtension != null)
                             {
                                 var ByteFile = Convert.FromBase64String(fileInfo[1]);
-                                string FilePath = FileRoot + $"{Truma.PatientName}_{fileNo}{fileExtension}";
+                                string FilePath = Path.Combine(FileRoot, item.FileName);
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
                                     fs.Write(ByteFile);
@@ -1903,10 +1909,10 @@ namespace Web.Services.Concrete
                     var RootPath = this._environment.WebRootPath;
                     string FileRoot = null;
                     List<string> Attachments = new();
-                    int fileNo = 1;
+
                     foreach (var item in codeTruma.Audio)
                     {
-                        if (!string.IsNullOrEmpty(item))
+                        if (!string.IsNullOrEmpty(item.Base64Str))
                         {
                             //var outPath = Directory.GetCurrentDirectory();
 
@@ -1940,12 +1946,12 @@ namespace Web.Services.Concrete
                                     fi.Delete();
                                 }
                             }
-                            var fileInfo = item.Split("base64,");
+                            var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             if (fileExtension != null)
                             {
                                 var ByteFile = Convert.FromBase64String(fileInfo[1]);
-                                string FilePath = FileRoot + $"{Truma.PatientName}_{fileNo}{fileExtension}";
+                                string FilePath = Path.Combine(FileRoot, item.FileName);
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
                                     fs.Write(ByteFile);
