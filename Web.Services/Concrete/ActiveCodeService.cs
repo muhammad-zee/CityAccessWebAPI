@@ -234,7 +234,7 @@ namespace Web.Services.Concrete
                             if (fileExtension != null)
                             {
                                 var ByteFile = Convert.FromBase64String(fileInfo[1]);
-                                string FilePath = FileRoot + $"{row.PatientName}_{fileNo}{fileExtension}";
+                                string FilePath = Path.Combine(FileRoot, $"{row.PatientName}_{fileNo}{fileExtension}");
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
                                     fs.Write(ByteFile);
@@ -242,7 +242,7 @@ namespace Web.Services.Concrete
 
                             }
                         }
-
+                        fileNo++;
                     }
                     if (FileRoot != null && FileRoot != "")
                     {
@@ -296,7 +296,7 @@ namespace Web.Services.Concrete
                             if (fileExtension != null)
                             {
                                 var ByteFile = Convert.FromBase64String(fileInfo[1]);
-                                string FilePath = FileRoot + $"{row.PatientName}_{fileNo}{fileExtension}";
+                                string FilePath = Path.Combine(FileRoot, $"{row.PatientName}_{fileNo}{fileExtension}");
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
                                     fs.Write(ByteFile);
@@ -304,7 +304,7 @@ namespace Web.Services.Concrete
 
                             }
                         }
-
+                        fileNo++;
                     }
                     if (FileRoot != null && FileRoot != "")
                     {
@@ -358,7 +358,7 @@ namespace Web.Services.Concrete
                             if (fileExtension != null)
                             {
                                 var ByteFile = Convert.FromBase64String(fileInfo[1]);
-                                string FilePath = FileRoot + $"{row.PatientName}_{fileNo}{fileExtension}";
+                                string FilePath = Path.Combine(FileRoot, $"{row.PatientName}_{fileNo}{fileExtension}");
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
                                     fs.Write(ByteFile);
@@ -366,6 +366,7 @@ namespace Web.Services.Concrete
 
                             }
                         }
+                        fileNo++;
 
                     }
                     if (FileRoot != null && FileRoot != "")
@@ -443,6 +444,7 @@ namespace Web.Services.Concrete
 
                             }
                         }
+                        fileNo++;
 
                     }
                     if (FileRoot != null && FileRoot != "")
@@ -505,6 +507,7 @@ namespace Web.Services.Concrete
 
                             }
                         }
+                        fileNo++;
 
                     }
                     if (FileRoot != null && FileRoot != "")
@@ -567,6 +570,7 @@ namespace Web.Services.Concrete
 
                             }
                         }
+                        fileNo++;
 
                     }
                     if (FileRoot != null && FileRoot != "")
@@ -695,7 +699,7 @@ namespace Web.Services.Concrete
                             if (fileExtension != null)
                             {
                                 var ByteFile = Convert.FromBase64String(fileInfo[1]);
-                                string FilePath = FileRoot + $"{row.PatientName}_{fileNo}{fileExtension}";
+                                string FilePath = Path.Combine(FileRoot, $"{row.PatientName}_{fileNo}{fileExtension}");
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
                                     fs.Write(ByteFile);
@@ -703,6 +707,7 @@ namespace Web.Services.Concrete
 
                             }
                         }
+                        fileNo++;
 
                     }
                     if (FileRoot != null && FileRoot != "")
@@ -757,7 +762,7 @@ namespace Web.Services.Concrete
                             if (fileExtension != null)
                             {
                                 var ByteFile = Convert.FromBase64String(fileInfo[1]);
-                                string FilePath = FileRoot + $"{row.PatientName}_{fileNo}{fileExtension}";
+                                string FilePath = Path.Combine(FileRoot, $"{row.PatientName}_{fileNo}{fileExtension}");
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
                                     fs.Write(ByteFile);
@@ -765,7 +770,7 @@ namespace Web.Services.Concrete
 
                             }
                         }
-
+                        fileNo++;
                     }
                     if (FileRoot != null && FileRoot != "")
                     {
@@ -819,7 +824,7 @@ namespace Web.Services.Concrete
                             if (fileExtension != null)
                             {
                                 var ByteFile = Convert.FromBase64String(fileInfo[1]);
-                                string FilePath = FileRoot + $"{row.PatientName}_{fileNo}{fileExtension}";
+                                string FilePath = Path.Combine(FileRoot, $"{row.PatientName}_{fileNo}{fileExtension}");
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
                                     fs.Write(ByteFile);
@@ -827,6 +832,7 @@ namespace Web.Services.Concrete
 
                             }
                         }
+                        fileNo++;
 
                     }
                     if (FileRoot != null && FileRoot != "")
@@ -906,7 +912,7 @@ namespace Web.Services.Concrete
 
                             }
                         }
-
+                        fileNo++;
                     }
                     if (FileRoot != null && FileRoot != "")
                     {
@@ -968,7 +974,7 @@ namespace Web.Services.Concrete
 
                             }
                         }
-
+                        fileNo++;
                     }
                     if (FileRoot != null && FileRoot != "")
                     {
@@ -1030,7 +1036,7 @@ namespace Web.Services.Concrete
 
                             }
                         }
-
+                        fileNo++;
                     }
                     if (FileRoot != null && FileRoot != "")
                     {
@@ -1158,7 +1164,7 @@ namespace Web.Services.Concrete
                             if (fileExtension != null)
                             {
                                 var ByteFile = Convert.FromBase64String(fileInfo[1]);
-                                string FilePath = FileRoot + $"{row.PatientName}_{fileNo}{fileExtension}";
+                                string FilePath = Path.Combine(FileRoot, $"{row.PatientName}_{fileNo}{fileExtension}");
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
                                     fs.Write(ByteFile);
@@ -1220,7 +1226,7 @@ namespace Web.Services.Concrete
                             if (fileExtension != null)
                             {
                                 var ByteFile = Convert.FromBase64String(fileInfo[1]);
-                                string FilePath = FileRoot + $"{row.PatientName}_{fileNo}{fileExtension}";
+                                string FilePath = Path.Combine(FileRoot, $"{row.PatientName}_{fileNo}{fileExtension}");
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
                                     fs.Write(ByteFile);
@@ -1282,7 +1288,7 @@ namespace Web.Services.Concrete
                             if (fileExtension != null)
                             {
                                 var ByteFile = Convert.FromBase64String(fileInfo[1]);
-                                string FilePath = FileRoot + $"{row.PatientName}_{fileNo}{fileExtension}";
+                                string FilePath = Path.Combine(FileRoot, $"{row.PatientName}_{fileNo}{fileExtension}");
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
                                     fs.Write(ByteFile);
@@ -1619,7 +1625,7 @@ namespace Web.Services.Concrete
                             if (fileExtension != null)
                             {
                                 var ByteFile = Convert.FromBase64String(fileInfo[1]);
-                                string FilePath = FileRoot + $"{row.PatientName}_{fileNo}{fileExtension}";
+                                string FilePath = Path.Combine(FileRoot, $"{row.PatientName}_{fileNo}{fileExtension}");
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
                                     fs.Write(ByteFile);
@@ -1627,7 +1633,7 @@ namespace Web.Services.Concrete
 
                             }
                         }
-
+                        fileNo++;
                     }
                     if (FileRoot != null && FileRoot != "")
                     {
@@ -1681,7 +1687,7 @@ namespace Web.Services.Concrete
                             if (fileExtension != null)
                             {
                                 var ByteFile = Convert.FromBase64String(fileInfo[1]);
-                                string FilePath = FileRoot + $"{row.PatientName}_{fileNo}{fileExtension}";
+                                string FilePath = Path.Combine(FileRoot, $"{row.PatientName}_{fileNo}{fileExtension}");
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
                                     fs.Write(ByteFile);
@@ -1689,7 +1695,7 @@ namespace Web.Services.Concrete
 
                             }
                         }
-
+                        fileNo++;
                     }
                     if (FileRoot != null && FileRoot != "")
                     {
@@ -1743,7 +1749,7 @@ namespace Web.Services.Concrete
                             if (fileExtension != null)
                             {
                                 var ByteFile = Convert.FromBase64String(fileInfo[1]);
-                                string FilePath = FileRoot + $"{row.PatientName}_{fileNo}{fileExtension}";
+                                string FilePath = Path.Combine(FileRoot, $"{row.PatientName}_{fileNo}{fileExtension}");
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
                                     fs.Write(ByteFile);
@@ -1751,7 +1757,7 @@ namespace Web.Services.Concrete
 
                             }
                         }
-
+                        fileNo++;
                     }
                     if (FileRoot != null && FileRoot != "")
                     {
@@ -1829,7 +1835,7 @@ namespace Web.Services.Concrete
 
                             }
                         }
-
+                        fileNo++;
                     }
                     if (FileRoot != null && FileRoot != "")
                     {
@@ -1891,7 +1897,7 @@ namespace Web.Services.Concrete
 
                             }
                         }
-
+                        fileNo++;
                     }
                     if (FileRoot != null && FileRoot != "")
                     {
@@ -1953,7 +1959,7 @@ namespace Web.Services.Concrete
 
                             }
                         }
-
+                        fileNo++;
                     }
                     if (FileRoot != null && FileRoot != "")
                     {

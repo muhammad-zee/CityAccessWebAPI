@@ -241,6 +241,13 @@ namespace Web.Services.Concrete
                 int rowsEffect = this._dbContext.Database.ExecuteSqlRaw(query);
                 if (rowsEffect > 0)
                 {
+
+                    if (keys.Contains("ServiceLineIdFk") && keyValues["ServiceLineIdFk"].ToString() != "0") 
+                    {
+                        var serviceLineId = keyValues["ServiceLineIdFk"].ToString().ToInt();
+
+                    }
+
                     return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Added Successfully" };
                 }
                 else
