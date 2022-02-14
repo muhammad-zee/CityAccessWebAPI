@@ -298,6 +298,21 @@ namespace Web.API.Controllers
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
         }
+        [HttpPost("VideoCall/rejectIncomingCall")]
+        public BaseResponse rejectIncomingCall(string roomSid)
+        {
+            try
+            {
+                
+                return this._communicaitonService.rejectIncomingCall(roomSid);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
         #endregion
     }
 }
