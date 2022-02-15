@@ -85,7 +85,7 @@ namespace Web.API.Controllers
 
         [Description("Delete File")]
         [HttpPost("activecode/DeleteFile")]
-        public BaseResponse DeleteFile(FilesVM files)
+        public BaseResponse DeleteFile([FromBody] FilesVM files)
         {
             try
             {

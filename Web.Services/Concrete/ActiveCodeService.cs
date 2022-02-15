@@ -145,25 +145,25 @@ namespace Web.Services.Concrete
             if (files.CodeType == "Stroke")
             {
                 var rootPath = this._codeStrokeRepo.Table.Where(x => x.CodeStrokeId == files.Id).Select(files.Type).FirstOrDefault();
-                string path = Path.Combine(this._environment.WebRootPath, rootPath + "/" + files.FileName);
+                string path = _environment.WebRootFileProvider.GetFileInfo(rootPath + '/' + files.FileName)?.PhysicalPath;
                 File.Delete(path);
             }
             else if (files.CodeType == "Sepsis")
             {
                 var rootPath = this._codeSepsisRepo.Table.Where(x => x.CodeSepsisId == files.Id).Select(files.Type).FirstOrDefault();
-                string path = Path.Combine(this._environment.WebRootPath, rootPath + "/" + files.FileName);
+                string path = _environment.WebRootFileProvider.GetFileInfo(rootPath + '/' + files.FileName)?.PhysicalPath;
                 File.Delete(path);
             }
             else if (files.CodeType == "STEMI")
             {
                 var rootPath = this._codeSTEMIRepo.Table.Where(x => x.CodeStemiid == files.Id).Select(files.Type).FirstOrDefault();
-                string path = Path.Combine(this._environment.WebRootPath, rootPath + "/" + files.FileName);
+                string path = _environment.WebRootFileProvider.GetFileInfo(rootPath + '/' + files.FileName)?.PhysicalPath;
                 File.Delete(path);
             }
             else if (files.CodeType == "Trauma")
             {
                 var rootPath = this._codeTrumaRepo.Table.Where(x => x.CodeTraumaId == files.Id).Select(files.Type).FirstOrDefault();
-                string path = Path.Combine(this._environment.WebRootPath, rootPath + "/" + files.FileName);
+                string path = _environment.WebRootFileProvider.GetFileInfo(rootPath+'/'+files.FileName)?.PhysicalPath;
                 File.Delete(path);
             }
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "File Deleted Successfully" };
