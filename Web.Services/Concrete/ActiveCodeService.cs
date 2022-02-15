@@ -140,7 +140,7 @@ namespace Web.Services.Concrete
 
         #region Delete File
 
-        public BaseResponse DeleteFile(FilesVM files) 
+        public BaseResponse DeleteFile(FilesVM files)
         {
             if (files.CodeType == "Stroke")
             {
@@ -148,7 +148,7 @@ namespace Web.Services.Concrete
                 string path = Path.Combine(this._environment.WebRootPath, rootPath + "/" + files.FileName);
                 File.Delete(path);
             }
-            else if (files.CodeType == "Sepsis") 
+            else if (files.CodeType == "Sepsis")
             {
                 var rootPath = this._codeSepsisRepo.Table.Where(x => x.CodeSepsisId == files.Id).Select(files.Type).FirstOrDefault();
                 string path = Path.Combine(this._environment.WebRootPath, rootPath + "/" + files.FileName);
@@ -180,30 +180,46 @@ namespace Web.Services.Concrete
             var strokeDataVM = AutoMapperHelper.MapList<CodeStroke, CodeStrokeVM>(strokeData);
             strokeDataVM.ForEach(x =>
             {
-                if (!string.IsNullOrEmpty(x.Attachments) && !string.IsNullOrWhiteSpace(x.Attachments)) 
+                x.AttachmentsPath = new List<string>();
+                x.AudiosPath = new List<string>();
+                x.VideosPath = new List<string>();
+
+                if (!string.IsNullOrEmpty(x.Attachments) && !string.IsNullOrWhiteSpace(x.Attachments))
                 {
-                    DirectoryInfo AttachFiles = new DirectoryInfo(x.Attachments);
-                    foreach (var item in AttachFiles.GetFiles())
+                    string path = _environment.WebRootFileProvider.GetFileInfo(x.Video)?.PhysicalPath;
+                    if (Directory.Exists(path))
                     {
-                        x.AttachmentsPath.Add(item.FullName);
+                        DirectoryInfo AttachFiles = new DirectoryInfo(x.Attachments);
+                        foreach (var item in AttachFiles.GetFiles())
+                        {
+                            x.AttachmentsPath.Add(item.FullName.Replace("D:\\HLX\\RoutingAndQueueingWebAPI\\Web.API\\wwwroot", "").Replace("\\", "/"));
+                        }
                     }
                 }
 
                 if (!string.IsNullOrEmpty(x.Audio) && !string.IsNullOrWhiteSpace(x.Audio))
                 {
-                    DirectoryInfo AudioFiles = new DirectoryInfo(x.Audio);
-                    foreach (var item in AudioFiles.GetFiles())
+                    string path = _environment.WebRootFileProvider.GetFileInfo(x.Video)?.PhysicalPath;
+                    if (Directory.Exists(path))
                     {
-                        x.AudiosPath.Add(item.FullName);
+                        DirectoryInfo AudioFiles = new DirectoryInfo(x.Audio);
+                        foreach (var item in AudioFiles.GetFiles())
+                        {
+                            x.AudiosPath.Add(item.FullName.Replace("D:\\HLX\\RoutingAndQueueingWebAPI\\Web.API\\wwwroot", "").Replace("\\", "/"));
+                        }
                     }
                 }
 
                 if (!string.IsNullOrEmpty(x.Video) && !string.IsNullOrWhiteSpace(x.Video))
                 {
-                    DirectoryInfo VideoFiles = new DirectoryInfo(x.Video);
-                    foreach (var item in VideoFiles.GetFiles())
+                    string path = _environment.WebRootFileProvider.GetFileInfo(x.Video)?.PhysicalPath;
+                    if (Directory.Exists(path))
                     {
-                        x.VideosPath.Add(item.FullName);
+                        DirectoryInfo VideoFiles = new DirectoryInfo(path);
+                        foreach (var item in VideoFiles.GetFiles())
+                        {
+                            x.VideosPath.Add(item.FullName.Replace("D:\\HLX\\RoutingAndQueueingWebAPI\\Web.API\\wwwroot", "").Replace("\\", "/"));
+                        }
                     }
                 }
                 x.GenderTitle = _controlListDetailsRepo.Table.Where(g => g.ControlListDetailId == x.Gender).Select(g => g.Title).FirstOrDefault();
@@ -286,7 +302,7 @@ namespace Web.Services.Concrete
                     {
                         if (!string.IsNullOrEmpty(item.Base64Str))
                         {
-                            
+
                             var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             if (fileExtension != null)
@@ -346,7 +362,7 @@ namespace Web.Services.Concrete
                     {
                         if (!string.IsNullOrEmpty(item.Base64Str))
                         {
-                            
+
                             var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             if (fileExtension != null)
@@ -407,7 +423,7 @@ namespace Web.Services.Concrete
                     {
                         if (!string.IsNullOrEmpty(item.Base64Str))
                         {
-                            
+
                             var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             if (fileExtension != null)
@@ -485,7 +501,7 @@ namespace Web.Services.Concrete
                     {
                         if (!string.IsNullOrEmpty(item.Base64Str))
                         {
-                           
+
                             var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             if (fileExtension != null)
@@ -512,7 +528,7 @@ namespace Web.Services.Concrete
                     var RootPath = this._environment.WebRootPath;
                     string FileRoot = null;
                     List<string> Attachments = new();
-                    
+
 
                     FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeStroke.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
                     FileRoot = Path.Combine(RootPath, FileRoot);
@@ -548,7 +564,7 @@ namespace Web.Services.Concrete
                     {
                         if (!string.IsNullOrEmpty(item.Base64Str))
                         {
-                            
+
                             var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             if (fileExtension != null)
@@ -611,7 +627,7 @@ namespace Web.Services.Concrete
                     {
                         if (!string.IsNullOrEmpty(item.Base64Str))
                         {
-                           
+
                             var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             if (fileExtension != null)
@@ -666,6 +682,48 @@ namespace Web.Services.Concrete
             var SepsisDataVM = AutoMapperHelper.MapList<CodeSepsi, CodeSepsisVM>(SepsisData);
             SepsisDataVM.ForEach(x =>
             {
+                x.AttachmentsPath = new List<string>();
+                x.AudiosPath = new List<string>();
+                x.VideosPath = new List<string>();
+
+                if (!string.IsNullOrEmpty(x.Attachments) && !string.IsNullOrWhiteSpace(x.Attachments))
+                {
+                    string path = _environment.WebRootFileProvider.GetFileInfo(x.Video)?.PhysicalPath;
+                    if (Directory.Exists(path))
+                    {
+                        DirectoryInfo AttachFiles = new DirectoryInfo(x.Attachments);
+                        foreach (var item in AttachFiles.GetFiles())
+                        {
+                            x.AttachmentsPath.Add(item.FullName.Replace("D:\\HLX\\RoutingAndQueueingWebAPI\\Web.API\\wwwroot", "").Replace("\\", "/"));
+                        }
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(x.Audio) && !string.IsNullOrWhiteSpace(x.Audio))
+                {
+                    string path = _environment.WebRootFileProvider.GetFileInfo(x.Video)?.PhysicalPath;
+                    if (Directory.Exists(path))
+                    {
+                        DirectoryInfo AudioFiles = new DirectoryInfo(x.Audio);
+                        foreach (var item in AudioFiles.GetFiles())
+                        {
+                            x.AudiosPath.Add(item.FullName.Replace("D:\\HLX\\RoutingAndQueueingWebAPI\\Web.API\\wwwroot", "").Replace("\\", "/"));
+                        }
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(x.Video) && !string.IsNullOrWhiteSpace(x.Video))
+                {
+                    string path = _environment.WebRootFileProvider.GetFileInfo(x.Video)?.PhysicalPath;
+                    if (Directory.Exists(path))
+                    {
+                        DirectoryInfo VideoFiles = new DirectoryInfo(path);
+                        foreach (var item in VideoFiles.GetFiles())
+                        {
+                            x.VideosPath.Add(item.FullName.Replace("D:\\HLX\\RoutingAndQueueingWebAPI\\Web.API\\wwwroot", "").Replace("\\", "/"));
+                        }
+                    }
+                }
                 x.GenderTitle = _controlListDetailsRepo.Table.Where(g => g.ControlListDetailId == x.Gender).Select(g => g.Title).FirstOrDefault();
                 x.BloodThinnersTitle = _controlListDetailsRepo.Table.Where(b => b.ControlListDetailId == x.BloodThinners).Select(b => b.Title).FirstOrDefault();
             });
@@ -712,7 +770,7 @@ namespace Web.Services.Concrete
                     var RootPath = this._environment.WebRootPath;
                     string FileRoot = null;
                     List<string> Attachments = new();
-                    
+
                     FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeSepsis.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
                     FileRoot = Path.Combine(RootPath, FileRoot);
                     if (!Directory.Exists(FileRoot))
@@ -747,7 +805,7 @@ namespace Web.Services.Concrete
                     {
                         if (!string.IsNullOrEmpty(item.Base64Str))
                         {
-                            
+
                             var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             if (fileExtension != null)
@@ -774,7 +832,7 @@ namespace Web.Services.Concrete
                     var RootPath = this._environment.WebRootPath;
                     string FileRoot = null;
                     List<string> Attachments = new();
-                    
+
 
                     FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeSepsis.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
                     FileRoot = Path.Combine(RootPath, FileRoot);
@@ -810,7 +868,7 @@ namespace Web.Services.Concrete
                     {
                         if (!string.IsNullOrEmpty(item.Base64Str))
                         {
-                            
+
                             var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             if (fileExtension != null)
@@ -872,7 +930,7 @@ namespace Web.Services.Concrete
                     {
                         if (!string.IsNullOrEmpty(item.Base64Str))
                         {
-                            
+
                             var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             if (fileExtension != null)
@@ -952,7 +1010,7 @@ namespace Web.Services.Concrete
                     {
                         if (!string.IsNullOrEmpty(item.Base64Str))
                         {
-                           
+
                             var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             if (fileExtension != null)
@@ -1014,7 +1072,7 @@ namespace Web.Services.Concrete
                     {
                         if (!string.IsNullOrEmpty(item.Base64Str))
                         {
-                            
+
                             var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             if (fileExtension != null)
@@ -1076,7 +1134,7 @@ namespace Web.Services.Concrete
                     {
                         if (!string.IsNullOrEmpty(item.Base64Str))
                         {
-                            
+
                             var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             if (fileExtension != null)
@@ -1130,6 +1188,48 @@ namespace Web.Services.Concrete
             var STEMIDataVM = AutoMapperHelper.MapList<CodeStemi, CodeSTEMIVM>(STEMIData);
             STEMIDataVM.ForEach(x =>
             {
+                x.AttachmentsPath = new List<string>();
+                x.AudiosPath = new List<string>();
+                x.VideosPath = new List<string>();
+
+                if (!string.IsNullOrEmpty(x.Attachments) && !string.IsNullOrWhiteSpace(x.Attachments))
+                {
+                    string path = _environment.WebRootFileProvider.GetFileInfo(x.Video)?.PhysicalPath;
+                    if (Directory.Exists(path))
+                    {
+                        DirectoryInfo AttachFiles = new DirectoryInfo(x.Attachments);
+                        foreach (var item in AttachFiles.GetFiles())
+                        {
+                            x.AttachmentsPath.Add(item.FullName.Replace("D:\\HLX\\RoutingAndQueueingWebAPI\\Web.API\\wwwroot", "").Replace("\\", "/"));
+                        }
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(x.Audio) && !string.IsNullOrWhiteSpace(x.Audio))
+                {
+                    string path = _environment.WebRootFileProvider.GetFileInfo(x.Video)?.PhysicalPath;
+                    if (Directory.Exists(path))
+                    {
+                        DirectoryInfo AudioFiles = new DirectoryInfo(x.Audio);
+                        foreach (var item in AudioFiles.GetFiles())
+                        {
+                            x.AudiosPath.Add(item.FullName.Replace("D:\\HLX\\RoutingAndQueueingWebAPI\\Web.API\\wwwroot", "").Replace("\\", "/"));
+                        }
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(x.Video) && !string.IsNullOrWhiteSpace(x.Video))
+                {
+                    string path = _environment.WebRootFileProvider.GetFileInfo(x.Video)?.PhysicalPath;
+                    if (Directory.Exists(path))
+                    {
+                        DirectoryInfo VideoFiles = new DirectoryInfo(path);
+                        foreach (var item in VideoFiles.GetFiles())
+                        {
+                            x.VideosPath.Add(item.FullName.Replace("D:\\HLX\\RoutingAndQueueingWebAPI\\Web.API\\wwwroot", "").Replace("\\", "/"));
+                        }
+                    }
+                }
                 x.GenderTitle = _controlListDetailsRepo.Table.Where(g => g.ControlListDetailId == x.Gender).Select(g => g.Title).FirstOrDefault();
                 x.BloodThinnersTitle = _controlListDetailsRepo.Table.Where(b => b.ControlListDetailId == x.BloodThinners).Select(b => b.Title).FirstOrDefault();
             });
@@ -1212,7 +1312,7 @@ namespace Web.Services.Concrete
                     {
                         if (!string.IsNullOrEmpty(item.Base64Str))
                         {
-                           
+
                             var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             if (fileExtension != null)
@@ -1274,7 +1374,7 @@ namespace Web.Services.Concrete
                     {
                         if (!string.IsNullOrEmpty(item.Base64Str))
                         {
-                            
+
                             var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             if (fileExtension != null)
@@ -1336,7 +1436,7 @@ namespace Web.Services.Concrete
                     {
                         if (!string.IsNullOrEmpty(item.Base64Str))
                         {
-                           
+
                             var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             if (fileExtension != null)
@@ -1413,7 +1513,7 @@ namespace Web.Services.Concrete
                     {
                         if (!string.IsNullOrEmpty(item.Base64Str))
                         {
-                           
+
                             var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             if (fileExtension != null)
@@ -1475,7 +1575,7 @@ namespace Web.Services.Concrete
                     {
                         if (!string.IsNullOrEmpty(item.Base64Str))
                         {
-                            
+
                             var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             if (fileExtension != null)
@@ -1538,7 +1638,7 @@ namespace Web.Services.Concrete
                     {
                         if (!string.IsNullOrEmpty(item.Base64Str))
                         {
-                            
+
                             var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             if (fileExtension != null)
@@ -1592,6 +1692,48 @@ namespace Web.Services.Concrete
             var TrumaDataVM = AutoMapperHelper.MapList<CodeTrauma, CodeTrumaVM>(TrumaData);
             TrumaDataVM.ForEach(x =>
             {
+                x.AttachmentsPath = new List<string>();
+                x.AudiosPath = new List<string>();
+                x.VideosPath = new List<string>();
+
+                if (!string.IsNullOrEmpty(x.Attachments) && !string.IsNullOrWhiteSpace(x.Attachments))
+                {
+                    string path = _environment.WebRootFileProvider.GetFileInfo(x.Video)?.PhysicalPath;
+                    if (Directory.Exists(path))
+                    {
+                        DirectoryInfo AttachFiles = new DirectoryInfo(x.Attachments);
+                        foreach (var item in AttachFiles.GetFiles())
+                        {
+                            x.AttachmentsPath.Add(item.FullName.Replace("D:\\HLX\\RoutingAndQueueingWebAPI\\Web.API\\wwwroot", "").Replace("\\", "/"));
+                        }
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(x.Audio) && !string.IsNullOrWhiteSpace(x.Audio))
+                {
+                    string path = _environment.WebRootFileProvider.GetFileInfo(x.Video)?.PhysicalPath;
+                    if (Directory.Exists(path))
+                    {
+                        DirectoryInfo AudioFiles = new DirectoryInfo(x.Audio);
+                        foreach (var item in AudioFiles.GetFiles())
+                        {
+                            x.AudiosPath.Add(item.FullName.Replace("D:\\HLX\\RoutingAndQueueingWebAPI\\Web.API\\wwwroot", "").Replace("\\", "/"));
+                        }
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(x.Video) && !string.IsNullOrWhiteSpace(x.Video))
+                {
+                    string path = _environment.WebRootFileProvider.GetFileInfo(x.Video)?.PhysicalPath;
+                    if (Directory.Exists(path))
+                    {
+                        DirectoryInfo VideoFiles = new DirectoryInfo(path);
+                        foreach (var item in VideoFiles.GetFiles())
+                        {
+                            x.VideosPath.Add(item.FullName.Replace("D:\\HLX\\RoutingAndQueueingWebAPI\\Web.API\\wwwroot", "").Replace("\\", "/"));
+                        }
+                    }
+                }
                 x.GenderTitle = _controlListDetailsRepo.Table.Where(g => g.ControlListDetailId == x.Gender).Select(g => g.Title).FirstOrDefault();
                 x.BloodThinnersTitle = _controlListDetailsRepo.Table.Where(b => b.ControlListDetailId == x.BloodThinners).Select(b => b.Title).FirstOrDefault();
             });
@@ -1674,7 +1816,7 @@ namespace Web.Services.Concrete
                     {
                         if (!string.IsNullOrEmpty(item.Base64Str))
                         {
-                           
+
                             var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             if (fileExtension != null)
@@ -1736,7 +1878,7 @@ namespace Web.Services.Concrete
                     {
                         if (!string.IsNullOrEmpty(item.Base64Str))
                         {
-                            
+
                             var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             if (fileExtension != null)
@@ -1798,7 +1940,7 @@ namespace Web.Services.Concrete
                     {
                         if (!string.IsNullOrEmpty(item.Base64Str))
                         {
-                           
+
                             var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             if (fileExtension != null)
@@ -1876,7 +2018,7 @@ namespace Web.Services.Concrete
                     {
                         if (!string.IsNullOrEmpty(item.Base64Str))
                         {
-                           
+
                             var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             if (fileExtension != null)
@@ -1938,7 +2080,7 @@ namespace Web.Services.Concrete
                     {
                         if (!string.IsNullOrEmpty(item.Base64Str))
                         {
-                            
+
                             var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             if (fileExtension != null)
@@ -2000,7 +2142,7 @@ namespace Web.Services.Concrete
                     {
                         if (!string.IsNullOrEmpty(item.Base64Str))
                         {
-                           
+
                             var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             if (fileExtension != null)
