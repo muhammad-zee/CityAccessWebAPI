@@ -688,10 +688,10 @@ namespace Web.Services.Concrete
 
                 if (!string.IsNullOrEmpty(x.Attachments) && !string.IsNullOrWhiteSpace(x.Attachments))
                 {
-                    string path = _environment.WebRootFileProvider.GetFileInfo(x.Video)?.PhysicalPath;
+                    string path = _environment.WebRootFileProvider.GetFileInfo(x.Attachments)?.PhysicalPath;
                     if (Directory.Exists(path))
                     {
-                        DirectoryInfo AttachFiles = new DirectoryInfo(x.Attachments);
+                        DirectoryInfo AttachFiles = new DirectoryInfo(path);
                         foreach (var item in AttachFiles.GetFiles())
                         {
                             x.AttachmentsPath.Add(x.Attachments + "/" + item.Name);
@@ -701,10 +701,10 @@ namespace Web.Services.Concrete
 
                 if (!string.IsNullOrEmpty(x.Audio) && !string.IsNullOrWhiteSpace(x.Audio))
                 {
-                    string path = _environment.WebRootFileProvider.GetFileInfo(x.Video)?.PhysicalPath;
+                    string path = _environment.WebRootFileProvider.GetFileInfo(x.Audio)?.PhysicalPath;
                     if (Directory.Exists(path))
                     {
-                        DirectoryInfo AudioFiles = new DirectoryInfo(x.Audio);
+                        DirectoryInfo AudioFiles = new DirectoryInfo(path);
                         foreach (var item in AudioFiles.GetFiles())
                         {
                             x.AudiosPath.Add(x.Audio + "/" + item.Name);
@@ -1194,10 +1194,10 @@ namespace Web.Services.Concrete
 
                 if (!string.IsNullOrEmpty(x.Attachments) && !string.IsNullOrWhiteSpace(x.Attachments))
                 {
-                    string path = _environment.WebRootFileProvider.GetFileInfo(x.Video)?.PhysicalPath;
+                    string path = _environment.WebRootFileProvider.GetFileInfo(x.Attachments)?.PhysicalPath;
                     if (Directory.Exists(path))
                     {
-                        DirectoryInfo AttachFiles = new DirectoryInfo(x.Attachments);
+                        DirectoryInfo AttachFiles = new DirectoryInfo(path);
                         foreach (var item in AttachFiles.GetFiles())
                         {
                             x.AttachmentsPath.Add(x.Attachments + "/" + item.Name);
@@ -1207,10 +1207,10 @@ namespace Web.Services.Concrete
 
                 if (!string.IsNullOrEmpty(x.Audio) && !string.IsNullOrWhiteSpace(x.Audio))
                 {
-                    string path = _environment.WebRootFileProvider.GetFileInfo(x.Video)?.PhysicalPath;
+                    string path = _environment.WebRootFileProvider.GetFileInfo(x.Audio)?.PhysicalPath;
                     if (Directory.Exists(path))
                     {
-                        DirectoryInfo AudioFiles = new DirectoryInfo(x.Audio);
+                        DirectoryInfo AudioFiles = new DirectoryInfo(path);
                         foreach (var item in AudioFiles.GetFiles())
                         {
                             x.AudiosPath.Add(x.Audio + "/" + item.Name);
@@ -1698,10 +1698,10 @@ namespace Web.Services.Concrete
 
                 if (!string.IsNullOrEmpty(x.Attachments) && !string.IsNullOrWhiteSpace(x.Attachments))
                 {
-                    string path = _environment.WebRootFileProvider.GetFileInfo(x.Video)?.PhysicalPath;
+                    string path = _environment.WebRootFileProvider.GetFileInfo(x.Attachments)?.PhysicalPath;
                     if (Directory.Exists(path))
                     {
-                        DirectoryInfo AttachFiles = new DirectoryInfo(x.Attachments);
+                        DirectoryInfo AttachFiles = new DirectoryInfo(path);
                         foreach (var item in AttachFiles.GetFiles())
                         {
                             x.AttachmentsPath.Add(x.Attachments + "/" + item.Name);
@@ -1711,10 +1711,10 @@ namespace Web.Services.Concrete
 
                 if (!string.IsNullOrEmpty(x.Audio) && !string.IsNullOrWhiteSpace(x.Audio))
                 {
-                    string path = _environment.WebRootFileProvider.GetFileInfo(x.Video)?.PhysicalPath;
+                    string path = _environment.WebRootFileProvider.GetFileInfo(x.Audio)?.PhysicalPath;
                     if (Directory.Exists(path))
                     {
-                        DirectoryInfo AudioFiles = new DirectoryInfo(x.Audio);
+                        DirectoryInfo AudioFiles = new DirectoryInfo(path);
                         foreach (var item in AudioFiles.GetFiles())
                         {
                             x.AudiosPath.Add(x.Audio + "/" + item.Name);
