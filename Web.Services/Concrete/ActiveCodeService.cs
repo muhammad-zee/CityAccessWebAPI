@@ -180,22 +180,32 @@ namespace Web.Services.Concrete
             var strokeDataVM = AutoMapperHelper.MapList<CodeStroke, CodeStrokeVM>(strokeData);
             strokeDataVM.ForEach(x =>
             {
-                DirectoryInfo AttachFiles = new DirectoryInfo(x.Attachments);
-                foreach (var item in AttachFiles.GetFiles())
+                if (!string.IsNullOrEmpty(x.Attachments) && !string.IsNullOrWhiteSpace(x.Attachments)) 
                 {
-                    x.AttachmentsPath.Add(item.FullName);
-                }
-                DirectoryInfo AudioFiles = new DirectoryInfo(x.Audio);
-                foreach (var item in AudioFiles.GetFiles())
-                {
-                    x.AudiosPath.Add(item.FullName);
-                }
-                DirectoryInfo VideoFiles = new DirectoryInfo(x.Video);
-                foreach (var item in VideoFiles.GetFiles())
-                {
-                    x.VideosPath.Add(item.FullName);
+                    DirectoryInfo AttachFiles = new DirectoryInfo(x.Attachments);
+                    foreach (var item in AttachFiles.GetFiles())
+                    {
+                        x.AttachmentsPath.Add(item.FullName);
+                    }
                 }
 
+                if (!string.IsNullOrEmpty(x.Audio) && !string.IsNullOrWhiteSpace(x.Audio))
+                {
+                    DirectoryInfo AudioFiles = new DirectoryInfo(x.Audio);
+                    foreach (var item in AudioFiles.GetFiles())
+                    {
+                        x.AudiosPath.Add(item.FullName);
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(x.Video) && !string.IsNullOrWhiteSpace(x.Video))
+                {
+                    DirectoryInfo VideoFiles = new DirectoryInfo(x.Video);
+                    foreach (var item in VideoFiles.GetFiles())
+                    {
+                        x.VideosPath.Add(item.FullName);
+                    }
+                }
                 x.GenderTitle = _controlListDetailsRepo.Table.Where(g => g.ControlListDetailId == x.Gender).Select(g => g.Title).FirstOrDefault();
                 x.BloodThinnersTitle = _controlListDetailsRepo.Table.Where(b => b.ControlListDetailId == x.BloodThinners).Select(b => b.Title).FirstOrDefault();
             });
