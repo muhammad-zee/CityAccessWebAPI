@@ -10,6 +10,7 @@ using Web.Data.Models;
 using Web.DLL.Generic_Repository;
 using Web.Model;
 using Web.Model.Common;
+using Web.Services.Enums;
 using Web.Services.Extensions;
 using Web.Services.Helper;
 using Web.Services.Interfaces;
@@ -20,8 +21,11 @@ namespace Web.Services.Concrete
     {
         private RAQ_DbContext _dbContext;
         private IHostingEnvironment _environment;
+        private ICommunicationService _communication;
+        private IRepository<User> _userRepo;
         private IRepository<Organization> _orgRepo;
         private IRepository<ServiceLine> _serviceLineRepo;
+        private IRepository<UsersSchedule> _userSchedulesRepo;
         private IRepository<ControlListDetail> _controlListDetailsRepo;
         private IRepository<ActiveCode> _activeCodeRepo;
         private IRepository<CodeStroke> _codeStrokeRepo;
@@ -32,8 +36,11 @@ namespace Web.Services.Concrete
         public ActiveCodeService(RAQ_DbContext dbContext,
             IConfiguration config,
             IHostingEnvironment environment,
+            ICommunicationService communication,
+            IRepository<User> userRepo,
             IRepository<Organization> orgRepo,
             IRepository<ServiceLine> serviceLineRepo,
+            IRepository<UsersSchedule> userSchedulesRepo,
             IRepository<ControlListDetail> controlListDetailsRepo,
             IRepository<ActiveCode> activeCodeRepo,
             IRepository<CodeStroke> codeStrokeRepo,
@@ -44,8 +51,11 @@ namespace Web.Services.Concrete
             this._config = config;
             this._dbContext = dbContext;
             this._environment = environment;
+            this._communication = communication;
+            this._userRepo = userRepo;
             this._orgRepo = orgRepo;
             this._serviceLineRepo = serviceLineRepo;
+            this._userSchedulesRepo = userSchedulesRepo;
             this._controlListDetailsRepo = controlListDetailsRepo;
             this._activeCodeRepo = activeCodeRepo;
             this._codeStrokeRepo = codeStrokeRepo;
@@ -451,6 +461,28 @@ namespace Web.Services.Concrete
                 row.Audio = codeStroke.AudioFolderRoot;
 
                 this._codeStrokeRepo.Update(row);
+
+                var serviceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == row.OrganizationIdFk && x.CodeIdFk == UCLEnums.Stroke.ToInt() && !x.IsDeleted).Select(x => x.ServiceLineIds).FirstOrDefault();
+                if (serviceLineIds != null && serviceLineIds != "")
+                {
+                    var UserChannelSid = (from us in this._userSchedulesRepo.Table
+                                          join u in this._userRepo.Table on us.UserIdFk equals u.UserId
+                                          where serviceLineIds.ToIntList().Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
+                                          select u.UserChannelSid).ToList();
+
+                    var notification = new PushNotificationVM()
+                    {
+                        Id = row.CodeStrokeId,
+                        OrgId = row.OrganizationIdFk,
+                        UserChannelSid = UserChannelSid,
+                        From = AuthorEnums.Stroke.ToString(),
+                        Msg = "Stroke From is Changed",
+                        RouteLink = ""
+                    };
+
+                    _communication.pushNotification(notification);
+
+                }
 
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Modified", Body = row };
             }
@@ -961,6 +993,28 @@ namespace Web.Services.Concrete
 
                 this._codeSepsisRepo.Update(row);
 
+                var serviceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == row.OrganizationIdFk && x.CodeIdFk == UCLEnums.Sepsis.ToInt() && !x.IsDeleted).Select(x => x.ServiceLineIds).FirstOrDefault();
+                if (serviceLineIds != null && serviceLineIds != "")
+                {
+                    var UserChannelSid = (from us in this._userSchedulesRepo.Table
+                                          join u in this._userRepo.Table on us.UserIdFk equals u.UserId
+                                          where serviceLineIds.ToIntList().Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
+                                          select u.UserChannelSid).ToList();
+
+                    var notification = new PushNotificationVM()
+                    {
+                        Id = row.CodeSepsisId,
+                        OrgId = row.OrganizationIdFk,
+                        UserChannelSid = UserChannelSid,
+                        From = AuthorEnums.Sepsis.ToString(),
+                        Msg = "Sepsis From is Changed",
+                        RouteLink = ""
+                    };
+
+                    _communication.pushNotification(notification);
+
+                }
+
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Modified", Body = row };
             }
             else
@@ -1463,6 +1517,28 @@ namespace Web.Services.Concrete
                 row.Audio = codeSTEMI.AudioFolderRoot;
 
                 this._codeSTEMIRepo.Update(row);
+
+                var serviceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == row.OrganizationIdFk && x.CodeIdFk == UCLEnums.STEMI.ToInt() && !x.IsDeleted).Select(x => x.ServiceLineIds).FirstOrDefault();
+                if (serviceLineIds != null && serviceLineIds != "")
+                {
+                    var UserChannelSid = (from us in this._userSchedulesRepo.Table
+                                          join u in this._userRepo.Table on us.UserIdFk equals u.UserId
+                                          where serviceLineIds.ToIntList().Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
+                                          select u.UserChannelSid).ToList();
+
+                    var notification = new PushNotificationVM()
+                    {
+                        Id = row.CodeStemiid,
+                        OrgId = row.OrganizationIdFk,
+                        UserChannelSid = UserChannelSid,
+                        From = AuthorEnums.STEMI.ToString(),
+                        Msg = "STEMI From is Changed",
+                        RouteLink = ""
+                    };
+
+                    _communication.pushNotification(notification);
+
+                }
 
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Modified", Body = row };
             }
@@ -1967,6 +2043,28 @@ namespace Web.Services.Concrete
                 row.Audio = codeTruma.AudioFolderRoot;
 
                 this._codeTrumaRepo.Update(row);
+
+                var serviceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == row.OrganizationIdFk && x.CodeIdFk == UCLEnums.Trauma.ToInt() && !x.IsDeleted).Select(x => x.ServiceLineIds).FirstOrDefault();
+                if (serviceLineIds != null && serviceLineIds != "")
+                {
+                    var UserChannelSid = (from us in this._userSchedulesRepo.Table
+                                          join u in this._userRepo.Table on us.UserIdFk equals u.UserId
+                                          where serviceLineIds.ToIntList().Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
+                                          select u.UserChannelSid).ToList();
+
+                    var notification = new PushNotificationVM()
+                    {
+                        Id = row.CodeTraumaId,
+                        OrgId = row.OrganizationIdFk,
+                        UserChannelSid = UserChannelSid,
+                        From = AuthorEnums.Trauma.ToString(),
+                        Msg = "Trauma From is Changed",
+                        RouteLink = ""
+                    };
+
+                    _communication.pushNotification(notification);
+
+                }
 
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Modified", Body = row };
             }

@@ -1,7 +1,11 @@
 ﻿namespace Web.Services.Enums
 {
-    public static class AuthorEnums
+    public enum AuthorEnums
     {
-        public static string VideoCallController = "VideoCallController";
+        VideoCall,
+        Stroke,
+        STEMI,
+        Sepsis,
+        Trauma
     }
 }

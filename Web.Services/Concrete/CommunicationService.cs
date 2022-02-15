@@ -658,12 +658,35 @@ namespace Web.Services.Concrete
                                     }, Formatting.Indented);
             this.sendPushNotification(new ConversationMessageVM
             {
-                author = AuthorEnums.VideoCallController,
+                author = AuthorEnums.VideoCall.ToString(),
                 body = "Video Call",
                 attributes = attributes,
                 channelSid = UserChannelSid
             });
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Call Dialed" };
+        }
+        public BaseResponse pushNotification(PushNotificationVM model)
+        {
+            //var UserChannelSid = this._userRepo.Table.Where(u => model.UserIds.Contains(u.UserId) && u.UserChannelSid != null && u.IsDeleted != true).Select(x => x.UserChannelSid).ToList();
+
+            var attributes = JsonConvert.SerializeObject(new Dictionary<string, Object>()
+                                    {
+                                        { "id", model.Id},
+                                        { "orgId", model.OrgId},
+                                        { "routerLink", model.RouteLink}
+                                    }, Formatting.Indented);
+            foreach (var item in model.UserChannelSid)
+            {
+                this.sendPushNotification(new ConversationMessageVM
+                {
+                    author = model.From,
+                    body = model.Msg,
+                    attributes = attributes,
+                    channelSid = item
+                });
+            }
+
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Message Send" };
         }
         public BaseResponse rejectIncomingCall(string roomSid)
         {
