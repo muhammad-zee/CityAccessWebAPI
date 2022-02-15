@@ -192,7 +192,7 @@ namespace Web.Services.Concrete
                         DirectoryInfo AttachFiles = new DirectoryInfo(x.Attachments);
                         foreach (var item in AttachFiles.GetFiles())
                         {
-                            x.AttachmentsPath.Add(item.FullName.Replace("D:\\HLX\\RoutingAndQueueingWebAPI\\Web.API\\wwwroot", "").Replace("\\", "/"));
+                            x.AttachmentsPath.Add(x.Attachments + "/" + item.Name);
                         }
                     }
                 }
@@ -205,20 +205,20 @@ namespace Web.Services.Concrete
                         DirectoryInfo AudioFiles = new DirectoryInfo(x.Audio);
                         foreach (var item in AudioFiles.GetFiles())
                         {
-                            x.AudiosPath.Add(item.FullName.Replace("D:\\HLX\\RoutingAndQueueingWebAPI\\Web.API\\wwwroot", "").Replace("\\", "/"));
+                            x.AudiosPath.Add(x.Audio + "/" + item.Name);
                         }
                     }
                 }
 
                 if (!string.IsNullOrEmpty(x.Video) && !string.IsNullOrWhiteSpace(x.Video))
                 {
-                    string path = _environment.WebRootFileProvider.GetFileInfo(x.Video)?.PhysicalPath;
+                    var path = _environment.WebRootFileProvider.GetFileInfo(x.Video)?.PhysicalPath; //.GetFileInfo(x.Video);//?.PhysicalPath;
                     if (Directory.Exists(path))
                     {
                         DirectoryInfo VideoFiles = new DirectoryInfo(path);
                         foreach (var item in VideoFiles.GetFiles())
                         {
-                            x.VideosPath.Add(item.FullName.Replace("D:\\HLX\\RoutingAndQueueingWebAPI\\Web.API\\wwwroot", "").Replace("\\", "/"));
+                            x.VideosPath.Add(x.Video + "/" + item.Name);
                         }
                     }
                 }
@@ -694,7 +694,7 @@ namespace Web.Services.Concrete
                         DirectoryInfo AttachFiles = new DirectoryInfo(x.Attachments);
                         foreach (var item in AttachFiles.GetFiles())
                         {
-                            x.AttachmentsPath.Add(item.FullName.Replace("D:\\HLX\\RoutingAndQueueingWebAPI\\Web.API\\wwwroot", "").Replace("\\", "/"));
+                            x.AttachmentsPath.Add(x.Attachments + "/" + item.Name);
                         }
                     }
                 }
@@ -707,20 +707,20 @@ namespace Web.Services.Concrete
                         DirectoryInfo AudioFiles = new DirectoryInfo(x.Audio);
                         foreach (var item in AudioFiles.GetFiles())
                         {
-                            x.AudiosPath.Add(item.FullName.Replace("D:\\HLX\\RoutingAndQueueingWebAPI\\Web.API\\wwwroot", "").Replace("\\", "/"));
+                            x.AudiosPath.Add(x.Audio + "/" + item.Name);
                         }
                     }
                 }
 
                 if (!string.IsNullOrEmpty(x.Video) && !string.IsNullOrWhiteSpace(x.Video))
                 {
-                    string path = _environment.WebRootFileProvider.GetFileInfo(x.Video)?.PhysicalPath;
+                    var path = _environment.WebRootFileProvider.GetFileInfo(x.Video)?.PhysicalPath; //.GetFileInfo(x.Video);//?.PhysicalPath;
                     if (Directory.Exists(path))
                     {
                         DirectoryInfo VideoFiles = new DirectoryInfo(path);
                         foreach (var item in VideoFiles.GetFiles())
                         {
-                            x.VideosPath.Add(item.FullName.Replace("D:\\HLX\\RoutingAndQueueingWebAPI\\Web.API\\wwwroot", "").Replace("\\", "/"));
+                            x.VideosPath.Add(x.Video + "/" + item.Name);
                         }
                     }
                 }
@@ -1200,7 +1200,7 @@ namespace Web.Services.Concrete
                         DirectoryInfo AttachFiles = new DirectoryInfo(x.Attachments);
                         foreach (var item in AttachFiles.GetFiles())
                         {
-                            x.AttachmentsPath.Add(item.FullName.Replace("D:\\HLX\\RoutingAndQueueingWebAPI\\Web.API\\wwwroot", "").Replace("\\", "/"));
+                            x.AttachmentsPath.Add(x.Attachments + "/" + item.Name);
                         }
                     }
                 }
@@ -1213,20 +1213,20 @@ namespace Web.Services.Concrete
                         DirectoryInfo AudioFiles = new DirectoryInfo(x.Audio);
                         foreach (var item in AudioFiles.GetFiles())
                         {
-                            x.AudiosPath.Add(item.FullName.Replace("D:\\HLX\\RoutingAndQueueingWebAPI\\Web.API\\wwwroot", "").Replace("\\", "/"));
+                            x.AudiosPath.Add(x.Audio + "/" + item.Name);
                         }
                     }
                 }
 
                 if (!string.IsNullOrEmpty(x.Video) && !string.IsNullOrWhiteSpace(x.Video))
                 {
-                    string path = _environment.WebRootFileProvider.GetFileInfo(x.Video)?.PhysicalPath;
+                    var path = _environment.WebRootFileProvider.GetFileInfo(x.Video)?.PhysicalPath; //.GetFileInfo(x.Video);//?.PhysicalPath;
                     if (Directory.Exists(path))
                     {
                         DirectoryInfo VideoFiles = new DirectoryInfo(path);
                         foreach (var item in VideoFiles.GetFiles())
                         {
-                            x.VideosPath.Add(item.FullName.Replace("D:\\HLX\\RoutingAndQueueingWebAPI\\Web.API\\wwwroot", "").Replace("\\", "/"));
+                            x.VideosPath.Add(x.Video + "/" + item.Name);
                         }
                     }
                 }
@@ -1704,7 +1704,7 @@ namespace Web.Services.Concrete
                         DirectoryInfo AttachFiles = new DirectoryInfo(x.Attachments);
                         foreach (var item in AttachFiles.GetFiles())
                         {
-                            x.AttachmentsPath.Add(item.FullName.Replace("D:\\HLX\\RoutingAndQueueingWebAPI\\Web.API\\wwwroot", "").Replace("\\", "/"));
+                            x.AttachmentsPath.Add(x.Attachments + "/" + item.Name);
                         }
                     }
                 }
@@ -1717,20 +1717,20 @@ namespace Web.Services.Concrete
                         DirectoryInfo AudioFiles = new DirectoryInfo(x.Audio);
                         foreach (var item in AudioFiles.GetFiles())
                         {
-                            x.AudiosPath.Add(item.FullName.Replace("D:\\HLX\\RoutingAndQueueingWebAPI\\Web.API\\wwwroot", "").Replace("\\", "/"));
+                            x.AudiosPath.Add(x.Audio + "/" + item.Name);
                         }
                     }
                 }
 
                 if (!string.IsNullOrEmpty(x.Video) && !string.IsNullOrWhiteSpace(x.Video))
                 {
-                    string path = _environment.WebRootFileProvider.GetFileInfo(x.Video)?.PhysicalPath;
+                    var path = _environment.WebRootFileProvider.GetFileInfo(x.Video)?.PhysicalPath; //.GetFileInfo(x.Video);//?.PhysicalPath;
                     if (Directory.Exists(path))
                     {
                         DirectoryInfo VideoFiles = new DirectoryInfo(path);
                         foreach (var item in VideoFiles.GetFiles())
                         {
-                            x.VideosPath.Add(item.FullName.Replace("D:\\HLX\\RoutingAndQueueingWebAPI\\Web.API\\wwwroot", "").Replace("\\", "/"));
+                            x.VideosPath.Add(x.Video + "/" + item.Name);
                         }
                     }
                 }
