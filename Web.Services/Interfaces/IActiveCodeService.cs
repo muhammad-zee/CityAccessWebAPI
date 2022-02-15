@@ -17,7 +17,7 @@ namespace Web.Services.Interfaces
         #endregion
 
         #region Code Stroke
-        BaseResponse GetAllStrokeCode();
+        BaseResponse GetAllStrokeCode(int orgId);
         BaseResponse GetStrokeDataById(int strokeId);
         BaseResponse AddOrUpdateStrokeData(CodeStrokeVM codeStroke);
         BaseResponse DeleteStroke(int strokeId);
@@ -25,21 +25,21 @@ namespace Web.Services.Interfaces
 
 
         #region Code Sepsis
-        BaseResponse GetAllSepsisCode();
+        BaseResponse GetAllSepsisCode(int orgId);
         BaseResponse GetSepsisDataById(int SepsisId);
         BaseResponse AddOrUpdateSepsisData(CodeSepsisVM codeSepsis);
         BaseResponse DeleteSepsis(int SepsisId);
         #endregion
 
         #region Code STEMI
-        BaseResponse GetAllSTEMICode();
+        BaseResponse GetAllSTEMICode(int orgId);
         BaseResponse GetSTEMIDataById(int STEMIId);
         BaseResponse AddOrUpdateSTEMIData(CodeSTEMIVM codeSTEMI);
         BaseResponse DeleteSTEMI(int STEMIId);
         #endregion
 
         #region Code Truma
-        BaseResponse GetAllTrumaCode();
+        BaseResponse GetAllTrumaCode(int orgId);
         BaseResponse GetTrumaDataById(int TrumaId);
         BaseResponse AddOrUpdateTrumaData(CodeTrumaVM codeTruma);
         BaseResponse DeleteTruma(int TrumaId);

@@ -174,9 +174,9 @@ namespace Web.Services.Concrete
 
         #region Code Stroke
 
-        public BaseResponse GetAllStrokeCode()
+        public BaseResponse GetAllStrokeCode(int orgId)
         {
-            var strokeData = this._codeStrokeRepo.Table.Where(x => !x.IsDeleted).ToList();
+            var strokeData = this._codeStrokeRepo.Table.Where(x => x.OrganizationIdFk == orgId && !x.IsDeleted).ToList();
             var strokeDataVM = AutoMapperHelper.MapList<CodeStroke, CodeStrokeVM>(strokeData);
             strokeDataVM.ForEach(x =>
             {
@@ -676,9 +676,9 @@ namespace Web.Services.Concrete
         #region Code Sepsis
 
 
-        public BaseResponse GetAllSepsisCode()
+        public BaseResponse GetAllSepsisCode(int orgId)
         {
-            var SepsisData = this._codeSepsisRepo.Table.Where(x => !x.IsDeleted).ToList();
+            var SepsisData = this._codeSepsisRepo.Table.Where(x => x.OrganizationIdFk == orgId && !x.IsDeleted).ToList();
             var SepsisDataVM = AutoMapperHelper.MapList<CodeSepsi, CodeSepsisVM>(SepsisData);
             SepsisDataVM.ForEach(x =>
             {
@@ -1182,9 +1182,9 @@ namespace Web.Services.Concrete
 
         #region Code STEMI
 
-        public BaseResponse GetAllSTEMICode()
+        public BaseResponse GetAllSTEMICode(int orgId)
         {
-            var STEMIData = this._codeSTEMIRepo.Table.Where(x => !x.IsDeleted).ToList();
+            var STEMIData = this._codeSTEMIRepo.Table.Where(x => x.OrganizationIdFk == orgId && !x.IsDeleted).ToList();
             var STEMIDataVM = AutoMapperHelper.MapList<CodeStemi, CodeSTEMIVM>(STEMIData);
             STEMIDataVM.ForEach(x =>
             {
@@ -1686,9 +1686,9 @@ namespace Web.Services.Concrete
 
         #region Code Truma
 
-        public BaseResponse GetAllTrumaCode()
+        public BaseResponse GetAllTrumaCode(int orgId)
         {
-            var TrumaData = this._codeTrumaRepo.Table.Where(x => !x.IsDeleted).ToList();
+            var TrumaData = this._codeTrumaRepo.Table.Where(x => x.OrganizationIdFk == orgId && !x.IsDeleted).ToList();
             var TrumaDataVM = AutoMapperHelper.MapList<CodeTrauma, CodeTrumaVM>(TrumaData);
             TrumaDataVM.ForEach(x =>
             {

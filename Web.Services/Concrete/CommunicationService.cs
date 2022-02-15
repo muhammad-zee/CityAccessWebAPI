@@ -22,7 +22,6 @@ using Web.Model.Common;
 using Web.Services.Enums;
 using Web.Services.Helper;
 using Web.Services.Interfaces;
-using conversationResource = Twilio.Rest.Conversations.V1;
 
 namespace Web.Services.Concrete
 {
@@ -661,7 +660,7 @@ namespace Web.Services.Concrete
             {
                 author = AuthorEnums.VideoCallController,
                 body = "Video Call",
-                attributes= attributes,
+                attributes = attributes,
                 channelSid = UserChannelSid
             });
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Call Dialed" };

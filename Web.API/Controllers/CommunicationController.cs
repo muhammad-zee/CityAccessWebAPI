@@ -288,7 +288,7 @@ namespace Web.API.Controllers
         {
             try
             {
-                
+
                 return this._communicaitonService.dialVideoCall(model);
             }
             catch (Exception ex)
@@ -303,7 +303,7 @@ namespace Web.API.Controllers
         {
             try
             {
-                
+
                 return this._communicaitonService.rejectIncomingCall(roomSid);
             }
             catch (Exception ex)
