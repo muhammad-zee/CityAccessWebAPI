@@ -533,15 +533,37 @@ namespace Web.Services.Concrete
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             var ByteFile = Convert.FromBase64String(fileInfo[1]);
                             string FilePath = Path.Combine(FileRoot, item.FileName);
-                            long newFileSize = ByteFile.LongLength;
-                            long existingFileSize = 0;
 
                             if (File.Exists(FilePath))
                             {
+                                long existingFileSize = 0;
+                                long newFileSize = ByteFile.LongLength;
                                 FileInfo ExistingfileInfo = new FileInfo(FilePath);
                                 existingFileSize = ExistingfileInfo.Length;
+
+                                if (existingFileSize > 0 && newFileSize != existingFileSize)
+                                {
+                                    var alterFile = item.FileName.Split('.');
+                                    string extention = alterFile.LastOrDefault();
+                                    var alterFileName = alterFile.ToList();
+                                    alterFileName.RemoveAt(alterFileName.Count - 1);
+                                    string fileName = string.Join(".", alterFileName);
+                                    fileName = fileName + "_" + HelperExtension.CreateRandomString(7) + "." + extention;
+                                    FilePath = Path.Combine(FileRoot, fileName);
+                                    using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                    {
+                                        fs.Write(ByteFile);
+                                    }
+                                }
+                                else
+                                {
+                                    using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                    {
+                                        fs.Write(ByteFile);
+                                    }
+                                }
                             }
-                            if (existingFileSize > 0 && newFileSize != existingFileSize)
+                            else
                             {
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
@@ -601,15 +623,37 @@ namespace Web.Services.Concrete
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             var ByteFile = Convert.FromBase64String(fileInfo[1]);
                             string FilePath = Path.Combine(FileRoot, item.FileName);
-                            long newFileSize = ByteFile.LongLength;
-                            long existingFileSize = 0;
 
                             if (File.Exists(FilePath))
                             {
+                                long existingFileSize = 0;
+                                long newFileSize = ByteFile.LongLength;
                                 FileInfo ExistingfileInfo = new FileInfo(FilePath);
                                 existingFileSize = ExistingfileInfo.Length;
+
+                                if (existingFileSize > 0 && newFileSize != existingFileSize)
+                                {
+                                    var alterFile = item.FileName.Split('.');
+                                    string extention = alterFile.LastOrDefault();
+                                    var alterFileName = alterFile.ToList();
+                                    alterFileName.RemoveAt(alterFileName.Count - 1);
+                                    string fileName = string.Join(".", alterFileName);
+                                    fileName = fileName + "_" + HelperExtension.CreateRandomString(7) + "." + extention;
+                                    FilePath = Path.Combine(FileRoot, fileName);
+                                    using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                    {
+                                        fs.Write(ByteFile);
+                                    }
+                                }
+                                else
+                                {
+                                    using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                    {
+                                        fs.Write(ByteFile);
+                                    }
+                                }
                             }
-                            if (existingFileSize > 0 && newFileSize != existingFileSize)
+                            else
                             {
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
@@ -754,15 +798,37 @@ namespace Web.Services.Concrete
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             var ByteFile = Convert.FromBase64String(fileInfo[1]);
                             string FilePath = Path.Combine(FileRoot, item.FileName);
-                            long newFileSize = ByteFile.LongLength;
-                            long existingFileSize = 0;
 
                             if (File.Exists(FilePath))
                             {
+                                long existingFileSize = 0;
+                                long newFileSize = ByteFile.LongLength;
                                 FileInfo ExistingfileInfo = new FileInfo(FilePath);
                                 existingFileSize = ExistingfileInfo.Length;
+
+                                if (existingFileSize > 0 && newFileSize != existingFileSize)
+                                {
+                                    var alterFile = item.FileName.Split('.');
+                                    string extention = alterFile.LastOrDefault();
+                                    var alterFileName = alterFile.ToList();
+                                    alterFileName.RemoveAt(alterFileName.Count - 1);
+                                    string fileName = string.Join(".", alterFileName);
+                                    fileName = fileName + "_" + HelperExtension.CreateRandomString(7) + "." + extention;
+                                    FilePath = Path.Combine(FileRoot, fileName);
+                                    using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                    {
+                                        fs.Write(ByteFile);
+                                    }
+                                }
+                                else
+                                {
+                                    using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                    {
+                                        fs.Write(ByteFile);
+                                    }
+                                }
                             }
-                            if (existingFileSize > 0 && newFileSize != existingFileSize)
+                            else
                             {
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
@@ -824,15 +890,37 @@ namespace Web.Services.Concrete
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             var ByteFile = Convert.FromBase64String(fileInfo[1]);
                             string FilePath = Path.Combine(FileRoot, item.FileName);
-                            long newFileSize = ByteFile.LongLength;
-                            long existingFileSize = 0;
 
                             if (File.Exists(FilePath))
                             {
+                                long existingFileSize = 0;
+                                long newFileSize = ByteFile.LongLength;
                                 FileInfo ExistingfileInfo = new FileInfo(FilePath);
                                 existingFileSize = ExistingfileInfo.Length;
+
+                                if (existingFileSize > 0 && newFileSize != existingFileSize)
+                                {
+                                    var alterFile = item.FileName.Split('.');
+                                    string extention = alterFile.LastOrDefault();
+                                    var alterFileName = alterFile.ToList();
+                                    alterFileName.RemoveAt(alterFileName.Count - 1);
+                                    string fileName = string.Join(".", alterFileName);
+                                    fileName = fileName + "_" + HelperExtension.CreateRandomString(7) + "." + extention;
+                                    FilePath = Path.Combine(FileRoot, fileName);
+                                    using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                    {
+                                        fs.Write(ByteFile);
+                                    }
+                                }
+                                else
+                                {
+                                    using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                    {
+                                        fs.Write(ByteFile);
+                                    }
+                                }
                             }
-                            if (existingFileSize > 0 && newFileSize != existingFileSize)
+                            else
                             {
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
@@ -894,15 +982,37 @@ namespace Web.Services.Concrete
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             var ByteFile = Convert.FromBase64String(fileInfo[1]);
                             string FilePath = Path.Combine(FileRoot, item.FileName);
-                            long newFileSize = ByteFile.LongLength;
-                            long existingFileSize = 0;
 
                             if (File.Exists(FilePath))
                             {
+                                long existingFileSize = 0;
+                                long newFileSize = ByteFile.LongLength;
                                 FileInfo ExistingfileInfo = new FileInfo(FilePath);
                                 existingFileSize = ExistingfileInfo.Length;
+
+                                if (existingFileSize > 0 && newFileSize != existingFileSize)
+                                {
+                                    var alterFile = item.FileName.Split('.');
+                                    string extention = alterFile.LastOrDefault();
+                                    var alterFileName = alterFile.ToList();
+                                    alterFileName.RemoveAt(alterFileName.Count - 1);
+                                    string fileName = string.Join(".", alterFileName);
+                                    fileName = fileName + "_" + HelperExtension.CreateRandomString(7) + "." + extention;
+                                    FilePath = Path.Combine(FileRoot, fileName);
+                                    using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                    {
+                                        fs.Write(ByteFile);
+                                    }
+                                }
+                                else
+                                {
+                                    using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                    {
+                                        fs.Write(ByteFile);
+                                    }
+                                }
                             }
-                            if (existingFileSize > 0 && newFileSize != existingFileSize)
+                            else
                             {
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
@@ -1122,15 +1232,37 @@ namespace Web.Services.Concrete
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             var ByteFile = Convert.FromBase64String(fileInfo[1]);
                             string FilePath = Path.Combine(FileRoot, item.FileName);
-                            long newFileSize = ByteFile.LongLength;
-                            long existingFileSize = 0;
 
                             if (File.Exists(FilePath))
                             {
+                                long existingFileSize = 0;
+                                long newFileSize = ByteFile.LongLength;
                                 FileInfo ExistingfileInfo = new FileInfo(FilePath);
                                 existingFileSize = ExistingfileInfo.Length;
+
+                                if (existingFileSize > 0 && newFileSize != existingFileSize)
+                                {
+                                    var alterFile = item.FileName.Split('.');
+                                    string extention = alterFile.LastOrDefault();
+                                    var alterFileName = alterFile.ToList();
+                                    alterFileName.RemoveAt(alterFileName.Count - 1);
+                                    string fileName = string.Join(".", alterFileName);
+                                    fileName = fileName + "_" + HelperExtension.CreateRandomString(7) + "." + extention;
+                                    FilePath = Path.Combine(FileRoot, fileName);
+                                    using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                    {
+                                        fs.Write(ByteFile);
+                                    }
+                                }
+                                else
+                                {
+                                    using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                    {
+                                        fs.Write(ByteFile);
+                                    }
+                                }
                             }
-                            if (existingFileSize > 0 && newFileSize != existingFileSize)
+                            else
                             {
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
@@ -1192,15 +1324,37 @@ namespace Web.Services.Concrete
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             var ByteFile = Convert.FromBase64String(fileInfo[1]);
                             string FilePath = Path.Combine(FileRoot, item.FileName);
-                            long newFileSize = ByteFile.LongLength;
-                            long existingFileSize = 0;
 
                             if (File.Exists(FilePath))
                             {
+                                long existingFileSize = 0;
+                                long newFileSize = ByteFile.LongLength;
                                 FileInfo ExistingfileInfo = new FileInfo(FilePath);
                                 existingFileSize = ExistingfileInfo.Length;
+
+                                if (existingFileSize > 0 && newFileSize != existingFileSize)
+                                {
+                                    var alterFile = item.FileName.Split('.');
+                                    string extention = alterFile.LastOrDefault();
+                                    var alterFileName = alterFile.ToList();
+                                    alterFileName.RemoveAt(alterFileName.Count - 1);
+                                    string fileName = string.Join(".", alterFileName);
+                                    fileName = fileName + "_" + HelperExtension.CreateRandomString(7) + "." + extention;
+                                    FilePath = Path.Combine(FileRoot, fileName);
+                                    using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                    {
+                                        fs.Write(ByteFile);
+                                    }
+                                }
+                                else
+                                {
+                                    using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                    {
+                                        fs.Write(ByteFile);
+                                    }
+                                }
                             }
-                            if (existingFileSize > 0 && newFileSize != existingFileSize)
+                            else
                             {
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
@@ -1261,15 +1415,37 @@ namespace Web.Services.Concrete
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             var ByteFile = Convert.FromBase64String(fileInfo[1]);
                             string FilePath = Path.Combine(FileRoot, item.FileName);
-                            long newFileSize = ByteFile.LongLength;
-                            long existingFileSize = 0;
 
                             if (File.Exists(FilePath))
                             {
+                                long existingFileSize = 0;
+                                long newFileSize = ByteFile.LongLength;
                                 FileInfo ExistingfileInfo = new FileInfo(FilePath);
                                 existingFileSize = ExistingfileInfo.Length;
+
+                                if (existingFileSize > 0 && newFileSize != existingFileSize)
+                                {
+                                    var alterFile = item.FileName.Split('.');
+                                    string extention = alterFile.LastOrDefault();
+                                    var alterFileName = alterFile.ToList();
+                                    alterFileName.RemoveAt(alterFileName.Count - 1);
+                                    string fileName = string.Join(".", alterFileName);
+                                    fileName = fileName + "_" + HelperExtension.CreateRandomString(7) + "." + extention;
+                                    FilePath = Path.Combine(FileRoot, fileName);
+                                    using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                    {
+                                        fs.Write(ByteFile);
+                                    }
+                                }
+                                else
+                                {
+                                    using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                    {
+                                        fs.Write(ByteFile);
+                                    }
+                                }
                             }
-                            if (existingFileSize > 0 && newFileSize != existingFileSize)
+                            else
                             {
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
@@ -1293,6 +1469,51 @@ namespace Web.Services.Concrete
 
 
                 this._codeSepsisRepo.Update(row);
+
+
+                codeSepsis.AttachmentsPath = new List<string>();
+                codeSepsis.AudiosPath = new List<string>();
+                codeSepsis.VideosPath = new List<string>();
+
+                if (!string.IsNullOrEmpty(codeSepsis.AttachmentsFolderRoot) && !string.IsNullOrWhiteSpace(codeSepsis.AttachmentsFolderRoot))
+                {
+                    string path = _environment.WebRootFileProvider.GetFileInfo(codeSepsis.AttachmentsFolderRoot)?.PhysicalPath;
+                    if (Directory.Exists(path))
+                    {
+                        DirectoryInfo AttachFiles = new DirectoryInfo(path);
+                        foreach (var item in AttachFiles.GetFiles())
+                        {
+                            codeSepsis.AttachmentsPath.Add(codeSepsis.AttachmentsFolderRoot + "/" + item.Name);
+                        }
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(codeSepsis.AudioFolderRoot) && !string.IsNullOrWhiteSpace(codeSepsis.AudioFolderRoot))
+                {
+                    string path = _environment.WebRootFileProvider.GetFileInfo(codeSepsis.AudioFolderRoot)?.PhysicalPath;
+                    if (Directory.Exists(path))
+                    {
+                        DirectoryInfo AudioFiles = new DirectoryInfo(path);
+                        foreach (var item in AudioFiles.GetFiles())
+                        {
+                            codeSepsis.AudiosPath.Add(codeSepsis.AudioFolderRoot + "/" + item.Name);
+                        }
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(codeSepsis.VideoFolderRoot) && !string.IsNullOrWhiteSpace(codeSepsis.VideoFolderRoot))
+                {
+                    var path = _environment.WebRootFileProvider.GetFileInfo(codeSepsis.VideoFolderRoot)?.PhysicalPath;
+                    if (Directory.Exists(path))
+                    {
+                        DirectoryInfo VideoFiles = new DirectoryInfo(path);
+                        foreach (var item in VideoFiles.GetFiles())
+                        {
+                            codeSepsis.VideosPath.Add(codeSepsis.VideoFolderRoot + "/" + item.Name);
+                        }
+                    }
+                }
+
 
                 if (row.IsEms) 
                 {
@@ -1373,15 +1594,37 @@ namespace Web.Services.Concrete
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             var ByteFile = Convert.FromBase64String(fileInfo[1]);
                             string FilePath = Path.Combine(FileRoot, item.FileName);
-                            long newFileSize = ByteFile.LongLength;
-                            long existingFileSize = 0;
 
                             if (File.Exists(FilePath))
                             {
+                                long existingFileSize = 0;
+                                long newFileSize = ByteFile.LongLength;
                                 FileInfo ExistingfileInfo = new FileInfo(FilePath);
                                 existingFileSize = ExistingfileInfo.Length;
+
+                                if (existingFileSize > 0 && newFileSize != existingFileSize)
+                                {
+                                    var alterFile = item.FileName.Split('.');
+                                    string extention = alterFile.LastOrDefault();
+                                    var alterFileName = alterFile.ToList();
+                                    alterFileName.RemoveAt(alterFileName.Count - 1);
+                                    string fileName = string.Join(".", alterFileName);
+                                    fileName = fileName + "_" + HelperExtension.CreateRandomString(7) + "." + extention;
+                                    FilePath = Path.Combine(FileRoot, fileName);
+                                    using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                    {
+                                        fs.Write(ByteFile);
+                                    }
+                                }
+                                else
+                                {
+                                    using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                    {
+                                        fs.Write(ByteFile);
+                                    }
+                                }
                             }
-                            if (existingFileSize > 0 && newFileSize != existingFileSize)
+                            else
                             {
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
@@ -1442,15 +1685,37 @@ namespace Web.Services.Concrete
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             var ByteFile = Convert.FromBase64String(fileInfo[1]);
                             string FilePath = Path.Combine(FileRoot, item.FileName);
-                            long newFileSize = ByteFile.LongLength;
-                            long existingFileSize = 0;
 
                             if (File.Exists(FilePath))
                             {
+                                long existingFileSize = 0;
+                                long newFileSize = ByteFile.LongLength;
                                 FileInfo ExistingfileInfo = new FileInfo(FilePath);
                                 existingFileSize = ExistingfileInfo.Length;
+
+                                if (existingFileSize > 0 && newFileSize != existingFileSize)
+                                {
+                                    var alterFile = item.FileName.Split('.');
+                                    string extention = alterFile.LastOrDefault();
+                                    var alterFileName = alterFile.ToList();
+                                    alterFileName.RemoveAt(alterFileName.Count - 1);
+                                    string fileName = string.Join(".", alterFileName);
+                                    fileName = fileName + "_" + HelperExtension.CreateRandomString(7) + "." + extention;
+                                    FilePath = Path.Combine(FileRoot, fileName);
+                                    using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                    {
+                                        fs.Write(ByteFile);
+                                    }
+                                }
+                                else
+                                {
+                                    using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                    {
+                                        fs.Write(ByteFile);
+                                    }
+                                }
                             }
-                            if (existingFileSize > 0 && newFileSize != existingFileSize)
+                            else
                             {
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
@@ -1511,15 +1776,37 @@ namespace Web.Services.Concrete
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             var ByteFile = Convert.FromBase64String(fileInfo[1]);
                             string FilePath = Path.Combine(FileRoot, item.FileName);
-                            long newFileSize = ByteFile.LongLength;
-                            long existingFileSize = 0;
 
                             if (File.Exists(FilePath))
                             {
+                                long existingFileSize = 0;
+                                long newFileSize = ByteFile.LongLength;
                                 FileInfo ExistingfileInfo = new FileInfo(FilePath);
                                 existingFileSize = ExistingfileInfo.Length;
+
+                                if (existingFileSize > 0 && newFileSize != existingFileSize)
+                                {
+                                    var alterFile = item.FileName.Split('.');
+                                    string extention = alterFile.LastOrDefault();
+                                    var alterFileName = alterFile.ToList();
+                                    alterFileName.RemoveAt(alterFileName.Count - 1);
+                                    string fileName = string.Join(".", alterFileName);
+                                    fileName = fileName + "_" + HelperExtension.CreateRandomString(7) + "." + extention;
+                                    FilePath = Path.Combine(FileRoot, fileName);
+                                    using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                    {
+                                        fs.Write(ByteFile);
+                                    }
+                                }
+                                else
+                                {
+                                    using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                    {
+                                        fs.Write(ByteFile);
+                                    }
+                                }
                             }
-                            if (existingFileSize > 0 && newFileSize != existingFileSize)
+                            else
                             {
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
@@ -1738,15 +2025,37 @@ namespace Web.Services.Concrete
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             var ByteFile = Convert.FromBase64String(fileInfo[1]);
                             string FilePath = Path.Combine(FileRoot, item.FileName);
-                            long newFileSize = ByteFile.LongLength;
-                            long existingFileSize = 0;
 
                             if (File.Exists(FilePath))
                             {
+                                long existingFileSize = 0;
+                                long newFileSize = ByteFile.LongLength;
                                 FileInfo ExistingfileInfo = new FileInfo(FilePath);
                                 existingFileSize = ExistingfileInfo.Length;
+
+                                if (existingFileSize > 0 && newFileSize != existingFileSize)
+                                {
+                                    var alterFile = item.FileName.Split('.');
+                                    string extention = alterFile.LastOrDefault();
+                                    var alterFileName = alterFile.ToList();
+                                    alterFileName.RemoveAt(alterFileName.Count - 1);
+                                    string fileName = string.Join(".", alterFileName);
+                                    fileName = fileName + "_" + HelperExtension.CreateRandomString(7) + "." + extention;
+                                    FilePath = Path.Combine(FileRoot, fileName);
+                                    using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                    {
+                                        fs.Write(ByteFile);
+                                    }
+                                }
+                                else
+                                {
+                                    using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                    {
+                                        fs.Write(ByteFile);
+                                    }
+                                }
                             }
-                            if (existingFileSize > 0 && newFileSize != existingFileSize)
+                            else
                             {
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
@@ -1807,15 +2116,37 @@ namespace Web.Services.Concrete
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             var ByteFile = Convert.FromBase64String(fileInfo[1]);
                             string FilePath = Path.Combine(FileRoot, item.FileName);
-                            long newFileSize = ByteFile.LongLength;
-                            long existingFileSize = 0;
 
                             if (File.Exists(FilePath))
                             {
+                                long existingFileSize = 0;
+                                long newFileSize = ByteFile.LongLength;
                                 FileInfo ExistingfileInfo = new FileInfo(FilePath);
                                 existingFileSize = ExistingfileInfo.Length;
+
+                                if (existingFileSize > 0 && newFileSize != existingFileSize)
+                                {
+                                    var alterFile = item.FileName.Split('.');
+                                    string extention = alterFile.LastOrDefault();
+                                    var alterFileName = alterFile.ToList();
+                                    alterFileName.RemoveAt(alterFileName.Count - 1);
+                                    string fileName = string.Join(".", alterFileName);
+                                    fileName = fileName + "_" + HelperExtension.CreateRandomString(7) + "." + extention;
+                                    FilePath = Path.Combine(FileRoot, fileName);
+                                    using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                    {
+                                        fs.Write(ByteFile);
+                                    }
+                                }
+                                else
+                                {
+                                    using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                    {
+                                        fs.Write(ByteFile);
+                                    }
+                                }
                             }
-                            if (existingFileSize > 0 && newFileSize != existingFileSize)
+                            else
                             {
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
@@ -1876,15 +2207,37 @@ namespace Web.Services.Concrete
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             var ByteFile = Convert.FromBase64String(fileInfo[1]);
                             string FilePath = Path.Combine(FileRoot, item.FileName);
-                            long newFileSize = ByteFile.LongLength;
-                            long existingFileSize = 0;
 
                             if (File.Exists(FilePath))
                             {
+                                long existingFileSize = 0;
+                                long newFileSize = ByteFile.LongLength;
                                 FileInfo ExistingfileInfo = new FileInfo(FilePath);
                                 existingFileSize = ExistingfileInfo.Length;
+
+                                if (existingFileSize > 0 && newFileSize != existingFileSize)
+                                {
+                                    var alterFile = item.FileName.Split('.');
+                                    string extention = alterFile.LastOrDefault();
+                                    var alterFileName = alterFile.ToList();
+                                    alterFileName.RemoveAt(alterFileName.Count - 1);
+                                    string fileName = string.Join(".", alterFileName);
+                                    fileName = fileName + "_" + HelperExtension.CreateRandomString(7) + "." + extention;
+                                    FilePath = Path.Combine(FileRoot, fileName);
+                                    using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                    {
+                                        fs.Write(ByteFile);
+                                    }
+                                }
+                                else
+                                {
+                                    using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                    {
+                                        fs.Write(ByteFile);
+                                    }
+                                }
                             }
-                            if (existingFileSize > 0 && newFileSize != existingFileSize)
+                            else
                             {
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
@@ -1905,6 +2258,52 @@ namespace Web.Services.Concrete
                 row.Audio = codeSTEMI.AudioFolderRoot;
 
                 this._codeSTEMIRepo.Update(row);
+
+
+                codeSTEMI.AttachmentsPath = new List<string>();
+                codeSTEMI.AudiosPath = new List<string>();
+                codeSTEMI.VideosPath = new List<string>();
+
+                if (!string.IsNullOrEmpty(codeSTEMI.AttachmentsFolderRoot) && !string.IsNullOrWhiteSpace(codeSTEMI.AttachmentsFolderRoot))
+                {
+                    string path = _environment.WebRootFileProvider.GetFileInfo(codeSTEMI.AttachmentsFolderRoot)?.PhysicalPath;
+                    if (Directory.Exists(path))
+                    {
+                        DirectoryInfo AttachFiles = new DirectoryInfo(path);
+                        foreach (var item in AttachFiles.GetFiles())
+                        {
+                            codeSTEMI.AttachmentsPath.Add(codeSTEMI.AttachmentsFolderRoot + "/" + item.Name);
+                        }
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(codeSTEMI.AudioFolderRoot) && !string.IsNullOrWhiteSpace(codeSTEMI.AudioFolderRoot))
+                {
+                    string path = _environment.WebRootFileProvider.GetFileInfo(codeSTEMI.AudioFolderRoot)?.PhysicalPath;
+                    if (Directory.Exists(path))
+                    {
+                        DirectoryInfo AudioFiles = new DirectoryInfo(path);
+                        foreach (var item in AudioFiles.GetFiles())
+                        {
+                            codeSTEMI.AudiosPath.Add(codeSTEMI.AudioFolderRoot + "/" + item.Name);
+                        }
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(codeSTEMI.VideoFolderRoot) && !string.IsNullOrWhiteSpace(codeSTEMI.VideoFolderRoot))
+                {
+                    var path = _environment.WebRootFileProvider.GetFileInfo(codeSTEMI.VideoFolderRoot)?.PhysicalPath;
+                    if (Directory.Exists(path))
+                    {
+                        DirectoryInfo VideoFiles = new DirectoryInfo(path);
+                        foreach (var item in VideoFiles.GetFiles())
+                        {
+                            codeSTEMI.VideosPath.Add(codeSTEMI.VideoFolderRoot + "/" + item.Name);
+                        }
+                    }
+                }
+
+
                 if (row.IsEms != null && row.IsEms.Value) 
                 {
                     var serviceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == row.OrganizationIdFk && x.CodeIdFk == UCLEnums.STEMI.ToInt() && !x.IsDeleted).Select(x => x.ServiceLineIds).FirstOrDefault();
@@ -1984,15 +2383,37 @@ namespace Web.Services.Concrete
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             var ByteFile = Convert.FromBase64String(fileInfo[1]);
                             string FilePath = Path.Combine(FileRoot, item.FileName);
-                            long newFileSize = ByteFile.LongLength;
-                            long existingFileSize = 0;
 
                             if (File.Exists(FilePath))
                             {
+                                long existingFileSize = 0;
+                                long newFileSize = ByteFile.LongLength;
                                 FileInfo ExistingfileInfo = new FileInfo(FilePath);
                                 existingFileSize = ExistingfileInfo.Length;
+
+                                if (existingFileSize > 0 && newFileSize != existingFileSize)
+                                {
+                                    var alterFile = item.FileName.Split('.');
+                                    string extention = alterFile.LastOrDefault();
+                                    var alterFileName = alterFile.ToList();
+                                    alterFileName.RemoveAt(alterFileName.Count - 1);
+                                    string fileName = string.Join(".", alterFileName);
+                                    fileName = fileName + "_" + HelperExtension.CreateRandomString(7) + "." + extention;
+                                    FilePath = Path.Combine(FileRoot, fileName);
+                                    using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                    {
+                                        fs.Write(ByteFile);
+                                    }
+                                }
+                                else
+                                {
+                                    using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                    {
+                                        fs.Write(ByteFile);
+                                    }
+                                }
                             }
-                            if (existingFileSize > 0 && newFileSize != existingFileSize)
+                            else
                             {
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
@@ -2053,15 +2474,37 @@ namespace Web.Services.Concrete
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             var ByteFile = Convert.FromBase64String(fileInfo[1]);
                             string FilePath = Path.Combine(FileRoot, item.FileName);
-                            long newFileSize = ByteFile.LongLength;
-                            long existingFileSize = 0;
 
                             if (File.Exists(FilePath))
                             {
+                                long existingFileSize = 0;
+                                long newFileSize = ByteFile.LongLength;
                                 FileInfo ExistingfileInfo = new FileInfo(FilePath);
                                 existingFileSize = ExistingfileInfo.Length;
+
+                                if (existingFileSize > 0 && newFileSize != existingFileSize)
+                                {
+                                    var alterFile = item.FileName.Split('.');
+                                    string extention = alterFile.LastOrDefault();
+                                    var alterFileName = alterFile.ToList();
+                                    alterFileName.RemoveAt(alterFileName.Count - 1);
+                                    string fileName = string.Join(".", alterFileName);
+                                    fileName = fileName + "_" + HelperExtension.CreateRandomString(7) + "." + extention;
+                                    FilePath = Path.Combine(FileRoot, fileName);
+                                    using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                    {
+                                        fs.Write(ByteFile);
+                                    }
+                                }
+                                else
+                                {
+                                    using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                    {
+                                        fs.Write(ByteFile);
+                                    }
+                                }
                             }
-                            if (existingFileSize > 0 && newFileSize != existingFileSize)
+                            else
                             {
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
@@ -2123,15 +2566,37 @@ namespace Web.Services.Concrete
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             var ByteFile = Convert.FromBase64String(fileInfo[1]);
                             string FilePath = Path.Combine(FileRoot, item.FileName);
-                            long newFileSize = ByteFile.LongLength;
-                            long existingFileSize = 0;
 
                             if (File.Exists(FilePath))
                             {
+                                long existingFileSize = 0;
+                                long newFileSize = ByteFile.LongLength;
                                 FileInfo ExistingfileInfo = new FileInfo(FilePath);
                                 existingFileSize = ExistingfileInfo.Length;
+
+                                if (existingFileSize > 0 && newFileSize != existingFileSize)
+                                {
+                                    var alterFile = item.FileName.Split('.');
+                                    string extention = alterFile.LastOrDefault();
+                                    var alterFileName = alterFile.ToList();
+                                    alterFileName.RemoveAt(alterFileName.Count - 1);
+                                    string fileName = string.Join(".", alterFileName);
+                                    fileName = fileName + "_" + HelperExtension.CreateRandomString(7) + "." + extention;
+                                    FilePath = Path.Combine(FileRoot, fileName);
+                                    using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                    {
+                                        fs.Write(ByteFile);
+                                    }
+                                }
+                                else
+                                {
+                                    using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                    {
+                                        fs.Write(ByteFile);
+                                    }
+                                }
                             }
-                            if (existingFileSize > 0 && newFileSize != existingFileSize)
+                            else
                             {
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
@@ -2350,15 +2815,37 @@ namespace Web.Services.Concrete
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             var ByteFile = Convert.FromBase64String(fileInfo[1]);
                             string FilePath = Path.Combine(FileRoot, item.FileName);
-                            long newFileSize = ByteFile.LongLength;
-                            long existingFileSize = 0;
 
                             if (File.Exists(FilePath))
                             {
+                                long existingFileSize = 0;
+                                long newFileSize = ByteFile.LongLength;
                                 FileInfo ExistingfileInfo = new FileInfo(FilePath);
                                 existingFileSize = ExistingfileInfo.Length;
+
+                                if (existingFileSize > 0 && newFileSize != existingFileSize)
+                                {
+                                    var alterFile = item.FileName.Split('.');
+                                    string extention = alterFile.LastOrDefault();
+                                    var alterFileName = alterFile.ToList();
+                                    alterFileName.RemoveAt(alterFileName.Count - 1);
+                                    string fileName = string.Join(".", alterFileName);
+                                    fileName = fileName + "_" + HelperExtension.CreateRandomString(7) + "." + extention;
+                                    FilePath = Path.Combine(FileRoot, fileName);
+                                    using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                    {
+                                        fs.Write(ByteFile);
+                                    }
+                                }
+                                else
+                                {
+                                    using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                    {
+                                        fs.Write(ByteFile);
+                                    }
+                                }
                             }
-                            if (existingFileSize > 0 && newFileSize != existingFileSize)
+                            else
                             {
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
@@ -2419,15 +2906,37 @@ namespace Web.Services.Concrete
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             var ByteFile = Convert.FromBase64String(fileInfo[1]);
                             string FilePath = Path.Combine(FileRoot, item.FileName);
-                            long newFileSize = ByteFile.LongLength;
-                            long existingFileSize = 0;
 
                             if (File.Exists(FilePath))
                             {
+                                long existingFileSize = 0;
+                                long newFileSize = ByteFile.LongLength;
                                 FileInfo ExistingfileInfo = new FileInfo(FilePath);
                                 existingFileSize = ExistingfileInfo.Length;
+
+                                if (existingFileSize > 0 && newFileSize != existingFileSize)
+                                {
+                                    var alterFile = item.FileName.Split('.');
+                                    string extention = alterFile.LastOrDefault();
+                                    var alterFileName = alterFile.ToList();
+                                    alterFileName.RemoveAt(alterFileName.Count - 1);
+                                    string fileName = string.Join(".", alterFileName);
+                                    fileName = fileName + "_" + HelperExtension.CreateRandomString(7) + "." + extention;
+                                    FilePath = Path.Combine(FileRoot, fileName);
+                                    using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                    {
+                                        fs.Write(ByteFile);
+                                    }
+                                }
+                                else
+                                {
+                                    using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                    {
+                                        fs.Write(ByteFile);
+                                    }
+                                }
                             }
-                            if (existingFileSize > 0 && newFileSize != existingFileSize)
+                            else
                             {
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
@@ -2488,15 +2997,37 @@ namespace Web.Services.Concrete
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             var ByteFile = Convert.FromBase64String(fileInfo[1]);
                             string FilePath = Path.Combine(FileRoot, item.FileName);
-                            long newFileSize = ByteFile.LongLength;
-                            long existingFileSize = 0;
 
                             if (File.Exists(FilePath))
                             {
+                                long existingFileSize = 0;
+                                long newFileSize = ByteFile.LongLength;
                                 FileInfo ExistingfileInfo = new FileInfo(FilePath);
                                 existingFileSize = ExistingfileInfo.Length;
+
+                                if (existingFileSize > 0 && newFileSize != existingFileSize)
+                                {
+                                    var alterFile = item.FileName.Split('.');
+                                    string extention = alterFile.LastOrDefault();
+                                    var alterFileName = alterFile.ToList();
+                                    alterFileName.RemoveAt(alterFileName.Count - 1);
+                                    string fileName = string.Join(".", alterFileName);
+                                    fileName = fileName + "_" + HelperExtension.CreateRandomString(7) + "." + extention;
+                                    FilePath = Path.Combine(FileRoot, fileName);
+                                    using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                    {
+                                        fs.Write(ByteFile);
+                                    }
+                                }
+                                else
+                                {
+                                    using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                    {
+                                        fs.Write(ByteFile);
+                                    }
+                                }
                             }
-                            if (existingFileSize > 0 && newFileSize != existingFileSize)
+                            else
                             {
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
@@ -2517,6 +3048,51 @@ namespace Web.Services.Concrete
                 row.Audio = codeTruma.AudioFolderRoot;
 
                 this._codeTrumaRepo.Update(row);
+
+
+                codeTruma.AttachmentsPath = new List<string>();
+                codeTruma.AudiosPath = new List<string>();
+                codeTruma.VideosPath = new List<string>();
+
+                if (!string.IsNullOrEmpty(codeTruma.AttachmentsFolderRoot) && !string.IsNullOrWhiteSpace(codeTruma.AttachmentsFolderRoot))
+                {
+                    string path = _environment.WebRootFileProvider.GetFileInfo(codeTruma.AttachmentsFolderRoot)?.PhysicalPath;
+                    if (Directory.Exists(path))
+                    {
+                        DirectoryInfo AttachFiles = new DirectoryInfo(path);
+                        foreach (var item in AttachFiles.GetFiles())
+                        {
+                            codeTruma.AttachmentsPath.Add(codeTruma.AttachmentsFolderRoot + "/" + item.Name);
+                        }
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(codeTruma.AudioFolderRoot) && !string.IsNullOrWhiteSpace(codeTruma.AudioFolderRoot))
+                {
+                    string path = _environment.WebRootFileProvider.GetFileInfo(codeTruma.AudioFolderRoot)?.PhysicalPath;
+                    if (Directory.Exists(path))
+                    {
+                        DirectoryInfo AudioFiles = new DirectoryInfo(path);
+                        foreach (var item in AudioFiles.GetFiles())
+                        {
+                            codeTruma.AudiosPath.Add(codeTruma.AudioFolderRoot + "/" + item.Name);
+                        }
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(codeTruma.VideoFolderRoot) && !string.IsNullOrWhiteSpace(codeTruma.VideoFolderRoot))
+                {
+                    var path = _environment.WebRootFileProvider.GetFileInfo(codeTruma.VideoFolderRoot)?.PhysicalPath;
+                    if (Directory.Exists(path))
+                    {
+                        DirectoryInfo VideoFiles = new DirectoryInfo(path);
+                        foreach (var item in VideoFiles.GetFiles())
+                        {
+                            codeTruma.VideosPath.Add(codeTruma.VideoFolderRoot + "/" + item.Name);
+                        }
+                    }
+                }
+
 
                 if (row.IsEms != null && row.IsEms.Value) 
                 {
@@ -2597,15 +3173,37 @@ namespace Web.Services.Concrete
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             var ByteFile = Convert.FromBase64String(fileInfo[1]);
                             string FilePath = Path.Combine(FileRoot, item.FileName);
-                            long newFileSize = ByteFile.LongLength;
-                            long existingFileSize = 0;
 
                             if (File.Exists(FilePath))
                             {
+                                long existingFileSize = 0;
+                                long newFileSize = ByteFile.LongLength;
                                 FileInfo ExistingfileInfo = new FileInfo(FilePath);
                                 existingFileSize = ExistingfileInfo.Length;
+
+                                if (existingFileSize > 0 && newFileSize != existingFileSize)
+                                {
+                                    var alterFile = item.FileName.Split('.');
+                                    string extention = alterFile.LastOrDefault();
+                                    var alterFileName = alterFile.ToList();
+                                    alterFileName.RemoveAt(alterFileName.Count - 1);
+                                    string fileName = string.Join(".", alterFileName);
+                                    fileName = fileName + "_" + HelperExtension.CreateRandomString(7) + "." + extention;
+                                    FilePath = Path.Combine(FileRoot, fileName);
+                                    using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                    {
+                                        fs.Write(ByteFile);
+                                    }
+                                }
+                                else
+                                {
+                                    using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                    {
+                                        fs.Write(ByteFile);
+                                    }
+                                }
                             }
-                            if (existingFileSize > 0 && newFileSize != existingFileSize)
+                            else
                             {
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
@@ -2666,15 +3264,37 @@ namespace Web.Services.Concrete
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             var ByteFile = Convert.FromBase64String(fileInfo[1]);
                             string FilePath = Path.Combine(FileRoot, item.FileName);
-                            long newFileSize = ByteFile.LongLength;
-                            long existingFileSize = 0;
 
                             if (File.Exists(FilePath))
                             {
+                                long existingFileSize = 0;
+                                long newFileSize = ByteFile.LongLength;
                                 FileInfo ExistingfileInfo = new FileInfo(FilePath);
                                 existingFileSize = ExistingfileInfo.Length;
+
+                                if (existingFileSize > 0 && newFileSize != existingFileSize)
+                                {
+                                    var alterFile = item.FileName.Split('.');
+                                    string extention = alterFile.LastOrDefault();
+                                    var alterFileName = alterFile.ToList();
+                                    alterFileName.RemoveAt(alterFileName.Count - 1);
+                                    string fileName = string.Join(".", alterFileName);
+                                    fileName = fileName + "_" + HelperExtension.CreateRandomString(7) + "." + extention;
+                                    FilePath = Path.Combine(FileRoot, fileName);
+                                    using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                    {
+                                        fs.Write(ByteFile);
+                                    }
+                                }
+                                else
+                                {
+                                    using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                    {
+                                        fs.Write(ByteFile);
+                                    }
+                                }
                             }
-                            if (existingFileSize > 0 && newFileSize != existingFileSize)
+                            else
                             {
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
@@ -2735,15 +3355,37 @@ namespace Web.Services.Concrete
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             var ByteFile = Convert.FromBase64String(fileInfo[1]);
                             string FilePath = Path.Combine(FileRoot, item.FileName);
-                            long newFileSize = ByteFile.LongLength;
-                            long existingFileSize = 0;
 
                             if (File.Exists(FilePath))
                             {
+                                long existingFileSize = 0;
+                                long newFileSize = ByteFile.LongLength;
                                 FileInfo ExistingfileInfo = new FileInfo(FilePath);
                                 existingFileSize = ExistingfileInfo.Length;
+
+                                if (existingFileSize > 0 && newFileSize != existingFileSize)
+                                {
+                                    var alterFile = item.FileName.Split('.');
+                                    string extention = alterFile.LastOrDefault();
+                                    var alterFileName = alterFile.ToList();
+                                    alterFileName.RemoveAt(alterFileName.Count - 1);
+                                    string fileName = string.Join(".", alterFileName);
+                                    fileName = fileName + "_" + HelperExtension.CreateRandomString(7) + "." + extention;
+                                    FilePath = Path.Combine(FileRoot, fileName);
+                                    using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                    {
+                                        fs.Write(ByteFile);
+                                    }
+                                }
+                                else
+                                {
+                                    using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                    {
+                                        fs.Write(ByteFile);
+                                    }
+                                }
                             }
-                            if (existingFileSize > 0 && newFileSize != existingFileSize)
+                            else
                             {
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
