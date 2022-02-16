@@ -477,7 +477,7 @@ namespace Web.Services.Concrete
                         UserChannelSid = UserChannelSid,
                         From = AuthorEnums.Stroke.ToString(),
                         Msg = "Stroke From is Changed",
-                        RouteLink = ""
+                        RouteLink = "/Home/Activate%20Code/code-strok-form"
                     };
 
                     _communication.pushNotification(notification);
