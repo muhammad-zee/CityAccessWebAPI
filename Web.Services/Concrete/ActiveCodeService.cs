@@ -199,7 +199,7 @@ namespace Web.Services.Concrete
                         UserChannelSid = UserChannelSid,
                         From = AuthorEnums.Sepsis.ToString(),
                         Msg = "Sepsis From is Changed",
-                        RouteLink = "/Home/Activate%20Code/sepsis-strok-form"
+                        RouteLink = "/Home/Activate%20Code/code-sepsis-form"
                     };
 
                     _communication.pushNotification(notification);
@@ -590,26 +590,29 @@ namespace Web.Services.Concrete
 
                 this._codeStrokeRepo.Update(row);
 
-                var serviceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == row.OrganizationIdFk && x.CodeIdFk == UCLEnums.Stroke.ToInt() && !x.IsDeleted).Select(x => x.ServiceLineIds).FirstOrDefault();
-                if (serviceLineIds != null && serviceLineIds != "")
+                if (row.IsEms!= null && row.IsEms.Value) 
                 {
-                    var UserChannelSid = (from us in this._userSchedulesRepo.Table
-                                          join u in this._userRepo.Table on us.UserIdFk equals u.UserId
-                                          where serviceLineIds.ToIntList().Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.Now && us.ScheduleDateEnd >= DateTime.Now && !us.IsDeleted && !u.IsDeleted
-                                          select u.UserChannelSid).ToList();
-
-                    var notification = new PushNotificationVM()
+                    var serviceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == row.OrganizationIdFk && x.CodeIdFk == UCLEnums.Stroke.ToInt() && !x.IsDeleted).Select(x => x.ServiceLineIds).FirstOrDefault();
+                    if (serviceLineIds != null && serviceLineIds != "")
                     {
-                        Id = row.CodeStrokeId,
-                        OrgId = row.OrganizationIdFk,
-                        UserChannelSid = UserChannelSid,
-                        From = AuthorEnums.Stroke.ToString(),
-                        Msg = "Stroke From is Changed",
-                        RouteLink = "/Home/Activate%20Code/code-strok-form"
-                    };
+                        var UserChannelSid = (from us in this._userSchedulesRepo.Table
+                                              join u in this._userRepo.Table on us.UserIdFk equals u.UserId
+                                              where serviceLineIds.ToIntList().Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.Now && us.ScheduleDateEnd >= DateTime.Now && !us.IsDeleted && !u.IsDeleted
+                                              select u.UserChannelSid).ToList();
 
-                    _communication.pushNotification(notification);
+                        var notification = new PushNotificationVM()
+                        {
+                            Id = row.CodeStrokeId,
+                            OrgId = row.OrganizationIdFk,
+                            UserChannelSid = UserChannelSid,
+                            From = AuthorEnums.Stroke.ToString(),
+                            Msg = "Stroke From is Changed",
+                            RouteLink = "/Home/Activate%20Code/code-strok-form"
+                        };
 
+                        _communication.pushNotification(notification);
+
+                    }
                 }
 
                 codeStroke.AttachmentsPath = new List<string>();
@@ -1207,26 +1210,29 @@ namespace Web.Services.Concrete
 
                 this._codeSepsisRepo.Update(row);
 
-                var serviceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == row.OrganizationIdFk && x.CodeIdFk == UCLEnums.Sepsis.ToInt() && !x.IsDeleted).Select(x => x.ServiceLineIds).FirstOrDefault();
-                if (serviceLineIds != null && serviceLineIds != "")
+                if (row.IsEms) 
                 {
-                    var UserChannelSid = (from us in this._userSchedulesRepo.Table
-                                          join u in this._userRepo.Table on us.UserIdFk equals u.UserId
-                                          where serviceLineIds.ToIntList().Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
-                                          select u.UserChannelSid).ToList();
-
-                    var notification = new PushNotificationVM()
+                    var serviceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == row.OrganizationIdFk && x.CodeIdFk == UCLEnums.Sepsis.ToInt() && !x.IsDeleted).Select(x => x.ServiceLineIds).FirstOrDefault();
+                    if (serviceLineIds != null && serviceLineIds != "")
                     {
-                        Id = row.CodeSepsisId,
-                        OrgId = row.OrganizationIdFk,
-                        UserChannelSid = UserChannelSid,
-                        From = AuthorEnums.Sepsis.ToString(),
-                        Msg = "Sepsis From is Changed",
-                        RouteLink = ""
-                    };
+                        var UserChannelSid = (from us in this._userSchedulesRepo.Table
+                                              join u in this._userRepo.Table on us.UserIdFk equals u.UserId
+                                              where serviceLineIds.ToIntList().Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
+                                              select u.UserChannelSid).ToList();
 
-                    _communication.pushNotification(notification);
+                        var notification = new PushNotificationVM()
+                        {
+                            Id = row.CodeSepsisId,
+                            OrgId = row.OrganizationIdFk,
+                            UserChannelSid = UserChannelSid,
+                            From = AuthorEnums.Sepsis.ToString(),
+                            Msg = "Sepsis From is Changed",
+                            RouteLink = "/Home/Activate%20Code/code-sepsis-form"
+                        };
 
+                        _communication.pushNotification(notification);
+
+                    }
                 }
 
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Modified", Body = row };
@@ -1773,27 +1779,29 @@ namespace Web.Services.Concrete
                 row.Audio = codeSTEMI.AudioFolderRoot;
 
                 this._codeSTEMIRepo.Update(row);
-
-                var serviceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == row.OrganizationIdFk && x.CodeIdFk == UCLEnums.STEMI.ToInt() && !x.IsDeleted).Select(x => x.ServiceLineIds).FirstOrDefault();
-                if (serviceLineIds != null && serviceLineIds != "")
+                if (row.IsEms != null && row.IsEms.Value) 
                 {
-                    var UserChannelSid = (from us in this._userSchedulesRepo.Table
-                                          join u in this._userRepo.Table on us.UserIdFk equals u.UserId
-                                          where serviceLineIds.ToIntList().Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
-                                          select u.UserChannelSid).ToList();
-
-                    var notification = new PushNotificationVM()
+                    var serviceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == row.OrganizationIdFk && x.CodeIdFk == UCLEnums.STEMI.ToInt() && !x.IsDeleted).Select(x => x.ServiceLineIds).FirstOrDefault();
+                    if (serviceLineIds != null && serviceLineIds != "")
                     {
-                        Id = row.CodeStemiid,
-                        OrgId = row.OrganizationIdFk,
-                        UserChannelSid = UserChannelSid,
-                        From = AuthorEnums.STEMI.ToString(),
-                        Msg = "STEMI From is Changed",
-                        RouteLink = ""
-                    };
+                        var UserChannelSid = (from us in this._userSchedulesRepo.Table
+                                              join u in this._userRepo.Table on us.UserIdFk equals u.UserId
+                                              where serviceLineIds.ToIntList().Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
+                                              select u.UserChannelSid).ToList();
 
-                    _communication.pushNotification(notification);
+                        var notification = new PushNotificationVM()
+                        {
+                            Id = row.CodeStemiid,
+                            OrgId = row.OrganizationIdFk,
+                            UserChannelSid = UserChannelSid,
+                            From = AuthorEnums.STEMI.ToString(),
+                            Msg = "STEMI From is Changed",
+                            RouteLink = "/Home/Activate%20Code/code-STEMI-form"
+                        };
 
+                        _communication.pushNotification(notification);
+
+                    }
                 }
 
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Modified", Body = row };
@@ -2342,28 +2350,30 @@ namespace Web.Services.Concrete
 
                 this._codeTrumaRepo.Update(row);
 
-                var serviceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == row.OrganizationIdFk && x.CodeIdFk == UCLEnums.Trauma.ToInt() && !x.IsDeleted).Select(x => x.ServiceLineIds).FirstOrDefault();
-                if (serviceLineIds != null && serviceLineIds != "")
+                if (row.IsEms != null && row.IsEms.Value) 
                 {
-                    var UserChannelSid = (from us in this._userSchedulesRepo.Table
-                                          join u in this._userRepo.Table on us.UserIdFk equals u.UserId
-                                          where serviceLineIds.ToIntList().Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
-                                          select u.UserChannelSid).ToList();
-
-                    var notification = new PushNotificationVM()
+                    var serviceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == row.OrganizationIdFk && x.CodeIdFk == UCLEnums.Trauma.ToInt() && !x.IsDeleted).Select(x => x.ServiceLineIds).FirstOrDefault();
+                    if (serviceLineIds != null && serviceLineIds != "")
                     {
-                        Id = row.CodeTraumaId,
-                        OrgId = row.OrganizationIdFk,
-                        UserChannelSid = UserChannelSid,
-                        From = AuthorEnums.Trauma.ToString(),
-                        Msg = "Trauma From is Changed",
-                        RouteLink = ""
-                    };
+                        var UserChannelSid = (from us in this._userSchedulesRepo.Table
+                                              join u in this._userRepo.Table on us.UserIdFk equals u.UserId
+                                              where serviceLineIds.ToIntList().Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
+                                              select u.UserChannelSid).ToList();
 
-                    _communication.pushNotification(notification);
+                        var notification = new PushNotificationVM()
+                        {
+                            Id = row.CodeTraumaId,
+                            OrgId = row.OrganizationIdFk,
+                            UserChannelSid = UserChannelSid,
+                            From = AuthorEnums.Trauma.ToString(),
+                            Msg = "Trauma From is Changed",
+                            RouteLink = "/Home/Activate%20Code/code-trauma-form"
+                        };
 
+                        _communication.pushNotification(notification);
+
+                    }
                 }
-
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Modified", Body = row };
             }
             else
