@@ -152,7 +152,7 @@ namespace Web.Services.Concrete
 
         public BaseResponse DeleteFile(FilesVM files)
         {
-            if (files.CodeType == "Stroke")
+            if (files.CodeType == AuthorEnums.Stroke.ToString())
             {
                 var rootPath = this._codeStrokeRepo.Table.Where(x => x.CodeStrokeId == files.Id).Select(files.Type, "IsEMS").FirstOrDefault();
                 string path = _environment.WebRootFileProvider.GetFileInfo(rootPath + '/' + files.FileName)?.PhysicalPath;
@@ -179,7 +179,7 @@ namespace Web.Services.Concrete
 
                 }
             }
-            else if (files.CodeType == "Sepsis")
+            else if (files.CodeType == AuthorEnums.Sepsis.ToString())
             {
                 var rootPath = this._codeSepsisRepo.Table.Where(x => x.CodeSepsisId == files.Id).Select(files.Type).FirstOrDefault();
                 string path = _environment.WebRootFileProvider.GetFileInfo(rootPath + '/' + files.FileName)?.PhysicalPath;
@@ -206,7 +206,7 @@ namespace Web.Services.Concrete
 
                 }
             }
-            else if (files.CodeType == "STEMI")
+            else if (files.CodeType == AuthorEnums.STEMI.ToString())
             {
                 var rootPath = this._codeSTEMIRepo.Table.Where(x => x.CodeStemiid == files.Id).Select(files.Type).FirstOrDefault();
                 string path = _environment.WebRootFileProvider.GetFileInfo(rootPath + '/' + files.FileName)?.PhysicalPath;
@@ -233,7 +233,7 @@ namespace Web.Services.Concrete
 
                 }
             }
-            else if (files.CodeType == "Trauma")
+            else if (files.CodeType == AuthorEnums.Trauma.ToString())
             {
                 var rootPath = this._codeTrumaRepo.Table.Where(x => x.CodeTraumaId == files.Id).Select(files.Type).FirstOrDefault();
                 string path = _environment.WebRootFileProvider.GetFileInfo(rootPath+'/'+files.FileName)?.PhysicalPath;
@@ -443,18 +443,46 @@ namespace Web.Services.Concrete
 
                             var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
-                            if (fileExtension != null)
+                            var ByteFile = Convert.FromBase64String(fileInfo[1]);
+                            string FilePath = Path.Combine(FileRoot, item.FileName);
+                            
+                            if (File.Exists(FilePath))
                             {
-                                var ByteFile = Convert.FromBase64String(fileInfo[1]);
-                                string FilePath = Path.Combine(FileRoot, item.FileName);
+                                long existingFileSize = 0;
+                                long newFileSize = ByteFile.LongLength;
+                                FileInfo ExistingfileInfo = new FileInfo(FilePath);
+                                existingFileSize = ExistingfileInfo.Length;
+                                
+                                if (existingFileSize > 0 && newFileSize != existingFileSize)
+                                {
+                                    var alterFile = item.FileName.Split('.');
+                                    string extention = alterFile.LastOrDefault();
+                                    var alterFileName = alterFile.ToList();
+                                    alterFileName.RemoveAt(alterFileName.Count - 1);
+                                    string fileName = string.Join(".", alterFileName);
+                                    fileName = fileName + "_" + HelperExtension.CreateRandomString(7) + "." + extention;
+                                    FilePath = Path.Combine(FileRoot, fileName);
+                                    using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                    {
+                                        fs.Write(ByteFile);
+                                    }
+                                }
+                                else
+                                {
+                                    using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                    {
+                                        fs.Write(ByteFile);
+                                    }
+                                }
+                            }
+                            else
+                            {
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
                                     fs.Write(ByteFile);
                                 }
-
                             }
                         }
-
                     }
                     if (FileRoot != null && FileRoot != "")
                     {
@@ -503,15 +531,22 @@ namespace Web.Services.Concrete
 
                             var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
-                            if (fileExtension != null)
+                            var ByteFile = Convert.FromBase64String(fileInfo[1]);
+                            string FilePath = Path.Combine(FileRoot, item.FileName);
+                            long newFileSize = ByteFile.LongLength;
+                            long existingFileSize = 0;
+
+                            if (File.Exists(FilePath))
                             {
-                                var ByteFile = Convert.FromBase64String(fileInfo[1]);
-                                string FilePath = Path.Combine(FileRoot, item.FileName);
+                                FileInfo ExistingfileInfo = new FileInfo(FilePath);
+                                existingFileSize = ExistingfileInfo.Length;
+                            }
+                            if (existingFileSize > 0 && newFileSize != existingFileSize)
+                            {
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
                                     fs.Write(ByteFile);
                                 }
-
                             }
                         }
 
@@ -564,15 +599,22 @@ namespace Web.Services.Concrete
 
                             var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
-                            if (fileExtension != null)
+                            var ByteFile = Convert.FromBase64String(fileInfo[1]);
+                            string FilePath = Path.Combine(FileRoot, item.FileName);
+                            long newFileSize = ByteFile.LongLength;
+                            long existingFileSize = 0;
+
+                            if (File.Exists(FilePath))
                             {
-                                var ByteFile = Convert.FromBase64String(fileInfo[1]);
-                                string FilePath = Path.Combine(FileRoot, item.FileName);
+                                FileInfo ExistingfileInfo = new FileInfo(FilePath);
+                                existingFileSize = ExistingfileInfo.Length;
+                            }
+                            if (existingFileSize > 0 && newFileSize != existingFileSize)
+                            {
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
                                     fs.Write(ByteFile);
                                 }
-
                             }
                         }
 
@@ -632,7 +674,7 @@ namespace Web.Services.Concrete
                     }
                 }
 
-                if (!string.IsNullOrEmpty(codeStroke.Audio) && !string.IsNullOrWhiteSpace(codeStroke.AudioFolderRoot))
+                if (!string.IsNullOrEmpty(codeStroke.AudioFolderRoot) && !string.IsNullOrWhiteSpace(codeStroke.AudioFolderRoot))
                 {
                     string path = _environment.WebRootFileProvider.GetFileInfo(codeStroke.AudioFolderRoot)?.PhysicalPath;
                     if (Directory.Exists(path))
@@ -645,7 +687,7 @@ namespace Web.Services.Concrete
                     }
                 }
 
-                if (!string.IsNullOrEmpty(codeStroke.Video) && !string.IsNullOrWhiteSpace(codeStroke.VideoFolderRoot))
+                if (!string.IsNullOrEmpty(codeStroke.VideoFolderRoot) && !string.IsNullOrWhiteSpace(codeStroke.VideoFolderRoot))
                 {
                     var path = _environment.WebRootFileProvider.GetFileInfo(codeStroke.VideoFolderRoot)?.PhysicalPath;
                     if (Directory.Exists(path))
@@ -710,15 +752,22 @@ namespace Web.Services.Concrete
 
                             var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
-                            if (fileExtension != null)
+                            var ByteFile = Convert.FromBase64String(fileInfo[1]);
+                            string FilePath = Path.Combine(FileRoot, item.FileName);
+                            long newFileSize = ByteFile.LongLength;
+                            long existingFileSize = 0;
+
+                            if (File.Exists(FilePath))
                             {
-                                var ByteFile = Convert.FromBase64String(fileInfo[1]);
-                                string FilePath = Path.Combine(FileRoot, item.FileName);
+                                FileInfo ExistingfileInfo = new FileInfo(FilePath);
+                                existingFileSize = ExistingfileInfo.Length;
+                            }
+                            if (existingFileSize > 0 && newFileSize != existingFileSize)
+                            {
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
                                     fs.Write(ByteFile);
                                 }
-
                             }
                         }
 
@@ -773,15 +822,22 @@ namespace Web.Services.Concrete
 
                             var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
-                            if (fileExtension != null)
+                            var ByteFile = Convert.FromBase64String(fileInfo[1]);
+                            string FilePath = Path.Combine(FileRoot, item.FileName);
+                            long newFileSize = ByteFile.LongLength;
+                            long existingFileSize = 0;
+
+                            if (File.Exists(FilePath))
                             {
-                                var ByteFile = Convert.FromBase64String(fileInfo[1]);
-                                string FilePath = Path.Combine(FileRoot, item.FileName);
+                                FileInfo ExistingfileInfo = new FileInfo(FilePath);
+                                existingFileSize = ExistingfileInfo.Length;
+                            }
+                            if (existingFileSize > 0 && newFileSize != existingFileSize)
+                            {
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
                                     fs.Write(ByteFile);
                                 }
-
                             }
                         }
 
@@ -836,15 +892,22 @@ namespace Web.Services.Concrete
 
                             var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
-                            if (fileExtension != null)
+                            var ByteFile = Convert.FromBase64String(fileInfo[1]);
+                            string FilePath = Path.Combine(FileRoot, item.FileName);
+                            long newFileSize = ByteFile.LongLength;
+                            long existingFileSize = 0;
+
+                            if (File.Exists(FilePath))
                             {
-                                var ByteFile = Convert.FromBase64String(fileInfo[1]);
-                                string FilePath = Path.Combine(FileRoot, item.FileName);
+                                FileInfo ExistingfileInfo = new FileInfo(FilePath);
+                                existingFileSize = ExistingfileInfo.Length;
+                            }
+                            if (existingFileSize > 0 && newFileSize != existingFileSize)
+                            {
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
                                     fs.Write(ByteFile);
                                 }
-
                             }
                         }
 
@@ -1057,15 +1120,22 @@ namespace Web.Services.Concrete
 
                             var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
-                            if (fileExtension != null)
+                            var ByteFile = Convert.FromBase64String(fileInfo[1]);
+                            string FilePath = Path.Combine(FileRoot, item.FileName);
+                            long newFileSize = ByteFile.LongLength;
+                            long existingFileSize = 0;
+
+                            if (File.Exists(FilePath))
                             {
-                                var ByteFile = Convert.FromBase64String(fileInfo[1]);
-                                string FilePath = Path.Combine(FileRoot, item.FileName);
+                                FileInfo ExistingfileInfo = new FileInfo(FilePath);
+                                existingFileSize = ExistingfileInfo.Length;
+                            }
+                            if (existingFileSize > 0 && newFileSize != existingFileSize)
+                            {
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
                                     fs.Write(ByteFile);
                                 }
-
                             }
                         }
 
@@ -1120,15 +1190,22 @@ namespace Web.Services.Concrete
 
                             var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
-                            if (fileExtension != null)
+                            var ByteFile = Convert.FromBase64String(fileInfo[1]);
+                            string FilePath = Path.Combine(FileRoot, item.FileName);
+                            long newFileSize = ByteFile.LongLength;
+                            long existingFileSize = 0;
+
+                            if (File.Exists(FilePath))
                             {
-                                var ByteFile = Convert.FromBase64String(fileInfo[1]);
-                                string FilePath = Path.Combine(FileRoot, item.FileName);
+                                FileInfo ExistingfileInfo = new FileInfo(FilePath);
+                                existingFileSize = ExistingfileInfo.Length;
+                            }
+                            if (existingFileSize > 0 && newFileSize != existingFileSize)
+                            {
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
                                     fs.Write(ByteFile);
                                 }
-
                             }
                         }
 
@@ -1182,15 +1259,22 @@ namespace Web.Services.Concrete
 
                             var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
-                            if (fileExtension != null)
+                            var ByteFile = Convert.FromBase64String(fileInfo[1]);
+                            string FilePath = Path.Combine(FileRoot, item.FileName);
+                            long newFileSize = ByteFile.LongLength;
+                            long existingFileSize = 0;
+
+                            if (File.Exists(FilePath))
                             {
-                                var ByteFile = Convert.FromBase64String(fileInfo[1]);
-                                string FilePath = Path.Combine(FileRoot, item.FileName);
+                                FileInfo ExistingfileInfo = new FileInfo(FilePath);
+                                existingFileSize = ExistingfileInfo.Length;
+                            }
+                            if (existingFileSize > 0 && newFileSize != existingFileSize)
+                            {
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
                                     fs.Write(ByteFile);
                                 }
-
                             }
                         }
 
@@ -1287,15 +1371,22 @@ namespace Web.Services.Concrete
 
                             var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
-                            if (fileExtension != null)
+                            var ByteFile = Convert.FromBase64String(fileInfo[1]);
+                            string FilePath = Path.Combine(FileRoot, item.FileName);
+                            long newFileSize = ByteFile.LongLength;
+                            long existingFileSize = 0;
+
+                            if (File.Exists(FilePath))
                             {
-                                var ByteFile = Convert.FromBase64String(fileInfo[1]);
-                                string FilePath = Path.Combine(FileRoot, item.FileName);
+                                FileInfo ExistingfileInfo = new FileInfo(FilePath);
+                                existingFileSize = ExistingfileInfo.Length;
+                            }
+                            if (existingFileSize > 0 && newFileSize != existingFileSize)
+                            {
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
                                     fs.Write(ByteFile);
                                 }
-
                             }
                         }
 
@@ -1349,15 +1440,22 @@ namespace Web.Services.Concrete
 
                             var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
-                            if (fileExtension != null)
+                            var ByteFile = Convert.FromBase64String(fileInfo[1]);
+                            string FilePath = Path.Combine(FileRoot, item.FileName);
+                            long newFileSize = ByteFile.LongLength;
+                            long existingFileSize = 0;
+
+                            if (File.Exists(FilePath))
                             {
-                                var ByteFile = Convert.FromBase64String(fileInfo[1]);
-                                string FilePath = Path.Combine(FileRoot, item.FileName);
+                                FileInfo ExistingfileInfo = new FileInfo(FilePath);
+                                existingFileSize = ExistingfileInfo.Length;
+                            }
+                            if (existingFileSize > 0 && newFileSize != existingFileSize)
+                            {
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
                                     fs.Write(ByteFile);
                                 }
-
                             }
                         }
 
@@ -1411,15 +1509,22 @@ namespace Web.Services.Concrete
 
                             var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
-                            if (fileExtension != null)
+                            var ByteFile = Convert.FromBase64String(fileInfo[1]);
+                            string FilePath = Path.Combine(FileRoot, item.FileName);
+                            long newFileSize = ByteFile.LongLength;
+                            long existingFileSize = 0;
+
+                            if (File.Exists(FilePath))
                             {
-                                var ByteFile = Convert.FromBase64String(fileInfo[1]);
-                                string FilePath = Path.Combine(FileRoot, item.FileName);
+                                FileInfo ExistingfileInfo = new FileInfo(FilePath);
+                                existingFileSize = ExistingfileInfo.Length;
+                            }
+                            if (existingFileSize > 0 && newFileSize != existingFileSize)
+                            {
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
                                     fs.Write(ByteFile);
                                 }
-
                             }
                         }
 
@@ -1631,15 +1736,22 @@ namespace Web.Services.Concrete
 
                             var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
-                            if (fileExtension != null)
+                            var ByteFile = Convert.FromBase64String(fileInfo[1]);
+                            string FilePath = Path.Combine(FileRoot, item.FileName);
+                            long newFileSize = ByteFile.LongLength;
+                            long existingFileSize = 0;
+
+                            if (File.Exists(FilePath))
                             {
-                                var ByteFile = Convert.FromBase64String(fileInfo[1]);
-                                string FilePath = Path.Combine(FileRoot, item.FileName);
+                                FileInfo ExistingfileInfo = new FileInfo(FilePath);
+                                existingFileSize = ExistingfileInfo.Length;
+                            }
+                            if (existingFileSize > 0 && newFileSize != existingFileSize)
+                            {
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
                                     fs.Write(ByteFile);
                                 }
-
                             }
                         }
 
@@ -1693,15 +1805,22 @@ namespace Web.Services.Concrete
 
                             var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
-                            if (fileExtension != null)
+                            var ByteFile = Convert.FromBase64String(fileInfo[1]);
+                            string FilePath = Path.Combine(FileRoot, item.FileName);
+                            long newFileSize = ByteFile.LongLength;
+                            long existingFileSize = 0;
+
+                            if (File.Exists(FilePath))
                             {
-                                var ByteFile = Convert.FromBase64String(fileInfo[1]);
-                                string FilePath = Path.Combine(FileRoot, item.FileName);
+                                FileInfo ExistingfileInfo = new FileInfo(FilePath);
+                                existingFileSize = ExistingfileInfo.Length;
+                            }
+                            if (existingFileSize > 0 && newFileSize != existingFileSize)
+                            {
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
                                     fs.Write(ByteFile);
                                 }
-
                             }
                         }
 
@@ -1755,15 +1874,22 @@ namespace Web.Services.Concrete
 
                             var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
-                            if (fileExtension != null)
+                            var ByteFile = Convert.FromBase64String(fileInfo[1]);
+                            string FilePath = Path.Combine(FileRoot, item.FileName);
+                            long newFileSize = ByteFile.LongLength;
+                            long existingFileSize = 0;
+
+                            if (File.Exists(FilePath))
                             {
-                                var ByteFile = Convert.FromBase64String(fileInfo[1]);
-                                string FilePath = Path.Combine(FileRoot, item.FileName);
+                                FileInfo ExistingfileInfo = new FileInfo(FilePath);
+                                existingFileSize = ExistingfileInfo.Length;
+                            }
+                            if (existingFileSize > 0 && newFileSize != existingFileSize)
+                            {
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
                                     fs.Write(ByteFile);
                                 }
-
                             }
                         }
 
@@ -1856,15 +1982,22 @@ namespace Web.Services.Concrete
 
                             var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
-                            if (fileExtension != null)
+                            var ByteFile = Convert.FromBase64String(fileInfo[1]);
+                            string FilePath = Path.Combine(FileRoot, item.FileName);
+                            long newFileSize = ByteFile.LongLength;
+                            long existingFileSize = 0;
+
+                            if (File.Exists(FilePath))
                             {
-                                var ByteFile = Convert.FromBase64String(fileInfo[1]);
-                                string FilePath = Path.Combine(FileRoot, item.FileName);
+                                FileInfo ExistingfileInfo = new FileInfo(FilePath);
+                                existingFileSize = ExistingfileInfo.Length;
+                            }
+                            if (existingFileSize > 0 && newFileSize != existingFileSize)
+                            {
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
                                     fs.Write(ByteFile);
                                 }
-
                             }
                         }
 
@@ -1918,15 +2051,22 @@ namespace Web.Services.Concrete
 
                             var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
-                            if (fileExtension != null)
+                            var ByteFile = Convert.FromBase64String(fileInfo[1]);
+                            string FilePath = Path.Combine(FileRoot, item.FileName);
+                            long newFileSize = ByteFile.LongLength;
+                            long existingFileSize = 0;
+
+                            if (File.Exists(FilePath))
                             {
-                                var ByteFile = Convert.FromBase64String(fileInfo[1]);
-                                string FilePath = Path.Combine(FileRoot, item.FileName);
+                                FileInfo ExistingfileInfo = new FileInfo(FilePath);
+                                existingFileSize = ExistingfileInfo.Length;
+                            }
+                            if (existingFileSize > 0 && newFileSize != existingFileSize)
+                            {
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
                                     fs.Write(ByteFile);
                                 }
-
                             }
                         }
 
@@ -1981,15 +2121,22 @@ namespace Web.Services.Concrete
 
                             var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
-                            if (fileExtension != null)
+                            var ByteFile = Convert.FromBase64String(fileInfo[1]);
+                            string FilePath = Path.Combine(FileRoot, item.FileName);
+                            long newFileSize = ByteFile.LongLength;
+                            long existingFileSize = 0;
+
+                            if (File.Exists(FilePath))
                             {
-                                var ByteFile = Convert.FromBase64String(fileInfo[1]);
-                                string FilePath = Path.Combine(FileRoot, item.FileName);
+                                FileInfo ExistingfileInfo = new FileInfo(FilePath);
+                                existingFileSize = ExistingfileInfo.Length;
+                            }
+                            if (existingFileSize > 0 && newFileSize != existingFileSize)
+                            {
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
                                     fs.Write(ByteFile);
                                 }
-
                             }
                         }
 
@@ -2201,15 +2348,22 @@ namespace Web.Services.Concrete
 
                             var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
-                            if (fileExtension != null)
+                            var ByteFile = Convert.FromBase64String(fileInfo[1]);
+                            string FilePath = Path.Combine(FileRoot, item.FileName);
+                            long newFileSize = ByteFile.LongLength;
+                            long existingFileSize = 0;
+
+                            if (File.Exists(FilePath))
                             {
-                                var ByteFile = Convert.FromBase64String(fileInfo[1]);
-                                string FilePath = Path.Combine(FileRoot, item.FileName);
+                                FileInfo ExistingfileInfo = new FileInfo(FilePath);
+                                existingFileSize = ExistingfileInfo.Length;
+                            }
+                            if (existingFileSize > 0 && newFileSize != existingFileSize)
+                            {
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
                                     fs.Write(ByteFile);
                                 }
-
                             }
                         }
 
@@ -2263,15 +2417,22 @@ namespace Web.Services.Concrete
 
                             var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
-                            if (fileExtension != null)
+                            var ByteFile = Convert.FromBase64String(fileInfo[1]);
+                            string FilePath = Path.Combine(FileRoot, item.FileName);
+                            long newFileSize = ByteFile.LongLength;
+                            long existingFileSize = 0;
+
+                            if (File.Exists(FilePath))
                             {
-                                var ByteFile = Convert.FromBase64String(fileInfo[1]);
-                                string FilePath = Path.Combine(FileRoot, item.FileName);
+                                FileInfo ExistingfileInfo = new FileInfo(FilePath);
+                                existingFileSize = ExistingfileInfo.Length;
+                            }
+                            if (existingFileSize > 0 && newFileSize != existingFileSize)
+                            {
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
                                     fs.Write(ByteFile);
                                 }
-
                             }
                         }
 
@@ -2325,15 +2486,22 @@ namespace Web.Services.Concrete
 
                             var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
-                            if (fileExtension != null)
+                            var ByteFile = Convert.FromBase64String(fileInfo[1]);
+                            string FilePath = Path.Combine(FileRoot, item.FileName);
+                            long newFileSize = ByteFile.LongLength;
+                            long existingFileSize = 0;
+
+                            if (File.Exists(FilePath))
                             {
-                                var ByteFile = Convert.FromBase64String(fileInfo[1]);
-                                string FilePath = Path.Combine(FileRoot, item.FileName);
+                                FileInfo ExistingfileInfo = new FileInfo(FilePath);
+                                existingFileSize = ExistingfileInfo.Length;
+                            }
+                            if (existingFileSize > 0 && newFileSize != existingFileSize)
+                            {
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
                                     fs.Write(ByteFile);
                                 }
-
                             }
                         }
 
@@ -2427,15 +2595,22 @@ namespace Web.Services.Concrete
 
                             var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
-                            if (fileExtension != null)
+                            var ByteFile = Convert.FromBase64String(fileInfo[1]);
+                            string FilePath = Path.Combine(FileRoot, item.FileName);
+                            long newFileSize = ByteFile.LongLength;
+                            long existingFileSize = 0;
+
+                            if (File.Exists(FilePath))
                             {
-                                var ByteFile = Convert.FromBase64String(fileInfo[1]);
-                                string FilePath = Path.Combine(FileRoot, item.FileName);
+                                FileInfo ExistingfileInfo = new FileInfo(FilePath);
+                                existingFileSize = ExistingfileInfo.Length;
+                            }
+                            if (existingFileSize > 0 && newFileSize != existingFileSize)
+                            {
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
                                     fs.Write(ByteFile);
                                 }
-
                             }
                         }
 
@@ -2489,15 +2664,22 @@ namespace Web.Services.Concrete
 
                             var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
-                            if (fileExtension != null)
+                            var ByteFile = Convert.FromBase64String(fileInfo[1]);
+                            string FilePath = Path.Combine(FileRoot, item.FileName);
+                            long newFileSize = ByteFile.LongLength;
+                            long existingFileSize = 0;
+
+                            if (File.Exists(FilePath))
                             {
-                                var ByteFile = Convert.FromBase64String(fileInfo[1]);
-                                string FilePath = Path.Combine(FileRoot, item.FileName);
+                                FileInfo ExistingfileInfo = new FileInfo(FilePath);
+                                existingFileSize = ExistingfileInfo.Length;
+                            }
+                            if (existingFileSize > 0 && newFileSize != existingFileSize)
+                            {
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
                                     fs.Write(ByteFile);
                                 }
-
                             }
                         }
 
@@ -2551,15 +2733,22 @@ namespace Web.Services.Concrete
 
                             var fileInfo = item.Base64Str.Split("base64,");
                             string fileExtension = fileInfo[0].GetFileExtenstion();
-                            if (fileExtension != null)
+                            var ByteFile = Convert.FromBase64String(fileInfo[1]);
+                            string FilePath = Path.Combine(FileRoot, item.FileName);
+                            long newFileSize = ByteFile.LongLength;
+                            long existingFileSize = 0;
+
+                            if (File.Exists(FilePath))
                             {
-                                var ByteFile = Convert.FromBase64String(fileInfo[1]);
-                                string FilePath = Path.Combine(FileRoot, item.FileName);
+                                FileInfo ExistingfileInfo = new FileInfo(FilePath);
+                                existingFileSize = ExistingfileInfo.Length;
+                            }
+                            if (existingFileSize > 0 && newFileSize != existingFileSize)
+                            {
                                 using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
                                 {
                                     fs.Write(ByteFile);
                                 }
-
                             }
                         }
 

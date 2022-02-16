@@ -677,13 +677,16 @@ namespace Web.Services.Concrete
                                     }, Formatting.Indented);
             foreach (var item in model.UserChannelSid)
             {
-                this.sendPushNotification(new ConversationMessageVM
+                if (item != null) 
                 {
-                    author = model.From,
-                    body = model.Msg,
-                    attributes = attributes,
-                    channelSid = item
-                });
+                    this.sendPushNotification(new ConversationMessageVM
+                    {
+                        author = model.From,
+                        body = model.Msg,
+                        attributes = attributes,
+                        channelSid = item
+                    });
+                }
             }
 
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Message Send" };
