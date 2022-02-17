@@ -670,9 +670,18 @@ namespace Web.Services.Concrete
                     }
                 }
 
-                row.Attachments = codeStroke.AttachmentsFolderRoot;
-                row.Video = codeStroke.VideoFolderRoot;
-                row.Audio = codeStroke.AudioFolderRoot;
+                if (codeStroke.AttachmentsFolderRoot != null) 
+                {
+                    row.Attachments = codeStroke.AttachmentsFolderRoot;
+                }
+                if (codeStroke.VideoFolderRoot != null) 
+                {
+                    row.Video = codeStroke.VideoFolderRoot;
+                }
+                if (codeStroke.AudioFolderRoot != null) 
+                {
+                    row.Audio = codeStroke.AudioFolderRoot;
+                }
 
                 this._codeStrokeRepo.Update(row);
 
@@ -1029,9 +1038,18 @@ namespace Web.Services.Concrete
                     }
                 }
 
-                stroke.Attachments = codeStroke.AttachmentsFolderRoot;
-                stroke.Video = codeStroke.VideoFolderRoot;
-                stroke.Audio = codeStroke.AudioFolderRoot;
+                if (codeStroke.AttachmentsFolderRoot != null)
+                {
+                    stroke.Attachments = codeStroke.AttachmentsFolderRoot;
+                }
+                if (codeStroke.VideoFolderRoot != null)
+                {
+                    stroke.Video = codeStroke.VideoFolderRoot;
+                }
+                if (codeStroke.AudioFolderRoot != null)
+                {
+                    stroke.Audio = codeStroke.AudioFolderRoot;
+                }
 
                 this._codeStrokeRepo.Insert(stroke);
 
@@ -1462,9 +1480,18 @@ namespace Web.Services.Concrete
                     }
                 }
 
-                row.Attachments = codeSepsis.AttachmentsFolderRoot;
-                row.Video = codeSepsis.VideoFolderRoot;
-                row.Audio = codeSepsis.AudioFolderRoot;
+                if (codeSepsis.AttachmentsFolderRoot != null)
+                {
+                    row.Attachments = codeSepsis.AttachmentsFolderRoot;
+                }
+                if (codeSepsis.VideoFolderRoot != null)
+                {
+                    row.Video = codeSepsis.VideoFolderRoot;
+                }
+                if (codeSepsis.AudioFolderRoot != null)
+                {
+                    row.Audio = codeSepsis.AudioFolderRoot;
+                }
 
 
 
@@ -1822,10 +1849,18 @@ namespace Web.Services.Concrete
                     }
                 }
 
-                Sepsis.Attachments = codeSepsis.AttachmentsFolderRoot;
-                Sepsis.Video = codeSepsis.VideoFolderRoot;
-                Sepsis.Audio = codeSepsis.AudioFolderRoot;
-
+                if (codeSepsis.AttachmentsFolderRoot != null)
+                {
+                    Sepsis.Attachments = codeSepsis.AttachmentsFolderRoot;
+                }
+                if (codeSepsis.VideoFolderRoot != null)
+                {
+                    Sepsis.Video = codeSepsis.VideoFolderRoot;
+                }
+                if (codeSepsis.AudioFolderRoot != null)
+                {
+                    Sepsis.Audio = codeSepsis.AudioFolderRoot;
+                }
                 this._codeSepsisRepo.Insert(Sepsis);
 
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Added", Body = Sepsis };
@@ -2253,9 +2288,18 @@ namespace Web.Services.Concrete
                     }
                 }
 
-                row.Attachments = codeSTEMI.AttachmentsFolderRoot;
-                row.Video = codeSTEMI.VideoFolderRoot;
-                row.Audio = codeSTEMI.AudioFolderRoot;
+                if (codeSTEMI.AttachmentsFolderRoot != null)
+                {
+                    row.Attachments = codeSTEMI.AttachmentsFolderRoot;
+                }
+                if (codeSTEMI.VideoFolderRoot != null)
+                {
+                    row.Video = codeSTEMI.VideoFolderRoot;
+                }
+                if (codeSTEMI.AudioFolderRoot != null)
+                {
+                    row.Audio = codeSTEMI.AudioFolderRoot;
+                }
 
                 this._codeSTEMIRepo.Update(row);
 
@@ -2611,10 +2655,18 @@ namespace Web.Services.Concrete
                         codeSTEMI.AudioFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
                     }
                 }
-
-                STEMI.Attachments = codeSTEMI.AttachmentsFolderRoot;
-                STEMI.Video = codeSTEMI.VideoFolderRoot;
-                STEMI.Audio = codeSTEMI.AudioFolderRoot;
+                if (codeSTEMI.AttachmentsFolderRoot != null)
+                {
+                    STEMI.Attachments = codeSTEMI.AttachmentsFolderRoot;
+                }
+                if (codeSTEMI.VideoFolderRoot != null)
+                {
+                    STEMI.Video = codeSTEMI.VideoFolderRoot;
+                }
+                if (codeSTEMI.AudioFolderRoot != null)
+                {
+                    STEMI.Audio = codeSTEMI.AudioFolderRoot;
+                }
 
                 this._codeSTEMIRepo.Insert(STEMI);
 
@@ -3043,9 +3095,18 @@ namespace Web.Services.Concrete
                     }
                 }
 
-                row.Attachments = codeTruma.AttachmentsFolderRoot;
-                row.Video = codeTruma.VideoFolderRoot;
-                row.Audio = codeTruma.AudioFolderRoot;
+                if (codeTruma.AttachmentsFolderRoot != null)
+                {
+                    row.Attachments = codeTruma.AttachmentsFolderRoot;
+                }
+                if (codeTruma.VideoFolderRoot != null)
+                {
+                    row.Video = codeTruma.VideoFolderRoot;
+                }
+                if (codeTruma.AudioFolderRoot != null)
+                {
+                    row.Audio = codeTruma.AudioFolderRoot;
+                }
 
                 this._codeTrumaRepo.Update(row);
 
@@ -3400,11 +3461,18 @@ namespace Web.Services.Concrete
                         codeTruma.AudioFolderRoot = FileRoot.Replace(RootPath, "").Replace("\\", "/");
                     }
                 }
-
-                Truma.Attachments = codeTruma.AttachmentsFolderRoot;
-                Truma.Video = codeTruma.VideoFolderRoot;
-                Truma.Audio = codeTruma.AudioFolderRoot;
-
+                if (codeTruma.AttachmentsFolderRoot != null)
+                {
+                    Truma.Attachments = codeTruma.AttachmentsFolderRoot;
+                }
+                if (codeTruma.VideoFolderRoot != null)
+                {
+                    Truma.Video = codeTruma.VideoFolderRoot;
+                }
+                if (codeTruma.AudioFolderRoot != null)
+                {
+                    Truma.Audio = codeTruma.AudioFolderRoot;
+                }
                 this._codeTrumaRepo.Insert(Truma);
 
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Added", Body = Truma };
