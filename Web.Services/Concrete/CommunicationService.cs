@@ -695,8 +695,8 @@ namespace Web.Services.Concrete
         {
             var attributes = JsonConvert.SerializeObject(new Dictionary<string, Object>()
                                     {
-                                        { "EventType", eventType},
-                                        { "Type", "VideoCallEvent"}
+                                        { "eventType", eventType},
+                                        { "type", "VideoCallEvent"}
                                     }, Formatting.Indented);
             if (roomSid != "" && eventType == CallEventEnums.Rejected.ToString())
             {
