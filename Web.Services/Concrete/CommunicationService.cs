@@ -691,13 +691,15 @@ namespace Web.Services.Concrete
 
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Message Send" };
         }
-        public BaseResponse rejectIncomingCall(string roomSid)
+        public BaseResponse incomingCallEvent(string roomSid, string eventType,string channelSid)
         {
-            var room = RoomResource.Update(
-            status: RoomResource.RoomStatusEnum.Completed,
-            pathSid: roomSid
-        );
-
+            if (eventType == CallEventEnums.Rejected.ToString() && roomSid != "")
+            {
+                var room = RoomResource.Update(
+                status: RoomResource.RoomStatusEnum.Completed,
+                pathSid: roomSid
+            );
+            }
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Room Completed" };
         }
         #endregion

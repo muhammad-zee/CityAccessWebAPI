@@ -36,7 +36,7 @@ namespace Web.Services.Interfaces
         BaseResponse VideoRoomCallbackEvent(string EventType);
         BaseResponse dialVideoCall(DialVideoCallVM model);
 
-        BaseResponse rejectIncomingCall(string roomSid);
+        BaseResponse incomingCallEvent(string roomSid,string eventType, string channelSid);
         #endregion
 
         bool SendSms(string ToPhoneNumber, string SmsBody);
