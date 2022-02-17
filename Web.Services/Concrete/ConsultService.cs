@@ -32,6 +32,7 @@ namespace Web.Services.Concrete
             IRepository<OrganizationConsultField> orgConsultRepo,
             IRepository<ConsultAcknowledgment> consultAcknowledgmentRepo)
         {
+            this._dbContext = dbContext;
             this._config = config;
             this._communicationService = communicationService;
             this._usersRepo = userRepo;
@@ -200,7 +201,7 @@ namespace Web.Services.Concrete
         {
             var keys = keyValues.Keys.ToList();
             var values = keyValues.Values.ToList();
-           
+
             bool isConsultIdExist = keyValues.ContainsKey("ConsultId");
             if (isConsultIdExist && keyValues["ConsultId"].ToString() == "0")
             {
@@ -210,14 +211,16 @@ namespace Web.Services.Concrete
 
                 for (int i = 0; i < keys.Count(); i++)
                 {
-                    if (keys[i] != "ConsultId" && keys[i] != "CreatedBy" && keys[i] != "CreatedDate")
+                    if (keys[i] != "ConsultId" && keys[i] != "CreatedBy" && keys[i] != "CreatedDate" && keys[i] != "DateOfBirth")
                     {
                         query += $"[{keys[i]}]";
                         if ((i + 1) == keys.Count)
                         {
-                            query += ",ConsultNumber";
-                            query += ",CreatedBy";
-                            query += ",CreatedDate";
+                            query += ",[DateOfBirth]";
+                            query += ",[ConsultNumber]";
+                            query += ",[CreatedBy]";
+                            query += ",[CreatedDate]";
+                            query += ",[IsDeleted]";
                             query += ")";
                         }
                         else
@@ -227,19 +230,21 @@ namespace Web.Services.Concrete
                     }
                 }
 
-                query += "VALUES (";
+                query += " VALUES (";
 
                 for (int i = 0; i < values.Count; i++)
                 {
-                    if (keys[i] != "ConsultId" && keys[i] != "CreatedBy" && keys[i] != "CreatedDate")
+                    if (keys[i] != "ConsultId" && keys[i] != "CreatedBy" && keys[i] != "CreatedDate" && keys[i] != "DateOfBirth")
                     {
-                        query += values[i];
+                        query += $"'{values[i]}'";
                         if ((i + 1) == values.Count)
                         {
-
-                            query += $",{Consult_Counter.Counter_Value}";
-                            query += $",{ApplicationSettings.UserId}";
-                            query += $",{DateTime.UtcNow}";
+                            var dob = DateTime.Parse(keyValues["DateOfBirth"].ToString()).ToString("MM-dd-yyyy");
+                            query += $",'{dob}'";
+                            query += $",'{Consult_Counter.Counter_Value}'";
+                            query += $",'{ApplicationSettings.UserId}'";
+                            query += $",'{DateTime.UtcNow.ToString("MM-dd-yyyy hh:mm:ss")}'";
+                            query += ",'0'";
                             query += ")";
                         }
                         else

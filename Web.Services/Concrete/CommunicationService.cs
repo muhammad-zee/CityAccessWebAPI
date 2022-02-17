@@ -341,6 +341,7 @@ namespace Web.Services.Concrete
                             UniqueName = p,
                             UserIdFk = user.UserId,
                             ConversationChannelIdFk = channel.ConversationChannelId,
+                            IsAdmin = user.UserId == model.CreatedBy,
                             CreatedBy = model.CreatedBy,
                             CreatedDate = DateTime.UtcNow,
                             IsDeleted = false
@@ -359,7 +360,7 @@ namespace Web.Services.Concrete
             else
             {
                 response.Status = HttpStatusCode.OK;
-                response.Message = "channgel not saved yet";
+                response.Message = "channel not saved yet";
             }
             return response;
         }
@@ -589,6 +590,20 @@ namespace Web.Services.Concrete
             }
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Chat users found", Body = statusList };
         }
+        public BaseResponse GetCurrentConversationParticipants(string channelSid)
+        {
+            if (!string.IsNullOrEmpty(channelSid) && !string.IsNullOrWhiteSpace(channelSid))
+            {
+                var ConversationParticipants = this._dbContext.LoadStoredProcedure("raq_getCurrentConversationParticipants")
+                    .WithSqlParam("@channelSid", channelSid)
+                    .ExecuteStoredProc<ConversationParticipant>();
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = ConversationParticipants };
+            }
+            else
+            {
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Channel Sid Null or Empty" };
+            }
+        }
         public bool conversationUserIsOnline(string UserSid)
         {
             try
@@ -677,7 +692,7 @@ namespace Web.Services.Concrete
                                     }, Formatting.Indented);
             foreach (var item in model.UserChannelSid)
             {
-                if (item != null) 
+                if (item != null)
                 {
                     this.sendPushNotification(new ConversationMessageVM
                     {

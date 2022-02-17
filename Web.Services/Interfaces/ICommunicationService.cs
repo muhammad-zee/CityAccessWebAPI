@@ -24,6 +24,7 @@ namespace Web.Services.Interfaces
         BaseResponse updateConversationUserSid(string UserSid);
         BaseResponse getAllConversationUsers();
         BaseResponse getConversationUsersStatus(string UserSid);
+        BaseResponse GetCurrentConversationParticipants(string channelSid);
         bool conversationUserIsOnline(string UserSid);
         ChannelResource createConversationChannel(string FriendlyName, string UniqueName);
         UserResource createConversationUser(string Identity, string FriendlyName);

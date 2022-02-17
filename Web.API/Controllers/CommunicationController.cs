@@ -249,7 +249,20 @@ namespace Web.API.Controllers
             }
         }
 
-
+        [HttpGet("Conversation/CurrentConversationParticipants/{channelSid}")]
+        public BaseResponse CurrentConversationParticipants(string channelSid)
+        {
+            try
+            {
+                return this._communicaitonService.GetCurrentConversationParticipants(channelSid);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
 
 
         #region [video call]

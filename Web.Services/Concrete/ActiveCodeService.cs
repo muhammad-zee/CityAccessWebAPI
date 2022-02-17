@@ -236,7 +236,7 @@ namespace Web.Services.Concrete
             else if (files.CodeType == AuthorEnums.Trauma.ToString())
             {
                 var rootPath = this._codeTrumaRepo.Table.Where(x => x.CodeTraumaId == files.Id).Select(files.Type).FirstOrDefault();
-                string path = _environment.WebRootFileProvider.GetFileInfo(rootPath+'/'+files.FileName)?.PhysicalPath;
+                string path = _environment.WebRootFileProvider.GetFileInfo(rootPath + '/' + files.FileName)?.PhysicalPath;
                 File.Delete(path);
                 var serviceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == files.OrgId && x.CodeIdFk == UCLEnums.Stroke.ToInt() && !x.IsDeleted).Select(x => x.ServiceLineIds).FirstOrDefault();
                 if (serviceLineIds != null && serviceLineIds != "")
@@ -261,7 +261,7 @@ namespace Web.Services.Concrete
                 }
             }
 
-           
+
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "File Deleted Successfully" };
         }
 
@@ -445,14 +445,14 @@ namespace Web.Services.Concrete
                             string fileExtension = fileInfo[0].GetFileExtenstion();
                             var ByteFile = Convert.FromBase64String(fileInfo[1]);
                             string FilePath = Path.Combine(FileRoot, item.FileName);
-                            
+
                             if (File.Exists(FilePath))
                             {
                                 long existingFileSize = 0;
                                 long newFileSize = ByteFile.LongLength;
                                 FileInfo ExistingfileInfo = new FileInfo(FilePath);
                                 existingFileSize = ExistingfileInfo.Length;
-                                
+
                                 if (existingFileSize > 0 && newFileSize != existingFileSize)
                                 {
                                     var alterFile = item.FileName.Split('.');
@@ -670,22 +670,22 @@ namespace Web.Services.Concrete
                     }
                 }
 
-                if (codeStroke.AttachmentsFolderRoot != null) 
+                if (codeStroke.AttachmentsFolderRoot != null)
                 {
                     row.Attachments = codeStroke.AttachmentsFolderRoot;
                 }
-                if (codeStroke.VideoFolderRoot != null) 
+                if (codeStroke.VideoFolderRoot != null)
                 {
                     row.Video = codeStroke.VideoFolderRoot;
                 }
-                if (codeStroke.AudioFolderRoot != null) 
+                if (codeStroke.AudioFolderRoot != null)
                 {
                     row.Audio = codeStroke.AudioFolderRoot;
                 }
 
                 this._codeStrokeRepo.Update(row);
 
-                if (row.IsEms!= null && row.IsEms.Value) 
+                if (row.IsEms != null && row.IsEms.Value)
                 {
                     var serviceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == row.OrganizationIdFk && x.CodeIdFk == UCLEnums.Stroke.ToInt() && !x.IsDeleted).Select(x => x.ServiceLineIds).FirstOrDefault();
                     if (serviceLineIds != null && serviceLineIds != "")
@@ -1542,7 +1542,7 @@ namespace Web.Services.Concrete
                 }
 
 
-                if (row.IsEms) 
+                if (row.IsEms)
                 {
                     var serviceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == row.OrganizationIdFk && x.CodeIdFk == UCLEnums.Sepsis.ToInt() && !x.IsDeleted).Select(x => x.ServiceLineIds).FirstOrDefault();
                     if (serviceLineIds != null && serviceLineIds != "")
@@ -2348,7 +2348,7 @@ namespace Web.Services.Concrete
                 }
 
 
-                if (row.IsEms != null && row.IsEms.Value) 
+                if (row.IsEms != null && row.IsEms.Value)
                 {
                     var serviceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == row.OrganizationIdFk && x.CodeIdFk == UCLEnums.STEMI.ToInt() && !x.IsDeleted).Select(x => x.ServiceLineIds).FirstOrDefault();
                     if (serviceLineIds != null && serviceLineIds != "")
@@ -3155,7 +3155,7 @@ namespace Web.Services.Concrete
                 }
 
 
-                if (row.IsEms != null && row.IsEms.Value) 
+                if (row.IsEms != null && row.IsEms.Value)
                 {
                     var serviceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == row.OrganizationIdFk && x.CodeIdFk == UCLEnums.Trauma.ToInt() && !x.IsDeleted).Select(x => x.ServiceLineIds).FirstOrDefault();
                     if (serviceLineIds != null && serviceLineIds != "")
