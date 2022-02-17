@@ -298,13 +298,13 @@ namespace Web.API.Controllers
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
         }
-        [HttpGet("VideoCall/rejectIncomingCall")]
-        public BaseResponse rejectIncomingCall(string roomSid)
+        [HttpGet("VideoCall/incomingCallEvent")]
+        public BaseResponse incomingCallEvent(string roomSid,string eventType, string channelSid)
         {
             try
             {
 
-                return this._communicaitonService.rejectIncomingCall(roomSid);
+                return this._communicaitonService.incomingCallEvent(roomSid, eventType, channelSid);
             }
             catch (Exception ex)
             {
