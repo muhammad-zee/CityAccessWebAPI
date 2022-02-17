@@ -654,7 +654,7 @@ namespace Web.Services.Concrete
                                         {"isVideo", model.isVideo},
                                         {"roomName", model.roomName},
                                         {"roomSid", model.roomSid},
-                                        {"type", "Video Call"}
+                                        {"type", "VideoCall"}
                                     }, Formatting.Indented);
             this.sendPushNotification(new ConversationMessageVM
             {
@@ -691,16 +691,28 @@ namespace Web.Services.Concrete
 
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Message Send" };
         }
-        public BaseResponse incomingCallEvent(string roomSid, string eventType,string channelSid)
+        public BaseResponse incomingCallEvent(string roomSid, string eventType, string channelSid)
         {
-            if (eventType == CallEventEnums.Rejected.ToString() && roomSid != "")
+            var attributes = JsonConvert.SerializeObject(new Dictionary<string, Object>()
+                                    {
+                                        { "EventType", eventType},
+                                        { "Type", "VideoCallEvent"}
+                                    }, Formatting.Indented);
+            if (roomSid != "" && eventType == CallEventEnums.Rejected.ToString())
             {
                 var room = RoomResource.Update(
                 status: RoomResource.RoomStatusEnum.Completed,
                 pathSid: roomSid
-            );
+                );
             }
-            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Room Completed" };
+            var push = this.sendPushNotification(new ConversationMessageVM
+            {
+                author = AuthorEnums.VideoCall.ToString(),
+                body = eventType,
+                attributes = attributes,
+                channelSid = channelSid
+            });
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Event Sent" };
         }
         #endregion
     }
