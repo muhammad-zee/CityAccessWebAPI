@@ -1567,7 +1567,7 @@ namespace Web.Services.Concrete
                     }
                 }
 
-                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Modified", Body = row };
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Modified", Body = codeSepsis };
             }
             else
             {
@@ -2373,7 +2373,7 @@ namespace Web.Services.Concrete
                     }
                 }
 
-                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Modified", Body = row };
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Modified", Body = codeSTEMI };
             }
             else
             {
@@ -3179,7 +3179,7 @@ namespace Web.Services.Concrete
 
                     }
                 }
-                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Modified", Body = row };
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Modified", Body = codeTruma };
             }
             else
             {
