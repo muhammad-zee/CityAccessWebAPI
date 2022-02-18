@@ -321,15 +321,15 @@ namespace Web.Services.Concrete
                 {
                     if (keys[i] != "ConsultId" && keys[i] != "ModifiedBy" && keys[i] != "ModifiedDate")
                     {
-                        query += $"[{keys[i]}] = {values[i]}";
+                        query += $"[{keys[i]}] = '{values[i]}'";
                         if (i < keys.Count)
                         {
                             query += ",";
                         }
                     }
                 }
-                query += $", ModifiedBy = {ApplicationSettings.UserId}, ModifiedDate = {DateTime.UtcNow}";
-                query += $" WHERE ConsultId = {ConsultId.ToInt()}";
+                query += $", ModifiedBy = '{ApplicationSettings.UserId}', ModifiedDate = '{DateTime.UtcNow}'";
+                query += $" WHERE ConsultId = '{ConsultId.ToInt()}'";
 
                 int rowsEffect = this._dbContext.Database.ExecuteSqlRaw(query);
                 if (rowsEffect > 0)
