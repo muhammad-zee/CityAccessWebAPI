@@ -28,7 +28,7 @@ namespace Web.API.Controllers
             _consultService = consultService;
             _config = config;
             _hostEnvironment = environment;
-            _logger = new Logger(_hostEnvironment);
+            _logger = new Logger(_hostEnvironment, config);
         }
 
         #region Consult Fields

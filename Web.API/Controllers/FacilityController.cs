@@ -26,7 +26,7 @@ namespace Web.API.Controllers
         {
             this._config = config;
             this._hostEnvironment = environment;
-            this._logger = new Logger(this._hostEnvironment);
+            this._logger = new Logger(this._hostEnvironment, config);
             this._facilityService = facilityService;
         }
 

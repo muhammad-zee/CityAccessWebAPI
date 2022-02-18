@@ -25,7 +25,7 @@ namespace Web.API.Controllers
             this._communicaitonService = communicaitonService;
             _config = config;
             _hostEnvironment = environment;
-            _logger = new Logger(_hostEnvironment);
+            _logger = new Logger(_hostEnvironment, config);
         }
 
         [HttpGet("Conversation/generateConversationToken")]

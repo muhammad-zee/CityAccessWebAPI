@@ -26,7 +26,7 @@ namespace Web.API.Controllers
             _settingService = settingService;
             _config = config;
             _hostEnvironment = environment;
-            _logger = new Logger(_hostEnvironment);
+            _logger = new Logger(_hostEnvironment, config);
         }
 
         [Description("Get Settings By Org Id")]

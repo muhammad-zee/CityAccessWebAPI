@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.IO;
 
@@ -7,10 +8,13 @@ namespace Web.API.Helper
     public class Logger
     {
         private IWebHostEnvironment _hostEnvironment;
-
-        public Logger(IWebHostEnvironment hostEnvironment)
+        IConfiguration _config;
+        private string _RootPath;
+        public Logger(IWebHostEnvironment hostEnvironment, IConfiguration configuration)
         {
+            _config = configuration;
             _hostEnvironment = hostEnvironment;
+            _RootPath = _config["FilePath:Path"].ToString();
         }
 
         #region Memeber
@@ -37,7 +41,7 @@ namespace Web.API.Helper
             {
                 FileInfo logFileInfo = new FileInfo(logFile);
                 //FileAppender fileAppender = new FileAppender();
-                var RootPath = this._hostEnvironment.WebRootPath;
+                var RootPath = this._RootPath; //this._hostEnvironment.WebRootPath;
                 RootPath = Path.Combine(RootPath, "Logs");
                 if (!Directory.Exists(RootPath))
                 {

@@ -23,13 +23,14 @@ namespace Web.API.Controllers
         private IConfiguration _config;
         Logger _logger;
         private IWebHostEnvironment _hostEnvironment;
-
+        private string _RootPath;
         public ScheduleController(IConfiguration config, IWebHostEnvironment environment, IScheduleService scheduleService)
         {
             this._config = config;
             this._hostEnvironment = environment;
-            this._logger = new Logger(this._hostEnvironment);
+            this._logger = new Logger(this._hostEnvironment, config);
             this._scheduleService = scheduleService;
+            this._RootPath = this._config["FilePath:Path"].ToString();
         }
 
 
@@ -136,7 +137,7 @@ namespace Web.API.Controllers
                 if (!string.IsNullOrEmpty(fileVM.Base64CSV))
                 {
                     var folderName = Path.Combine("ImportSchecdule");
-                    var pathToSave = Path.Combine(this._hostEnvironment.WebRootPath, folderName);
+                    var pathToSave = Path.Combine(this._RootPath, folderName);
                     if (!Directory.Exists(pathToSave))
                     {
                         Directory.CreateDirectory(pathToSave);

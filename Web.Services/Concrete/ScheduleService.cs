@@ -26,7 +26,7 @@ namespace Web.Services.Concrete
         private readonly UnitOfWork unitorWork;
         private IHostingEnvironment _environment;
         private RAQ_DbContext _dbContext;
-
+        private string _RootPath;
         private readonly IRepository<UsersSchedule> _scheduleRepo;
         private readonly IRepository<User> _userRepo;
         private readonly IRepository<UserRole> _userRoleRepo;
@@ -49,7 +49,7 @@ namespace Web.Services.Concrete
             this._config = configuration;
             this._environment = environment;
             this.conStr = _config["ConnectionStrings:DefaultConnection"].ToString();
-
+            this._RootPath = _config["FilePath:Path"].ToString();
 
             this._scheduleRepo = scheduleRepo;
             this._userRepo = userRepo;
@@ -245,7 +245,7 @@ namespace Web.Services.Concrete
                 }
 
                 var folderName = Path.Combine("ScheduleTemplates");
-                var pathToSave = Path.Combine(this._environment.WebRootPath, folderName);
+                var pathToSave = Path.Combine(this._RootPath, folderName);
                 if (!Directory.Exists(pathToSave))
                 {
                     Directory.CreateDirectory(pathToSave);
@@ -255,7 +255,7 @@ namespace Web.Services.Concrete
                 new CSVReader().WriteDataTableAsCSV(tbl, fullPath);
 
 
-                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Template ready", Body = new { path = fullPath.Replace(this._environment.WebRootPath, ""), fileName = fileName } };
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Template ready", Body = new { path = fullPath.Replace(this._RootPath, ""), fileName = fileName } };
             }
             else
             {

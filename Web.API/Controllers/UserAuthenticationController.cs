@@ -26,7 +26,7 @@ namespace Web.API.Controllers
             _jwtAuth = jwtAuth;
             _config = config;
             _hostEnvironment = environment;
-            _logger = new Logger(_hostEnvironment);
+            _logger = new Logger(_hostEnvironment, config);
         }
 
         [AllowAnonymous]
