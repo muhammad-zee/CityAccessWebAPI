@@ -264,6 +264,20 @@ namespace Web.API.Controllers
             }
         }
 
+        [HttpGet("Conversation/CreateOrRemoveGroupMemberAsAdmin/{isAdmin}/{uniqueName}/{channleSid}")]
+        public BaseResponse createOrRemoveGroupMemberAsAdmin(bool isAdmin, string uniqueName, string channleSid) 
+        {
+            try
+            {
+                return this._communicaitonService.createOrRemoveGroupMemberAsAdmin(isAdmin, uniqueName, channleSid);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
 
         #region [video call]
         [HttpGet("VideoCall/generateVideoCallToken")]

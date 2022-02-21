@@ -29,7 +29,7 @@ namespace Web.Services.Interfaces
         ChannelResource createConversationChannel(string FriendlyName, string UniqueName);
         UserResource createConversationUser(string Identity, string FriendlyName);
         MemberResource addNewUserToConversationChannel(string ChannelSid, string ParticipantUniqueName);
-
+        BaseResponse createOrRemoveGroupMemberAsAdmin(bool isAdmin, string uniqueName, string channleSid);
 
         #region [Video Call]
         BaseResponse generateVideoCallToken(string identity);

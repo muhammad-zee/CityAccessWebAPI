@@ -624,6 +624,22 @@ namespace Web.Services.Concrete
                 return false;
             }
         }
+
+        public BaseResponse createOrRemoveGroupMemberAsAdmin(bool isAdmin, string uniqueName, string channleSid) 
+        {
+            var row = (from cp in this._conversationParticipantsRepo.Table
+                       join c in this._conversationChannelsRepo.Table on cp.ConversationChannelIdFk equals c.ConversationChannelId
+                       where cp.UniqueName == uniqueName && c.ChannelSid == channleSid && !cp.IsDeleted && !c.IsDeleted
+                       select cp).FirstOrDefault();
+
+            row.IsAdmin = isAdmin;
+            row.ModifiedBy = ApplicationSettings.UserId;
+            row.ModifiedDate = DateTime.UtcNow;
+            this._conversationParticipantsRepo.Update(row);
+
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = $"{row.FriendlyName} is admin now." };
+        }
+
         #endregion
 
 
