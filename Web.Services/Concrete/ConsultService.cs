@@ -1,10 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Net;
+using System.Net.Http;
+using System.Threading.Tasks;
 using Web.Data.Models;
 using Web.DLL.Generic_Repository;
 using Web.Model;
@@ -15,27 +18,43 @@ using Web.Services.Interfaces;
 
 namespace Web.Services.Concrete
 {
+    public class AddCompVM 
+    {
+        public string long_name { get; set; }
+        public string short_name { get; set; }
+        public List<string> types { get; set; }
+    }
     public class ConsultService : IConsultService
     {
         private RAQ_DbContext _dbContext;
         private ICommunicationService _communicationService;
+        private IHttpClient _httpClient;
         private IRepository<User> _usersRepo;
+        private IRepository<Organization> _orgRepo;
+        private IRepository<ControlListDetail> _controlListDetailsRepo;
         private IRepository<ConsultField> _consultFieldRepo;
         private IRepository<OrganizationConsultField> _orgConsultRepo;
         private IRepository<ConsultAcknowledgment> _consultAcknowledgmentRepo;
         IConfiguration _config;
+
         public ConsultService(RAQ_DbContext dbContext,
             ICommunicationService communicationService,
+            IHttpClient httpClient,
             IConfiguration config,
             IRepository<User> userRepo,
+            IRepository<Organization> orgRepo,
+            IRepository<ControlListDetail> controlListDetailsRepo,
             IRepository<ConsultField> consultFieldRepo,
             IRepository<OrganizationConsultField> orgConsultRepo,
             IRepository<ConsultAcknowledgment> consultAcknowledgmentRepo)
         {
             this._dbContext = dbContext;
             this._config = config;
+            this._httpClient = httpClient;
             this._communicationService = communicationService;
             this._usersRepo = userRepo;
+            this._orgRepo = orgRepo;
+            this._controlListDetailsRepo = controlListDetailsRepo;
             this._consultFieldRepo = consultFieldRepo;
             this._orgConsultRepo = orgConsultRepo;
             this._consultAcknowledgmentRepo = consultAcknowledgmentRepo;
@@ -178,6 +197,48 @@ namespace Web.Services.Concrete
 
         #endregion
 
+        #region Map & addresses
+
+        public BaseResponse GetHospitalsOfStatesByCodeId(int codeId, string latlng) 
+        {
+            var googleApiResult = this._httpClient.GetAsync("https://maps.googleapis.com/maps/api/geocode/json?latlng=" + latlng + "&key=AIzaSyA5EvXiXjlmc0hpLPmLgGZoOgZ80Ca0eQ0").Result;
+
+            dynamic results = googleApiResult["results"];
+            var address = results[0]["address_components"];
+            var StateName = "";
+            for (int i = 0; i < address.Count; i++)
+            {
+                var addressType = address[i].types;
+                for (int j = 0; j < addressType.Count; j++)
+                {
+                    if (addressType[j] == "administrative_area_level_1") 
+                    {
+                        StateName = address[i].long_name;
+                    }
+                }
+            }
+
+            if (StateName != "")
+            {
+                var stateId = this._controlListDetailsRepo.Table.Where(x => x.Description.Contains(StateName) && !x.IsDeleted).Select(x => new { Id = x.ControlListDetailId, x.Title }).FirstOrDefault();
+
+                var orgsAddress = this._orgRepo.Table.Where(x => x.ActiveCodes.Contains(codeId.ToString()) && x.StateIdFk == stateId.Id && !x.IsDeleted).ToList();
+
+                List<string> addresses = new List<string>();
+
+                foreach (var item in orgsAddress)
+                {
+                    string addres = $"{item.PrimaryAddress}, {StateName}, {item.Zip}";
+                    addresses.Add(addres);
+                }
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Addresses Returned", Body = addresses };
+            }
+            else {
+                return new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "State Not Found" };
+            }
+        }
+
+        #endregion
 
         #region Consults
 
