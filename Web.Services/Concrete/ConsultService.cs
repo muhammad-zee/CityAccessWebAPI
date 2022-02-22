@@ -90,7 +90,8 @@ namespace Web.Services.Concrete
                                   cf.FieldType,
                                   cf.FieldData,
                                   cf.FieldDataType,
-                                  cf.FieldDataLength
+                                  cf.FieldDataLength,
+                                  cf.IsRequired
                               }).Distinct().ToList();
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Found", Body = formFields };
         }
@@ -180,6 +181,7 @@ namespace Web.Services.Concrete
                                      FieldDataType = c.FieldDataType,
                                      FieldDataLength = c.FieldDataLength,
                                      SortOrder = oc.SortOrder,
+                                     IsRequired = c.IsRequired
                                  }).Distinct().OrderBy(x => x.SortOrder).ToList();
 
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = consultFields };
@@ -338,7 +340,7 @@ namespace Web.Services.Concrete
                         }
                     }
                 }
-                query += $", ModifiedBy = '{ApplicationSettings.UserId}', ModifiedDate = '{DateTime.UtcNow}'";
+                query += $" [ModifiedBy] = '{ApplicationSettings.UserId}', [ModifiedDate] = '{DateTime.UtcNow.ToString("MM-dd-yyyy hh:mm:ss")}'";
                 query += $" WHERE ConsultId = '{ConsultId.ToInt()}'";
 
                 int rowsEffect = this._dbContext.Database.ExecuteSqlRaw(query);

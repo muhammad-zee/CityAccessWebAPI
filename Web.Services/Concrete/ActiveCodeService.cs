@@ -3524,7 +3524,6 @@ namespace Web.Services.Concrete
                 var stateId = this._controlListDetailsRepo.Table.Where(x => x.Description.Contains(StateName) && !x.IsDeleted).Select(x => new { Id = x.ControlListDetailId, x.Title }).FirstOrDefault();
                 if (stateId != null)
                 {
-
                     var orgsAddress = this._orgRepo.Table.Where(x => x.ActiveCodes.Contains(codeId.ToString()) && x.StateIdFk == stateId.Id && !x.IsDeleted).ToList();
 
                     List<object> objList = new List<object>();
