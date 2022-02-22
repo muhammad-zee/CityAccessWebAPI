@@ -360,7 +360,7 @@ namespace Web.Services.Helper
         }
 
 
-        public static IDictionary<string, object> ExecuteStoredProc_ToDictionary(this SqlCommand command)
+        public static List<Dictionary<string, object>> ExecuteStoredProc_ToDictionary(this SqlCommand command)
         {
             using (command)
             {
@@ -376,7 +376,7 @@ namespace Web.Services.Helper
 
                     if (ds.Tables[0].Rows.Count > 0)
                     {
-                        var objList = new Dictionary<string, object>();
+                        var objList = new List<Dictionary<string, object>>();
                         var dr = ds.Tables[0];
                         var colMapping = dr.Columns.Cast<DataColumn>().ToDictionary(key => key.ColumnName.ToLower());
 
@@ -385,25 +385,27 @@ namespace Web.Services.Helper
                             foreach (var rows in dr.Rows)
                             {
                                 var row = (DataRow)rows;
+                                var objRow = new Dictionary<string, object>();
                                 foreach (var col in colMapping)
                                 {
                                     try
                                     {                                                                                                                  //string colName = colMapping[prop.Name.ToLower()].ColumnName;
                                         var val = row[col.Key];
-                                        objList.Add(col.Key, val);
+                                        objRow.Add(col.Key, val);
                                     }
                                     catch
                                     {
-                                        objList.Add(col.Key, null);
+                                        objRow.Add(col.Key, null);
                                     }
                                 }
+                                objList.Add(objRow);
                             }
                         }
                         return objList;
                     }
                     else
                     {
-                        return new Dictionary<string, object>();
+                        return new List<Dictionary<string, object>>();
                     }
                 }
                 catch (Exception ex)
