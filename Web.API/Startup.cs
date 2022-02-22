@@ -166,8 +166,7 @@ namespace Web.API
                 //.SetIsOriginAllowed(origin => true)
                 .AllowAnyOrigin()
                 .AllowAnyMethod()
-                .AllowAnyHeader()
-                .AllowCredentials());
+                .AllowAnyHeader());
 
             app.UseAuthentication();
 
