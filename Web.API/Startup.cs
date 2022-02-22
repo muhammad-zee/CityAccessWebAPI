@@ -143,8 +143,6 @@ namespace Web.API
             app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "RoutingAndQueueingAPI v1"));
             /*}*/
 
-
-
             app.UseSwaggerUI(c =>
             {
                 // For Debug in Kestrel
@@ -155,31 +153,25 @@ namespace Web.API
             });
             app.UseHttpsRedirection();
 
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                ServeUnknownFileTypes = true,
+            });
+            //.UseDirectoryBrowser()
+            //.UseRequestLocalization();
+
             app.UseRouting();
+
+            app.UseCors(x => x
+                //.SetIsOriginAllowed(origin => true)
+                .AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .AllowCredentials());
 
             app.UseAuthentication();
 
             app.UseAuthorization();
-
-            //app.UseElmahIo();
-            app.UseElmah();
-            app.UseElmahExceptionPage();
-
-            // global error handler
-            app.UseMiddleware<ErrorHandlerMiddleware>();
-
-            app.UseCors(x => x
-              .SetIsOriginAllowed(origin => true)
-              .AllowAnyMethod()
-              .AllowAnyHeader()
-              .AllowCredentials());
-
-            app.UseStaticFiles(new StaticFileOptions
-            {
-                ServeUnknownFileTypes = true,
-            })
-            .UseDirectoryBrowser()
-            .UseRequestLocalization();
 
             //app.UseStaticFiles(new StaticFileOptions
             //{
@@ -189,6 +181,13 @@ namespace Web.API
             {
                 endpoints.MapControllers();
             });
+
+            //app.UseElmahIo();
+            app.UseElmah();
+            app.UseElmahExceptionPage();
+
+            // global error handler
+            app.UseMiddleware<ErrorHandlerMiddleware>();
         }
     }
 }
