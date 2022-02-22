@@ -3522,24 +3522,31 @@ namespace Web.Services.Concrete
             if (StateName != "")
             {
                 var stateId = this._controlListDetailsRepo.Table.Where(x => x.Description.Contains(StateName) && !x.IsDeleted).Select(x => new { Id = x.ControlListDetailId, x.Title }).FirstOrDefault();
-
-                var orgsAddress = this._orgRepo.Table.Where(x => x.ActiveCodes.Contains(codeId.ToString()) && x.StateIdFk == stateId.Id && !x.IsDeleted).ToList();
-
-                List<object> objList = new List<object>();
-
-                foreach (var item in orgsAddress)
+                if (stateId != null)
                 {
-                    string add = $"{item.PrimaryAddress}, {StateName}, {item.Zip}";
-                    var googleApiLatLng = this._httpClient.GetAsync("https://maps.googleapis.com/maps/api/geocode/json?address=" + add + "&key=AIzaSyA5EvXiXjlmc0hpLPmLgGZoOgZ80Ca0eQ0").Result;
 
-                    dynamic Apiresults = googleApiLatLng["results"];
-                    var geometry = results[0]["geometry"];
-                    var location = geometry["location"];
-                    var longLat = new List<double> { Convert.ToDouble(location.lat), Convert.ToDouble(location.lng) };
+                    var orgsAddress = this._orgRepo.Table.Where(x => x.ActiveCodes.Contains(codeId.ToString()) && x.StateIdFk == stateId.Id && !x.IsDeleted).ToList();
 
-                    objList.Add(new { OrganizationId = item.OrganizationId, Address = add, lat = longLat[0], lng = longLat[1], title = item.OrganizationName });
+                    List<object> objList = new List<object>();
+
+                    foreach (var item in orgsAddress)
+                    {
+                        string add = $"{item.PrimaryAddress}, {StateName}, {item.Zip}";
+                        var googleApiLatLng = this._httpClient.GetAsync("https://maps.googleapis.com/maps/api/geocode/json?address=" + add + "&key=AIzaSyA5EvXiXjlmc0hpLPmLgGZoOgZ80Ca0eQ0").Result;
+
+                        dynamic Apiresults = googleApiLatLng["results"];
+                        var geometry = results[0]["geometry"];
+                        var location = geometry["location"];
+                        var longLat = new List<double> { Convert.ToDouble(location.lat), Convert.ToDouble(location.lng) };
+
+                        objList.Add(new { OrganizationId = item.OrganizationId, Address = add, lat = longLat[0], lng = longLat[1], title = item.OrganizationName });
+                    }
+                    return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Addresses Returned", Body = objList };
                 }
-                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Addresses Returned", Body = objList };
+                else 
+                {
+                    return new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "State Not Found" };
+                }
             }
             else
             {
