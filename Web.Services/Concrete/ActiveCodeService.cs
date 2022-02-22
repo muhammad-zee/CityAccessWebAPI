@@ -3532,10 +3532,12 @@ namespace Web.Services.Concrete
                     foreach (var item in orgsAddress)
                     {
                         string add = $"{item.PrimaryAddress} {item.City}, {stateId.Title} {item.Zip}";
-                        var googleApiLatLng = this._httpClient.GetAsync("https://maps.googleapis.com/maps/api/geocode/json?address=" + add + "&key=AIzaSyA5EvXiXjlmc0hpLPmLgGZoOgZ80Ca0eQ0").Result;
+                        string url = "https://maps.googleapis.com/maps/api/geocode/json?address=" + add.Replace(" ", "%20") + "&key=AIzaSyA5EvXiXjlmc0hpLPmLgGZoOgZ80Ca0eQ0";
+                        var googleApiLatLng = this._httpClient.GetAsync(url).Result;
 
                         dynamic Apiresults = googleApiLatLng["results"];
-                        var geometry = results[0]["geometry"];
+                        var formatted_address = Apiresults[0]["formatted_address"];
+                        var geometry = Apiresults[0]["geometry"];
                         var location = geometry["location"];
                         var longLat = new List<double> { Convert.ToDouble(location.lat), Convert.ToDouble(location.lng) };
 
