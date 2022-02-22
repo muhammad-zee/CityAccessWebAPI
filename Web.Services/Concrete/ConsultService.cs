@@ -279,7 +279,7 @@ namespace Web.Services.Concrete
                             {
                                 if (keyValues["ConsultType"].ToString() == "Urgent")
                                 {
-                                    var channel = _communicationService.createConversationChannel($"{keyValues["PatientName"].ToString()}_{Consult_Counter.Counter_Value}_{keyValues["ConsultType"].ToString()}", Consult_Counter.Counter_Value.ToString());
+                                    var channel = _communicationService.createConversationChannel($"{keyValues["PatientFirstName"].ToString()}_{Consult_Counter.Counter_Value}_{keyValues["ConsultType"].ToString()}", Consult_Counter.Counter_Value.ToString());
                                     foreach (var item in users)
                                     {
                                         _communicationService.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
@@ -297,7 +297,7 @@ namespace Web.Services.Concrete
                         }
                         else if (users != null && users.Count > 0)
                         {
-                            var channel = _communicationService.createConversationChannel($"{keyValues["PatientName"].ToString()}_{Consult_Counter.Counter_Value}_{keyValues["ConsultType"].ToString()}", Consult_Counter.Counter_Value.ToString());
+                            var channel = _communicationService.createConversationChannel($"{keyValues["PatientFirstName"].ToString()}_{Consult_Counter.Counter_Value}_{keyValues["ConsultType"].ToString()}", Consult_Counter.Counter_Value.ToString());
                             foreach (var item in users)
                             {
                                 _communicationService.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
@@ -309,7 +309,7 @@ namespace Web.Services.Concrete
                                 body = "This Group created by system for consult purpose",
                                 channelSid = channel.Sid
                             };
-                            _communicationService.sendPushNotification(msg);
+                            var sendMsg=_communicationService.sendPushNotification(msg);
                         }
                     }
 
