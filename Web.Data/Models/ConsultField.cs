@@ -18,6 +18,7 @@ namespace Web.Data.Models
         public string FieldType { get; set; }
         public string FieldDataType { get; set; }
         public int? FieldDataLength { get; set; }
+        public int? FieldData { get; set; }
         public int CreatedBy { get; set; }
         public DateTime CreatedDate { get; set; }
         public int? ModifiedBy { get; set; }

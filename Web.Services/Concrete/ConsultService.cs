@@ -88,6 +88,7 @@ namespace Web.Services.Concrete
                                   cf.FieldLabel,
                                   cf.FieldName,
                                   cf.FieldType,
+                                  cf.FieldData,
                                   cf.FieldDataType,
                                   cf.FieldDataLength
                               }).Distinct().ToList();
@@ -175,6 +176,7 @@ namespace Web.Services.Concrete
                                      FieldLabel = c.FieldLabel,
                                      FieldName = c.FieldName,
                                      FieldType = c.FieldType,
+                                     FieldData = c.FieldData,
                                      FieldDataType = c.FieldDataType,
                                      FieldDataLength = c.FieldDataLength,
                                      SortOrder = oc.SortOrder,

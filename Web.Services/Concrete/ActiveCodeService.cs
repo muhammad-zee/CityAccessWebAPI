@@ -66,7 +66,7 @@ namespace Web.Services.Concrete
             this._codeSepsisRepo = codeSepsisRepo;
             this._codeSTEMIRepo = codeSTEMIRepo;
             this._codeTrumaRepo = codeTrumaRepo;
-            this._RootPath = this._config["FilePath:Path"].ToString();
+            this._RootPath + "/Organizations" = this._config["FilePath:Path"].ToString();
         }
 
         #region Active Code
@@ -287,7 +287,7 @@ namespace Web.Services.Concrete
 
                 if (!string.IsNullOrEmpty(x.Attachments) && !string.IsNullOrWhiteSpace(x.Attachments))
                 {
-                    string path = this._RootPath + '/' + x.Attachments; //this._RootPath + '/' + x.Attachments;
+                    string path = this._RootPath + "/Organizations" + '/' + x.Attachments; //this._RootPath + "/Organizations" + '/' + x.Attachments;
                     if (Directory.Exists(path))
                     {
                         DirectoryInfo AttachFiles = new DirectoryInfo(path);
@@ -300,7 +300,7 @@ namespace Web.Services.Concrete
 
                 if (!string.IsNullOrEmpty(x.Audio) && !string.IsNullOrWhiteSpace(x.Audio))
                 {
-                    string path = this._RootPath + '/' + x.Audio; //this._RootPath + '/' + x.Audio;
+                    string path = this._RootPath + "/Organizations" + '/' + x.Audio; //this._RootPath + "/Organizations" + '/' + x.Audio;
                     if (Directory.Exists(path))
                     {
                         DirectoryInfo AudioFiles = new DirectoryInfo(path);
@@ -313,7 +313,7 @@ namespace Web.Services.Concrete
 
                 if (!string.IsNullOrEmpty(x.Video) && !string.IsNullOrWhiteSpace(x.Video))
                 {
-                    var path = this._RootPath + '/' + x.Video; //this._RootPath + '/' + x.Video;
+                    var path = this._RootPath + "/Organizations" + '/' + x.Video; //this._RootPath + "/Organizations" + '/' + x.Video;
                     if (Directory.Exists(path))
                     {
                         DirectoryInfo VideoFiles = new DirectoryInfo(path);
@@ -341,7 +341,7 @@ namespace Web.Services.Concrete
 
                 if (!string.IsNullOrEmpty(StrokeDataVM.Attachments) && !string.IsNullOrWhiteSpace(StrokeDataVM.Attachments))
                 {
-                    string path = this._RootPath + '/' + strokeData.Attachments; //_environment.WebRootFileProvider.GetFileInfo(StrokeDataVM.Attachments)?.PhysicalPath;
+                    string path = this._RootPath + "/Organizations" + '/' + strokeData.Attachments; //_environment.WebRootFileProvider.GetFileInfo(StrokeDataVM.Attachments)?.PhysicalPath;
                     if (Directory.Exists(path))
                     {
                         DirectoryInfo AttachFiles = new DirectoryInfo(path);
@@ -354,7 +354,7 @@ namespace Web.Services.Concrete
 
                 if (!string.IsNullOrEmpty(StrokeDataVM.Audio) && !string.IsNullOrWhiteSpace(StrokeDataVM.Audio))
                 {
-                    string path = this._RootPath + '/' + strokeData.Audio; //_environment.WebRootFileProvider.GetFileInfo(StrokeDataVM.Audio)?.PhysicalPath;
+                    string path = this._RootPath + "/Organizations" + '/' + strokeData.Audio; //_environment.WebRootFileProvider.GetFileInfo(StrokeDataVM.Audio)?.PhysicalPath;
                     if (Directory.Exists(path))
                     {
                         DirectoryInfo AudioFiles = new DirectoryInfo(path);
@@ -367,7 +367,7 @@ namespace Web.Services.Concrete
 
                 if (!string.IsNullOrEmpty(StrokeDataVM.Video) && !string.IsNullOrWhiteSpace(StrokeDataVM.Video))
                 {
-                    var path = this._RootPath + '/' + strokeData.Video;  //_environment.WebRootFileProvider.GetFileInfo(StrokeDataVM.Video)?.PhysicalPath; //.GetFileInfo(StrokeDataVM.Video);//?.PhysicalPath;
+                    var path = this._RootPath + "/Organizations" + '/' + strokeData.Video;  //_environment.WebRootFileProvider.GetFileInfo(StrokeDataVM.Video)?.PhysicalPath; //.GetFileInfo(StrokeDataVM.Video);//?.PhysicalPath;
                     if (Directory.Exists(path))
                     {
                         DirectoryInfo VideoFiles = new DirectoryInfo(path);
@@ -408,7 +408,7 @@ namespace Web.Services.Concrete
 
                 if (codeStroke.Attachment != null && codeStroke.Attachment.Count > 0)
                 {
-                    var RootPath = this._RootPath; //this._RootPath;
+                    var RootPath = this._RootPath + "/Organizations"; //this._RootPath + "/Organizations";
                     string FileRoot = null;
                     List<string> Attachments = new();
                     FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeStroke.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
@@ -496,7 +496,7 @@ namespace Web.Services.Concrete
                 }
                 if (codeStroke.Videos != null && codeStroke.Videos.Count > 0)
                 {
-                    var RootPath = this._RootPath;
+                    var RootPath = this._RootPath + "/Organizations";
                     string FileRoot = null;
                     List<string> Attachments = new();
                     FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeStroke.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
@@ -585,7 +585,7 @@ namespace Web.Services.Concrete
                 }
                 if (codeStroke.Audios != null && codeStroke.Audios.Count > 0)
                 {
-                    var RootPath = this._RootPath;
+                    var RootPath = this._RootPath + "/Organizations";
                     string FileRoot = null;
                     List<string> Attachments = new();
 
@@ -721,7 +721,7 @@ namespace Web.Services.Concrete
 
                 if (!string.IsNullOrEmpty(codeStroke.AttachmentsFolderRoot) && !string.IsNullOrWhiteSpace(codeStroke.AttachmentsFolderRoot))
                 {
-                    string path = this._RootPath + '/' + codeStroke.AttachmentsFolderRoot; //_environment.WebRootFileProvider.GetFileInfo(codeStroke.AttachmentsFolderRoot)?.PhysicalPath;
+                    string path = this._RootPath + "/Organizations" + '/' + codeStroke.AttachmentsFolderRoot; //_environment.WebRootFileProvider.GetFileInfo(codeStroke.AttachmentsFolderRoot)?.PhysicalPath;
                     if (Directory.Exists(path))
                     {
                         DirectoryInfo AttachFiles = new DirectoryInfo(path);
@@ -734,7 +734,7 @@ namespace Web.Services.Concrete
 
                 if (!string.IsNullOrEmpty(codeStroke.AudioFolderRoot) && !string.IsNullOrWhiteSpace(codeStroke.AudioFolderRoot))
                 {
-                    string path = this._RootPath + '/' + codeStroke.AudioFolderRoot;  //_environment.WebRootFileProvider.GetFileInfo(codeStroke.AudioFolderRoot)?.PhysicalPath;
+                    string path = this._RootPath + "/Organizations" + '/' + codeStroke.AudioFolderRoot;  //_environment.WebRootFileProvider.GetFileInfo(codeStroke.AudioFolderRoot)?.PhysicalPath;
                     if (Directory.Exists(path))
                     {
                         DirectoryInfo AudioFiles = new DirectoryInfo(path);
@@ -747,7 +747,7 @@ namespace Web.Services.Concrete
 
                 if (!string.IsNullOrEmpty(codeStroke.VideoFolderRoot) && !string.IsNullOrWhiteSpace(codeStroke.VideoFolderRoot))
                 {
-                    var path = this._RootPath + '/' + codeStroke.VideoFolderRoot;  //_environment.WebRootFileProvider.GetFileInfo(codeStroke.VideoFolderRoot)?.PhysicalPath;
+                    var path = this._RootPath + "/Organizations" + '/' + codeStroke.VideoFolderRoot;  //_environment.WebRootFileProvider.GetFileInfo(codeStroke.VideoFolderRoot)?.PhysicalPath;
                     if (Directory.Exists(path))
                     {
                         DirectoryInfo VideoFiles = new DirectoryInfo(path);
@@ -768,7 +768,7 @@ namespace Web.Services.Concrete
 
                 if (codeStroke.Attachment != null && codeStroke.Attachment.Count > 0)
                 {
-                    var RootPath = this._RootPath;
+                    var RootPath = this._RootPath + "/Organizations";
                     string FileRoot = null;
                     List<string> Attachments = new();
 
@@ -860,7 +860,7 @@ namespace Web.Services.Concrete
                 }
                 if (codeStroke.Videos != null && codeStroke.Videos.Count > 0)
                 {
-                    var RootPath = this._RootPath;
+                    var RootPath = this._RootPath + "/Organizations";
                     string FileRoot = null;
                     List<string> Attachments = new();
 
@@ -952,7 +952,7 @@ namespace Web.Services.Concrete
                 }
                 if (codeStroke.Audios != null && codeStroke.Audios.Count > 0)
                 {
-                    var RootPath = this._RootPath;
+                    var RootPath = this._RootPath + "/Organizations";
                     string FileRoot = null;
                     List<string> Attachments = new();
 
@@ -1090,7 +1090,7 @@ namespace Web.Services.Concrete
 
                 if (!string.IsNullOrEmpty(x.Attachments) && !string.IsNullOrWhiteSpace(x.Attachments))
                 {
-                    string path = this._RootPath + '/' + x.Attachments;
+                    string path = this._RootPath + "/Organizations" + '/' + x.Attachments;
                     if (Directory.Exists(path))
                     {
                         DirectoryInfo AttachFiles = new DirectoryInfo(path);
@@ -1103,7 +1103,7 @@ namespace Web.Services.Concrete
 
                 if (!string.IsNullOrEmpty(x.Audio) && !string.IsNullOrWhiteSpace(x.Audio))
                 {
-                    string path = this._RootPath + '/' + x.Audio;
+                    string path = this._RootPath + "/Organizations" + '/' + x.Audio;
                     if (Directory.Exists(path))
                     {
                         DirectoryInfo AudioFiles = new DirectoryInfo(path);
@@ -1116,7 +1116,7 @@ namespace Web.Services.Concrete
 
                 if (!string.IsNullOrEmpty(x.Video) && !string.IsNullOrWhiteSpace(x.Video))
                 {
-                    var path = this._RootPath + '/' + x.Video;
+                    var path = this._RootPath + "/Organizations" + '/' + x.Video;
                     if (Directory.Exists(path))
                     {
                         DirectoryInfo VideoFiles = new DirectoryInfo(path);
@@ -1144,7 +1144,7 @@ namespace Web.Services.Concrete
 
                 if (!string.IsNullOrEmpty(SepsisDataVM.Attachments) && !string.IsNullOrWhiteSpace(SepsisDataVM.Attachments))
                 {
-                    string path = this._RootPath + '/' + SepsisDataVM.Attachments; //_environment.WebRootFileProvider.GetFileInfo(SepsisDataVM.Attachments)?.PhysicalPath;
+                    string path = this._RootPath + "/Organizations" + '/' + SepsisDataVM.Attachments; //_environment.WebRootFileProvider.GetFileInfo(SepsisDataVM.Attachments)?.PhysicalPath;
                     if (Directory.Exists(path))
                     {
                         DirectoryInfo AttachFiles = new DirectoryInfo(path);
@@ -1157,7 +1157,7 @@ namespace Web.Services.Concrete
 
                 if (!string.IsNullOrEmpty(SepsisDataVM.Audio) && !string.IsNullOrWhiteSpace(SepsisDataVM.Audio))
                 {
-                    string path = this._RootPath + '/' + SepsisDataVM.Audio; //_environment.WebRootFileProvider.GetFileInfo(SepsisDataVM.Audio)?.PhysicalPath;
+                    string path = this._RootPath + "/Organizations" + '/' + SepsisDataVM.Audio; //_environment.WebRootFileProvider.GetFileInfo(SepsisDataVM.Audio)?.PhysicalPath;
                     if (Directory.Exists(path))
                     {
                         DirectoryInfo AudioFiles = new DirectoryInfo(path);
@@ -1170,7 +1170,7 @@ namespace Web.Services.Concrete
 
                 if (!string.IsNullOrEmpty(SepsisDataVM.Video) && !string.IsNullOrWhiteSpace(SepsisDataVM.Video))
                 {
-                    var path = this._RootPath + '/' + SepsisDataVM.Video; //_environment.WebRootFileProvider.GetFileInfo(SepsisDataVM.Video)?.PhysicalPath; //.GetFileInfo(SepsisDataVM.Video);//?.PhysicalPath;
+                    var path = this._RootPath + "/Organizations" + '/' + SepsisDataVM.Video; //_environment.WebRootFileProvider.GetFileInfo(SepsisDataVM.Video)?.PhysicalPath; //.GetFileInfo(SepsisDataVM.Video);//?.PhysicalPath;
                     if (Directory.Exists(path))
                     {
                         DirectoryInfo VideoFiles = new DirectoryInfo(path);
@@ -1212,7 +1212,7 @@ namespace Web.Services.Concrete
 
                 if (codeSepsis.Attachment != null && codeSepsis.Attachment.Count > 0)
                 {
-                    var RootPath = this._RootPath;
+                    var RootPath = this._RootPath + "/Organizations";
                     string FileRoot = null;
                     List<string> Attachments = new();
 
@@ -1303,7 +1303,7 @@ namespace Web.Services.Concrete
                 }
                 if (codeSepsis.Videos != null && codeSepsis.Videos.Count > 0)
                 {
-                    var RootPath = this._RootPath;
+                    var RootPath = this._RootPath + "/Organizations";
                     string FileRoot = null;
                     List<string> Attachments = new();
 
@@ -1394,7 +1394,7 @@ namespace Web.Services.Concrete
                 }
                 if (codeSepsis.Audios != null && codeSepsis.Audios.Count > 0)
                 {
-                    var RootPath = this._RootPath;
+                    var RootPath = this._RootPath + "/Organizations";
                     string FileRoot = null;
                     List<string> Attachments = new();
                     //var outPath = Directory.GetCurrentDirectory();
@@ -1509,7 +1509,7 @@ namespace Web.Services.Concrete
 
                 if (!string.IsNullOrEmpty(codeSepsis.AttachmentsFolderRoot) && !string.IsNullOrWhiteSpace(codeSepsis.AttachmentsFolderRoot))
                 {
-                    string path = this._RootPath + '/' + codeSepsis.AttachmentsFolderRoot; //_environment.WebRootFileProvider.GetFileInfo(codeSepsis.AttachmentsFolderRoot)?.PhysicalPath;
+                    string path = this._RootPath + "/Organizations" + '/' + codeSepsis.AttachmentsFolderRoot; //_environment.WebRootFileProvider.GetFileInfo(codeSepsis.AttachmentsFolderRoot)?.PhysicalPath;
                     if (Directory.Exists(path))
                     {
                         DirectoryInfo AttachFiles = new DirectoryInfo(path);
@@ -1522,7 +1522,7 @@ namespace Web.Services.Concrete
 
                 if (!string.IsNullOrEmpty(codeSepsis.AudioFolderRoot) && !string.IsNullOrWhiteSpace(codeSepsis.AudioFolderRoot))
                 {
-                    string path = this._RootPath + '/' + codeSepsis.AudioFolderRoot; //_environment.WebRootFileProvider.GetFileInfo(codeSepsis.AudioFolderRoot)?.PhysicalPath;
+                    string path = this._RootPath + "/Organizations" + '/' + codeSepsis.AudioFolderRoot; //_environment.WebRootFileProvider.GetFileInfo(codeSepsis.AudioFolderRoot)?.PhysicalPath;
                     if (Directory.Exists(path))
                     {
                         DirectoryInfo AudioFiles = new DirectoryInfo(path);
@@ -1535,7 +1535,7 @@ namespace Web.Services.Concrete
 
                 if (!string.IsNullOrEmpty(codeSepsis.VideoFolderRoot) && !string.IsNullOrWhiteSpace(codeSepsis.VideoFolderRoot))
                 {
-                    var path = this._RootPath + '/' + codeSepsis.VideoFolderRoot; //_environment.WebRootFileProvider.GetFileInfo(codeSepsis.VideoFolderRoot)?.PhysicalPath;
+                    var path = this._RootPath + "/Organizations" + '/' + codeSepsis.VideoFolderRoot; //_environment.WebRootFileProvider.GetFileInfo(codeSepsis.VideoFolderRoot)?.PhysicalPath;
                     if (Directory.Exists(path))
                     {
                         DirectoryInfo VideoFiles = new DirectoryInfo(path);
@@ -1582,7 +1582,7 @@ namespace Web.Services.Concrete
 
                 if (codeSepsis.Attachment != null && codeSepsis.Attachment.Count > 0)
                 {
-                    var RootPath = this._RootPath;
+                    var RootPath = this._RootPath + "/Organizations";
                     string FileRoot = null;
                     List<string> Attachments = new();
 
@@ -1673,7 +1673,7 @@ namespace Web.Services.Concrete
                 }
                 if (codeSepsis.Videos != null && codeSepsis.Videos.Count > 0)
                 {
-                    var RootPath = this._RootPath;
+                    var RootPath = this._RootPath + "/Organizations";
                     string FileRoot = null;
                     List<string> Attachments = new();
 
@@ -1764,7 +1764,7 @@ namespace Web.Services.Concrete
                 }
                 if (codeSepsis.Audios != null && codeSepsis.Audios.Count > 0)
                 {
-                    var RootPath = this._RootPath;
+                    var RootPath = this._RootPath + "/Organizations";
                     string FileRoot = null;
                     List<string> Attachments = new();
                     //var outPath = Directory.GetCurrentDirectory();
@@ -1900,7 +1900,7 @@ namespace Web.Services.Concrete
 
                 if (!string.IsNullOrEmpty(x.Attachments) && !string.IsNullOrWhiteSpace(x.Attachments))
                 {
-                    string path = this._RootPath + '/' + x.Attachments;
+                    string path = this._RootPath + "/Organizations" + '/' + x.Attachments;
                     if (Directory.Exists(path))
                     {
                         DirectoryInfo AttachFiles = new DirectoryInfo(path);
@@ -1913,7 +1913,7 @@ namespace Web.Services.Concrete
 
                 if (!string.IsNullOrEmpty(x.Audio) && !string.IsNullOrWhiteSpace(x.Audio))
                 {
-                    string path = this._RootPath + '/' + x.Audio;
+                    string path = this._RootPath + "/Organizations" + '/' + x.Audio;
                     if (Directory.Exists(path))
                     {
                         DirectoryInfo AudioFiles = new DirectoryInfo(path);
@@ -1926,7 +1926,7 @@ namespace Web.Services.Concrete
 
                 if (!string.IsNullOrEmpty(x.Video) && !string.IsNullOrWhiteSpace(x.Video))
                 {
-                    var path = this._RootPath + '/' + x.Video;
+                    var path = this._RootPath + "/Organizations" + '/' + x.Video;
                     if (Directory.Exists(path))
                     {
                         DirectoryInfo VideoFiles = new DirectoryInfo(path);
@@ -1954,7 +1954,7 @@ namespace Web.Services.Concrete
 
                 if (!string.IsNullOrEmpty(STEMIDataVM.Attachments) && !string.IsNullOrWhiteSpace(STEMIDataVM.Attachments))
                 {
-                    string path = this._RootPath + '/' + STEMIDataVM.Attachments; //_environment.WebRootFileProvider.GetFileInfo(STEMIDataVM.Attachments)?.PhysicalPath;
+                    string path = this._RootPath + "/Organizations" + '/' + STEMIDataVM.Attachments; //_environment.WebRootFileProvider.GetFileInfo(STEMIDataVM.Attachments)?.PhysicalPath;
                     if (Directory.Exists(path))
                     {
                         DirectoryInfo AttachFiles = new DirectoryInfo(path);
@@ -1967,7 +1967,7 @@ namespace Web.Services.Concrete
 
                 if (!string.IsNullOrEmpty(STEMIDataVM.Audio) && !string.IsNullOrWhiteSpace(STEMIDataVM.Audio))
                 {
-                    string path = this._RootPath + '/' + STEMIDataVM.Audio;  //_environment.WebRootFileProvider.GetFileInfo(STEMIDataVM.Audio)?.PhysicalPath;
+                    string path = this._RootPath + "/Organizations" + '/' + STEMIDataVM.Audio;  //_environment.WebRootFileProvider.GetFileInfo(STEMIDataVM.Audio)?.PhysicalPath;
                     if (Directory.Exists(path))
                     {
                         DirectoryInfo AudioFiles = new DirectoryInfo(path);
@@ -1980,7 +1980,7 @@ namespace Web.Services.Concrete
 
                 if (!string.IsNullOrEmpty(STEMIDataVM.Video) && !string.IsNullOrWhiteSpace(STEMIDataVM.Video))
                 {
-                    var path = this._RootPath + '/' + STEMIDataVM.Video; //_environment.WebRootFileProvider.GetFileInfo(STEMIDataVM.Video)?.PhysicalPath; //.GetFileInfo(STEMIDataVM.Video);//?.PhysicalPath;
+                    var path = this._RootPath + "/Organizations" + '/' + STEMIDataVM.Video; //_environment.WebRootFileProvider.GetFileInfo(STEMIDataVM.Video)?.PhysicalPath; //.GetFileInfo(STEMIDataVM.Video);//?.PhysicalPath;
                     if (Directory.Exists(path))
                     {
                         DirectoryInfo VideoFiles = new DirectoryInfo(path);
@@ -2021,7 +2021,7 @@ namespace Web.Services.Concrete
 
                 if (codeSTEMI.Attachment != null && codeSTEMI.Attachment.Count > 0)
                 {
-                    var RootPath = this._RootPath;
+                    var RootPath = this._RootPath + "/Organizations";
                     string FileRoot = null;
                     List<string> Attachments = new();
                     //var outPath = Directory.GetCurrentDirectory();
@@ -2112,7 +2112,7 @@ namespace Web.Services.Concrete
                 }
                 if (codeSTEMI.Videos != null && codeSTEMI.Videos.Count > 0)
                 {
-                    var RootPath = this._RootPath;
+                    var RootPath = this._RootPath + "/Organizations";
                     string FileRoot = null;
                     List<string> Attachments = new();
                     //var outPath = Directory.GetCurrentDirectory();
@@ -2203,7 +2203,7 @@ namespace Web.Services.Concrete
                 }
                 if (codeSTEMI.Audios != null && codeSTEMI.Audios.Count > 0)
                 {
-                    var RootPath = this._RootPath;
+                    var RootPath = this._RootPath + "/Organizations";
                     string FileRoot = null;
                     List<string> Attachments = new();
                     //var outPath = Directory.GetCurrentDirectory();
@@ -2315,7 +2315,7 @@ namespace Web.Services.Concrete
 
                 if (!string.IsNullOrEmpty(codeSTEMI.AttachmentsFolderRoot) && !string.IsNullOrWhiteSpace(codeSTEMI.AttachmentsFolderRoot))
                 {
-                    string path = this._RootPath + '/' + codeSTEMI.AttachmentsFolderRoot;  //_environment.WebRootFileProvider.GetFileInfo(codeSTEMI.AttachmentsFolderRoot)?.PhysicalPath;
+                    string path = this._RootPath + "/Organizations" + '/' + codeSTEMI.AttachmentsFolderRoot;  //_environment.WebRootFileProvider.GetFileInfo(codeSTEMI.AttachmentsFolderRoot)?.PhysicalPath;
                     if (Directory.Exists(path))
                     {
                         DirectoryInfo AttachFiles = new DirectoryInfo(path);
@@ -2328,7 +2328,7 @@ namespace Web.Services.Concrete
 
                 if (!string.IsNullOrEmpty(codeSTEMI.AudioFolderRoot) && !string.IsNullOrWhiteSpace(codeSTEMI.AudioFolderRoot))
                 {
-                    string path = this._RootPath + '/' + codeSTEMI.AudioFolderRoot; //_environment.WebRootFileProvider.GetFileInfo(codeSTEMI.AudioFolderRoot)?.PhysicalPath;
+                    string path = this._RootPath + "/Organizations" + '/' + codeSTEMI.AudioFolderRoot; //_environment.WebRootFileProvider.GetFileInfo(codeSTEMI.AudioFolderRoot)?.PhysicalPath;
                     if (Directory.Exists(path))
                     {
                         DirectoryInfo AudioFiles = new DirectoryInfo(path);
@@ -2341,7 +2341,7 @@ namespace Web.Services.Concrete
 
                 if (!string.IsNullOrEmpty(codeSTEMI.VideoFolderRoot) && !string.IsNullOrWhiteSpace(codeSTEMI.VideoFolderRoot))
                 {
-                    var path = this._RootPath + '/' + codeSTEMI.VideoFolderRoot; //_environment.WebRootFileProvider.GetFileInfo(codeSTEMI.VideoFolderRoot)?.PhysicalPath;
+                    var path = this._RootPath + "/Organizations" + '/' + codeSTEMI.VideoFolderRoot; //_environment.WebRootFileProvider.GetFileInfo(codeSTEMI.VideoFolderRoot)?.PhysicalPath;
                     if (Directory.Exists(path))
                     {
                         DirectoryInfo VideoFiles = new DirectoryInfo(path);
@@ -2388,7 +2388,7 @@ namespace Web.Services.Concrete
 
                 if (codeSTEMI.Attachment != null && codeSTEMI.Attachment.Count > 0)
                 {
-                    var RootPath = this._RootPath;
+                    var RootPath = this._RootPath + "/Organizations";
                     string FileRoot = null;
                     List<string> Attachments = new();
                     //var outPath = Directory.GetCurrentDirectory();
@@ -2479,7 +2479,7 @@ namespace Web.Services.Concrete
                 }
                 if (codeSTEMI.Videos != null && codeSTEMI.Videos.Count > 0)
                 {
-                    var RootPath = this._RootPath;
+                    var RootPath = this._RootPath + "/Organizations";
                     string FileRoot = null;
                     List<string> Attachments = new();
                     //var outPath = Directory.GetCurrentDirectory();
@@ -2570,7 +2570,7 @@ namespace Web.Services.Concrete
                 }
                 if (codeSTEMI.Audios != null && codeSTEMI.Audios.Count > 0)
                 {
-                    var RootPath = this._RootPath;
+                    var RootPath = this._RootPath + "/Organizations";
                     string FileRoot = null;
                     List<string> Attachments = new();
 
@@ -2707,7 +2707,7 @@ namespace Web.Services.Concrete
 
                 if (!string.IsNullOrEmpty(x.Attachments) && !string.IsNullOrWhiteSpace(x.Attachments))
                 {
-                    string path = this._RootPath + '/' + x.Attachments;
+                    string path = this._RootPath + "/Organizations" + '/' + x.Attachments;
                     if (Directory.Exists(path))
                     {
                         DirectoryInfo AttachFiles = new DirectoryInfo(path);
@@ -2720,7 +2720,7 @@ namespace Web.Services.Concrete
 
                 if (!string.IsNullOrEmpty(x.Audio) && !string.IsNullOrWhiteSpace(x.Audio))
                 {
-                    string path = this._RootPath + '/' + x.Audio;
+                    string path = this._RootPath + "/Organizations" + '/' + x.Audio;
                     if (Directory.Exists(path))
                     {
                         DirectoryInfo AudioFiles = new DirectoryInfo(path);
@@ -2733,7 +2733,7 @@ namespace Web.Services.Concrete
 
                 if (!string.IsNullOrEmpty(x.Video) && !string.IsNullOrWhiteSpace(x.Video))
                 {
-                    var path = this._RootPath + '/' + x.Video;
+                    var path = this._RootPath + "/Organizations" + '/' + x.Video;
                     if (Directory.Exists(path))
                     {
                         DirectoryInfo VideoFiles = new DirectoryInfo(path);
@@ -2761,7 +2761,7 @@ namespace Web.Services.Concrete
 
                 if (!string.IsNullOrEmpty(TrumaDataVM.Attachments) && !string.IsNullOrWhiteSpace(TrumaDataVM.Attachments))
                 {
-                    string path = this._RootPath + '/' + TrumaDataVM.Attachments; //_environment.WebRootFileProvider.GetFileInfo(TrumaDataVM.Attachments)?.PhysicalPath;
+                    string path = this._RootPath + "/Organizations" + '/' + TrumaDataVM.Attachments; //_environment.WebRootFileProvider.GetFileInfo(TrumaDataVM.Attachments)?.PhysicalPath;
                     if (Directory.Exists(path))
                     {
                         DirectoryInfo AttachFiles = new DirectoryInfo(path);
@@ -2774,7 +2774,7 @@ namespace Web.Services.Concrete
 
                 if (!string.IsNullOrEmpty(TrumaDataVM.Audio) && !string.IsNullOrWhiteSpace(TrumaDataVM.Audio))
                 {
-                    string path = this._RootPath + '/' + TrumaDataVM.Audio; //_environment.WebRootFileProvider.GetFileInfo(TrumaDataVM.Audio)?.PhysicalPath;
+                    string path = this._RootPath + "/Organizations" + '/' + TrumaDataVM.Audio; //_environment.WebRootFileProvider.GetFileInfo(TrumaDataVM.Audio)?.PhysicalPath;
                     if (Directory.Exists(path))
                     {
                         DirectoryInfo AudioFiles = new DirectoryInfo(path);
@@ -2787,7 +2787,7 @@ namespace Web.Services.Concrete
 
                 if (!string.IsNullOrEmpty(TrumaDataVM.Video) && !string.IsNullOrWhiteSpace(TrumaDataVM.Video))
                 {
-                    var path = this._RootPath + '/' + TrumaDataVM.Video; //_environment.WebRootFileProvider.GetFileInfo(TrumaDataVM.Video)?.PhysicalPath; //.GetFileInfo(TrumaDataVM.Video);//?.PhysicalPath;
+                    var path = this._RootPath + "/Organizations" + '/' + TrumaDataVM.Video; //_environment.WebRootFileProvider.GetFileInfo(TrumaDataVM.Video)?.PhysicalPath; //.GetFileInfo(TrumaDataVM.Video);//?.PhysicalPath;
                     if (Directory.Exists(path))
                     {
                         DirectoryInfo VideoFiles = new DirectoryInfo(path);
@@ -2828,7 +2828,7 @@ namespace Web.Services.Concrete
 
                 if (codeTruma.Attachment != null && codeTruma.Attachment.Count > 0)
                 {
-                    var RootPath = this._RootPath;
+                    var RootPath = this._RootPath + "/Organizations";
                     string FileRoot = null;
                     List<string> Attachments = new();
                     //var outPath = Directory.GetCurrentDirectory();
@@ -2919,7 +2919,7 @@ namespace Web.Services.Concrete
                 }
                 if (codeTruma.Videos != null && codeTruma.Videos.Count > 0)
                 {
-                    var RootPath = this._RootPath;
+                    var RootPath = this._RootPath + "/Organizations";
                     string FileRoot = null;
                     List<string> Attachments = new();
                     //var outPath = Directory.GetCurrentDirectory();
@@ -3010,7 +3010,7 @@ namespace Web.Services.Concrete
                 }
                 if (codeTruma.Audios != null && codeTruma.Audios.Count > 0)
                 {
-                    var RootPath = this._RootPath;
+                    var RootPath = this._RootPath + "/Organizations";
                     string FileRoot = null;
                     List<string> Attachments = new();
                     //var outPath = Directory.GetCurrentDirectory();
@@ -3122,7 +3122,7 @@ namespace Web.Services.Concrete
 
                 if (!string.IsNullOrEmpty(codeTruma.AttachmentsFolderRoot) && !string.IsNullOrWhiteSpace(codeTruma.AttachmentsFolderRoot))
                 {
-                    string path = this._RootPath + '/' + codeTruma.AttachmentsFolderRoot; //_environment.WebRootFileProvider.GetFileInfo(codeTruma.AttachmentsFolderRoot)?.PhysicalPath;
+                    string path = this._RootPath + "/Organizations" + '/' + codeTruma.AttachmentsFolderRoot; //_environment.WebRootFileProvider.GetFileInfo(codeTruma.AttachmentsFolderRoot)?.PhysicalPath;
                     if (Directory.Exists(path))
                     {
                         DirectoryInfo AttachFiles = new DirectoryInfo(path);
@@ -3135,7 +3135,7 @@ namespace Web.Services.Concrete
 
                 if (!string.IsNullOrEmpty(codeTruma.AudioFolderRoot) && !string.IsNullOrWhiteSpace(codeTruma.AudioFolderRoot))
                 {
-                    string path = this._RootPath + '/' + codeTruma.AudioFolderRoot; //_environment.WebRootFileProvider.GetFileInfo(codeTruma.AudioFolderRoot)?.PhysicalPath;
+                    string path = this._RootPath + "/Organizations" + '/' + codeTruma.AudioFolderRoot; //_environment.WebRootFileProvider.GetFileInfo(codeTruma.AudioFolderRoot)?.PhysicalPath;
                     if (Directory.Exists(path))
                     {
                         DirectoryInfo AudioFiles = new DirectoryInfo(path);
@@ -3148,7 +3148,7 @@ namespace Web.Services.Concrete
 
                 if (!string.IsNullOrEmpty(codeTruma.VideoFolderRoot) && !string.IsNullOrWhiteSpace(codeTruma.VideoFolderRoot))
                 {
-                    var path = this._RootPath + '/' + codeTruma.VideoFolderRoot;  //_environment.WebRootFileProvider.GetFileInfo(codeTruma.VideoFolderRoot)?.PhysicalPath;
+                    var path = this._RootPath + "/Organizations" + '/' + codeTruma.VideoFolderRoot;  //_environment.WebRootFileProvider.GetFileInfo(codeTruma.VideoFolderRoot)?.PhysicalPath;
                     if (Directory.Exists(path))
                     {
                         DirectoryInfo VideoFiles = new DirectoryInfo(path);
@@ -3195,7 +3195,7 @@ namespace Web.Services.Concrete
 
                 if (codeTruma.Attachment != null && codeTruma.Attachment.Count > 0)
                 {
-                    var RootPath = this._RootPath;
+                    var RootPath = this._RootPath + "/Organizations";
                     string FileRoot = null;
                     List<string> Attachments = new();
                     //var outPath = Directory.GetCurrentDirectory();
@@ -3286,7 +3286,7 @@ namespace Web.Services.Concrete
                 }
                 if (codeTruma.Videos != null && codeTruma.Videos.Count > 0)
                 {
-                    var RootPath = this._RootPath;
+                    var RootPath = this._RootPath + "/Organizations";
                     string FileRoot = null;
                     List<string> Attachments = new();
                     //var outPath = Directory.GetCurrentDirectory();
@@ -3377,7 +3377,7 @@ namespace Web.Services.Concrete
                 }
                 if (codeTruma.Audios != null && codeTruma.Audios.Count > 0)
                 {
-                    var RootPath = this._RootPath;
+                    var RootPath = this._RootPath + "/Organizations";
                     string FileRoot = null;
                     List<string> Attachments = new();
                     //var outPath = Directory.GetCurrentDirectory();
@@ -3543,7 +3543,7 @@ namespace Web.Services.Concrete
                     }
                     return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Addresses Returned", Body = objList };
                 }
-                else 
+                else
                 {
                     return new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "State Not Found" };
                 }

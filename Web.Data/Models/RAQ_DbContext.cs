@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 #nullable disable
 
@@ -36,12 +38,14 @@ namespace Web.Data.Models
         public virtual DbSet<FavouriteTeam> FavouriteTeams { get; set; }
         public virtual DbSet<InteractiveVoiceResponse> InteractiveVoiceResponses { get; set; }
         public virtual DbSet<Ivrsetting> Ivrsettings { get; set; }
+        public virtual DbSet<MdrouteCounter> MdrouteCounters { get; set; }
         public virtual DbSet<Organization> Organizations { get; set; }
         public virtual DbSet<OrganizationConsultField> OrganizationConsultFields { get; set; }
         public virtual DbSet<Role> Roles { get; set; }
         public virtual DbSet<ServiceLine> ServiceLines { get; set; }
         public virtual DbSet<Setting> Settings { get; set; }
         public virtual DbSet<State> States { get; set; }
+        public virtual DbSet<Temp> Temps { get; set; }
         public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<UserAccess> UserAccesses { get; set; }
         public virtual DbSet<UserRole> UserRoles { get; set; }
@@ -324,9 +328,7 @@ namespace Web.Data.Models
             {
                 entity.Property(e => e.CallbackNumber).HasMaxLength(15);
 
-                entity.Property(e => e.ConsultType)
-                    .IsRequired()
-                    .HasMaxLength(50);
+                entity.Property(e => e.ConsultType).HasMaxLength(50);
 
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");
 
@@ -338,13 +340,9 @@ namespace Web.Data.Models
 
                 entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
 
-                entity.Property(e => e.PatientFirstName)
-                    .IsRequired()
-                    .HasMaxLength(50);
+                entity.Property(e => e.PatientFirstName).HasMaxLength(50);
 
-                entity.Property(e => e.PatientLastName)
-                    .IsRequired()
-                    .HasMaxLength(50);
+                entity.Property(e => e.PatientLastName).HasMaxLength(50);
 
                 entity.HasOne(d => d.ServiceLineIdFkNavigation)
                     .WithMany(p => p.Consults)
@@ -609,6 +607,26 @@ namespace Web.Data.Models
                     .HasConstraintName("FK_IVRSettings_InteractiveVoiceResponse");
             });
 
+            modelBuilder.Entity<MdrouteCounter>(entity =>
+            {
+                entity.HasNoKey();
+
+                entity.ToTable("MDRoute_Counter");
+
+                entity.Property(e => e.CounterInitial)
+                    .IsRequired()
+                    .HasMaxLength(10)
+                    .HasColumnName("Counter_Initial");
+
+                entity.Property(e => e.CounterName)
+                    .IsRequired()
+                    .HasMaxLength(50)
+                    .HasColumnName("Counter_Name")
+                    .HasDefaultValueSql("((10000))");
+
+                entity.Property(e => e.CounterValue).HasColumnName("Counter_Value");
+            });
+
             modelBuilder.Entity<Organization>(entity =>
             {
                 entity.Property(e => e.ActiveCodes).HasMaxLength(50);
@@ -728,6 +746,21 @@ namespace Web.Data.Models
                 entity.Property(e => e.StateProvince)
                     .HasMaxLength(100)
                     .IsFixedLength(true);
+            });
+
+            modelBuilder.Entity<Temp>(entity =>
+            {
+                entity.HasNoKey();
+
+                entity.ToTable("temp");
+
+                entity.Property(e => e.EndDate).HasColumnType("datetime");
+
+                entity.Property(e => e.EndTime).HasColumnType("datetime");
+
+                entity.Property(e => e.StartDate).HasColumnType("datetime");
+
+                entity.Property(e => e.StartTime).HasColumnType("datetime");
             });
 
             modelBuilder.Entity<User>(entity =>
