@@ -250,7 +250,8 @@ namespace Web.Services.Concrete
                 {
                     Directory.CreateDirectory(pathToSave);
                 }
-                else {
+                else
+                {
                     DirectoryInfo dir = new DirectoryInfo(pathToSave);
                     foreach (FileInfo fi in dir.GetFiles())
                     {

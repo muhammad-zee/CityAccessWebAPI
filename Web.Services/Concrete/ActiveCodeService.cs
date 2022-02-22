@@ -3531,7 +3531,7 @@ namespace Web.Services.Concrete
 
                     foreach (var item in orgsAddress)
                     {
-                        string add = $"{item.PrimaryAddress}, {StateName}, {item.Zip}";
+                        string add = $"{item.PrimaryAddress} {item.City}, {stateId.Title} {item.Zip}";
                         var googleApiLatLng = this._httpClient.GetAsync("https://maps.googleapis.com/maps/api/geocode/json?address=" + add + "&key=AIzaSyA5EvXiXjlmc0hpLPmLgGZoOgZ80Ca0eQ0").Result;
 
                         dynamic Apiresults = googleApiLatLng["results"];
