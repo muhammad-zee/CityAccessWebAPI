@@ -385,8 +385,10 @@ namespace Web.Services.Concrete
             return response;
         }
 
-        public BaseResponse deleteChatChannel(string ChannelSid)
+        public BaseResponse deleteAllChannels(string key)
         {
+            if(key == "qw4hddqcrg")
+            {
             TwilioClient.Init(this.Twilio_AccountSid, this.Twilio_AuthToken);
             var channels = ChannelResource.Read(pathServiceSid: this.Twilio_ChatServiceSid);
             foreach (var ch in channels)
@@ -406,6 +408,12 @@ namespace Web.Services.Concrete
                 }
             }
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Channels Found" };
+            }
+            else
+            {
+            return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = "Incorrect Key" };
+            }
+
         }
 
         public BaseResponse deleteConversationChannel(string ChannelSid, int UserId)

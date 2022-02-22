@@ -16,7 +16,7 @@ namespace Web.Services.Interfaces
         BaseResponse saveConversationChannel(ConversationChannelVM channel);
         BaseResponse saveConversationChannelParticipants(ConversationChannelParticipantsVM channel);
         BaseResponse getConversationChannels(int UserId);
-        BaseResponse deleteChatChannel(string ChannelSid);
+        BaseResponse deleteAllChannels(string key);
         BaseResponse deleteConversationChannel(string ChannelSid, int UserId);
         BaseResponse deleteConversationParticipant(string ChannelSid, string ParticipantUniqueName, int UserId);
         BaseResponse addUserToChannelUsingApi(string ChannelUniqueName, string ParticipantUniqueName, int UserId);

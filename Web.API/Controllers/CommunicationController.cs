@@ -86,12 +86,13 @@ namespace Web.API.Controllers
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
         }
-        [HttpGet("Conversation/daleteChannelBySid")]
-        public BaseResponse daleteChannelBySid(string ChannelSid)
+        [AllowAnonymous]
+        [HttpGet("Conversation/daleteAllChannels")]
+        public BaseResponse daleteAllChannels(string key)
         {
             try
             {
-                return this._communicaitonService.deleteChatChannel(ChannelSid);
+                return this._communicaitonService.deleteAllChannels(key);
             }
             catch (Exception ex)
             {
