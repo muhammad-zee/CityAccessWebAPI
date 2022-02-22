@@ -22,6 +22,7 @@ using Web.Model.Common;
 using Web.Services.Enums;
 using Web.Services.Helper;
 using Web.Services.Interfaces;
+using static Twilio.Rest.Chat.V2.Service.ChannelResource;
 
 namespace Web.Services.Concrete
 {
@@ -564,8 +565,8 @@ namespace Web.Services.Concrete
         public ChannelResource createConversationChannel(string FriendlyName, string UniqueName)
         {
             TwilioClient.Init(this.Twilio_AccountSid, this.Twilio_AuthToken);
-            var channel = ChannelResource.Create(pathServiceSid: this.Twilio_ChatServiceSid, friendlyName: FriendlyName, uniqueName: UniqueName);
-            //var channel = Twilio.Rest.Conversations.V1.ConversationResource.Create(pathServiceSid: this.Twilio_ChatServiceSid,friendlyName:FriendlyName,uniqueName: UniqueName);
+            var channel = ChannelResource.Create(pathServiceSid: this.Twilio_ChatServiceSid, friendlyName: FriendlyName, uniqueName: UniqueName,type: ChannelTypeEnum.Private);
+            //var channel = Twilio.Rest.Conversations.V1.ConversationResource.Create(servives: this.Twilio_ChatServiceSid, friendlyName: FriendlyName, uniqueName: UniqueName);
             return channel;
         }
 
