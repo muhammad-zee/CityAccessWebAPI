@@ -66,7 +66,7 @@ namespace Web.Services.Concrete
             this._codeSepsisRepo = codeSepsisRepo;
             this._codeSTEMIRepo = codeSTEMIRepo;
             this._codeTrumaRepo = codeTrumaRepo;
-            this._RootPath + "/Organizations" = this._config["FilePath:Path"].ToString();
+            this._RootPath = this._config["FilePath:Path"].ToString();
         }
 
         #region Active Code
