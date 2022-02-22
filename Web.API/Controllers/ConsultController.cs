@@ -135,25 +135,6 @@ namespace Web.API.Controllers
 
         #endregion
 
-        #region Map & Addresses
-
-        [HttpGet("map/GetHospitalsOfStatesByCodeId/{codeId}/{coordinates}")]
-        public BaseResponse GetHospitalsOfStatesByCodeId(int codeId, string coordinates)
-        {
-            try
-            {
-                return _consultService.GetHospitalsOfStatesByCodeId(codeId, coordinates);
-            }
-            catch (Exception ex)
-            {
-                ElmahExtensions.RiseError(ex);
-                _logger.LogExceptions(ex);
-                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
-            }
-        }
-
-        #endregion
-
         #region Consults
 
         [Description("Get All Consults")]

@@ -20,6 +20,7 @@ namespace Web.Services.Concrete
     public class ActiveCodeService : IActiveCodeService
     {
         private RAQ_DbContext _dbContext;
+        private IHttpClient _httpClient;
         private IHostingEnvironment _environment;
         private ICommunicationService _communication;
         private IRepository<User> _userRepo;
@@ -36,6 +37,7 @@ namespace Web.Services.Concrete
         private string _RootPath;
         public ActiveCodeService(RAQ_DbContext dbContext,
             IConfiguration config,
+            IHttpClient httpClient,
             IHostingEnvironment environment,
             ICommunicationService communication,
             IRepository<User> userRepo,
@@ -50,6 +52,7 @@ namespace Web.Services.Concrete
             IRepository<CodeTrauma> codeTrumaRepo)
         {
             this._config = config;
+            this._httpClient = httpClient;
             this._dbContext = dbContext;
             this._environment = environment;
             this._communication = communication;
@@ -3495,5 +3498,55 @@ namespace Web.Services.Concrete
 
         #endregion
 
+        #region Map & addresses
+
+        public BaseResponse GetHospitalsOfStatesByCodeId(int codeId, string latlng)
+        {
+            var googleApiResult = this._httpClient.GetAsync("https://maps.googleapis.com/maps/api/geocode/json?latlng=" + latlng + "&key=AIzaSyA5EvXiXjlmc0hpLPmLgGZoOgZ80Ca0eQ0").Result;
+
+            dynamic results = googleApiResult["results"];
+            var address = results[0]["address_components"];
+            var StateName = "";
+            for (int i = 0; i < address.Count; i++)
+            {
+                var addressType = address[i].types;
+                for (int j = 0; j < addressType.Count; j++)
+                {
+                    if (addressType[j] == "administrative_area_level_1")
+                    {
+                        StateName = address[i].long_name;
+                    }
+                }
+            }
+
+            if (StateName != "")
+            {
+                var stateId = this._controlListDetailsRepo.Table.Where(x => x.Description.Contains(StateName) && !x.IsDeleted).Select(x => new { Id = x.ControlListDetailId, x.Title }).FirstOrDefault();
+
+                var orgsAddress = this._orgRepo.Table.Where(x => x.ActiveCodes.Contains(codeId.ToString()) && x.StateIdFk == stateId.Id && !x.IsDeleted).ToList();
+
+                List<object> objList = new List<object>();
+
+                foreach (var item in orgsAddress)
+                {
+                    string add = $"{item.PrimaryAddress}, {StateName}, {item.Zip}";
+                    var googleApiLatLng = this._httpClient.GetAsync("https://maps.googleapis.com/maps/api/geocode/json?address=" + add + "&key=AIzaSyA5EvXiXjlmc0hpLPmLgGZoOgZ80Ca0eQ0").Result;
+
+                    dynamic Apiresults = googleApiLatLng["results"];
+                    var geometry = results[0]["geometry"];
+                    var location = geometry["location"];
+                    var longLat = new List<double> { Convert.ToDouble(location.lat), Convert.ToDouble(location.lng) };
+
+                    objList.Add(new { OrganizationId = item.OrganizationId, Address = add, lat = longLat[0], lng = longLat[1], title = item.OrganizationName });
+                }
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Addresses Returned", Body = objList };
+            }
+            else
+            {
+                return new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "State Not Found" };
+            }
+        }
+
+        #endregion
     }
 }

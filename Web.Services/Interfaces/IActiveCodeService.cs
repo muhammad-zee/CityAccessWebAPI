@@ -44,5 +44,11 @@ namespace Web.Services.Interfaces
         BaseResponse AddOrUpdateTrumaData(CodeTrumaVM codeTruma);
         BaseResponse DeleteTruma(int TrumaId);
         #endregion
+
+        #region Map and Addresses
+
+        BaseResponse GetHospitalsOfStatesByCodeId(int codeId, string latlng);
+
+        #endregion
     }
 }

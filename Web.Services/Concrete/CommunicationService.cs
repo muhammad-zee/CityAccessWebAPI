@@ -387,31 +387,31 @@ namespace Web.Services.Concrete
 
         public BaseResponse deleteAllChannels(string key)
         {
-            if(key == "qw4hddqcrg")
+            if (key == "qw4hddqcrg")
             {
-            TwilioClient.Init(this.Twilio_AccountSid, this.Twilio_AuthToken);
-            var channels = ChannelResource.Read(pathServiceSid: this.Twilio_ChatServiceSid);
-            foreach (var ch in channels)
-            {
-                var delete = ChannelResource.Delete(pathServiceSid: this.Twilio_ChatServiceSid, pathSid: ch.Sid);
-                var dbChannel = this._conversationChannelsRepo.Table.FirstOrDefault(c => c.ChannelSid == ch.Sid && c.IsDeleted != true);
-                if (dbChannel != null)
+                TwilioClient.Init(this.Twilio_AccountSid, this.Twilio_AuthToken);
+                var channels = ChannelResource.Read(pathServiceSid: this.Twilio_ChatServiceSid);
+                foreach (var ch in channels)
                 {
-                    dbChannel.IsDeleted = true;
-                    this._conversationChannelsRepo.Update(dbChannel);
-                    var channelParticipants = this._conversationParticipantsRepo.Table.Where(p => p.ConversationChannelIdFk == dbChannel.ConversationChannelId);
-                    foreach (var p in channelParticipants)
+                    var delete = ChannelResource.Delete(pathServiceSid: this.Twilio_ChatServiceSid, pathSid: ch.Sid);
+                    var dbChannel = this._conversationChannelsRepo.Table.FirstOrDefault(c => c.ChannelSid == ch.Sid && c.IsDeleted != true);
+                    if (dbChannel != null)
                     {
-                        p.IsDeleted = true;
+                        dbChannel.IsDeleted = true;
+                        this._conversationChannelsRepo.Update(dbChannel);
+                        var channelParticipants = this._conversationParticipantsRepo.Table.Where(p => p.ConversationChannelIdFk == dbChannel.ConversationChannelId);
+                        foreach (var p in channelParticipants)
+                        {
+                            p.IsDeleted = true;
+                        }
+                        this._conversationParticipantsRepo.Update(channelParticipants);
                     }
-                    this._conversationParticipantsRepo.Update(channelParticipants);
                 }
-            }
-            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Channels Found" };
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Channels Found" };
             }
             else
             {
-            return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = "Incorrect Key" };
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = "Incorrect Key" };
             }
 
         }
@@ -633,7 +633,7 @@ namespace Web.Services.Concrete
             }
         }
 
-        public BaseResponse createOrRemoveGroupMemberAsAdmin(bool isAdmin, string uniqueName, string channleSid) 
+        public BaseResponse createOrRemoveGroupMemberAsAdmin(bool isAdmin, string uniqueName, string channleSid)
         {
             var row = (from cp in this._conversationParticipantsRepo.Table
                        join c in this._conversationChannelsRepo.Table on cp.ConversationChannelIdFk equals c.ConversationChannelId

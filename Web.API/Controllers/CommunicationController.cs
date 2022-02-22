@@ -266,7 +266,7 @@ namespace Web.API.Controllers
         }
 
         [HttpGet("Conversation/CreateOrRemoveGroupMemberAsAdmin/{isAdmin}/{uniqueName}/{channleSid}")]
-        public BaseResponse createOrRemoveGroupMemberAsAdmin(bool isAdmin, string uniqueName, string channleSid) 
+        public BaseResponse createOrRemoveGroupMemberAsAdmin(bool isAdmin, string uniqueName, string channleSid)
         {
             try
             {
@@ -327,7 +327,7 @@ namespace Web.API.Controllers
             }
         }
         [HttpGet("VideoCall/incomingCallEvent")]
-        public BaseResponse incomingCallEvent(string roomSid,string eventType, string channelSid)
+        public BaseResponse incomingCallEvent(string roomSid, string eventType, string channelSid)
         {
             try
             {
