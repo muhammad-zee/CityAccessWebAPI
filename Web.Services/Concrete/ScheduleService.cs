@@ -250,6 +250,13 @@ namespace Web.Services.Concrete
                 {
                     Directory.CreateDirectory(pathToSave);
                 }
+                else {
+                    DirectoryInfo dir = new DirectoryInfo(pathToSave);
+                    foreach (FileInfo fi in dir.GetFiles())
+                    {
+                        fi.Delete();
+                    }
+                }
                 var fileName = $"Schedule Template For {serviceLineUsers.FirstOrDefault().ServiceName}.csv"; //ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
                 var fullPath = Path.Combine(pathToSave, fileName);
                 new CSVReader().WriteDataTableAsCSV(tbl, fullPath);
