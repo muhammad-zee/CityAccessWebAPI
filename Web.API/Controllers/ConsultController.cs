@@ -137,12 +137,12 @@ namespace Web.API.Controllers
 
         #region Map & Addresses
 
-        [HttpGet("map/GetHospitalsOfStatesByCodeId/{codeId}/{latlng}")]
-        public BaseResponse GetHospitalsOfStatesByCodeId(int codeId, string latlng)
+        [HttpGet("map/GetHospitalsOfStatesByCodeId/{codeId}/{coordinates}")]
+        public BaseResponse GetHospitalsOfStatesByCodeId(int codeId, string coordinates)
         {
             try
             {
-                return _consultService.GetHospitalsOfStatesByCodeId(codeId, latlng);
+                return _consultService.GetHospitalsOfStatesByCodeId(codeId, coordinates);
             }
             catch (Exception ex)
             {

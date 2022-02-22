@@ -18,12 +18,6 @@ using Web.Services.Interfaces;
 
 namespace Web.Services.Concrete
 {
-    public class AddCompVM 
-    {
-        public string long_name { get; set; }
-        public string short_name { get; set; }
-        public List<string> types { get; set; }
-    }
     public class ConsultService : IConsultService
     {
         private RAQ_DbContext _dbContext;
@@ -199,7 +193,7 @@ namespace Web.Services.Concrete
 
         #region Map & addresses
 
-        public BaseResponse GetHospitalsOfStatesByCodeId(int codeId, string latlng) 
+        public BaseResponse GetHospitalsOfStatesByCodeId(int codeId, string latlng)
         {
             var googleApiResult = this._httpClient.GetAsync("https://maps.googleapis.com/maps/api/geocode/json?latlng=" + latlng + "&key=AIzaSyA5EvXiXjlmc0hpLPmLgGZoOgZ80Ca0eQ0").Result;
 
@@ -211,7 +205,7 @@ namespace Web.Services.Concrete
                 var addressType = address[i].types;
                 for (int j = 0; j < addressType.Count; j++)
                 {
-                    if (addressType[j] == "administrative_area_level_1") 
+                    if (addressType[j] == "administrative_area_level_1")
                     {
                         StateName = address[i].long_name;
                     }
@@ -224,16 +218,24 @@ namespace Web.Services.Concrete
 
                 var orgsAddress = this._orgRepo.Table.Where(x => x.ActiveCodes.Contains(codeId.ToString()) && x.StateIdFk == stateId.Id && !x.IsDeleted).ToList();
 
-                List<string> addresses = new List<string>();
-
+                List<object> objList = new List<object>();
+             
                 foreach (var item in orgsAddress)
                 {
-                    string addres = $"{item.PrimaryAddress}, {StateName}, {item.Zip}";
-                    addresses.Add(addres);
+                    string add = $"{item.PrimaryAddress}, {StateName}, {item.Zip}";
+                    var googleApiLatLng = this._httpClient.GetAsync("https://maps.googleapis.com/maps/api/geocode/json?address=" + add + "&key=AIzaSyA5EvXiXjlmc0hpLPmLgGZoOgZ80Ca0eQ0").Result;
+
+                    dynamic Apiresults = googleApiLatLng["results"];
+                    var geometry = results[0]["geometry"];
+                    var location = geometry["location"];
+                    var longLat = new List<double> { Convert.ToDouble(location.lat), Convert.ToDouble(location.lng) };
+
+                    objList.Add(new { OrganizationId = item.OrganizationId, Address = add, lat = longLat[0], lng = longLat[1], title = item.OrganizationName });
                 }
-                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Addresses Returned", Body = addresses };
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Addresses Returned", Body = objList };
             }
-            else {
+            else
+            {
                 return new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "State Not Found" };
             }
         }
