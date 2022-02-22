@@ -234,7 +234,7 @@ namespace Web.Services.Concrete
                         Directory.CreateDirectory(targetPath);
                     }
                     register.UserImageByte = Convert.FromBase64String(register.UserImage.Split("base64,")[1]);
-                    targetPath += $"{user.FirstName}-{user.LastName}_{user.UserId}.png";
+                    targetPath += "/" + $"{user.FirstName}-{user.LastName}_{user.UserId}.png";
                     using (FileStream fs = new FileStream(targetPath, FileMode.Create, FileAccess.Write))
                     {
                         fs.Write(register.UserImageByte);
@@ -340,7 +340,7 @@ namespace Web.Services.Concrete
                             {
                                 Directory.CreateDirectory(targetPath);
                             }
-                            targetPath += $"{obj.FirstName}-{obj.LastName}_{obj.UserId}.png";
+                            targetPath += "/" + $"{obj.FirstName}-{obj.LastName}_{obj.UserId}.png";
                             register.UserImageByte = Convert.FromBase64String(register.UserImage.Split("base64,")[1]);
                             using (FileStream fs = new FileStream(targetPath, FileMode.Create, FileAccess.Write))
                             {
