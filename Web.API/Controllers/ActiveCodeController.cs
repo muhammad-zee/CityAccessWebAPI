@@ -213,6 +213,7 @@ namespace Web.API.Controllers
         {
             try
             {
+                var state = ModelState;
                 return _activeCodesService.AddOrUpdateSepsisData(codeSepsis);
             }
             catch (Exception ex)
