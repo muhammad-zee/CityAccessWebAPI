@@ -126,6 +126,7 @@ namespace Web.API
             services.AddTransient(typeof(ISettingService), typeof(SettingsService));
             services.AddTransient(typeof(IConsultService), typeof(ConsultService));
             services.AddTransient(typeof(IActiveCodeService), typeof(ActiveCodeService));
+            services.AddTransient(typeof(IHttpClient), typeof(HttpClientHelper));
 
             //Register Services Repositories
 
@@ -142,8 +143,6 @@ namespace Web.API
             app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "RoutingAndQueueingAPI v1"));
             /*}*/
 
-
-
             app.UseSwaggerUI(c =>
             {
                 // For Debug in Kestrel
@@ -154,31 +153,24 @@ namespace Web.API
             });
             app.UseHttpsRedirection();
 
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                ServeUnknownFileTypes = true,
+            });
+            //.UseDirectoryBrowser()
+            //.UseRequestLocalization();
+
             app.UseRouting();
+
+            app.UseCors(x => x
+                //.SetIsOriginAllowed(origin => true)
+                .AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader());
 
             app.UseAuthentication();
 
             app.UseAuthorization();
-
-            //app.UseElmahIo();
-            app.UseElmah();
-            app.UseElmahExceptionPage();
-
-            // global error handler
-            app.UseMiddleware<ErrorHandlerMiddleware>();
-
-            app.UseCors(x => x
-              .SetIsOriginAllowed(origin => true)
-              .AllowAnyMethod()
-              .AllowAnyHeader()
-              .AllowCredentials());
-
-            app.UseStaticFiles(new StaticFileOptions
-            {
-                ServeUnknownFileTypes = true,
-            })
-            .UseDirectoryBrowser()
-            .UseRequestLocalization();
 
             //app.UseStaticFiles(new StaticFileOptions
             //{
@@ -188,6 +180,13 @@ namespace Web.API
             {
                 endpoints.MapControllers();
             });
+
+            //app.UseElmahIo();
+            app.UseElmah();
+            app.UseElmahExceptionPage();
+
+            // global error handler
+            app.UseMiddleware<ErrorHandlerMiddleware>();
         }
     }
 }
