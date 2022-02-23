@@ -8,7 +8,8 @@ namespace Web.Services.Enums
 {
     public enum ChannelAttributeEnums
     {
-        ChannelType
+        ChannelType,
+        ConsultId
     }
     public enum ChannelTypeEnums
     {

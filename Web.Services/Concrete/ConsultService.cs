@@ -283,8 +283,10 @@ namespace Web.Services.Concrete
 
                         var conversationChannelAttributes = JsonConvert.SerializeObject(new Dictionary<string, Object>()
                                     {
-                                        {ChannelAttributeEnums.ChannelType.ToString(), ChannelTypeEnums.Consult.ToString()}
+                                        {ChannelAttributeEnums.ChannelType.ToString(), ChannelTypeEnums.Consult.ToString()},
+                                        {ChannelAttributeEnums.ConsultId.ToString(), Consult_Counter.Counter_Value}
                                     }, Formatting.Indented);
+
                         var loggedUser = (from u in this._usersRepo.Table
                                           where u.UserId == ApplicationSettings.UserId
                                           select new RegisterCredentialVM
@@ -443,6 +445,8 @@ namespace Web.Services.Concrete
         {
             var consultAknowledge = this._consultAcknowledgmentRepo.Table.Where(x => x.UserIdFk == userId && !x.IsAcknowledge && !x.IsDeleted).ToList();
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = consultAknowledge };
+
+
         }
 
         public BaseResponse AcknowledgeConsult(int consultId)
