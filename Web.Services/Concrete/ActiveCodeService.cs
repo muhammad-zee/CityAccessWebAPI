@@ -1058,6 +1058,42 @@ namespace Web.Services.Concrete
 
                 this._codeStrokeRepo.Insert(stroke);
 
+                if (stroke.IsEms != null && stroke.IsEms.Value)
+                {
+                    var serviceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == stroke.OrganizationIdFk && x.CodeIdFk == UCLEnums.Stroke.ToInt() && !x.IsDeleted).Select(x => x.ServiceLineIds).FirstOrDefault();
+                    if (serviceLineIds != null && serviceLineIds != "")
+                    {
+                        var UserChannelSid = (from us in this._userSchedulesRepo.Table
+                                              join u in this._userRepo.Table on us.UserIdFk equals u.UserId
+                                              where serviceLineIds.ToIntList().Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
+                                              select u.UserChannelSid).ToList();
+                        var loggedUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => x.UserUniqueId).FirstOrDefault();
+                        UserChannelSid.Add(loggedUser);
+
+                        if (UserChannelSid != null && UserChannelSid.Count > 0)
+                        {
+                            //string uniqueName = $"CONSULT_{Consult_Counter.Counter_Value.ToString()}";
+                            string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
+                            string friendlyName = $"EMS_{UCLEnums.Stroke.ToString()}_{stroke.CodeStrokeId}";
+                            var channel = _communication.createConversationChannel(friendlyName, uniqueName, null);
+                            foreach (var item in UserChannelSid)
+                            {
+                                _communication.addNewUserToConversationChannel(channel.Sid, item);
+
+                            }
+                            var msg = new ConversationMessageVM()
+                            {
+                                author = "System",
+                                attributes = "",
+                                body = $"This Group created by system for EMS_{UCLEnums.Stroke.ToString()} purpose",
+                                channelSid = channel.Sid
+                            };
+                            var sendMsg = _communication.sendPushNotification(msg);
+                        }
+
+                    }
+                }
+
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Added", Body = stroke };
             }
         }
@@ -1868,6 +1904,44 @@ namespace Web.Services.Concrete
                 }
                 this._codeSepsisRepo.Insert(Sepsis);
 
+
+                if (Sepsis.IsEms)
+                {
+                    var serviceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == Sepsis.OrganizationIdFk && x.CodeIdFk == UCLEnums.Sepsis.ToInt() && !x.IsDeleted).Select(x => x.ServiceLineIds).FirstOrDefault();
+                    if (serviceLineIds != null && serviceLineIds != "")
+                    {
+                        var UserChannelSid = (from us in this._userSchedulesRepo.Table
+                                              join u in this._userRepo.Table on us.UserIdFk equals u.UserId
+                                              where serviceLineIds.ToIntList().Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
+                                              select u.UserChannelSid).ToList();
+                        var loggedUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => x.UserUniqueId).FirstOrDefault();
+                        UserChannelSid.Add(loggedUser);
+
+                        if (UserChannelSid != null && UserChannelSid.Count > 0)
+                        {
+                            //string uniqueName = $"CONSULT_{Consult_Counter.Counter_Value.ToString()}";
+                            string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
+                            string friendlyName = $"EMS_{UCLEnums.Sepsis.ToString()}_{Sepsis.CodeSepsisId}";
+                            var channel = _communication.createConversationChannel(friendlyName, uniqueName, null);
+                            foreach (var item in UserChannelSid)
+                            {
+                                _communication.addNewUserToConversationChannel(channel.Sid, item);
+
+                            }
+                            var msg = new ConversationMessageVM()
+                            {
+                                author = "System",
+                                attributes = "",
+                                body = $"This Group created by system for EMS_{UCLEnums.Sepsis.ToString()} purpose",
+                                channelSid = channel.Sid
+                            };
+                            var sendMsg = _communication.sendPushNotification(msg);
+                        }
+
+                    }
+                }
+
+
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Added", Body = Sepsis };
             }
         }
@@ -2675,6 +2749,42 @@ namespace Web.Services.Concrete
 
                 this._codeSTEMIRepo.Insert(STEMI);
 
+                if (STEMI.IsEms != null && STEMI.IsEms.Value)
+                {
+                    var serviceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == STEMI.OrganizationIdFk && x.CodeIdFk == UCLEnums.STEMI.ToInt() && !x.IsDeleted).Select(x => x.ServiceLineIds).FirstOrDefault();
+                    if (serviceLineIds != null && serviceLineIds != "")
+                    {
+                        var UserChannelSid = (from us in this._userSchedulesRepo.Table
+                                              join u in this._userRepo.Table on us.UserIdFk equals u.UserId
+                                              where serviceLineIds.ToIntList().Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
+                                              select u.UserChannelSid).ToList();
+                        var loggedUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => x.UserUniqueId).FirstOrDefault();
+                        UserChannelSid.Add(loggedUser);
+
+                        if (UserChannelSid != null && UserChannelSid.Count > 0)
+                        {
+                            //string uniqueName = $"CONSULT_{Consult_Counter.Counter_Value.ToString()}";
+                            string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
+                            string friendlyName = $"EMS_{UCLEnums.STEMI.ToString()}_{STEMI.CodeStemiid}";
+                            var channel = _communication.createConversationChannel(friendlyName, uniqueName, null);
+                            foreach (var item in UserChannelSid)
+                            {
+                                _communication.addNewUserToConversationChannel(channel.Sid, item);
+                               
+                            }
+                            var msg = new ConversationMessageVM()
+                            {
+                                author = "System",
+                                attributes = "",
+                                body = $"This Group created by system for EMS_{UCLEnums.STEMI.ToString()} purpose",
+                                channelSid = channel.Sid
+                            };
+                            var sendMsg = _communication.sendPushNotification(msg);
+                        }
+
+                    }
+                }
+
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Added", Body = STEMI };
             }
         }
@@ -3479,6 +3589,44 @@ namespace Web.Services.Concrete
                     Truma.Audio = codeTruma.AudioFolderRoot;
                 }
                 this._codeTrumaRepo.Insert(Truma);
+
+
+                if (Truma.IsEms != null && Truma.IsEms.Value)
+                {
+                    var serviceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == Truma.OrganizationIdFk && x.CodeIdFk == UCLEnums.Trauma.ToInt() && !x.IsDeleted).Select(x => x.ServiceLineIds).FirstOrDefault();
+                    if (serviceLineIds != null && serviceLineIds != "")
+                    {
+                        var UserChannelSid = (from us in this._userSchedulesRepo.Table
+                                              join u in this._userRepo.Table on us.UserIdFk equals u.UserId
+                                              where serviceLineIds.ToIntList().Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
+                                              select u.UserChannelSid).ToList();
+                        var loggedUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => x.UserUniqueId).FirstOrDefault();
+                        UserChannelSid.Add(loggedUser);
+
+                        if (UserChannelSid != null && UserChannelSid.Count > 0)
+                        {
+                            //string uniqueName = $"CONSULT_{Consult_Counter.Counter_Value.ToString()}";
+                            string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
+                            string friendlyName = $"EMS_{UCLEnums.Trauma.ToString()}_{Truma.CodeTraumaId}";
+                            var channel = _communication.createConversationChannel(friendlyName, uniqueName, null);
+                            foreach (var item in UserChannelSid)
+                            {
+                                _communication.addNewUserToConversationChannel(channel.Sid, item);
+
+                            }
+                            var msg = new ConversationMessageVM()
+                            {
+                                author = "System",
+                                attributes = "",
+                                body = $"This Group created by system for EMS_{UCLEnums.Trauma.ToString()} purpose",
+                                channelSid = channel.Sid
+                            };
+                            var sendMsg = _communication.sendPushNotification(msg);
+                        }
+
+                    }
+                }
+
 
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Added", Body = Truma };
             }
