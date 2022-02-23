@@ -278,9 +278,9 @@ namespace Web.Services.Concrete
                                     .WithSqlParam("@servicelineIdFk", serviceLineId)
                                     .WithSqlParam("@dayOfWeek", DateTime.UtcNow.DayOfWeek.ToString())
                                     .ExecuteStoredProc<RegisterCredentialVM>();
-<<<<<<< Updated upstream
+
                         var consultType = _controlListDetailsRepo.Table.Where(x => x.ControlListDetailId == keyValues["ConsultType"].ToString().ToInt()).Select(x => x.Title).FirstOrDefault();
-=======
+
                         var conversationChannelAttributes = JsonConvert.SerializeObject(new Dictionary<string, Object>()
                                     {
                                         {ChannelAttributeEnums.ChannelType.ToString(), ChannelTypeEnums.Consult.ToString()}
@@ -292,7 +292,7 @@ namespace Web.Services.Concrete
                                               UserUniqueId = u.UserUniqueId
                                           }).FirstOrDefault();
                         users.Add(loggedUser);
->>>>>>> Stashed changes
+
                         if (users != null && users.Count > 0 && users.FirstOrDefault().IsAfterHours == true)
                         {
                             if (keys.Contains("ConsultType") && keyValues["ConsultType"].ToString() != null && keyValues["ConsultType"].ToString() != "")
@@ -300,14 +300,11 @@ namespace Web.Services.Concrete
                                 
                                 if (consultType != null && consultType == "Urgent")
                                 {
-<<<<<<< Updated upstream
-                                    var channel = _communicationService.createConversationChannel($"{keyValues["PatientFirstName"].ToString()}_{Consult_Counter.Counter_Value}_{consultType}", Consult_Counter.Counter_Value.ToString());
-=======
                                     //string uniqueName = $"CONSULT_{Consult_Counter.Counter_Value.ToString()}";
                                     string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
                                     string friendlyName = $"{keyValues["PatientFirstName"].ToString()}_{Consult_Counter.Counter_Value}_{keyValues["ConsultType"].ToString()}";
                                     var channel = _communicationService.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
->>>>>>> Stashed changes
+
                                     foreach (var item in users)
                                     {
                                         this._communicationService.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
@@ -325,14 +322,11 @@ namespace Web.Services.Concrete
                         }
                         else if (users != null && users.Count > 0)
                         {
-<<<<<<< Updated upstream
-                            var channel = _communicationService.createConversationChannel($"{keyValues["PatientFirstName"].ToString()}_{Consult_Counter.Counter_Value}_{consultType}", Consult_Counter.Counter_Value.ToString());
-=======
                             //string uniqueName = $"CONSULT_{Consult_Counter.Counter_Value.ToString()}";
                             string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
                             string friendlyName = $"{keyValues["PatientFirstName"].ToString()}_{Consult_Counter.Counter_Value}_{keyValues["ConsultType"].ToString()}";
                             var channel = _communicationService.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
->>>>>>> Stashed changes
+
                             foreach (var item in users)
                             {
                                 _communicationService.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
@@ -389,6 +383,17 @@ namespace Web.Services.Concrete
             return new BaseResponse() { Status = HttpStatusCode.NotModified, Message = "Consult Id Column is not exist" };
         }
 
+
+        #endregion
+
+
+        #region Consult Acknowledgments
+
+        public BaseResponse GetAllConsultAcknowledgments() 
+        {
+            var consultAcknowledgments = this._consultAcknowledgmentRepo.Table.Where(x => !x.IsDeleted).ToList();
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = consultAcknowledgments };
+        }
 
         #endregion
     }
