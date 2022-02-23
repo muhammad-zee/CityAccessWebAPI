@@ -9,12 +9,18 @@ namespace Web.Services.Enums
     public enum ChannelAttributeEnums
     {
         ChannelType,
-        ConsultId
+        CodeType,
+        ConsultId,
+        StrokeId,
+        SepsisId,
+        STEMIId,
+        TraumaId
     }
     public enum ChannelTypeEnums
     {
         OneToOne,
         Group,
-        Consult
+        Consult,
+        EMS
     }
 }

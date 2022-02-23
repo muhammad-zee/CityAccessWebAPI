@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -1066,16 +1067,22 @@ namespace Web.Services.Concrete
                         var UserChannelSid = (from us in this._userSchedulesRepo.Table
                                               join u in this._userRepo.Table on us.UserIdFk equals u.UserId
                                               where serviceLineIds.ToIntList().Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
-                                              select u.UserChannelSid).ToList();
+                                              select u.UserUniqueId).ToList();
                         var loggedUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => x.UserUniqueId).FirstOrDefault();
                         UserChannelSid.Add(loggedUser);
+                        var conversationChannelAttributes = JsonConvert.SerializeObject(new Dictionary<string, Object>()
+                                    {
+                                        {ChannelAttributeEnums.ChannelType.ToString(), ChannelTypeEnums.EMS.ToString()},
+                                        {ChannelAttributeEnums.CodeType.ToString(), UCLEnums.Stroke.ToString()},
+                                        {ChannelAttributeEnums.StrokeId.ToString(), stroke.CodeStrokeId}
+                                    }, Formatting.Indented);
 
                         if (UserChannelSid != null && UserChannelSid.Count > 0)
                         {
                             //string uniqueName = $"CONSULT_{Consult_Counter.Counter_Value.ToString()}";
                             string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
                             string friendlyName = $"EMS_{UCLEnums.Stroke.ToString()}_{stroke.CodeStrokeId}";
-                            var channel = _communication.createConversationChannel(friendlyName, uniqueName, null);
+                            var channel = _communication.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
                             foreach (var item in UserChannelSid)
                             {
                                 _communication.addNewUserToConversationChannel(channel.Sid, item);
@@ -1913,7 +1920,7 @@ namespace Web.Services.Concrete
                         var UserChannelSid = (from us in this._userSchedulesRepo.Table
                                               join u in this._userRepo.Table on us.UserIdFk equals u.UserId
                                               where serviceLineIds.ToIntList().Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
-                                              select u.UserChannelSid).ToList();
+                                              select u.UserUniqueId).ToList();
                         var loggedUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => x.UserUniqueId).FirstOrDefault();
                         UserChannelSid.Add(loggedUser);
 
@@ -1922,7 +1929,13 @@ namespace Web.Services.Concrete
                             //string uniqueName = $"CONSULT_{Consult_Counter.Counter_Value.ToString()}";
                             string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
                             string friendlyName = $"EMS_{UCLEnums.Sepsis.ToString()}_{Sepsis.CodeSepsisId}";
-                            var channel = _communication.createConversationChannel(friendlyName, uniqueName, null);
+                            var conversationChannelAttributes = JsonConvert.SerializeObject(new Dictionary<string, Object>()
+                                    {
+                                        {ChannelAttributeEnums.ChannelType.ToString(), ChannelTypeEnums.EMS.ToString()},
+                                        {ChannelAttributeEnums.CodeType.ToString(), UCLEnums.Sepsis.ToString()},
+                                        {ChannelAttributeEnums.SepsisId.ToString(), Sepsis.CodeSepsisId}
+                                    }, Formatting.Indented);
+                            var channel = _communication.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
                             foreach (var item in UserChannelSid)
                             {
                                 _communication.addNewUserToConversationChannel(channel.Sid, item);
@@ -2757,7 +2770,7 @@ namespace Web.Services.Concrete
                         var UserChannelSid = (from us in this._userSchedulesRepo.Table
                                               join u in this._userRepo.Table on us.UserIdFk equals u.UserId
                                               where serviceLineIds.ToIntList().Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
-                                              select u.UserChannelSid).ToList();
+                                              select u.UserUniqueId).ToList();
                         var loggedUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => x.UserUniqueId).FirstOrDefault();
                         UserChannelSid.Add(loggedUser);
 
@@ -2766,7 +2779,13 @@ namespace Web.Services.Concrete
                             //string uniqueName = $"CONSULT_{Consult_Counter.Counter_Value.ToString()}";
                             string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
                             string friendlyName = $"EMS_{UCLEnums.STEMI.ToString()}_{STEMI.CodeStemiid}";
-                            var channel = _communication.createConversationChannel(friendlyName, uniqueName, null);
+                            var conversationChannelAttributes = JsonConvert.SerializeObject(new Dictionary<string, Object>()
+                                    {
+                                        {ChannelAttributeEnums.ChannelType.ToString(), ChannelTypeEnums.EMS.ToString()},
+                                        {ChannelAttributeEnums.CodeType.ToString(), UCLEnums.STEMI.ToString()},
+                                        {ChannelAttributeEnums.STEMIId.ToString(), STEMI.CodeStemiid}
+                                    }, Formatting.Indented);
+                            var channel = _communication.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
                             foreach (var item in UserChannelSid)
                             {
                                 _communication.addNewUserToConversationChannel(channel.Sid, item);
@@ -3599,7 +3618,7 @@ namespace Web.Services.Concrete
                         var UserChannelSid = (from us in this._userSchedulesRepo.Table
                                               join u in this._userRepo.Table on us.UserIdFk equals u.UserId
                                               where serviceLineIds.ToIntList().Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
-                                              select u.UserChannelSid).ToList();
+                                              select u.UserUniqueId).ToList();
                         var loggedUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => x.UserUniqueId).FirstOrDefault();
                         UserChannelSid.Add(loggedUser);
 
@@ -3608,7 +3627,13 @@ namespace Web.Services.Concrete
                             //string uniqueName = $"CONSULT_{Consult_Counter.Counter_Value.ToString()}";
                             string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
                             string friendlyName = $"EMS_{UCLEnums.Trauma.ToString()}_{Truma.CodeTraumaId}";
-                            var channel = _communication.createConversationChannel(friendlyName, uniqueName, null);
+                            var conversationChannelAttributes = JsonConvert.SerializeObject(new Dictionary<string, Object>()
+                                    {
+                                        {ChannelAttributeEnums.ChannelType.ToString(), ChannelTypeEnums.EMS.ToString()},
+                                        {ChannelAttributeEnums.CodeType.ToString(), UCLEnums.Trauma.ToString()},
+                                        {ChannelAttributeEnums.TraumaId.ToString(), Truma.CodeTraumaId}
+                                    }, Formatting.Indented);
+                            var channel = _communication.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
                             foreach (var item in UserChannelSid)
                             {
                                 _communication.addNewUserToConversationChannel(channel.Sid, item);

@@ -572,7 +572,7 @@ namespace Web.Services.Concrete
         public ChannelResource createConversationChannel(string FriendlyName, string UniqueName,string Attrubutes)
         {
             TwilioClient.Init(this.Twilio_AccountSid, this.Twilio_AuthToken);
-            string userUniqueId = this._userRepo.Table.FirstOrDefault(u => u.IsDeleted != true && u.UserId == ApplicationSettings.UserId && !string.IsNullOrEmpty(u.ConversationUserSid)).UserUniqueId;
+            string userUniqueId = this._userRepo.Table.Where(u => u.IsDeleted != true && u.UserId == ApplicationSettings.UserId && !string.IsNullOrEmpty(u.ConversationUserSid)).Select(x => x.UserUniqueId).FirstOrDefault();
             userUniqueId = string.IsNullOrEmpty(userUniqueId) ? "system" : userUniqueId;
             var channel = ChannelResource.Create(pathServiceSid: this.Twilio_ChatServiceSid, friendlyName: FriendlyName, uniqueName: UniqueName,attributes: Attrubutes, type: ChannelTypeEnum.Private,createdBy:userUniqueId);
             //var channel = Twilio.Rest.Conversations.V1.ConversationResource.Create(servives: this.Twilio_ChatServiceSid, friendlyName: FriendlyName, uniqueName: UniqueName);
@@ -646,7 +646,7 @@ namespace Web.Services.Concrete
         public BaseResponse createOrRemoveGroupMemberAsAdmin(bool isAdmin, string uniqueName, string channleSid)
         {
             HttpStatusCode status = HttpStatusCode.NotFound;
-            string message = "Member not found."
+            string message = "Member not found.";
             var row = (from cp in this._conversationParticipantsRepo.Table
                        join c in this._conversationChannelsRepo.Table on cp.ConversationChannelIdFk equals c.ConversationChannelId
                        where cp.UniqueName == uniqueName && c.ChannelSid == channleSid && !cp.IsDeleted && !c.IsDeleted
