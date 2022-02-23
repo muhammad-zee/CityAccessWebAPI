@@ -339,17 +339,17 @@ namespace Web.Services.Concrete
                 User user = null;
                 foreach (var p in model.Participants)
                 {
-                    user = this._userRepo.Table.FirstOrDefault(u => u.IsDeleted != true && u.IsActive == true && u.UserUniqueId == p);
-                    bool participantExists = this._conversationParticipantsRepo.Table.Count(cp => cp.IsDeleted != true && cp.UserIdFk == user.UserId && cp.ConversationChannelIdFk == channel.ConversationChannelId && cp.UniqueName == p) > 0;
+                    user = this._userRepo.Table.FirstOrDefault(u => u.IsDeleted != true && u.IsActive == true && u.UserUniqueId == p.UniqueName);
+                    bool participantExists = this._conversationParticipantsRepo.Table.Count(cp => cp.IsDeleted != true && cp.UserIdFk == user.UserId && cp.ConversationChannelIdFk == channel.ConversationChannelId && cp.UniqueName == p.UniqueName) > 0;
                     if (!participantExists)
                     {
                         newParticipant = new ConversationParticipant()
                         {
                             FriendlyName = user.FirstName + " " + user.LastName,
-                            UniqueName = p,
+                            UniqueName = p.UniqueName,
                             UserIdFk = user.UserId,
                             ConversationChannelIdFk = channel.ConversationChannelId,
-                            IsAdmin = user.UserId == model.CreatedBy,
+                            IsAdmin = p.IsAdmin,
                             CreatedBy = model.CreatedBy,
                             CreatedDate = DateTime.UtcNow,
                             IsDeleted = false
@@ -487,7 +487,7 @@ namespace Web.Services.Concrete
                 var newParticipant = new ConversationChannelParticipantsVM
                 {
                     UserId = participant.UserId,
-                    Participants = new List<string> { participant.UserUniqueId },
+                    Participants = new List<ParticipantVM> { new ParticipantVM { UniqueName = participant.UserUniqueId } },
                     ChannelSid = channel.Sid,
                     CreatedBy = UserId
                 };
@@ -569,10 +569,12 @@ namespace Web.Services.Concrete
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Chat users found", Body = chatUsers };
         }
 
-        public ChannelResource createConversationChannel(string FriendlyName, string UniqueName)
+        public ChannelResource createConversationChannel(string FriendlyName, string UniqueName,string Attrubutes)
         {
             TwilioClient.Init(this.Twilio_AccountSid, this.Twilio_AuthToken);
-            var channel = ChannelResource.Create(pathServiceSid: this.Twilio_ChatServiceSid, friendlyName: FriendlyName, uniqueName: UniqueName,type: ChannelTypeEnum.Private);
+            string userUniqueId = this._userRepo.Table.FirstOrDefault(u => u.IsDeleted != true && u.UserId == ApplicationSettings.UserId && !string.IsNullOrEmpty(u.ConversationUserSid)).UserUniqueId;
+            userUniqueId = string.IsNullOrEmpty(userUniqueId) ? "system" : userUniqueId;
+            var channel = ChannelResource.Create(pathServiceSid: this.Twilio_ChatServiceSid, friendlyName: FriendlyName, uniqueName: UniqueName,attributes: Attrubutes, type: ChannelTypeEnum.Private,createdBy:userUniqueId);
             //var channel = Twilio.Rest.Conversations.V1.ConversationResource.Create(servives: this.Twilio_ChatServiceSid, friendlyName: FriendlyName, uniqueName: UniqueName);
             return channel;
         }

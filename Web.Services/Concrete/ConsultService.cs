@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,7 @@ using Web.Data.Models;
 using Web.DLL.Generic_Repository;
 using Web.Model;
 using Web.Model.Common;
+using Web.Services.Enums;
 using Web.Services.Extensions;
 using Web.Services.Helper;
 using Web.Services.Interfaces;
@@ -276,7 +278,21 @@ namespace Web.Services.Concrete
                                     .WithSqlParam("@servicelineIdFk", serviceLineId)
                                     .WithSqlParam("@dayOfWeek", DateTime.UtcNow.DayOfWeek.ToString())
                                     .ExecuteStoredProc<RegisterCredentialVM>();
+<<<<<<< Updated upstream
                         var consultType = _controlListDetailsRepo.Table.Where(x => x.ControlListDetailId == keyValues["ConsultType"].ToString().ToInt()).Select(x => x.Title).FirstOrDefault();
+=======
+                        var conversationChannelAttributes = JsonConvert.SerializeObject(new Dictionary<string, Object>()
+                                    {
+                                        {ChannelAttributeEnums.ChannelType.ToString(), ChannelTypeEnums.Consult.ToString()}
+                                    }, Formatting.Indented);
+                        var loggedUser = (from u in this._usersRepo.Table
+                                          where u.UserId == ApplicationSettings.UserId
+                                          select new RegisterCredentialVM
+                                          {
+                                              UserUniqueId = u.UserUniqueId
+                                          }).FirstOrDefault();
+                        users.Add(loggedUser);
+>>>>>>> Stashed changes
                         if (users != null && users.Count > 0 && users.FirstOrDefault().IsAfterHours == true)
                         {
                             if (keys.Contains("ConsultType") && keyValues["ConsultType"].ToString() != null && keyValues["ConsultType"].ToString() != "")
@@ -284,10 +300,17 @@ namespace Web.Services.Concrete
                                 
                                 if (consultType != null && consultType == "Urgent")
                                 {
+<<<<<<< Updated upstream
                                     var channel = _communicationService.createConversationChannel($"{keyValues["PatientFirstName"].ToString()}_{Consult_Counter.Counter_Value}_{consultType}", Consult_Counter.Counter_Value.ToString());
+=======
+                                    //string uniqueName = $"CONSULT_{Consult_Counter.Counter_Value.ToString()}";
+                                    string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
+                                    string friendlyName = $"{keyValues["PatientFirstName"].ToString()}_{Consult_Counter.Counter_Value}_{keyValues["ConsultType"].ToString()}";
+                                    var channel = _communicationService.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
+>>>>>>> Stashed changes
                                     foreach (var item in users)
                                     {
-                                        _communicationService.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
+                                        this._communicationService.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
                                     }
                                     var msg = new ConversationMessageVM()
                                     {
@@ -302,7 +325,14 @@ namespace Web.Services.Concrete
                         }
                         else if (users != null && users.Count > 0)
                         {
+<<<<<<< Updated upstream
                             var channel = _communicationService.createConversationChannel($"{keyValues["PatientFirstName"].ToString()}_{Consult_Counter.Counter_Value}_{consultType}", Consult_Counter.Counter_Value.ToString());
+=======
+                            //string uniqueName = $"CONSULT_{Consult_Counter.Counter_Value.ToString()}";
+                            string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
+                            string friendlyName = $"{keyValues["PatientFirstName"].ToString()}_{Consult_Counter.Counter_Value}_{keyValues["ConsultType"].ToString()}";
+                            var channel = _communicationService.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
+>>>>>>> Stashed changes
                             foreach (var item in users)
                             {
                                 _communicationService.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);

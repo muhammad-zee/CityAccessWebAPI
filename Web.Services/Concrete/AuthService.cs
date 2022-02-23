@@ -294,7 +294,7 @@ namespace Web.Services.Concrete
                         }
 
 
-                        var notificationChannel = this._communicationService.createConversationChannel(register.FirstName + " " + register.LastName, randomString);
+                        var notificationChannel = this._communicationService.createConversationChannel(register.FirstName + " " + register.LastName, randomString,"");
                         var conversationUser = this._communicationService.createConversationUser(randomString, register.FirstName + " " + register.LastName);
                         var addConversationUserToChannel = this._communicationService.addNewUserToConversationChannel(notificationChannel.Sid, randomString);
                         var obj = new User()
