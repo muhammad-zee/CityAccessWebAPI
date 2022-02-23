@@ -276,14 +276,15 @@ namespace Web.Services.Concrete
                                     .WithSqlParam("@servicelineIdFk", serviceLineId)
                                     .WithSqlParam("@dayOfWeek", DateTime.UtcNow.DayOfWeek.ToString())
                                     .ExecuteStoredProc<RegisterCredentialVM>();
-
+                        var consultType = _controlListDetailsRepo.Table.Where(x => x.ControlListDetailId == keyValues["ConsultType"].ToString().ToInt()).Select(x => x.Title).FirstOrDefault();
                         if (users != null && users.Count > 0 && users.FirstOrDefault().IsAfterHours == true)
                         {
                             if (keys.Contains("ConsultType") && keyValues["ConsultType"].ToString() != null && keyValues["ConsultType"].ToString() != "")
                             {
-                                if (keyValues["ConsultType"].ToString() == "Urgent")
+                                
+                                if (consultType != null && consultType == "Urgent")
                                 {
-                                    var channel = _communicationService.createConversationChannel($"{keyValues["PatientFirstName"].ToString()}_{Consult_Counter.Counter_Value}_{keyValues["ConsultType"].ToString()}", Consult_Counter.Counter_Value.ToString());
+                                    var channel = _communicationService.createConversationChannel($"{keyValues["PatientFirstName"].ToString()}_{Consult_Counter.Counter_Value}_{consultType}", Consult_Counter.Counter_Value.ToString());
                                     foreach (var item in users)
                                     {
                                         _communicationService.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
@@ -301,7 +302,7 @@ namespace Web.Services.Concrete
                         }
                         else if (users != null && users.Count > 0)
                         {
-                            var channel = _communicationService.createConversationChannel($"{keyValues["PatientFirstName"].ToString()}_{Consult_Counter.Counter_Value}_{keyValues["ConsultType"].ToString()}", Consult_Counter.Counter_Value.ToString());
+                            var channel = _communicationService.createConversationChannel($"{keyValues["PatientFirstName"].ToString()}_{Consult_Counter.Counter_Value}_{consultType}", Consult_Counter.Counter_Value.ToString());
                             foreach (var item in users)
                             {
                                 _communicationService.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
