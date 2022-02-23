@@ -1509,7 +1509,7 @@ namespace Web.Services.Concrete
 
                 if (!string.IsNullOrEmpty(codeSepsis.AttachmentsFolderRoot) && !string.IsNullOrWhiteSpace(codeSepsis.AttachmentsFolderRoot))
                 {
-                    string path = this._RootPath + "/Organizations" + '/' + codeSepsis.AttachmentsFolderRoot; //_environment.WebRootFileProvider.GetFileInfo(codeSepsis.AttachmentsFolderRoot)?.PhysicalPath;
+                    string path = this._RootPath + codeSepsis.AttachmentsFolderRoot; //_environment.WebRootFileProvider.GetFileInfo(codeSepsis.AttachmentsFolderRoot)?.PhysicalPath;
                     if (Directory.Exists(path))
                     {
                         DirectoryInfo AttachFiles = new DirectoryInfo(path);
@@ -1522,7 +1522,7 @@ namespace Web.Services.Concrete
 
                 if (!string.IsNullOrEmpty(codeSepsis.AudioFolderRoot) && !string.IsNullOrWhiteSpace(codeSepsis.AudioFolderRoot))
                 {
-                    string path = this._RootPath + "/Organizations" + '/' + codeSepsis.AudioFolderRoot; //_environment.WebRootFileProvider.GetFileInfo(codeSepsis.AudioFolderRoot)?.PhysicalPath;
+                    string path = this._RootPath + '/' + codeSepsis.AudioFolderRoot; //_environment.WebRootFileProvider.GetFileInfo(codeSepsis.AudioFolderRoot)?.PhysicalPath;
                     if (Directory.Exists(path))
                     {
                         DirectoryInfo AudioFiles = new DirectoryInfo(path);
@@ -1535,7 +1535,7 @@ namespace Web.Services.Concrete
 
                 if (!string.IsNullOrEmpty(codeSepsis.VideoFolderRoot) && !string.IsNullOrWhiteSpace(codeSepsis.VideoFolderRoot))
                 {
-                    var path = this._RootPath + "/Organizations" + '/' + codeSepsis.VideoFolderRoot; //_environment.WebRootFileProvider.GetFileInfo(codeSepsis.VideoFolderRoot)?.PhysicalPath;
+                    var path = this._RootPath + '/' + codeSepsis.VideoFolderRoot; //_environment.WebRootFileProvider.GetFileInfo(codeSepsis.VideoFolderRoot)?.PhysicalPath;
                     if (Directory.Exists(path))
                     {
                         DirectoryInfo VideoFiles = new DirectoryInfo(path);
