@@ -185,6 +185,89 @@ namespace Web.API.Controllers
             }
         }
 
+        [Description("Delete Consult")]
+        [HttpGet("consult/DeleteConsult/{consultId}")]
+        public BaseResponse DeleteConsult(int consultId)
+        {
+            try
+            {
+                return _consultService.DeleteConsult(consultId);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
+
+        #endregion
+
+
+        #region Consult Acknowledgments
+
+        [HttpGet("consult/GetAllConsultAcknowledgments")]
+        public BaseResponse GetAllConsultAcknowledgments() 
+        {
+            try
+            {
+                return _consultService.GetAllConsultAcknowledgments();
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
+        [HttpGet("consult/GetConsultAcknowledgmentByConsultId/{consultId}")]
+        public BaseResponse GetConsultAcknowledgmentByConsultId(int consultId)
+        {
+            try
+            {
+                return _consultService.GetConsultAcknowledgmentByConsultId(consultId);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
+        [HttpGet("consult/GetConsultAcknowledgmentByUserId/{userId}")]
+        public BaseResponse GetConsultAcknowledgmentByUserId(int userId)
+        {
+            try
+            {
+                return _consultService.GetConsultAcknowledgmentByUserId(userId);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
+
+        [HttpGet("consult/AcknowledgeConsult/{consultId}")]
+        public BaseResponse AcknowledgeConsult(int consultId)
+        {
+            try
+            {
+                return _consultService.AcknowledgeConsult(consultId);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
         #endregion
     }
 }

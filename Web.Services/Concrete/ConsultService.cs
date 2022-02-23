@@ -297,18 +297,28 @@ namespace Web.Services.Concrete
                         {
                             if (keys.Contains("ConsultType") && keyValues["ConsultType"].ToString() != null && keyValues["ConsultType"].ToString() != "")
                             {
-                                
+
                                 if (consultType != null && consultType == "Urgent")
                                 {
                                     //string uniqueName = $"CONSULT_{Consult_Counter.Counter_Value.ToString()}";
                                     string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
                                     string friendlyName = $"{keyValues["PatientFirstName"].ToString()}_{Consult_Counter.Counter_Value}_{keyValues["ConsultType"].ToString()}";
                                     var channel = _communicationService.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
-
+                                    List<ConsultAcknowledgment> consultAcknowledgmentList = new();
                                     foreach (var item in users)
                                     {
                                         this._communicationService.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
+                                        var acknowledgeConsult = new ConsultAcknowledgment
+                                        {
+                                            IsAcknowledge = false,
+                                            ConsultIdFk = Consult_Counter.Counter_Value,
+                                            UserIdFk = item.UserId,
+                                            CreatedBy = ApplicationSettings.UserId,
+                                            CreatedDate = DateTime.UtcNow
+                                        };
+                                        consultAcknowledgmentList.Add(acknowledgeConsult);
                                     }
+                                    this._consultAcknowledgmentRepo.Insert(consultAcknowledgmentList);
                                     var msg = new ConversationMessageVM()
                                     {
                                         author = "System",
@@ -326,11 +336,21 @@ namespace Web.Services.Concrete
                             string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
                             string friendlyName = $"{keyValues["PatientFirstName"].ToString()}_{Consult_Counter.Counter_Value}_{keyValues["ConsultType"].ToString()}";
                             var channel = _communicationService.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
-
+                            List<ConsultAcknowledgment> consultAcknowledgmentList = new();
                             foreach (var item in users)
                             {
                                 _communicationService.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
+                                var acknowledgeConsult = new ConsultAcknowledgment
+                                {
+                                    IsAcknowledge = false,
+                                    ConsultIdFk = Consult_Counter.Counter_Value,
+                                    UserIdFk = item.UserId,
+                                    CreatedBy = ApplicationSettings.UserId,
+                                    CreatedDate = DateTime.UtcNow
+                                };
+                                consultAcknowledgmentList.Add(acknowledgeConsult);
                             }
+                            this._consultAcknowledgmentRepo.Insert(consultAcknowledgmentList);
                             var msg = new ConversationMessageVM()
                             {
                                 author = "System",
@@ -338,7 +358,7 @@ namespace Web.Services.Concrete
                                 body = "This Group created by system for consult purpose",
                                 channelSid = channel.Sid
                             };
-                            var sendMsg=_communicationService.sendPushNotification(msg);
+                            var sendMsg = _communicationService.sendPushNotification(msg);
                         }
                     }
 
@@ -383,18 +403,61 @@ namespace Web.Services.Concrete
             return new BaseResponse() { Status = HttpStatusCode.NotModified, Message = "Consult Id Column is not exist" };
         }
 
+        public BaseResponse DeleteConsult(int consultId)
+        {
+            var isDeleted = this._dbContext.Database.ExecuteSqlRaw($"Update Consults SET IsDeleted = 1, ModifiedBy = '{ApplicationSettings.UserId}', ModifiedDate = '{DateTime.UtcNow.ToString("yyyy-MM-dd hh:mm:ss")}' WHERE ConsultId = '{consultId}'");
+            if (isDeleted > 0)
+            {
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Consult Deleted" };
+            }
+            else
+            {
+                return new BaseResponse() { Status = HttpStatusCode.NotModified, Message = "No Recored deleted" };
+            }
+        }
 
         #endregion
 
 
         #region Consult Acknowledgments
 
-        public BaseResponse GetAllConsultAcknowledgments() 
+        public BaseResponse GetAllConsultAcknowledgments()
         {
             var consultAcknowledgments = this._consultAcknowledgmentRepo.Table.Where(x => !x.IsDeleted).ToList();
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = consultAcknowledgments };
         }
 
+        public BaseResponse GetConsultAcknowledgmentByConsultId(int consultId)
+        {
+            var consultAknowledge = this._consultAcknowledgmentRepo.Table.Where(x => x.ConsultIdFk == consultId && !x.IsDeleted).ToList();
+            List<object> objList = new List<object>();
+            foreach (var item in consultAknowledge)
+            {
+                string userName = this._usersRepo.Table.Where(x => x.UserId == item.UserIdFk && !x.IsDeleted).Select(x => x.FirstName + ' ' + x.LastName).FirstOrDefault();
+                objList.Add(new { userName, isAcknowledge = item.IsAcknowledge, item });
+            }
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = objList };
+        }
+
+        public BaseResponse GetConsultAcknowledgmentByUserId(int userId)
+        {
+            var consultAknowledge = this._consultAcknowledgmentRepo.Table.Where(x => x.UserIdFk == userId && !x.IsAcknowledge && !x.IsDeleted).ToList();
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = consultAknowledge };
+        }
+
+        public BaseResponse AcknowledgeConsult(int consultId)
+        {
+            var consultAknow = this._consultAcknowledgmentRepo.Table.Where(x => x.ConsultIdFk == consultId && x.UserIdFk == ApplicationSettings.UserId && !x.IsDeleted).FirstOrDefault();
+            consultAknow.IsAcknowledge = true;
+            consultAknow.ModifiedBy = ApplicationSettings.UserId;
+            consultAknow.ModifiedDate = DateTime.UtcNow;
+
+            this._consultAcknowledgmentRepo.Update(consultAknow);
+
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Acknowledged Consult" };
+        }
+
         #endregion
+
     }
 }

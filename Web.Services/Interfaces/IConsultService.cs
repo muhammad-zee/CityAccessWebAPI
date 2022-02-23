@@ -22,6 +22,14 @@ namespace Web.Services.Interfaces
         BaseResponse GetAllConsults();
         BaseResponse GetConsultById(int Id);
         BaseResponse AddOrUpdateConsult(IDictionary<string, object> keyValues);
+        BaseResponse DeleteConsult(int consultId);
+        #endregion
+
+        #region Consult Acknowledgments
+        BaseResponse GetAllConsultAcknowledgments();
+        BaseResponse GetConsultAcknowledgmentByConsultId(int consultId);
+        BaseResponse GetConsultAcknowledgmentByUserId(int userId);
+        BaseResponse AcknowledgeConsult(int consultId);
         #endregion
     }
 }
