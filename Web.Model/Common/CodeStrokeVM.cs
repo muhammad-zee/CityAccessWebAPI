@@ -10,6 +10,7 @@ namespace Web.Model.Common
         public DateTime? Dob { get; set; }
         public int? Gender { get; set; }
         public int OrganizationIdFk { get; set; }
+        public string OrganizationName { get; set; }
         public string GenderTitle { get; set; }
         public string ChiefComplant { get; set; }
         public DateTime? LastKnownWell { get; set; }

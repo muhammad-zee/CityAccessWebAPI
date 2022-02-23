@@ -3708,12 +3708,12 @@ namespace Web.Services.Concrete
                         var googleApiLatLng = this._httpClient.GetAsync(url).Result;
 
                         dynamic Apiresults = googleApiLatLng["results"];
-                        var formatted_address = Apiresults[0]["formatted_address"];
+                        var formatted_address = Convert.ToString(Apiresults[0]["formatted_address"]);
                         var geometry = Apiresults[0]["geometry"];
                         var location = geometry["location"];
                         var longLat = new List<double> { Convert.ToDouble(location.lat), Convert.ToDouble(location.lng) };
 
-                        objList.Add(new { OrganizationId = item.OrganizationId, Address = add, lat = longLat[0], lng = longLat[1], title = item.OrganizationName });
+                        objList.Add(new { OrganizationId = item.OrganizationId, Address = formatted_address, lat = longLat[0], lng = longLat[1], title = item.OrganizationName });
                     }
                     return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Addresses Returned", Body = objList };
                 }
