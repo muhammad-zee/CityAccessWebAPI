@@ -228,7 +228,9 @@ namespace Web.Services.Concrete
                         query += $"[{keys[i]}]";
                         if ((i + 1) == keys.Count)
                         {
-                            query += ",[DateOfBirth]";
+                            if (keyValues.ContainsKey("DateOfBirth"))
+                                query += ",[DateOfBirth]";
+
                             query += ",[ConsultNumber]";
                             query += ",[CreatedBy]";
                             query += ",[CreatedDate]";
@@ -251,8 +253,11 @@ namespace Web.Services.Concrete
                         query += $"'{values[i]}'";
                         if ((i + 1) == values.Count)
                         {
-                            var dob = DateTime.Parse(keyValues["DateOfBirth"].ToString()).ToString("MM-dd-yyyy");
-                            query += $",'{dob}'";
+                            if (keyValues.ContainsKey("DateOfBirth")) 
+                            {
+                                var dob = DateTime.Parse(keyValues["DateOfBirth"].ToString()).ToString("MM-dd-yyyy");
+                                query += $",'{dob}'";
+                            }
                             query += $",'{Consult_Counter.Counter_Value}'";
                             query += $",'{ApplicationSettings.UserId}'";
                             query += $",'{DateTime.UtcNow.ToString("MM-dd-yyyy hh:mm:ss")}'";
