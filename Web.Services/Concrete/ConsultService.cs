@@ -296,7 +296,8 @@ namespace Web.Services.Concrete
                                           where u.UserId == ApplicationSettings.UserId
                                           select new RegisterCredentialVM
                                           {
-                                              UserUniqueId = u.UserUniqueId
+                                              UserUniqueId = u.UserUniqueId,
+                                              UserId = u.UserId
                                           }).FirstOrDefault();
                         users.Add(loggedUser);
 
@@ -436,14 +437,12 @@ namespace Web.Services.Concrete
 
         public BaseResponse GetConsultAcknowledgmentByConsultId(int consultId)
         {
-            var consultAknowledge = this._consultAcknowledgmentRepo.Table.Where(x => x.ConsultIdFk == consultId && !x.IsDeleted).ToList();
-            List<object> objList = new List<object>();
-            foreach (var item in consultAknowledge)
-            {
-                string userName = this._usersRepo.Table.Where(x => x.UserId == item.UserIdFk && !x.IsDeleted).Select(x => x.FirstName + ' ' + x.LastName).FirstOrDefault();
-                objList.Add(new { userName, isAcknowledge = item.IsAcknowledge, item });
-            }
-            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = objList };
+
+            var consultAcknowledgment = _dbContext.LoadStoredProcedure("md_getConsultAcknowledgmentByConsultId")
+             .WithSqlParam("@ConsultId", consultId)
+             .ExecuteStoredProc<ConsultAcknowledgmentVM>();
+
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = consultAcknowledgment };
         }
 
         public BaseResponse GetConsultAcknowledgmentByUserId(int userId)
