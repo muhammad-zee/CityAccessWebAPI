@@ -282,6 +282,28 @@ namespace Web.Services.Concrete
         {
             var strokeData = this._codeStrokeRepo.Table.Where(x => x.OrganizationIdFk == orgId && !x.IsDeleted).ToList();
             var strokeDataVM = AutoMapperHelper.MapList<CodeStroke, CodeStrokeVM>(strokeData);
+            var orgData = new object();
+
+            var org = this._orgRepo.Table.Where(o => o.OrganizationId == orgId && !o.IsDeleted).FirstOrDefault();
+            if (org != null)
+            {
+                var state = this._controlListDetailsRepo.Table.Where(s => s.ControlListDetailId == org.StateIdFk).Select(s => new { Id = s.ControlListDetailId, s.Title, s.Description }).FirstOrDefault();
+                if (state != null)
+                {
+                    string add = $"{org.PrimaryAddress} {org.City}, {state.Title} {org.Zip}";
+                    string url = "https://maps.googleapis.com/maps/api/geocode/json?address=" + add.Replace(" ", "%20") + "&key=" + this._GoogleApiKey;
+                    var googleApiLatLng = this._httpClient.GetAsync(url).Result;
+
+                    dynamic Apiresults = googleApiLatLng["results"];
+                    var formatted_address = Convert.ToString(Apiresults[0]["formatted_address"]);
+                    var geometry = Apiresults[0]["geometry"];
+                    var location = geometry["location"];
+                    var longLat = new List<double> { Convert.ToDouble(location["lat"]), Convert.ToDouble(location["lng"]) };
+
+                    orgData = new { OrganizationId = org.OrganizationId, Address = formatted_address, DestinationCoords = string.Join(",", longLat), org.OrganizationName };
+                }
+            }
+
             strokeDataVM.ForEach(x =>
             {
                 x.AttachmentsPath = new List<string>();
@@ -328,26 +350,7 @@ namespace Web.Services.Concrete
                     }
                 }
 
-                var org = this._orgRepo.Table.Where(o => o.OrganizationId == x.OrganizationIdFk && !o.IsDeleted).FirstOrDefault();
-                if (org != null)
-                {
-                    var state = this._controlListDetailsRepo.Table.Where(s => s.ControlListDetailId == org.StateIdFk).Select(s => new { Id = s.ControlListDetailId, s.Title, s.Description }).FirstOrDefault();
-                    if (state != null)
-                    {
-                        string add = $"{org.PrimaryAddress} {org.City}, {state.Title} {org.Zip}";
-                        string url = "https://maps.googleapis.com/maps/api/geocode/json?address=" + add.Replace(" ", "%20") + "&key=" + this._GoogleApiKey;
-                        var googleApiLatLng = this._httpClient.GetAsync(url).Result;
-
-                        dynamic Apiresults = googleApiLatLng["results"];
-                        var formatted_address = Convert.ToString(Apiresults[0]["formatted_address"]);
-                        var geometry = Apiresults[0]["geometry"];
-                        var location = geometry["location"];
-                        var longLat = new List<double> { Convert.ToDouble(location["lat"]), Convert.ToDouble(location["lng"]) };
-
-                        x.OrganizationData = new { OrganizationId = org.OrganizationId, Address = formatted_address, DestinationCoords = string.Join(",", longLat), org.OrganizationName };
-                    }
-                }
-
+                x.OrganizationData = orgData;
                 x.GenderTitle = _controlListDetailsRepo.Table.Where(g => g.ControlListDetailId == x.Gender).Select(g => g.Title).FirstOrDefault();
                 x.BloodThinnersTitle = _controlListDetailsRepo.Table.Where(b => b.ControlListDetailId == x.BloodThinners).Select(b => b.Title).FirstOrDefault();
             });
@@ -1171,6 +1174,29 @@ namespace Web.Services.Concrete
         {
             var SepsisData = this._codeSepsisRepo.Table.Where(x => x.OrganizationIdFk == orgId && !x.IsDeleted).ToList();
             var SepsisDataVM = AutoMapperHelper.MapList<CodeSepsi, CodeSepsisVM>(SepsisData);
+
+            var orgData = new object();
+
+            var org = this._orgRepo.Table.Where(o => o.OrganizationId == orgId && !o.IsDeleted).FirstOrDefault();
+            if (org != null)
+            {
+                var state = this._controlListDetailsRepo.Table.Where(s => s.ControlListDetailId == org.StateIdFk).Select(s => new { Id = s.ControlListDetailId, s.Title, s.Description }).FirstOrDefault();
+                if (state != null)
+                {
+                    string add = $"{org.PrimaryAddress} {org.City}, {state.Title} {org.Zip}";
+                    string url = "https://maps.googleapis.com/maps/api/geocode/json?address=" + add.Replace(" ", "%20") + "&key=" + this._GoogleApiKey;
+                    var googleApiLatLng = this._httpClient.GetAsync(url).Result;
+
+                    dynamic Apiresults = googleApiLatLng["results"];
+                    var formatted_address = Convert.ToString(Apiresults[0]["formatted_address"]);
+                    var geometry = Apiresults[0]["geometry"];
+                    var location = geometry["location"];
+                    var longLat = new List<double> { Convert.ToDouble(location["lat"]), Convert.ToDouble(location["lng"]) };
+
+                    orgData = new { OrganizationId = org.OrganizationId, Address = formatted_address, DestinationCoords = string.Join(",", longLat), org.OrganizationName };
+                }
+            }
+
             SepsisDataVM.ForEach(x =>
             {
                 x.AttachmentsPath = new List<string>();
@@ -1217,27 +1243,7 @@ namespace Web.Services.Concrete
                     }
                 }
 
-
-                var org = this._orgRepo.Table.Where(o => o.OrganizationId == x.OrganizationIdFk && !o.IsDeleted).FirstOrDefault();
-                if (org != null)
-                {
-                    var state = this._controlListDetailsRepo.Table.Where(s => s.ControlListDetailId == org.StateIdFk).Select(s => new { Id = s.ControlListDetailId, s.Title, s.Description }).FirstOrDefault();
-                    if (state != null)
-                    {
-                        string add = $"{org.PrimaryAddress} {org.City}, {state.Title} {org.Zip}";
-                        string url = "https://maps.googleapis.com/maps/api/geocode/json?address=" + add.Replace(" ", "%20") + "&key=" + this._GoogleApiKey;
-                        var googleApiLatLng = this._httpClient.GetAsync(url).Result;
-
-                        dynamic Apiresults = googleApiLatLng["results"];
-                        var formatted_address = Convert.ToString(Apiresults[0]["formatted_address"]);
-                        var geometry = Apiresults[0]["geometry"];
-                        var location = geometry["location"];
-                        var longLat = new List<double> { Convert.ToDouble(location["lat"]), Convert.ToDouble(location["lng"]) };
-
-                        x.OrganizationData = new { OrganizationId = org.OrganizationId, Address = formatted_address, DestinationCoords = string.Join(",", longLat), org.OrganizationName };
-                    }
-                }
-
+                x.OrganizationData = orgData;
                 x.GenderTitle = _controlListDetailsRepo.Table.Where(g => g.ControlListDetailId == x.Gender).Select(g => g.Title).FirstOrDefault();
                 x.BloodThinnersTitle = _controlListDetailsRepo.Table.Where(b => b.ControlListDetailId == x.BloodThinners).Select(b => b.Title).FirstOrDefault();
             });
@@ -2068,6 +2074,29 @@ namespace Web.Services.Concrete
         {
             var STEMIData = this._codeSTEMIRepo.Table.Where(x => x.OrganizationIdFk == orgId && !x.IsDeleted).ToList();
             var STEMIDataVM = AutoMapperHelper.MapList<CodeStemi, CodeSTEMIVM>(STEMIData);
+
+            var orgData = new object();
+
+            var org = this._orgRepo.Table.Where(o => o.OrganizationId == orgId && !o.IsDeleted).FirstOrDefault();
+            if (org != null)
+            {
+                var state = this._controlListDetailsRepo.Table.Where(s => s.ControlListDetailId == org.StateIdFk).Select(s => new { Id = s.ControlListDetailId, s.Title, s.Description }).FirstOrDefault();
+                if (state != null)
+                {
+                    string add = $"{org.PrimaryAddress} {org.City}, {state.Title} {org.Zip}";
+                    string url = "https://maps.googleapis.com/maps/api/geocode/json?address=" + add.Replace(" ", "%20") + "&key=" + this._GoogleApiKey;
+                    var googleApiLatLng = this._httpClient.GetAsync(url).Result;
+
+                    dynamic Apiresults = googleApiLatLng["results"];
+                    var formatted_address = Convert.ToString(Apiresults[0]["formatted_address"]);
+                    var geometry = Apiresults[0]["geometry"];
+                    var location = geometry["location"];
+                    var longLat = new List<double> { Convert.ToDouble(location["lat"]), Convert.ToDouble(location["lng"]) };
+
+                    orgData = new { OrganizationId = org.OrganizationId, Address = formatted_address, DestinationCoords = string.Join(",", longLat), org.OrganizationName };
+                }
+            }
+
             STEMIDataVM.ForEach(x =>
             {
                 x.AttachmentsPath = new List<string>();
@@ -2113,26 +2142,7 @@ namespace Web.Services.Concrete
                     }
                 }
 
-                var org = this._orgRepo.Table.Where(o => o.OrganizationId == x.OrganizationIdFk && !o.IsDeleted).FirstOrDefault();
-                if (org != null)
-                {
-                    var state = this._controlListDetailsRepo.Table.Where(s => s.ControlListDetailId == org.StateIdFk).Select(s => new { Id = s.ControlListDetailId, s.Title, s.Description }).FirstOrDefault();
-                    if (state != null)
-                    {
-                        string add = $"{org.PrimaryAddress} {org.City}, {state.Title} {org.Zip}";
-                        string url = "https://maps.googleapis.com/maps/api/geocode/json?address=" + add.Replace(" ", "%20") + "&key=" + this._GoogleApiKey;
-                        var googleApiLatLng = this._httpClient.GetAsync(url).Result;
-
-                        dynamic Apiresults = googleApiLatLng["results"];
-                        var formatted_address = Convert.ToString(Apiresults[0]["formatted_address"]);
-                        var geometry = Apiresults[0]["geometry"];
-                        var location = geometry["location"];
-                        var longLat = new List<double> { Convert.ToDouble(location["lat"]), Convert.ToDouble(location["lng"]) };
-
-                        x.OrganizationData = new { OrganizationId = org.OrganizationId, Address = formatted_address, DestinationCoords = string.Join(",", longLat), org.OrganizationName };
-                    }
-                }
-
+                x.OrganizationData = orgData;
                 x.GenderTitle = _controlListDetailsRepo.Table.Where(g => g.ControlListDetailId == x.Gender).Select(g => g.Title).FirstOrDefault();
                 x.BloodThinnersTitle = _controlListDetailsRepo.Table.Where(b => b.ControlListDetailId == x.BloodThinners).Select(b => b.Title).FirstOrDefault();
             });
@@ -2960,6 +2970,29 @@ namespace Web.Services.Concrete
         {
             var TrumaData = this._codeTrumaRepo.Table.Where(x => x.OrganizationIdFk == orgId && !x.IsDeleted).ToList();
             var TrumaDataVM = AutoMapperHelper.MapList<CodeTrauma, CodeTrumaVM>(TrumaData);
+
+            var orgData = new object();
+
+            var org = this._orgRepo.Table.Where(o => o.OrganizationId == orgId && !o.IsDeleted).FirstOrDefault();
+            if (org != null)
+            {
+                var state = this._controlListDetailsRepo.Table.Where(s => s.ControlListDetailId == org.StateIdFk).Select(s => new { Id = s.ControlListDetailId, s.Title, s.Description }).FirstOrDefault();
+                if (state != null)
+                {
+                    string add = $"{org.PrimaryAddress} {org.City}, {state.Title} {org.Zip}";
+                    string url = "https://maps.googleapis.com/maps/api/geocode/json?address=" + add.Replace(" ", "%20") + "&key=" + this._GoogleApiKey;
+                    var googleApiLatLng = this._httpClient.GetAsync(url).Result;
+
+                    dynamic Apiresults = googleApiLatLng["results"];
+                    var formatted_address = Convert.ToString(Apiresults[0]["formatted_address"]);
+                    var geometry = Apiresults[0]["geometry"];
+                    var location = geometry["location"];
+                    var longLat = new List<double> { Convert.ToDouble(location["lat"]), Convert.ToDouble(location["lng"]) };
+
+                    orgData = new { OrganizationId = org.OrganizationId, Address = formatted_address, DestinationCoords = string.Join(",", longLat), org.OrganizationName };
+                }
+            }
+
             TrumaDataVM.ForEach(x =>
             {
                 x.AttachmentsPath = new List<string>();
@@ -3004,27 +3037,7 @@ namespace Web.Services.Concrete
                         }
                     }
                 }
-
-                var org = this._orgRepo.Table.Where(o => o.OrganizationId == x.OrganizationIdFk && !o.IsDeleted).FirstOrDefault();
-                if (org != null)
-                {
-                    var state = this._controlListDetailsRepo.Table.Where(s => s.ControlListDetailId == org.StateIdFk).Select(s => new { Id = s.ControlListDetailId, s.Title, s.Description }).FirstOrDefault();
-                    if (state != null)
-                    {
-                        string add = $"{org.PrimaryAddress} {org.City}, {state.Title} {org.Zip}";
-                        string url = "https://maps.googleapis.com/maps/api/geocode/json?address=" + add.Replace(" ", "%20") + "&key=" + this._GoogleApiKey;
-                        var googleApiLatLng = this._httpClient.GetAsync(url).Result;
-
-                        dynamic Apiresults = googleApiLatLng["results"];
-                        var formatted_address = Convert.ToString(Apiresults[0]["formatted_address"]);
-                        var geometry = Apiresults[0]["geometry"];
-                        var location = geometry["location"];
-                        var longLat = new List<double> { Convert.ToDouble(location["lat"]), Convert.ToDouble(location["lng"]) };
-
-                        x.OrganizationData = new { OrganizationId = org.OrganizationId, Address = formatted_address, DestinationCoords = string.Join(",", longLat), org.OrganizationName };
-                    }
-                }
-
+                x.OrganizationData = orgData;
                 x.GenderTitle = _controlListDetailsRepo.Table.Where(g => g.ControlListDetailId == x.Gender).Select(g => g.Title).FirstOrDefault();
                 x.BloodThinnersTitle = _controlListDetailsRepo.Table.Where(b => b.ControlListDetailId == x.BloodThinners).Select(b => b.Title).FirstOrDefault();
             });
