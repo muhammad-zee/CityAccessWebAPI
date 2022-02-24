@@ -78,7 +78,7 @@ namespace Web.Services.Concrete
 
         public BaseResponse GetLabelCounts(int orgId)
         {
-            var LabelCounts = this._dbContext.LoadStoredProcedure("raq_getCountOfTablesForDashboard")
+            var LabelCounts = this._dbContext.LoadStoredProcedure("md_getCountOfTablesForDashboard")
                     //.WithSqlParam("@is_SuperAdmin", ApplicationSettings.isSuperAdmin)
                     //.WithSqlParam("@userId", ApplicationSettings.UserId)
                     .WithSqlParam("@orgId", orgId)
@@ -89,7 +89,7 @@ namespace Web.Services.Concrete
 
         public BaseResponse GetUsersForDashBoard(int orgId)
         {
-            var users = this._dbContext.LoadStoredProcedure("raq_getUsersForDashBoard")
+            var users = this._dbContext.LoadStoredProcedure("md_getUsersForDashBoard")
                     .WithSqlParam("@is_SuperAdmin", ApplicationSettings.isSuperAdmin)
                     .WithSqlParam("@userId", ApplicationSettings.UserId)
                     .WithSqlParam("@orgId", orgId)
@@ -126,7 +126,7 @@ namespace Web.Services.Concrete
 
         public BaseResponse GetSchedulesForCurrentDate(ScheduleVM schedule)
         {
-            var scheduleList = this._dbContext.LoadStoredProcedure("raq_getScheduleListForDashboard")
+            var scheduleList = this._dbContext.LoadStoredProcedure("md_getScheduleListForDashboard")
                             .WithSqlParam("@orgId", schedule.selectedOrganizationId)
                             .WithSqlParam("@serviceLineIds", schedule.selectedService)
                             .WithSqlParam("@roleIds", schedule.selectedRole)
@@ -167,7 +167,7 @@ namespace Web.Services.Concrete
         public BaseResponse GetAllUsersByOrganizationId(int OrganizationId, int UserRoleId)
         {
             //var result = _user.Table.Where(x => x.IsDeleted == false).ToList();
-            var result = this._dbContext.LoadStoredProcedure("raq_getAllUsersByOrganizationId")
+            var result = this._dbContext.LoadStoredProcedure("md_getAllUsersByOrganizationId")
                 .WithSqlParam("@pOrganizationId", OrganizationId)
                 .WithSqlParam("@pUserRoleId", UserRoleId)
                 .ExecuteStoredProc<User>();
@@ -194,7 +194,7 @@ namespace Web.Services.Concrete
         }
         public BaseResponse GetAllUsersByServiceLineAndRoleId(string OrganizationId, string ServiceLineId, string RoleIds)
         {
-            var users = _dbContext.LoadStoredProcedure("raq_getAllUsersByServiceLineIdAndRoleId")
+            var users = _dbContext.LoadStoredProcedure("md_getAllUsersByServiceLineIdAndRoleId")
                         .WithSqlParam("@organizationId", OrganizationId)
                         .WithSqlParam("@serviceLineId", ServiceLineId)
                         .WithSqlParam("@roleId", RoleIds).ExecuteStoredProc<UserListVm>().ToList();
@@ -203,7 +203,7 @@ namespace Web.Services.Concrete
         }
         public BaseResponse getAllScheduleUsersByServiceAndRoleId(string OrganizationId, string ServiceLineId, string RoleIds)
         {
-            var users = _dbContext.LoadStoredProcedure("raq_getAllScheduleUsersByServiceLineIdAndRoleId")
+            var users = _dbContext.LoadStoredProcedure("md_getAllScheduleUsersByServiceLineIdAndRoleId")
                         .WithSqlParam("@organizationId", OrganizationId)
                         .WithSqlParam("@serviceLineId", ServiceLineId)
                         .WithSqlParam("@roleId", RoleIds).ExecuteStoredProc<UserListVm>().ToList();
@@ -703,7 +703,7 @@ namespace Web.Services.Concrete
         {
             BaseResponse response = null;
 
-            var RCAresultData = _dbContext.LoadStoredProcedure("raq_getComponentAccessByUserAndRole")
+            var RCAresultData = _dbContext.LoadStoredProcedure("md_getComponentAccessByUserAndRole")
              .WithSqlParam("@pUserId", userId)
              .WithSqlParam("@pRoleId", roleId)
              .ExecuteStoredProc<ComponentAccessByRoleAndUserVM>();

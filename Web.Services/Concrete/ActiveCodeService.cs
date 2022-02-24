@@ -91,7 +91,7 @@ namespace Web.Services.Concrete
 
             //             }).Distinct().ToList();
 
-            var codes = this._dbContext.LoadStoredProcedure("raq_getActivatedCodesForOrg")
+            var codes = this._dbContext.LoadStoredProcedure("md_getActivatedCodesForOrg")
                 .WithSqlParam("@pOrgId", orgId)
                 .ExecuteStoredProc<ActiveCodeVM>();
             foreach (var item in codes)

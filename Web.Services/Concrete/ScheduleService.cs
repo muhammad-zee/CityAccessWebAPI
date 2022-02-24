@@ -82,7 +82,7 @@ namespace Web.Services.Concrete
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Found", Body = schedule };
             }
 
-            var scheduleList = this._dbContext.LoadStoredProcedure("raq_getSchedule")
+            var scheduleList = this._dbContext.LoadStoredProcedure("md_getSchedule")
                 .WithSqlParam("@startDate", param.StartDate.AddDays(-1))
                 .WithSqlParam("@endDate", param.EndDate)
                 .WithSqlParam("@organizationId", param.OrganizationId)
@@ -97,7 +97,7 @@ namespace Web.Services.Concrete
 
         public BaseResponse GetScheduleList(ScheduleVM schedule)
         {
-            var scheduleList = this._dbContext.LoadStoredProcedure("raq_getScheduleListByFilterIds")
+            var scheduleList = this._dbContext.LoadStoredProcedure("md_getScheduleListByFilterIds")
                             .WithSqlParam("@orgId", schedule.selectedOrganizationId)
                             .WithSqlParam("@serviceLineIds", schedule.selectedService)
                             .WithSqlParam("@roleIds", schedule.selectedRole)

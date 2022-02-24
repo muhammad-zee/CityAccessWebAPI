@@ -26,7 +26,7 @@ namespace Web.Services.Interfaces
         BaseResponse getConversationUsersStatus(string UserSid);
         BaseResponse GetCurrentConversationParticipants(string channelSid);
         bool conversationUserIsOnline(string UserSid);
-        ChannelResource createConversationChannel(string FriendlyName, string UniqueName,string Attributes);
+        ChannelResource createConversationChannel(string FriendlyName, string UniqueName, string Attributes);
         UserResource createConversationUser(string Identity, string FriendlyName);
         MemberResource addNewUserToConversationChannel(string ChannelSid, string ParticipantUniqueName);
         BaseResponse createOrRemoveGroupMemberAsAdmin(bool isAdmin, string uniqueName, string channleSid);

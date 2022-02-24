@@ -137,7 +137,7 @@ namespace Web.Services.Concrete
 
         public BaseResponse GetServicesByOrganizationId(int OrganizationId)
         {
-            var services = _dbContext.LoadStoredProcedure("raq_getAllServicesByOrganizationId")
+            var services = _dbContext.LoadStoredProcedure("md_getAllServicesByOrganizationId")
                 .WithSqlParam("@pOrganizationId", OrganizationId)
             .ExecuteStoredProc<ServiceLineVM>();
             return new BaseResponse()
@@ -437,13 +437,13 @@ namespace Web.Services.Concrete
         {
             if (!string.IsNullOrEmpty(Ids))
             {
-                var treeList = _dbContext.LoadStoredProcedure("raq_getOrgAssociationList")
+                var treeList = _dbContext.LoadStoredProcedure("md_getOrgAssociationList")
                 .WithSqlParam("@pOrganizationId", Ids)
                 .ExecuteStoredProc<TreeviewItemVM>();
 
                 var orgTree = treeList.BuildTree();
 
-                var roleTreeList = _dbContext.LoadStoredProcedure("raq_getOrgsRole")
+                var roleTreeList = _dbContext.LoadStoredProcedure("md_getOrgsRole")
                 .WithSqlParam("@pOrganizationId", Ids)
                 .ExecuteStoredProc<TreeviewItemVM>();
 

@@ -208,7 +208,7 @@ namespace Web.API.Controllers
         #region Consult Acknowledgments
 
         [HttpGet("consult/GetAllConsultAcknowledgments")]
-        public BaseResponse GetAllConsultAcknowledgments() 
+        public BaseResponse GetAllConsultAcknowledgments()
         {
             try
             {

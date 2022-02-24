@@ -195,14 +195,14 @@ namespace Web.Services.Concrete
 
         public BaseResponse GetAllConsults()
         {
-            var consultData = _dbContext.LoadStoredProcedure("raq_getAllConsults").ExecuteStoredProc_ToDictionary();
+            var consultData = _dbContext.LoadStoredProcedure("md_getAllConsults").ExecuteStoredProc_ToDictionary();
 
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = consultData };
         }
 
         public BaseResponse GetConsultById(int Id)
         {
-            var consultData = _dbContext.LoadStoredProcedure("raq_getConsultById")
+            var consultData = _dbContext.LoadStoredProcedure("md_getConsultById")
                 .WithSqlParam("@consultId", Id)
                 .ExecuteStoredProc_ToDictionary();
 
@@ -217,7 +217,7 @@ namespace Web.Services.Concrete
             bool isConsultIdExist = keyValues.ContainsKey("ConsultId");
             if (isConsultIdExist && keyValues["ConsultId"].ToString() == "0")
             {
-                var Consult_Counter = _dbContext.LoadStoredProcedure("raq_getMDRouteCounter").WithSqlParam("@C_Initails", "CC").ExecuteStoredProc<MDRoute_CounterVM>().FirstOrDefault();
+                var Consult_Counter = _dbContext.LoadStoredProcedure("md_getMDRouteCounter").WithSqlParam("@C_Initails", "CC").ExecuteStoredProc<MDRoute_CounterVM>().FirstOrDefault();
 
                 string query = "INSERT INTO [dbo].[Consults] (";
 
@@ -279,7 +279,7 @@ namespace Web.Services.Concrete
                     {
                         var serviceLineId = keyValues["ServiceLineIdFk"].ToString().ToInt();
 
-                        var users = _dbContext.LoadStoredProcedure("raq_getAvailableUserOnSchedule")
+                        var users = _dbContext.LoadStoredProcedure("md_getAvailableUserOnSchedule")
                                     .WithSqlParam("@servicelineIdFk", serviceLineId)
                                     .WithSqlParam("@dayOfWeek", DateTime.UtcNow.DayOfWeek.ToString())
                                     .ExecuteStoredProc<RegisterCredentialVM>();

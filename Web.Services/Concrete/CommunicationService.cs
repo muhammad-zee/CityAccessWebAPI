@@ -376,7 +376,7 @@ namespace Web.Services.Concrete
         {
             BaseResponse response = new BaseResponse();
 
-            var channels = this._dbContext.LoadStoredProcedure("raq_getConversationChannelsByUserId")
+            var channels = this._dbContext.LoadStoredProcedure("md_getConversationChannelsByUserId")
             .WithSqlParam("@pUserId", UserId)
             .ExecuteStoredProc<ConversationChannelsListVM>();
             if (channels != null)
@@ -537,7 +537,7 @@ namespace Web.Services.Concrete
         {
 
             //var chatusers = this._userrepo.table.where(u => u.isdeleted != true && u.isactive == true && !string.isnullorempty(u.userchannelsid));
-            var chatUsers = this._dbContext.LoadStoredProcedure("raq_getAllConversationUsers")
+            var chatUsers = this._dbContext.LoadStoredProcedure("md_getAllConversationUsers")
              .WithSqlParam("@proleid", ApplicationSettings.RoleIds)
              .ExecuteStoredProc<ChatUsersVM>();
             foreach (var user in chatUsers)
@@ -569,12 +569,12 @@ namespace Web.Services.Concrete
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Chat users found", Body = chatUsers };
         }
 
-        public ChannelResource createConversationChannel(string FriendlyName, string UniqueName,string Attrubutes)
+        public ChannelResource createConversationChannel(string FriendlyName, string UniqueName, string Attrubutes)
         {
             TwilioClient.Init(this.Twilio_AccountSid, this.Twilio_AuthToken);
             string userUniqueId = this._userRepo.Table.Where(u => u.IsDeleted != true && u.UserId == ApplicationSettings.UserId && !string.IsNullOrEmpty(u.ConversationUserSid)).Select(x => x.UserUniqueId).FirstOrDefault();
             userUniqueId = string.IsNullOrEmpty(userUniqueId) ? "system" : userUniqueId;
-            var channel = ChannelResource.Create(pathServiceSid: this.Twilio_ChatServiceSid, friendlyName: FriendlyName, uniqueName: UniqueName,attributes: Attrubutes, type: ChannelTypeEnum.Private,createdBy:userUniqueId);
+            var channel = ChannelResource.Create(pathServiceSid: this.Twilio_ChatServiceSid, friendlyName: FriendlyName, uniqueName: UniqueName, attributes: Attrubutes, type: ChannelTypeEnum.Private, createdBy: userUniqueId);
             //var channel = Twilio.Rest.Conversations.V1.ConversationResource.Create(servives: this.Twilio_ChatServiceSid, friendlyName: FriendlyName, uniqueName: UniqueName);
             return channel;
         }
@@ -612,7 +612,7 @@ namespace Web.Services.Concrete
         {
             if (!string.IsNullOrEmpty(channelSid) && !string.IsNullOrWhiteSpace(channelSid))
             {
-                var ConversationParticipants = this._dbContext.LoadStoredProcedure("raq_getCurrentConversationParticipants")
+                var ConversationParticipants = this._dbContext.LoadStoredProcedure("md_getCurrentConversationParticipants")
                     .WithSqlParam("@channelSid", channelSid)
                     .ExecuteStoredProc<ConversationParticipant>();
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = ConversationParticipants };
