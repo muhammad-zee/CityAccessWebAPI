@@ -3862,7 +3862,7 @@ namespace Web.Services.Concrete
 
         public BaseResponse GetHospitalsOfStatesByCodeId(int codeId, string latlng)
         {
-            var googleApiResult = this._httpClient.GetAsync("https://maps.googleapis.com/maps/api/geocode/json?latlng=" + latlng + "&key=AIzaSyA5EvXiXjlmc0hpLPmLgGZoOgZ80Ca0eQ0").Result;
+            var googleApiResult = this._httpClient.GetAsync("https://maps.googleapis.com/maps/api/geocode/json?latlng=" + latlng + "&key=" + this._GoogleApiKey).Result;
 
             dynamic results = googleApiResult["results"];
             var address = results[0]["address_components"];
@@ -3891,7 +3891,7 @@ namespace Web.Services.Concrete
                     foreach (var item in orgsAddress)
                     {
                         string add = $"{item.PrimaryAddress} {item.City}, {stateId.Title} {item.Zip}";
-                        string url = "https://maps.googleapis.com/maps/api/geocode/json?address=" + add.Replace(" ", "%20") + "&key=AIzaSyA5EvXiXjlmc0hpLPmLgGZoOgZ80Ca0eQ0";
+                        string url = "https://maps.googleapis.com/maps/api/geocode/json?address=" + add.Replace(" ", "%20") + "&key=" + this._GoogleApiKey;
                         var googleApiLatLng = this._httpClient.GetAsync(url).Result;
 
                         dynamic Apiresults = googleApiLatLng["results"];
@@ -3900,7 +3900,7 @@ namespace Web.Services.Concrete
                         var location = geometry["location"];
                         var longLat = new List<double> { Convert.ToDouble(location.lat), Convert.ToDouble(location.lng) };
 
-                        objList.Add(new { OrganizationId = item.OrganizationId, Address = formatted_address, DestinationCoords = string.Join(",", longLat), title = item.OrganizationName });
+                        objList.Add(new { OrganizationId = item.OrganizationId, Address = formatted_address, lat = longLat[0], lng = longLat[1], title = item.OrganizationName });
                     }
                     return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Addresses Returned", Body = objList };
                 }
