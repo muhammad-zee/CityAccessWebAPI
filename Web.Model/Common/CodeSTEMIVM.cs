@@ -36,7 +36,7 @@ namespace Web.Model.Common
         public List<string> AudiosPath { get; set; }
         public List<string> VideosPath { get; set; }
         public List<string> AttachmentsPath { get; set; }
-
+        public object OrganizationData { get; set; }
         public string AudioFolderRoot { get; set; }
         public string VideoFolderRoot { get; set; }
         public string AttachmentsFolderRoot { get; set; }

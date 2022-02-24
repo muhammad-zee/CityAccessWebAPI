@@ -32,7 +32,7 @@ namespace Web.Model.Common
         public string Audio { get; set; }
         public string Video { get; set; }
         public string Attachments { get; set; }
-
+        public object OrganizationData { get; set; }
         public List<string> AudiosPath { get; set; }
         public List<string> VideosPath { get; set; }
         public List<string> AttachmentsPath { get; set; }
