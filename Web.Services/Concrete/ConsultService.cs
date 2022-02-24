@@ -255,7 +255,7 @@ namespace Web.Services.Concrete
                         {
                             if (keyValues.ContainsKey("DateOfBirth")) 
                             {
-                                var dob = DateTime.Parse(keyValues["DateOfBirth"].ToString()).ToString("MM-dd-yyyy");
+                                var dob = DateTime.Parse(keyValues["DateOfBirth"].ToString()).ToString("MM-dd-yyyy hh:mm:ss");
                                 query += $",'{dob}'";
                             }
                             query += $",'{Consult_Counter.Counter_Value}'";
