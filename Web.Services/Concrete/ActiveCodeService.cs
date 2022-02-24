@@ -329,10 +329,10 @@ namespace Web.Services.Concrete
                 }
 
                 var org = this._orgRepo.Table.Where(o => o.OrganizationId == x.OrganizationIdFk && !o.IsDeleted).FirstOrDefault();
-                if (org != null) 
+                if (org != null)
                 {
                     var state = this._controlListDetailsRepo.Table.Where(s => s.ControlListDetailId == org.StateIdFk).Select(s => new { Id = s.ControlListDetailId, s.Title, s.Description }).FirstOrDefault();
-                    if (state != null) 
+                    if (state != null)
                     {
                         string add = $"{org.PrimaryAddress} {org.City}, {state.Title} {org.Zip}";
                         string url = "https://maps.googleapis.com/maps/api/geocode/json?address=" + add.Replace(" ", "%20") + "&key=" + this._GoogleApiKey;
@@ -344,7 +344,7 @@ namespace Web.Services.Concrete
                         var location = geometry["location"];
                         var longLat = new List<double> { Convert.ToDouble(location["lat"]), Convert.ToDouble(location["lng"]) };
 
-                        x.OrganizationData = new { OrganizationId = org.OrganizationId, Address = formatted_address, lat = longLat[0], lng = longLat[1], title = org.OrganizationName };
+                        x.OrganizationData = new { OrganizationId = org.OrganizationId, Address = formatted_address, DestinationCoords = string.Join(",", longLat), org.OrganizationName };
                     }
                 }
 
@@ -420,7 +420,7 @@ namespace Web.Services.Concrete
                         var location = geometry["location"];
                         var longLat = new List<double> { Convert.ToDouble(location["lat"]), Convert.ToDouble(location["lng"]) };
 
-                        StrokeDataVM.OrganizationData = new { OrganizationId = org.OrganizationId, Address = formatted_address, lat = longLat[0], lng = longLat[1], title = org.OrganizationName };
+                        StrokeDataVM.OrganizationData = new { OrganizationId = org.OrganizationId, Address = formatted_address, DestinationCoords = string.Join(",", longLat), org.OrganizationName };
                     }
                 }
 
@@ -1234,7 +1234,7 @@ namespace Web.Services.Concrete
                         var location = geometry["location"];
                         var longLat = new List<double> { Convert.ToDouble(location["lat"]), Convert.ToDouble(location["lng"]) };
 
-                        x.OrganizationData = new { OrganizationId = org.OrganizationId, Address = formatted_address, lat = longLat[0], lng = longLat[1], title = org.OrganizationName };
+                        x.OrganizationData = new { OrganizationId = org.OrganizationId, Address = formatted_address, DestinationCoords = string.Join(",", longLat), org.OrganizationName };
                     }
                 }
 
@@ -1309,7 +1309,7 @@ namespace Web.Services.Concrete
                         var location = geometry["location"];
                         var longLat = new List<double> { Convert.ToDouble(location["lat"]), Convert.ToDouble(location["lng"]) };
 
-                        SepsisDataVM.OrganizationData = new { OrganizationId = org.OrganizationId, Address = formatted_address, lat = longLat[0], lng = longLat[1], title = org.OrganizationName };
+                        SepsisDataVM.OrganizationData = new { OrganizationId = org.OrganizationId, Address = formatted_address, DestinationCoords = string.Join(",", longLat), org.OrganizationName };
                     }
                 }
 
@@ -2129,7 +2129,7 @@ namespace Web.Services.Concrete
                         var location = geometry["location"];
                         var longLat = new List<double> { Convert.ToDouble(location["lat"]), Convert.ToDouble(location["lng"]) };
 
-                        x.OrganizationData = new { OrganizationId = org.OrganizationId, Address = formatted_address, lat = longLat[0], lng = longLat[1], title = org.OrganizationName };
+                        x.OrganizationData = new { OrganizationId = org.OrganizationId, Address = formatted_address, DestinationCoords = string.Join(",", longLat), org.OrganizationName };
                     }
                 }
 
@@ -2205,7 +2205,7 @@ namespace Web.Services.Concrete
                         var location = geometry["location"];
                         var longLat = new List<double> { Convert.ToDouble(location["lat"]), Convert.ToDouble(location["lng"]) };
 
-                        STEMIDataVM.OrganizationData = new { OrganizationId = org.OrganizationId, Address = formatted_address, lat = longLat[0], lng = longLat[1], title = org.OrganizationName };
+                        STEMIDataVM.OrganizationData = new { OrganizationId = org.OrganizationId, Address = formatted_address, DestinationCoords = string.Join(",", longLat), org.OrganizationName };
                     }
                 }
 
@@ -2921,7 +2921,7 @@ namespace Web.Services.Concrete
                             foreach (var item in UserChannelSid)
                             {
                                 _communication.addNewUserToConversationChannel(channel.Sid, item);
-                               
+
                             }
                             var msg = new ConversationMessageVM()
                             {
@@ -3021,7 +3021,7 @@ namespace Web.Services.Concrete
                         var location = geometry["location"];
                         var longLat = new List<double> { Convert.ToDouble(location["lat"]), Convert.ToDouble(location["lng"]) };
 
-                        x.OrganizationData = new { OrganizationId = org.OrganizationId, Address = formatted_address, lat = longLat[0], lng = longLat[1], title = org.OrganizationName };
+                        x.OrganizationData = new { OrganizationId = org.OrganizationId, Address = formatted_address, DestinationCoords = string.Join(",", longLat), org.OrganizationName };
                     }
                 }
 
@@ -3096,7 +3096,7 @@ namespace Web.Services.Concrete
                         var location = geometry["location"];
                         var longLat = new List<double> { Convert.ToDouble(location["lat"]), Convert.ToDouble(location["lng"]) };
 
-                        TrumaDataVM.OrganizationData = new { OrganizationId = org.OrganizationId, Address = formatted_address, lat = longLat[0], lng = longLat[1], title = org.OrganizationName };
+                        TrumaDataVM.OrganizationData = new { OrganizationId = org.OrganizationId, Address = formatted_address, DestinationCoords = string.Join(",", longLat), org.OrganizationName };
                     }
                 }
 
@@ -3887,7 +3887,7 @@ namespace Web.Services.Concrete
                         var location = geometry["location"];
                         var longLat = new List<double> { Convert.ToDouble(location.lat), Convert.ToDouble(location.lng) };
 
-                        objList.Add(new { OrganizationId = item.OrganizationId, Address = formatted_address, lat = longLat[0], lng = longLat[1], title = item.OrganizationName });
+                        objList.Add(new { OrganizationId = item.OrganizationId, Address = formatted_address, DestinationCoords = string.Join(",", longLat), title = item.OrganizationName });
                     }
                     return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Addresses Returned", Body = objList };
                 }

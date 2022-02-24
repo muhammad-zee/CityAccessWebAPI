@@ -223,7 +223,7 @@ namespace Web.Services.Concrete
 
                 for (int i = 0; i < keys.Count(); i++)
                 {
-                    if (keys[i] != "ConsultId" && keys[i] != "CreatedBy" && keys[i] != "CreatedDate" && keys[i] != "DateOfBirth")
+                    if (keys[i] != "ConsultId" && keys[i] != "CreatedBy" && keys[i] != "CreatedDate")
                     {
                         query += $"[{keys[i]}]";
                         if ((i + 1) == keys.Count)
@@ -248,7 +248,7 @@ namespace Web.Services.Concrete
 
                 for (int i = 0; i < values.Count; i++)
                 {
-                    if (keys[i] != "ConsultId" && keys[i] != "CreatedBy" && keys[i] != "CreatedDate" && keys[i] != "DateOfBirth")
+                    if (keys[i] != "ConsultId" && keys[i] != "CreatedBy" && keys[i] != "CreatedDate")
                     {
                         query += $"'{values[i]}'";
                         if ((i + 1) == values.Count)
