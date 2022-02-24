@@ -200,6 +200,16 @@ namespace Web.Services.Concrete
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = consultData };
         }
 
+        public BaseResponse GetConsultsByServiceLineId(string serviceLineIds)
+        {
+            var consultData = _dbContext.LoadStoredProcedure("md_getGetConsultsByServiceLineId")
+                .WithSqlParam("@ServiceLineId", serviceLineIds)
+                .ExecuteStoredProc_ToDictionary();
+
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = consultData };
+        }
+
+
         public BaseResponse GetConsultById(int Id)
         {
             var consultData = _dbContext.LoadStoredProcedure("md_getConsultById")

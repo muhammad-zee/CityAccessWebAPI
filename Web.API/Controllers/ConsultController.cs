@@ -169,6 +169,23 @@ namespace Web.API.Controllers
             }
         }
 
+        [Description("Get Consults By Service Line Id")]
+        [HttpGet("consult/GetConsultsByServiceLineId/{serviceLineIds}")]
+        public BaseResponse GetConsultsByServiceLineId(string serviceLineIds)
+        {
+            try
+            {
+                return _consultService.GetConsultsByServiceLineId(serviceLineIds);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
+
         [Description("Add or Update Consult Form")]
         [HttpPost("consult/AddOrUpdateConsult")]
         public BaseResponse AddOrUpdateConsult([FromBody] IDictionary<string, object> keyValues)
