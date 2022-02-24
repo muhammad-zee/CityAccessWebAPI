@@ -1122,7 +1122,7 @@ namespace Web.Services.Concrete
                         var conversationChannelAttributes = JsonConvert.SerializeObject(new Dictionary<string, Object>()
                                     {
                                         {ChannelAttributeEnums.ChannelType.ToString(), ChannelTypeEnums.EMS.ToString()},
-                                        {ChannelAttributeEnums.CodeType.ToString(), UCLEnums.Stroke.ToString()},
+                                        {ChannelAttributeEnums.CodeType.ToString(), ChannelTypeEnums.Stroke.ToString()},
                                         {ChannelAttributeEnums.StrokeId.ToString(), stroke.CodeStrokeId}
                                     }, Formatting.Indented);
 
@@ -2027,7 +2027,7 @@ namespace Web.Services.Concrete
                             var conversationChannelAttributes = JsonConvert.SerializeObject(new Dictionary<string, Object>()
                                     {
                                         {ChannelAttributeEnums.ChannelType.ToString(), ChannelTypeEnums.EMS.ToString()},
-                                        {ChannelAttributeEnums.CodeType.ToString(), UCLEnums.Sepsis.ToString()},
+                                        {ChannelAttributeEnums.CodeType.ToString(), ChannelTypeEnums.Sepsis.ToString()},
                                         {ChannelAttributeEnums.SepsisId.ToString(), Sepsis.CodeSepsisId}
                                     }, Formatting.Indented);
                             var channel = _communication.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
@@ -2924,7 +2924,7 @@ namespace Web.Services.Concrete
                             var conversationChannelAttributes = JsonConvert.SerializeObject(new Dictionary<string, Object>()
                                     {
                                         {ChannelAttributeEnums.ChannelType.ToString(), ChannelTypeEnums.EMS.ToString()},
-                                        {ChannelAttributeEnums.CodeType.ToString(), UCLEnums.STEMI.ToString()},
+                                        {ChannelAttributeEnums.CodeType.ToString(), ChannelTypeEnums.STEMI.ToString()},
                                         {ChannelAttributeEnums.STEMIId.ToString(), STEMI.CodeStemiid}
                                     }, Formatting.Indented);
                             var channel = _communication.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
@@ -3817,7 +3817,7 @@ namespace Web.Services.Concrete
                             var conversationChannelAttributes = JsonConvert.SerializeObject(new Dictionary<string, Object>()
                                     {
                                         {ChannelAttributeEnums.ChannelType.ToString(), ChannelTypeEnums.EMS.ToString()},
-                                        {ChannelAttributeEnums.CodeType.ToString(), UCLEnums.Trauma.ToString()},
+                                        {ChannelAttributeEnums.CodeType.ToString(), ChannelTypeEnums.Trauma.ToString()},
                                         {ChannelAttributeEnums.TraumaId.ToString(), Truma.CodeTraumaId}
                                     }, Formatting.Indented);
                             var channel = _communication.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);

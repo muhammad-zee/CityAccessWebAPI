@@ -15,6 +15,10 @@
         OneToOne,
         Group,
         Consult,
-        EMS
+        EMS,
+        Stroke,
+        STEMI,
+        Sepsis,
+        Trauma
     }
 }
