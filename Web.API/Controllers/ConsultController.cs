@@ -170,12 +170,12 @@ namespace Web.API.Controllers
         }
 
         [Description("Get Consults By Service Line Id")]
-        [HttpGet("consult/GetConsultsByServiceLineId/{serviceLineIds}")]
-        public BaseResponse GetConsultsByServiceLineId(string serviceLineIds)
+        [HttpPost("consult/GetConsultsByServiceLineId")]
+        public BaseResponse GetConsultsByServiceLineId([FromBody] ConsultFieldsVM consult)
         {
             try
             {
-                return _consultService.GetConsultsByServiceLineId(serviceLineIds);
+                return _consultService.GetConsultsByServiceLineId(consult);
             }
             catch (Exception ex)
             {

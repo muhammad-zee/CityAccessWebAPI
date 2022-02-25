@@ -61,35 +61,15 @@ namespace Web.Services.Concrete
 
         public BaseResponse getSchedule(EditParams param)
         {
-            if (param.ShowAllSchedule == "false")
-            {
-                var schedule = (from us in _scheduleRepo.Table
-                                join u in _userRepo.Table on us.UserIdFk equals u.UserId
-                                where us.UserIdFk == param.CreatedBy && us.ScheduleDate >= DateTime.UtcNow.Date && !us.IsDeleted && !u.IsDeleted
-                                select new ScheduleEventData()
-                                {
-                                    id = us.UsersScheduleId,
-                                    subject = u.FirstName + " " + u.LastName,
-                                    startTime = us.ScheduleDateStart,
-                                    endTime = us.ScheduleDateEnd,
-                                    scheduleUserId = u.UserId.ToString(),
-                                    userId = u.UserId.ToString(),
-                                    roleId = us.RoleIdFk.ToString(),
-                                    serviceLineId = us.ServiceLineIdFk.ToString(),
-                                    RoleName = this._roleRepo.Table.Where(x => !x.IsDeleted && x.RoleId == us.RoleIdFk).Select(x => x.RoleName).FirstOrDefault(),
-                                    ServiceName = this._serviceRepo.Table.Where(x => !x.IsDeleted && x.ServiceLineId == us.ServiceLineIdFk).Select(x => x.ServiceName).FirstOrDefault()
-                                }).ToList();
-                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Found", Body = schedule };
-            }
-
             var scheduleList = this._dbContext.LoadStoredProcedure("md_getSchedule")
-                .WithSqlParam("@startDate", param.StartDate.AddDays(-1))
+                .WithSqlParam("@startDate", param.StartDate.AddDays(-1).Date)
                 .WithSqlParam("@endDate", param.EndDate)
                 .WithSqlParam("@organizationId", param.OrganizationId)
                 .WithSqlParam("@departmentIds", param.departmentIds)
                 .WithSqlParam("@serviceLineIds", param.ServiceLineIds)
                 .WithSqlParam("@roleIds", param.RoleIds)
-                .WithSqlParam("@userIds", param.UserIds)
+                .WithSqlParam("@userIds", param.ShowAllSchedule == "false" ? param.CreatedBy.ToString() : param.UserIds)
+                .WithSqlParam("@showAllSchedule", param.ShowAllSchedule)
             .ExecuteStoredProc<ScheduleEventData>();
 
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Found", Body = scheduleList };

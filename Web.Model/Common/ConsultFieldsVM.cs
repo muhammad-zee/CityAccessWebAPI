@@ -21,5 +21,9 @@ namespace Web.Model.Common
         public int? SortOrder { get; set; }
         public bool IsSelected { get; set; }
 
+        public string ServiceLineIds { get; set; }
+        public string DepartmentIds { get; set; }
+        public int OrganizationId { get; set; }
+
     }
 }
