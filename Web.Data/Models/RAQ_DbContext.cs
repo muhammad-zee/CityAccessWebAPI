@@ -247,9 +247,15 @@ namespace Web.Data.Models
 
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");
 
+                entity.Property(e => e.Distance).HasMaxLength(20);
+
                 entity.Property(e => e.Dob)
                     .HasColumnType("datetime")
                     .HasColumnName("DOB");
+
+                entity.Property(e => e.EndTime).HasColumnType("datetime");
+
+                entity.Property(e => e.EstimatedTime).HasMaxLength(50);
 
                 entity.Property(e => e.FamilyContactName).HasMaxLength(100);
 
@@ -266,6 +272,8 @@ namespace Web.Data.Models
                 entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
 
                 entity.Property(e => e.PatientName).HasMaxLength(100);
+
+                entity.Property(e => e.StartingPoint).HasMaxLength(50);
 
                 entity.Property(e => e.Video).HasMaxLength(500);
             });

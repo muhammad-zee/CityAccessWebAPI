@@ -3122,7 +3122,13 @@ namespace Web.Services.Concrete
                 row.FamilyContactName = codeTruma.FamilyContactName;
                 row.FamilyContactNumber = codeTruma.FamilyContactNumber;
                 row.IsEms = codeTruma.IsEms;
-                row.IsCompleted = codeTruma.IsCompleted;
+                //row.IsCompleted = codeTruma.IsCompleted;
+                if (codeTruma.IsCompleted != null && codeTruma.IsCompleted == true) 
+                {
+                    row.IsCompleted = true;
+                    row.EndTime = DateTime.UtcNow;
+                    row.ActualTime = row.EndTime - row.CreatedDate;
+                }
                 row.ModifiedBy = codeTruma.ModifiedBy;
                 row.ModifiedDate = DateTime.UtcNow;
                 row.IsDeleted = false;
