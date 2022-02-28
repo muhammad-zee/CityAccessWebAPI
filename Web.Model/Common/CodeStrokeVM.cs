@@ -5,6 +5,7 @@ namespace Web.Model.Common
 {
     public class CodeStrokeVM
     {
+        public int Id { get; set; }
         public int CodeStrokeId { get; set; }
         public string PatientName { get; set; }
         public DateTime? Dob { get; set; }
@@ -32,6 +33,7 @@ namespace Web.Model.Common
         public string Audio { get; set; }
         public string Video { get; set; }
         public string Attachments { get; set; }
+        public string CodeName { get; set; }
 
         public List<string> AudiosPath { get; set; }
         public List<string> VideosPath { get; set; }

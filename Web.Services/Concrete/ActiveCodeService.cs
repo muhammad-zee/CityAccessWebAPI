@@ -282,27 +282,27 @@ namespace Web.Services.Concrete
         {
             var strokeData = this._codeStrokeRepo.Table.Where(x => x.OrganizationIdFk == orgId && !x.IsDeleted).ToList();
             var strokeDataVM = AutoMapperHelper.MapList<CodeStroke, CodeStrokeVM>(strokeData);
-            var orgData = new object();
+            var orgData = GetHosplitalAddressObject(orgId);
 
-            var org = this._orgRepo.Table.Where(o => o.OrganizationId == orgId && !o.IsDeleted).FirstOrDefault();
-            if (org != null)
-            {
-                var state = this._controlListDetailsRepo.Table.Where(s => s.ControlListDetailId == org.StateIdFk).Select(s => new { Id = s.ControlListDetailId, s.Title, s.Description }).FirstOrDefault();
-                if (state != null)
-                {
-                    string add = $"{org.PrimaryAddress} {org.City}, {state.Title} {org.Zip}";
-                    string url = "https://maps.googleapis.com/maps/api/geocode/json?address=" + add.Replace(" ", "%20") + "&key=" + this._GoogleApiKey;
-                    var googleApiLatLng = this._httpClient.GetAsync(url).Result;
+            //var org = this._orgRepo.Table.Where(o => o.OrganizationId == orgId && !o.IsDeleted).FirstOrDefault();
+            //if (org != null)
+            //{
+            //    var state = this._controlListDetailsRepo.Table.Where(s => s.ControlListDetailId == org.StateIdFk).Select(s => new { Id = s.ControlListDetailId, s.Title, s.Description }).FirstOrDefault();
+            //    if (state != null)
+            //    {
+            //        string add = $"{org.PrimaryAddress} {org.City}, {state.Title} {org.Zip}";
+            //        string url = "https://maps.googleapis.com/maps/api/geocode/json?address=" + add.Replace(" ", "%20") + "&key=" + this._GoogleApiKey;
+            //        var googleApiLatLng = this._httpClient.GetAsync(url).Result;
 
-                    dynamic Apiresults = googleApiLatLng["results"];
-                    var formatted_address = Convert.ToString(Apiresults[0]["formatted_address"]);
-                    var geometry = Apiresults[0]["geometry"];
-                    var location = geometry["location"];
-                    var longLat = new List<double> { Convert.ToDouble(location["lat"]), Convert.ToDouble(location["lng"]) };
+            //        dynamic Apiresults = googleApiLatLng["results"];
+            //        var formatted_address = Convert.ToString(Apiresults[0]["formatted_address"]);
+            //        var geometry = Apiresults[0]["geometry"];
+            //        var location = geometry["location"];
+            //        var longLat = new List<double> { Convert.ToDouble(location["lat"]), Convert.ToDouble(location["lng"]) };
 
-                    orgData = new { OrganizationId = org.OrganizationId, Address = formatted_address, DestinationCoords = string.Join(",", longLat), org.OrganizationName };
-                }
-            }
+            //        orgData = new { OrganizationId = org.OrganizationId, Address = formatted_address, DestinationCoords = string.Join(",", longLat), org.OrganizationName };
+            //    }
+            //}
 
             strokeDataVM.ForEach(x =>
             {
@@ -407,25 +407,27 @@ namespace Web.Services.Concrete
                     }
                 }
 
-                var org = this._orgRepo.Table.Where(o => o.OrganizationId == StrokeDataVM.OrganizationIdFk && !o.IsDeleted).FirstOrDefault();
-                if (org != null)
-                {
-                    var state = this._controlListDetailsRepo.Table.Where(s => s.ControlListDetailId == org.StateIdFk).Select(s => new { Id = s.ControlListDetailId, s.Title, s.Description }).FirstOrDefault();
-                    if (state != null)
-                    {
-                        string add = $"{org.PrimaryAddress} {org.City}, {state.Title} {org.Zip}";
-                        string url = "https://maps.googleapis.com/maps/api/geocode/json?address=" + add.Replace(" ", "%20") + "&key=" + this._GoogleApiKey;
-                        var googleApiLatLng = this._httpClient.GetAsync(url).Result;
+                //var org = this._orgRepo.Table.Where(o => o.OrganizationId == StrokeDataVM.OrganizationIdFk && !o.IsDeleted).FirstOrDefault();
+                //if (org != null)
+                //{
+                //    var state = this._controlListDetailsRepo.Table.Where(s => s.ControlListDetailId == org.StateIdFk).Select(s => new { Id = s.ControlListDetailId, s.Title, s.Description }).FirstOrDefault();
+                //    if (state != null)
+                //    {
+                //        string add = $"{org.PrimaryAddress} {org.City}, {state.Title} {org.Zip}";
+                //        string url = "https://maps.googleapis.com/maps/api/geocode/json?address=" + add.Replace(" ", "%20") + "&key=" + this._GoogleApiKey;
+                //        var googleApiLatLng = this._httpClient.GetAsync(url).Result;
 
-                        dynamic Apiresults = googleApiLatLng["results"];
-                        var formatted_address = Convert.ToString(Apiresults[0]["formatted_address"]);
-                        var geometry = Apiresults[0]["geometry"];
-                        var location = geometry["location"];
-                        var longLat = new List<double> { Convert.ToDouble(location["lat"]), Convert.ToDouble(location["lng"]) };
+                //        dynamic Apiresults = googleApiLatLng["results"];
+                //        var formatted_address = Convert.ToString(Apiresults[0]["formatted_address"]);
+                //        var geometry = Apiresults[0]["geometry"];
+                //        var location = geometry["location"];
+                //        var longLat = new List<double> { Convert.ToDouble(location["lat"]), Convert.ToDouble(location["lng"]) };
 
-                        StrokeDataVM.OrganizationData = new { OrganizationId = org.OrganizationId, Address = formatted_address, DestinationCoords = string.Join(",", longLat), org.OrganizationName };
-                    }
-                }
+                //        StrokeDataVM.OrganizationData = new { OrganizationId = org.OrganizationId, Address = formatted_address, DestinationCoords = string.Join(",", longLat), org.OrganizationName };
+                //    }
+                //}
+
+                StrokeDataVM.OrganizationData = GetHosplitalAddressObject(StrokeDataVM.OrganizationIdFk);
 
                 StrokeDataVM.GenderTitle = _controlListDetailsRepo.Table.Where(g => g.ControlListDetailId == StrokeDataVM.Gender).Select(g => g.Title).FirstOrDefault();
                 StrokeDataVM.BloodThinnersTitle = _controlListDetailsRepo.Table.Where(b => b.ControlListDetailId == StrokeDataVM.BloodThinners).Select(b => b.Title).FirstOrDefault();
@@ -1175,27 +1177,27 @@ namespace Web.Services.Concrete
             var SepsisData = this._codeSepsisRepo.Table.Where(x => x.OrganizationIdFk == orgId && !x.IsDeleted).ToList();
             var SepsisDataVM = AutoMapperHelper.MapList<CodeSepsi, CodeSepsisVM>(SepsisData);
 
-            var orgData = new object();
+            var orgData = GetHosplitalAddressObject(orgId);
 
-            var org = this._orgRepo.Table.Where(o => o.OrganizationId == orgId && !o.IsDeleted).FirstOrDefault();
-            if (org != null)
-            {
-                var state = this._controlListDetailsRepo.Table.Where(s => s.ControlListDetailId == org.StateIdFk).Select(s => new { Id = s.ControlListDetailId, s.Title, s.Description }).FirstOrDefault();
-                if (state != null)
-                {
-                    string add = $"{org.PrimaryAddress} {org.City}, {state.Title} {org.Zip}";
-                    string url = "https://maps.googleapis.com/maps/api/geocode/json?address=" + add.Replace(" ", "%20") + "&key=" + this._GoogleApiKey;
-                    var googleApiLatLng = this._httpClient.GetAsync(url).Result;
+            //var org = this._orgRepo.Table.Where(o => o.OrganizationId == orgId && !o.IsDeleted).FirstOrDefault();
+            //if (org != null)
+            //{
+            //    var state = this._controlListDetailsRepo.Table.Where(s => s.ControlListDetailId == org.StateIdFk).Select(s => new { Id = s.ControlListDetailId, s.Title, s.Description }).FirstOrDefault();
+            //    if (state != null)
+            //    {
+            //        string add = $"{org.PrimaryAddress} {org.City}, {state.Title} {org.Zip}";
+            //        string url = "https://maps.googleapis.com/maps/api/geocode/json?address=" + add.Replace(" ", "%20") + "&key=" + this._GoogleApiKey;
+            //        var googleApiLatLng = this._httpClient.GetAsync(url).Result;
 
-                    dynamic Apiresults = googleApiLatLng["results"];
-                    var formatted_address = Convert.ToString(Apiresults[0]["formatted_address"]);
-                    var geometry = Apiresults[0]["geometry"];
-                    var location = geometry["location"];
-                    var longLat = new List<double> { Convert.ToDouble(location["lat"]), Convert.ToDouble(location["lng"]) };
+            //        dynamic Apiresults = googleApiLatLng["results"];
+            //        var formatted_address = Convert.ToString(Apiresults[0]["formatted_address"]);
+            //        var geometry = Apiresults[0]["geometry"];
+            //        var location = geometry["location"];
+            //        var longLat = new List<double> { Convert.ToDouble(location["lat"]), Convert.ToDouble(location["lng"]) };
 
-                    orgData = new { OrganizationId = org.OrganizationId, Address = formatted_address, DestinationCoords = string.Join(",", longLat), org.OrganizationName };
-                }
-            }
+            //        orgData = new { OrganizationId = org.OrganizationId, Address = formatted_address, DestinationCoords = string.Join(",", longLat), org.OrganizationName };
+            //    }
+            //}
 
             SepsisDataVM.ForEach(x =>
             {
@@ -1299,25 +1301,27 @@ namespace Web.Services.Concrete
                     }
                 }
 
-                var org = this._orgRepo.Table.Where(o => o.OrganizationId == SepsisDataVM.OrganizationIdFk && !o.IsDeleted).FirstOrDefault();
-                if (org != null)
-                {
-                    var state = this._controlListDetailsRepo.Table.Where(s => s.ControlListDetailId == org.StateIdFk).Select(s => new { Id = s.ControlListDetailId, s.Title, s.Description }).FirstOrDefault();
-                    if (state != null)
-                    {
-                        string add = $"{org.PrimaryAddress} {org.City}, {state.Title} {org.Zip}";
-                        string url = "https://maps.googleapis.com/maps/api/geocode/json?address=" + add.Replace(" ", "%20") + "&key=" + this._GoogleApiKey;
-                        var googleApiLatLng = this._httpClient.GetAsync(url).Result;
+                //var org = this._orgRepo.Table.Where(o => o.OrganizationId == SepsisDataVM.OrganizationIdFk && !o.IsDeleted).FirstOrDefault();
+                //if (org != null)
+                //{
+                //    var state = this._controlListDetailsRepo.Table.Where(s => s.ControlListDetailId == org.StateIdFk).Select(s => new { Id = s.ControlListDetailId, s.Title, s.Description }).FirstOrDefault();
+                //    if (state != null)
+                //    {
+                //        string add = $"{org.PrimaryAddress} {org.City}, {state.Title} {org.Zip}";
+                //        string url = "https://maps.googleapis.com/maps/api/geocode/json?address=" + add.Replace(" ", "%20") + "&key=" + this._GoogleApiKey;
+                //        var googleApiLatLng = this._httpClient.GetAsync(url).Result;
 
-                        dynamic Apiresults = googleApiLatLng["results"];
-                        var formatted_address = Convert.ToString(Apiresults[0]["formatted_address"]);
-                        var geometry = Apiresults[0]["geometry"];
-                        var location = geometry["location"];
-                        var longLat = new List<double> { Convert.ToDouble(location["lat"]), Convert.ToDouble(location["lng"]) };
+                //        dynamic Apiresults = googleApiLatLng["results"];
+                //        var formatted_address = Convert.ToString(Apiresults[0]["formatted_address"]);
+                //        var geometry = Apiresults[0]["geometry"];
+                //        var location = geometry["location"];
+                //        var longLat = new List<double> { Convert.ToDouble(location["lat"]), Convert.ToDouble(location["lng"]) };
 
-                        SepsisDataVM.OrganizationData = new { OrganizationId = org.OrganizationId, Address = formatted_address, DestinationCoords = string.Join(",", longLat), org.OrganizationName };
-                    }
-                }
+                //        SepsisDataVM.OrganizationData = new { OrganizationId = org.OrganizationId, Address = formatted_address, DestinationCoords = string.Join(",", longLat), org.OrganizationName };
+                //    }
+                //}
+
+                SepsisDataVM.OrganizationData = GetHosplitalAddressObject(SepsisDataVM.OrganizationIdFk);
 
                 SepsisDataVM.GenderTitle = _controlListDetailsRepo.Table.Where(g => g.ControlListDetailId == SepsisDataVM.Gender).Select(g => g.Title).FirstOrDefault();
                 SepsisDataVM.BloodThinnersTitle = _controlListDetailsRepo.Table.Where(b => b.ControlListDetailId == SepsisDataVM.BloodThinners).Select(b => b.Title).FirstOrDefault();
@@ -2075,27 +2079,27 @@ namespace Web.Services.Concrete
             var STEMIData = this._codeSTEMIRepo.Table.Where(x => x.OrganizationIdFk == orgId && !x.IsDeleted).ToList();
             var STEMIDataVM = AutoMapperHelper.MapList<CodeStemi, CodeSTEMIVM>(STEMIData);
 
-            var orgData = new object();
+            var orgData = GetHosplitalAddressObject(orgId);
 
-            var org = this._orgRepo.Table.Where(o => o.OrganizationId == orgId && !o.IsDeleted).FirstOrDefault();
-            if (org != null)
-            {
-                var state = this._controlListDetailsRepo.Table.Where(s => s.ControlListDetailId == org.StateIdFk).Select(s => new { Id = s.ControlListDetailId, s.Title, s.Description }).FirstOrDefault();
-                if (state != null)
-                {
-                    string add = $"{org.PrimaryAddress} {org.City}, {state.Title} {org.Zip}";
-                    string url = "https://maps.googleapis.com/maps/api/geocode/json?address=" + add.Replace(" ", "%20") + "&key=" + this._GoogleApiKey;
-                    var googleApiLatLng = this._httpClient.GetAsync(url).Result;
+            //var org = this._orgRepo.Table.Where(o => o.OrganizationId == orgId && !o.IsDeleted).FirstOrDefault();
+            //if (org != null)
+            //{
+            //    var state = this._controlListDetailsRepo.Table.Where(s => s.ControlListDetailId == org.StateIdFk).Select(s => new { Id = s.ControlListDetailId, s.Title, s.Description }).FirstOrDefault();
+            //    if (state != null)
+            //    {
+            //        string add = $"{org.PrimaryAddress} {org.City}, {state.Title} {org.Zip}";
+            //        string url = "https://maps.googleapis.com/maps/api/geocode/json?address=" + add.Replace(" ", "%20") + "&key=" + this._GoogleApiKey;
+            //        var googleApiLatLng = this._httpClient.GetAsync(url).Result;
 
-                    dynamic Apiresults = googleApiLatLng["results"];
-                    var formatted_address = Convert.ToString(Apiresults[0]["formatted_address"]);
-                    var geometry = Apiresults[0]["geometry"];
-                    var location = geometry["location"];
-                    var longLat = new List<double> { Convert.ToDouble(location["lat"]), Convert.ToDouble(location["lng"]) };
+            //        dynamic Apiresults = googleApiLatLng["results"];
+            //        var formatted_address = Convert.ToString(Apiresults[0]["formatted_address"]);
+            //        var geometry = Apiresults[0]["geometry"];
+            //        var location = geometry["location"];
+            //        var longLat = new List<double> { Convert.ToDouble(location["lat"]), Convert.ToDouble(location["lng"]) };
 
-                    orgData = new { OrganizationId = org.OrganizationId, Address = formatted_address, DestinationCoords = string.Join(",", longLat), org.OrganizationName };
-                }
-            }
+            //        orgData = new { OrganizationId = org.OrganizationId, Address = formatted_address, DestinationCoords = string.Join(",", longLat), org.OrganizationName };
+            //    }
+            //}
 
             STEMIDataVM.ForEach(x =>
             {
@@ -2199,26 +2203,26 @@ namespace Web.Services.Concrete
                 }
 
 
-                var org = this._orgRepo.Table.Where(o => o.OrganizationId == STEMIDataVM.OrganizationIdFk && !o.IsDeleted).FirstOrDefault();
-                if (org != null)
-                {
-                    var state = this._controlListDetailsRepo.Table.Where(s => s.ControlListDetailId == org.StateIdFk).Select(s => new { Id = s.ControlListDetailId, s.Title, s.Description }).FirstOrDefault();
-                    if (state != null)
-                    {
-                        string add = $"{org.PrimaryAddress} {org.City}, {state.Title} {org.Zip}";
-                        string url = "https://maps.googleapis.com/maps/api/geocode/json?address=" + add.Replace(" ", "%20") + "&key=" + this._GoogleApiKey;
-                        var googleApiLatLng = this._httpClient.GetAsync(url).Result;
+                //var org = this._orgRepo.Table.Where(o => o.OrganizationId == STEMIDataVM.OrganizationIdFk && !o.IsDeleted).FirstOrDefault();
+                //if (org != null)
+                //{
+                //    var state = this._controlListDetailsRepo.Table.Where(s => s.ControlListDetailId == org.StateIdFk).Select(s => new { Id = s.ControlListDetailId, s.Title, s.Description }).FirstOrDefault();
+                //    if (state != null)
+                //    {
+                //        string add = $"{org.PrimaryAddress} {org.City}, {state.Title} {org.Zip}";
+                //        string url = "https://maps.googleapis.com/maps/api/geocode/json?address=" + add.Replace(" ", "%20") + "&key=" + this._GoogleApiKey;
+                //        var googleApiLatLng = this._httpClient.GetAsync(url).Result;
 
-                        dynamic Apiresults = googleApiLatLng["results"];
-                        var formatted_address = Convert.ToString(Apiresults[0]["formatted_address"]);
-                        var geometry = Apiresults[0]["geometry"];
-                        var location = geometry["location"];
-                        var longLat = new List<double> { Convert.ToDouble(location["lat"]), Convert.ToDouble(location["lng"]) };
+                //        dynamic Apiresults = googleApiLatLng["results"];
+                //        var formatted_address = Convert.ToString(Apiresults[0]["formatted_address"]);
+                //        var geometry = Apiresults[0]["geometry"];
+                //        var location = geometry["location"];
+                //        var longLat = new List<double> { Convert.ToDouble(location["lat"]), Convert.ToDouble(location["lng"]) };
 
-                        STEMIDataVM.OrganizationData = new { OrganizationId = org.OrganizationId, Address = formatted_address, DestinationCoords = string.Join(",", longLat), org.OrganizationName };
-                    }
-                }
-
+                //        STEMIDataVM.OrganizationData = new { OrganizationId = org.OrganizationId, Address = formatted_address, DestinationCoords = string.Join(",", longLat), org.OrganizationName };
+                //    }
+                //}
+                STEMIDataVM.OrganizationData = GetHosplitalAddressObject(STEMIDataVM.OrganizationIdFk);
                 STEMIDataVM.GenderTitle = _controlListDetailsRepo.Table.Where(g => g.ControlListDetailId == STEMIDataVM.Gender).Select(g => g.Title).FirstOrDefault();
                 STEMIDataVM.BloodThinnersTitle = _controlListDetailsRepo.Table.Where(b => b.ControlListDetailId == STEMIDataVM.BloodThinners).Select(b => b.Title).FirstOrDefault();
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Found", Body = STEMIDataVM };
@@ -2971,27 +2975,7 @@ namespace Web.Services.Concrete
             var TrumaData = this._codeTrumaRepo.Table.Where(x => x.OrganizationIdFk == orgId && !x.IsDeleted).ToList();
             var TrumaDataVM = AutoMapperHelper.MapList<CodeTrauma, CodeTrumaVM>(TrumaData);
 
-            var orgData = new object();
-
-            var org = this._orgRepo.Table.Where(o => o.OrganizationId == orgId && !o.IsDeleted).FirstOrDefault();
-            if (org != null)
-            {
-                var state = this._controlListDetailsRepo.Table.Where(s => s.ControlListDetailId == org.StateIdFk).Select(s => new { Id = s.ControlListDetailId, s.Title, s.Description }).FirstOrDefault();
-                if (state != null)
-                {
-                    string add = $"{org.PrimaryAddress} {org.City}, {state.Title} {org.Zip}";
-                    string url = "https://maps.googleapis.com/maps/api/geocode/json?address=" + add.Replace(" ", "%20") + "&key=" + this._GoogleApiKey;
-                    var googleApiLatLng = this._httpClient.GetAsync(url).Result;
-
-                    dynamic Apiresults = googleApiLatLng["results"];
-                    var formatted_address = Convert.ToString(Apiresults[0]["formatted_address"]);
-                    var geometry = Apiresults[0]["geometry"];
-                    var location = geometry["location"];
-                    var longLat = new List<double> { Convert.ToDouble(location["lat"]), Convert.ToDouble(location["lng"]) };
-
-                    orgData = new { OrganizationId = org.OrganizationId, Address = formatted_address, DestinationCoords = string.Join(",", longLat), org.OrganizationName };
-                }
-            }
+            var orgData = GetHosplitalAddressObject(orgId);
 
             TrumaDataVM.ForEach(x =>
             {
@@ -3093,25 +3077,27 @@ namespace Web.Services.Concrete
                     }
                 }
 
-                var org = this._orgRepo.Table.Where(o => o.OrganizationId == TrumaDataVM.OrganizationIdFk && !o.IsDeleted).FirstOrDefault();
-                if (org != null)
-                {
-                    var state = this._controlListDetailsRepo.Table.Where(s => s.ControlListDetailId == org.StateIdFk).Select(s => new { Id = s.ControlListDetailId, s.Title, s.Description }).FirstOrDefault();
-                    if (state != null)
-                    {
-                        string add = $"{org.PrimaryAddress} {org.City}, {state.Title} {org.Zip}";
-                        string url = "https://maps.googleapis.com/maps/api/geocode/json?address=" + add.Replace(" ", "%20") + "&key=" + this._GoogleApiKey;
-                        var googleApiLatLng = this._httpClient.GetAsync(url).Result;
+                //var org = this._orgRepo.Table.Where(o => o.OrganizationId == TrumaDataVM.OrganizationIdFk && !o.IsDeleted).FirstOrDefault();
+                //if (org != null)
+                //{
+                //    var state = this._controlListDetailsRepo.Table.Where(s => s.ControlListDetailId == org.StateIdFk).Select(s => new { Id = s.ControlListDetailId, s.Title, s.Description }).FirstOrDefault();
+                //    if (state != null)
+                //    {
+                //        string add = $"{org.PrimaryAddress} {org.City}, {state.Title} {org.Zip}";
+                //        string url = "https://maps.googleapis.com/maps/api/geocode/json?address=" + add.Replace(" ", "%20") + "&key=" + this._GoogleApiKey;
+                //        var googleApiLatLng = this._httpClient.GetAsync(url).Result;
 
-                        dynamic Apiresults = googleApiLatLng["results"];
-                        var formatted_address = Convert.ToString(Apiresults[0]["formatted_address"]);
-                        var geometry = Apiresults[0]["geometry"];
-                        var location = geometry["location"];
-                        var longLat = new List<double> { Convert.ToDouble(location["lat"]), Convert.ToDouble(location["lng"]) };
+                //        dynamic Apiresults = googleApiLatLng["results"];
+                //        var formatted_address = Convert.ToString(Apiresults[0]["formatted_address"]);
+                //        var geometry = Apiresults[0]["geometry"];
+                //        var location = geometry["location"];
+                //        var longLat = new List<double> { Convert.ToDouble(location["lat"]), Convert.ToDouble(location["lng"]) };
 
-                        TrumaDataVM.OrganizationData = new { OrganizationId = org.OrganizationId, Address = formatted_address, DestinationCoords = string.Join(",", longLat), org.OrganizationName };
-                    }
-                }
+                //        TrumaDataVM.OrganizationData = new { OrganizationId = org.OrganizationId, Address = formatted_address, DestinationCoords = string.Join(",", longLat), org.OrganizationName };
+                //    }
+                //}
+
+                TrumaDataVM.OrganizationData = GetHosplitalAddressObject(TrumaDataVM.OrganizationIdFk);
 
                 TrumaDataVM.GenderTitle = _controlListDetailsRepo.Table.Where(g => g.ControlListDetailId == TrumaDataVM.Gender).Select(g => g.Title).FirstOrDefault();
                 TrumaDataVM.BloodThinnersTitle = _controlListDetailsRepo.Table.Where(b => b.ControlListDetailId == TrumaDataVM.BloodThinners).Select(b => b.Title).FirstOrDefault();
@@ -3858,7 +3844,61 @@ namespace Web.Services.Concrete
 
         #endregion
 
+        #region EMS
+
+        public BaseResponse GetActiveEMS()
+        {
+            var activeEMS = this._dbContext.LoadStoredProcedure("md_getActiveEMS").ExecuteStoredProc<CodeStrokeVM>();
+
+            var orgDataList = new List<dynamic>();
+            foreach (var item in activeEMS.Select(x => x.OrganizationIdFk).Distinct().ToList())
+            {
+                var orgData = GetHosplitalAddressObject(item);
+                if (orgData != null)
+                    orgDataList.Add(orgData);
+            }
+            foreach (var item in activeEMS)
+            {
+                item.OrganizationData = orgDataList.Where(x => x.OrganizationId == item.OrganizationIdFk).FirstOrDefault();
+            }
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = activeEMS };
+        }
+
+        #endregion
+
+
         #region Map & addresses
+
+        public object GetHosplitalAddressObject(int orgId)
+        {
+            var org = this._orgRepo.Table.Where(o => o.OrganizationId == orgId && !o.IsDeleted).FirstOrDefault();
+            if (org != null)
+            {
+                var state = this._controlListDetailsRepo.Table.Where(s => s.ControlListDetailId == org.StateIdFk).Select(s => new { Id = s.ControlListDetailId, s.Title, s.Description }).FirstOrDefault();
+                if (state != null)
+                {
+                    string add = $"{org.PrimaryAddress} {org.City}, {state.Title} {org.Zip}";
+                    string url = "https://maps.googleapis.com/maps/api/geocode/json?address=" + add.Replace(" ", "%20") + "&key=" + this._GoogleApiKey;
+                    var googleApiLatLng = this._httpClient.GetAsync(url).Result;
+
+                    dynamic Apiresults = googleApiLatLng["results"];
+                    var formatted_address = Convert.ToString(Apiresults[0]["formatted_address"]);
+                    var geometry = Apiresults[0]["geometry"];
+                    var location = geometry["location"];
+                    var longLat = new List<double> { Convert.ToDouble(location["lat"]), Convert.ToDouble(location["lng"]) };
+
+                    return new { OrganizationId = org.OrganizationId, Address = formatted_address, DestinationCoords = string.Join(",", longLat), org.OrganizationName };
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            else
+            {
+                return null;
+            }
+        }
 
         public BaseResponse GetHospitalsOfStatesByCodeId(int codeId, string latlng)
         {

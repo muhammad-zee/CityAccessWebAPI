@@ -45,6 +45,10 @@ namespace Web.Services.Interfaces
         BaseResponse DeleteTruma(int TrumaId);
         #endregion
 
+        #region EMS
+        BaseResponse GetActiveEMS();
+        #endregion
+
         #region Map and Addresses
 
         BaseResponse GetHospitalsOfStatesByCodeId(int codeId, string latlng);

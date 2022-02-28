@@ -384,6 +384,26 @@ namespace Web.API.Controllers
 
         #endregion
 
+        [Description("Get All Active EMS")]
+        [HttpGet("EMS/GetActiveEMS")]
+        public BaseResponse GetActiveEMS() 
+        {
+            try
+            {
+                return _activeCodesService.GetActiveEMS();
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+        #region EMS
+
+
+        #endregion
+
         #region Map & Addresses
 
         [HttpGet("map/GetHospitalsOfStatesByCodeId/{codeId}/{coordinates}")]
