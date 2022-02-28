@@ -61,14 +61,16 @@ namespace Web.Services.Concrete
         public BaseResponse GetConsultFeildsForOrg(int OrgId)
         {
             var consultFields = this._consultFieldRepo.Table.Where(x => !x.IsDeleted).ToList();
-            var selectedConsultFields = this._orgConsultRepo.Table.Where(x => x.OrganizationIdFk == OrgId && !x.IsDeleted).Select(x => x.ConsultFieldIdFk).ToList();
+            var selectedConsultFields = this._orgConsultRepo.Table.Where(x => x.OrganizationIdFk == OrgId && !x.IsDeleted).Select(x => new { x.ConsultFieldIdFk, x.IsRequired, x.SortOrder }).ToList();
 
             var consultFieldVM = AutoMapperHelper.MapList<ConsultField, ConsultFieldsVM>(consultFields);
 
             foreach (var item in consultFieldVM)
             {
-                if (selectedConsultFields.Contains(item.ConsultFieldId))
+                if (selectedConsultFields.Select(x => x.ConsultFieldIdFk).Contains(item.ConsultFieldId))
                 {
+                    item.IsRequired = selectedConsultFields.Where(x => x.ConsultFieldIdFk == item.ConsultFieldId).Select(s => s.IsRequired).FirstOrDefault();
+                    item.SortOrder = selectedConsultFields.Where(x => x.ConsultFieldIdFk == item.ConsultFieldId).Select(s => s.SortOrder.Value).FirstOrDefault();
                     item.IsSelected = true;
                 }
                 else
