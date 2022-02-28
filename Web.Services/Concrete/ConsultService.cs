@@ -93,7 +93,7 @@ namespace Web.Services.Concrete
                                   cf.FieldData,
                                   cf.FieldDataType,
                                   cf.FieldDataLength,
-                                  ocf.IsRequired
+                                  cf.IsRequired
                               }).Distinct().ToList();
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Found", Body = formFields };
         }
@@ -153,7 +153,7 @@ namespace Web.Services.Concrete
                 this._orgConsultRepo.Update(toBeDeletedRows);
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Deleted Successfully" };
             }
-            else
+            else 
             {
                 var duplicateObj = orgConsultFields.Select(x => new { x.OrganizationIdFk, x.ConsultFieldIdFk }).ToList();
 
