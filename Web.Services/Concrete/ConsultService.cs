@@ -93,7 +93,7 @@ namespace Web.Services.Concrete
                                   cf.FieldData,
                                   cf.FieldDataType,
                                   cf.FieldDataLength,
-                                  cf.IsRequired
+                                  ocf.IsRequired
                               }).Distinct().ToList();
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Found", Body = formFields };
         }

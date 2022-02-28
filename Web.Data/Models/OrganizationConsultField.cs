@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 #nullable disable
 
@@ -10,6 +11,7 @@ namespace Web.Data.Models
         public int OrganizationIdFk { get; set; }
         public int ConsultFieldIdFk { get; set; }
         public int? SortOrder { get; set; }
+        public bool IsRequired { get; set; }
         public int CreatedBy { get; set; }
         public DateTime CreatedDate { get; set; }
         public int? ModifiedBy { get; set; }
