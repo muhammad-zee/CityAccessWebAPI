@@ -26,6 +26,11 @@ namespace Web.Model.Common
         public int? ModifiedBy { get; set; }
         public DateTime? ModifiedDate { get; set; }
         public bool? IsDeleted { get; set; }
+        public DateTime? EndTime { get; set; }
+        public string EstimatedTime { get; set; }
+        public TimeSpan? ActualTime { get; set; }
+        public string Distance { get; set; }
+        public string StartingPoint { get; set; }
         public List<FilesVM> Audios { get; set; }
         public List<FilesVM> Videos { get; set; }
         public List<FilesVM> Attachment { get; set; }

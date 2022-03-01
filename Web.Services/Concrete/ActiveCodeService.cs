@@ -453,7 +453,13 @@ namespace Web.Services.Concrete
                 row.FamilyContactName = codeStroke.FamilyContactName;
                 row.FamilyContactNumber = codeStroke.FamilyContactNumber;
                 row.IsEms = codeStroke.IsEms;
-                row.IsCompleted = codeStroke.IsCompleted;
+                //row.IsCompleted = codeStroke.IsCompleted;
+                if (codeStroke.IsCompleted != null && codeStroke.IsCompleted == true)
+                {
+                    row.IsCompleted = true;
+                    row.EndTime = DateTime.UtcNow;
+                    row.ActualTime = row.EndTime - row.CreatedDate;
+                }
                 row.ModifiedBy = codeStroke.ModifiedBy;
                 row.ModifiedDate = DateTime.UtcNow;
                 row.IsDeleted = false;
@@ -1346,7 +1352,13 @@ namespace Web.Services.Concrete
                 row.FamilyContactName = codeSepsis.FamilyContactName;
                 row.FamilyContactNumber = codeSepsis.FamilyContactNumber;
                 row.IsEms = codeSepsis.IsEms;
-                row.IsCompleted = codeSepsis.IsCompleted;
+                //row.IsCompleted = codeSepsis.IsCompleted;
+                if (codeSepsis.IsCompleted == true)
+                {
+                    row.IsCompleted = true;
+                    row.EndTime = DateTime.UtcNow;
+                    row.ActualTime = row.EndTime - row.CreatedDate;
+                }
                 row.ModifiedBy = codeSepsis.ModifiedBy;
                 row.ModifiedDate = DateTime.UtcNow;
                 row.IsDeleted = false;
@@ -2246,7 +2258,13 @@ namespace Web.Services.Concrete
                 row.FamilyContactName = codeSTEMI.FamilyContactName;
                 row.FamilyContactNumber = codeSTEMI.FamilyContactNumber;
                 row.IsEms = codeSTEMI.IsEms;
-                row.IsCompleted = codeSTEMI.IsCompleted;
+                //row.IsCompleted = codeSTEMI.IsCompleted;
+                if (codeSTEMI.IsCompleted != null && codeSTEMI.IsCompleted == true)
+                {
+                    row.IsCompleted = true;
+                    row.EndTime = DateTime.UtcNow;
+                    row.ActualTime = row.EndTime - row.CreatedDate;
+                }
                 row.ModifiedBy = codeSTEMI.ModifiedBy;
                 row.ModifiedDate = DateTime.UtcNow;
                 row.IsDeleted = false;

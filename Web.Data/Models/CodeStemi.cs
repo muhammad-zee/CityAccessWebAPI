@@ -28,5 +28,10 @@ namespace Web.Data.Models
         public string Audio { get; set; }
         public string Video { get; set; }
         public string Attachments { get; set; }
+        public DateTime? EndTime { get; set; }
+        public string EstimatedTime { get; set; }
+        public TimeSpan? ActualTime { get; set; }
+        public string Distance { get; set; }
+        public string StartingPoint { get; set; }
     }
 }
