@@ -159,22 +159,41 @@ namespace Web.Services.Concrete
             {
                 var duplicateObj = orgConsultFields.Select(x => new { x.OrganizationIdFk, x.ConsultFieldIdFk }).ToList();
 
-                var alreadyExistFields = this._orgConsultRepo.Table.Where(x => duplicateObj.Select(y => y.ConsultFieldIdFk).Contains(x.ConsultFieldIdFk) && duplicateObj.Select(y => y.OrganizationIdFk).Contains(x.OrganizationIdFk) && !x.IsDeleted).Select(x => x.ConsultFieldIdFk).Distinct().ToList();
-                duplicateObj.RemoveAll(r => alreadyExistFields.Contains(r.ConsultFieldIdFk));
+                var alreadyExistFields = this._orgConsultRepo.Table.Where(x => duplicateObj.Select(y => y.ConsultFieldIdFk).Contains(x.ConsultFieldIdFk) && duplicateObj.Select(y => y.OrganizationIdFk).Contains(x.OrganizationIdFk) && !x.IsDeleted).Distinct().ToList();
+
+                var objsNeedToUpdate = alreadyExistFields.Where(x => duplicateObj.Select(c => c.ConsultFieldIdFk).Contains(x.ConsultFieldIdFk)).ToList();
+
+                if (objsNeedToUpdate.Count > 0) 
+                {
+                    foreach (var item in objsNeedToUpdate)
+                    {
+                        item.SortOrder = orgConsultFields.Where(x => x.ConsultFieldIdFk == item.ConsultFieldIdFk).Select(x => x.SortOrder).FirstOrDefault();
+                        item.IsRequired = orgConsultFields.Where(x => x.ConsultFieldIdFk == item.ConsultFieldIdFk).Select(x => x.IsRequired).FirstOrDefault();
+                    }
+                    this._orgConsultRepo.Update(objsNeedToUpdate);
+                }
+
+                duplicateObj.RemoveAll(r => alreadyExistFields.Select(x => x.ConsultFieldIdFk).Contains(r.ConsultFieldIdFk));
 
                 var orgConsults = AutoMapperHelper.MapList<OrgConsultFieldsVM, OrganizationConsultField>(orgConsultFields.Where(x => duplicateObj.Select(c => c.ConsultFieldIdFk).Contains(x.ConsultFieldIdFk)).ToList());
 
-                this._orgConsultRepo.Insert(orgConsults);
+                if (orgConsults.Count > 0) 
+                {
+                    this._orgConsultRepo.Insert(orgConsults);
+                }
 
-                alreadyExistFields = this._orgConsultRepo.Table.Where(x => duplicateObj.Select(y => y.ConsultFieldIdFk).Contains(x.ConsultFieldIdFk) && duplicateObj.Select(y => y.OrganizationIdFk).Contains(x.OrganizationIdFk) && !x.IsDeleted).Select(x => x.ConsultFieldIdFk).Distinct().ToList();
-                duplicateObj.RemoveAll(r => alreadyExistFields.Contains(r.ConsultFieldIdFk));
+                alreadyExistFields = this._orgConsultRepo.Table.Where(x => duplicateObj.Select(y => y.ConsultFieldIdFk).Contains(x.ConsultFieldIdFk) && duplicateObj.Select(y => y.OrganizationIdFk).Contains(x.OrganizationIdFk) && !x.IsDeleted).Distinct().ToList();
+                duplicateObj.RemoveAll(r => alreadyExistFields.Select(x => x.ConsultFieldIdFk).Contains(r.ConsultFieldIdFk));
 
                 var deletedOnes = this._orgConsultRepo.Table.Where(x => !(orgConsultFields.Select(y => y.ConsultFieldIdFk).Contains(x.ConsultFieldIdFk)) && orgConsultFields.Select(y => y.OrganizationIdFk).Contains(x.OrganizationIdFk) && !x.IsDeleted).ToList();
 
                 int? ModifiedBy = orgConsultFields.Select(x => x.ModifiedBy).FirstOrDefault();
 
-                deletedOnes.ForEach(x => { x.ModifiedBy = ModifiedBy; x.ModifiedDate = DateTime.UtcNow; x.IsDeleted = true; });
-                this._orgConsultRepo.Update(deletedOnes);
+                if (deletedOnes.Count > 0) 
+                {
+                    deletedOnes.ForEach(x => { x.ModifiedBy = ModifiedBy; x.ModifiedDate = DateTime.UtcNow; x.IsDeleted = true; });
+                    this._orgConsultRepo.Update(deletedOnes);
+                }
 
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Saved Successfully" };
             }
