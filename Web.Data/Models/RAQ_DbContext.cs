@@ -18,6 +18,7 @@ namespace Web.Data.Models
         }
 
         public virtual DbSet<ActiveCode> ActiveCodes { get; set; }
+        public virtual DbSet<ActiveCodesGroupMember> ActiveCodesGroupMembers { get; set; }
         public virtual DbSet<ClinicalHoliday> ClinicalHolidays { get; set; }
         public virtual DbSet<ClinicalHour> ClinicalHours { get; set; }
         public virtual DbSet<CodeSepsi> CodeSepses { get; set; }
@@ -78,6 +79,17 @@ namespace Web.Data.Models
                     .HasForeignKey(d => d.OrganizationIdFk)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_ActiveCodes_Organizations");
+            });
+
+            modelBuilder.Entity<ActiveCodesGroupMember>(entity =>
+            {
+                entity.Property(e => e.ActiveCodeName)
+                    .IsRequired()
+                    .HasMaxLength(20);
+
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
             });
 
             modelBuilder.Entity<ClinicalHoliday>(entity =>

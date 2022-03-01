@@ -34,6 +34,7 @@ namespace Web.Services.Concrete
         private IRepository<CodeSepsi> _codeSepsisRepo;
         private IRepository<CodeStemi> _codeSTEMIRepo;
         private IRepository<CodeTrauma> _codeTrumaRepo;
+        private IRepository<ActiveCodesGroupMember> _activeCodesGroupMembersRepo;
         IConfiguration _config;
         private string _RootPath;
         private string _GoogleApiKey;
@@ -51,7 +52,8 @@ namespace Web.Services.Concrete
             IRepository<CodeStroke> codeStrokeRepo,
             IRepository<CodeSepsi> codeSepsisRepo,
             IRepository<CodeStemi> codeSTEMIRepo,
-            IRepository<CodeTrauma> codeTrumaRepo)
+            IRepository<CodeTrauma> codeTrumaRepo,
+            IRepository<ActiveCodesGroupMember> activeCodesGroupMembersRepo)
         {
             this._config = config;
             this._httpClient = httpClient;
@@ -68,6 +70,7 @@ namespace Web.Services.Concrete
             this._codeSepsisRepo = codeSepsisRepo;
             this._codeSTEMIRepo = codeSTEMIRepo;
             this._codeTrumaRepo = codeTrumaRepo;
+            this._activeCodesGroupMembersRepo = activeCodesGroupMembersRepo;
             this._RootPath = this._config["FilePath:Path"].ToString();
             this._GoogleApiKey = this._config["GoogleApi:Key"].ToString();
         }
@@ -1124,8 +1127,8 @@ namespace Web.Services.Concrete
                         var UserChannelSid = (from us in this._userSchedulesRepo.Table
                                               join u in this._userRepo.Table on us.UserIdFk equals u.UserId
                                               where serviceLineIds.ToIntList().Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
-                                              select u.UserUniqueId).ToList();
-                        var loggedUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => x.UserUniqueId).FirstOrDefault();
+                                              select new { u.UserUniqueId, u.UserId }).ToList();
+                        var loggedUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).FirstOrDefault();
                         UserChannelSid.Add(loggedUser);
                         var conversationChannelAttributes = JsonConvert.SerializeObject(new Dictionary<string, Object>()
                                     {
@@ -1133,7 +1136,7 @@ namespace Web.Services.Concrete
                                         {ChannelAttributeEnums.CodeType.ToString(), ChannelTypeEnums.Stroke.ToString()},
                                         {ChannelAttributeEnums.StrokeId.ToString(), stroke.CodeStrokeId}
                                     }, Formatting.Indented);
-
+                        List<ActiveCodesGroupMember> ACodeGroupMembers = new List<ActiveCodesGroupMember>();
                         if (UserChannelSid != null && UserChannelSid.Count > 0)
                         {
                             //string uniqueName = $"CONSULT_{Consult_Counter.Counter_Value.ToString()}";
@@ -1142,9 +1145,20 @@ namespace Web.Services.Concrete
                             var channel = _communication.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
                             foreach (var item in UserChannelSid)
                             {
-                                _communication.addNewUserToConversationChannel(channel.Sid, item);
-
+                                var codeGroupMember = new ActiveCodesGroupMember()
+                                {
+                                    UserIdFk = item.UserId,
+                                    ActiveCodeIdFk = stroke.CodeStrokeId,
+                                    ActiveCodeName = UCLEnums.Stroke.ToString(),
+                                    IsAcknowledge = false,
+                                    CreatedBy = ApplicationSettings.UserId,
+                                    CreatedDate = DateTime.UtcNow,
+                                    IsDeleted = false
+                                };
+                                ACodeGroupMembers.Add(codeGroupMember);
+                                _communication.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
                             }
+                            var isMembersAdded = AddGroupMembers(ACodeGroupMembers);
                             var msg = new ConversationMessageVM()
                             {
                                 author = "System",
@@ -2031,10 +2045,10 @@ namespace Web.Services.Concrete
                         var UserChannelSid = (from us in this._userSchedulesRepo.Table
                                               join u in this._userRepo.Table on us.UserIdFk equals u.UserId
                                               where serviceLineIds.ToIntList().Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
-                                              select u.UserUniqueId).ToList();
-                        var loggedUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => x.UserUniqueId).FirstOrDefault();
+                                              select new { u.UserUniqueId, u.UserId }).ToList();
+                        var loggedUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).FirstOrDefault();
                         UserChannelSid.Add(loggedUser);
-
+                        List<ActiveCodesGroupMember> ACodeGroupMembers = new List<ActiveCodesGroupMember>();
                         if (UserChannelSid != null && UserChannelSid.Count > 0)
                         {
                             //string uniqueName = $"CONSULT_{Consult_Counter.Counter_Value.ToString()}";
@@ -2049,9 +2063,21 @@ namespace Web.Services.Concrete
                             var channel = _communication.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
                             foreach (var item in UserChannelSid)
                             {
-                                _communication.addNewUserToConversationChannel(channel.Sid, item);
-
+                                var codeGroupMember = new ActiveCodesGroupMember()
+                                {
+                                    UserIdFk = item.UserId,
+                                    ActiveCodeIdFk = Sepsis.CodeSepsisId,
+                                    ActiveCodeName = UCLEnums.Sepsis.ToString(),
+                                    IsAcknowledge = false,
+                                    CreatedBy = ApplicationSettings.UserId,
+                                    CreatedDate = DateTime.UtcNow,
+                                    IsDeleted = false
+                                };
+                                ACodeGroupMembers.Add(codeGroupMember);
+                                _communication.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
                             }
+                            var isMembersAdded = AddGroupMembers(ACodeGroupMembers);
+
                             var msg = new ConversationMessageVM()
                             {
                                 author = "System",
@@ -2934,10 +2960,10 @@ namespace Web.Services.Concrete
                         var UserChannelSid = (from us in this._userSchedulesRepo.Table
                                               join u in this._userRepo.Table on us.UserIdFk equals u.UserId
                                               where serviceLineIds.ToIntList().Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
-                                              select u.UserUniqueId).ToList();
-                        var loggedUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => x.UserUniqueId).FirstOrDefault();
+                                              select new { u.UserUniqueId, u.UserId }).ToList();
+                        var loggedUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).FirstOrDefault();
                         UserChannelSid.Add(loggedUser);
-
+                        List<ActiveCodesGroupMember> ACodeGroupMembers = new List<ActiveCodesGroupMember>();
                         if (UserChannelSid != null && UserChannelSid.Count > 0)
                         {
                             //string uniqueName = $"CONSULT_{Consult_Counter.Counter_Value.ToString()}";
@@ -2952,9 +2978,20 @@ namespace Web.Services.Concrete
                             var channel = _communication.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
                             foreach (var item in UserChannelSid)
                             {
-                                _communication.addNewUserToConversationChannel(channel.Sid, item);
-
+                                var codeGroupMember = new ActiveCodesGroupMember()
+                                {
+                                    UserIdFk = item.UserId,
+                                    ActiveCodeIdFk = STEMI.CodeStemiid,
+                                    ActiveCodeName = UCLEnums.STEMI.ToString(),
+                                    IsAcknowledge = false,
+                                    CreatedBy = ApplicationSettings.UserId,
+                                    CreatedDate = DateTime.UtcNow,
+                                    IsDeleted = false
+                                };
+                                ACodeGroupMembers.Add(codeGroupMember);
+                                _communication.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
                             }
+                            var isMembersAdded = AddGroupMembers(ACodeGroupMembers);
                             var msg = new ConversationMessageVM()
                             {
                                 author = "System",
@@ -3815,10 +3852,10 @@ namespace Web.Services.Concrete
                         var UserChannelSid = (from us in this._userSchedulesRepo.Table
                                               join u in this._userRepo.Table on us.UserIdFk equals u.UserId
                                               where serviceLineIds.ToIntList().Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
-                                              select u.UserUniqueId).ToList();
-                        var loggedUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => x.UserUniqueId).FirstOrDefault();
+                                              select new { u.UserUniqueId , u.UserId}).ToList();
+                        var loggedUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).FirstOrDefault();
                         UserChannelSid.Add(loggedUser);
-
+                        List<ActiveCodesGroupMember> ACodeGroupMembers = new List<ActiveCodesGroupMember>();
                         if (UserChannelSid != null && UserChannelSid.Count > 0)
                         {
                             //string uniqueName = $"CONSULT_{Consult_Counter.Counter_Value.ToString()}";
@@ -3833,9 +3870,21 @@ namespace Web.Services.Concrete
                             var channel = _communication.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
                             foreach (var item in UserChannelSid)
                             {
-                                _communication.addNewUserToConversationChannel(channel.Sid, item);
+                                var codeGroupMember = new ActiveCodesGroupMember()
+                                {
+                                    UserIdFk = item.UserId,
+                                    ActiveCodeIdFk = Truma.CodeTraumaId,
+                                    ActiveCodeName = UCLEnums.Trauma.ToString(),
+                                    IsAcknowledge = false,
+                                    CreatedBy = ApplicationSettings.UserId,
+                                    CreatedDate = DateTime.UtcNow,
+                                    IsDeleted = false
+                                };
+                                ACodeGroupMembers.Add(codeGroupMember);
+                                _communication.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
 
                             }
+                            var isMembersAdded = AddGroupMembers(ACodeGroupMembers);
                             var msg = new ConversationMessageVM()
                             {
                                 author = "System",
@@ -3867,6 +3916,19 @@ namespace Web.Services.Concrete
 
 
         #endregion
+
+        public BaseResponse AddGroupMembers(List<ActiveCodesGroupMember> activeCodesGroup) 
+        {
+            if (activeCodesGroup.Count > 0)
+            {
+                this._activeCodesGroupMembersRepo.Insert(activeCodesGroup);
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Inserted" };
+            }
+            else 
+            {
+                return new BaseResponse() { Status = HttpStatusCode.NotModified, Message = "No Data Inserted" };
+            }
+        }
 
         #region EMS
 
