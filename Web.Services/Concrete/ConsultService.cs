@@ -243,6 +243,7 @@ namespace Web.Services.Concrete
                 .WithSqlParam("@serviceLineIds", consult.ServiceLineIds)
                 .WithSqlParam("@userId", ApplicationSettings.UserId)
                 .WithSqlParam("@showAllConsults", consult.showAllConsults)
+                .WithSqlParam("@isFromDashboard", consult.IsFromDashboard)
                 .ExecuteStoredProc_ToDictionary();
 
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = consultData };
