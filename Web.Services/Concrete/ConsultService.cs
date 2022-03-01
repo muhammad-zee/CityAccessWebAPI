@@ -241,6 +241,8 @@ namespace Web.Services.Concrete
                 .WithSqlParam("@organizationId", consult.OrganizationId)
                 .WithSqlParam("@departmentIds", consult.DepartmentIds)
                 .WithSqlParam("@serviceLineIds", consult.ServiceLineIds)
+                .WithSqlParam("@userId", ApplicationSettings.UserId)
+                .WithSqlParam("@showAllConsults", consult.showAllConsults)
                 .ExecuteStoredProc_ToDictionary();
 
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = consultData };
@@ -357,10 +359,10 @@ namespace Web.Services.Concrete
                                 {
                                     //string uniqueName = $"CONSULT_{Consult_Counter.Counter_Value.ToString()}";
                                     string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
-                                    string friendlyName = $"{keyValues["PatientFirstName"].ToString()}_{Consult_Counter.Counter_Value}_{keyValues["ConsultType"].ToString()}";
+                                    string friendlyName = $"Consult_{Consult_Counter.Counter_Value}_{consultType}";
                                     var channel = _communicationService.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
                                     List<ConsultAcknowledgment> consultAcknowledgmentList = new();
-                                    foreach (var item in users)
+                                    foreach (var item in users.Distinct())
                                     {
                                         this._communicationService.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
                                         var acknowledgeConsult = new ConsultAcknowledgment
@@ -389,10 +391,10 @@ namespace Web.Services.Concrete
                         {
                             //string uniqueName = $"CONSULT_{Consult_Counter.Counter_Value.ToString()}";
                             string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
-                            string friendlyName = $"{keyValues["PatientFirstName"].ToString()}_{Consult_Counter.Counter_Value}_{keyValues["ConsultType"].ToString()}";
+                            string friendlyName = $"Consult_{Consult_Counter.Counter_Value}_{consultType}";
                             var channel = _communicationService.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
                             List<ConsultAcknowledgment> consultAcknowledgmentList = new();
-                            foreach (var item in users)
+                            foreach (var item in users.Distinct())
                             {
                                 _communicationService.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
                                 var acknowledgeConsult = new ConsultAcknowledgment
