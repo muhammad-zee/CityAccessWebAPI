@@ -483,7 +483,7 @@ namespace Web.Services.Concrete
                 row.FamilyContactNumber = codeStroke.FamilyContactNumber;
                 row.IsEms = codeStroke.IsEms;
                 //row.IsCompleted = codeStroke.IsCompleted;
-                if (codeStroke.IsCompleted != null && codeStroke.IsCompleted == true)
+                if (codeStroke.IsCompleted != null && codeStroke.IsCompleted == true && row.IsCompleted != true)
                 {
                     row.IsCompleted = true;
                     row.EndTime = DateTime.UtcNow;
