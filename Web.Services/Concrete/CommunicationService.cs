@@ -679,7 +679,7 @@ namespace Web.Services.Concrete
 
             // Create a video grant for the token
             var grant = new VideoGrant();
-            grant.Room = null;//Request.QueryString["room"];
+            grant.Room = "321654987";
             var grants = new HashSet<IGrant> { grant };
 
             // Create an Access Token generator
