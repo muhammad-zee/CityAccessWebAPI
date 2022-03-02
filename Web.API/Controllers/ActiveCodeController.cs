@@ -79,6 +79,21 @@ namespace Web.API.Controllers
             }
         }
 
+        [Description("Get All Active Codes")]
+        [HttpGet("activecode/GetAllActiveCodes/{orgId}")]
+        public BaseResponse GetAllActiveCodes(int orgId) 
+        {
+            try
+            {
+                return _activeCodesService.GetAllActiveCodes(orgId);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
 
         #region Delete Files
 
@@ -104,12 +119,12 @@ namespace Web.API.Controllers
         #region Code Stroke
 
         [Description("Get All Stroke Data")]
-        [HttpGet("stroke/GetAllStrokeData/{orgId}")]
-        public BaseResponse GetAllStrokeData(int orgId)
+        [HttpPost("stroke/GetAllStrokeData")]
+        public BaseResponse GetAllStrokeData([FromBody] ActiveCodeVM activeCode)
         {
             try
             {
-                return _activeCodesService.GetAllStrokeCode(orgId);
+                return _activeCodesService.GetAllStrokeCode(activeCode);
             }
             catch (Exception ex)
             {
@@ -175,12 +190,12 @@ namespace Web.API.Controllers
         #region Code Sepsis
 
         [Description("Get All Sepsis Data")]
-        [HttpGet("Sepsis/GetAllSepsisData/{orgId}")]
-        public BaseResponse GetAllSepsisData(int orgId)
+        [HttpPost("Sepsis/GetAllSepsisData")]
+        public BaseResponse GetAllSepsisData([FromBody] ActiveCodeVM activeCode)
         {
             try
             {
-                return _activeCodesService.GetAllSepsisCode(orgId);
+                return _activeCodesService.GetAllSepsisCode(activeCode);
             }
             catch (Exception ex)
             {
@@ -247,12 +262,12 @@ namespace Web.API.Controllers
         #region Code STEMI
 
         [Description("Get All STEMI Data")]
-        [HttpGet("STEMI/GetAllSTEMIData/{orgId}")]
-        public BaseResponse GetAllSTEMIData(int orgId)
+        [HttpPost("STEMI/GetAllSTEMIData")]
+        public BaseResponse GetAllSTEMIData([FromBody] ActiveCodeVM activeCode)
         {
             try
             {
-                return _activeCodesService.GetAllSTEMICode(orgId);
+                return _activeCodesService.GetAllSTEMICode(activeCode);
             }
             catch (Exception ex)
             {
@@ -318,12 +333,12 @@ namespace Web.API.Controllers
         #region Code Truma
 
         [Description("Get All Truma Data")]
-        [HttpGet("Truma/GetAllTrumaData/{orgId}")]
-        public BaseResponse GetAllTrumaData(int orgId)
+        [HttpPost("Truma/GetAllTrumaData")]
+        public BaseResponse GetAllTrumaData([FromBody] ActiveCodeVM activeCode)
         {
             try
             {
-                return _activeCodesService.GetAllTrumaCode(orgId);
+                return _activeCodesService.GetAllTrumaCode(activeCode);
             }
             catch (Exception ex)
             {

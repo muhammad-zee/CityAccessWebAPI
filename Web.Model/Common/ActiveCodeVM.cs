@@ -17,6 +17,9 @@ namespace Web.Model.Common
         public DateTime? ModifiedDate { get; set; }
         public bool IsDeleted { get; set; }
 
+        public bool showAllActiveCodes { get; set; }
+        public bool fromDashboard { get; set; }
+
         public List<ServiceLineVM> serviceLines { get; set; }
     }
 }

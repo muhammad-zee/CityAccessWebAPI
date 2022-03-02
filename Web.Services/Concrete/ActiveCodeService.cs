@@ -156,6 +156,24 @@ namespace Web.Services.Concrete
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Deleted" };
         }
 
+        public BaseResponse GetAllActiveCodes(int orgId) 
+        {
+            var activeCodesData = this._dbContext.LoadStoredProcedure("md_getActiveCodesForDashboard")
+                                    .WithSqlParam("@organizationId", orgId)
+                                    .ExecuteStoredProc<CodeStrokeVM>();
+            var orgDataList = new List<dynamic>();
+            foreach (var item in activeCodesData.Select(x => x.OrganizationIdFk).Distinct().ToList())
+            {
+                var orgData = GetHosplitalAddressObject(item);
+                if (orgData != null)
+                    orgDataList.Add(orgData);
+            }
+            foreach (var item in activeCodesData)
+            {
+                item.OrganizationData = orgDataList.Where(x => x.OrganizationId == item.OrganizationIdFk).FirstOrDefault();
+            }
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = activeCodesData };
+        }
 
         #endregion
 
@@ -281,11 +299,19 @@ namespace Web.Services.Concrete
 
         #region Code Stroke
 
-        public BaseResponse GetAllStrokeCode(int orgId)
+        public BaseResponse GetAllStrokeCode(ActiveCodeVM activeCode)
         {
-            var strokeData = this._codeStrokeRepo.Table.Where(x => x.OrganizationIdFk == orgId && !x.IsDeleted).ToList();
+            var strokeData = new List<CodeStroke>();
+            if (activeCode.showAllActiveCodes)
+            {
+                strokeData = this._codeStrokeRepo.Table.Where(x => x.OrganizationIdFk == activeCode.OrganizationIdFk && !x.IsDeleted).ToList();
+            }
+            else
+            {
+                strokeData = this._codeStrokeRepo.Table.Where(x => x.CreatedBy == ApplicationSettings.UserId && !x.IsDeleted).ToList();
+            }
             var strokeDataVM = AutoMapperHelper.MapList<CodeStroke, CodeStrokeVM>(strokeData);
-            var orgData = GetHosplitalAddressObject(orgId);
+            var orgData = GetHosplitalAddressObject(activeCode.OrganizationIdFk);
 
             //var org = this._orgRepo.Table.Where(o => o.OrganizationId == orgId && !o.IsDeleted).FirstOrDefault();
             //if (org != null)
@@ -1192,12 +1218,20 @@ namespace Web.Services.Concrete
         #region Code Sepsis
 
 
-        public BaseResponse GetAllSepsisCode(int orgId)
+        public BaseResponse GetAllSepsisCode(ActiveCodeVM activeCode)
         {
-            var SepsisData = this._codeSepsisRepo.Table.Where(x => x.OrganizationIdFk == orgId && !x.IsDeleted).ToList();
+            var SepsisData = new List<CodeSepsi>();
+            if (activeCode.showAllActiveCodes)
+            {
+                SepsisData = this._codeSepsisRepo.Table.Where(x => x.OrganizationIdFk == activeCode.OrganizationIdFk && !x.IsDeleted).ToList();
+            }
+            else
+            {
+                SepsisData = this._codeSepsisRepo.Table.Where(x => x.CreatedBy == ApplicationSettings.UserId && !x.IsDeleted).ToList();
+            }
             var SepsisDataVM = AutoMapperHelper.MapList<CodeSepsi, CodeSepsisVM>(SepsisData);
 
-            var orgData = GetHosplitalAddressObject(orgId);
+            var orgData = GetHosplitalAddressObject(activeCode.OrganizationIdFk);
 
             //var org = this._orgRepo.Table.Where(o => o.OrganizationId == orgId && !o.IsDeleted).FirstOrDefault();
             //if (org != null)
@@ -2112,12 +2146,20 @@ namespace Web.Services.Concrete
 
         #region Code STEMI
 
-        public BaseResponse GetAllSTEMICode(int orgId)
+        public BaseResponse GetAllSTEMICode(ActiveCodeVM activeCode)
         {
-            var STEMIData = this._codeSTEMIRepo.Table.Where(x => x.OrganizationIdFk == orgId && !x.IsDeleted).ToList();
+            var STEMIData = new List<CodeStemi>();
+            if (activeCode.showAllActiveCodes)
+            {
+                STEMIData = this._codeSTEMIRepo.Table.Where(x => x.OrganizationIdFk == activeCode.OrganizationIdFk && !x.IsDeleted).ToList();
+            }
+            else
+            {
+                STEMIData = this._codeSTEMIRepo.Table.Where(x => x.CreatedBy == ApplicationSettings.UserId && !x.IsDeleted).ToList();
+            }
             var STEMIDataVM = AutoMapperHelper.MapList<CodeStemi, CodeSTEMIVM>(STEMIData);
 
-            var orgData = GetHosplitalAddressObject(orgId);
+            var orgData = GetHosplitalAddressObject(activeCode.OrganizationIdFk);
 
             //var org = this._orgRepo.Table.Where(o => o.OrganizationId == orgId && !o.IsDeleted).FirstOrDefault();
             //if (org != null)
@@ -3025,12 +3067,21 @@ namespace Web.Services.Concrete
 
         #region Code Truma
 
-        public BaseResponse GetAllTrumaCode(int orgId)
+        public BaseResponse GetAllTrumaCode(ActiveCodeVM activeCode)
         {
-            var TrumaData = this._codeTrumaRepo.Table.Where(x => x.OrganizationIdFk == orgId && !x.IsDeleted).ToList();
+            var TrumaData = new List<CodeTrauma>();
+            if (activeCode.showAllActiveCodes)
+            {
+                TrumaData = this._codeTrumaRepo.Table.Where(x => x.OrganizationIdFk == activeCode.OrganizationIdFk && !x.IsDeleted).ToList();
+            }
+            else
+            {
+                TrumaData = this._codeTrumaRepo.Table.Where(x => x.CreatedBy == ApplicationSettings.UserId && !x.IsDeleted).ToList();
+            }
+
             var TrumaDataVM = AutoMapperHelper.MapList<CodeTrauma, CodeTrumaVM>(TrumaData);
 
-            var orgData = GetHosplitalAddressObject(orgId);
+            var orgData = GetHosplitalAddressObject(activeCode.OrganizationIdFk);
 
             TrumaDataVM.ForEach(x =>
             {
@@ -3178,7 +3229,7 @@ namespace Web.Services.Concrete
                 row.FamilyContactNumber = codeTruma.FamilyContactNumber;
                 row.IsEms = codeTruma.IsEms;
                 //row.IsCompleted = codeTruma.IsCompleted;
-                if (codeTruma.IsCompleted != null && codeTruma.IsCompleted == true) 
+                if (codeTruma.IsCompleted != null && codeTruma.IsCompleted == true)
                 {
                     row.IsCompleted = true;
                     row.EndTime = DateTime.UtcNow;
@@ -3852,7 +3903,7 @@ namespace Web.Services.Concrete
                         var UserChannelSid = (from us in this._userSchedulesRepo.Table
                                               join u in this._userRepo.Table on us.UserIdFk equals u.UserId
                                               where serviceLineIds.ToIntList().Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
-                                              select new { u.UserUniqueId , u.UserId}).ToList();
+                                              select new { u.UserUniqueId, u.UserId }).ToList();
                         var loggedUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).FirstOrDefault();
                         UserChannelSid.Add(loggedUser);
                         List<ActiveCodesGroupMember> ACodeGroupMembers = new List<ActiveCodesGroupMember>();
@@ -3917,14 +3968,14 @@ namespace Web.Services.Concrete
 
         #endregion
 
-        public BaseResponse AddGroupMembers(List<ActiveCodesGroupMember> activeCodesGroup) 
+        public BaseResponse AddGroupMembers(List<ActiveCodesGroupMember> activeCodesGroup)
         {
             if (activeCodesGroup.Count > 0)
             {
                 this._activeCodesGroupMembersRepo.Insert(activeCodesGroup);
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Inserted" };
             }
-            else 
+            else
             {
                 return new BaseResponse() { Status = HttpStatusCode.NotModified, Message = "No Data Inserted" };
             }
