@@ -179,13 +179,15 @@ namespace Web.Services.Concrete
         {
             var thisWeekStart = DateTime.Today.AddDays(-1 * (int)(DateTime.Today.DayOfWeek)).AddDays(1);
             var thisWeekEnd = thisWeekStart.AddDays(7).AddSeconds(-1);
-            var ActiveCodes = this._dbContext.LoadStoredProcedure("md_getConsultGraphDataForDashboard")
+            var ActiveCodes = this._dbContext.LoadStoredProcedure("md_getEMSandActiveCodesGraphDataForDashboard")
                     .WithSqlParam("@OrganizationId", OrgId)
-                    .WithSqlParam("@StartDate", thisWeekStart.Date)
-                    .WithSqlParam("@EndDate", thisWeekEnd.Date)
+                    .WithSqlParam("@StartDate", thisWeekStart.ToString("yyyy-MM-dd"))
+                    .WithSqlParam("@EndDate", thisWeekEnd.ToString("yyyy-MM-dd"))
                     .ExecuteStoredProc<GraphVM>();
 
-            var datasets = new List<object>() { new
+            if (ActiveCodes.Count < 7)
+            {
+                var datasets = new List<object>() { new
                                                 {
                                                   label= "EMS",
                                                   backgroundColor= "#089bab",
@@ -198,6 +200,9 @@ namespace Web.Services.Concrete
                                                   data= ActiveCodes.Select(c=>c.ActiveCodes).ToList()
                                                 }
                                             };
+            }
+
+           
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Found", Body = datasets };
 
         }

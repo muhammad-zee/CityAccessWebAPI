@@ -96,7 +96,7 @@ namespace Web.API.Controllers
         }
 
         [Description("Get All Active Codes")]
-        [HttpGet("activecode/GetEMSandActiveCodesForDashboard/{orgId}")]
+        [HttpGet("activecode/GetEMSandActiveCodesForDashboard/{OrgId}")]
         public BaseResponse GetEMSandActiveCodesForDashboard(int OrgId)
         {
             try
