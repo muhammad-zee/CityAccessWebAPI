@@ -16,7 +16,7 @@ namespace Web.Model.Common
         public DateTime? LastKnownWell { get; set; }
         public string Hpi { get; set; }
         public string BloodThinners { get; set; }
-        public string BloodThinnersTitle { get; set; }
+        public List<object> BloodThinnersTitle { get; set; }
         public string FamilyContactName { get; set; }
         public string FamilyContactNumber { get; set; }
         public bool? IsEms { get; set; }

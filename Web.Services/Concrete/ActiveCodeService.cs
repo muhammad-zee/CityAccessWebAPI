@@ -454,7 +454,7 @@ namespace Web.Services.Concrete
 
                 x.OrganizationData = orgData;
                 x.GenderTitle = _controlListDetailsRepo.Table.Where(g => g.ControlListDetailId == x.Gender).Select(g => g.Title).FirstOrDefault();
-                x.BloodThinnersTitle = _controlListDetailsRepo.Table.Where(b => x.BloodThinners.ToIntList().Contains(b.ControlListDetailId)).Select(b => b.Title).FirstOrDefault();
+                x.BloodThinnersTitle.AddRange(_controlListDetailsRepo.Table.Where(b => x.BloodThinners.ToIntList().Contains(b.ControlListDetailId)).Select(b => new { Id = b.ControlListDetailId, b.Title }).ToList());
             });
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = strokeDataVM };
         }
@@ -532,7 +532,7 @@ namespace Web.Services.Concrete
                 StrokeDataVM.OrganizationData = GetHosplitalAddressObject(StrokeDataVM.OrganizationIdFk);
 
                 StrokeDataVM.GenderTitle = _controlListDetailsRepo.Table.Where(g => g.ControlListDetailId == StrokeDataVM.Gender).Select(g => g.Title).FirstOrDefault();
-                StrokeDataVM.BloodThinnersTitle = _controlListDetailsRepo.Table.Where(b => StrokeDataVM.BloodThinners.ToIntList().Contains(b.ControlListDetailId)).Select(b => b.Title).FirstOrDefault();
+                StrokeDataVM.BloodThinnersTitle.AddRange(_controlListDetailsRepo.Table.Where(b => StrokeDataVM.BloodThinners.ToIntList().Contains(b.ControlListDetailId)).Select(b => new { Id = b.ControlListDetailId, b.Title }).ToList());
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Found", Body = StrokeDataVM };
             }
             return new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "Record Not Found" };
@@ -1374,7 +1374,7 @@ namespace Web.Services.Concrete
 
                 x.OrganizationData = orgData;
                 x.GenderTitle = _controlListDetailsRepo.Table.Where(g => g.ControlListDetailId == x.Gender).Select(g => g.Title).FirstOrDefault();
-                x.BloodThinnersTitle = _controlListDetailsRepo.Table.Where(b => x.BloodThinners.ToIntList().Contains(b.ControlListDetailId)).Select(b => b.Title).FirstOrDefault();
+                x.BloodThinnersTitle.AddRange(_controlListDetailsRepo.Table.Where(b => x.BloodThinners.ToIntList().Contains(b.ControlListDetailId)).Select(b => new { Id = b.ControlListDetailId, b.Title }).ToList());
             });
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = SepsisDataVM };
         }
@@ -1451,7 +1451,7 @@ namespace Web.Services.Concrete
                 SepsisDataVM.OrganizationData = GetHosplitalAddressObject(SepsisDataVM.OrganizationIdFk);
 
                 SepsisDataVM.GenderTitle = _controlListDetailsRepo.Table.Where(g => g.ControlListDetailId == SepsisDataVM.Gender).Select(g => g.Title).FirstOrDefault();
-                SepsisDataVM.BloodThinnersTitle = _controlListDetailsRepo.Table.Where(b => SepsisDataVM.BloodThinners.ToIntList().Contains(b.ControlListDetailId)).Select(b => b.Title).FirstOrDefault();
+                SepsisDataVM.BloodThinnersTitle.AddRange(_controlListDetailsRepo.Table.Where(b => SepsisDataVM.BloodThinners.ToIntList().Contains(b.ControlListDetailId)).Select(b => new { Id = b.ControlListDetailId, b.Title }).ToList());
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Found", Body = SepsisDataVM };
             }
             return new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "Record Not Found" };
@@ -2301,7 +2301,7 @@ namespace Web.Services.Concrete
 
                 x.OrganizationData = orgData;
                 x.GenderTitle = _controlListDetailsRepo.Table.Where(g => g.ControlListDetailId == x.Gender).Select(g => g.Title).FirstOrDefault();
-                x.BloodThinnersTitle = _controlListDetailsRepo.Table.Where(b => x.BloodThinners.ToIntList().Contains(b.ControlListDetailId)).Select(b => b.Title).FirstOrDefault();
+                x.BloodThinnersTitle.AddRange(_controlListDetailsRepo.Table.Where(b => x.BloodThinners.ToIntList().Contains(b.ControlListDetailId)).Select(b => new { Id = b.ControlListDetailId, b.Title }).ToList());
             });
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = STEMIDataVM };
         }
@@ -2377,7 +2377,7 @@ namespace Web.Services.Concrete
                 //}
                 STEMIDataVM.OrganizationData = GetHosplitalAddressObject(STEMIDataVM.OrganizationIdFk);
                 STEMIDataVM.GenderTitle = _controlListDetailsRepo.Table.Where(g => g.ControlListDetailId == STEMIDataVM.Gender).Select(g => g.Title).FirstOrDefault();
-                STEMIDataVM.BloodThinnersTitle = _controlListDetailsRepo.Table.Where(b => STEMIDataVM.BloodThinners.ToIntList().Contains(b.ControlListDetailId)).Select(b => b.Title).FirstOrDefault();
+                STEMIDataVM.BloodThinnersTitle.AddRange(_controlListDetailsRepo.Table.Where(b => STEMIDataVM.BloodThinners.ToIntList().Contains(b.ControlListDetailId)).Select(b => new { Id = b.ControlListDetailId, b.Title }).ToList());
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Found", Body = STEMIDataVM };
             }
             return new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "Record Not Found" };
@@ -3202,7 +3202,7 @@ namespace Web.Services.Concrete
                 }
                 x.OrganizationData = orgData;
                 x.GenderTitle = _controlListDetailsRepo.Table.Where(g => g.ControlListDetailId == x.Gender).Select(g => g.Title).FirstOrDefault();
-                x.BloodThinnersTitle = _controlListDetailsRepo.Table.Where(b => x.BloodThinners.ToIntList().Contains(b.ControlListDetailId)).Select(b => b.Title).FirstOrDefault();
+                x.BloodThinnersTitle.AddRange(_controlListDetailsRepo.Table.Where(b => x.BloodThinners.ToIntList().Contains(b.ControlListDetailId)).Select(b => new { Id = b.ControlListDetailId, b.Title }).ToList());
             });
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = TrumaDataVM };
         }
@@ -3279,7 +3279,7 @@ namespace Web.Services.Concrete
                 TrumaDataVM.OrganizationData = GetHosplitalAddressObject(TrumaDataVM.OrganizationIdFk);
 
                 TrumaDataVM.GenderTitle = _controlListDetailsRepo.Table.Where(g => g.ControlListDetailId == TrumaDataVM.Gender).Select(g => g.Title).FirstOrDefault();
-                TrumaDataVM.BloodThinnersTitle = _controlListDetailsRepo.Table.Where(b => TrumaDataVM.BloodThinners.ToIntList().Contains(b.ControlListDetailId)).Select(b => b.Title).FirstOrDefault();
+                TrumaDataVM.BloodThinnersTitle.AddRange(_controlListDetailsRepo.Table.Where(b => TrumaDataVM.BloodThinners.ToIntList().Contains(b.ControlListDetailId)).Select(b => new { Id = b.ControlListDetailId, b.Title }).ToList());
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Found", Body = TrumaDataVM };
             }
             return new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "Record Not Found" };
