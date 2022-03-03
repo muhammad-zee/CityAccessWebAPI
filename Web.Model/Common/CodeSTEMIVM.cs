@@ -13,7 +13,7 @@ namespace Web.Model.Common
         public string ChiefComplant { get; set; }
         public DateTime? LastKnownWell { get; set; }
         public string Hpi { get; set; }
-        public int? BloodThinners { get; set; }
+        public string BloodThinners { get; set; }
         public string BloodThinnersTitle { get; set; }
         public string FamilyContactName { get; set; }
         public string FamilyContactNumber { get; set; }

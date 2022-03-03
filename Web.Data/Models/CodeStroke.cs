@@ -15,7 +15,7 @@ namespace Web.Data.Models
         public string ChiefComplant { get; set; }
         public DateTime? LastKnownWell { get; set; }
         public string Hpi { get; set; }
-        public int? BloodThinners { get; set; }
+        public string BloodThinners { get; set; }
         public string FamilyContactNumber { get; set; }
         public int CreatedBy { get; set; }
         public DateTime CreatedDate { get; set; }

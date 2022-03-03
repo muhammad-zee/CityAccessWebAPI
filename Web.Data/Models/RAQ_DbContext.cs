@@ -47,6 +47,7 @@ namespace Web.Data.Models
         public virtual DbSet<Setting> Settings { get; set; }
         public virtual DbSet<State> States { get; set; }
         public virtual DbSet<Temp> Temps { get; set; }
+        public virtual DbSet<TmpFerdeen> TmpFerdeens { get; set; }
         public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<UserAccess> UserAccesses { get; set; }
         public virtual DbSet<UserRole> UserRoles { get; set; }
@@ -152,6 +153,8 @@ namespace Web.Data.Models
 
                 entity.Property(e => e.Audio).HasMaxLength(500);
 
+                entity.Property(e => e.BloodThinners).HasMaxLength(100);
+
                 entity.Property(e => e.ChiefComplant).HasMaxLength(200);
 
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");
@@ -197,6 +200,8 @@ namespace Web.Data.Models
 
                 entity.Property(e => e.Audio).HasMaxLength(500);
 
+                entity.Property(e => e.BloodThinners).HasMaxLength(100);
+
                 entity.Property(e => e.ChiefComplant).HasMaxLength(200);
 
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");
@@ -238,6 +243,8 @@ namespace Web.Data.Models
 
                 entity.Property(e => e.Audio).HasMaxLength(500);
 
+                entity.Property(e => e.BloodThinners).HasMaxLength(100);
+
                 entity.Property(e => e.ChiefComplant).HasMaxLength(200);
 
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");
@@ -278,6 +285,8 @@ namespace Web.Data.Models
                 entity.Property(e => e.Attachments).HasMaxLength(500);
 
                 entity.Property(e => e.Audio).HasMaxLength(500);
+
+                entity.Property(e => e.BloodThinners).HasMaxLength(100);
 
                 entity.Property(e => e.ChiefComplant).HasMaxLength(200);
 
@@ -805,6 +814,17 @@ namespace Web.Data.Models
                 entity.Property(e => e.StartDate).HasColumnType("datetime");
 
                 entity.Property(e => e.StartTime).HasColumnType("datetime");
+            });
+
+            modelBuilder.Entity<TmpFerdeen>(entity =>
+            {
+                entity.HasNoKey();
+
+                entity.ToTable("tmpFerdeen");
+
+                entity.Property(e => e.CreatedDate)
+                    .HasColumnType("date")
+                    .HasColumnName("createdDate");
             });
 
             modelBuilder.Entity<User>(entity =>
