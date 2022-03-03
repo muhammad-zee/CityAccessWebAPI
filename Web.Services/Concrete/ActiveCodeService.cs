@@ -156,7 +156,7 @@ namespace Web.Services.Concrete
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Deleted" };
         }
 
-        public BaseResponse GetAllActiveCodes(int orgId) 
+        public BaseResponse GetAllActiveCodes(int orgId)
         {
             var activeCodesData = this._dbContext.LoadStoredProcedure("md_getActiveCodesForDashboard")
                                     .WithSqlParam("@organizationId", orgId)
@@ -173,6 +173,33 @@ namespace Web.Services.Concrete
                 item.OrganizationData = orgDataList.Where(x => x.OrganizationId == item.OrganizationIdFk).FirstOrDefault();
             }
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = activeCodesData };
+        }
+
+        public BaseResponse GetEMSandActiveCodesForDashboard(int OrgId)
+        {
+            var thisWeekStart = DateTime.Today.AddDays(-1 * (int)(DateTime.Today.DayOfWeek)).AddDays(1);
+            var thisWeekEnd = thisWeekStart.AddDays(7).AddSeconds(-1);
+            var ActiveCodes = this._dbContext.LoadStoredProcedure("md_getConsultGraphDataForDashboard")
+                    .WithSqlParam("@OrganizationId", OrgId)
+                    .WithSqlParam("@StartDate", thisWeekStart.Date)
+                    .WithSqlParam("@EndDate", thisWeekEnd.Date)
+                    .ExecuteStoredProc<GraphVM>();
+
+            var datasets = new List<object>() { new
+                                                {
+                                                  label= "EMS",
+                                                  backgroundColor= "#089bab",
+                                                  data= ActiveCodes.Select(c=>c.EMS).ToList()
+                                                },
+                                                new
+                                                {
+                                                  label= "Active Codes",
+                                                  backgroundColor= "#CEEBEE",
+                                                  data= ActiveCodes.Select(c=>c.ActiveCodes).ToList()
+                                                }
+                                            };
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Found", Body = datasets };
+
         }
 
         #endregion

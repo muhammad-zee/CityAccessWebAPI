@@ -91,7 +91,7 @@ namespace Web.Services.Concrete
                 .WithSqlParam("@OrganizationId", OrgId)
                 .WithSqlParam("@StartDate", thisWeekStart)
                 .WithSqlParam("@EndDate", thisWeekEnd)
-                .ExecuteStoredProc<ConsultGraphVM>();
+                .ExecuteStoredProc<GraphVM>();
             var datasets = new List<object>() { new 
                                                 {
                                                   label= "URGENT",
