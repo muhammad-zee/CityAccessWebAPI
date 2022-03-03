@@ -184,10 +184,7 @@ namespace Web.Services.Concrete
                     .WithSqlParam("@StartDate", thisWeekStart.ToString("yyyy-MM-dd"))
                     .WithSqlParam("@EndDate", thisWeekEnd.ToString("yyyy-MM-dd"))
                     .ExecuteStoredProc<GraphVM>();
-
-            if (ActiveCodes.Count < 7)
-            {
-                var datasets = new List<object>() { new
+            var datasets = new List<object>() { new
                                                 {
                                                   label= "EMS",
                                                   backgroundColor= "#089bab",
@@ -200,9 +197,7 @@ namespace Web.Services.Concrete
                                                   data= ActiveCodes.Select(c=>c.ActiveCodes).ToList()
                                                 }
                                             };
-            }
 
-           
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Found", Body = datasets };
 
         }
