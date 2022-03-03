@@ -8,10 +8,12 @@ namespace Web.Model.Common
         public int CodeSepsisId { get; set; }
         public string PatientName { get; set; }
         public DateTime Dob { get; set; }
+        public string DobStr { get; set; }
         public int Gender { get; set; }
         public string GenderTitle { get; set; }
         public string ChiefComplant { get; set; }
         public DateTime LastKnownWell { get; set; }
+        public string LastKnownWellStr { get; set; }
         public string Hpi { get; set; }
         public string BloodThinners { get; set; }
         public List<object> BloodThinnersTitle { get; set; }

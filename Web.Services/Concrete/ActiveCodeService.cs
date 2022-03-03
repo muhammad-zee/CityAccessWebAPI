@@ -1466,6 +1466,14 @@ namespace Web.Services.Concrete
 
         public BaseResponse AddOrUpdateSepsisData(CodeSepsisVM codeSepsis)
         {
+            if (codeSepsis != null && !string.IsNullOrEmpty(codeSepsis.LastKnownWellStr) && !string.IsNullOrWhiteSpace(codeSepsis.LastKnownWellStr))
+            {
+                codeSepsis.LastKnownWell = DateTime.Parse(codeSepsis.LastKnownWellStr);
+            }
+            if (codeSepsis != null && !string.IsNullOrEmpty(codeSepsis.DobStr) && !string.IsNullOrWhiteSpace(codeSepsis.DobStr))
+            {
+                codeSepsis.Dob = DateTime.Parse(codeSepsis.DobStr);
+            }
             if (codeSepsis.CodeSepsisId > 0)
             {
                 var row = this._codeSepsisRepo.Table.Where(x => x.CodeSepsisId == codeSepsis.CodeSepsisId && !x.IsDeleted).FirstOrDefault();
@@ -2394,6 +2402,14 @@ namespace Web.Services.Concrete
 
         public BaseResponse AddOrUpdateSTEMIData(CodeSTEMIVM codeSTEMI)
         {
+            if (codeSTEMI != null && !string.IsNullOrEmpty(codeSTEMI.LastKnownWellStr) && !string.IsNullOrWhiteSpace(codeSTEMI.LastKnownWellStr))
+            {
+                codeSTEMI.LastKnownWell = DateTime.Parse(codeSTEMI.LastKnownWellStr);
+            }
+            if (codeSTEMI != null && !string.IsNullOrEmpty(codeSTEMI.DobStr) && !string.IsNullOrWhiteSpace(codeSTEMI.DobStr))
+            {
+                codeSTEMI.Dob = DateTime.Parse(codeSTEMI.DobStr);
+            }
             if (codeSTEMI.CodeStemiid > 0)
             {
                 var row = this._codeSTEMIRepo.Table.Where(x => x.CodeStemiid == codeSTEMI.CodeStemiid && !x.IsDeleted).FirstOrDefault();
@@ -3297,6 +3313,14 @@ namespace Web.Services.Concrete
 
         public BaseResponse AddOrUpdateTrumaData(CodeTrumaVM codeTruma)
         {
+            if (codeTruma != null && !string.IsNullOrEmpty(codeTruma.LastKnownWellStr) && !string.IsNullOrWhiteSpace(codeTruma.LastKnownWellStr))
+            {
+                codeTruma.LastKnownWell = DateTime.Parse(codeTruma.LastKnownWellStr);
+            }
+            if (codeTruma != null && !string.IsNullOrEmpty(codeTruma.DobStr) && !string.IsNullOrWhiteSpace(codeTruma.DobStr))
+            {
+                codeTruma.Dob = DateTime.Parse(codeTruma.DobStr);
+            }
             if (codeTruma.CodeTraumaId > 0)
             {
                 var row = this._codeTrumaRepo.Table.Where(x => x.CodeTraumaId == codeTruma.CodeTraumaId && !x.IsDeleted).FirstOrDefault();
