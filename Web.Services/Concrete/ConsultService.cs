@@ -81,7 +81,33 @@ namespace Web.Services.Concrete
 
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Found", Body = consultFieldVM };
         }
+        public BaseResponse GetConsultGraphDataForOrg(int OrgId)
+        {
+            DateTime baseDate = DateTime.Today;
+            var thisWeekStart = baseDate.AddDays(-(int)baseDate.DayOfWeek);
+            var thisWeekEnd = thisWeekStart.AddDays(7).AddSeconds(-1);
 
+            var consultFields = this._dbContext.LoadStoredProcedure("md_getConsultGraphDataForDashboard")
+                .WithSqlParam("@OrganizationId", OrgId)
+                .WithSqlParam("@StartDate", thisWeekStart)
+                .WithSqlParam("@EndDate", thisWeekEnd)
+                .ExecuteStoredProc<ConsultGraphVM>();
+            var datasets = new List<object>() { new 
+                                                {
+                                                  label= "URGENT",
+                                                  backgroundColor= "#089bab",
+                                                  data= consultFields.Select(c=>c.UrgentConsults).ToList()
+                                                },
+                                                new 
+                                                {
+                                                  label= "ROUTINE",
+                                                  backgroundColor= "#CEEBEE",
+                                                  data= consultFields.Select(c=>c.RoutineConsults).ToList()
+                                                }
+                                            };
+           
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Found", Body = datasets };
+        }
         public BaseResponse GetConsultFormFieldByOrgId(int OrgId)
         {
             var formFields = (from cf in this._consultFieldRepo.Table

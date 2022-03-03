@@ -20,6 +20,7 @@ namespace Web.Services.Interfaces
 
         #region Consults
         BaseResponse GetAllConsults();
+        BaseResponse GetConsultGraphDataForOrg(int orgId);
         BaseResponse GetConsultById(int Id);
         BaseResponse GetConsultsByServiceLineId(ConsultFieldsVM consult);
         BaseResponse AddOrUpdateConsult(IDictionary<string, object> keyValues);
