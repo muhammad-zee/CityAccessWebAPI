@@ -184,7 +184,52 @@ namespace Web.Services.Concrete
                     .WithSqlParam("@StartDate", thisWeekStart.ToString("yyyy-MM-dd"))
                     .WithSqlParam("@EndDate", thisWeekEnd.ToString("yyyy-MM-dd"))
                     .ExecuteStoredProc<GraphVM>();
-            var datasets = new List<object>() { new
+
+            List<string> Label = new();
+            while (thisWeekEnd.Date >= thisWeekStart.Date)
+            {
+                Label.Add(thisWeekStart.ToString("MMM-dd"));
+                thisWeekStart = thisWeekStart.AddDays(1);
+            }
+            thisWeekStart = DateTime.Today.AddDays(-1 * (int)(DateTime.Today.DayOfWeek)).AddDays(1);
+            var datasets = new List<object>();
+            if (ActiveCodes.Count < 7)
+            {
+                List<int> EMS = new();
+                List<int> activeCodes = new();
+                while (thisWeekEnd.Date >= thisWeekStart.Date)
+                {
+                    if (ActiveCodes.Any(x => x.CreatedDate.Date == thisWeekStart.Date))
+                    {
+                        EMS.Add(ActiveCodes.Where(x => x.CreatedDate.Date == thisWeekStart.Date).Select(x => x.EMS).FirstOrDefault());
+                        activeCodes.Add(ActiveCodes.Where(x => x.CreatedDate.Date == thisWeekStart.Date).Select(x => x.ActiveCodes).FirstOrDefault());
+                    }
+                    else
+                    {
+                        EMS.Add(0);
+                        activeCodes.Add(0);
+                    }
+                    thisWeekStart = thisWeekStart.AddDays(1);
+                }
+                datasets.Add(new
+                {
+                    label = "EMS",
+                    backgroundColor = "#089bab",
+                    borderColor = "#089bab",
+                    data = EMS
+                });
+                datasets.Add(new
+                {
+                    label = "Active Codes",
+                    backgroundColor = "#CEEBEE",
+                    borderColor = "#CEEBEE",
+                    data = activeCodes
+                });
+
+            }
+            else
+            {
+                datasets = new List<object>() { new
                                                 {
                                                   label= "EMS",
                                                   backgroundColor= "#089bab",
@@ -197,8 +242,9 @@ namespace Web.Services.Concrete
                                                   data= ActiveCodes.Select(c=>c.ActiveCodes).ToList()
                                                 }
                                             };
+            }
 
-            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Found", Body = datasets };
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Found", Body = new { labels = Label, datasets } };
 
         }
 

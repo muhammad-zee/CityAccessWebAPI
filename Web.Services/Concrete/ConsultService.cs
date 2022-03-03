@@ -83,8 +83,7 @@ namespace Web.Services.Concrete
         }
         public BaseResponse GetConsultGraphDataForOrg(int OrgId)
         {
-            DateTime baseDate = DateTime.Today;
-            var thisWeekStart = baseDate.AddDays(-(int)baseDate.DayOfWeek);
+            var thisWeekStart = DateTime.Today.AddDays(-1 * (int)(DateTime.Today.DayOfWeek)).AddDays(1);
             var thisWeekEnd = thisWeekStart.AddDays(7).AddSeconds(-1);
 
             var consultFields = this._dbContext.LoadStoredProcedure("md_getConsultGraphDataForDashboard")
@@ -92,21 +91,66 @@ namespace Web.Services.Concrete
                 .WithSqlParam("@StartDate", thisWeekStart)
                 .WithSqlParam("@EndDate", thisWeekEnd)
                 .ExecuteStoredProc<GraphVM>();
-            var datasets = new List<object>() { new 
+            var datasets = new List<object>();
+            List<string> Label = new();
+            while (thisWeekEnd.Date >= thisWeekStart.Date)
+            {
+                Label.Add(thisWeekStart.ToString("MMM-dd"));
+                thisWeekStart = thisWeekStart.AddDays(1);
+            }
+            thisWeekStart = DateTime.Today.AddDays(-1 * (int)(DateTime.Today.DayOfWeek)).AddDays(1);
+            if (consultFields.Count < 7)
+            {
+                List<int> Urgent = new();
+                List<int> Routine = new();
+
+                while (thisWeekEnd.Date >= thisWeekStart.Date)
+                {
+                    if (consultFields.Any(x => x.CreatedDate.Date == thisWeekStart.Date))
+                    {
+                        Urgent.Add(consultFields.Where(x => x.CreatedDate.Date == thisWeekStart.Date).Select(x => x.UrgentConsults).FirstOrDefault());
+                        Routine.Add(consultFields.Where(x => x.CreatedDate.Date == thisWeekStart.Date).Select(x => x.RoutineConsults).FirstOrDefault());
+                    }
+                    else
+                    {
+                        Urgent.Add(0);
+                        Routine.Add(0);
+                    }
+                    thisWeekStart = thisWeekStart.AddDays(1);
+                }
+
+                datasets.Add(new
+                {
+                    label = "URGENT",
+                    backgroundColor = "#089bab",
+                    data = Urgent
+                });
+                datasets.Add(new
+                {
+                    label = "ROUTINE",
+                    backgroundColor = "#CEEBEE",
+                    data = Routine
+                });
+            }
+            else
+            {
+                datasets = new List<object>(){ new
                                                 {
                                                   label= "URGENT",
                                                   backgroundColor= "#089bab",
                                                   data= consultFields.Select(c=>c.UrgentConsults).ToList()
                                                 },
-                                                new 
+                                                new
                                                 {
                                                   label= "ROUTINE",
                                                   backgroundColor= "#CEEBEE",
                                                   data= consultFields.Select(c=>c.RoutineConsults).ToList()
                                                 }
                                             };
-           
-            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Found", Body = datasets };
+            }
+
+
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Found", Body = new { labels = Label, datasets } };
         }
         public BaseResponse GetConsultFormFieldByOrgId(int OrgId)
         {
@@ -181,7 +225,7 @@ namespace Web.Services.Concrete
                 this._orgConsultRepo.Update(toBeDeletedRows);
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Deleted Successfully" };
             }
-            else 
+            else
             {
                 var duplicateObj = orgConsultFields.Select(x => new { x.OrganizationIdFk, x.ConsultFieldIdFk }).ToList();
 
@@ -189,7 +233,7 @@ namespace Web.Services.Concrete
 
                 var objsNeedToUpdate = alreadyExistFields.Where(x => duplicateObj.Select(c => c.ConsultFieldIdFk).Contains(x.ConsultFieldIdFk)).ToList();
 
-                if (objsNeedToUpdate.Count > 0) 
+                if (objsNeedToUpdate.Count > 0)
                 {
                     foreach (var item in objsNeedToUpdate)
                     {
@@ -203,7 +247,7 @@ namespace Web.Services.Concrete
 
                 var orgConsults = AutoMapperHelper.MapList<OrgConsultFieldsVM, OrganizationConsultField>(orgConsultFields.Where(x => duplicateObj.Select(c => c.ConsultFieldIdFk).Contains(x.ConsultFieldIdFk)).ToList());
 
-                if (orgConsults.Count > 0) 
+                if (orgConsults.Count > 0)
                 {
                     this._orgConsultRepo.Insert(orgConsults);
                 }
@@ -215,7 +259,7 @@ namespace Web.Services.Concrete
 
                 int? ModifiedBy = orgConsultFields.Select(x => x.ModifiedBy).FirstOrDefault();
 
-                if (deletedOnes.Count > 0) 
+                if (deletedOnes.Count > 0)
                 {
                     deletedOnes.ForEach(x => { x.ModifiedBy = ModifiedBy; x.ModifiedDate = DateTime.UtcNow; x.IsDeleted = true; });
                     this._orgConsultRepo.Update(deletedOnes);
