@@ -95,6 +95,21 @@ namespace Web.API.Controllers
             }
         }
 
+        [Description("Get All Active Codes")]
+        [HttpGet("activecode/GetEMSandActiveCodesForDashboard/{orgId}")]
+        public BaseResponse GetEMSandActiveCodesForDashboard(int OrgId)
+        {
+            try
+            {
+                return _activeCodesService.GetEMSandActiveCodesForDashboard(OrgId);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
         #region Delete Files
 
 
