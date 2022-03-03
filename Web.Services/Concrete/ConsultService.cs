@@ -380,7 +380,7 @@ namespace Web.Services.Concrete
                             //}
                             query += $",'{Consult_Counter.Counter_Value}'";
                             query += $",'{ApplicationSettings.UserId}'";
-                            query += $",'{DateTime.UtcNow.ToString("MM-dd-yyyy hh:mm:ss")}'";
+                            query += $",'{DateTime.UtcNow}'";
                             query += ",'0'";
                             query += ")";
                         }

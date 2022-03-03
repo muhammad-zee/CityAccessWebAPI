@@ -881,50 +881,50 @@ namespace Web.Services.Concrete
                     }
                 }
 
-                codeStroke.AttachmentsPath = new List<string>();
-                codeStroke.AudiosPath = new List<string>();
-                codeStroke.VideosPath = new List<string>();
+                //codeStroke.AttachmentsPath = new List<string>();
+                //codeStroke.AudiosPath = new List<string>();
+                //codeStroke.VideosPath = new List<string>();
 
-                if (!string.IsNullOrEmpty(codeStroke.AttachmentsFolderRoot) && !string.IsNullOrWhiteSpace(codeStroke.AttachmentsFolderRoot))
-                {
-                    string path = this._RootPath + codeStroke.AttachmentsFolderRoot; //_environment.WebRootFileProvider.GetFileInfo(codeStroke.AttachmentsFolderRoot)?.PhysicalPath;
-                    if (Directory.Exists(path))
-                    {
-                        DirectoryInfo AttachFiles = new DirectoryInfo(path);
-                        foreach (var item in AttachFiles.GetFiles())
-                        {
-                            codeStroke.AttachmentsPath.Add(codeStroke.AttachmentsFolderRoot + "/" + item.Name);
-                        }
-                    }
-                }
+                //if (!string.IsNullOrEmpty(codeStroke.AttachmentsFolderRoot) && !string.IsNullOrWhiteSpace(codeStroke.AttachmentsFolderRoot))
+                //{
+                //    string path = this._RootPath + codeStroke.AttachmentsFolderRoot; //_environment.WebRootFileProvider.GetFileInfo(codeStroke.AttachmentsFolderRoot)?.PhysicalPath;
+                //    if (Directory.Exists(path))
+                //    {
+                //        DirectoryInfo AttachFiles = new DirectoryInfo(path);
+                //        foreach (var item in AttachFiles.GetFiles())
+                //        {
+                //            codeStroke.AttachmentsPath.Add(codeStroke.AttachmentsFolderRoot + "/" + item.Name);
+                //        }
+                //    }
+                //}
 
-                if (!string.IsNullOrEmpty(codeStroke.AudioFolderRoot) && !string.IsNullOrWhiteSpace(codeStroke.AudioFolderRoot))
-                {
-                    string path = this._RootPath + codeStroke.AudioFolderRoot;  //_environment.WebRootFileProvider.GetFileInfo(codeStroke.AudioFolderRoot)?.PhysicalPath;
-                    if (Directory.Exists(path))
-                    {
-                        DirectoryInfo AudioFiles = new DirectoryInfo(path);
-                        foreach (var item in AudioFiles.GetFiles())
-                        {
-                            codeStroke.AudiosPath.Add(codeStroke.AudioFolderRoot + "/" + item.Name);
-                        }
-                    }
-                }
+                //if (!string.IsNullOrEmpty(codeStroke.AudioFolderRoot) && !string.IsNullOrWhiteSpace(codeStroke.AudioFolderRoot))
+                //{
+                //    string path = this._RootPath + codeStroke.AudioFolderRoot;  //_environment.WebRootFileProvider.GetFileInfo(codeStroke.AudioFolderRoot)?.PhysicalPath;
+                //    if (Directory.Exists(path))
+                //    {
+                //        DirectoryInfo AudioFiles = new DirectoryInfo(path);
+                //        foreach (var item in AudioFiles.GetFiles())
+                //        {
+                //            codeStroke.AudiosPath.Add(codeStroke.AudioFolderRoot + "/" + item.Name);
+                //        }
+                //    }
+                //}
 
-                if (!string.IsNullOrEmpty(codeStroke.VideoFolderRoot) && !string.IsNullOrWhiteSpace(codeStroke.VideoFolderRoot))
-                {
-                    var path = this._RootPath + codeStroke.VideoFolderRoot;  //_environment.WebRootFileProvider.GetFileInfo(codeStroke.VideoFolderRoot)?.PhysicalPath;
-                    if (Directory.Exists(path))
-                    {
-                        DirectoryInfo VideoFiles = new DirectoryInfo(path);
-                        foreach (var item in VideoFiles.GetFiles())
-                        {
-                            codeStroke.VideosPath.Add(codeStroke.VideoFolderRoot + "/" + item.Name);
-                        }
-                    }
-                }
+                //if (!string.IsNullOrEmpty(codeStroke.VideoFolderRoot) && !string.IsNullOrWhiteSpace(codeStroke.VideoFolderRoot))
+                //{
+                //    var path = this._RootPath + codeStroke.VideoFolderRoot;  //_environment.WebRootFileProvider.GetFileInfo(codeStroke.VideoFolderRoot)?.PhysicalPath;
+                //    if (Directory.Exists(path))
+                //    {
+                //        DirectoryInfo VideoFiles = new DirectoryInfo(path);
+                //        foreach (var item in VideoFiles.GetFiles())
+                //        {
+                //            codeStroke.VideosPath.Add(codeStroke.VideoFolderRoot + "/" + item.Name);
+                //        }
+                //    }
+                //}
 
-                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Modified", Body = codeStroke };
+                return GetStrokeDataById(row.CodeStrokeId);
             }
             else
             {
@@ -1276,7 +1276,7 @@ namespace Web.Services.Concrete
                     }
                 }
 
-                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Added", Body = stroke };
+                return GetStrokeDataById(stroke.CodeStrokeId);
             }
         }
 
@@ -1792,51 +1792,6 @@ namespace Web.Services.Concrete
 
                 this._codeSepsisRepo.Update(row);
 
-
-                codeSepsis.AttachmentsPath = new List<string>();
-                codeSepsis.AudiosPath = new List<string>();
-                codeSepsis.VideosPath = new List<string>();
-
-                if (!string.IsNullOrEmpty(codeSepsis.AttachmentsFolderRoot) && !string.IsNullOrWhiteSpace(codeSepsis.AttachmentsFolderRoot))
-                {
-                    string path = this._RootPath + codeSepsis.AttachmentsFolderRoot; //_environment.WebRootFileProvider.GetFileInfo(codeSepsis.AttachmentsFolderRoot)?.PhysicalPath;
-                    if (Directory.Exists(path))
-                    {
-                        DirectoryInfo AttachFiles = new DirectoryInfo(path);
-                        foreach (var item in AttachFiles.GetFiles())
-                        {
-                            codeSepsis.AttachmentsPath.Add(codeSepsis.AttachmentsFolderRoot + "/" + item.Name);
-                        }
-                    }
-                }
-
-                if (!string.IsNullOrEmpty(codeSepsis.AudioFolderRoot) && !string.IsNullOrWhiteSpace(codeSepsis.AudioFolderRoot))
-                {
-                    string path = this._RootPath + codeSepsis.AudioFolderRoot; //_environment.WebRootFileProvider.GetFileInfo(codeSepsis.AudioFolderRoot)?.PhysicalPath;
-                    if (Directory.Exists(path))
-                    {
-                        DirectoryInfo AudioFiles = new DirectoryInfo(path);
-                        foreach (var item in AudioFiles.GetFiles())
-                        {
-                            codeSepsis.AudiosPath.Add(codeSepsis.AudioFolderRoot + "/" + item.Name);
-                        }
-                    }
-                }
-
-                if (!string.IsNullOrEmpty(codeSepsis.VideoFolderRoot) && !string.IsNullOrWhiteSpace(codeSepsis.VideoFolderRoot))
-                {
-                    var path = this._RootPath + codeSepsis.VideoFolderRoot; //_environment.WebRootFileProvider.GetFileInfo(codeSepsis.VideoFolderRoot)?.PhysicalPath;
-                    if (Directory.Exists(path))
-                    {
-                        DirectoryInfo VideoFiles = new DirectoryInfo(path);
-                        foreach (var item in VideoFiles.GetFiles())
-                        {
-                            codeSepsis.VideosPath.Add(codeSepsis.VideoFolderRoot + "/" + item.Name);
-                        }
-                    }
-                }
-
-
                 if (row.IsEms)
                 {
                     var serviceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == row.OrganizationIdFk && x.CodeIdFk == UCLEnums.Sepsis.ToInt() && !x.IsDeleted).Select(x => x.ServiceLineIds).FirstOrDefault();
@@ -1862,7 +1817,53 @@ namespace Web.Services.Concrete
                     }
                 }
 
-                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Modified", Body = codeSepsis };
+                //codeSepsis.AttachmentsPath = new List<string>();
+                //codeSepsis.AudiosPath = new List<string>();
+                //codeSepsis.VideosPath = new List<string>();
+
+                //if (!string.IsNullOrEmpty(codeSepsis.AttachmentsFolderRoot) && !string.IsNullOrWhiteSpace(codeSepsis.AttachmentsFolderRoot))
+                //{
+                //    string path = this._RootPath + codeSepsis.AttachmentsFolderRoot; //_environment.WebRootFileProvider.GetFileInfo(codeSepsis.AttachmentsFolderRoot)?.PhysicalPath;
+                //    if (Directory.Exists(path))
+                //    {
+                //        DirectoryInfo AttachFiles = new DirectoryInfo(path);
+                //        foreach (var item in AttachFiles.GetFiles())
+                //        {
+                //            codeSepsis.AttachmentsPath.Add(codeSepsis.AttachmentsFolderRoot + "/" + item.Name);
+                //        }
+                //    }
+                //}
+
+                //if (!string.IsNullOrEmpty(codeSepsis.AudioFolderRoot) && !string.IsNullOrWhiteSpace(codeSepsis.AudioFolderRoot))
+                //{
+                //    string path = this._RootPath + codeSepsis.AudioFolderRoot; //_environment.WebRootFileProvider.GetFileInfo(codeSepsis.AudioFolderRoot)?.PhysicalPath;
+                //    if (Directory.Exists(path))
+                //    {
+                //        DirectoryInfo AudioFiles = new DirectoryInfo(path);
+                //        foreach (var item in AudioFiles.GetFiles())
+                //        {
+                //            codeSepsis.AudiosPath.Add(codeSepsis.AudioFolderRoot + "/" + item.Name);
+                //        }
+                //    }
+                //}
+
+                //if (!string.IsNullOrEmpty(codeSepsis.VideoFolderRoot) && !string.IsNullOrWhiteSpace(codeSepsis.VideoFolderRoot))
+                //{
+                //    var path = this._RootPath + codeSepsis.VideoFolderRoot; //_environment.WebRootFileProvider.GetFileInfo(codeSepsis.VideoFolderRoot)?.PhysicalPath;
+                //    if (Directory.Exists(path))
+                //    {
+                //        DirectoryInfo VideoFiles = new DirectoryInfo(path);
+                //        foreach (var item in VideoFiles.GetFiles())
+                //        {
+                //            codeSepsis.VideosPath.Add(codeSepsis.VideoFolderRoot + "/" + item.Name);
+                //        }
+                //    }
+                //}
+
+
+
+
+                return GetSepsisDataById(row.CodeSepsisId);
             }
             else
             {
@@ -2214,7 +2215,7 @@ namespace Web.Services.Concrete
                 }
 
 
-                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Added", Body = Sepsis };
+                return GetSepsisDataById(Sepsis.CodeSepsisId);
             }
         }
 
@@ -2724,52 +2725,6 @@ namespace Web.Services.Concrete
                 }
 
                 this._codeSTEMIRepo.Update(row);
-
-
-                codeSTEMI.AttachmentsPath = new List<string>();
-                codeSTEMI.AudiosPath = new List<string>();
-                codeSTEMI.VideosPath = new List<string>();
-
-                if (!string.IsNullOrEmpty(codeSTEMI.AttachmentsFolderRoot) && !string.IsNullOrWhiteSpace(codeSTEMI.AttachmentsFolderRoot))
-                {
-                    string path = this._RootPath + codeSTEMI.AttachmentsFolderRoot;  //_environment.WebRootFileProvider.GetFileInfo(codeSTEMI.AttachmentsFolderRoot)?.PhysicalPath;
-                    if (Directory.Exists(path))
-                    {
-                        DirectoryInfo AttachFiles = new DirectoryInfo(path);
-                        foreach (var item in AttachFiles.GetFiles())
-                        {
-                            codeSTEMI.AttachmentsPath.Add(codeSTEMI.AttachmentsFolderRoot + "/" + item.Name);
-                        }
-                    }
-                }
-
-                if (!string.IsNullOrEmpty(codeSTEMI.AudioFolderRoot) && !string.IsNullOrWhiteSpace(codeSTEMI.AudioFolderRoot))
-                {
-                    string path = this._RootPath + codeSTEMI.AudioFolderRoot; //_environment.WebRootFileProvider.GetFileInfo(codeSTEMI.AudioFolderRoot)?.PhysicalPath;
-                    if (Directory.Exists(path))
-                    {
-                        DirectoryInfo AudioFiles = new DirectoryInfo(path);
-                        foreach (var item in AudioFiles.GetFiles())
-                        {
-                            codeSTEMI.AudiosPath.Add(codeSTEMI.AudioFolderRoot + "/" + item.Name);
-                        }
-                    }
-                }
-
-                if (!string.IsNullOrEmpty(codeSTEMI.VideoFolderRoot) && !string.IsNullOrWhiteSpace(codeSTEMI.VideoFolderRoot))
-                {
-                    var path = this._RootPath + codeSTEMI.VideoFolderRoot; //_environment.WebRootFileProvider.GetFileInfo(codeSTEMI.VideoFolderRoot)?.PhysicalPath;
-                    if (Directory.Exists(path))
-                    {
-                        DirectoryInfo VideoFiles = new DirectoryInfo(path);
-                        foreach (var item in VideoFiles.GetFiles())
-                        {
-                            codeSTEMI.VideosPath.Add(codeSTEMI.VideoFolderRoot + "/" + item.Name);
-                        }
-                    }
-                }
-
-
                 if (row.IsEms != null && row.IsEms.Value)
                 {
                     var serviceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == row.OrganizationIdFk && x.CodeIdFk == UCLEnums.STEMI.ToInt() && !x.IsDeleted).Select(x => x.ServiceLineIds).FirstOrDefault();
@@ -2795,7 +2750,53 @@ namespace Web.Services.Concrete
                     }
                 }
 
-                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Modified", Body = codeSTEMI };
+                //codeSTEMI.AttachmentsPath = new List<string>();
+                //codeSTEMI.AudiosPath = new List<string>();
+                //codeSTEMI.VideosPath = new List<string>();
+
+                //if (!string.IsNullOrEmpty(codeSTEMI.AttachmentsFolderRoot) && !string.IsNullOrWhiteSpace(codeSTEMI.AttachmentsFolderRoot))
+                //{
+                //    string path = this._RootPath + codeSTEMI.AttachmentsFolderRoot;  //_environment.WebRootFileProvider.GetFileInfo(codeSTEMI.AttachmentsFolderRoot)?.PhysicalPath;
+                //    if (Directory.Exists(path))
+                //    {
+                //        DirectoryInfo AttachFiles = new DirectoryInfo(path);
+                //        foreach (var item in AttachFiles.GetFiles())
+                //        {
+                //            codeSTEMI.AttachmentsPath.Add(codeSTEMI.AttachmentsFolderRoot + "/" + item.Name);
+                //        }
+                //    }
+                //}
+
+                //if (!string.IsNullOrEmpty(codeSTEMI.AudioFolderRoot) && !string.IsNullOrWhiteSpace(codeSTEMI.AudioFolderRoot))
+                //{
+                //    string path = this._RootPath + codeSTEMI.AudioFolderRoot; //_environment.WebRootFileProvider.GetFileInfo(codeSTEMI.AudioFolderRoot)?.PhysicalPath;
+                //    if (Directory.Exists(path))
+                //    {
+                //        DirectoryInfo AudioFiles = new DirectoryInfo(path);
+                //        foreach (var item in AudioFiles.GetFiles())
+                //        {
+                //            codeSTEMI.AudiosPath.Add(codeSTEMI.AudioFolderRoot + "/" + item.Name);
+                //        }
+                //    }
+                //}
+
+                //if (!string.IsNullOrEmpty(codeSTEMI.VideoFolderRoot) && !string.IsNullOrWhiteSpace(codeSTEMI.VideoFolderRoot))
+                //{
+                //    var path = this._RootPath + codeSTEMI.VideoFolderRoot; //_environment.WebRootFileProvider.GetFileInfo(codeSTEMI.VideoFolderRoot)?.PhysicalPath;
+                //    if (Directory.Exists(path))
+                //    {
+                //        DirectoryInfo VideoFiles = new DirectoryInfo(path);
+                //        foreach (var item in VideoFiles.GetFiles())
+                //        {
+                //            codeSTEMI.VideosPath.Add(codeSTEMI.VideoFolderRoot + "/" + item.Name);
+                //        }
+                //    }
+                //}
+
+
+
+
+                return GetSTEMIDataById(row.CodeStemiid);
             }
             else
             {
@@ -3145,7 +3146,7 @@ namespace Web.Services.Concrete
                     }
                 }
 
-                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Added", Body = STEMI };
+                return GetSTEMIDataById(STEMI.CodeStemiid);
             }
         }
 
@@ -3635,52 +3636,6 @@ namespace Web.Services.Concrete
                 }
 
                 this._codeTrumaRepo.Update(row);
-
-
-                codeTruma.AttachmentsPath = new List<string>();
-                codeTruma.AudiosPath = new List<string>();
-                codeTruma.VideosPath = new List<string>();
-
-                if (!string.IsNullOrEmpty(codeTruma.AttachmentsFolderRoot) && !string.IsNullOrWhiteSpace(codeTruma.AttachmentsFolderRoot))
-                {
-                    string path = this._RootPath + codeTruma.AttachmentsFolderRoot; //_environment.WebRootFileProvider.GetFileInfo(codeTruma.AttachmentsFolderRoot)?.PhysicalPath;
-                    if (Directory.Exists(path))
-                    {
-                        DirectoryInfo AttachFiles = new DirectoryInfo(path);
-                        foreach (var item in AttachFiles.GetFiles())
-                        {
-                            codeTruma.AttachmentsPath.Add(codeTruma.AttachmentsFolderRoot + "/" + item.Name);
-                        }
-                    }
-                }
-
-                if (!string.IsNullOrEmpty(codeTruma.AudioFolderRoot) && !string.IsNullOrWhiteSpace(codeTruma.AudioFolderRoot))
-                {
-                    string path = this._RootPath + codeTruma.AudioFolderRoot; //_environment.WebRootFileProvider.GetFileInfo(codeTruma.AudioFolderRoot)?.PhysicalPath;
-                    if (Directory.Exists(path))
-                    {
-                        DirectoryInfo AudioFiles = new DirectoryInfo(path);
-                        foreach (var item in AudioFiles.GetFiles())
-                        {
-                            codeTruma.AudiosPath.Add(codeTruma.AudioFolderRoot + "/" + item.Name);
-                        }
-                    }
-                }
-
-                if (!string.IsNullOrEmpty(codeTruma.VideoFolderRoot) && !string.IsNullOrWhiteSpace(codeTruma.VideoFolderRoot))
-                {
-                    var path = this._RootPath + codeTruma.VideoFolderRoot;  //_environment.WebRootFileProvider.GetFileInfo(codeTruma.VideoFolderRoot)?.PhysicalPath;
-                    if (Directory.Exists(path))
-                    {
-                        DirectoryInfo VideoFiles = new DirectoryInfo(path);
-                        foreach (var item in VideoFiles.GetFiles())
-                        {
-                            codeTruma.VideosPath.Add(codeTruma.VideoFolderRoot + "/" + item.Name);
-                        }
-                    }
-                }
-
-
                 if (row.IsEms != null && row.IsEms.Value)
                 {
                     var serviceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == row.OrganizationIdFk && x.CodeIdFk == UCLEnums.Trauma.ToInt() && !x.IsDeleted).Select(x => x.ServiceLineIds).FirstOrDefault();
@@ -3705,7 +3660,53 @@ namespace Web.Services.Concrete
 
                     }
                 }
-                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Modified", Body = codeTruma };
+
+                //codeTruma.AttachmentsPath = new List<string>();
+                //codeTruma.AudiosPath = new List<string>();
+                //codeTruma.VideosPath = new List<string>();
+
+                //if (!string.IsNullOrEmpty(codeTruma.AttachmentsFolderRoot) && !string.IsNullOrWhiteSpace(codeTruma.AttachmentsFolderRoot))
+                //{
+                //    string path = this._RootPath + codeTruma.AttachmentsFolderRoot; //_environment.WebRootFileProvider.GetFileInfo(codeTruma.AttachmentsFolderRoot)?.PhysicalPath;
+                //    if (Directory.Exists(path))
+                //    {
+                //        DirectoryInfo AttachFiles = new DirectoryInfo(path);
+                //        foreach (var item in AttachFiles.GetFiles())
+                //        {
+                //            codeTruma.AttachmentsPath.Add(codeTruma.AttachmentsFolderRoot + "/" + item.Name);
+                //        }
+                //    }
+                //}
+
+                //if (!string.IsNullOrEmpty(codeTruma.AudioFolderRoot) && !string.IsNullOrWhiteSpace(codeTruma.AudioFolderRoot))
+                //{
+                //    string path = this._RootPath + codeTruma.AudioFolderRoot; //_environment.WebRootFileProvider.GetFileInfo(codeTruma.AudioFolderRoot)?.PhysicalPath;
+                //    if (Directory.Exists(path))
+                //    {
+                //        DirectoryInfo AudioFiles = new DirectoryInfo(path);
+                //        foreach (var item in AudioFiles.GetFiles())
+                //        {
+                //            codeTruma.AudiosPath.Add(codeTruma.AudioFolderRoot + "/" + item.Name);
+                //        }
+                //    }
+                //}
+
+                //if (!string.IsNullOrEmpty(codeTruma.VideoFolderRoot) && !string.IsNullOrWhiteSpace(codeTruma.VideoFolderRoot))
+                //{
+                //    var path = this._RootPath + codeTruma.VideoFolderRoot;  //_environment.WebRootFileProvider.GetFileInfo(codeTruma.VideoFolderRoot)?.PhysicalPath;
+                //    if (Directory.Exists(path))
+                //    {
+                //        DirectoryInfo VideoFiles = new DirectoryInfo(path);
+                //        foreach (var item in VideoFiles.GetFiles())
+                //        {
+                //            codeTruma.VideosPath.Add(codeTruma.VideoFolderRoot + "/" + item.Name);
+                //        }
+                //    }
+                //}
+
+
+
+                return GetTrumaDataById(row.CodeTraumaId);
             }
             else
             {
@@ -4057,7 +4058,7 @@ namespace Web.Services.Concrete
                 }
 
 
-                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Added", Body = Truma };
+                return GetTrumaDataById(Truma.CodeTraumaId);
             }
         }
 

@@ -81,7 +81,7 @@ namespace Web.API.Controllers
 
         [Description("Get All Active Codes")]
         [HttpGet("activecode/GetAllActiveCodes/{orgId}")]
-        public BaseResponse GetAllActiveCodes(int orgId) 
+        public BaseResponse GetAllActiveCodes(int orgId)
         {
             try
             {
@@ -416,7 +416,7 @@ namespace Web.API.Controllers
 
         [Description("Get All Active EMS")]
         [HttpGet("EMS/GetActiveEMS")]
-        public BaseResponse GetActiveEMS() 
+        public BaseResponse GetActiveEMS()
         {
             try
             {
