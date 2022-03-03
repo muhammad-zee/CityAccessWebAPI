@@ -13,6 +13,7 @@ namespace Web.Model.Common
         public int OrganizationIdFk { get; set; }
         public string GenderTitle { get; set; }
         public string ChiefComplant { get; set; }
+        public string LastKnownWellStr { get; set; }
         public DateTime? LastKnownWell { get; set; }
         public string Hpi { get; set; }
         public string BloodThinners { get; set; }

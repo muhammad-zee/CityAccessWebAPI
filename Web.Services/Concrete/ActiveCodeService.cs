@@ -412,6 +412,7 @@ namespace Web.Services.Concrete
                 x.AudiosPath = new List<string>();
                 x.VideosPath = new List<string>();
                 x.OrganizationData = new object();
+                x.BloodThinnersTitle = new List<object>();
 
                 if (!string.IsNullOrEmpty(x.Attachments) && !string.IsNullOrWhiteSpace(x.Attachments))
                 {
@@ -468,6 +469,7 @@ namespace Web.Services.Concrete
                 StrokeDataVM.AttachmentsPath = new List<string>();
                 StrokeDataVM.AudiosPath = new List<string>();
                 StrokeDataVM.VideosPath = new List<string>();
+                StrokeDataVM.BloodThinnersTitle = new List<object>();
                 StrokeDataVM.OrganizationData = new object();
 
                 if (!string.IsNullOrEmpty(StrokeDataVM.Attachments) && !string.IsNullOrWhiteSpace(StrokeDataVM.Attachments))
@@ -540,6 +542,10 @@ namespace Web.Services.Concrete
 
         public BaseResponse AddOrUpdateStrokeData(CodeStrokeVM codeStroke)
         {
+            if (codeStroke != null && !string.IsNullOrEmpty(codeStroke.LastKnownWellStr) && !string.IsNullOrWhiteSpace(codeStroke.LastKnownWellStr))
+            {
+                codeStroke.LastKnownWell = DateTime.Parse(codeStroke.LastKnownWellStr);
+            }
             if (codeStroke.CodeStrokeId > 0)
             {
                 var row = this._codeStrokeRepo.Table.Where(x => x.CodeStrokeId == codeStroke.CodeStrokeId && !x.IsDeleted).FirstOrDefault();
@@ -922,7 +928,6 @@ namespace Web.Services.Concrete
             }
             else
             {
-
                 codeStroke.CreatedDate = DateTime.UtcNow;
                 var stroke = AutoMapperHelper.MapSingleRow<CodeStrokeVM, CodeStroke>(codeStroke);
 
@@ -1331,6 +1336,7 @@ namespace Web.Services.Concrete
                 x.AttachmentsPath = new List<string>();
                 x.AudiosPath = new List<string>();
                 x.VideosPath = new List<string>();
+                x.BloodThinnersTitle = new List<object>();
                 //x.OrganizationData == new object();
 
                 if (!string.IsNullOrEmpty(x.Attachments) && !string.IsNullOrWhiteSpace(x.Attachments))
@@ -1388,6 +1394,7 @@ namespace Web.Services.Concrete
                 SepsisDataVM.AttachmentsPath = new List<string>();
                 SepsisDataVM.AudiosPath = new List<string>();
                 SepsisDataVM.VideosPath = new List<string>();
+                SepsisDataVM.BloodThinnersTitle = new List<object>();
 
                 if (!string.IsNullOrEmpty(SepsisDataVM.Attachments) && !string.IsNullOrWhiteSpace(SepsisDataVM.Attachments))
                 {
@@ -2259,6 +2266,7 @@ namespace Web.Services.Concrete
                 x.AttachmentsPath = new List<string>();
                 x.AudiosPath = new List<string>();
                 x.VideosPath = new List<string>();
+                x.BloodThinnersTitle = new List<object>();
 
                 if (!string.IsNullOrEmpty(x.Attachments) && !string.IsNullOrWhiteSpace(x.Attachments))
                 {
@@ -2315,6 +2323,7 @@ namespace Web.Services.Concrete
                 STEMIDataVM.AttachmentsPath = new List<string>();
                 STEMIDataVM.AudiosPath = new List<string>();
                 STEMIDataVM.VideosPath = new List<string>();
+                STEMIDataVM.BloodThinnersTitle = new List<object>();
 
                 if (!string.IsNullOrEmpty(STEMIDataVM.Attachments) && !string.IsNullOrWhiteSpace(STEMIDataVM.Attachments))
                 {
@@ -3161,7 +3170,7 @@ namespace Web.Services.Concrete
                 x.AttachmentsPath = new List<string>();
                 x.AudiosPath = new List<string>();
                 x.VideosPath = new List<string>();
-
+                x.BloodThinnersTitle = new List<object>();
                 if (!string.IsNullOrEmpty(x.Attachments) && !string.IsNullOrWhiteSpace(x.Attachments))
                 {
                     string path = this._RootPath + x.Attachments;
@@ -3216,6 +3225,7 @@ namespace Web.Services.Concrete
                 TrumaDataVM.AttachmentsPath = new List<string>();
                 TrumaDataVM.AudiosPath = new List<string>();
                 TrumaDataVM.VideosPath = new List<string>();
+                TrumaDataVM.BloodThinnersTitle = new List<object>();
 
                 if (!string.IsNullOrEmpty(TrumaDataVM.Attachments) && !string.IsNullOrWhiteSpace(TrumaDataVM.Attachments))
                 {
