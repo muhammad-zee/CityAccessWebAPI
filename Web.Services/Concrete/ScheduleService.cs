@@ -267,7 +267,7 @@ namespace Web.Services.Concrete
                 }
 
                 if (this._scheduleRepo.Table.Any(x => x.UserIdFk == param.selectedUserId.ToInt() && x.ServiceLineIdFk == param.added.ElementAt(0).serviceLineId.ToInt() && x.RoleIdFk == param.added.ElementAt(0).roleId.ToInt() 
-                    && (x.ScheduleDateStart >= param.added.ElementAt(0).startTime && x.ScheduleDateEnd <= param.added.ElementAt(0).startTime) && (x.ScheduleDateStart >= param.added.ElementAt(0).endTime && x.ScheduleDateEnd <= param.added.ElementAt(0).endTime))) 
+                    && ((x.ScheduleDateStart <= param.added.ElementAt(0).startTime && x.ScheduleDateEnd >= param.added.ElementAt(0).startTime) || (x.ScheduleDateStart <= param.added.ElementAt(0).endTime && x.ScheduleDateEnd >= param.added.ElementAt(0).endTime)))) 
                 {
                     response.Status = HttpStatusCode.NotModified;
                     response.Message = "Schedule is already exist";
