@@ -177,39 +177,43 @@ namespace Web.Services.Concrete
 
         public BaseResponse GetEMSandActiveCodesForDashboard(int OrgId)
         {
-            var thisWeekStart = DateTime.Today.AddDays(-1 * (int)(DateTime.Today.DayOfWeek)).AddDays(1);
-            var thisWeekEnd = thisWeekStart.AddDays(7).AddSeconds(-1);
+
+            var today = DateTime.Today;
+            var lastWeek = today.AddDays(-7);
+       //     var thisWeekStart = DateTime.Today.AddDays(-1 * (int)(DateTime.Today.DayOfWeek)).AddDays(1);
+         //   var thisWeekEnd = thisWeekStart.AddDays(7).AddSeconds(-1);
             var ActiveCodes = this._dbContext.LoadStoredProcedure("md_getEMSandActiveCodesGraphDataForDashboard")
                     .WithSqlParam("@OrganizationId", OrgId)
-                    .WithSqlParam("@StartDate", thisWeekStart.ToString("yyyy-MM-dd"))
-                    .WithSqlParam("@EndDate", thisWeekEnd.ToString("yyyy-MM-dd"))
+                    .WithSqlParam("@StartDate", lastWeek.ToString("yyyy-MM-dd"))
+                    .WithSqlParam("@EndDate", today.ToString("yyyy-MM-dd"))
                     .ExecuteStoredProc<GraphVM>();
 
             List<string> Label = new();
-            while (thisWeekEnd.Date >= thisWeekStart.Date)
+            while (today.Date >= lastWeek.Date)
             {
-                Label.Add(thisWeekStart.ToString("MMM-dd"));
-                thisWeekStart = thisWeekStart.AddDays(1);
+                Label.Add(lastWeek.ToString("MMM-dd"));
+                lastWeek = lastWeek.AddDays(1);
             }
-            thisWeekStart = DateTime.Today.AddDays(-1 * (int)(DateTime.Today.DayOfWeek)).AddDays(1);
+            // thisWeekStart = DateTime.Today.AddDays(-1 * (int)(DateTime.Today.DayOfWeek)).AddDays(1);
+            lastWeek = today.AddDays(-7);
             var datasets = new List<object>();
             if (ActiveCodes.Count < 7)
             {
                 List<int> EMS = new();
                 List<int> activeCodes = new();
-                while (thisWeekEnd.Date >= thisWeekStart.Date)
+                while (today.Date >= lastWeek.Date)
                 {
-                    if (ActiveCodes.Any(x => x.CreatedDate.Date == thisWeekStart.Date))
+                    if (ActiveCodes.Any(x => x.CreatedDate.Date == lastWeek.Date))
                     {
-                        EMS.Add(ActiveCodes.Where(x => x.CreatedDate.Date == thisWeekStart.Date).Select(x => x.EMS).FirstOrDefault());
-                        activeCodes.Add(ActiveCodes.Where(x => x.CreatedDate.Date == thisWeekStart.Date).Select(x => x.ActiveCodes).FirstOrDefault());
+                        EMS.Add(ActiveCodes.Where(x => x.CreatedDate.Date == lastWeek.Date).Select(x => x.EMS).FirstOrDefault());
+                        activeCodes.Add(ActiveCodes.Where(x => x.CreatedDate.Date == lastWeek.Date).Select(x => x.ActiveCodes).FirstOrDefault());
                     }
                     else
                     {
                         EMS.Add(0);
                         activeCodes.Add(0);
                     }
-                    thisWeekStart = thisWeekStart.AddDays(1);
+                    lastWeek = lastWeek.AddDays(1);
                 }
                 datasets.Add(new
                 {

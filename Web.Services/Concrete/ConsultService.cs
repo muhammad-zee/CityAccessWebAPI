@@ -83,40 +83,44 @@ namespace Web.Services.Concrete
         }
         public BaseResponse GetConsultGraphDataForOrg(int OrgId)
         {
-            var thisWeekStart = DateTime.Today.AddDays(-1 * (int)(DateTime.Today.DayOfWeek)).AddDays(1);
-            var thisWeekEnd = thisWeekStart.AddDays(7).AddSeconds(-1);
+
+            var today = DateTime.Today;
+            var lastweek = today.AddDays(-7);
+            //var thisWeekStart = DateTime.Today.AddDays(-1 * (int)(DateTime.Today.DayOfWeek)).AddDays(1);
+           // var thisWeekEnd = thisWeekStart.AddDays(7).AddSeconds(-1);
 
             var consultFields = this._dbContext.LoadStoredProcedure("md_getConsultGraphDataForDashboard")
                 .WithSqlParam("@OrganizationId", OrgId)
-                .WithSqlParam("@StartDate", thisWeekStart)
-                .WithSqlParam("@EndDate", thisWeekEnd)
+                .WithSqlParam("@StartDate", lastweek)
+                .WithSqlParam("@EndDate", today)
                 .ExecuteStoredProc<GraphVM>();
             var datasets = new List<object>();
             List<string> Label = new();
-            while (thisWeekEnd.Date >= thisWeekStart.Date)
+            while (today.Date >= lastweek.Date)
             {
-                Label.Add(thisWeekStart.ToString("MMM-dd"));
-                thisWeekStart = thisWeekStart.AddDays(1);
+                Label.Add(lastweek.ToString("MMM-dd"));
+                lastweek = lastweek.AddDays(1);
             }
-            thisWeekStart = DateTime.Today.AddDays(-1 * (int)(DateTime.Today.DayOfWeek)).AddDays(1);
+            // thisWeekStart = DateTime.Today.AddDays(-1 * (int)(DateTime.Today.DayOfWeek)).AddDays(1);
+            lastweek = today.AddDays(-7);
             if (consultFields.Count < 7)
             {
                 List<int> Urgent = new();
                 List<int> Routine = new();
 
-                while (thisWeekEnd.Date >= thisWeekStart.Date)
+                while (today.Date >= lastweek.Date)
                 {
-                    if (consultFields.Any(x => x.CreatedDate.Date == thisWeekStart.Date))
+                    if (consultFields.Any(x => x.CreatedDate.Date == lastweek.Date))
                     {
-                        Urgent.Add(consultFields.Where(x => x.CreatedDate.Date == thisWeekStart.Date).Select(x => x.UrgentConsults).FirstOrDefault());
-                        Routine.Add(consultFields.Where(x => x.CreatedDate.Date == thisWeekStart.Date).Select(x => x.RoutineConsults).FirstOrDefault());
+                        Urgent.Add(consultFields.Where(x => x.CreatedDate.Date == lastweek.Date).Select(x => x.UrgentConsults).FirstOrDefault());
+                        Routine.Add(consultFields.Where(x => x.CreatedDate.Date == lastweek.Date).Select(x => x.RoutineConsults).FirstOrDefault());
                     }
                     else
                     {
                         Urgent.Add(0);
                         Routine.Add(0);
                     }
-                    thisWeekStart = thisWeekStart.AddDays(1);
+                    lastweek = lastweek.AddDays(1);
                 }
 
                 datasets.Add(new
