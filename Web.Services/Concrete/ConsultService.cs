@@ -86,9 +86,6 @@ namespace Web.Services.Concrete
 
             var today = DateTime.Today;
             var lastweek = today.AddDays(-7);
-            //var thisWeekStart = DateTime.Today.AddDays(-1 * (int)(DateTime.Today.DayOfWeek)).AddDays(1);
-           // var thisWeekEnd = thisWeekStart.AddDays(7).AddSeconds(-1);
-
             var consultFields = this._dbContext.LoadStoredProcedure("md_getConsultGraphDataForDashboard")
                 .WithSqlParam("@OrganizationId", OrgId)
                 .WithSqlParam("@StartDate", lastweek)
@@ -101,7 +98,6 @@ namespace Web.Services.Concrete
                 Label.Add(lastweek.ToString("MMM-dd"));
                 lastweek = lastweek.AddDays(1);
             }
-            // thisWeekStart = DateTime.Today.AddDays(-1 * (int)(DateTime.Today.DayOfWeek)).AddDays(1);
             lastweek = today.AddDays(-7);
             if (consultFields.Count < 7)
             {
