@@ -4111,6 +4111,53 @@ namespace Web.Services.Concrete
             foreach (var item in activeEMS)
             {
                 item.OrganizationData = orgDataList.Where(x => x.OrganizationId == item.OrganizationIdFk).FirstOrDefault();
+
+                item.AttachmentsPath = new List<string>();
+                item.AudiosPath = new List<string>();
+                item.VideosPath = new List<string>();
+                item.BloodThinnersTitle = new List<object>();
+                if (!string.IsNullOrEmpty(item.Attachments) && !string.IsNullOrWhiteSpace(item.Attachments))
+                {
+                    string path = this._RootPath + item.Attachments;
+                    if (Directory.Exists(path))
+                    {
+                        DirectoryInfo AttachFiles = new DirectoryInfo(path);
+                        foreach (var file in AttachFiles.GetFiles())
+                        {
+                            item.AttachmentsPath.Add(item.Attachments + "/" + file.Name);
+                        }
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(item.Audio) && !string.IsNullOrWhiteSpace(item.Audio))
+                {
+                    string path = this._RootPath + item.Audio;
+                    if (Directory.Exists(path))
+                    {
+                        DirectoryInfo AudioFiles = new DirectoryInfo(path);
+                        foreach (var file in AudioFiles.GetFiles())
+                        {
+                            item.AudiosPath.Add(item.Audio + "/" + file.Name);
+                        }
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(item.Video) && !string.IsNullOrWhiteSpace(item.Video))
+                {
+                    var path = this._RootPath + item.Video;
+                    if (Directory.Exists(path))
+                    {
+                        DirectoryInfo VideoFiles = new DirectoryInfo(path);
+                        foreach (var file in VideoFiles.GetFiles())
+                        {
+                            item.VideosPath.Add(item.Video + "/" + file.Name);
+                        }
+                    }
+                }
+                item.LastKnownWellStr = item.LastKnownWell?.ToString("yyyy-MM-dd hh:mm:ss tt");
+                //item.OrganizationData = orgData;
+                item.GenderTitle = _controlListDetailsRepo.Table.Where(g => g.ControlListDetailId == item.Gender).Select(g => g.Title).FirstOrDefault();
+                item.BloodThinnersTitle.AddRange(_controlListDetailsRepo.Table.Where(b => item.BloodThinners.ToIntList().Contains(b.ControlListDetailId)).Select(b => new { Id = b.ControlListDetailId, b.Title }).ToList());
             }
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = activeEMS };
         }
