@@ -206,6 +206,11 @@ namespace Web.Services.Concrete
                     }
                 }
 
+                if (register.DobStr != null) 
+                {
+                    register.Dob = DateTime.Parse(register.DobStr);
+                }
+
                 user.FirstName = register.FirstName;
                 user.MiddleName = register.MiddleName;
                 user.LastName = register.LastName;
@@ -297,6 +302,10 @@ namespace Web.Services.Concrete
                         var notificationChannel = this._communicationService.createConversationChannel(register.FirstName + " " + register.LastName, randomString, "");
                         var conversationUser = this._communicationService.createConversationUser(randomString, register.FirstName + " " + register.LastName);
                         var addConversationUserToChannel = this._communicationService.addNewUserToConversationChannel(notificationChannel.Sid, randomString);
+                        if (register.DobStr != null)
+                        {
+                            register.Dob = DateTime.Parse(register.DobStr);
+                        }
                         var obj = new User()
                         {
                             FirstName = register.FirstName,

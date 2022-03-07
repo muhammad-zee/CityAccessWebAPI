@@ -28,6 +28,7 @@ namespace Web.Model.Common
         public int GenderId { get; set; }
         public string Gender { get; set; }
         public DateTime? Dob { get; set; }
+        public string DobStr { get; set; }
         public string OfficeAddress { get; set; } = "";
         public string HomeAddress { get; set; } = "";
         [Required]

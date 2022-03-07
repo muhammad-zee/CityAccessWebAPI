@@ -155,7 +155,7 @@ namespace Web.Services.Concrete
                 item.GenderId = Convert.ToInt32(item.Gender);
                 item.Gender = genders.Where(x => x.ControlListDetailId == item.GenderId).Select(x => x.Title).FirstOrDefault();
                 item.UserImage = String.IsNullOrEmpty(item.UserImage) ? "" : item.UserImage.Replace(Directory.GetCurrentDirectory() + "/", "");
-
+                item.DobStr = item.Dob?.ToString("yyyy-MM-dd");
                 var dptids = _serviceRepo.Table.Where(x => userRelationIds.Where(x => x.UserIdFk == item.UserId).Select(x => x.ServiceLineIdFk).Distinct().Contains(x.ServiceLineId) && x.IsDeleted != true).Select(x => x.DepartmentIdFk).Distinct().ToList();
                 item.ServiceLineIdsList = userRelationIds.Where(x => x.UserIdFk == item.UserId).Select(x => x.ServiceLineIdFk).Distinct().ToList();
                 item.DptIdsList = dptids;
@@ -181,7 +181,7 @@ namespace Web.Services.Concrete
                 item.GenderId = Convert.ToInt32(item.Gender);
                 item.Gender = genders.Where(x => x.ControlListDetailId == item.GenderId).Select(x => x.Title).FirstOrDefault();
                 item.UserImage = String.IsNullOrEmpty(item.UserImage) ? "" : item.UserImage.Replace(Directory.GetCurrentDirectory() + "/", "");
-
+                item.DobStr = item.Dob?.ToString("yyyy-MM-dd");
                 var dptids = _serviceRepo.Table.Where(x => userRelationIds.Where(x => x.UserIdFk == item.UserId).Select(x => x.ServiceLineIdFk).Distinct().ToList().Contains(x.ServiceLineId) && x.IsDeleted != true).Select(x => x.DepartmentIdFk).Distinct().ToList();
                 item.ServiceLineIdsList = userRelationIds.Where(x => x.UserIdFk == item.UserId).Select(x => x.ServiceLineIdFk).Distinct().ToList();
                 item.DptIdsList = dptids;
@@ -222,6 +222,7 @@ namespace Web.Services.Concrete
                 user.GenderId = Convert.ToInt32(user.Gender);
                 user.Gender = genders.Where(x => x.ControlListDetailId == user.GenderId).Select(x => x.Title).FirstOrDefault();
                 user.UserImage = user.UserImage?.Replace(Directory.GetCurrentDirectory() + "/", "");
+                user.DobStr = user.Dob?.ToString("yyyy-MM-dd");
                 user.State = _controlListDetails.Table.Where(x => x.ControlListDetailId == user.StateKey).Select(x => x.Title).FirstOrDefault();
                 user.UserServices = (from us in _userRelationRepo.Table
                                      join s in _serviceRepo.Table on us.ServiceLineIdFk equals s.ServiceLineId
