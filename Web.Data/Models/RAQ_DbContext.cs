@@ -696,9 +696,9 @@ namespace Web.Data.Models
 
                 entity.Property(e => e.PhoneNo).HasMaxLength(15);
 
-                entity.Property(e => e.PrimaryAddress).HasMaxLength(50);
+                entity.Property(e => e.PrimaryAddress).HasMaxLength(500);
 
-                entity.Property(e => e.PrimaryAddress2).HasMaxLength(50);
+                entity.Property(e => e.PrimaryAddress2).HasMaxLength(500);
 
                 entity.Property(e => e.PrimaryMobileNo).HasMaxLength(15);
 

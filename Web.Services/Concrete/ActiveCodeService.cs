@@ -180,8 +180,8 @@ namespace Web.Services.Concrete
 
             var today = DateTime.Today;
             var lastWeek = today.AddDays(-7);
-       //     var thisWeekStart = DateTime.Today.AddDays(-1 * (int)(DateTime.Today.DayOfWeek)).AddDays(1);
-         //   var thisWeekEnd = thisWeekStart.AddDays(7).AddSeconds(-1);
+            //     var thisWeekStart = DateTime.Today.AddDays(-1 * (int)(DateTime.Today.DayOfWeek)).AddDays(1);
+            //   var thisWeekEnd = thisWeekStart.AddDays(7).AddSeconds(-1);
             var ActiveCodes = this._dbContext.LoadStoredProcedure("md_getEMSandActiveCodesGraphDataForDashboard")
                     .WithSqlParam("@OrganizationId", OrgId)
                     .WithSqlParam("@StartDate", lastWeek.ToString("yyyy-MM-dd"))
