@@ -9,7 +9,7 @@ namespace Web.Services.Interfaces
         BaseResponse getSchedule(EditParams param);
         BaseResponse GetScheduleList(ScheduleVM schedule);
         BaseResponse ImportCSV(ImportCSVFileVM fileVM);
-        BaseResponse GetScheduleTemplate(int serviceLine);
+        BaseResponse GetScheduleTemplate(int serviceLine, string roleIds);
         BaseResponse SaveSchedule(ScheduleVM schedule);
         BaseResponse AddUpdateUserSchedule(EditParams param);
         BaseResponse DeleteSchedule(int scheduleId, int userId);

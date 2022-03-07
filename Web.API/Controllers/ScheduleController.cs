@@ -176,12 +176,12 @@ namespace Web.API.Controllers
 
 
         [Description("Get Schedule Template")]
-        [HttpGet("Schedule/GetScheduleTemplate/{serviceLineId}")]
-        public BaseResponse GetScheduleTemplate(int serviceLineId)
+        [HttpGet("Schedule/GetScheduleTemplate/{serviceLineId}/{roleIds}")]
+        public BaseResponse GetScheduleTemplate(int serviceLineId, string roleIds)
         {
             try
             {
-                var response = this._scheduleService.GetScheduleTemplate(serviceLineId);
+                var response = this._scheduleService.GetScheduleTemplate(serviceLineId, roleIds);
                 return response;
             }
             catch (Exception ex)

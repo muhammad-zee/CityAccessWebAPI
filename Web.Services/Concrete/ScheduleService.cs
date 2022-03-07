@@ -36,7 +36,6 @@ namespace Web.Services.Concrete
 
         public ScheduleService(RAQ_DbContext dbContext,
             IConfiguration configuration,
-            IOptions<ApplicationSettings> appSettings,
             IHostingEnvironment environment,
             IRepository<UsersSchedule> scheduleRepo,
             IRepository<User> userRepo,
@@ -105,24 +104,37 @@ namespace Web.Services.Concrete
                 if (colIndex > 0)
                 {
                     var initials = col.ToString();
-                    var userId = (from ur in _userRelationRepo.Table
-                                  join u in _userRepo.Table on ur.UserIdFk equals u.UserId
-                                  where ur.ServiceLineIdFk == fileVM.ServiceLineId && !u.IsDeleted && u.Initials == initials
-                                  select u.UserId).FirstOrDefault();
+                    var user = this._dbContext.LoadStoredProcedure("md_getUserandRoleIdForScheduleImport")
+                                    .WithSqlParam("@serviceLineId", fileVM.ServiceLineId)
+                                    .WithSqlParam("@roleIds", fileVM.RoleIds)
+                                    .WithSqlParam("@initials", initials)
+                                    .ExecuteStoredProc<UserRole>().FirstOrDefault();
 
-                    foreach (var item in dt.Rows)
+                        //(from ur in _userRelationRepo.Table
+                        //          join u in _userRepo.Table on ur.UserIdFk equals u.UserId
+                        //          join urs in this._userRoleRepo.Table on u.UserId equals urs.UserIdFk
+                        //          join r in this._roleRepo.Table on urs.RoleIdFk equals r.RoleId
+                        //          where ur.ServiceLineIdFk == fileVM.ServiceLineId && fileVM.RoleIds.ToIntList().Contains(r.RoleId) && !r.IsDeleted && !u.IsDeleted && u.Initials == initials
+                        //          select u.UserId).FirstOrDefault();
+
+                    //var roleIds = (from ur in _userRelationRepo.Table
+                    //               join r in _userRoleRepo.Table on ur.UserIdFk equals r.UserIdFk
+                    //               where r.UserIdFk == userId && ur.ServiceLineIdFk == fileVM.ServiceLineId
+                    //               select r.RoleIdFk).Distinct().ToList();
+
+                    if (user.UserIdFk > 0)
                     {
-                        try
+                        foreach (var item in dt.Rows)
                         {
-                            var row = (DataRow)item;
-                            index++;
-
-                            if (!string.IsNullOrEmpty(row[0].ToString()) && !string.IsNullOrEmpty(row[1].ToString()))
+                            try
                             {
-                                if (userId > 0)
+                                var row = (DataRow)item;
+                                index++;
+
+                                if (!string.IsNullOrEmpty(row[0].ToString()) && !string.IsNullOrEmpty(row[1].ToString()))
                                 {
-                                    var ScheduleDate = Convert.ToDateTime(row[0]);
-                                    var alreadyExist = _scheduleRepo.Table.Where(x => x.UserIdFk == userId && x.ScheduleDateStart.Date == ScheduleDate.Date && !x.IsDeleted).ToList();
+                                    var ScheduleDate = DateTime.Parse(row[0].ToString()); //Convert.ToDateTime(row[0]);
+                                    var alreadyExist = _scheduleRepo.Table.Where(x => x.UserIdFk == user.UserIdFk && x.ScheduleDateStart.Date == ScheduleDate.Date && !x.IsDeleted).ToList();
                                     if (alreadyExist.Count > 0)
                                     {
                                         listToBeRemoved.AddRange(alreadyExist);
@@ -133,8 +145,8 @@ namespace Web.Services.Concrete
                                     var StartDateTimeStr = row[0].ToString() + " " + timeRange[0];
                                     var EndDateTimeStr = row[0].ToString() + " " + timeRange[1];
 
-                                    var StartDateTime = Convert.ToDateTime(StartDateTimeStr);
-                                    var EndDateTime = Convert.ToDateTime(EndDateTimeStr);
+                                    var StartDateTime = DateTime.Parse(StartDateTimeStr); //Convert.ToDateTime(StartDateTimeStr);
+                                    var EndDateTime = DateTime.Parse(EndDateTimeStr); //Convert.ToDateTime(EndDateTimeStr);
                                     if (EndDateTime.TimeOfDay < StartDateTime.TimeOfDay)
                                     {
                                         EndDateTime = EndDateTime.AddDays(1);
@@ -145,7 +157,8 @@ namespace Web.Services.Concrete
                                         ScheduleDate = StartDateTime.Date.ToUniversalTimeZone(),
                                         ScheduleDateStart = StartDateTime.ToUniversalTimeZone(),
                                         ScheduleDateEnd = EndDateTime.ToUniversalTimeZone(),
-                                        UserIdFk = userId,
+                                        UserIdFk = user.UserIdFk,
+                                        RoleIdFk = user.RoleIdFk,
                                         ServiceLineIdFk = fileVM.ServiceLineId,
                                         CreatedBy = fileVM.LoggedinUserId,
                                         CreatedDate = DateTime.UtcNow,
@@ -153,19 +166,20 @@ namespace Web.Services.Concrete
                                     };
                                     listToBeInsert.Add(obj);
                                 }
-                                else
-                                {
-                                    error.Add($"'{initials}' is not exist in selected service line.");
-                                }
-
+                            }
+                            catch (Exception ex)
+                            {
+                                error.Add($"There is an exception at row: {index} \n Exception: {ex}");
+                                ElmahExtensions.RiseError(ex);
                             }
                         }
-                        catch (Exception ex)
-                        {
-                            error.Add($"There is an exception at row: {index} \n Exception: {ex}");
-                            ElmahExtensions.RiseError(ex);
-                        }
+
                     }
+                    else
+                    {
+                        error.Add($"'{initials}' is not exist in selected service line.");
+                    }
+
                 }
                 colIndex++;
             }
@@ -184,14 +198,17 @@ namespace Web.Services.Concrete
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Process Complete", Body = error.Distinct() };
         }
 
-        public BaseResponse GetScheduleTemplate(int serviceLine)
+        public BaseResponse GetScheduleTemplate(int serviceLine, string roleIds)
         {
             var serviceLineUsers = (from u in this._userRepo.Table
+                                    join urs in this._userRoleRepo.Table on u.UserId equals urs.UserIdFk
+                                    join r in this._roleRepo.Table on urs.RoleIdFk equals r.RoleId
                                     join ur in this._userRelationRepo.Table on u.UserId equals ur.UserIdFk
                                     join s in this._serviceRepo.Table on ur.ServiceLineIdFk equals s.ServiceLineId
-                                    where s.ServiceLineId == serviceLine && !u.IsDeleted && !s.IsDeleted
+                                    where s.ServiceLineId == serviceLine && roleIds.ToIntList().Contains(r.RoleId) && !r.IsDeleted && !u.IsDeleted && !s.IsDeleted
                                     select new
                                     {
+                                        r.RoleId,
                                         u.Initials,
                                         s.ServiceName
                                     }).Distinct().ToList();
@@ -219,7 +236,7 @@ namespace Web.Services.Concrete
                 for (int i = 0; i < 7; i++)
                 {
                     DataRow row = tbl.NewRow();
-                    row[0] = DateTime.Now.AddDays(i).ToString("dd/MM/yyyy");
+                    row[0] = DateTime.Now.AddDays(i).ToString("MM/dd/yyyy");
                     row[1] = "8:00-18:00";
                     tbl.Rows.Add(row);
                 }
