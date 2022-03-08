@@ -16,6 +16,7 @@
 
         public string ServiceName { get; set; }
 
+        public string Initials { get; set; }
         public string DepartmentName { get; set; }
     }
 }

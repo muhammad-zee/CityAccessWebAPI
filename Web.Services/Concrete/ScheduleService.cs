@@ -200,7 +200,11 @@ namespace Web.Services.Concrete
 
         public BaseResponse GetScheduleTemplate(int serviceLine, string roleIds)
         {
-            var serviceLineUsers = (from u in this._userRepo.Table
+            var serviceLineUsers = this._dbContext.LoadStoredProcedure("md_getScheduleTemplateByServiceline&Roleids")
+                .WithSqlParam("@serviceLine", serviceLine)
+                .WithSqlParam("@roleIds", roleIds)
+                .ExecuteStoredProc<ScheduleListVM>();
+                /*(from u in this._userRepo.Table
                                     join urs in this._userRoleRepo.Table on u.UserId equals urs.UserIdFk
                                     join r in this._roleRepo.Table on urs.RoleIdFk equals r.RoleId
                                     join ur in this._userRelationRepo.Table on u.UserId equals ur.UserIdFk
@@ -211,7 +215,7 @@ namespace Web.Services.Concrete
                                         r.RoleId,
                                         u.Initials,
                                         s.ServiceName
-                                    }).Distinct().ToList();
+                                    }).Distinct().ToList();*/
             if (serviceLineUsers.Count > 0)
             {
                 int count = 0;
