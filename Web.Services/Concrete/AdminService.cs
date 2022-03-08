@@ -246,7 +246,7 @@ namespace Web.Services.Concrete
                     UserProfileSchedules.Add(userProfile);
                 }
 
-                user.UserProfileSchedules = UserProfileSchedules;
+                user.UserProfileSchedules = UserProfileSchedules.OrderBy(x=>x.ScheduleDate).ToList();
 
                 return new BaseResponse { Status = HttpStatusCode.OK, Message = "User Found", Body = user };
             }
