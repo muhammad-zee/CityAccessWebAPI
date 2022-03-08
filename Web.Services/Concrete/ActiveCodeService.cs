@@ -4099,7 +4099,9 @@ namespace Web.Services.Concrete
 
         public BaseResponse GetActiveEMS()
         {
-            var activeEMS = this._dbContext.LoadStoredProcedure("md_getActiveEMS").ExecuteStoredProc<CodeStrokeVM>();
+            var activeEMS = this._dbContext.LoadStoredProcedure("md_getActiveEMS")
+                            .WithSqlParam("@currentUserId", ApplicationSettings.UserId)
+                            .ExecuteStoredProc<CodeStrokeVM>();
 
             var orgDataList = new List<dynamic>();
             foreach (var item in activeEMS.Select(x => x.OrganizationIdFk).Distinct().ToList())
