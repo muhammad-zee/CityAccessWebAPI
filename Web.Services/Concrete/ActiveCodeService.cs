@@ -533,6 +533,7 @@ namespace Web.Services.Concrete
                     }
                 }
                 x.LastKnownWellStr = x.LastKnownWell?.ToString("yyyy-MM-dd hh:mm:ss tt");
+                x.DobStr = x.Dob?.ToString("yyyy-MM-dd hh:mm:ss tt");
                 x.OrganizationData = orgData;
                 x.GenderTitle = _controlListDetailsRepo.Table.Where(g => g.ControlListDetailId == x.Gender).Select(g => g.Title).FirstOrDefault();
                 x.BloodThinnersTitle.AddRange(_controlListDetailsRepo.Table.Where(b => x.BloodThinners.ToIntList().Contains(b.ControlListDetailId)).Select(b => new { Id = b.ControlListDetailId, b.Title }).ToList());
@@ -613,6 +614,7 @@ namespace Web.Services.Concrete
 
                 StrokeDataVM.OrganizationData = GetHosplitalAddressObject(StrokeDataVM.OrganizationIdFk);
                 StrokeDataVM.LastKnownWellStr = StrokeDataVM.LastKnownWell?.ToString("yyyy-MM-dd hh:mm:ss tt");
+                StrokeDataVM.DobStr = StrokeDataVM.Dob?.ToString("yyyy-MM-dd hh:mm:ss tt");
                 StrokeDataVM.GenderTitle = _controlListDetailsRepo.Table.Where(g => g.ControlListDetailId == StrokeDataVM.Gender).Select(g => g.Title).FirstOrDefault();
                 StrokeDataVM.BloodThinnersTitle.AddRange(_controlListDetailsRepo.Table.Where(b => StrokeDataVM.BloodThinners.ToIntList().Contains(b.ControlListDetailId)).Select(b => new { Id = b.ControlListDetailId, b.Title }).ToList());
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Found", Body = StrokeDataVM };
@@ -936,29 +938,26 @@ namespace Web.Services.Concrete
 
                 this._codeStrokeRepo.Update(row);
 
-                if (row.IsEms != null && row.IsEms.Value)
+                var serviceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == row.OrganizationIdFk && x.CodeIdFk == UCLEnums.Stroke.ToInt() && !x.IsDeleted).Select(x => x.ServiceLineIds).FirstOrDefault();
+                if (serviceLineIds != null && serviceLineIds != "")
                 {
-                    var serviceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == row.OrganizationIdFk && x.CodeIdFk == UCLEnums.Stroke.ToInt() && !x.IsDeleted).Select(x => x.ServiceLineIds).FirstOrDefault();
-                    if (serviceLineIds != null && serviceLineIds != "")
+                    var UserChannelSid = (from us in this._userSchedulesRepo.Table
+                                          join u in this._userRepo.Table on us.UserIdFk equals u.UserId
+                                          where serviceLineIds.ToIntList().Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.Now && us.ScheduleDateEnd >= DateTime.Now && !us.IsDeleted && !u.IsDeleted
+                                          select u.UserChannelSid).ToList();
+
+                    var notification = new PushNotificationVM()
                     {
-                        var UserChannelSid = (from us in this._userSchedulesRepo.Table
-                                              join u in this._userRepo.Table on us.UserIdFk equals u.UserId
-                                              where serviceLineIds.ToIntList().Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.Now && us.ScheduleDateEnd >= DateTime.Now && !us.IsDeleted && !u.IsDeleted
-                                              select u.UserChannelSid).ToList();
+                        Id = row.CodeStrokeId,
+                        OrgId = row.OrganizationIdFk,
+                        UserChannelSid = UserChannelSid,
+                        From = AuthorEnums.Stroke.ToString(),
+                        Msg = "Stroke From is Changed",
+                        RouteLink = "/Home/Activate%20Code/code-strok-form"
+                    };
 
-                        var notification = new PushNotificationVM()
-                        {
-                            Id = row.CodeStrokeId,
-                            OrgId = row.OrganizationIdFk,
-                            UserChannelSid = UserChannelSid,
-                            From = AuthorEnums.Stroke.ToString(),
-                            Msg = "Stroke From is Changed",
-                            RouteLink = "/Home/Activate%20Code/code-strok-form"
-                        };
+                    _communication.pushNotification(notification);
 
-                        _communication.pushNotification(notification);
-
-                    }
                 }
 
                 //codeStroke.AttachmentsPath = new List<string>();
@@ -1303,58 +1302,56 @@ namespace Web.Services.Concrete
 
                 this._codeStrokeRepo.Insert(stroke);
 
-                if (stroke.IsEms != null && stroke.IsEms.Value)
+                var serviceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == stroke.OrganizationIdFk && x.CodeIdFk == UCLEnums.Stroke.ToInt() && !x.IsDeleted).Select(x => x.ServiceLineIds).FirstOrDefault();
+                if (serviceLineIds != null && serviceLineIds != "")
                 {
-                    var serviceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == stroke.OrganizationIdFk && x.CodeIdFk == UCLEnums.Stroke.ToInt() && !x.IsDeleted).Select(x => x.ServiceLineIds).FirstOrDefault();
-                    if (serviceLineIds != null && serviceLineIds != "")
-                    {
-                        var UserChannelSid = (from us in this._userSchedulesRepo.Table
-                                              join u in this._userRepo.Table on us.UserIdFk equals u.UserId
-                                              where serviceLineIds.ToIntList().Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
-                                              select new { u.UserUniqueId, u.UserId }).ToList();
-                        var loggedUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).FirstOrDefault();
-                        UserChannelSid.Add(loggedUser);
-                        var conversationChannelAttributes = JsonConvert.SerializeObject(new Dictionary<string, Object>()
+                    var UserChannelSid = (from us in this._userSchedulesRepo.Table
+                                          join u in this._userRepo.Table on us.UserIdFk equals u.UserId
+                                          where serviceLineIds.ToIntList().Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
+                                          select new { u.UserUniqueId, u.UserId }).ToList();
+                    var loggedUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).FirstOrDefault();
+                    UserChannelSid.Add(loggedUser);
+                    var conversationChannelAttributes = JsonConvert.SerializeObject(new Dictionary<string, Object>()
                                     {
                                         {ChannelAttributeEnums.ChannelType.ToString(), ChannelTypeEnums.EMS.ToString()},
                                         {ChannelAttributeEnums.CodeType.ToString(), ChannelTypeEnums.Stroke.ToString()},
                                         {ChannelAttributeEnums.StrokeId.ToString(), stroke.CodeStrokeId}
                                     }, Formatting.Indented);
-                        List<ActiveCodesGroupMember> ACodeGroupMembers = new List<ActiveCodesGroupMember>();
-                        if (UserChannelSid != null && UserChannelSid.Count > 0)
+                    List<ActiveCodesGroupMember> ACodeGroupMembers = new List<ActiveCodesGroupMember>();
+                    if (UserChannelSid != null && UserChannelSid.Count > 0)
+                    {
+                        //string uniqueName = $"CONSULT_{Consult_Counter.Counter_Value.ToString()}";
+                        string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
+                        string friendlyName = stroke.IsEms.HasValue && stroke.IsEms.Value ? $"EMS_{UCLEnums.Stroke.ToString()}_{stroke.CodeStrokeId}" : $"ActiveCode_{UCLEnums.Stroke.ToString()}_{stroke.CodeStrokeId}";
+                        var channel = _communication.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
+                        foreach (var item in UserChannelSid)
                         {
-                            //string uniqueName = $"CONSULT_{Consult_Counter.Counter_Value.ToString()}";
-                            string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
-                            string friendlyName = $"EMS_{UCLEnums.Stroke.ToString()}_{stroke.CodeStrokeId}";
-                            var channel = _communication.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
-                            foreach (var item in UserChannelSid)
+                            var codeGroupMember = new ActiveCodesGroupMember()
                             {
-                                var codeGroupMember = new ActiveCodesGroupMember()
-                                {
-                                    UserIdFk = item.UserId,
-                                    ActiveCodeIdFk = stroke.CodeStrokeId,
-                                    ActiveCodeName = UCLEnums.Stroke.ToString(),
-                                    IsAcknowledge = false,
-                                    CreatedBy = ApplicationSettings.UserId,
-                                    CreatedDate = DateTime.UtcNow,
-                                    IsDeleted = false
-                                };
-                                ACodeGroupMembers.Add(codeGroupMember);
-                                _communication.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
-                            }
-                            var isMembersAdded = AddGroupMembers(ACodeGroupMembers);
-                            var msg = new ConversationMessageVM()
-                            {
-                                author = "System",
-                                attributes = "",
-                                body = $"This Group created by system for EMS_{UCLEnums.Stroke.ToString()} purpose",
-                                channelSid = channel.Sid
+                                UserIdFk = item.UserId,
+                                ActiveCodeIdFk = stroke.CodeStrokeId,
+                                ActiveCodeName = UCLEnums.Stroke.ToString(),
+                                IsAcknowledge = false,
+                                CreatedBy = ApplicationSettings.UserId,
+                                CreatedDate = DateTime.UtcNow,
+                                IsDeleted = false
                             };
-                            var sendMsg = _communication.sendPushNotification(msg);
+                            ACodeGroupMembers.Add(codeGroupMember);
+                            _communication.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
                         }
-
+                        var isMembersAdded = AddGroupMembers(ACodeGroupMembers);
+                        var msg = new ConversationMessageVM()
+                        {
+                            author = "System",
+                            attributes = "",
+                            body = $"This Group created by system for EMS_{UCLEnums.Stroke.ToString()} purpose",
+                            channelSid = channel.Sid
+                        };
+                        var sendMsg = _communication.sendPushNotification(msg);
                     }
+
                 }
+
 
                 return GetStrokeDataById(stroke.CodeStrokeId);
             }
@@ -1458,6 +1455,7 @@ namespace Web.Services.Concrete
                     }
                 }
                 x.LastKnownWellStr = x.LastKnownWell.ToString("yyyy-MM-dd hh:mm:ss tt");
+                x.DobStr = x.Dob.ToString("yyyy-MM-dd hh:mm:ss tt");
                 x.OrganizationData = orgData;
                 x.GenderTitle = _controlListDetailsRepo.Table.Where(g => g.ControlListDetailId == x.Gender).Select(g => g.Title).FirstOrDefault();
                 x.BloodThinnersTitle.AddRange(_controlListDetailsRepo.Table.Where(b => x.BloodThinners.ToIntList().Contains(b.ControlListDetailId)).Select(b => new { Id = b.ControlListDetailId, b.Title }).ToList());
@@ -1537,6 +1535,7 @@ namespace Web.Services.Concrete
 
                 SepsisDataVM.OrganizationData = GetHosplitalAddressObject(SepsisDataVM.OrganizationIdFk);
                 SepsisDataVM.LastKnownWellStr = SepsisDataVM.LastKnownWell.ToString("yyyy-MM-dd hh:mm:ss tt");
+                SepsisDataVM.DobStr = SepsisDataVM.Dob.ToString("yyyy-MM-dd hh:mm:ss tt");
                 SepsisDataVM.GenderTitle = _controlListDetailsRepo.Table.Where(g => g.ControlListDetailId == SepsisDataVM.Gender).Select(g => g.Title).FirstOrDefault();
                 SepsisDataVM.BloodThinnersTitle.AddRange(_controlListDetailsRepo.Table.Where(b => SepsisDataVM.BloodThinners.ToIntList().Contains(b.ControlListDetailId)).Select(b => new { Id = b.ControlListDetailId, b.Title }).ToList());
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Found", Body = SepsisDataVM };
@@ -1872,29 +1871,26 @@ namespace Web.Services.Concrete
 
                 this._codeSepsisRepo.Update(row);
 
-                if (row.IsEms)
+                var serviceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == row.OrganizationIdFk && x.CodeIdFk == UCLEnums.Sepsis.ToInt() && !x.IsDeleted).Select(x => x.ServiceLineIds).FirstOrDefault();
+                if (serviceLineIds != null && serviceLineIds != "")
                 {
-                    var serviceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == row.OrganizationIdFk && x.CodeIdFk == UCLEnums.Sepsis.ToInt() && !x.IsDeleted).Select(x => x.ServiceLineIds).FirstOrDefault();
-                    if (serviceLineIds != null && serviceLineIds != "")
+                    var UserChannelSid = (from us in this._userSchedulesRepo.Table
+                                          join u in this._userRepo.Table on us.UserIdFk equals u.UserId
+                                          where serviceLineIds.ToIntList().Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
+                                          select u.UserChannelSid).ToList();
+
+                    var notification = new PushNotificationVM()
                     {
-                        var UserChannelSid = (from us in this._userSchedulesRepo.Table
-                                              join u in this._userRepo.Table on us.UserIdFk equals u.UserId
-                                              where serviceLineIds.ToIntList().Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
-                                              select u.UserChannelSid).ToList();
+                        Id = row.CodeSepsisId,
+                        OrgId = row.OrganizationIdFk,
+                        UserChannelSid = UserChannelSid,
+                        From = AuthorEnums.Sepsis.ToString(),
+                        Msg = "Sepsis From is Changed",
+                        RouteLink = "/Home/Activate%20Code/code-sepsis-form"
+                    };
 
-                        var notification = new PushNotificationVM()
-                        {
-                            Id = row.CodeSepsisId,
-                            OrgId = row.OrganizationIdFk,
-                            UserChannelSid = UserChannelSid,
-                            From = AuthorEnums.Sepsis.ToString(),
-                            Msg = "Sepsis From is Changed",
-                            RouteLink = "/Home/Activate%20Code/code-sepsis-form"
-                        };
+                    _communication.pushNotification(notification);
 
-                        _communication.pushNotification(notification);
-
-                    }
                 }
 
                 //codeSepsis.AttachmentsPath = new List<string>();
@@ -2240,58 +2236,55 @@ namespace Web.Services.Concrete
                 this._codeSepsisRepo.Insert(Sepsis);
 
 
-                if (Sepsis.IsEms)
+                var serviceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == Sepsis.OrganizationIdFk && x.CodeIdFk == UCLEnums.Sepsis.ToInt() && !x.IsDeleted).Select(x => x.ServiceLineIds).FirstOrDefault();
+                if (serviceLineIds != null && serviceLineIds != "")
                 {
-                    var serviceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == Sepsis.OrganizationIdFk && x.CodeIdFk == UCLEnums.Sepsis.ToInt() && !x.IsDeleted).Select(x => x.ServiceLineIds).FirstOrDefault();
-                    if (serviceLineIds != null && serviceLineIds != "")
+                    var UserChannelSid = (from us in this._userSchedulesRepo.Table
+                                          join u in this._userRepo.Table on us.UserIdFk equals u.UserId
+                                          where serviceLineIds.ToIntList().Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
+                                          select new { u.UserUniqueId, u.UserId }).ToList();
+                    var loggedUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).FirstOrDefault();
+                    UserChannelSid.Add(loggedUser);
+                    List<ActiveCodesGroupMember> ACodeGroupMembers = new List<ActiveCodesGroupMember>();
+                    if (UserChannelSid != null && UserChannelSid.Count > 0)
                     {
-                        var UserChannelSid = (from us in this._userSchedulesRepo.Table
-                                              join u in this._userRepo.Table on us.UserIdFk equals u.UserId
-                                              where serviceLineIds.ToIntList().Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
-                                              select new { u.UserUniqueId, u.UserId }).ToList();
-                        var loggedUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).FirstOrDefault();
-                        UserChannelSid.Add(loggedUser);
-                        List<ActiveCodesGroupMember> ACodeGroupMembers = new List<ActiveCodesGroupMember>();
-                        if (UserChannelSid != null && UserChannelSid.Count > 0)
-                        {
-                            //string uniqueName = $"CONSULT_{Consult_Counter.Counter_Value.ToString()}";
-                            string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
-                            string friendlyName = $"EMS_{UCLEnums.Sepsis.ToString()}_{Sepsis.CodeSepsisId}";
-                            var conversationChannelAttributes = JsonConvert.SerializeObject(new Dictionary<string, Object>()
+                        //string uniqueName = $"CONSULT_{Consult_Counter.Counter_Value.ToString()}";
+                        string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
+                        string friendlyName = Sepsis.IsEms ? $"EMS_{UCLEnums.Sepsis.ToString()}_{Sepsis.CodeSepsisId}" : $"ActiveCodes_{UCLEnums.Sepsis.ToString()}_{Sepsis.CodeSepsisId}";
+                        var conversationChannelAttributes = JsonConvert.SerializeObject(new Dictionary<string, Object>()
                                     {
                                         {ChannelAttributeEnums.ChannelType.ToString(), ChannelTypeEnums.EMS.ToString()},
                                         {ChannelAttributeEnums.CodeType.ToString(), ChannelTypeEnums.Sepsis.ToString()},
                                         {ChannelAttributeEnums.SepsisId.ToString(), Sepsis.CodeSepsisId}
                                     }, Formatting.Indented);
-                            var channel = _communication.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
-                            foreach (var item in UserChannelSid)
+                        var channel = _communication.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
+                        foreach (var item in UserChannelSid)
+                        {
+                            var codeGroupMember = new ActiveCodesGroupMember()
                             {
-                                var codeGroupMember = new ActiveCodesGroupMember()
-                                {
-                                    UserIdFk = item.UserId,
-                                    ActiveCodeIdFk = Sepsis.CodeSepsisId,
-                                    ActiveCodeName = UCLEnums.Sepsis.ToString(),
-                                    IsAcknowledge = false,
-                                    CreatedBy = ApplicationSettings.UserId,
-                                    CreatedDate = DateTime.UtcNow,
-                                    IsDeleted = false
-                                };
-                                ACodeGroupMembers.Add(codeGroupMember);
-                                _communication.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
-                            }
-                            var isMembersAdded = AddGroupMembers(ACodeGroupMembers);
-
-                            var msg = new ConversationMessageVM()
-                            {
-                                author = "System",
-                                attributes = "",
-                                body = $"This Group created by system for EMS_{UCLEnums.Sepsis.ToString()} purpose",
-                                channelSid = channel.Sid
+                                UserIdFk = item.UserId,
+                                ActiveCodeIdFk = Sepsis.CodeSepsisId,
+                                ActiveCodeName = UCLEnums.Sepsis.ToString(),
+                                IsAcknowledge = false,
+                                CreatedBy = ApplicationSettings.UserId,
+                                CreatedDate = DateTime.UtcNow,
+                                IsDeleted = false
                             };
-                            var sendMsg = _communication.sendPushNotification(msg);
+                            ACodeGroupMembers.Add(codeGroupMember);
+                            _communication.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
                         }
+                        var isMembersAdded = AddGroupMembers(ACodeGroupMembers);
 
+                        var msg = new ConversationMessageVM()
+                        {
+                            author = "System",
+                            attributes = "",
+                            body = $"This Group created by system for EMS_{UCLEnums.Sepsis.ToString()} purpose",
+                            channelSid = channel.Sid
+                        };
+                        var sendMsg = _communication.sendPushNotification(msg);
                     }
+
                 }
 
 
@@ -2396,6 +2389,7 @@ namespace Web.Services.Concrete
                     }
                 }
                 x.LastKnownWellStr = x.LastKnownWell?.ToString("yyyy-MM-dd hh:mm:ss tt");
+                x.DobStr = x.Dob?.ToString("yyyy-MM-dd hh:mm:ss tt");
                 x.OrganizationData = orgData;
                 x.GenderTitle = _controlListDetailsRepo.Table.Where(g => g.ControlListDetailId == x.Gender).Select(g => g.Title).FirstOrDefault();
                 x.BloodThinnersTitle.AddRange(_controlListDetailsRepo.Table.Where(b => x.BloodThinners.ToIntList().Contains(b.ControlListDetailId)).Select(b => new { Id = b.ControlListDetailId, b.Title }).ToList());
@@ -2474,6 +2468,7 @@ namespace Web.Services.Concrete
                 //    }
                 //}
                 STEMIDataVM.LastKnownWellStr = STEMIDataVM.LastKnownWell?.ToString("yyyy-MM-dd hh:mm:ss tt");
+                STEMIDataVM.DobStr = STEMIDataVM.Dob?.ToString("yyyy-MM-dd hh:mm:ss tt");
                 STEMIDataVM.OrganizationData = GetHosplitalAddressObject(STEMIDataVM.OrganizationIdFk);
                 STEMIDataVM.GenderTitle = _controlListDetailsRepo.Table.Where(g => g.ControlListDetailId == STEMIDataVM.Gender).Select(g => g.Title).FirstOrDefault();
                 STEMIDataVM.BloodThinnersTitle.AddRange(_controlListDetailsRepo.Table.Where(b => STEMIDataVM.BloodThinners.ToIntList().Contains(b.ControlListDetailId)).Select(b => new { Id = b.ControlListDetailId, b.Title }).ToList());
@@ -2806,29 +2801,27 @@ namespace Web.Services.Concrete
                 }
 
                 this._codeSTEMIRepo.Update(row);
-                if (row.IsEms != null && row.IsEms.Value)
+
+                var serviceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == row.OrganizationIdFk && x.CodeIdFk == UCLEnums.STEMI.ToInt() && !x.IsDeleted).Select(x => x.ServiceLineIds).FirstOrDefault();
+                if (serviceLineIds != null && serviceLineIds != "")
                 {
-                    var serviceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == row.OrganizationIdFk && x.CodeIdFk == UCLEnums.STEMI.ToInt() && !x.IsDeleted).Select(x => x.ServiceLineIds).FirstOrDefault();
-                    if (serviceLineIds != null && serviceLineIds != "")
+                    var UserChannelSid = (from us in this._userSchedulesRepo.Table
+                                          join u in this._userRepo.Table on us.UserIdFk equals u.UserId
+                                          where serviceLineIds.ToIntList().Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
+                                          select u.UserChannelSid).ToList();
+
+                    var notification = new PushNotificationVM()
                     {
-                        var UserChannelSid = (from us in this._userSchedulesRepo.Table
-                                              join u in this._userRepo.Table on us.UserIdFk equals u.UserId
-                                              where serviceLineIds.ToIntList().Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
-                                              select u.UserChannelSid).ToList();
+                        Id = row.CodeStemiid,
+                        OrgId = row.OrganizationIdFk,
+                        UserChannelSid = UserChannelSid,
+                        From = AuthorEnums.STEMI.ToString(),
+                        Msg = "STEMI From is Changed",
+                        RouteLink = "/Home/Activate%20Code/code-STEMI-form"
+                    };
 
-                        var notification = new PushNotificationVM()
-                        {
-                            Id = row.CodeStemiid,
-                            OrgId = row.OrganizationIdFk,
-                            UserChannelSid = UserChannelSid,
-                            From = AuthorEnums.STEMI.ToString(),
-                            Msg = "STEMI From is Changed",
-                            RouteLink = "/Home/Activate%20Code/code-STEMI-form"
-                        };
+                    _communication.pushNotification(notification);
 
-                        _communication.pushNotification(notification);
-
-                    }
                 }
 
                 //codeSTEMI.AttachmentsPath = new List<string>();
@@ -3174,58 +3167,56 @@ namespace Web.Services.Concrete
 
                 this._codeSTEMIRepo.Insert(STEMI);
 
-                if (STEMI.IsEms != null && STEMI.IsEms.Value)
+                var serviceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == STEMI.OrganizationIdFk && x.CodeIdFk == UCLEnums.STEMI.ToInt() && !x.IsDeleted).Select(x => x.ServiceLineIds).FirstOrDefault();
+                if (serviceLineIds != null && serviceLineIds != "")
                 {
-                    var serviceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == STEMI.OrganizationIdFk && x.CodeIdFk == UCLEnums.STEMI.ToInt() && !x.IsDeleted).Select(x => x.ServiceLineIds).FirstOrDefault();
-                    if (serviceLineIds != null && serviceLineIds != "")
+                    var UserChannelSid = (from us in this._userSchedulesRepo.Table
+                                          join u in this._userRepo.Table on us.UserIdFk equals u.UserId
+                                          where serviceLineIds.ToIntList().Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
+                                          select new { u.UserUniqueId, u.UserId }).ToList();
+                    var loggedUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).FirstOrDefault();
+                    UserChannelSid.Add(loggedUser);
+                    List<ActiveCodesGroupMember> ACodeGroupMembers = new List<ActiveCodesGroupMember>();
+                    if (UserChannelSid != null && UserChannelSid.Count > 0)
                     {
-                        var UserChannelSid = (from us in this._userSchedulesRepo.Table
-                                              join u in this._userRepo.Table on us.UserIdFk equals u.UserId
-                                              where serviceLineIds.ToIntList().Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
-                                              select new { u.UserUniqueId, u.UserId }).ToList();
-                        var loggedUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).FirstOrDefault();
-                        UserChannelSid.Add(loggedUser);
-                        List<ActiveCodesGroupMember> ACodeGroupMembers = new List<ActiveCodesGroupMember>();
-                        if (UserChannelSid != null && UserChannelSid.Count > 0)
-                        {
-                            //string uniqueName = $"CONSULT_{Consult_Counter.Counter_Value.ToString()}";
-                            string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
-                            string friendlyName = $"EMS_{UCLEnums.STEMI.ToString()}_{STEMI.CodeStemiid}";
-                            var conversationChannelAttributes = JsonConvert.SerializeObject(new Dictionary<string, Object>()
+                        //string uniqueName = $"CONSULT_{Consult_Counter.Counter_Value.ToString()}";
+                        string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
+                        string friendlyName = STEMI.IsEms.HasValue && STEMI.IsEms.Value ? $"EMS_{UCLEnums.STEMI.ToString()}_{STEMI.CodeStemiid}" : $"ActiveCode_{UCLEnums.STEMI.ToString()}_{STEMI.CodeStemiid}"
+                        var conversationChannelAttributes = JsonConvert.SerializeObject(new Dictionary<string, Object>()
                                     {
                                         {ChannelAttributeEnums.ChannelType.ToString(), ChannelTypeEnums.EMS.ToString()},
                                         {ChannelAttributeEnums.CodeType.ToString(), ChannelTypeEnums.STEMI.ToString()},
                                         {ChannelAttributeEnums.STEMIId.ToString(), STEMI.CodeStemiid}
                                     }, Formatting.Indented);
-                            var channel = _communication.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
-                            foreach (var item in UserChannelSid)
+                        var channel = _communication.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
+                        foreach (var item in UserChannelSid)
+                        {
+                            var codeGroupMember = new ActiveCodesGroupMember()
                             {
-                                var codeGroupMember = new ActiveCodesGroupMember()
-                                {
-                                    UserIdFk = item.UserId,
-                                    ActiveCodeIdFk = STEMI.CodeStemiid,
-                                    ActiveCodeName = UCLEnums.STEMI.ToString(),
-                                    IsAcknowledge = false,
-                                    CreatedBy = ApplicationSettings.UserId,
-                                    CreatedDate = DateTime.UtcNow,
-                                    IsDeleted = false
-                                };
-                                ACodeGroupMembers.Add(codeGroupMember);
-                                _communication.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
-                            }
-                            var isMembersAdded = AddGroupMembers(ACodeGroupMembers);
-                            var msg = new ConversationMessageVM()
-                            {
-                                author = "System",
-                                attributes = "",
-                                body = $"This Group created by system for EMS_{UCLEnums.STEMI.ToString()} purpose",
-                                channelSid = channel.Sid
+                                UserIdFk = item.UserId,
+                                ActiveCodeIdFk = STEMI.CodeStemiid,
+                                ActiveCodeName = UCLEnums.STEMI.ToString(),
+                                IsAcknowledge = false,
+                                CreatedBy = ApplicationSettings.UserId,
+                                CreatedDate = DateTime.UtcNow,
+                                IsDeleted = false
                             };
-                            var sendMsg = _communication.sendPushNotification(msg);
+                            ACodeGroupMembers.Add(codeGroupMember);
+                            _communication.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
                         }
-
+                        var isMembersAdded = AddGroupMembers(ACodeGroupMembers);
+                        var msg = new ConversationMessageVM()
+                        {
+                            author = "System",
+                            attributes = "",
+                            body = $"This Group created by system for EMS_{UCLEnums.STEMI.ToString()} purpose",
+                            channelSid = channel.Sid
+                        };
+                        var sendMsg = _communication.sendPushNotification(msg);
                     }
+
                 }
+
 
                 return GetSTEMIDataById(STEMI.CodeStemiid);
             }
@@ -3308,6 +3299,7 @@ namespace Web.Services.Concrete
                     }
                 }
                 x.LastKnownWellStr = x.LastKnownWell?.ToString("yyyy-MM-dd hh:mm:ss tt");
+                x.DobStr = x.Dob?.ToString("yyyy-MM-dd hh:mm:ss tt");
                 x.OrganizationData = orgData;
                 x.GenderTitle = _controlListDetailsRepo.Table.Where(g => g.ControlListDetailId == x.Gender).Select(g => g.Title).FirstOrDefault();
                 x.BloodThinnersTitle.AddRange(_controlListDetailsRepo.Table.Where(b => x.BloodThinners.ToIntList().Contains(b.ControlListDetailId)).Select(b => new { Id = b.ControlListDetailId, b.Title }).ToList());
@@ -3387,6 +3379,7 @@ namespace Web.Services.Concrete
 
                 TrumaDataVM.OrganizationData = GetHosplitalAddressObject(TrumaDataVM.OrganizationIdFk);
                 TrumaDataVM.LastKnownWellStr = TrumaDataVM.LastKnownWell?.ToString("yyyy-MM-dd hh:mm:ss tt");
+                TrumaDataVM.DobStr = TrumaDataVM.Dob?.ToString("yyyy-MM-dd hh:mm:ss tt");
                 TrumaDataVM.GenderTitle = _controlListDetailsRepo.Table.Where(g => g.ControlListDetailId == TrumaDataVM.Gender).Select(g => g.Title).FirstOrDefault();
                 TrumaDataVM.BloodThinnersTitle.AddRange(_controlListDetailsRepo.Table.Where(b => TrumaDataVM.BloodThinners.ToIntList().Contains(b.ControlListDetailId)).Select(b => new { Id = b.ControlListDetailId, b.Title }).ToList());
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Found", Body = TrumaDataVM };
@@ -3718,29 +3711,27 @@ namespace Web.Services.Concrete
                 }
 
                 this._codeTrumaRepo.Update(row);
-                if (row.IsEms != null && row.IsEms.Value)
+
+                var serviceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == row.OrganizationIdFk && x.CodeIdFk == UCLEnums.Trauma.ToInt() && !x.IsDeleted).Select(x => x.ServiceLineIds).FirstOrDefault();
+                if (serviceLineIds != null && serviceLineIds != "")
                 {
-                    var serviceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == row.OrganizationIdFk && x.CodeIdFk == UCLEnums.Trauma.ToInt() && !x.IsDeleted).Select(x => x.ServiceLineIds).FirstOrDefault();
-                    if (serviceLineIds != null && serviceLineIds != "")
+                    var UserChannelSid = (from us in this._userSchedulesRepo.Table
+                                          join u in this._userRepo.Table on us.UserIdFk equals u.UserId
+                                          where serviceLineIds.ToIntList().Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
+                                          select u.UserChannelSid).ToList();
+
+                    var notification = new PushNotificationVM()
                     {
-                        var UserChannelSid = (from us in this._userSchedulesRepo.Table
-                                              join u in this._userRepo.Table on us.UserIdFk equals u.UserId
-                                              where serviceLineIds.ToIntList().Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
-                                              select u.UserChannelSid).ToList();
+                        Id = row.CodeTraumaId,
+                        OrgId = row.OrganizationIdFk,
+                        UserChannelSid = UserChannelSid,
+                        From = AuthorEnums.Trauma.ToString(),
+                        Msg = "Trauma From is Changed",
+                        RouteLink = "/Home/Activate%20Code/code-trauma-form"
+                    };
 
-                        var notification = new PushNotificationVM()
-                        {
-                            Id = row.CodeTraumaId,
-                            OrgId = row.OrganizationIdFk,
-                            UserChannelSid = UserChannelSid,
-                            From = AuthorEnums.Trauma.ToString(),
-                            Msg = "Trauma From is Changed",
-                            RouteLink = "/Home/Activate%20Code/code-trauma-form"
-                        };
+                    _communication.pushNotification(notification);
 
-                        _communication.pushNotification(notification);
-
-                    }
                 }
 
                 //codeTruma.AttachmentsPath = new List<string>();
@@ -4084,59 +4075,55 @@ namespace Web.Services.Concrete
                 }
                 this._codeTrumaRepo.Insert(Truma);
 
-
-                if (Truma.IsEms != null && Truma.IsEms.Value)
+                var serviceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == Truma.OrganizationIdFk && x.CodeIdFk == UCLEnums.Trauma.ToInt() && !x.IsDeleted).Select(x => x.ServiceLineIds).FirstOrDefault();
+                if (serviceLineIds != null && serviceLineIds != "")
                 {
-                    var serviceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == Truma.OrganizationIdFk && x.CodeIdFk == UCLEnums.Trauma.ToInt() && !x.IsDeleted).Select(x => x.ServiceLineIds).FirstOrDefault();
-                    if (serviceLineIds != null && serviceLineIds != "")
+                    var UserChannelSid = (from us in this._userSchedulesRepo.Table
+                                          join u in this._userRepo.Table on us.UserIdFk equals u.UserId
+                                          where serviceLineIds.ToIntList().Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
+                                          select new { u.UserUniqueId, u.UserId }).ToList();
+                    var loggedUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).FirstOrDefault();
+                    UserChannelSid.Add(loggedUser);
+                    List<ActiveCodesGroupMember> ACodeGroupMembers = new List<ActiveCodesGroupMember>();
+                    if (UserChannelSid != null && UserChannelSid.Count > 0)
                     {
-                        var UserChannelSid = (from us in this._userSchedulesRepo.Table
-                                              join u in this._userRepo.Table on us.UserIdFk equals u.UserId
-                                              where serviceLineIds.ToIntList().Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
-                                              select new { u.UserUniqueId, u.UserId }).ToList();
-                        var loggedUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).FirstOrDefault();
-                        UserChannelSid.Add(loggedUser);
-                        List<ActiveCodesGroupMember> ACodeGroupMembers = new List<ActiveCodesGroupMember>();
-                        if (UserChannelSid != null && UserChannelSid.Count > 0)
-                        {
-                            //string uniqueName = $"CONSULT_{Consult_Counter.Counter_Value.ToString()}";
-                            string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
-                            string friendlyName = $"EMS_{UCLEnums.Trauma.ToString()}_{Truma.CodeTraumaId}";
-                            var conversationChannelAttributes = JsonConvert.SerializeObject(new Dictionary<string, Object>()
+                        //string uniqueName = $"CONSULT_{Consult_Counter.Counter_Value.ToString()}";
+                        string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
+                        string friendlyName = Truma.IsEms.HasValue && Truma.IsEms.Value ? $"EMS_{UCLEnums.Trauma.ToString()}_{Truma.CodeTraumaId}" : $"ActiveCode_{UCLEnums.Trauma.ToString()}_{Truma.CodeTraumaId}";
+                        var conversationChannelAttributes = JsonConvert.SerializeObject(new Dictionary<string, Object>()
                                     {
                                         {ChannelAttributeEnums.ChannelType.ToString(), ChannelTypeEnums.EMS.ToString()},
                                         {ChannelAttributeEnums.CodeType.ToString(), ChannelTypeEnums.Trauma.ToString()},
                                         {ChannelAttributeEnums.TraumaId.ToString(), Truma.CodeTraumaId}
                                     }, Formatting.Indented);
-                            var channel = _communication.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
-                            foreach (var item in UserChannelSid)
+                        var channel = _communication.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
+                        foreach (var item in UserChannelSid)
+                        {
+                            var codeGroupMember = new ActiveCodesGroupMember()
                             {
-                                var codeGroupMember = new ActiveCodesGroupMember()
-                                {
-                                    UserIdFk = item.UserId,
-                                    ActiveCodeIdFk = Truma.CodeTraumaId,
-                                    ActiveCodeName = UCLEnums.Trauma.ToString(),
-                                    IsAcknowledge = false,
-                                    CreatedBy = ApplicationSettings.UserId,
-                                    CreatedDate = DateTime.UtcNow,
-                                    IsDeleted = false
-                                };
-                                ACodeGroupMembers.Add(codeGroupMember);
-                                _communication.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
-
-                            }
-                            var isMembersAdded = AddGroupMembers(ACodeGroupMembers);
-                            var msg = new ConversationMessageVM()
-                            {
-                                author = "System",
-                                attributes = "",
-                                body = $"This Group created by system for EMS_{UCLEnums.Trauma.ToString()} purpose",
-                                channelSid = channel.Sid
+                                UserIdFk = item.UserId,
+                                ActiveCodeIdFk = Truma.CodeTraumaId,
+                                ActiveCodeName = UCLEnums.Trauma.ToString(),
+                                IsAcknowledge = false,
+                                CreatedBy = ApplicationSettings.UserId,
+                                CreatedDate = DateTime.UtcNow,
+                                IsDeleted = false
                             };
-                            var sendMsg = _communication.sendPushNotification(msg);
-                        }
+                            ACodeGroupMembers.Add(codeGroupMember);
+                            _communication.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
 
+                        }
+                        var isMembersAdded = AddGroupMembers(ACodeGroupMembers);
+                        var msg = new ConversationMessageVM()
+                        {
+                            author = "System",
+                            attributes = "",
+                            body = $"This Group created by system for EMS_{UCLEnums.Trauma.ToString()} purpose",
+                            channelSid = channel.Sid
+                        };
+                        var sendMsg = _communication.sendPushNotification(msg);
                     }
+
                 }
 
 
