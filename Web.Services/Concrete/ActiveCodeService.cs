@@ -4385,6 +4385,10 @@ namespace Web.Services.Concrete
             {
                 codeBlue.LastKnownWell = DateTime.Parse(codeBlue.LastKnownWellStr);
             }
+            if (codeBlue != null && !string.IsNullOrEmpty(codeBlue.DobStr) && !string.IsNullOrWhiteSpace(codeBlue.DobStr))
+            {
+                codeBlue.Dob = DateTime.Parse(codeBlue.DobStr);
+            }
             if (codeBlue.CodeBlueId > 0)
             {
                 var row = this._codeBlueRepo.Table.Where(x => x.CodeBlueId == codeBlue.CodeBlueId && !x.IsDeleted).FirstOrDefault();
