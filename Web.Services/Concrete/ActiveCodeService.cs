@@ -630,6 +630,10 @@ namespace Web.Services.Concrete
             {
                 codeStroke.LastKnownWell = DateTime.Parse(codeStroke.LastKnownWellStr);
             }
+            if (codeStroke != null && !string.IsNullOrEmpty(codeStroke.DobStr) && !string.IsNullOrWhiteSpace(codeStroke.DobStr))
+            {
+                codeStroke.Dob = DateTime.Parse(codeStroke.DobStr);
+            }
             if (codeStroke.CodeStrokeId > 0)
             {
                 var row = this._codeStrokeRepo.Table.Where(x => x.CodeStrokeId == codeStroke.CodeStrokeId && !x.IsDeleted).FirstOrDefault();
