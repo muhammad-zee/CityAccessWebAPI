@@ -467,7 +467,7 @@ namespace Web.Services.Concrete
                             //string uniqueName = $"CONSULT_{Consult_Counter.Counter_Value.ToString()}";
                             string ServiceName = this._serviceLineRepo.Table.Where(x => x.ServiceLineId == serviceLineId && !x.IsDeleted).Select(x => x.ServiceName).FirstOrDefault();
                             string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
-                            string friendlyName = $"{consultType}_{ServiceName}_{Consult_Counter.Counter_Value}_Consult";
+                            string friendlyName = $"{consultType} {ServiceName} Consult {Consult_Counter.Counter_Value}";
                             var channel = _communicationService.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
                             List<ConsultAcknowledgment> consultAcknowledgmentList = new();
                             foreach (var item in users.Distinct())
@@ -484,13 +484,37 @@ namespace Web.Services.Concrete
                                 consultAcknowledgmentList.Add(acknowledgeConsult);
                             }
                             this._consultAcknowledgmentRepo.Insert(consultAcknowledgmentList);
-                            var msg = new ConversationMessageVM()
+                            var msg = new ConversationMessageVM();
+                            msg.author = "System";
+                            msg.attributes = "";
+                            msg.body = $"{consultType} {ServiceName} \\n";
+                            if (keyValues.ContainsKey("PatientFirstName") && keyValues.ContainsKey("PatientLastName"))
                             {
-                                author = "System",
-                                attributes = "",
-                                body = "This Group created by system for consult purpose",
-                                channelSid = channel.Sid
-                            };
+                                msg.body += $"Patient Name: {keyValues["PatientFirstName"].ToString()} {keyValues["PatientLastName"].ToString()} \\n";
+                            }
+                            else 
+                            {
+                                if (keyValues.ContainsKey("PatientFirstName")) 
+                                {
+                                    msg.body += $"Patient Name: {keyValues["PatientFirstName"].ToString()} \\n";
+                                }
+                                if (keyValues.ContainsKey("PatientLastName")) 
+                                {
+                                    msg.body += $"Patient Name: {keyValues["PatientLastName"].ToString()} \\n";
+                                }
+                            }
+
+                            msg.body += keyValues.ContainsKey("PatientFirstName") ? $"Patient Name: {keyValues["PatientFirstName"].ToString()} " : "";
+                            msg.body += keyValues.ContainsKey("PatientLastName") ? $"{keyValues["PatientLastName"].ToString()} \\n" : "";
+                            if (keyValues.ContainsKey("DateOfBirth")) 
+                            {
+                                DateTime dob = DateTime.Parse(keyValues["DateOfBirth"].ToString());
+                                msg.body = $"Dob: {dob:MM-dd-yyyy} \\n";
+                            }
+                            msg.body += keyValues.ContainsKey("MedicalRecordNumber") ? $"Medical Record Number: {keyValues["MedicalRecordNumber"].ToString()} \\n" : "";
+                            msg.body += keyValues.ContainsKey("CallbackNumber") ? $"Callback Number: {keyValues["CallbackNumber"].ToString()} \\n" : "";
+                            msg.channelSid = channel.Sid;
+                            
                             var sendMsg = _communicationService.sendPushNotification(msg);
                         }
                     }
