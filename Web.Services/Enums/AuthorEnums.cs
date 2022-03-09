@@ -6,6 +6,7 @@
         Stroke,
         STEMI,
         Sepsis,
-        Trauma
+        Trauma,
+        Blue
     }
 }

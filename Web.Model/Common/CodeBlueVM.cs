@@ -12,6 +12,7 @@ namespace Web.Model.Common
         public int CodeBlueId { get; set; }
         public string PatientName { get; set; }
         public DateTime? Dob { get; set; }
+        public string DobStr { get; set; }
         public int? Gender { get; set; }
         public int OrganizationIdFk { get; set; }
         public string GenderTitle { get; set; }
