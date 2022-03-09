@@ -27,6 +27,7 @@ namespace Web.Services.Concrete
         private IRepository<ConsultField> _consultFieldRepo;
         private IRepository<OrganizationConsultField> _orgConsultRepo;
         private IRepository<ConsultAcknowledgment> _consultAcknowledgmentRepo;
+        private IRepository<ServiceLine> _serviceLineRepo;
         IConfiguration _config;
 
         public ConsultService(RAQ_DbContext dbContext,
@@ -37,6 +38,7 @@ namespace Web.Services.Concrete
             IRepository<ControlListDetail> controlListDetailsRepo,
             IRepository<ConsultField> consultFieldRepo,
             IRepository<OrganizationConsultField> orgConsultRepo,
+            IRepository<ServiceLine> serviceLineRepo,
             IRepository<ConsultAcknowledgment> consultAcknowledgmentRepo)
         {
             this._dbContext = dbContext;
@@ -44,6 +46,7 @@ namespace Web.Services.Concrete
             this._communicationService = communicationService;
             this._usersRepo = userRepo;
             this._orgRepo = orgRepo;
+            this._serviceLineRepo = serviceLineRepo;
             this._controlListDetailsRepo = controlListDetailsRepo;
             this._consultFieldRepo = consultFieldRepo;
             this._orgConsultRepo = orgConsultRepo;
@@ -429,8 +432,9 @@ namespace Web.Services.Concrete
                                 if (consultType != null && consultType == "Urgent")
                                 {
                                     //string uniqueName = $"CONSULT_{Consult_Counter.Counter_Value.ToString()}";
+                                    string ServiceName = this._serviceLineRepo.Table.Where(x => x.ServiceLineId == serviceLineId && !x.IsDeleted).Select(x => x.ServiceName).FirstOrDefault();
                                     string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
-                                    string friendlyName = $"Consult_{Consult_Counter.Counter_Value}_{consultType}";
+                                    string friendlyName = $"{consultType}_{ServiceName}_{Consult_Counter.Counter_Value}_Consult";
                                     var channel = _communicationService.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
                                     List<ConsultAcknowledgment> consultAcknowledgmentList = new();
                                     foreach (var item in users.Distinct())
@@ -461,8 +465,9 @@ namespace Web.Services.Concrete
                         else if (users != null && users.Count > 0)
                         {
                             //string uniqueName = $"CONSULT_{Consult_Counter.Counter_Value.ToString()}";
+                            string ServiceName = this._serviceLineRepo.Table.Where(x => x.ServiceLineId == serviceLineId && !x.IsDeleted).Select(x => x.ServiceName).FirstOrDefault();
                             string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
-                            string friendlyName = $"Consult_{Consult_Counter.Counter_Value}_{consultType}";
+                            string friendlyName = $"{consultType}_{ServiceName}_{Consult_Counter.Counter_Value}_Consult";
                             var channel = _communicationService.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
                             List<ConsultAcknowledgment> consultAcknowledgmentList = new();
                             foreach (var item in users.Distinct())
