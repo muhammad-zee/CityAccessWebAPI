@@ -5136,6 +5136,7 @@ namespace Web.Services.Concrete
         {
             var activeEMS = this._dbContext.LoadStoredProcedure("md_getActiveEMS")
                             .WithSqlParam("@currentUserId", ApplicationSettings.UserId)
+                            .WithSqlParam("@isSuperAdmin", ApplicationSettings.isSuperAdmin)
                             .ExecuteStoredProc<CodeStrokeVM>();
 
             var orgDataList = new List<dynamic>();
