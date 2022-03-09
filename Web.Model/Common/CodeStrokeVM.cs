@@ -24,6 +24,7 @@ namespace Web.Model.Common
         public bool? IsEms { get; set; }
         public bool? IsCompleted { get; set; }
         public int? CreatedBy { get; set; }
+        public string CreatedDateStr { get; set; }
         public DateTime CreatedDate { get; set; }
         public int? ModifiedBy { get; set; }
         public DateTime? ModifiedDate { get; set; }
