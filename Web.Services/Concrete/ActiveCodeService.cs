@@ -34,6 +34,7 @@ namespace Web.Services.Concrete
         private IRepository<CodeSepsi> _codeSepsisRepo;
         private IRepository<CodeStemi> _codeSTEMIRepo;
         private IRepository<CodeTrauma> _codeTrumaRepo;
+        private IRepository<CodeBlue> _codeBlueRepo;
         private IRepository<ActiveCodesGroupMember> _activeCodesGroupMembersRepo;
         IConfiguration _config;
         private string _RootPath;
@@ -4129,6 +4130,930 @@ namespace Web.Services.Concrete
 
 
         #endregion
+
+        #region Code Blue
+
+        public BaseResponse GetAllBlueCode(ActiveCodeVM activeCode)
+        {
+            var blueData = new List<CodeBlue>();
+            if (activeCode.showAllActiveCodes)
+            {
+                blueData = this._codeBlueRepo.Table.Where(x => x.OrganizationIdFk == activeCode.OrganizationIdFk && !x.IsDeleted).OrderByDescending(x => x.CodeBlueId).ToList();
+            }
+            else
+            {
+                blueData = this._codeBlueRepo.Table.Where(x => x.CreatedBy == ApplicationSettings.UserId && !x.IsDeleted).OrderByDescending(x => x.CodeBlueId).ToList();
+            }
+            var blueDataVM = AutoMapperHelper.MapList<CodeBlue, CodeBlueVM>(blueData);
+            var orgData = GetHosplitalAddressObject(activeCode.OrganizationIdFk);
+
+            //var org = this._orgRepo.Table.Where(o => o.OrganizationId == orgId && !o.IsDeleted).FirstOrDefault();
+            //if (org != null)
+            //{
+            //    var state = this._controlListDetailsRepo.Table.Where(s => s.ControlListDetailId == org.StateIdFk).Select(s => new { Id = s.ControlListDetailId, s.Title, s.Description }).FirstOrDefault();
+            //    if (state != null)
+            //    {
+            //        string add = $"{org.PrimaryAddress} {org.City}, {state.Title} {org.Zip}";
+            //        string url = "https://maps.googleapis.com/maps/api/geocode/json?address=" + add.Replace(" ", "%20") + "&key=" + this._GoogleApiKey;
+            //        var googleApiLatLng = this._httpClient.GetAsync(url).Result;
+
+            //        dynamic Apiresults = googleApiLatLng["results"];
+            //        var formatted_address = Convert.ToString(Apiresults[0]["formatted_address"]);
+            //        var geometry = Apiresults[0]["geometry"];
+            //        var location = geometry["location"];
+            //        var longLat = new List<double> { Convert.ToDouble(location["lat"]), Convert.ToDouble(location["lng"]) };
+
+            //        orgData = new { OrganizationId = org.OrganizationId, Address = formatted_address, DestinationCoords = string.Join(",", longLat), org.OrganizationName };
+            //    }
+            //}
+
+            blueDataVM.ForEach(x =>
+            {
+                x.AttachmentsPath = new List<string>();
+                x.AudiosPath = new List<string>();
+                x.VideosPath = new List<string>();
+                x.OrganizationData = new object();
+                x.BloodThinnersTitle = new List<object>();
+
+                if (!string.IsNullOrEmpty(x.Attachments) && !string.IsNullOrWhiteSpace(x.Attachments))
+                {
+                    string path = this._RootPath + x.Attachments; //this._RootPath  + x.Attachments;
+                    if (Directory.Exists(path))
+                    {
+                        DirectoryInfo AttachFiles = new DirectoryInfo(path);
+                        foreach (var item in AttachFiles.GetFiles())
+                        {
+                            x.AttachmentsPath.Add(x.Attachments + "/" + item.Name);
+                        }
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(x.Audio) && !string.IsNullOrWhiteSpace(x.Audio))
+                {
+                    string path = this._RootPath + x.Audio; //this._RootPath  + x.Audio;
+                    if (Directory.Exists(path))
+                    {
+                        DirectoryInfo AudioFiles = new DirectoryInfo(path);
+                        foreach (var item in AudioFiles.GetFiles())
+                        {
+                            x.AudiosPath.Add(x.Audio + "/" + item.Name);
+                        }
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(x.Video) && !string.IsNullOrWhiteSpace(x.Video))
+                {
+                    var path = this._RootPath + x.Video; //this._RootPath  + x.Video;
+                    if (Directory.Exists(path))
+                    {
+                        DirectoryInfo VideoFiles = new DirectoryInfo(path);
+                        foreach (var item in VideoFiles.GetFiles())
+                        {
+                            x.VideosPath.Add(x.Video + "/" + item.Name);
+                        }
+                    }
+                }
+                x.LastKnownWellStr = x.LastKnownWell?.ToString("yyyy-MM-dd hh:mm:ss tt");
+                x.OrganizationData = orgData;
+                x.GenderTitle = _controlListDetailsRepo.Table.Where(g => g.ControlListDetailId == x.Gender).Select(g => g.Title).FirstOrDefault();
+                x.BloodThinnersTitle.AddRange(_controlListDetailsRepo.Table.Where(b => x.BloodThinners.ToIntList().Contains(b.ControlListDetailId)).Select(b => new { Id = b.ControlListDetailId, b.Title }).ToList());
+            });
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = blueDataVM };
+        }
+
+        public BaseResponse GetBlueDataById(int blueId)
+        {
+            var blueData = this._codeBlueRepo.Table.Where(x => x.CodeBlueId == blueId && !x.IsDeleted).FirstOrDefault();
+            if (blueData != null)
+            {
+                var BlueDataVM = AutoMapperHelper.MapSingleRow<CodeBlue, CodeBlueVM>(blueData);
+                BlueDataVM.AttachmentsPath = new List<string>();
+                BlueDataVM.AudiosPath = new List<string>();
+                BlueDataVM.VideosPath = new List<string>();
+                BlueDataVM.BloodThinnersTitle = new List<object>();
+                BlueDataVM.OrganizationData = new object();
+
+                if (!string.IsNullOrEmpty(BlueDataVM.Attachments) && !string.IsNullOrWhiteSpace(BlueDataVM.Attachments))
+                {
+                    string path = this._RootPath + blueData.Attachments; //_environment.WebRootFileProvider.GetFileInfo(StrokeDataVM.Attachments)?.PhysicalPath;
+                    if (Directory.Exists(path))
+                    {
+                        DirectoryInfo AttachFiles = new DirectoryInfo(path);
+                        foreach (var item in AttachFiles.GetFiles())
+                        {
+                            BlueDataVM.AttachmentsPath.Add(BlueDataVM.Attachments + "/" + item.Name);
+                        }
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(BlueDataVM.Audio) && !string.IsNullOrWhiteSpace(BlueDataVM.Audio))
+                {
+                    string path = this._RootPath + blueData.Audio; //_environment.WebRootFileProvider.GetFileInfo(StrokeDataVM.Audio)?.PhysicalPath;
+                    if (Directory.Exists(path))
+                    {
+                        DirectoryInfo AudioFiles = new DirectoryInfo(path);
+                        foreach (var item in AudioFiles.GetFiles())
+                        {
+                            BlueDataVM.AudiosPath.Add(BlueDataVM.Audio + "/" + item.Name);
+                        }
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(BlueDataVM.Video) && !string.IsNullOrWhiteSpace(BlueDataVM.Video))
+                {
+                    var path = this._RootPath + blueData.Video;  //_environment.WebRootFileProvider.GetFileInfo(StrokeDataVM.Video)?.PhysicalPath; //.GetFileInfo(StrokeDataVM.Video);//?.PhysicalPath;
+                    if (Directory.Exists(path))
+                    {
+                        DirectoryInfo VideoFiles = new DirectoryInfo(path);
+                        foreach (var item in VideoFiles.GetFiles())
+                        {
+                            BlueDataVM.VideosPath.Add(BlueDataVM.Video + "/" + item.Name);
+                        }
+                    }
+                }
+
+                //var org = this._orgRepo.Table.Where(o => o.OrganizationId == StrokeDataVM.OrganizationIdFk && !o.IsDeleted).FirstOrDefault();
+                //if (org != null)
+                //{
+                //    var state = this._controlListDetailsRepo.Table.Where(s => s.ControlListDetailId == org.StateIdFk).Select(s => new { Id = s.ControlListDetailId, s.Title, s.Description }).FirstOrDefault();
+                //    if (state != null)
+                //    {
+                //        string add = $"{org.PrimaryAddress} {org.City}, {state.Title} {org.Zip}";
+                //        string url = "https://maps.googleapis.com/maps/api/geocode/json?address=" + add.Replace(" ", "%20") + "&key=" + this._GoogleApiKey;
+                //        var googleApiLatLng = this._httpClient.GetAsync(url).Result;
+
+                //        dynamic Apiresults = googleApiLatLng["results"];
+                //        var formatted_address = Convert.ToString(Apiresults[0]["formatted_address"]);
+                //        var geometry = Apiresults[0]["geometry"];
+                //        var location = geometry["location"];
+                //        var longLat = new List<double> { Convert.ToDouble(location["lat"]), Convert.ToDouble(location["lng"]) };
+
+                //        StrokeDataVM.OrganizationData = new { OrganizationId = org.OrganizationId, Address = formatted_address, DestinationCoords = string.Join(",", longLat), org.OrganizationName };
+                //    }
+                //}
+
+                BlueDataVM.OrganizationData = GetHosplitalAddressObject(BlueDataVM.OrganizationIdFk);
+                BlueDataVM.LastKnownWellStr = BlueDataVM.LastKnownWell?.ToString("yyyy-MM-dd hh:mm:ss tt");
+                BlueDataVM.GenderTitle = _controlListDetailsRepo.Table.Where(g => g.ControlListDetailId == BlueDataVM.Gender).Select(g => g.Title).FirstOrDefault();
+                BlueDataVM.BloodThinnersTitle.AddRange(_controlListDetailsRepo.Table.Where(b => BlueDataVM.BloodThinners.ToIntList().Contains(b.ControlListDetailId)).Select(b => new { Id = b.ControlListDetailId, b.Title }).ToList());
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Found", Body = BlueDataVM };
+            }
+            return new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "Record Not Found" };
+        }
+
+        public BaseResponse AddOrUpdateBlueData(CodeBlueVM codeBlue)
+        {
+            if (codeBlue != null && !string.IsNullOrEmpty(codeBlue.LastKnownWellStr) && !string.IsNullOrWhiteSpace(codeBlue.LastKnownWellStr))
+            {
+                codeBlue.LastKnownWell = DateTime.Parse(codeBlue.LastKnownWellStr);
+            }
+            if (codeBlue.CodeBlueId > 0)
+            {
+                var row = this._codeBlueRepo.Table.Where(x => x.CodeBlueId == codeBlue.CodeBlueId && !x.IsDeleted).FirstOrDefault();
+
+                row.OrganizationIdFk = codeBlue.OrganizationIdFk;
+                row.PatientName = codeBlue.PatientName;
+                row.Dob = codeBlue.Dob;
+                row.Gender = codeBlue.Gender;
+                row.ChiefComplant = codeBlue.ChiefComplant;
+                row.LastKnownWell = codeBlue.LastKnownWell;
+                row.Hpi = codeBlue.Hpi;
+                row.BloodThinners = codeBlue.BloodThinners;
+                row.FamilyContactName = codeBlue.FamilyContactName;
+                row.FamilyContactNumber = codeBlue.FamilyContactNumber;
+                row.IsEms = codeBlue.IsEms;
+                //row.IsCompleted = codeStroke.IsCompleted;
+                if (codeBlue.IsCompleted != null && codeBlue.IsCompleted == true && row.IsCompleted != true)
+                {
+                    row.IsCompleted = true;
+                    row.EndTime = DateTime.UtcNow;
+                    row.ActualTime = row.EndTime - row.CreatedDate;
+                }
+                row.ModifiedBy = codeBlue.ModifiedBy;
+                row.ModifiedDate = DateTime.UtcNow;
+                row.IsDeleted = false;
+
+                if (codeBlue.Attachment != null && codeBlue.Attachment.Count > 0)
+                {
+                    var RootPath = this._RootPath + "/Organizations"; //this._RootPath + "/Organizations";
+                    string FileRoot = null;
+                    List<string> Attachments = new();
+                    FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeBlue.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
+                    FileRoot = Path.Combine(RootPath, FileRoot);
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, "Blue");
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, row.CodeBlueId.ToString());
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, "Attachments");
+
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    //else
+                    //{
+                    //    DirectoryInfo dir = new DirectoryInfo(FileRoot);
+                    //    foreach (FileInfo fi in dir.GetFiles())
+                    //    {
+                    //        fi.Delete();
+                    //    }
+                    //}
+                    foreach (var item in codeBlue.Attachment)
+                    {
+                        if (!string.IsNullOrEmpty(item.Base64Str))
+                        {
+
+                            var fileInfo = item.Base64Str.Split("base64,");
+                            string fileExtension = fileInfo[0].GetFileExtenstion();
+                            var ByteFile = Convert.FromBase64String(fileInfo[1]);
+                            string FilePath = Path.Combine(FileRoot, item.FileName);
+
+                            if (File.Exists(FilePath))
+                            {
+                                long existingFileSize = 0;
+                                long newFileSize = ByteFile.LongLength;
+                                FileInfo ExistingfileInfo = new FileInfo(FilePath);
+                                existingFileSize = ExistingfileInfo.Length;
+
+                                if (existingFileSize > 0 && newFileSize != existingFileSize)
+                                {
+                                    var alterFile = item.FileName.Split('.');
+                                    string extention = alterFile.LastOrDefault();
+                                    var alterFileName = alterFile.ToList();
+                                    alterFileName.RemoveAt(alterFileName.Count - 1);
+                                    string fileName = string.Join(".", alterFileName);
+                                    fileName = fileName + "_" + HelperExtension.CreateRandomString(7) + "." + extention;
+                                    FilePath = Path.Combine(FileRoot, fileName);
+                                    using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                    {
+                                        fs.Write(ByteFile);
+                                    }
+                                }
+                                else
+                                {
+                                    using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                    {
+                                        fs.Write(ByteFile);
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                {
+                                    fs.Write(ByteFile);
+                                }
+                            }
+                        }
+                    }
+                    if (FileRoot != null && FileRoot != "")
+                    {
+                        codeBlue.AttachmentsFolderRoot = FileRoot.Replace(this._RootPath, "").Replace("\\", "/");
+                    }
+                }
+                if (codeBlue.Videos != null && codeBlue.Videos.Count > 0)
+                {
+                    var RootPath = this._RootPath + "/Organizations";
+                    string FileRoot = null;
+                    List<string> Attachments = new();
+                    FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeBlue.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
+                    FileRoot = Path.Combine(RootPath, FileRoot);
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, "Stroke");
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, row.CodeBlueId.ToString());
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, "Videos");
+
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    //else
+                    //{
+                    //    DirectoryInfo dir = new DirectoryInfo(FileRoot);
+                    //    foreach (FileInfo fi in dir.GetFiles())
+                    //    {
+                    //        fi.Delete();
+                    //    }
+                    //}
+                    foreach (var item in codeBlue.Videos)
+                    {
+                        if (!string.IsNullOrEmpty(item.Base64Str))
+                        {
+
+                            var fileInfo = item.Base64Str.Split("base64,");
+                            string fileExtension = fileInfo[0].GetFileExtenstion();
+                            var ByteFile = Convert.FromBase64String(fileInfo[1]);
+                            string FilePath = Path.Combine(FileRoot, item.FileName);
+
+                            if (File.Exists(FilePath))
+                            {
+                                long existingFileSize = 0;
+                                long newFileSize = ByteFile.LongLength;
+                                FileInfo ExistingfileInfo = new FileInfo(FilePath);
+                                existingFileSize = ExistingfileInfo.Length;
+
+                                if (existingFileSize > 0 && newFileSize != existingFileSize)
+                                {
+                                    var alterFile = item.FileName.Split('.');
+                                    string extention = alterFile.LastOrDefault();
+                                    var alterFileName = alterFile.ToList();
+                                    alterFileName.RemoveAt(alterFileName.Count - 1);
+                                    string fileName = string.Join(".", alterFileName);
+                                    fileName = fileName + "_" + HelperExtension.CreateRandomString(7) + "." + extention;
+                                    FilePath = Path.Combine(FileRoot, fileName);
+                                    using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                    {
+                                        fs.Write(ByteFile);
+                                    }
+                                }
+                                else
+                                {
+                                    using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                    {
+                                        fs.Write(ByteFile);
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                {
+                                    fs.Write(ByteFile);
+                                }
+                            }
+                        }
+
+                    }
+                    if (FileRoot != null && FileRoot != "")
+                    {
+                        codeBlue.VideoFolderRoot = FileRoot.Replace(this._RootPath, "").Replace("\\", "/");
+                    }
+                }
+                if (codeBlue.Audios != null && codeBlue.Audios.Count > 0)
+                {
+                    var RootPath = this._RootPath + "/Organizations";
+                    string FileRoot = null;
+                    List<string> Attachments = new();
+
+                    FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeBlue.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
+                    FileRoot = Path.Combine(RootPath, FileRoot);
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, "Blue");
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, row.CodeBlueId.ToString());
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, "Audios");
+
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    //else
+                    //{
+                    //    DirectoryInfo dir = new DirectoryInfo(FileRoot);
+                    //    foreach (FileInfo fi in dir.GetFiles())
+                    //    {
+                    //        fi.Delete();
+                    //    }
+                    //}
+                    foreach (var item in codeBlue.Audios)
+                    {
+                        if (!string.IsNullOrEmpty(item.Base64Str))
+                        {
+
+                            var fileInfo = item.Base64Str.Split("base64,");
+                            string fileExtension = fileInfo[0].GetFileExtenstion();
+                            var ByteFile = Convert.FromBase64String(fileInfo[1]);
+                            string FilePath = Path.Combine(FileRoot, item.FileName);
+
+                            if (File.Exists(FilePath))
+                            {
+                                long existingFileSize = 0;
+                                long newFileSize = ByteFile.LongLength;
+                                FileInfo ExistingfileInfo = new FileInfo(FilePath);
+                                existingFileSize = ExistingfileInfo.Length;
+
+                                if (existingFileSize > 0 && newFileSize != existingFileSize)
+                                {
+                                    var alterFile = item.FileName.Split('.');
+                                    string extention = alterFile.LastOrDefault();
+                                    var alterFileName = alterFile.ToList();
+                                    alterFileName.RemoveAt(alterFileName.Count - 1);
+                                    string fileName = string.Join(".", alterFileName);
+                                    fileName = fileName + "_" + HelperExtension.CreateRandomString(7) + "." + extention;
+                                    FilePath = Path.Combine(FileRoot, fileName);
+                                    using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                    {
+                                        fs.Write(ByteFile);
+                                    }
+                                }
+                                else
+                                {
+                                    using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                    {
+                                        fs.Write(ByteFile);
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                {
+                                    fs.Write(ByteFile);
+                                }
+                            }
+                        }
+
+
+                    }
+                    if (FileRoot != null && FileRoot != "")
+                    {
+                        codeBlue.AudioFolderRoot = FileRoot.Replace(this._RootPath, "").Replace("\\", "/");
+                    }
+                }
+
+                if (codeBlue.AttachmentsFolderRoot != null)
+                {
+                    row.Attachments = codeBlue.AttachmentsFolderRoot;
+                }
+                if (codeBlue.VideoFolderRoot != null)
+                {
+                    row.Video = codeBlue.VideoFolderRoot;
+                }
+                if (codeBlue.AudioFolderRoot != null)
+                {
+                    row.Audio = codeBlue.AudioFolderRoot;
+                }
+
+                this._codeBlueRepo.Update(row);
+
+                if (row.IsEms != null && row.IsEms.Value)
+                {
+                    var serviceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == row.OrganizationIdFk && x.CodeIdFk == UCLEnums.Stroke.ToInt() && !x.IsDeleted).Select(x => x.ServiceLineIds).FirstOrDefault();
+                    if (serviceLineIds != null && serviceLineIds != "")
+                    {
+                        var UserChannelSid = (from us in this._userSchedulesRepo.Table
+                                              join u in this._userRepo.Table on us.UserIdFk equals u.UserId
+                                              where serviceLineIds.ToIntList().Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.Now && us.ScheduleDateEnd >= DateTime.Now && !us.IsDeleted && !u.IsDeleted
+                                              select u.UserChannelSid).ToList();
+
+                        var notification = new PushNotificationVM()
+                        {
+                            Id = row.CodeBlueId,
+                            OrgId = row.OrganizationIdFk,
+                            UserChannelSid = UserChannelSid,
+                            From = AuthorEnums.Stroke.ToString(),
+                            Msg = "Blue From is Changed",
+                            RouteLink = "/Home/Activate%20Code/code-blue-form"
+                        };
+
+                        _communication.pushNotification(notification);
+
+                    }
+                }
+
+                //codeStroke.AttachmentsPath = new List<string>();
+                //codeStroke.AudiosPath = new List<string>();
+                //codeStroke.VideosPath = new List<string>();
+
+                //if (!string.IsNullOrEmpty(codeStroke.AttachmentsFolderRoot) && !string.IsNullOrWhiteSpace(codeStroke.AttachmentsFolderRoot))
+                //{
+                //    string path = this._RootPath + codeStroke.AttachmentsFolderRoot; //_environment.WebRootFileProvider.GetFileInfo(codeStroke.AttachmentsFolderRoot)?.PhysicalPath;
+                //    if (Directory.Exists(path))
+                //    {
+                //        DirectoryInfo AttachFiles = new DirectoryInfo(path);
+                //        foreach (var item in AttachFiles.GetFiles())
+                //        {
+                //            codeStroke.AttachmentsPath.Add(codeStroke.AttachmentsFolderRoot + "/" + item.Name);
+                //        }
+                //    }
+                //}
+
+                //if (!string.IsNullOrEmpty(codeStroke.AudioFolderRoot) && !string.IsNullOrWhiteSpace(codeStroke.AudioFolderRoot))
+                //{
+                //    string path = this._RootPath + codeStroke.AudioFolderRoot;  //_environment.WebRootFileProvider.GetFileInfo(codeStroke.AudioFolderRoot)?.PhysicalPath;
+                //    if (Directory.Exists(path))
+                //    {
+                //        DirectoryInfo AudioFiles = new DirectoryInfo(path);
+                //        foreach (var item in AudioFiles.GetFiles())
+                //        {
+                //            codeStroke.AudiosPath.Add(codeStroke.AudioFolderRoot + "/" + item.Name);
+                //        }
+                //    }
+                //}
+
+                //if (!string.IsNullOrEmpty(codeStroke.VideoFolderRoot) && !string.IsNullOrWhiteSpace(codeStroke.VideoFolderRoot))
+                //{
+                //    var path = this._RootPath + codeStroke.VideoFolderRoot;  //_environment.WebRootFileProvider.GetFileInfo(codeStroke.VideoFolderRoot)?.PhysicalPath;
+                //    if (Directory.Exists(path))
+                //    {
+                //        DirectoryInfo VideoFiles = new DirectoryInfo(path);
+                //        foreach (var item in VideoFiles.GetFiles())
+                //        {
+                //            codeStroke.VideosPath.Add(codeStroke.VideoFolderRoot + "/" + item.Name);
+                //        }
+                //    }
+                //}
+
+                return GetBlueDataById(row.CodeBlueId);
+            }
+            else
+            {
+                codeBlue.CreatedDate = DateTime.UtcNow;
+                var blue = AutoMapperHelper.MapSingleRow<CodeBlueVM, CodeBlue>(codeBlue);
+
+                if (codeBlue.Attachment != null && codeBlue.Attachment.Count > 0)
+                {
+                    var RootPath = this._RootPath + "/Organizations";
+                    string FileRoot = null;
+                    List<string> Attachments = new();
+
+
+                    FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeBlue.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
+                    FileRoot = Path.Combine(RootPath, FileRoot);
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, "Blue");
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, blue.CodeBlueId.ToString());
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, "Attachments");
+
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    //else
+                    //{
+                    //    DirectoryInfo dir = new DirectoryInfo(FileRoot);
+                    //    foreach (FileInfo fi in dir.GetFiles())
+                    //    {
+                    //        fi.Delete();
+                    //    }
+                    //}
+                    foreach (var item in codeBlue.Attachment)
+                    {
+                        if (!string.IsNullOrEmpty(item.Base64Str))
+                        {
+
+                            var fileInfo = item.Base64Str.Split("base64,");
+                            string fileExtension = fileInfo[0].GetFileExtenstion();
+                            var ByteFile = Convert.FromBase64String(fileInfo[1]);
+                            string FilePath = Path.Combine(FileRoot, item.FileName);
+
+                            if (File.Exists(FilePath))
+                            {
+                                long existingFileSize = 0;
+                                long newFileSize = ByteFile.LongLength;
+                                FileInfo ExistingfileInfo = new FileInfo(FilePath);
+                                existingFileSize = ExistingfileInfo.Length;
+
+                                if (existingFileSize > 0 && newFileSize != existingFileSize)
+                                {
+                                    var alterFile = item.FileName.Split('.');
+                                    string extention = alterFile.LastOrDefault();
+                                    var alterFileName = alterFile.ToList();
+                                    alterFileName.RemoveAt(alterFileName.Count - 1);
+                                    string fileName = string.Join(".", alterFileName);
+                                    fileName = fileName + "_" + HelperExtension.CreateRandomString(7) + "." + extention;
+                                    FilePath = Path.Combine(FileRoot, fileName);
+                                    using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                    {
+                                        fs.Write(ByteFile);
+                                    }
+                                }
+                                else
+                                {
+                                    using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                    {
+                                        fs.Write(ByteFile);
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                {
+                                    fs.Write(ByteFile);
+                                }
+                            }
+                        }
+
+
+                    }
+                    if (FileRoot != null && FileRoot != "")
+                    {
+                        codeBlue.AttachmentsFolderRoot = FileRoot.Replace(this._RootPath, "").Replace("\\", "/");
+                    }
+                }
+                if (codeBlue.Videos != null && codeBlue.Videos.Count > 0)
+                {
+                    var RootPath = this._RootPath + "/Organizations";
+                    string FileRoot = null;
+                    List<string> Attachments = new();
+
+
+                    FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeBlue.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
+                    FileRoot = Path.Combine(RootPath, FileRoot);
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, "Blue");
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, blue.CodeBlueId.ToString());
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, "Videos");
+
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    //else
+                    //{
+                    //    DirectoryInfo dir = new DirectoryInfo(FileRoot);
+                    //    foreach (FileInfo fi in dir.GetFiles())
+                    //    {
+                    //        fi.Delete();
+                    //    }
+                    //}
+                    foreach (var item in codeBlue.Videos)
+                    {
+                        if (!string.IsNullOrEmpty(item.Base64Str))
+                        {
+
+                            var fileInfo = item.Base64Str.Split("base64,");
+                            string fileExtension = fileInfo[0].GetFileExtenstion();
+                            var ByteFile = Convert.FromBase64String(fileInfo[1]);
+                            string FilePath = Path.Combine(FileRoot, item.FileName);
+
+                            if (File.Exists(FilePath))
+                            {
+                                long existingFileSize = 0;
+                                long newFileSize = ByteFile.LongLength;
+                                FileInfo ExistingfileInfo = new FileInfo(FilePath);
+                                existingFileSize = ExistingfileInfo.Length;
+
+                                if (existingFileSize > 0 && newFileSize != existingFileSize)
+                                {
+                                    var alterFile = item.FileName.Split('.');
+                                    string extention = alterFile.LastOrDefault();
+                                    var alterFileName = alterFile.ToList();
+                                    alterFileName.RemoveAt(alterFileName.Count - 1);
+                                    string fileName = string.Join(".", alterFileName);
+                                    fileName = fileName + "_" + HelperExtension.CreateRandomString(7) + "." + extention;
+                                    FilePath = Path.Combine(FileRoot, fileName);
+                                    using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                    {
+                                        fs.Write(ByteFile);
+                                    }
+                                }
+                                else
+                                {
+                                    using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                    {
+                                        fs.Write(ByteFile);
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                {
+                                    fs.Write(ByteFile);
+                                }
+                            }
+                        }
+
+
+                    }
+                    if (FileRoot != null && FileRoot != "")
+                    {
+                        codeBlue.VideoFolderRoot = FileRoot.Replace(this._RootPath, "").Replace("\\", "/");
+                    }
+                }
+                if (codeBlue.Audios != null && codeBlue.Audios.Count > 0)
+                {
+                    var RootPath = this._RootPath + "/Organizations";
+                    string FileRoot = null;
+                    List<string> Attachments = new();
+
+
+                    FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeBlue.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
+                    FileRoot = Path.Combine(RootPath, FileRoot);
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, "Blue");
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, blue.CodeBlueId.ToString());
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    FileRoot = Path.Combine(FileRoot, "Audios");
+
+                    if (!Directory.Exists(FileRoot))
+                    {
+                        Directory.CreateDirectory(FileRoot);
+                    }
+                    //else
+                    //{
+                    //    DirectoryInfo dir = new DirectoryInfo(FileRoot);
+                    //    foreach (FileInfo fi in dir.GetFiles())
+                    //    {
+                    //        fi.Delete();
+                    //    }
+                    //}
+                    foreach (var item in codeBlue.Audios)
+                    {
+                        if (!string.IsNullOrEmpty(item.Base64Str))
+                        {
+
+                            var fileInfo = item.Base64Str.Split("base64,");
+                            string fileExtension = fileInfo[0].GetFileExtenstion();
+                            var ByteFile = Convert.FromBase64String(fileInfo[1]);
+                            string FilePath = Path.Combine(FileRoot, item.FileName);
+
+                            if (File.Exists(FilePath))
+                            {
+                                long existingFileSize = 0;
+                                long newFileSize = ByteFile.LongLength;
+                                FileInfo ExistingfileInfo = new FileInfo(FilePath);
+                                existingFileSize = ExistingfileInfo.Length;
+
+                                if (existingFileSize > 0 && newFileSize != existingFileSize)
+                                {
+                                    var alterFile = item.FileName.Split('.');
+                                    string extention = alterFile.LastOrDefault();
+                                    var alterFileName = alterFile.ToList();
+                                    alterFileName.RemoveAt(alterFileName.Count - 1);
+                                    string fileName = string.Join(".", alterFileName);
+                                    fileName = fileName + "_" + HelperExtension.CreateRandomString(7) + "." + extention;
+                                    FilePath = Path.Combine(FileRoot, fileName);
+                                    using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                    {
+                                        fs.Write(ByteFile);
+                                    }
+                                }
+                                else
+                                {
+                                    using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                    {
+                                        fs.Write(ByteFile);
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                {
+                                    fs.Write(ByteFile);
+                                }
+                            }
+                        }
+
+
+                    }
+                    if (FileRoot != null && FileRoot != "")
+                    {
+                        codeBlue.AudioFolderRoot = FileRoot.Replace(this._RootPath, "").Replace("\\", "/");
+                    }
+                }
+
+                if (codeBlue.AttachmentsFolderRoot != null)
+                {
+                    blue.Attachments = codeBlue.AttachmentsFolderRoot;
+                }
+                if (codeBlue.VideoFolderRoot != null)
+                {
+                    blue.Video = codeBlue.VideoFolderRoot;
+                }
+                if (codeBlue.AudioFolderRoot != null)
+                {
+                    blue.Audio = codeBlue.AudioFolderRoot;
+                }
+
+                this._codeBlueRepo.Insert(blue);
+
+                if (blue.IsEms != null && blue.IsEms.Value)
+                {
+                    var serviceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == blue.OrganizationIdFk && x.CodeIdFk == UCLEnums.Stroke.ToInt() && !x.IsDeleted).Select(x => x.ServiceLineIds).FirstOrDefault();
+                    if (serviceLineIds != null && serviceLineIds != "")
+                    {
+                        var UserChannelSid = (from us in this._userSchedulesRepo.Table
+                                              join u in this._userRepo.Table on us.UserIdFk equals u.UserId
+                                              where serviceLineIds.ToIntList().Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
+                                              select new { u.UserUniqueId, u.UserId }).ToList();
+                        var loggedUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).FirstOrDefault();
+                        UserChannelSid.Add(loggedUser);
+                        var conversationChannelAttributes = JsonConvert.SerializeObject(new Dictionary<string, Object>()
+                                    {
+                                        {ChannelAttributeEnums.ChannelType.ToString(), ChannelTypeEnums.EMS.ToString()},
+                                        {ChannelAttributeEnums.CodeType.ToString(), ChannelTypeEnums.Blue.ToString()},
+                                        {ChannelAttributeEnums.BlueId.ToString(), blue.CodeBlueId}
+                                    }, Formatting.Indented);
+                        List<ActiveCodesGroupMember> ACodeGroupMembers = new List<ActiveCodesGroupMember>();
+                        if (UserChannelSid != null && UserChannelSid.Count > 0)
+                        {
+                            //string uniqueName = $"CONSULT_{Consult_Counter.Counter_Value.ToString()}";
+                            string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
+                            string friendlyName = $"EMS_{UCLEnums.Blue.ToString()}_{blue.CodeBlueId}";
+                            var channel = _communication.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
+                            foreach (var item in UserChannelSid)
+                            {
+                                var codeGroupMember = new ActiveCodesGroupMember()
+                                {
+                                    UserIdFk = item.UserId,
+                                    ActiveCodeIdFk = blue.CodeBlueId,
+                                    ActiveCodeName = UCLEnums.Stroke.ToString(),
+                                    IsAcknowledge = false,
+                                    CreatedBy = ApplicationSettings.UserId,
+                                    CreatedDate = DateTime.UtcNow,
+                                    IsDeleted = false
+                                };
+                                ACodeGroupMembers.Add(codeGroupMember);
+                                _communication.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
+                            }
+                            var isMembersAdded = AddGroupMembers(ACodeGroupMembers);
+                            var msg = new ConversationMessageVM()
+                            {
+                                author = "System",
+                                attributes = "",
+                                body = $"This Group created by system for EMS_{UCLEnums.Blue.ToString()} purpose",
+                                channelSid = channel.Sid
+                            };
+                            var sendMsg = _communication.sendPushNotification(msg);
+                        }
+
+                    }
+                }
+
+                return GetBlueDataById(blue.CodeBlueId);
+            }
+        }
+
+        public BaseResponse DeleteBlue(int blueId)
+        {
+            var row = this._codeBlueRepo.Table.Where(x => x.CodeBlueId == blueId && !x.IsDeleted).FirstOrDefault();
+            row.IsDeleted = true;
+            row.ModifiedBy = ApplicationSettings.UserId;
+            row.ModifiedDate = DateTime.UtcNow;
+            this._codeBlueRepo.Update(row);
+
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Deleted" };
+        }
+
+        #endregion
+
 
         public BaseResponse AddGroupMembers(List<ActiveCodesGroupMember> activeCodesGroup)
         {

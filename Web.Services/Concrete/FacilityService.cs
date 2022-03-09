@@ -375,11 +375,14 @@ namespace Web.Services.Concrete
             }
             else
             {
-                organizations = (from ur in this._userRoleRepo.Table
+                organizations = this._dbContext.LoadStoredProcedure("md_getAllOrganizationsByRoleId")
+                    .WithSqlParam("@UserId", ApplicationSettings.UserId)
+                    .ExecuteStoredProc<Organization>().ToList();
+                    /*(from ur in this._userRoleRepo.Table
                                  join r in this._roleRepo.Table on ur.RoleIdFk equals r.RoleId
                                  join o in this._organizationRepo.Table on r.OrganizationIdFk equals o.OrganizationId
                                  where ur.UserIdFk == ApplicationSettings.UserId && !o.IsDeleted && !r.IsDeleted
-                                 select o).Distinct().ToList();
+                                 select o).Distinct().ToList();*/
             }
 
             var orgs = AutoMapperHelper.MapList<Organization, OrganizationVM>(organizations);

@@ -414,6 +414,77 @@ namespace Web.API.Controllers
 
         #endregion
 
+        #region Code Blue
+
+
+        [Description("Get All Blue Data")]
+        [HttpPost("blue/GetAllBlueData")]
+        public BaseResponse GetAllBlueData([FromBody] ActiveCodeVM activeCode)
+        {
+            try
+            {
+                return _activeCodesService.GetAllBlueCode(activeCode);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
+        [Description("Get Blue Data By Id")]
+        [HttpGet("blue/GetBlueDataById/{blueId}")]
+        public BaseResponse GetBlueDataById(int blueId)
+        {
+            try
+            {
+                return _activeCodesService.GetBlueDataById(blueId);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
+
+        [Description("Add Or Update blue")]
+        [HttpPost("blue/AddOrUpdateBlue")]
+        public BaseResponse AddOrUpdateBlue([FromBody] CodeBlueVM codeBlue)
+        {
+            try
+            {
+                return _activeCodesService.AddOrUpdateBlueData(codeBlue);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
+
+        [Description("Delete Blue Data By Id")]
+        [HttpGet("blue/DeleteBlueDataById/{blueId}")]
+        public BaseResponse DeleteBlueDataById(int blueId)
+        {
+            try
+            {
+                return _activeCodesService.DeleteBlue(blueId);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
+        #endregion
+
         [Description("Get All Active EMS")]
         [HttpGet("EMS/GetActiveEMS")]
         public BaseResponse GetActiveEMS()

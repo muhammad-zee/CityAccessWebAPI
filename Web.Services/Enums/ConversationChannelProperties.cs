@@ -8,7 +8,8 @@
         StrokeId,
         SepsisId,
         STEMIId,
-        TraumaId
+        TraumaId,
+        BlueId
     }
     public enum ChannelTypeEnums
     {
@@ -19,6 +20,7 @@
         Stroke,
         STEMI,
         Sepsis,
-        Trauma
+        Trauma,
+        Blue
     }
 }

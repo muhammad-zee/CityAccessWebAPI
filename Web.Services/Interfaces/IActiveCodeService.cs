@@ -47,6 +47,16 @@ namespace Web.Services.Interfaces
         BaseResponse DeleteTruma(int TrumaId);
         #endregion
 
+        #region Code Blue
+
+        BaseResponse GetAllBlueCode(ActiveCodeVM activeCode);
+        BaseResponse GetBlueDataById(int blueId);
+        BaseResponse AddOrUpdateBlueData(CodeBlueVM codeBlue);
+        BaseResponse DeleteBlue(int blueId);
+
+
+        #endregion
+
         #region EMS
         BaseResponse GetActiveEMS();
         #endregion
