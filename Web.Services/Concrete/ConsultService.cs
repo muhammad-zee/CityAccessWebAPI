@@ -503,9 +503,6 @@ namespace Web.Services.Concrete
                                     msg.body += $"Patient Name: {keyValues["PatientLastName"].ToString()} \\n";
                                 }
                             }
-
-                            msg.body += keyValues.ContainsKey("PatientFirstName") ? $"Patient Name: {keyValues["PatientFirstName"].ToString()} " : "";
-                            msg.body += keyValues.ContainsKey("PatientLastName") ? $"{keyValues["PatientLastName"].ToString()} \\n" : "";
                             if (keyValues.ContainsKey("DateOfBirth")) 
                             {
                                 DateTime dob = DateTime.Parse(keyValues["DateOfBirth"].ToString());

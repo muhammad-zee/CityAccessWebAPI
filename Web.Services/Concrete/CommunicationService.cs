@@ -571,6 +571,7 @@ namespace Web.Services.Concrete
 
         public ChannelResource createConversationChannel(string FriendlyName, string UniqueName, string Attrubutes)
         {
+            ServicePointManager.SecurityProtocol = (SecurityProtocolType)3072; //TLS 1.2
             TwilioClient.Init(this.Twilio_AccountSid, this.Twilio_AuthToken);
             string userUniqueId = this._userRepo.Table.Where(u => u.IsDeleted != true && u.UserId == ApplicationSettings.UserId && !string.IsNullOrEmpty(u.ConversationUserSid)).Select(x => x.UserUniqueId).FirstOrDefault();
             userUniqueId = string.IsNullOrEmpty(userUniqueId) ? "system" : userUniqueId;
