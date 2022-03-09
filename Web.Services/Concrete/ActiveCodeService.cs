@@ -675,7 +675,7 @@ namespace Web.Services.Concrete
                     {
                         Directory.CreateDirectory(FileRoot);
                     }
-                    FileRoot = Path.Combine(FileRoot, "Stroke");
+                    FileRoot = Path.Combine(FileRoot, UCLEnums.Stroke.ToString());
                     if (!Directory.Exists(FileRoot))
                     {
                         Directory.CreateDirectory(FileRoot);
@@ -763,7 +763,7 @@ namespace Web.Services.Concrete
                     {
                         Directory.CreateDirectory(FileRoot);
                     }
-                    FileRoot = Path.Combine(FileRoot, "Stroke");
+                    FileRoot = Path.Combine(FileRoot, UCLEnums.Stroke.ToString());
                     if (!Directory.Exists(FileRoot))
                     {
                         Directory.CreateDirectory(FileRoot);
@@ -853,7 +853,7 @@ namespace Web.Services.Concrete
                     {
                         Directory.CreateDirectory(FileRoot);
                     }
-                    FileRoot = Path.Combine(FileRoot, "Stroke");
+                    FileRoot = Path.Combine(FileRoot, UCLEnums.Stroke.ToString());
                     if (!Directory.Exists(FileRoot))
                     {
                         Directory.CreateDirectory(FileRoot);
@@ -1033,7 +1033,7 @@ namespace Web.Services.Concrete
                     {
                         Directory.CreateDirectory(FileRoot);
                     }
-                    FileRoot = Path.Combine(FileRoot, "Stroke");
+                    FileRoot = Path.Combine(FileRoot, UCLEnums.Stroke.ToString());
                     if (!Directory.Exists(FileRoot))
                     {
                         Directory.CreateDirectory(FileRoot);
@@ -1125,7 +1125,7 @@ namespace Web.Services.Concrete
                     {
                         Directory.CreateDirectory(FileRoot);
                     }
-                    FileRoot = Path.Combine(FileRoot, "Stroke");
+                    FileRoot = Path.Combine(FileRoot, UCLEnums.Stroke.ToString());
                     if (!Directory.Exists(FileRoot))
                     {
                         Directory.CreateDirectory(FileRoot);
@@ -1217,7 +1217,7 @@ namespace Web.Services.Concrete
                     {
                         Directory.CreateDirectory(FileRoot);
                     }
-                    FileRoot = Path.Combine(FileRoot, "Stroke");
+                    FileRoot = Path.Combine(FileRoot, UCLEnums.Stroke.ToString());
                     if (!Directory.Exists(FileRoot))
                     {
                         Directory.CreateDirectory(FileRoot);
@@ -1334,20 +1334,28 @@ namespace Web.Services.Concrete
                         string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
                         string friendlyName = stroke.IsEms.HasValue && stroke.IsEms.Value ? $"EMS_{UCLEnums.Stroke.ToString()}_{stroke.CodeStrokeId}" : $"ActiveCode_{UCLEnums.Stroke.ToString()}_{stroke.CodeStrokeId}";
                         var channel = _communication.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
+                        UserChannelSid = UserChannelSid.Distinct().ToList();
                         foreach (var item in UserChannelSid)
                         {
-                            var codeGroupMember = new ActiveCodesGroupMember()
+                            try
                             {
-                                UserIdFk = item.UserId,
-                                ActiveCodeIdFk = stroke.CodeStrokeId,
-                                ActiveCodeName = UCLEnums.Stroke.ToString(),
-                                IsAcknowledge = false,
-                                CreatedBy = ApplicationSettings.UserId,
-                                CreatedDate = DateTime.UtcNow,
-                                IsDeleted = false
-                            };
-                            ACodeGroupMembers.Add(codeGroupMember);
-                            _communication.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
+                                var codeGroupMember = new ActiveCodesGroupMember()
+                                {
+                                    UserIdFk = item.UserId,
+                                    ActiveCodeIdFk = stroke.CodeStrokeId,
+                                    ActiveCodeName = UCLEnums.Stroke.ToString(),
+                                    IsAcknowledge = false,
+                                    CreatedBy = ApplicationSettings.UserId,
+                                    CreatedDate = DateTime.UtcNow,
+                                    IsDeleted = false
+                                };
+                                ACodeGroupMembers.Add(codeGroupMember);
+                                _communication.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
+                            }
+                            catch (Exception ex)
+                            {
+                                ElmahExtensions.RiseError(ex);
+                            }
                         }
                         var isMembersAdded = AddGroupMembers(ACodeGroupMembers);
                         var msg = new ConversationMessageVM()
@@ -1601,7 +1609,7 @@ namespace Web.Services.Concrete
                     {
                         Directory.CreateDirectory(FileRoot);
                     }
-                    FileRoot = Path.Combine(FileRoot, "Sepsis");
+                    FileRoot = Path.Combine(FileRoot, UCLEnums.Sepsis.ToString());
                     if (!Directory.Exists(FileRoot))
                     {
                         Directory.CreateDirectory(FileRoot);
@@ -1693,7 +1701,7 @@ namespace Web.Services.Concrete
                     {
                         Directory.CreateDirectory(FileRoot);
                     }
-                    FileRoot = Path.Combine(FileRoot, "Sepsis");
+                    FileRoot = Path.Combine(FileRoot, UCLEnums.Sepsis.ToString());
                     if (!Directory.Exists(FileRoot))
                     {
                         Directory.CreateDirectory(FileRoot);
@@ -1784,7 +1792,7 @@ namespace Web.Services.Concrete
                     {
                         Directory.CreateDirectory(FileRoot);
                     }
-                    FileRoot = Path.Combine(FileRoot, "Sepsis");
+                    FileRoot = Path.Combine(FileRoot, UCLEnums.Sepsis.ToString());
                     if (!Directory.Exists(FileRoot))
                     {
                         Directory.CreateDirectory(FileRoot);
@@ -1970,7 +1978,7 @@ namespace Web.Services.Concrete
                     {
                         Directory.CreateDirectory(FileRoot);
                     }
-                    FileRoot = Path.Combine(FileRoot, "Sepsis");
+                    FileRoot = Path.Combine(FileRoot, UCLEnums.Sepsis.ToString());
                     if (!Directory.Exists(FileRoot))
                     {
                         Directory.CreateDirectory(FileRoot);
@@ -2061,7 +2069,7 @@ namespace Web.Services.Concrete
                     {
                         Directory.CreateDirectory(FileRoot);
                     }
-                    FileRoot = Path.Combine(FileRoot, "Sepsis");
+                    FileRoot = Path.Combine(FileRoot, UCLEnums.Sepsis.ToString());
                     if (!Directory.Exists(FileRoot))
                     {
                         Directory.CreateDirectory(FileRoot);
@@ -2152,7 +2160,7 @@ namespace Web.Services.Concrete
                     {
                         Directory.CreateDirectory(FileRoot);
                     }
-                    FileRoot = Path.Combine(FileRoot, "Sepsis");
+                    FileRoot = Path.Combine(FileRoot, UCLEnums.Sepsis.ToString());
                     if (!Directory.Exists(FileRoot))
                     {
                         Directory.CreateDirectory(FileRoot);
@@ -2268,20 +2276,28 @@ namespace Web.Services.Concrete
                                         {ChannelAttributeEnums.SepsisId.ToString(), Sepsis.CodeSepsisId}
                                     }, Formatting.Indented);
                         var channel = _communication.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
+                        UserChannelSid = UserChannelSid.Distinct().ToList();
                         foreach (var item in UserChannelSid)
                         {
-                            var codeGroupMember = new ActiveCodesGroupMember()
+                            try
                             {
-                                UserIdFk = item.UserId,
-                                ActiveCodeIdFk = Sepsis.CodeSepsisId,
-                                ActiveCodeName = UCLEnums.Sepsis.ToString(),
-                                IsAcknowledge = false,
-                                CreatedBy = ApplicationSettings.UserId,
-                                CreatedDate = DateTime.UtcNow,
-                                IsDeleted = false
-                            };
-                            ACodeGroupMembers.Add(codeGroupMember);
-                            _communication.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
+                                var codeGroupMember = new ActiveCodesGroupMember()
+                                {
+                                    UserIdFk = item.UserId,
+                                    ActiveCodeIdFk = Sepsis.CodeSepsisId,
+                                    ActiveCodeName = UCLEnums.Sepsis.ToString(),
+                                    IsAcknowledge = false,
+                                    CreatedBy = ApplicationSettings.UserId,
+                                    CreatedDate = DateTime.UtcNow,
+                                    IsDeleted = false
+                                };
+                                ACodeGroupMembers.Add(codeGroupMember);
+                                _communication.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
+                            }
+                            catch (Exception ex)
+                            {
+                                ElmahExtensions.RiseError(ex);
+                            }
                         }
                         var isMembersAdded = AddGroupMembers(ACodeGroupMembers);
 
@@ -2536,7 +2552,7 @@ namespace Web.Services.Concrete
                     {
                         Directory.CreateDirectory(FileRoot);
                     }
-                    FileRoot = Path.Combine(FileRoot, "STEMI");
+                    FileRoot = Path.Combine(FileRoot, UCLEnums.STEMI.ToString());
                     if (!Directory.Exists(FileRoot))
                     {
                         Directory.CreateDirectory(FileRoot);
@@ -2627,7 +2643,7 @@ namespace Web.Services.Concrete
                     {
                         Directory.CreateDirectory(FileRoot);
                     }
-                    FileRoot = Path.Combine(FileRoot, "STEMI");
+                    FileRoot = Path.Combine(FileRoot, UCLEnums.STEMI.ToString());
                     if (!Directory.Exists(FileRoot))
                     {
                         Directory.CreateDirectory(FileRoot);
@@ -2718,7 +2734,7 @@ namespace Web.Services.Concrete
                     {
                         Directory.CreateDirectory(FileRoot);
                     }
-                    FileRoot = Path.Combine(FileRoot, "STEMI");
+                    FileRoot = Path.Combine(FileRoot, UCLEnums.STEMI.ToString());
                     if (!Directory.Exists(FileRoot))
                     {
                         Directory.CreateDirectory(FileRoot);
@@ -2901,7 +2917,7 @@ namespace Web.Services.Concrete
                     {
                         Directory.CreateDirectory(FileRoot);
                     }
-                    FileRoot = Path.Combine(FileRoot, "STEMI");
+                    FileRoot = Path.Combine(FileRoot, UCLEnums.STEMI.ToString());
                     if (!Directory.Exists(FileRoot))
                     {
                         Directory.CreateDirectory(FileRoot);
@@ -2992,7 +3008,7 @@ namespace Web.Services.Concrete
                     {
                         Directory.CreateDirectory(FileRoot);
                     }
-                    FileRoot = Path.Combine(FileRoot, "STEMI");
+                    FileRoot = Path.Combine(FileRoot, UCLEnums.STEMI.ToString());
                     if (!Directory.Exists(FileRoot))
                     {
                         Directory.CreateDirectory(FileRoot);
@@ -3071,6 +3087,7 @@ namespace Web.Services.Concrete
                     }
                 }
                 if (codeSTEMI.Audios != null && codeSTEMI.Audios.Count > 0)
+                if (codeSTEMI.Audios != null && codeSTEMI.Audios.Count > 0)
                 {
                     var RootPath = this._RootPath + "/Organizations";
                     string FileRoot = null;
@@ -3084,7 +3101,7 @@ namespace Web.Services.Concrete
                     {
                         Directory.CreateDirectory(FileRoot);
                     }
-                    FileRoot = Path.Combine(FileRoot, "STEMI");
+                    FileRoot = Path.Combine(FileRoot, UCLEnums.STEMI.ToString());
                     if (!Directory.Exists(FileRoot))
                     {
                         Directory.CreateDirectory(FileRoot);
@@ -3455,7 +3472,7 @@ namespace Web.Services.Concrete
                     {
                         Directory.CreateDirectory(FileRoot);
                     }
-                    FileRoot = Path.Combine(FileRoot, "Truma");
+                    FileRoot = Path.Combine(FileRoot, UCLEnums.Trauma.ToString());
                     if (!Directory.Exists(FileRoot))
                     {
                         Directory.CreateDirectory(FileRoot);
@@ -3546,7 +3563,7 @@ namespace Web.Services.Concrete
                     {
                         Directory.CreateDirectory(FileRoot);
                     }
-                    FileRoot = Path.Combine(FileRoot, "Truma");
+                    FileRoot = Path.Combine(FileRoot, UCLEnums.Trauma.ToString());
                     if (!Directory.Exists(FileRoot))
                     {
                         Directory.CreateDirectory(FileRoot);
@@ -3637,7 +3654,7 @@ namespace Web.Services.Concrete
                     {
                         Directory.CreateDirectory(FileRoot);
                     }
-                    FileRoot = Path.Combine(FileRoot, "Truma");
+                    FileRoot = Path.Combine(FileRoot, UCLEnums.Trauma.ToString());
                     if (!Directory.Exists(FileRoot))
                     {
                         Directory.CreateDirectory(FileRoot);
@@ -3820,7 +3837,7 @@ namespace Web.Services.Concrete
                     {
                         Directory.CreateDirectory(FileRoot);
                     }
-                    FileRoot = Path.Combine(FileRoot, "Truma");
+                    FileRoot = Path.Combine(FileRoot, UCLEnums.Trauma.ToString());
                     if (!Directory.Exists(FileRoot))
                     {
                         Directory.CreateDirectory(FileRoot);
@@ -3911,7 +3928,7 @@ namespace Web.Services.Concrete
                     {
                         Directory.CreateDirectory(FileRoot);
                     }
-                    FileRoot = Path.Combine(FileRoot, "Truma");
+                    FileRoot = Path.Combine(FileRoot, UCLEnums.Trauma.ToString());
                     if (!Directory.Exists(FileRoot))
                     {
                         Directory.CreateDirectory(FileRoot);
@@ -4002,7 +4019,7 @@ namespace Web.Services.Concrete
                     {
                         Directory.CreateDirectory(FileRoot);
                     }
-                    FileRoot = Path.Combine(FileRoot, "Truma");
+                    FileRoot = Path.Combine(FileRoot, UCLEnums.Trauma.ToString());
                     if (!Directory.Exists(FileRoot))
                     {
                         Directory.CreateDirectory(FileRoot);
@@ -4116,21 +4133,28 @@ namespace Web.Services.Concrete
                                         {ChannelAttributeEnums.TraumaId.ToString(), Truma.CodeTraumaId}
                                     }, Formatting.Indented);
                         var channel = _communication.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
+                        UserChannelSid = UserChannelSid.Distinct().ToList();
                         foreach (var item in UserChannelSid)
                         {
-                            var codeGroupMember = new ActiveCodesGroupMember()
+                            try
                             {
-                                UserIdFk = item.UserId,
-                                ActiveCodeIdFk = Truma.CodeTraumaId,
-                                ActiveCodeName = UCLEnums.Trauma.ToString(),
-                                IsAcknowledge = false,
-                                CreatedBy = ApplicationSettings.UserId,
-                                CreatedDate = DateTime.UtcNow,
-                                IsDeleted = false
-                            };
-                            ACodeGroupMembers.Add(codeGroupMember);
-                            _communication.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
-
+                                var codeGroupMember = new ActiveCodesGroupMember()
+                                {
+                                    UserIdFk = item.UserId,
+                                    ActiveCodeIdFk = Truma.CodeTraumaId,
+                                    ActiveCodeName = UCLEnums.Trauma.ToString(),
+                                    IsAcknowledge = false,
+                                    CreatedBy = ApplicationSettings.UserId,
+                                    CreatedDate = DateTime.UtcNow,
+                                    IsDeleted = false
+                                };
+                                ACodeGroupMembers.Add(codeGroupMember);
+                                _communication.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
+                            }
+                            catch (Exception ex)
+                            {
+                                ElmahExtensions.RiseError(ex);
+                            }
                         }
                         var isMembersAdded = AddGroupMembers(ACodeGroupMembers);
                         var msg = new ConversationMessageVM()
@@ -4737,7 +4761,7 @@ namespace Web.Services.Concrete
                     {
                         Directory.CreateDirectory(FileRoot);
                     }
-                    FileRoot = Path.Combine(FileRoot, "Blue");
+                    FileRoot = Path.Combine(FileRoot, UCLEnums.Blue.ToString());
                     if (!Directory.Exists(FileRoot))
                     {
                         Directory.CreateDirectory(FileRoot);
@@ -4829,7 +4853,7 @@ namespace Web.Services.Concrete
                     {
                         Directory.CreateDirectory(FileRoot);
                     }
-                    FileRoot = Path.Combine(FileRoot, "Blue");
+                    FileRoot = Path.Combine(FileRoot, UCLEnums.Blue.ToString());
                     if (!Directory.Exists(FileRoot))
                     {
                         Directory.CreateDirectory(FileRoot);
@@ -4921,7 +4945,7 @@ namespace Web.Services.Concrete
                     {
                         Directory.CreateDirectory(FileRoot);
                     }
-                    FileRoot = Path.Combine(FileRoot, "Blue");
+                    FileRoot = Path.Combine(FileRoot, UCLEnums.Blue.ToString());
                     if (!Directory.Exists(FileRoot))
                     {
                         Directory.CreateDirectory(FileRoot);
@@ -5038,20 +5062,28 @@ namespace Web.Services.Concrete
                         string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
                         string friendlyName = blue.IsEms.HasValue && blue.IsEms.Value ? $"EMS_{UCLEnums.Blue.ToString()}_{blue.CodeBlueId}" : $"ActiveCode_{UCLEnums.Blue.ToString()}_{blue.CodeBlueId}";
                         var channel = _communication.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
+                        UserChannelSid = UserChannelSid.Distinct().ToList();
                         foreach (var item in UserChannelSid)
                         {
-                            var codeGroupMember = new ActiveCodesGroupMember()
+                            try
                             {
-                                UserIdFk = item.UserId,
-                                ActiveCodeIdFk = blue.CodeBlueId,
-                                ActiveCodeName = UCLEnums.Blue.ToString(),
-                                IsAcknowledge = false,
-                                CreatedBy = ApplicationSettings.UserId,
-                                CreatedDate = DateTime.UtcNow,
-                                IsDeleted = false
-                            };
-                            ACodeGroupMembers.Add(codeGroupMember);
-                            _communication.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
+                                var codeGroupMember = new ActiveCodesGroupMember()
+                                {
+                                    UserIdFk = item.UserId,
+                                    ActiveCodeIdFk = blue.CodeBlueId,
+                                    ActiveCodeName = UCLEnums.Blue.ToString(),
+                                    IsAcknowledge = false,
+                                    CreatedBy = ApplicationSettings.UserId,
+                                    CreatedDate = DateTime.UtcNow,
+                                    IsDeleted = false
+                                };
+                                ACodeGroupMembers.Add(codeGroupMember);
+                                _communication.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
+                            }
+                            catch (Exception ex)
+                            {
+                                ElmahExtensions.RiseError(ex);
+                            }
                         }
                         var isMembersAdded = AddGroupMembers(ACodeGroupMembers);
                         var msg = new ConversationMessageVM()
