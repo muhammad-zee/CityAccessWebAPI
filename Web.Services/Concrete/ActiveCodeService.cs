@@ -54,6 +54,7 @@ namespace Web.Services.Concrete
             IRepository<CodeSepsi> codeSepsisRepo,
             IRepository<CodeStemi> codeSTEMIRepo,
             IRepository<CodeTrauma> codeTrumaRepo,
+            IRepository<CodeBlue> codeBlueRepo,
             IRepository<ActiveCodesGroupMember> activeCodesGroupMembersRepo)
         {
             this._config = config;
@@ -71,6 +72,7 @@ namespace Web.Services.Concrete
             this._codeSepsisRepo = codeSepsisRepo;
             this._codeSTEMIRepo = codeSTEMIRepo;
             this._codeTrumaRepo = codeTrumaRepo;
+            this._codeBlueRepo = codeBlueRepo;
             this._activeCodesGroupMembersRepo = activeCodesGroupMembersRepo;
             this._RootPath = this._config["FilePath:Path"].ToString();
             this._GoogleApiKey = this._config["GoogleApi:Key"].ToString();
@@ -3181,7 +3183,7 @@ namespace Web.Services.Concrete
                     {
                         //string uniqueName = $"CONSULT_{Consult_Counter.Counter_Value.ToString()}";
                         string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
-                        string friendlyName = STEMI.IsEms.HasValue && STEMI.IsEms.Value ? $"EMS_{UCLEnums.STEMI.ToString()}_{STEMI.CodeStemiid}" : $"ActiveCode_{UCLEnums.STEMI.ToString()}_{STEMI.CodeStemiid}"
+                        string friendlyName = STEMI.IsEms.HasValue && STEMI.IsEms.Value ? $"EMS_{UCLEnums.STEMI.ToString()}_{STEMI.CodeStemiid}" : $"ActiveCode_{UCLEnums.STEMI.ToString()}_{STEMI.CodeStemiid}";
                         var conversationChannelAttributes = JsonConvert.SerializeObject(new Dictionary<string, Object>()
                                     {
                                         {ChannelAttributeEnums.ChannelType.ToString(), ChannelTypeEnums.EMS.ToString()},
