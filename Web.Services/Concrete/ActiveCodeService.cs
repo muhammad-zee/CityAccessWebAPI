@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using ElmahCore;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System;
@@ -3198,20 +3199,29 @@ namespace Web.Services.Concrete
                                         {ChannelAttributeEnums.STEMIId.ToString(), STEMI.CodeStemiid}
                                     }, Formatting.Indented);
                         var channel = _communication.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
+                        
+                        UserChannelSid = UserChannelSid.Distinct().ToList();
                         foreach (var item in UserChannelSid)
                         {
-                            var codeGroupMember = new ActiveCodesGroupMember()
+                            try
                             {
-                                UserIdFk = item.UserId,
-                                ActiveCodeIdFk = STEMI.CodeStemiid,
-                                ActiveCodeName = UCLEnums.STEMI.ToString(),
-                                IsAcknowledge = false,
-                                CreatedBy = ApplicationSettings.UserId,
-                                CreatedDate = DateTime.UtcNow,
-                                IsDeleted = false
-                            };
-                            ACodeGroupMembers.Add(codeGroupMember);
-                            _communication.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
+                                var codeGroupMember = new ActiveCodesGroupMember()
+                                {
+                                    UserIdFk = item.UserId,
+                                    ActiveCodeIdFk = STEMI.CodeStemiid,
+                                    ActiveCodeName = UCLEnums.STEMI.ToString(),
+                                    IsAcknowledge = false,
+                                    CreatedBy = ApplicationSettings.UserId,
+                                    CreatedDate = DateTime.UtcNow,
+                                    IsDeleted = false
+                                };
+                                ACodeGroupMembers.Add(codeGroupMember);
+                                _communication.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
+                            }
+                            catch (Exception ex)
+                            {
+                                ElmahExtensions.RiseError(ex);
+                            }
                         }
                         var isMembersAdded = AddGroupMembers(ACodeGroupMembers);
                         var msg = new ConversationMessageVM()

@@ -589,9 +589,17 @@ namespace Web.Services.Concrete
         }
         public MemberResource addNewUserToConversationChannel(string ChannelSid, string ParticipantUniqueName)
         {
-            TwilioClient.Init(this.Twilio_AccountSid, this.Twilio_AuthToken);
-            var addParticipant = MemberResource.Create(identity: ParticipantUniqueName, pathServiceSid: this.Twilio_ChatServiceSid, pathChannelSid: ChannelSid);
-            return addParticipant;
+            try
+            {
+                TwilioClient.Init(this.Twilio_AccountSid, this.Twilio_AuthToken);
+                var addParticipant = MemberResource.Create(identity: ParticipantUniqueName, pathServiceSid: this.Twilio_ChatServiceSid, pathChannelSid: ChannelSid);
+                return addParticipant;
+            }
+            catch (Exception ex)
+            {
+                
+                return null;
+            }
 
         }
         public BaseResponse getConversationUsersStatus(string UserSid)
