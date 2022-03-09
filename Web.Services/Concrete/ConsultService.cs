@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using ElmahCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System;
@@ -437,27 +438,54 @@ namespace Web.Services.Concrete
                                     string friendlyName = $"{consultType}_{ServiceName}_{Consult_Counter.Counter_Value}_Consult";
                                     var channel = _communicationService.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
                                     List<ConsultAcknowledgment> consultAcknowledgmentList = new();
-                                    foreach (var item in users.Distinct())
+                                    users = users.Distinct().ToList();
+                                    foreach (var item in users)
                                     {
-                                        this._communicationService.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
-                                        var acknowledgeConsult = new ConsultAcknowledgment
+                                        try
                                         {
-                                            IsAcknowledge = false,
-                                            ConsultIdFk = Consult_Counter.Counter_Value,
-                                            UserIdFk = item.UserId,
-                                            CreatedBy = ApplicationSettings.UserId,
-                                            CreatedDate = DateTime.UtcNow
-                                        };
-                                        consultAcknowledgmentList.Add(acknowledgeConsult);
+                                            this._communicationService.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
+                                            var acknowledgeConsult = new ConsultAcknowledgment
+                                            {
+                                                IsAcknowledge = false,
+                                                ConsultIdFk = Consult_Counter.Counter_Value,
+                                                UserIdFk = item.UserId,
+                                                CreatedBy = ApplicationSettings.UserId,
+                                                CreatedDate = DateTime.UtcNow
+                                            };
+                                            consultAcknowledgmentList.Add(acknowledgeConsult);
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            ElmahExtensions.RiseError(ex);
+                                        }
                                     }
                                     this._consultAcknowledgmentRepo.Insert(consultAcknowledgmentList);
-                                    var msg = new ConversationMessageVM()
+                                    var msg = new ConversationMessageVM();
+                                    msg.author = "System";
+                                    msg.attributes = "";
+                                    msg.body = $"{consultType} {ServiceName} \\n";
+                                    if (keyValues.ContainsKey("PatientFirstName") && keyValues.ContainsKey("PatientLastName"))
                                     {
-                                        author = "System",
-                                        attributes = "",
-                                        body = "This Group created by system for consult purpose",
-                                        channelSid = channel.Sid
-                                    };
+                                        msg.body += $"Patient Name: {keyValues["PatientFirstName"].ToString()} {keyValues["PatientLastName"].ToString()} \\n";
+                                    }
+                                    else
+                                    {
+                                        if (keyValues.ContainsKey("PatientFirstName"))
+                                        {
+                                            msg.body += $"Patient Name: {keyValues["PatientFirstName"].ToString()} \\n";
+                                        }
+                                        if (keyValues.ContainsKey("PatientLastName"))
+                                        {
+                                            msg.body += $"Patient Name: {keyValues["PatientLastName"].ToString()} \\n";
+                                        }
+                                    }
+                                    if (keyValues.ContainsKey("DateOfBirth"))
+                                    {
+                                        DateTime dob = DateTime.Parse(keyValues["DateOfBirth"].ToString());
+                                        msg.body = $"Dob: {dob:MM-dd-yyyy} \\n";
+                                    }
+                                    msg.body += keyValues.ContainsKey("MedicalRecordNumber") ? $"Medical Record Number: {keyValues["MedicalRecordNumber"].ToString()} \\n" : "";
+                                    msg.body += keyValues.ContainsKey("CallbackNumber") ? $"Callback Number: {keyValues["CallbackNumber"].ToString()} \\n" : "";
                                     _communicationService.sendPushNotification(msg);
                                 }
                             }
@@ -470,18 +498,26 @@ namespace Web.Services.Concrete
                             string friendlyName = $"{consultType} {ServiceName} Consult {Consult_Counter.Counter_Value}";
                             var channel = _communicationService.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
                             List<ConsultAcknowledgment> consultAcknowledgmentList = new();
-                            foreach (var item in users.Distinct())
+                            users = users.Distinct().ToList();
+                            foreach (var item in users)
                             {
-                                _communicationService.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
-                                var acknowledgeConsult = new ConsultAcknowledgment
+                                try
                                 {
-                                    IsAcknowledge = false,
-                                    ConsultIdFk = Consult_Counter.Counter_Value,
-                                    UserIdFk = item.UserId,
-                                    CreatedBy = ApplicationSettings.UserId,
-                                    CreatedDate = DateTime.UtcNow
-                                };
-                                consultAcknowledgmentList.Add(acknowledgeConsult);
+                                    this._communicationService.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
+                                    var acknowledgeConsult = new ConsultAcknowledgment
+                                    {
+                                        IsAcknowledge = false,
+                                        ConsultIdFk = Consult_Counter.Counter_Value,
+                                        UserIdFk = item.UserId,
+                                        CreatedBy = ApplicationSettings.UserId,
+                                        CreatedDate = DateTime.UtcNow
+                                    };
+                                    consultAcknowledgmentList.Add(acknowledgeConsult);
+                                }
+                                catch (Exception ex)
+                                {
+                                    ElmahExtensions.RiseError(ex);
+                                }
                             }
                             this._consultAcknowledgmentRepo.Insert(consultAcknowledgmentList);
                             var msg = new ConversationMessageVM();
