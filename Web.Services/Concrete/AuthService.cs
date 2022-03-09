@@ -206,7 +206,7 @@ namespace Web.Services.Concrete
                     }
                 }
 
-                if (register.DobStr != null) 
+                if (register.DobStr != null)
                 {
                     register.Dob = DateTime.Parse(register.DobStr);
                 }

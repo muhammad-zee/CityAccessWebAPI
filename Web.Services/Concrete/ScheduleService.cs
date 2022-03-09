@@ -1,7 +1,6 @@
 ﻿using ElmahCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -110,12 +109,12 @@ namespace Web.Services.Concrete
                                     .WithSqlParam("@initials", initials)
                                     .ExecuteStoredProc<UserRole>().FirstOrDefault();
 
-                        //(from ur in _userRelationRepo.Table
-                        //          join u in _userRepo.Table on ur.UserIdFk equals u.UserId
-                        //          join urs in this._userRoleRepo.Table on u.UserId equals urs.UserIdFk
-                        //          join r in this._roleRepo.Table on urs.RoleIdFk equals r.RoleId
-                        //          where ur.ServiceLineIdFk == fileVM.ServiceLineId && fileVM.RoleIds.ToIntList().Contains(r.RoleId) && !r.IsDeleted && !u.IsDeleted && u.Initials == initials
-                        //          select u.UserId).FirstOrDefault();
+                    //(from ur in _userRelationRepo.Table
+                    //          join u in _userRepo.Table on ur.UserIdFk equals u.UserId
+                    //          join urs in this._userRoleRepo.Table on u.UserId equals urs.UserIdFk
+                    //          join r in this._roleRepo.Table on urs.RoleIdFk equals r.RoleId
+                    //          where ur.ServiceLineIdFk == fileVM.ServiceLineId && fileVM.RoleIds.ToIntList().Contains(r.RoleId) && !r.IsDeleted && !u.IsDeleted && u.Initials == initials
+                    //          select u.UserId).FirstOrDefault();
 
                     //var roleIds = (from ur in _userRelationRepo.Table
                     //               join r in _userRoleRepo.Table on ur.UserIdFk equals r.UserIdFk
@@ -204,18 +203,18 @@ namespace Web.Services.Concrete
                 .WithSqlParam("@serviceLine", serviceLine)
                 .WithSqlParam("@roleIds", roleIds)
                 .ExecuteStoredProc<ScheduleListVM>();
-                /*(from u in this._userRepo.Table
-                                    join urs in this._userRoleRepo.Table on u.UserId equals urs.UserIdFk
-                                    join r in this._roleRepo.Table on urs.RoleIdFk equals r.RoleId
-                                    join ur in this._userRelationRepo.Table on u.UserId equals ur.UserIdFk
-                                    join s in this._serviceRepo.Table on ur.ServiceLineIdFk equals s.ServiceLineId
-                                    where s.ServiceLineId == serviceLine && roleIds.ToIntList().Contains(r.RoleId) && !r.IsDeleted && !u.IsDeleted && !s.IsDeleted
-                                    select new
-                                    {
-                                        r.RoleId,
-                                        u.Initials,
-                                        s.ServiceName
-                                    }).Distinct().ToList();*/
+            /*(from u in this._userRepo.Table
+                                join urs in this._userRoleRepo.Table on u.UserId equals urs.UserIdFk
+                                join r in this._roleRepo.Table on urs.RoleIdFk equals r.RoleId
+                                join ur in this._userRelationRepo.Table on u.UserId equals ur.UserIdFk
+                                join s in this._serviceRepo.Table on ur.ServiceLineIdFk equals s.ServiceLineId
+                                where s.ServiceLineId == serviceLine && roleIds.ToIntList().Contains(r.RoleId) && !r.IsDeleted && !u.IsDeleted && !s.IsDeleted
+                                select new
+                                {
+                                    r.RoleId,
+                                    u.Initials,
+                                    s.ServiceName
+                                }).Distinct().ToList();*/
             if (serviceLineUsers.Count > 0)
             {
                 int count = 0;

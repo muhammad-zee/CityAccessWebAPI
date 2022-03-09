@@ -19,6 +19,7 @@ namespace Web.Data.Models
         public virtual DbSet<ActiveCodesGroupMember> ActiveCodesGroupMembers { get; set; }
         public virtual DbSet<ClinicalHoliday> ClinicalHolidays { get; set; }
         public virtual DbSet<ClinicalHour> ClinicalHours { get; set; }
+        public virtual DbSet<CodeBlue> CodeBlues { get; set; }
         public virtual DbSet<CodeSepsi> CodeSepses { get; set; }
         public virtual DbSet<CodeStemi> CodeStemis { get; set; }
         public virtual DbSet<CodeStroke> CodeStrokes { get; set; }
@@ -139,6 +140,51 @@ namespace Web.Data.Models
                     .HasForeignKey(d => d.ServicelineIdFk)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_ServiceLine_Departments");
+            });
+
+            modelBuilder.Entity<CodeBlue>(entity =>
+            {
+                entity.ToTable("CodeBlue");
+
+                entity.Property(e => e.Attachments).HasMaxLength(500);
+
+                entity.Property(e => e.Audio).HasMaxLength(500);
+
+                entity.Property(e => e.BloodThinners).HasMaxLength(100);
+
+                entity.Property(e => e.ChiefComplant).HasMaxLength(200);
+
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.Distance).HasMaxLength(20);
+
+                entity.Property(e => e.Dob)
+                    .HasColumnType("datetime")
+                    .HasColumnName("DOB");
+
+                entity.Property(e => e.EndTime).HasColumnType("datetime");
+
+                entity.Property(e => e.EstimatedTime).HasMaxLength(50);
+
+                entity.Property(e => e.FamilyContactName).HasMaxLength(100);
+
+                entity.Property(e => e.FamilyContactNumber).HasMaxLength(50);
+
+                entity.Property(e => e.Hpi)
+                    .HasMaxLength(15)
+                    .HasColumnName("HPI");
+
+                entity.Property(e => e.IsEms).HasColumnName("IsEMS");
+
+                entity.Property(e => e.LastKnownWell).HasColumnType("datetime");
+
+                entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.PatientName).HasMaxLength(100);
+
+                entity.Property(e => e.StartingPoint).HasMaxLength(50);
+
+                entity.Property(e => e.Video).HasMaxLength(500);
             });
 
             modelBuilder.Entity<CodeSepsi>(entity =>
