@@ -485,6 +485,8 @@ namespace Web.API.Controllers
 
         #endregion
 
+        #region EMS
+
         [Description("Get All Active EMS")]
         [HttpGet("EMS/GetActiveEMS")]
         public BaseResponse GetActiveEMS()
@@ -500,8 +502,6 @@ namespace Web.API.Controllers
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
         }
-        #region EMS
-
 
         #endregion
 

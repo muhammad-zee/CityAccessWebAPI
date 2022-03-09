@@ -3181,7 +3181,7 @@ namespace Web.Services.Concrete
                     {
                         //string uniqueName = $"CONSULT_{Consult_Counter.Counter_Value.ToString()}";
                         string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
-                        string friendlyName = STEMI.IsEms.HasValue && STEMI.IsEms.Value ? $"EMS_{UCLEnums.STEMI.ToString()}_{STEMI.CodeStemiid}" : $"ActiveCode_{UCLEnums.STEMI.ToString()}_{STEMI.CodeStemiid}"
+                        string friendlyName = STEMI.IsEms.HasValue && STEMI.IsEms.Value ? $"EMS_{UCLEnums.STEMI.ToString()}_{STEMI.CodeStemiid}" : $"ActiveCode_{UCLEnums.STEMI.ToString()}_{STEMI.CodeStemiid}";
                         var conversationChannelAttributes = JsonConvert.SerializeObject(new Dictionary<string, Object>()
                                     {
                                         {ChannelAttributeEnums.ChannelType.ToString(), ChannelTypeEnums.EMS.ToString()},
