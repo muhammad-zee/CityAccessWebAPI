@@ -434,7 +434,7 @@ namespace Web.Services.Concrete
                                     //string uniqueName = $"CONSULT_{Consult_Counter.Counter_Value.ToString()}";
                                     string ServiceName = this._serviceLineRepo.Table.Where(x => x.ServiceLineId == serviceLineId && !x.IsDeleted).Select(x => x.ServiceName).FirstOrDefault();
                                     string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
-                                    string friendlyName = $"{consultType}_{ServiceName}_{Consult_Counter.Counter_Value}_Consult";
+                                    string friendlyName = $"{consultType} {ServiceName} Consult {Consult_Counter.Counter_Value}";
                                     var channel = _communicationService.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
                                     List<ConsultAcknowledgment> consultAcknowledgmentList = new();
                                     users = users.Distinct().ToList();

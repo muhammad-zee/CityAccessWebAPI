@@ -5117,6 +5117,17 @@ namespace Web.Services.Concrete
                         }
                     }
                 }
+
+                var serviceIds = this._activeCodeRepo.Table.Where(s => s.OrganizationIdFk == item.OrganizationIdFk && s.CodeIdFk == item.CodeName.GetActiveCodeId() && !s.IsDeleted).Select(s => new { s.ServiceLineIds, s.DefaultServiceLineId }).FirstOrDefault();
+                item.ServiceLines = this._serviceLineRepo.Table.Where(s => serviceIds.ServiceLineIds.ToIntList().Distinct().Contains(s.ServiceLineId) && s.ServiceLineId != serviceIds.DefaultServiceLineId && !s.IsDeleted).Select(s => new ServiceLineVM() { ServiceLineId = s.ServiceLineId, ServiceName = s.ServiceName }).ToList();
+                var serviceLineIds = (from s in this._codesServiceLinesMappingRepo.Table
+                                      where s.OrganizationIdFk == item.OrganizationIdFk && s.CodeIdFk == item.CodeName.GetActiveCodeId()
+                                      && s.ActiveCodeId == item.Id && s.ActiveCodeName == item.CodeName && s.ServiceLineIdFk != serviceIds.DefaultServiceLineId
+                                      select s.ServiceLineIdFk).ToList();
+                item.DefaultServiceLineId = serviceIds.DefaultServiceLineId;
+                item.DefaultServiceLine = this._serviceLineRepo.Table.Where(s => s.ServiceLineId != serviceIds.DefaultServiceLineId && !s.IsDeleted).Select(s => new ServiceLineVM() { ServiceLineId = s.ServiceLineId, ServiceName = s.ServiceName }).FirstOrDefault();
+                item.SelectedServiceLineIds = string.Join(",", serviceLineIds);
+
                 item.LastKnownWellStr = item.LastKnownWell?.ToString("yyyy-MM-dd hh:mm:ss tt");
                 //item.OrganizationData = orgData;
                 item.GenderTitle = _controlListDetailsRepo.Table.Where(g => g.ControlListDetailId == item.Gender).Select(g => g.Title).FirstOrDefault();

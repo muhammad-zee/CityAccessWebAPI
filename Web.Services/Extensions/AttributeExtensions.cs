@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using Web.Services.Enums;
 
 namespace Web.Services.Extensions
 {
@@ -203,6 +204,21 @@ namespace Web.Services.Extensions
                 return new List<int>();
             }
         }
+
+        public static int GetActiveCodeId(this string codeName) 
+        {
+            var val = typeof(UCLEnums).GetField(codeName).GetRawConstantValue();
+            try
+            {
+                int codeId = val.ToInt();
+                return codeId;
+            }
+            catch 
+            {
+                return 0;
+            }
+        }
+
         public static string GetAbbreviation(this string inputString)
         {
 
