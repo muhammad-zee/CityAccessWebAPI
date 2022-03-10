@@ -5,7 +5,6 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Dynamic.Core;
 using System.Net;
 using Web.Data.Models;
 using Web.DLL.Generic_Repository;
@@ -528,18 +527,18 @@ namespace Web.Services.Concrete
                             {
                                 msg.body += $"Patient Name: {keyValues["PatientFirstName"].ToString()} {keyValues["PatientLastName"].ToString()} \\n";
                             }
-                            else 
+                            else
                             {
-                                if (keyValues.ContainsKey("PatientFirstName")) 
+                                if (keyValues.ContainsKey("PatientFirstName"))
                                 {
                                     msg.body += $"Patient Name: {keyValues["PatientFirstName"].ToString()} \\n";
                                 }
-                                if (keyValues.ContainsKey("PatientLastName")) 
+                                if (keyValues.ContainsKey("PatientLastName"))
                                 {
                                     msg.body += $"Patient Name: {keyValues["PatientLastName"].ToString()} \\n";
                                 }
                             }
-                            if (keyValues.ContainsKey("DateOfBirth")) 
+                            if (keyValues.ContainsKey("DateOfBirth"))
                             {
                                 DateTime dob = DateTime.Parse(keyValues["DateOfBirth"].ToString());
                                 msg.body = $"Dob: {dob:MM-dd-yyyy} \\n";
@@ -547,7 +546,7 @@ namespace Web.Services.Concrete
                             msg.body += keyValues.ContainsKey("MedicalRecordNumber") ? $"Medical Record Number: {keyValues["MedicalRecordNumber"].ToString()} \\n" : "";
                             msg.body += keyValues.ContainsKey("CallbackNumber") ? $"Callback Number: {keyValues["CallbackNumber"].ToString()} \\n" : "";
                             msg.channelSid = channel.Sid;
-                            
+
                             var sendMsg = _communicationService.sendPushNotification(msg);
                         }
                     }

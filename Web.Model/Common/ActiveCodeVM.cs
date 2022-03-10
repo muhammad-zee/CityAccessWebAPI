@@ -11,6 +11,8 @@ namespace Web.Model.Common
         public string OrganizationName { get; set; }
         public int CodeIdFk { get; set; }
         public string ServiceLineIds { get; set; }
+        public int DefaultServiceLineId { get; set; }
+        public string DefaultServiceLineName { get; set; }
         public int CreatedBy { get; set; }
         public DateTime CreatedDate { get; set; }
         public int? ModifiedBy { get; set; }

@@ -597,7 +597,7 @@ namespace Web.Services.Concrete
             }
             catch (Exception ex)
             {
-                
+
                 return null;
             }
 

@@ -124,6 +124,7 @@ namespace Web.Services.Concrete
                 if (item.ActiveCodeId > 0)
                 {
                     var row = this._activeCodeRepo.Table.Where(x => x.ActiveCodeId == item.ActiveCodeId && !x.IsDeleted).FirstOrDefault();
+                    row.DefaultServiceLineId = item.DefaultServiceLineId;
                     row.ServiceLineIds = item.ServiceLineIds;
                     row.ModifiedBy = item.ModifiedBy;
                     row.ModifiedDate = DateTime.Now;
@@ -132,9 +133,32 @@ namespace Web.Services.Concrete
                 }
                 else
                 {
-                    item.CreatedDate = DateTime.UtcNow;
-                    var row = AutoMapperHelper.MapSingleRow<ActiveCodeVM, ActiveCode>(item);
-                    insert.Add(row);
+                    var row = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == item.OrganizationIdFk && x.CodeIdFk == item.CodeIdFk && !x.IsDeleted).FirstOrDefault();
+                    if (row != null)
+                    {
+                        var oldServices = new List<string>();
+                        if (!string.IsNullOrEmpty(row.ServiceLineIds) && !string.IsNullOrWhiteSpace(row.ServiceLineIds))
+                        {
+                            oldServices = row.ServiceLineIds.Split(",").ToList();
+                        }
+                        var newServices = new List<string>();
+                        if (!string.IsNullOrEmpty(row.ServiceLineIds) && !string.IsNullOrWhiteSpace(row.ServiceLineIds))
+                        {
+                            newServices = item.ServiceLineIds.Split(",").ToList();
+                        }
+                        oldServices.AddRange(newServices);
+                        row.DefaultServiceLineId = item.DefaultServiceLineId;
+                        row.ServiceLineIds = string.Join(",", oldServices);
+                        row.ModifiedBy = item.CreatedBy;
+                        row.ModifiedDate = DateTime.Now;
+                        update.Add(row);
+                    }
+                    else
+                    {
+                        item.CreatedDate = DateTime.UtcNow;
+                        var newRow = AutoMapperHelper.MapSingleRow<ActiveCodeVM, ActiveCode>(item);
+                        insert.Add(newRow);
+                    }
                 }
 
             }
