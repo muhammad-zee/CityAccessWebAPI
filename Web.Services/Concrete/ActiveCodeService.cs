@@ -947,12 +947,36 @@ namespace Web.Services.Concrete
 
                 this._codeStrokeRepo.Update(row);
 
-                var serviceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == row.OrganizationIdFk && x.CodeIdFk == UCLEnums.Stroke.ToInt() && !x.IsDeleted).Select(x => x.ServiceLineIds).FirstOrDefault();
-                if (serviceLineIds != null && serviceLineIds != "")
+                 //this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == row.OrganizationIdFk && x.CodeIdFk == UCLEnums.Stroke.ToInt() && !x.IsDeleted).Select(x => x.ServiceLineIds).FirstOrDefault();
+                if (codeStroke.SelectedServiceLineIds != null && codeStroke.SelectedServiceLineIds != "")
                 {
+                    var serviceLineIds = codeStroke.SelectedServiceLineIds.ToIntList();
+
+                    var codeServiceMapping = this._codesServiceLinesMappingRepo.Table.Where(x => x.OrganizationIdFk == row.OrganizationIdFk && x.CodeIdFk == UCLEnums.Stroke.ToInt() && x.ActiveCodeId == row.CodeStrokeId).ToList();
+                    var rowsToDelete = codeServiceMapping.Where(x => !serviceLineIds.Contains(x.ServiceLineIdFk)).ToList();
+                    if (rowsToDelete.Count > 0)
+                        this._codesServiceLinesMappingRepo.DeleteRange(rowsToDelete);
+
+                    serviceLineIds.RemoveAll(x => codeServiceMapping.Select(s => s.ServiceLineIdFk).Contains(x));
+                    var codeServiceMappingList = new List<CodesServiceLinesMapping>();
+                    foreach (var item in serviceLineIds)
+                    {
+                        var codeService = new CodesServiceLinesMapping()
+                        {
+                            OrganizationIdFk = row.OrganizationIdFk,
+                            CodeIdFk = UCLEnums.Stroke.ToInt(),
+                            ServiceLineIdFk = item,
+                            ActiveCodeId = row.CodeStrokeId,
+                            ActiveCodeName = UCLEnums.Stroke.ToString()
+                        };
+                        codeServiceMappingList.Add(codeService);
+                    }
+                    this._codesServiceLinesMappingRepo.Insert(codeServiceMappingList);
+
+
                     var UserChannelSid = (from us in this._userSchedulesRepo.Table
                                           join u in this._userRepo.Table on us.UserIdFk equals u.UserId
-                                          where serviceLineIds.ToIntList().Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.Now && us.ScheduleDateEnd >= DateTime.Now && !us.IsDeleted && !u.IsDeleted
+                                          where serviceLineIds.Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.Now && us.ScheduleDateEnd >= DateTime.Now && !us.IsDeleted && !u.IsDeleted
                                           select u.UserChannelSid).ToList();
 
                     var notification = new PushNotificationVM()
@@ -968,49 +992,6 @@ namespace Web.Services.Concrete
                     _communication.pushNotification(notification);
 
                 }
-
-                //codeStroke.AttachmentsPath = new List<string>();
-                //codeStroke.AudiosPath = new List<string>();
-                //codeStroke.VideosPath = new List<string>();
-
-                //if (!string.IsNullOrEmpty(codeStroke.AttachmentsFolderRoot) && !string.IsNullOrWhiteSpace(codeStroke.AttachmentsFolderRoot))
-                //{
-                //    string path = this._RootPath + codeStroke.AttachmentsFolderRoot; //_environment.WebRootFileProvider.GetFileInfo(codeStroke.AttachmentsFolderRoot)?.PhysicalPath;
-                //    if (Directory.Exists(path))
-                //    {
-                //        DirectoryInfo AttachFiles = new DirectoryInfo(path);
-                //        foreach (var item in AttachFiles.GetFiles())
-                //        {
-                //            codeStroke.AttachmentsPath.Add(codeStroke.AttachmentsFolderRoot + "/" + item.Name);
-                //        }
-                //    }
-                //}
-
-                //if (!string.IsNullOrEmpty(codeStroke.AudioFolderRoot) && !string.IsNullOrWhiteSpace(codeStroke.AudioFolderRoot))
-                //{
-                //    string path = this._RootPath + codeStroke.AudioFolderRoot;  //_environment.WebRootFileProvider.GetFileInfo(codeStroke.AudioFolderRoot)?.PhysicalPath;
-                //    if (Directory.Exists(path))
-                //    {
-                //        DirectoryInfo AudioFiles = new DirectoryInfo(path);
-                //        foreach (var item in AudioFiles.GetFiles())
-                //        {
-                //            codeStroke.AudiosPath.Add(codeStroke.AudioFolderRoot + "/" + item.Name);
-                //        }
-                //    }
-                //}
-
-                //if (!string.IsNullOrEmpty(codeStroke.VideoFolderRoot) && !string.IsNullOrWhiteSpace(codeStroke.VideoFolderRoot))
-                //{
-                //    var path = this._RootPath + codeStroke.VideoFolderRoot;  //_environment.WebRootFileProvider.GetFileInfo(codeStroke.VideoFolderRoot)?.PhysicalPath;
-                //    if (Directory.Exists(path))
-                //    {
-                //        DirectoryInfo VideoFiles = new DirectoryInfo(path);
-                //        foreach (var item in VideoFiles.GetFiles())
-                //        {
-                //            codeStroke.VideosPath.Add(codeStroke.VideoFolderRoot + "/" + item.Name);
-                //        }
-                //    }
-                //}
 
                 return GetStrokeDataById(row.CodeStrokeId);
             }
