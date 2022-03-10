@@ -545,7 +545,7 @@ namespace Web.Services.Concrete
                                       && s.ActiveCodeId == x.CodeStrokeId && s.ActiveCodeName == UCLEnums.Stroke.ToString() && s.ServiceLineIdFk != serviceIds.DefaultServiceLineId
                                       select s.ServiceLineIdFk).ToList();
                 x.DefaultServiceLineId = serviceIds.DefaultServiceLineId;
-                x.DefaultServiceLine = this._serviceLineRepo.Table.Where(s => s.ServiceLineId != serviceIds.DefaultServiceLineId && !s.IsDeleted).Select(s => new ServiceLineVM() { ServiceLineId = s.ServiceLineId, ServiceName = s.ServiceName }).FirstOrDefault();
+                x.DefaultServiceLine = this._serviceLineRepo.Table.Where(s => s.ServiceLineId == serviceIds.DefaultServiceLineId && !s.IsDeleted).Select(s => new ServiceLineVM() { ServiceLineId = s.ServiceLineId, ServiceName = s.ServiceName }).FirstOrDefault();
                 x.SelectedServiceLineIds = string.Join(",", serviceLineIds);
                 x.LastKnownWellStr = x.LastKnownWell?.ToString("yyyy-MM-dd hh:mm:ss tt");
                 x.DobStr = x.Dob?.ToString("yyyy-MM-dd hh:mm:ss tt");
@@ -615,7 +615,7 @@ namespace Web.Services.Concrete
                                       && x.ActiveCodeId == strokeData.CodeStrokeId && x.ActiveCodeName == UCLEnums.Stroke.ToString() && x.ServiceLineIdFk != serviceIds.DefaultServiceLineId
                                       select x.ServiceLineIdFk).ToList();
                 StrokeDataVM.DefaultServiceLineId = serviceIds.DefaultServiceLineId;
-                StrokeDataVM.DefaultServiceLine = this._serviceLineRepo.Table.Where(x => x.ServiceLineId != serviceIds.DefaultServiceLineId && !x.IsDeleted).Select(x => new ServiceLineVM() { ServiceLineId = x.ServiceLineId, ServiceName = x.ServiceName }).FirstOrDefault();
+                StrokeDataVM.DefaultServiceLine = this._serviceLineRepo.Table.Where(x => x.ServiceLineId == serviceIds.DefaultServiceLineId && !x.IsDeleted).Select(x => new ServiceLineVM() { ServiceLineId = x.ServiceLineId, ServiceName = x.ServiceName }).FirstOrDefault();
                 StrokeDataVM.SelectedServiceLineIds = string.Join(",", serviceLineIds);
                 StrokeDataVM.OrganizationData = GetHosplitalAddressObject(StrokeDataVM.OrganizationIdFk);
                 StrokeDataVM.LastKnownWellStr = StrokeDataVM.LastKnownWell?.ToString("yyyy-MM-dd hh:mm:ss tt");
@@ -5125,7 +5125,7 @@ namespace Web.Services.Concrete
                                       && s.ActiveCodeId == item.Id && s.ActiveCodeName == item.CodeName && s.ServiceLineIdFk != serviceIds.DefaultServiceLineId
                                       select s.ServiceLineIdFk).ToList();
                 item.DefaultServiceLineId = serviceIds.DefaultServiceLineId;
-                item.DefaultServiceLine = this._serviceLineRepo.Table.Where(s => s.ServiceLineId != serviceIds.DefaultServiceLineId && !s.IsDeleted).Select(s => new ServiceLineVM() { ServiceLineId = s.ServiceLineId, ServiceName = s.ServiceName }).FirstOrDefault();
+                item.DefaultServiceLine = this._serviceLineRepo.Table.Where(s => s.ServiceLineId == serviceIds.DefaultServiceLineId && !s.IsDeleted).Select(s => new ServiceLineVM() { ServiceLineId = s.ServiceLineId, ServiceName = s.ServiceName }).FirstOrDefault();
                 item.SelectedServiceLineIds = string.Join(",", serviceLineIds);
 
                 item.LastKnownWellStr = item.LastKnownWell?.ToString("yyyy-MM-dd hh:mm:ss tt");
