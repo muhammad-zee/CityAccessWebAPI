@@ -12,6 +12,7 @@ namespace Web.Model.Common
         public int? ModifiedBy { get; set; }
         public DateTime? ModifiedDate { get; set; }
         public bool IsDeleted { get; set; }
+        public bool IsSelected { get; set; } = true;
 
         public int? DepartmentIdFk { get; set; }
     }

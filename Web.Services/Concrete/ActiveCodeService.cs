@@ -81,7 +81,7 @@ namespace Web.Services.Concrete
 
         #region Active Code
 
-        public BaseResponse GetActivatedCodesByOrgId(int orgId)
+        public BaseResponse GetActivatedCodesByOrgId(int orgId, string servicesLineIds = null)
         {
             //var codes = (from c in this._activeCodeRepo.Table
             //             join ucl in this._controlListDetailsRepo.Table on c.CodeIdFk equals ucl.ControlListDetailId
@@ -104,6 +104,13 @@ namespace Web.Services.Concrete
             foreach (var item in codes)
             {
                 item.serviceLines = this._serviceLineRepo.Table.Where(x => !x.IsDeleted && item.ServiceLineIds.ToIntList().Contains(x.ServiceLineId)).Select(x => new ServiceLineVM() { ServiceLineId = x.ServiceLineId, ServiceName = x.ServiceName }).ToList();
+                if (servicesLineIds != null && servicesLineIds != "")
+                {
+                    foreach (var service in item.serviceLines)
+                    {
+                        service.IsSelected = servicesLineIds.ToIntList().Contains(service.ServiceLineId);
+                    }
+                }
             }
             if (codes.Count > 0)
             {
@@ -111,7 +118,7 @@ namespace Web.Services.Concrete
             }
             else
             {
-                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "No Active Code Found", Body = codes };
+                return new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "No Active Code Found", Body = codes };
             }
         }
 
