@@ -12,6 +12,7 @@ namespace Web.Model.Common
         public string DobStr { get; set; }
         public int? Gender { get; set; }
         public int OrganizationIdFk { get; set; }
+        public int DefaultServiceLineId { get; set; }
         public string SelectedServiceLineIds { get; set; }
         public string GenderTitle { get; set; }
         public string ChiefComplant { get; set; }
@@ -38,6 +39,7 @@ namespace Web.Model.Common
         public List<FilesVM> Audios { get; set; }
         public List<FilesVM> Videos { get; set; }
         public List<FilesVM> Attachment { get; set; }
+        public ServiceLineVM DefaultServiceLine { get; set; }
         public List<ServiceLineVM> ServiceLines { get; set; }
         public string Audio { get; set; }
         public string Video { get; set; }
