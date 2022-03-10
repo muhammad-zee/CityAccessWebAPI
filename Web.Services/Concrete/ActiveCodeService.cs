@@ -539,11 +539,11 @@ namespace Web.Services.Concrete
 
 
                 var serviceIds = this._activeCodeRepo.Table.Where(s => s.OrganizationIdFk == x.OrganizationIdFk && s.CodeIdFk == UCLEnums.Stroke.ToInt() && !s.IsDeleted).Select(s => new { s.ServiceLineIds, s.DefaultServiceLineId}).FirstOrDefault();
-                x.ServiceLines = this._serviceLineRepo.Table.Where(s => serviceIds.ServiceLineIds.ToIntList().Distinct().Contains(s.ServiceLineId) && s.ServiceLineId != serviceIds.DefaultServiceLineId && !s.IsDeleted).Select(s => new ServiceLineVM() { ServiceLineId = s.ServiceLineId, ServiceName = s.ServiceName }).ToList();
                 var serviceLineIds = (from s in this._codesServiceLinesMappingRepo.Table
                                       where s.OrganizationIdFk == x.OrganizationIdFk && s.CodeIdFk == UCLEnums.Stroke.ToInt()
                                       && s.ActiveCodeId == x.CodeStrokeId && s.ActiveCodeName == UCLEnums.Stroke.ToString() && s.ServiceLineIdFk != serviceIds.DefaultServiceLineId
                                       select s.ServiceLineIdFk).ToList();
+                x.ServiceLines = this._serviceLineRepo.Table.Where(s => serviceIds.ServiceLineIds.ToIntList().Distinct().Contains(s.ServiceLineId) && s.ServiceLineId != serviceIds.DefaultServiceLineId && !s.IsDeleted).Select(s => new ServiceLineVM() { ServiceLineId = s.ServiceLineId, ServiceName = s.ServiceName, IsSelected = serviceLineIds.Contains(s.ServiceLineId) }).ToList();
                 x.DefaultServiceLineId = serviceIds.DefaultServiceLineId;
                 x.DefaultServiceLine = this._serviceLineRepo.Table.Where(s => s.ServiceLineId == serviceIds.DefaultServiceLineId && !s.IsDeleted).Select(s => new ServiceLineVM() { ServiceLineId = s.ServiceLineId, ServiceName = s.ServiceName }).FirstOrDefault();
                 x.SelectedServiceLineIds = string.Join(",", serviceLineIds);
@@ -609,11 +609,11 @@ namespace Web.Services.Concrete
                 }
 
                 var serviceIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == strokeData.OrganizationIdFk && x.CodeIdFk == UCLEnums.Stroke.ToInt() && !x.IsDeleted).Select(x => new { x.ServiceLineIds, x.DefaultServiceLineId}).FirstOrDefault();
-                StrokeDataVM.ServiceLines = this._serviceLineRepo.Table.Where(x => serviceIds.ServiceLineIds.ToIntList().Distinct().Contains(x.ServiceLineId) && x.ServiceLineId != serviceIds.DefaultServiceLineId && !x.IsDeleted).Select(x => new ServiceLineVM() { ServiceLineId = x.ServiceLineId, ServiceName = x.ServiceName }).ToList();
                 var serviceLineIds = (from x in this._codesServiceLinesMappingRepo.Table
                                       where x.OrganizationIdFk == strokeData.OrganizationIdFk && x.CodeIdFk == UCLEnums.Stroke.ToInt()
                                       && x.ActiveCodeId == strokeData.CodeStrokeId && x.ActiveCodeName == UCLEnums.Stroke.ToString() && x.ServiceLineIdFk != serviceIds.DefaultServiceLineId
                                       select x.ServiceLineIdFk).ToList();
+                StrokeDataVM.ServiceLines = this._serviceLineRepo.Table.Where(x => serviceIds.ServiceLineIds.ToIntList().Distinct().Contains(x.ServiceLineId) && x.ServiceLineId != serviceIds.DefaultServiceLineId && !x.IsDeleted).Select(x => new ServiceLineVM() { ServiceLineId = x.ServiceLineId, ServiceName = x.ServiceName, IsSelected = serviceLineIds.Contains(x.ServiceLineId) }).ToList();
                 StrokeDataVM.DefaultServiceLineId = serviceIds.DefaultServiceLineId;
                 StrokeDataVM.DefaultServiceLine = this._serviceLineRepo.Table.Where(x => x.ServiceLineId == serviceIds.DefaultServiceLineId && !x.IsDeleted).Select(x => new ServiceLineVM() { ServiceLineId = x.ServiceLineId, ServiceName = x.ServiceName }).FirstOrDefault();
                 StrokeDataVM.SelectedServiceLineIds = string.Join(",", serviceLineIds);
@@ -5100,11 +5100,12 @@ namespace Web.Services.Concrete
                 }
 
                 var serviceIds = this._activeCodeRepo.Table.Where(s => s.OrganizationIdFk == item.OrganizationIdFk && s.CodeIdFk == item.CodeName.GetActiveCodeId() && !s.IsDeleted).Select(s => new { s.ServiceLineIds, s.DefaultServiceLineId }).FirstOrDefault();
-                item.ServiceLines = this._serviceLineRepo.Table.Where(s => serviceIds.ServiceLineIds.ToIntList().Distinct().Contains(s.ServiceLineId) && s.ServiceLineId != serviceIds.DefaultServiceLineId && !s.IsDeleted).Select(s => new ServiceLineVM() { ServiceLineId = s.ServiceLineId, ServiceName = s.ServiceName }).ToList();
+                
                 var serviceLineIds = (from s in this._codesServiceLinesMappingRepo.Table
                                       where s.OrganizationIdFk == item.OrganizationIdFk && s.CodeIdFk == item.CodeName.GetActiveCodeId()
                                       && s.ActiveCodeId == item.Id && s.ActiveCodeName == item.CodeName && s.ServiceLineIdFk != serviceIds.DefaultServiceLineId
                                       select s.ServiceLineIdFk).ToList();
+                item.ServiceLines = this._serviceLineRepo.Table.Where(s => serviceIds.ServiceLineIds.ToIntList().Distinct().Contains(s.ServiceLineId) && s.ServiceLineId != serviceIds.DefaultServiceLineId && !s.IsDeleted).Select(s => new ServiceLineVM() { ServiceLineId = s.ServiceLineId, ServiceName = s.ServiceName, IsSelected = serviceLineIds.Contains(s.ServiceLineId) }).ToList();
                 item.DefaultServiceLineId = serviceIds.DefaultServiceLineId;
                 item.DefaultServiceLine = this._serviceLineRepo.Table.Where(s => s.ServiceLineId == serviceIds.DefaultServiceLineId && !s.IsDeleted).Select(s => new ServiceLineVM() { ServiceLineId = s.ServiceLineId, ServiceName = s.ServiceName }).FirstOrDefault();
                 item.SelectedServiceLineIds = string.Join(",", serviceLineIds);
