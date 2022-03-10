@@ -253,20 +253,20 @@ namespace Web.Services.Concrete
             try
             {
                 TwilioClient.Init(this.Twilio_AccountSid, this.Twilio_AuthToken);
-                //var Notify = conversationResource.Service.Conversation.MessageResource.Create(
-                //                           author: msg.author,
-                //                           body: msg.body,
-                //                           attributes: msg.attributes,
-                //                           pathChatServiceSid: this.Twilio_ChatServiceSid,
-                //                           pathConversationSid: msg.channelSid
-                //                           );
-                var Notify = Twilio.Rest.Chat.V2.Service.Channel.MessageResource.Create(
-                                           from: msg.author,
+                var Notify = Twilio.Rest.Conversations.V1.Service.Conversation.MessageResource.Create(
+                                           author: msg.author,
                                            body: msg.body,
                                            attributes: msg.attributes,
-                                           pathServiceSid: this.Twilio_ChatServiceSid,
-                                           pathChannelSid: msg.channelSid
+                                           pathChatServiceSid:  Twilio_ChatServiceSid,
+                                           pathConversationSid: msg.channelSid
                                            );
+                //var Notify = Twilio.Rest.Chat.V2.Service.Channel.MessageResource.Create(
+                //                           from: msg.author,
+                //                           body: msg.body,
+                //                           attributes: msg.attributes,
+                //                           pathServiceSid: this.Twilio_ChatServiceSid,
+                //                           pathChannelSid: msg.channelSid
+                //                           );
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Notification Sent", Body = Notify };
             }
             catch (Exception ex)

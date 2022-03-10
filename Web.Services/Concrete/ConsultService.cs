@@ -460,6 +460,7 @@ namespace Web.Services.Concrete
                                     }
                                     this._consultAcknowledgmentRepo.Insert(consultAcknowledgmentList);
                                     var msg = new ConversationMessageVM();
+                                    msg.channelSid = channel.Sid;
                                     msg.author = "System";
                                     msg.attributes = "";
                                     msg.body = $"{consultType} {ServiceName} \\n";
