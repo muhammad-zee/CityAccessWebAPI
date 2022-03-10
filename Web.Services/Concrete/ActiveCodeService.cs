@@ -37,6 +37,7 @@ namespace Web.Services.Concrete
         private IRepository<CodeTrauma> _codeTrumaRepo;
         private IRepository<CodeBlue> _codeBlueRepo;
         private IRepository<ActiveCodesGroupMember> _activeCodesGroupMembersRepo;
+        private IRepository<CodesServiceLinesMapping> _codesServiceLinesMappingRepo;
         IConfiguration _config;
         private string _RootPath;
         private string _GoogleApiKey;
@@ -56,7 +57,8 @@ namespace Web.Services.Concrete
             IRepository<CodeStemi> codeSTEMIRepo,
             IRepository<CodeTrauma> codeTrumaRepo,
             IRepository<CodeBlue> codeBlueRepo,
-            IRepository<ActiveCodesGroupMember> activeCodesGroupMembersRepo)
+            IRepository<ActiveCodesGroupMember> activeCodesGroupMembersRepo,
+            IRepository<CodesServiceLinesMapping> codesServiceLinesMappingRepo)
         {
             this._config = config;
             this._httpClient = httpClient;
@@ -75,42 +77,21 @@ namespace Web.Services.Concrete
             this._codeTrumaRepo = codeTrumaRepo;
             this._codeBlueRepo = codeBlueRepo;
             this._activeCodesGroupMembersRepo = activeCodesGroupMembersRepo;
+            this._codesServiceLinesMappingRepo = codesServiceLinesMappingRepo;
             this._RootPath = this._config["FilePath:Path"].ToString();
             this._GoogleApiKey = this._config["GoogleApi:Key"].ToString();
         }
 
         #region Active Code
 
-        public BaseResponse GetActivatedCodesByOrgId(int orgId, string servicesLineIds = null)
+        public BaseResponse GetActivatedCodesByOrgId(int orgId)
         {
-            //var codes = (from c in this._activeCodeRepo.Table
-            //             join ucl in this._controlListDetailsRepo.Table on c.CodeIdFk equals ucl.ControlListDetailId
-            //             where c.OrganizationIdFk == orgId && !c.IsDeleted
-            //             select new ActiveCodeVM()
-            //             {
-
-            //                 ActiveCodeId = c.ActiveCodeId,
-            //                 OrganizationIdFk = c.OrganizationIdFk,
-            //                 ActiveCodeName = ucl.Title,
-            //                 CodeIdFk = c.CodeIdFk,
-            //                 ServiceLineIds = c.ServiceLineIds,
-            //                 //serviceLines = this._serviceLineRepo.Table.Where(x => !x.IsDeleted && c.ServiceLineIds.ToIntList().Contains(x.ServiceLineId)).Select(x => new ServiceLineVM() { ServiceLineId = x.ServiceLineId, ServiceName = x.ServiceName }).ToList()
-
-            //             }).Distinct().ToList();
-
             var codes = this._dbContext.LoadStoredProcedure("md_getActivatedCodesForOrg")
                 .WithSqlParam("@pOrgId", orgId)
                 .ExecuteStoredProc<ActiveCodeVM>();
             foreach (var item in codes)
             {
                 item.serviceLines = this._serviceLineRepo.Table.Where(x => !x.IsDeleted && item.ServiceLineIds.ToIntList().Contains(x.ServiceLineId)).Select(x => new ServiceLineVM() { ServiceLineId = x.ServiceLineId, ServiceName = x.ServiceName }).ToList();
-                if (servicesLineIds != null && servicesLineIds != "")
-                {
-                    foreach (var service in item.serviceLines)
-                    {
-                        service.IsSelected = servicesLineIds.ToIntList().Contains(service.ServiceLineId);
-                    }
-                }
             }
             if (codes.Count > 0)
             {
@@ -508,26 +489,6 @@ namespace Web.Services.Concrete
             var strokeDataVM = AutoMapperHelper.MapList<CodeStroke, CodeStrokeVM>(strokeData);
             var orgData = GetHosplitalAddressObject(activeCode.OrganizationIdFk);
 
-            //var org = this._orgRepo.Table.Where(o => o.OrganizationId == orgId && !o.IsDeleted).FirstOrDefault();
-            //if (org != null)
-            //{
-            //    var state = this._controlListDetailsRepo.Table.Where(s => s.ControlListDetailId == org.StateIdFk).Select(s => new { Id = s.ControlListDetailId, s.Title, s.Description }).FirstOrDefault();
-            //    if (state != null)
-            //    {
-            //        string add = $"{org.PrimaryAddress} {org.City}, {state.Title} {org.Zip}";
-            //        string url = "https://maps.googleapis.com/maps/api/geocode/json?address=" + add.Replace(" ", "%20") + "&key=" + this._GoogleApiKey;
-            //        var googleApiLatLng = this._httpClient.GetAsync(url).Result;
-
-            //        dynamic Apiresults = googleApiLatLng["results"];
-            //        var formatted_address = Convert.ToString(Apiresults[0]["formatted_address"]);
-            //        var geometry = Apiresults[0]["geometry"];
-            //        var location = geometry["location"];
-            //        var longLat = new List<double> { Convert.ToDouble(location["lat"]), Convert.ToDouble(location["lng"]) };
-
-            //        orgData = new { OrganizationId = org.OrganizationId, Address = formatted_address, DestinationCoords = string.Join(",", longLat), org.OrganizationName };
-            //    }
-            //}
-
             strokeDataVM.ForEach(x =>
             {
                 x.AttachmentsPath = new List<string>();
@@ -535,6 +496,7 @@ namespace Web.Services.Concrete
                 x.VideosPath = new List<string>();
                 x.OrganizationData = new object();
                 x.BloodThinnersTitle = new List<object>();
+                x.ServiceLines = new List<ServiceLineVM>();
 
                 if (!string.IsNullOrEmpty(x.Attachments) && !string.IsNullOrWhiteSpace(x.Attachments))
                 {
@@ -574,6 +536,15 @@ namespace Web.Services.Concrete
                         }
                     }
                 }
+
+                var serviceIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == x.OrganizationIdFk && x.CodeIdFk == UCLEnums.Stroke.ToInt() && !x.IsDeleted).Select(x => x.ServiceLineIds).FirstOrDefault().ToIntList();
+                x.ServiceLines = this._serviceLineRepo.Table.Where(x => serviceIds.Contains(x.ServiceLineId) && !x.IsDeleted).Select(x => new ServiceLineVM() { ServiceLineId = x.ServiceLineId, ServiceName = x.ServiceName }).ToList();
+                var serviceLineIds = (from slm in this._codesServiceLinesMappingRepo.Table
+                                      where slm.OrganizationIdFk == slm.OrganizationIdFk && slm.CodeIdFk == UCLEnums.Stroke.ToInt()
+                                      && slm.ActiveCodeId == x.CodeStrokeId && slm.ActiveCodeName == UCLEnums.Stroke.ToString()
+                                      select slm.ServiceLineIdFk).ToList();
+                x.SelectedServiceLineIds = string.Join(",", serviceLineIds);
+
                 x.LastKnownWellStr = x.LastKnownWell?.ToString("yyyy-MM-dd hh:mm:ss tt");
                 x.DobStr = x.Dob?.ToString("yyyy-MM-dd hh:mm:ss tt");
                 x.OrganizationData = orgData;
@@ -594,6 +565,7 @@ namespace Web.Services.Concrete
                 StrokeDataVM.VideosPath = new List<string>();
                 StrokeDataVM.BloodThinnersTitle = new List<object>();
                 StrokeDataVM.OrganizationData = new object();
+                StrokeDataVM.ServiceLines = new List<ServiceLineVM>();
 
                 if (!string.IsNullOrEmpty(StrokeDataVM.Attachments) && !string.IsNullOrWhiteSpace(StrokeDataVM.Attachments))
                 {
@@ -634,26 +606,13 @@ namespace Web.Services.Concrete
                     }
                 }
 
-                //var org = this._orgRepo.Table.Where(o => o.OrganizationId == StrokeDataVM.OrganizationIdFk && !o.IsDeleted).FirstOrDefault();
-                //if (org != null)
-                //{
-                //    var state = this._controlListDetailsRepo.Table.Where(s => s.ControlListDetailId == org.StateIdFk).Select(s => new { Id = s.ControlListDetailId, s.Title, s.Description }).FirstOrDefault();
-                //    if (state != null)
-                //    {
-                //        string add = $"{org.PrimaryAddress} {org.City}, {state.Title} {org.Zip}";
-                //        string url = "https://maps.googleapis.com/maps/api/geocode/json?address=" + add.Replace(" ", "%20") + "&key=" + this._GoogleApiKey;
-                //        var googleApiLatLng = this._httpClient.GetAsync(url).Result;
-
-                //        dynamic Apiresults = googleApiLatLng["results"];
-                //        var formatted_address = Convert.ToString(Apiresults[0]["formatted_address"]);
-                //        var geometry = Apiresults[0]["geometry"];
-                //        var location = geometry["location"];
-                //        var longLat = new List<double> { Convert.ToDouble(location["lat"]), Convert.ToDouble(location["lng"]) };
-
-                //        StrokeDataVM.OrganizationData = new { OrganizationId = org.OrganizationId, Address = formatted_address, DestinationCoords = string.Join(",", longLat), org.OrganizationName };
-                //    }
-                //}
-
+                var serviceIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == strokeData.OrganizationIdFk && x.CodeIdFk == UCLEnums.Stroke.ToInt() && !x.IsDeleted).Select(x => x.ServiceLineIds).FirstOrDefault().ToIntList();
+                StrokeDataVM.ServiceLines = this._serviceLineRepo.Table.Where(x => serviceIds.Contains(x.ServiceLineId) && !x.IsDeleted).Select(x => new ServiceLineVM() { ServiceLineId = x.ServiceLineId, ServiceName = x.ServiceName }).ToList();
+                var serviceLineIds = (from x in this._codesServiceLinesMappingRepo.Table
+                                      where x.OrganizationIdFk == strokeData.OrganizationIdFk && x.CodeIdFk == UCLEnums.Stroke.ToInt()
+                                      && x.ActiveCodeId == strokeData.CodeStrokeId && x.ActiveCodeName == UCLEnums.Stroke.ToString()
+                                      select x.ServiceLineIdFk).ToList();
+                StrokeDataVM.SelectedServiceLineIds = string.Join(",", serviceLineIds);
                 StrokeDataVM.OrganizationData = GetHosplitalAddressObject(StrokeDataVM.OrganizationIdFk);
                 StrokeDataVM.LastKnownWellStr = StrokeDataVM.LastKnownWell?.ToString("yyyy-MM-dd hh:mm:ss tt");
                 StrokeDataVM.DobStr = StrokeDataVM.Dob?.ToString("yyyy-MM-dd hh:mm:ss tt");
@@ -1053,9 +1012,10 @@ namespace Web.Services.Concrete
             }
             else
             {
-                var serviceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeStroke.OrganizationIdFk && x.CodeIdFk == UCLEnums.Stroke.ToInt() && !x.IsDeleted).Select(x => x.ServiceLineIds).FirstOrDefault();
-                if (serviceLineIds != null && serviceLineIds != "")
+                //var serviceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeStroke.OrganizationIdFk && x.CodeIdFk == UCLEnums.Stroke.ToInt() && !x.IsDeleted).Select(x => x.ServiceLineIds).FirstOrDefault();
+                if (codeStroke.SelectedServiceLineIds != null && codeStroke.SelectedServiceLineIds != "")
                 {
+                    var serviceLineIds = codeStroke.SelectedServiceLineIds.ToIntList();
                     codeStroke.CreatedDate = DateTime.UtcNow;
                     var stroke = AutoMapperHelper.MapSingleRow<CodeStrokeVM, CodeStroke>(codeStroke);
 
@@ -1351,10 +1311,24 @@ namespace Web.Services.Concrete
 
                     this._codeStrokeRepo.Insert(stroke);
 
+                    var codeServiceMappingList = new List<CodesServiceLinesMapping>();
+                    foreach (var item in serviceLineIds)
+                    {
+                        var codeServiceMapping = new CodesServiceLinesMapping()
+                        {
+                            OrganizationIdFk = stroke.OrganizationIdFk,
+                            CodeIdFk = UCLEnums.Stroke.ToInt(),
+                            ServiceLineIdFk = item,
+                            ActiveCodeId = stroke.CodeStrokeId,
+                            ActiveCodeName = UCLEnums.Stroke.ToString()
+                        };
+                        codeServiceMappingList.Add(codeServiceMapping);
+                    }
+                    this._codesServiceLinesMappingRepo.Insert(codeServiceMappingList);
 
                     var UserChannelSid = (from us in this._userSchedulesRepo.Table
                                           join u in this._userRepo.Table on us.UserIdFk equals u.UserId
-                                          where serviceLineIds.ToIntList().Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
+                                          where serviceLineIds.Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
                                           select new { u.UserUniqueId, u.UserId }).ToList();
                     var loggedUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).FirstOrDefault();
                     UserChannelSid.Add(loggedUser);
@@ -1443,26 +1417,6 @@ namespace Web.Services.Concrete
             var SepsisDataVM = AutoMapperHelper.MapList<CodeSepsi, CodeSepsisVM>(SepsisData);
 
             var orgData = GetHosplitalAddressObject(activeCode.OrganizationIdFk);
-
-            //var org = this._orgRepo.Table.Where(o => o.OrganizationId == orgId && !o.IsDeleted).FirstOrDefault();
-            //if (org != null)
-            //{
-            //    var state = this._controlListDetailsRepo.Table.Where(s => s.ControlListDetailId == org.StateIdFk).Select(s => new { Id = s.ControlListDetailId, s.Title, s.Description }).FirstOrDefault();
-            //    if (state != null)
-            //    {
-            //        string add = $"{org.PrimaryAddress} {org.City}, {state.Title} {org.Zip}";
-            //        string url = "https://maps.googleapis.com/maps/api/geocode/json?address=" + add.Replace(" ", "%20") + "&key=" + this._GoogleApiKey;
-            //        var googleApiLatLng = this._httpClient.GetAsync(url).Result;
-
-            //        dynamic Apiresults = googleApiLatLng["results"];
-            //        var formatted_address = Convert.ToString(Apiresults[0]["formatted_address"]);
-            //        var geometry = Apiresults[0]["geometry"];
-            //        var location = geometry["location"];
-            //        var longLat = new List<double> { Convert.ToDouble(location["lat"]), Convert.ToDouble(location["lng"]) };
-
-            //        orgData = new { OrganizationId = org.OrganizationId, Address = formatted_address, DestinationCoords = string.Join(",", longLat), org.OrganizationName };
-            //    }
-            //}
 
             SepsisDataVM.ForEach(x =>
             {
@@ -1568,26 +1522,6 @@ namespace Web.Services.Concrete
                         }
                     }
                 }
-
-                //var org = this._orgRepo.Table.Where(o => o.OrganizationId == SepsisDataVM.OrganizationIdFk && !o.IsDeleted).FirstOrDefault();
-                //if (org != null)
-                //{
-                //    var state = this._controlListDetailsRepo.Table.Where(s => s.ControlListDetailId == org.StateIdFk).Select(s => new { Id = s.ControlListDetailId, s.Title, s.Description }).FirstOrDefault();
-                //    if (state != null)
-                //    {
-                //        string add = $"{org.PrimaryAddress} {org.City}, {state.Title} {org.Zip}";
-                //        string url = "https://maps.googleapis.com/maps/api/geocode/json?address=" + add.Replace(" ", "%20") + "&key=" + this._GoogleApiKey;
-                //        var googleApiLatLng = this._httpClient.GetAsync(url).Result;
-
-                //        dynamic Apiresults = googleApiLatLng["results"];
-                //        var formatted_address = Convert.ToString(Apiresults[0]["formatted_address"]);
-                //        var geometry = Apiresults[0]["geometry"];
-                //        var location = geometry["location"];
-                //        var longLat = new List<double> { Convert.ToDouble(location["lat"]), Convert.ToDouble(location["lng"]) };
-
-                //        SepsisDataVM.OrganizationData = new { OrganizationId = org.OrganizationId, Address = formatted_address, DestinationCoords = string.Join(",", longLat), org.OrganizationName };
-                //    }
-                //}
 
                 SepsisDataVM.OrganizationData = GetHosplitalAddressObject(SepsisDataVM.OrganizationIdFk);
                 SepsisDataVM.LastKnownWellStr = SepsisDataVM.LastKnownWell.ToString("yyyy-MM-dd hh:mm:ss tt");
@@ -2390,26 +2324,6 @@ namespace Web.Services.Concrete
 
             var orgData = GetHosplitalAddressObject(activeCode.OrganizationIdFk);
 
-            //var org = this._orgRepo.Table.Where(o => o.OrganizationId == orgId && !o.IsDeleted).FirstOrDefault();
-            //if (org != null)
-            //{
-            //    var state = this._controlListDetailsRepo.Table.Where(s => s.ControlListDetailId == org.StateIdFk).Select(s => new { Id = s.ControlListDetailId, s.Title, s.Description }).FirstOrDefault();
-            //    if (state != null)
-            //    {
-            //        string add = $"{org.PrimaryAddress} {org.City}, {state.Title} {org.Zip}";
-            //        string url = "https://maps.googleapis.com/maps/api/geocode/json?address=" + add.Replace(" ", "%20") + "&key=" + this._GoogleApiKey;
-            //        var googleApiLatLng = this._httpClient.GetAsync(url).Result;
-
-            //        dynamic Apiresults = googleApiLatLng["results"];
-            //        var formatted_address = Convert.ToString(Apiresults[0]["formatted_address"]);
-            //        var geometry = Apiresults[0]["geometry"];
-            //        var location = geometry["location"];
-            //        var longLat = new List<double> { Convert.ToDouble(location["lat"]), Convert.ToDouble(location["lng"]) };
-
-            //        orgData = new { OrganizationId = org.OrganizationId, Address = formatted_address, DestinationCoords = string.Join(",", longLat), org.OrganizationName };
-            //    }
-            //}
-
             STEMIDataVM.ForEach(x =>
             {
                 x.AttachmentsPath = new List<string>();
@@ -2514,26 +2428,6 @@ namespace Web.Services.Concrete
                     }
                 }
 
-
-                //var org = this._orgRepo.Table.Where(o => o.OrganizationId == STEMIDataVM.OrganizationIdFk && !o.IsDeleted).FirstOrDefault();
-                //if (org != null)
-                //{
-                //    var state = this._controlListDetailsRepo.Table.Where(s => s.ControlListDetailId == org.StateIdFk).Select(s => new { Id = s.ControlListDetailId, s.Title, s.Description }).FirstOrDefault();
-                //    if (state != null)
-                //    {
-                //        string add = $"{org.PrimaryAddress} {org.City}, {state.Title} {org.Zip}";
-                //        string url = "https://maps.googleapis.com/maps/api/geocode/json?address=" + add.Replace(" ", "%20") + "&key=" + this._GoogleApiKey;
-                //        var googleApiLatLng = this._httpClient.GetAsync(url).Result;
-
-                //        dynamic Apiresults = googleApiLatLng["results"];
-                //        var formatted_address = Convert.ToString(Apiresults[0]["formatted_address"]);
-                //        var geometry = Apiresults[0]["geometry"];
-                //        var location = geometry["location"];
-                //        var longLat = new List<double> { Convert.ToDouble(location["lat"]), Convert.ToDouble(location["lng"]) };
-
-                //        STEMIDataVM.OrganizationData = new { OrganizationId = org.OrganizationId, Address = formatted_address, DestinationCoords = string.Join(",", longLat), org.OrganizationName };
-                //    }
-                //}
                 STEMIDataVM.LastKnownWellStr = STEMIDataVM.LastKnownWell?.ToString("yyyy-MM-dd hh:mm:ss tt");
                 STEMIDataVM.DobStr = STEMIDataVM.Dob?.ToString("yyyy-MM-dd hh:mm:ss tt");
                 STEMIDataVM.OrganizationData = GetHosplitalAddressObject(STEMIDataVM.OrganizationIdFk);
@@ -3434,26 +3328,6 @@ namespace Web.Services.Concrete
                         }
                     }
                 }
-
-                //var org = this._orgRepo.Table.Where(o => o.OrganizationId == TrumaDataVM.OrganizationIdFk && !o.IsDeleted).FirstOrDefault();
-                //if (org != null)
-                //{
-                //    var state = this._controlListDetailsRepo.Table.Where(s => s.ControlListDetailId == org.StateIdFk).Select(s => new { Id = s.ControlListDetailId, s.Title, s.Description }).FirstOrDefault();
-                //    if (state != null)
-                //    {
-                //        string add = $"{org.PrimaryAddress} {org.City}, {state.Title} {org.Zip}";
-                //        string url = "https://maps.googleapis.com/maps/api/geocode/json?address=" + add.Replace(" ", "%20") + "&key=" + this._GoogleApiKey;
-                //        var googleApiLatLng = this._httpClient.GetAsync(url).Result;
-
-                //        dynamic Apiresults = googleApiLatLng["results"];
-                //        var formatted_address = Convert.ToString(Apiresults[0]["formatted_address"]);
-                //        var geometry = Apiresults[0]["geometry"];
-                //        var location = geometry["location"];
-                //        var longLat = new List<double> { Convert.ToDouble(location["lat"]), Convert.ToDouble(location["lng"]) };
-
-                //        TrumaDataVM.OrganizationData = new { OrganizationId = org.OrganizationId, Address = formatted_address, DestinationCoords = string.Join(",", longLat), org.OrganizationName };
-                //    }
-                //}
 
                 TrumaDataVM.OrganizationData = GetHosplitalAddressObject(TrumaDataVM.OrganizationIdFk);
                 TrumaDataVM.LastKnownWellStr = TrumaDataVM.LastKnownWell?.ToString("yyyy-MM-dd hh:mm:ss tt");

@@ -24,6 +24,7 @@ namespace Web.Data.Models
         public virtual DbSet<CodeStemi> CodeStemis { get; set; }
         public virtual DbSet<CodeStroke> CodeStrokes { get; set; }
         public virtual DbSet<CodeTrauma> CodeTraumas { get; set; }
+        public virtual DbSet<CodesServiceLinesMapping> CodesServiceLinesMappings { get; set; }
         public virtual DbSet<Component> Components { get; set; }
         public virtual DbSet<ComponentAccess> ComponentAccesses { get; set; }
         public virtual DbSet<Consult> Consults { get; set; }
@@ -171,7 +172,7 @@ namespace Web.Data.Models
                 entity.Property(e => e.FamilyContactNumber).HasMaxLength(50);
 
                 entity.Property(e => e.Hpi)
-                    .HasMaxLength(15)
+                    .HasMaxLength(500)
                     .HasColumnName("HPI");
 
                 entity.Property(e => e.IsEms).HasColumnName("IsEMS");
@@ -218,7 +219,7 @@ namespace Web.Data.Models
                 entity.Property(e => e.FamilyContactNumber).HasMaxLength(50);
 
                 entity.Property(e => e.Hpi)
-                    .HasMaxLength(15)
+                    .HasMaxLength(500)
                     .HasColumnName("HPI");
 
                 entity.Property(e => e.IsEms).HasColumnName("IsEMS");
@@ -265,7 +266,7 @@ namespace Web.Data.Models
                 entity.Property(e => e.FamilyContactNumber).HasMaxLength(50);
 
                 entity.Property(e => e.Hpi)
-                    .HasMaxLength(15)
+                    .HasMaxLength(500)
                     .HasColumnName("HPI");
 
                 entity.Property(e => e.IsEms).HasColumnName("IsEMS");
@@ -308,7 +309,7 @@ namespace Web.Data.Models
                 entity.Property(e => e.FamilyContactNumber).HasMaxLength(50);
 
                 entity.Property(e => e.Hpi)
-                    .HasMaxLength(15)
+                    .HasMaxLength(500)
                     .HasColumnName("HPI");
 
                 entity.Property(e => e.IsEms).HasColumnName("IsEMS");
@@ -351,7 +352,7 @@ namespace Web.Data.Models
                 entity.Property(e => e.FamilyContactNumber).HasMaxLength(50);
 
                 entity.Property(e => e.Hpi)
-                    .HasMaxLength(15)
+                    .HasMaxLength(500)
                     .HasColumnName("HPI");
 
                 entity.Property(e => e.IsEms).HasColumnName("IsEMS");
@@ -365,6 +366,15 @@ namespace Web.Data.Models
                 entity.Property(e => e.StartingPoint).HasMaxLength(50);
 
                 entity.Property(e => e.Video).HasMaxLength(500);
+            });
+
+            modelBuilder.Entity<CodesServiceLinesMapping>(entity =>
+            {
+                entity.ToTable("CodesServiceLinesMapping");
+
+                entity.Property(e => e.ActiveCodeName)
+                    .IsRequired()
+                    .HasMaxLength(15);
             });
 
             modelBuilder.Entity<Component>(entity =>
