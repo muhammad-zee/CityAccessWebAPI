@@ -550,7 +550,7 @@ namespace Web.Services.Concrete
                 }
 
 
-                var serviceIds = this._activeCodeRepo.Table.Where(s => s.OrganizationIdFk == x.OrganizationIdFk && s.CodeIdFk == UCLEnums.Stroke.ToInt() && !s.IsDeleted).Select(s => new { s.ServiceLineIds, s.DefaultServiceLineId}).FirstOrDefault();
+                var serviceIds = this._activeCodeRepo.Table.Where(s => s.OrganizationIdFk == x.OrganizationIdFk && s.CodeIdFk == UCLEnums.Stroke.ToInt() && !s.IsDeleted).Select(s => new { s.ServiceLineIds, s.DefaultServiceLineId }).FirstOrDefault();
                 var serviceLineIds = (from s in this._codesServiceLinesMappingRepo.Table
                                       where s.OrganizationIdFk == x.OrganizationIdFk && s.CodeIdFk == UCLEnums.Stroke.ToInt()
                                       && s.ActiveCodeId == x.CodeStrokeId && s.ActiveCodeName == UCLEnums.Stroke.ToString() && s.ServiceLineIdFk != serviceIds.DefaultServiceLineId
@@ -620,7 +620,7 @@ namespace Web.Services.Concrete
                     }
                 }
 
-                var serviceIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == strokeData.OrganizationIdFk && x.CodeIdFk == UCLEnums.Stroke.ToInt() && !x.IsDeleted).Select(x => new { x.ServiceLineIds, x.DefaultServiceLineId}).FirstOrDefault();
+                var serviceIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == strokeData.OrganizationIdFk && x.CodeIdFk == UCLEnums.Stroke.ToInt() && !x.IsDeleted).Select(x => new { x.ServiceLineIds, x.DefaultServiceLineId }).FirstOrDefault();
                 var serviceLineIds = (from x in this._codesServiceLinesMappingRepo.Table
                                       where x.OrganizationIdFk == strokeData.OrganizationIdFk && x.CodeIdFk == UCLEnums.Stroke.ToInt()
                                       && x.ActiveCodeId == strokeData.CodeStrokeId && x.ActiveCodeName == UCLEnums.Stroke.ToString() && x.ServiceLineIdFk != serviceIds.DefaultServiceLineId
@@ -959,7 +959,7 @@ namespace Web.Services.Concrete
 
                 this._codeStrokeRepo.Update(row);
 
-                 //this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == row.OrganizationIdFk && x.CodeIdFk == UCLEnums.Stroke.ToInt() && !x.IsDeleted).Select(x => x.ServiceLineIds).FirstOrDefault();
+                //this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == row.OrganizationIdFk && x.CodeIdFk == UCLEnums.Stroke.ToInt() && !x.IsDeleted).Select(x => x.ServiceLineIds).FirstOrDefault();
                 if (codeStroke.SelectedServiceLineIds != null && codeStroke.SelectedServiceLineIds != "")
                 {
                     var serviceLineIds = codeStroke.SelectedServiceLineIds.ToIntList();
@@ -2287,7 +2287,7 @@ namespace Web.Services.Concrete
                             }
                         }
                         var isMembersAdded = AddGroupMembers(ACodeGroupMembers);
-                       
+
                         var msg = new ConversationMessageVM();
                         msg.channelSid = channel.Sid;
                         msg.author = "System";
@@ -2297,8 +2297,8 @@ namespace Web.Services.Concrete
                             msg.body += $"<strong>Patient Name: </strong> {codeSepsis.PatientName} </br>";
                         msg.body += $"<strong>Dob: </strong> {codeSepsis.Dob:MM-dd-yyyy} </br>";
                         msg.body += $"<strong>Last Well Known: </strong> {codeSepsis.LastKnownWell:MM-dd-yyyy hh:mm tt} </br>";
-                        if(codeSepsis.ChiefComplant != null && codeSepsis.ChiefComplant != "")
-                        msg.body += $"<strong>Chief Complaint: </strong> {codeSepsis.ChiefComplant} </br>";
+                        if (codeSepsis.ChiefComplant != null && codeSepsis.ChiefComplant != "")
+                            msg.body += $"<strong>Chief Complaint: </strong> {codeSepsis.ChiefComplant} </br>";
                         if (codeSepsis.Hpi != null && codeSepsis.Hpi != "")
                             msg.body += $"<strong>Hpi: </strong> {codeSepsis.Hpi} </br>";
 
@@ -5288,7 +5288,7 @@ namespace Web.Services.Concrete
                 }
 
                 var serviceIds = this._activeCodeRepo.Table.Where(s => s.OrganizationIdFk == item.OrganizationIdFk && s.CodeIdFk == item.CodeName.GetActiveCodeId() && !s.IsDeleted).Select(s => new { s.ServiceLineIds, s.DefaultServiceLineId }).FirstOrDefault();
-                
+
                 var serviceLineIds = (from s in this._codesServiceLinesMappingRepo.Table
                                       where s.OrganizationIdFk == item.OrganizationIdFk && s.CodeIdFk == item.CodeName.GetActiveCodeId()
                                       && s.ActiveCodeId == item.Id && s.ActiveCodeName == item.CodeName && s.ServiceLineIdFk != serviceIds.DefaultServiceLineId
