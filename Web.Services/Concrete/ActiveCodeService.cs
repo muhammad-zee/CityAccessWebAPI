@@ -5126,7 +5126,7 @@ namespace Web.Services.Concrete
                             OrganizationIdFk = codeBlue.OrganizationIdFk,
                             CodeIdFk = UCLEnums.Blue.ToInt(),
                             ServiceLineIdFk = item,
-                            ActiveCodeId = codeBlue.CodeBlueId,
+                            ActiveCodeId = blue.CodeBlueId,
                             ActiveCodeName = UCLEnums.Blue.ToString()
                         };
                         codeServiceMappingList.Add(codeServiceMapping);
