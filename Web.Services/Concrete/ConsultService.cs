@@ -523,29 +523,29 @@ namespace Web.Services.Concrete
                             var msg = new ConversationMessageVM();
                             msg.author = "System";
                             msg.attributes = "";
-                            msg.body = $"{consultType} {ServiceName} \\n";
+                            msg.body = $"{consultType} {ServiceName} </br>";
                             if (keyValues.ContainsKey("PatientFirstName") && keyValues.ContainsKey("PatientLastName"))
                             {
-                                msg.body += $"Patient Name: {keyValues["PatientFirstName"].ToString()} {keyValues["PatientLastName"].ToString()} \\n";
+                                msg.body += $"<strong>Patient Name:</strong> {keyValues["PatientFirstName"].ToString()} {keyValues["PatientLastName"].ToString()} </br>";
                             }
                             else
                             {
                                 if (keyValues.ContainsKey("PatientFirstName"))
                                 {
-                                    msg.body += $"Patient Name: {keyValues["PatientFirstName"].ToString()} \\n";
+                                    msg.body += $"<strong>Patient Name:</strong> {keyValues["PatientFirstName"].ToString()} </br>";
                                 }
                                 if (keyValues.ContainsKey("PatientLastName"))
                                 {
-                                    msg.body += $"Patient Name: {keyValues["PatientLastName"].ToString()} \\n";
+                                    msg.body += $"<strong>Patient Name:</strong> {keyValues["PatientLastName"].ToString()} </br>";
                                 }
                             }
                             if (keyValues.ContainsKey("DateOfBirth"))
                             {
                                 DateTime dob = DateTime.Parse(keyValues["DateOfBirth"].ToString());
-                                msg.body = $"Dob: {dob:MM-dd-yyyy} \\n";
+                                msg.body += $"<strong>Dob:</strong> {dob:MM-dd-yyyy} </br>";
                             }
-                            msg.body += keyValues.ContainsKey("MedicalRecordNumber") ? $"Medical Record Number: {keyValues["MedicalRecordNumber"].ToString()} \\n" : "";
-                            msg.body += keyValues.ContainsKey("CallbackNumber") ? $"Callback Number: {keyValues["CallbackNumber"].ToString()} \\n" : "";
+                            msg.body += keyValues.ContainsKey("MedicalRecordNumber") ? $"<strong>Medical Record Number:</strong> {keyValues["MedicalRecordNumber"].ToString()} </br>" : "";
+                            msg.body += keyValues.ContainsKey("CallbackNumber") ? $"<strong>Callback Number:</strong> {keyValues["CallbackNumber"].ToString()} </br>" : "";
                             msg.channelSid = channel.Sid;
 
                             var sendMsg = _communicationService.sendPushNotification(msg);
