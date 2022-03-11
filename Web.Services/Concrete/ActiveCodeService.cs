@@ -1369,7 +1369,7 @@ namespace Web.Services.Concrete
                         msg.channelSid = channel.Sid;
                         msg.author = "System";
                         msg.attributes = "";
-                        msg.body = $"{(codeStroke.IsEms.HasValue && codeStroke.IsEms.Value ? "EMS Code" : "Active Code")} {UCLEnums.Stroke.ToString()} </br>";
+                        msg.body = $"{(codeStroke.IsEms.HasValue && codeStroke.IsEms.Value ? "EMS Code" : "Active Code")} {UCLEnums.Stroke.ToString()} </br></br>";
                         if (codeStroke.PatientName != null && codeStroke.PatientName != "")
                             msg.body += $"<strong>Patient Name: </strong> {codeStroke.PatientName} </br>";
                         msg.body += $"<strong>Dob: </strong> {codeStroke.Dob:MM-dd-yyyy} </br>";
@@ -2292,7 +2292,7 @@ namespace Web.Services.Concrete
                         msg.channelSid = channel.Sid;
                         msg.author = "System";
                         msg.attributes = "";
-                        msg.body = $"{(codeSepsis.IsEms ? "EMS Code" : "Active Code")} {UCLEnums.Sepsis.ToString()} </br>";
+                        msg.body = $"{(codeSepsis.IsEms ? "EMS Code" : "Active Code")} {UCLEnums.Sepsis.ToString()} </br></br>";
                         if (codeSepsis.PatientName != null && codeSepsis.PatientName != "")
                             msg.body += $"<strong>Patient Name: </strong> {codeSepsis.PatientName} </br>";
                         msg.body += $"<strong>Dob: </strong> {codeSepsis.Dob:MM-dd-yyyy} </br>";
@@ -3260,7 +3260,7 @@ namespace Web.Services.Concrete
                         msg.channelSid = channel.Sid;
                         msg.author = "System";
                         msg.attributes = "";
-                        msg.body = $"{(codeSTEMI.IsEms.HasValue && codeSTEMI.IsEms.Value ? "EMS Code" : "Active Code")} {UCLEnums.STEMI.ToString()} </br>";
+                        msg.body = $"{(codeSTEMI.IsEms.HasValue && codeSTEMI.IsEms.Value ? "EMS Code" : "Active Code")} {UCLEnums.STEMI.ToString()} </br></br>";
                         if (codeSTEMI.PatientName != null && codeSTEMI.PatientName != "")
                             msg.body += $"<strong>Patient Name: </strong> {codeSTEMI.PatientName} </br>";
                         msg.body += $"<strong>Dob: </strong> {codeSTEMI.Dob:MM-dd-yyyy} </br>";
@@ -4222,7 +4222,7 @@ namespace Web.Services.Concrete
                         msg.channelSid = channel.Sid;
                         msg.author = "System";
                         msg.attributes = "";
-                        msg.body = $"{(codeTruma.IsEms.HasValue && codeTruma.IsEms.Value ? "EMS Code" : "Active Code")} {UCLEnums.Trauma.ToString()} </br>";
+                        msg.body = $"{(codeTruma.IsEms.HasValue && codeTruma.IsEms.Value ? "EMS Code" : "Active Code")} {UCLEnums.Trauma.ToString()} </br></br>";
                         if (codeTruma.PatientName != null && codeTruma.PatientName != "")
                             msg.body += $"<strong>Patient Name: </strong> {codeTruma.PatientName} </br>";
                         msg.body += $"<strong>Dob: </strong> {codeTruma.Dob:MM-dd-yyyy} </br>";
@@ -5180,7 +5180,7 @@ namespace Web.Services.Concrete
                         msg.channelSid = channel.Sid;
                         msg.author = "System";
                         msg.attributes = "";
-                        msg.body = $"{(codeBlue.IsEms.HasValue && codeBlue.IsEms.Value ? "EMS Code" : "Active Code")} {UCLEnums.Blue.ToString()} </br>";
+                        msg.body = $"{(codeBlue.IsEms.HasValue && codeBlue.IsEms.Value ? "EMS Code" : "Active Code")} {UCLEnums.Blue.ToString()} </br></br>";
                         if (codeBlue.PatientName != null && codeBlue.PatientName != "")
                             msg.body += $"<strong>Patient Name: </strong> {codeBlue.PatientName} </br>";
                         msg.body += $"<strong>Dob: </strong> {codeBlue.Dob:MM-dd-yyyy} </br>";
