@@ -35,7 +35,10 @@ namespace Web.Model.Common
         public string Audio { get; set; }
         public string Video { get; set; }
         public string Attachments { get; set; }
-
+        public int DefaultServiceLineId { get; set; }
+        public string SelectedServiceLineIds { get; set; }
+        public ServiceLineVM DefaultServiceLine { get; set; }
+        public List<ServiceLineVM> ServiceLines { get; set; }
         public List<FilesVM> Audios { get; set; }
         public List<FilesVM> Videos { get; set; }
         public List<FilesVM> Attachment { get; set; }

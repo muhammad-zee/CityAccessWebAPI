@@ -192,6 +192,7 @@ namespace Web.Services.Concrete
                 item.AudiosPath = new List<string>();
                 item.VideosPath = new List<string>();
                 item.BloodThinnersTitle = new List<object>();
+                item.ServiceLines = new List<ServiceLineVM>();
                 if (!string.IsNullOrEmpty(item.Attachments) && !string.IsNullOrWhiteSpace(item.Attachments))
                 {
                     string path = this._RootPath + item.Attachments;
@@ -1420,6 +1421,7 @@ namespace Web.Services.Concrete
                 x.AudiosPath = new List<string>();
                 x.VideosPath = new List<string>();
                 x.BloodThinnersTitle = new List<object>();
+                x.ServiceLines = new List<ServiceLineVM>();
                 //x.OrganizationData == new object();
 
                 if (!string.IsNullOrEmpty(x.Attachments) && !string.IsNullOrWhiteSpace(x.Attachments))
@@ -1460,6 +1462,15 @@ namespace Web.Services.Concrete
                         }
                     }
                 }
+                var serviceIds = this._activeCodeRepo.Table.Where(s => s.OrganizationIdFk == x.OrganizationIdFk && s.CodeIdFk == UCLEnums.Sepsis.ToInt() && !s.IsDeleted).Select(s => new { s.ServiceLineIds, s.DefaultServiceLineId }).FirstOrDefault();
+                var serviceLineIds = (from s in this._codesServiceLinesMappingRepo.Table
+                                      where s.OrganizationIdFk == x.OrganizationIdFk && s.CodeIdFk == UCLEnums.Sepsis.ToInt()
+                                      && s.ActiveCodeId == x.CodeSepsisId && s.ActiveCodeName == UCLEnums.Sepsis.ToString() && s.ServiceLineIdFk != serviceIds.DefaultServiceLineId
+                                      select s.ServiceLineIdFk).ToList();
+                x.ServiceLines = this._serviceLineRepo.Table.Where(s => serviceIds.ServiceLineIds.ToIntList().Distinct().Contains(s.ServiceLineId) && s.ServiceLineId != serviceIds.DefaultServiceLineId && !s.IsDeleted).Select(s => new ServiceLineVM() { ServiceLineId = s.ServiceLineId, ServiceName = s.ServiceName, IsSelected = serviceLineIds.Contains(s.ServiceLineId) }).ToList();
+                x.DefaultServiceLineId = serviceIds.DefaultServiceLineId;
+                x.DefaultServiceLine = this._serviceLineRepo.Table.Where(s => s.ServiceLineId == serviceIds.DefaultServiceLineId && !s.IsDeleted).Select(s => new ServiceLineVM() { ServiceLineId = s.ServiceLineId, ServiceName = s.ServiceName }).FirstOrDefault();
+                x.SelectedServiceLineIds = string.Join(",", serviceLineIds);
                 x.LastKnownWellStr = x.LastKnownWell.ToString("yyyy-MM-dd hh:mm:ss tt");
                 x.DobStr = x.Dob.ToString("yyyy-MM-dd hh:mm:ss tt");
                 x.OrganizationData = orgData;
@@ -1518,6 +1529,16 @@ namespace Web.Services.Concrete
                         }
                     }
                 }
+
+                var serviceIds = this._activeCodeRepo.Table.Where(s => s.OrganizationIdFk == SepsisDataVM.OrganizationIdFk && s.CodeIdFk == UCLEnums.Sepsis.ToInt() && !s.IsDeleted).Select(s => new { s.ServiceLineIds, s.DefaultServiceLineId }).FirstOrDefault();
+                var serviceLineIds = (from s in this._codesServiceLinesMappingRepo.Table
+                                      where s.OrganizationIdFk == SepsisDataVM.OrganizationIdFk && s.CodeIdFk == UCLEnums.Sepsis.ToInt()
+                                      && s.ActiveCodeId == SepsisDataVM.CodeSepsisId && s.ActiveCodeName == UCLEnums.Sepsis.ToString() && s.ServiceLineIdFk != serviceIds.DefaultServiceLineId
+                                      select s.ServiceLineIdFk).ToList();
+                SepsisDataVM.ServiceLines = this._serviceLineRepo.Table.Where(s => serviceIds.ServiceLineIds.ToIntList().Distinct().Contains(s.ServiceLineId) && s.ServiceLineId != serviceIds.DefaultServiceLineId && !s.IsDeleted).Select(s => new ServiceLineVM() { ServiceLineId = s.ServiceLineId, ServiceName = s.ServiceName, IsSelected = serviceLineIds.Contains(s.ServiceLineId) }).ToList();
+                SepsisDataVM.DefaultServiceLineId = serviceIds.DefaultServiceLineId;
+                SepsisDataVM.DefaultServiceLine = this._serviceLineRepo.Table.Where(s => s.ServiceLineId == serviceIds.DefaultServiceLineId && !s.IsDeleted).Select(s => new ServiceLineVM() { ServiceLineId = s.ServiceLineId, ServiceName = s.ServiceName }).FirstOrDefault();
+                SepsisDataVM.SelectedServiceLineIds = string.Join(",", serviceLineIds);
 
                 SepsisDataVM.OrganizationData = GetHosplitalAddressObject(SepsisDataVM.OrganizationIdFk);
                 SepsisDataVM.LastKnownWellStr = SepsisDataVM.LastKnownWell.ToString("yyyy-MM-dd hh:mm:ss tt");
@@ -1857,12 +1878,35 @@ namespace Web.Services.Concrete
 
                 this._codeSepsisRepo.Update(row);
 
-                var serviceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == row.OrganizationIdFk && x.CodeIdFk == UCLEnums.Sepsis.ToInt() && !x.IsDeleted).Select(x => x.ServiceLineIds).FirstOrDefault();
-                if (serviceLineIds != null && serviceLineIds != "")
+                //var serviceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == row.OrganizationIdFk && x.CodeIdFk == UCLEnums.Sepsis.ToInt() && !x.IsDeleted).Select(x => x.ServiceLineIds).FirstOrDefault();
+                if (codeSepsis.SelectedServiceLineIds != null && codeSepsis.SelectedServiceLineIds != "")
                 {
+                    var serviceLineIds = codeSepsis.SelectedServiceLineIds.ToIntList();
+                    var codeServiceMapping = this._codesServiceLinesMappingRepo.Table.Where(x => x.OrganizationIdFk == row.OrganizationIdFk && x.CodeIdFk == UCLEnums.Sepsis.ToInt() && x.ActiveCodeId == row.CodeSepsisId).ToList();
+                    var rowsToDelete = codeServiceMapping.Where(x => !serviceLineIds.Contains(x.ServiceLineIdFk)).ToList();
+                    if (rowsToDelete.Count > 0)
+                        this._codesServiceLinesMappingRepo.DeleteRange(rowsToDelete);
+
+                    serviceLineIds.RemoveAll(x => codeServiceMapping.Select(s => s.ServiceLineIdFk).Contains(x));
+                    var codeServiceMappingList = new List<CodesServiceLinesMapping>();
+                    foreach (var item in serviceLineIds)
+                    {
+                        var codeService = new CodesServiceLinesMapping()
+                        {
+                            OrganizationIdFk = row.OrganizationIdFk,
+                            CodeIdFk = UCLEnums.Stroke.ToInt(),
+                            ServiceLineIdFk = item,
+                            ActiveCodeId = row.CodeSepsisId,
+                            ActiveCodeName = UCLEnums.Stroke.ToString()
+                        };
+                        codeServiceMappingList.Add(codeService);
+                    }
+                    this._codesServiceLinesMappingRepo.Insert(codeServiceMappingList);
+
+
                     var UserChannelSid = (from us in this._userSchedulesRepo.Table
                                           join u in this._userRepo.Table on us.UserIdFk equals u.UserId
-                                          where serviceLineIds.ToIntList().Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
+                                          where serviceLineIds.Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
                                           select u.UserChannelSid).ToList();
 
                     var notification = new PushNotificationVM()
@@ -1930,9 +1974,10 @@ namespace Web.Services.Concrete
             else
             {
 
-                var serviceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeSepsis.OrganizationIdFk && x.CodeIdFk == UCLEnums.Sepsis.ToInt() && !x.IsDeleted).Select(x => x.ServiceLineIds).FirstOrDefault();
-                if (serviceLineIds != null && serviceLineIds != "")
+                //var serviceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeSepsis.OrganizationIdFk && x.CodeIdFk == UCLEnums.Sepsis.ToInt() && !x.IsDeleted).Select(x => x.ServiceLineIds).FirstOrDefault();
+                if (codeSepsis.SelectedServiceLineIds != null && codeSepsis.SelectedServiceLineIds != "")
                 {
+                    var serviceLineIds = codeSepsis.SelectedServiceLineIds.ToIntList();
                     codeSepsis.CreatedDate = DateTime.UtcNow;
                     var Sepsis = AutoMapperHelper.MapSingleRow<CodeSepsisVM, CodeSepsi>(codeSepsis);
 
@@ -2224,11 +2269,24 @@ namespace Web.Services.Concrete
                     }
                     this._codeSepsisRepo.Insert(Sepsis);
 
-
+                    var codeServiceMappingList = new List<CodesServiceLinesMapping>();
+                    foreach (var item in serviceLineIds)
+                    {
+                        var codeServiceMapping = new CodesServiceLinesMapping()
+                        {
+                            OrganizationIdFk = Sepsis.OrganizationIdFk,
+                            CodeIdFk = UCLEnums.Sepsis.ToInt(),
+                            ServiceLineIdFk = item,
+                            ActiveCodeId = Sepsis.CodeSepsisId,
+                            ActiveCodeName = UCLEnums.Sepsis.ToString()
+                        };
+                        codeServiceMappingList.Add(codeServiceMapping);
+                    }
+                    this._codesServiceLinesMappingRepo.Insert(codeServiceMappingList);
 
                     var UserChannelSid = (from us in this._userSchedulesRepo.Table
                                           join u in this._userRepo.Table on us.UserIdFk equals u.UserId
-                                          where serviceLineIds.ToIntList().Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
+                                          where serviceLineIds.Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
                                           select new { u.UserUniqueId, u.UserId }).ToList();
                     var loggedUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).FirstOrDefault();
                     UserChannelSid.Add(loggedUser);
@@ -2326,6 +2384,7 @@ namespace Web.Services.Concrete
                 x.AudiosPath = new List<string>();
                 x.VideosPath = new List<string>();
                 x.BloodThinnersTitle = new List<object>();
+                x.ServiceLines = new List<ServiceLineVM>();
 
                 if (!string.IsNullOrEmpty(x.Attachments) && !string.IsNullOrWhiteSpace(x.Attachments))
                 {
@@ -2365,6 +2424,16 @@ namespace Web.Services.Concrete
                         }
                     }
                 }
+
+                var serviceIds = this._activeCodeRepo.Table.Where(s => s.OrganizationIdFk == x.OrganizationIdFk && s.CodeIdFk == UCLEnums.Sepsis.ToInt() && !s.IsDeleted).Select(s => new { s.ServiceLineIds, s.DefaultServiceLineId }).FirstOrDefault();
+                var serviceLineIds = (from s in this._codesServiceLinesMappingRepo.Table
+                                      where s.OrganizationIdFk == x.OrganizationIdFk && s.CodeIdFk == UCLEnums.Sepsis.ToInt()
+                                      && s.ActiveCodeId == x.CodeStemiid && s.ActiveCodeName == UCLEnums.Sepsis.ToString() && s.ServiceLineIdFk != serviceIds.DefaultServiceLineId
+                                      select s.ServiceLineIdFk).ToList();
+                x.ServiceLines = this._serviceLineRepo.Table.Where(s => serviceIds.ServiceLineIds.ToIntList().Distinct().Contains(s.ServiceLineId) && s.ServiceLineId != serviceIds.DefaultServiceLineId && !s.IsDeleted).Select(s => new ServiceLineVM() { ServiceLineId = s.ServiceLineId, ServiceName = s.ServiceName, IsSelected = serviceLineIds.Contains(s.ServiceLineId) }).ToList();
+                x.DefaultServiceLineId = serviceIds.DefaultServiceLineId;
+                x.DefaultServiceLine = this._serviceLineRepo.Table.Where(s => s.ServiceLineId == serviceIds.DefaultServiceLineId && !s.IsDeleted).Select(s => new ServiceLineVM() { ServiceLineId = s.ServiceLineId, ServiceName = s.ServiceName }).FirstOrDefault();
+                x.SelectedServiceLineIds = string.Join(",", serviceLineIds);
                 x.LastKnownWellStr = x.LastKnownWell?.ToString("yyyy-MM-dd hh:mm:ss tt");
                 x.DobStr = x.Dob?.ToString("yyyy-MM-dd hh:mm:ss tt");
                 x.OrganizationData = orgData;
@@ -2384,6 +2453,7 @@ namespace Web.Services.Concrete
                 STEMIDataVM.AudiosPath = new List<string>();
                 STEMIDataVM.VideosPath = new List<string>();
                 STEMIDataVM.BloodThinnersTitle = new List<object>();
+                STEMIDataVM.ServiceLines = new List<ServiceLineVM>();
 
                 if (!string.IsNullOrEmpty(STEMIDataVM.Attachments) && !string.IsNullOrWhiteSpace(STEMIDataVM.Attachments))
                 {
@@ -2423,6 +2493,15 @@ namespace Web.Services.Concrete
                         }
                     }
                 }
+                var serviceIds = this._activeCodeRepo.Table.Where(s => s.OrganizationIdFk == STEMIDataVM.OrganizationIdFk && s.CodeIdFk == UCLEnums.STEMI.ToInt() && !s.IsDeleted).Select(s => new { s.ServiceLineIds, s.DefaultServiceLineId }).FirstOrDefault();
+                var serviceLineIds = (from s in this._codesServiceLinesMappingRepo.Table
+                                      where s.OrganizationIdFk == STEMIDataVM.OrganizationIdFk && s.CodeIdFk == UCLEnums.STEMI.ToInt()
+                                      && s.ActiveCodeId == STEMIDataVM.CodeStemiid && s.ActiveCodeName == UCLEnums.STEMI.ToString() && s.ServiceLineIdFk != serviceIds.DefaultServiceLineId
+                                      select s.ServiceLineIdFk).ToList();
+                STEMIDataVM.ServiceLines = this._serviceLineRepo.Table.Where(s => serviceIds.ServiceLineIds.ToIntList().Distinct().Contains(s.ServiceLineId) && s.ServiceLineId != serviceIds.DefaultServiceLineId && !s.IsDeleted).Select(s => new ServiceLineVM() { ServiceLineId = s.ServiceLineId, ServiceName = s.ServiceName, IsSelected = serviceLineIds.Contains(s.ServiceLineId) }).ToList();
+                STEMIDataVM.DefaultServiceLineId = serviceIds.DefaultServiceLineId;
+                STEMIDataVM.DefaultServiceLine = this._serviceLineRepo.Table.Where(s => s.ServiceLineId == serviceIds.DefaultServiceLineId && !s.IsDeleted).Select(s => new ServiceLineVM() { ServiceLineId = s.ServiceLineId, ServiceName = s.ServiceName }).FirstOrDefault();
+                STEMIDataVM.SelectedServiceLineIds = string.Join(",", serviceLineIds);
 
                 STEMIDataVM.LastKnownWellStr = STEMIDataVM.LastKnownWell?.ToString("yyyy-MM-dd hh:mm:ss tt");
                 STEMIDataVM.DobStr = STEMIDataVM.Dob?.ToString("yyyy-MM-dd hh:mm:ss tt");
@@ -2759,12 +2838,35 @@ namespace Web.Services.Concrete
 
                 this._codeSTEMIRepo.Update(row);
 
-                var serviceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == row.OrganizationIdFk && x.CodeIdFk == UCLEnums.STEMI.ToInt() && !x.IsDeleted).Select(x => x.ServiceLineIds).FirstOrDefault();
-                if (serviceLineIds != null && serviceLineIds != "")
+                //var serviceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == row.OrganizationIdFk && x.CodeIdFk == UCLEnums.STEMI.ToInt() && !x.IsDeleted).Select(x => x.ServiceLineIds).FirstOrDefault();
+                if (codeSTEMI.SelectedServiceLineIds != null && codeSTEMI.SelectedServiceLineIds != "")
                 {
+
+                    var serviceLineIds = codeSTEMI.SelectedServiceLineIds.ToIntList();
+                    var codeServiceMapping = this._codesServiceLinesMappingRepo.Table.Where(x => x.OrganizationIdFk == row.OrganizationIdFk && x.CodeIdFk == UCLEnums.STEMI.ToInt() && x.ActiveCodeId == row.CodeStemiid).ToList();
+                    var rowsToDelete = codeServiceMapping.Where(x => !serviceLineIds.Contains(x.ServiceLineIdFk)).ToList();
+                    if (rowsToDelete.Count > 0)
+                        this._codesServiceLinesMappingRepo.DeleteRange(rowsToDelete);
+
+                    serviceLineIds.RemoveAll(x => codeServiceMapping.Select(s => s.ServiceLineIdFk).Contains(x));
+                    var codeServiceMappingList = new List<CodesServiceLinesMapping>();
+                    foreach (var item in serviceLineIds)
+                    {
+                        var codeService = new CodesServiceLinesMapping()
+                        {
+                            OrganizationIdFk = row.OrganizationIdFk,
+                            CodeIdFk = UCLEnums.STEMI.ToInt(),
+                            ServiceLineIdFk = item,
+                            ActiveCodeId = row.CodeStemiid,
+                            ActiveCodeName = UCLEnums.STEMI.ToString()
+                        };
+                        codeServiceMappingList.Add(codeService);
+                    }
+                    this._codesServiceLinesMappingRepo.Insert(codeServiceMappingList);
+
                     var UserChannelSid = (from us in this._userSchedulesRepo.Table
                                           join u in this._userRepo.Table on us.UserIdFk equals u.UserId
-                                          where serviceLineIds.ToIntList().Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
+                                          where serviceLineIds.Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
                                           select u.UserChannelSid).ToList();
 
                     var notification = new PushNotificationVM()
@@ -2831,9 +2933,11 @@ namespace Web.Services.Concrete
             }
             else
             {
-                var serviceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeSTEMI.OrganizationIdFk && x.CodeIdFk == UCLEnums.STEMI.ToInt() && !x.IsDeleted).Select(x => x.ServiceLineIds).FirstOrDefault();
-                if (serviceLineIds != null && serviceLineIds != "")
+                //var serviceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeSTEMI.OrganizationIdFk && x.CodeIdFk == UCLEnums.STEMI.ToInt() && !x.IsDeleted).Select(x => x.ServiceLineIds).FirstOrDefault();
+                if (codeSTEMI.SelectedServiceLineIds != null && codeSTEMI.SelectedServiceLineIds != "")
                 {
+                    var serviceLineIds = codeSTEMI.SelectedServiceLineIds.ToIntList();
+
                     codeSTEMI.CreatedDate = DateTime.UtcNow;
                     var STEMI = AutoMapperHelper.MapSingleRow<CodeSTEMIVM, CodeStemi>(codeSTEMI);
 
@@ -3126,10 +3230,24 @@ namespace Web.Services.Concrete
 
                     this._codeSTEMIRepo.Insert(STEMI);
 
+                    var codeServiceMappingList = new List<CodesServiceLinesMapping>();
+                    foreach (var item in serviceLineIds)
+                    {
+                        var codeServiceMapping = new CodesServiceLinesMapping()
+                        {
+                            OrganizationIdFk = STEMI.OrganizationIdFk,
+                            CodeIdFk = UCLEnums.STEMI.ToInt(),
+                            ServiceLineIdFk = item,
+                            ActiveCodeId = STEMI.CodeStemiid,
+                            ActiveCodeName = UCLEnums.STEMI.ToString()
+                        };
+                        codeServiceMappingList.Add(codeServiceMapping);
+                    }
+                    this._codesServiceLinesMappingRepo.Insert(codeServiceMappingList);
 
                     var UserChannelSid = (from us in this._userSchedulesRepo.Table
                                           join u in this._userRepo.Table on us.UserIdFk equals u.UserId
-                                          where serviceLineIds.ToIntList().Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
+                                          where serviceLineIds.Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
                                           select new { u.UserUniqueId, u.UserId }).ToList();
                     var loggedUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).FirstOrDefault();
                     UserChannelSid.Add(loggedUser);
@@ -3266,6 +3384,17 @@ namespace Web.Services.Concrete
                         }
                     }
                 }
+
+                var serviceIds = this._activeCodeRepo.Table.Where(s => s.OrganizationIdFk == x.OrganizationIdFk && s.CodeIdFk == UCLEnums.Trauma.ToInt() && !s.IsDeleted).Select(s => new { s.ServiceLineIds, s.DefaultServiceLineId }).FirstOrDefault();
+                var serviceLineIds = (from s in this._codesServiceLinesMappingRepo.Table
+                                      where s.OrganizationIdFk == x.OrganizationIdFk && s.CodeIdFk == UCLEnums.Trauma.ToInt()
+                                      && s.ActiveCodeId == x.CodeTraumaId && s.ActiveCodeName == UCLEnums.Trauma.ToString() && s.ServiceLineIdFk != serviceIds.DefaultServiceLineId
+                                      select s.ServiceLineIdFk).ToList();
+                x.ServiceLines = this._serviceLineRepo.Table.Where(s => serviceIds.ServiceLineIds.ToIntList().Distinct().Contains(s.ServiceLineId) && s.ServiceLineId != serviceIds.DefaultServiceLineId && !s.IsDeleted).Select(s => new ServiceLineVM() { ServiceLineId = s.ServiceLineId, ServiceName = s.ServiceName, IsSelected = serviceLineIds.Contains(s.ServiceLineId) }).ToList();
+                x.DefaultServiceLineId = serviceIds.DefaultServiceLineId;
+                x.DefaultServiceLine = this._serviceLineRepo.Table.Where(s => s.ServiceLineId == serviceIds.DefaultServiceLineId && !s.IsDeleted).Select(s => new ServiceLineVM() { ServiceLineId = s.ServiceLineId, ServiceName = s.ServiceName }).FirstOrDefault();
+                x.SelectedServiceLineIds = string.Join(",", serviceLineIds);
+
                 x.LastKnownWellStr = x.LastKnownWell?.ToString("yyyy-MM-dd hh:mm:ss tt");
                 x.DobStr = x.Dob?.ToString("yyyy-MM-dd hh:mm:ss tt");
                 x.OrganizationData = orgData;
@@ -3324,6 +3453,15 @@ namespace Web.Services.Concrete
                         }
                     }
                 }
+                var serviceIds = this._activeCodeRepo.Table.Where(s => s.OrganizationIdFk == TrumaDataVM.OrganizationIdFk && s.CodeIdFk == UCLEnums.Trauma.ToInt() && !s.IsDeleted).Select(s => new { s.ServiceLineIds, s.DefaultServiceLineId }).FirstOrDefault();
+                var serviceLineIds = (from s in this._codesServiceLinesMappingRepo.Table
+                                      where s.OrganizationIdFk == TrumaDataVM.OrganizationIdFk && s.CodeIdFk == UCLEnums.Trauma.ToInt()
+                                      && s.ActiveCodeId == TrumaDataVM.CodeTraumaId && s.ActiveCodeName == UCLEnums.Trauma.ToString() && s.ServiceLineIdFk != serviceIds.DefaultServiceLineId
+                                      select s.ServiceLineIdFk).ToList();
+                TrumaDataVM.ServiceLines = this._serviceLineRepo.Table.Where(s => serviceIds.ServiceLineIds.ToIntList().Distinct().Contains(s.ServiceLineId) && s.ServiceLineId != serviceIds.DefaultServiceLineId && !s.IsDeleted).Select(s => new ServiceLineVM() { ServiceLineId = s.ServiceLineId, ServiceName = s.ServiceName, IsSelected = serviceLineIds.Contains(s.ServiceLineId) }).ToList();
+                TrumaDataVM.DefaultServiceLineId = serviceIds.DefaultServiceLineId;
+                TrumaDataVM.DefaultServiceLine = this._serviceLineRepo.Table.Where(s => s.ServiceLineId == serviceIds.DefaultServiceLineId && !s.IsDeleted).Select(s => new ServiceLineVM() { ServiceLineId = s.ServiceLineId, ServiceName = s.ServiceName }).FirstOrDefault();
+                TrumaDataVM.SelectedServiceLineIds = string.Join(",", serviceLineIds);
 
                 TrumaDataVM.OrganizationData = GetHosplitalAddressObject(TrumaDataVM.OrganizationIdFk);
                 TrumaDataVM.LastKnownWellStr = TrumaDataVM.LastKnownWell?.ToString("yyyy-MM-dd hh:mm:ss tt");
@@ -3660,12 +3798,34 @@ namespace Web.Services.Concrete
 
                 this._codeTrumaRepo.Update(row);
 
-                var serviceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == row.OrganizationIdFk && x.CodeIdFk == UCLEnums.Trauma.ToInt() && !x.IsDeleted).Select(x => x.ServiceLineIds).FirstOrDefault();
-                if (serviceLineIds != null && serviceLineIds != "")
+                //var serviceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == row.OrganizationIdFk && x.CodeIdFk == UCLEnums.Trauma.ToInt() && !x.IsDeleted).Select(x => x.ServiceLineIds).FirstOrDefault();
+                if (codeTruma.SelectedServiceLineIds != null && codeTruma.SelectedServiceLineIds != "")
                 {
+
+                    var serviceLineIds = codeTruma.SelectedServiceLineIds.ToIntList();
+                    var codeServiceMapping = this._codesServiceLinesMappingRepo.Table.Where(x => x.OrganizationIdFk == row.OrganizationIdFk && x.CodeIdFk == UCLEnums.Trauma.ToInt() && x.ActiveCodeId == row.CodeTraumaId).ToList();
+                    var rowsToDelete = codeServiceMapping.Where(x => !serviceLineIds.Contains(x.ServiceLineIdFk)).ToList();
+                    if (rowsToDelete.Count > 0)
+                        this._codesServiceLinesMappingRepo.DeleteRange(rowsToDelete);
+
+                    serviceLineIds.RemoveAll(x => codeServiceMapping.Select(s => s.ServiceLineIdFk).Contains(x));
+                    var codeServiceMappingList = new List<CodesServiceLinesMapping>();
+                    foreach (var item in serviceLineIds)
+                    {
+                        var codeService = new CodesServiceLinesMapping()
+                        {
+                            OrganizationIdFk = row.OrganizationIdFk,
+                            CodeIdFk = UCLEnums.Trauma.ToInt(),
+                            ServiceLineIdFk = item,
+                            ActiveCodeId = row.CodeTraumaId,
+                            ActiveCodeName = UCLEnums.Trauma.ToString()
+                        };
+                        codeServiceMappingList.Add(codeService);
+                    }
+                    this._codesServiceLinesMappingRepo.Insert(codeServiceMappingList);
                     var UserChannelSid = (from us in this._userSchedulesRepo.Table
                                           join u in this._userRepo.Table on us.UserIdFk equals u.UserId
-                                          where serviceLineIds.ToIntList().Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
+                                          where serviceLineIds.Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
                                           select u.UserChannelSid).ToList();
 
                     var notification = new PushNotificationVM()
@@ -3732,9 +3892,10 @@ namespace Web.Services.Concrete
             else
             {
 
-                var serviceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeTruma.OrganizationIdFk && x.CodeIdFk == UCLEnums.Trauma.ToInt() && !x.IsDeleted).Select(x => x.ServiceLineIds).FirstOrDefault();
-                if (serviceLineIds != null && serviceLineIds != "")
+                //var serviceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeTruma.OrganizationIdFk && x.CodeIdFk == UCLEnums.Trauma.ToInt() && !x.IsDeleted).Select(x => x.ServiceLineIds).FirstOrDefault();
+                if (codeTruma.SelectedServiceLineIds != null && codeTruma.SelectedServiceLineIds != "")
                 {
+                    var serviceLineIds = codeTruma.SelectedServiceLineIds.ToIntList();
                     codeTruma.CreatedDate = DateTime.UtcNow;
                     var Truma = AutoMapperHelper.MapSingleRow<CodeTrumaVM, CodeTrauma>(codeTruma);
 
@@ -4026,9 +4187,24 @@ namespace Web.Services.Concrete
                     }
                     this._codeTrumaRepo.Insert(Truma);
 
+                    var codeServiceMappingList = new List<CodesServiceLinesMapping>();
+                    foreach (var item in serviceLineIds)
+                    {
+                        var codeServiceMapping = new CodesServiceLinesMapping()
+                        {
+                            OrganizationIdFk = Truma.OrganizationIdFk,
+                            CodeIdFk = UCLEnums.Trauma.ToInt(),
+                            ServiceLineIdFk = item,
+                            ActiveCodeId = Truma.CodeTraumaId,
+                            ActiveCodeName = UCLEnums.Trauma.ToString()
+                        };
+                        codeServiceMappingList.Add(codeServiceMapping);
+                    }
+                    this._codesServiceLinesMappingRepo.Insert(codeServiceMappingList);
+
                     var UserChannelSid = (from us in this._userSchedulesRepo.Table
                                           join u in this._userRepo.Table on us.UserIdFk equals u.UserId
-                                          where serviceLineIds.ToIntList().Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
+                                          where serviceLineIds.Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
                                           select new { u.UserUniqueId, u.UserId }).ToList();
                     var loggedUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).FirstOrDefault();
                     UserChannelSid.Add(loggedUser);
@@ -4118,26 +4294,6 @@ namespace Web.Services.Concrete
             var blueDataVM = AutoMapperHelper.MapList<CodeBlue, CodeBlueVM>(blueData);
             var orgData = GetHosplitalAddressObject(activeCode.OrganizationIdFk);
 
-            //var org = this._orgRepo.Table.Where(o => o.OrganizationId == orgId && !o.IsDeleted).FirstOrDefault();
-            //if (org != null)
-            //{
-            //    var state = this._controlListDetailsRepo.Table.Where(s => s.ControlListDetailId == org.StateIdFk).Select(s => new { Id = s.ControlListDetailId, s.Title, s.Description }).FirstOrDefault();
-            //    if (state != null)
-            //    {
-            //        string add = $"{org.PrimaryAddress} {org.City}, {state.Title} {org.Zip}";
-            //        string url = "https://maps.googleapis.com/maps/api/geocode/json?address=" + add.Replace(" ", "%20") + "&key=" + this._GoogleApiKey;
-            //        var googleApiLatLng = this._httpClient.GetAsync(url).Result;
-
-            //        dynamic Apiresults = googleApiLatLng["results"];
-            //        var formatted_address = Convert.ToString(Apiresults[0]["formatted_address"]);
-            //        var geometry = Apiresults[0]["geometry"];
-            //        var location = geometry["location"];
-            //        var longLat = new List<double> { Convert.ToDouble(location["lat"]), Convert.ToDouble(location["lng"]) };
-
-            //        orgData = new { OrganizationId = org.OrganizationId, Address = formatted_address, DestinationCoords = string.Join(",", longLat), org.OrganizationName };
-            //    }
-            //}
-
             blueDataVM.ForEach(x =>
             {
                 x.AttachmentsPath = new List<string>();
@@ -4145,7 +4301,7 @@ namespace Web.Services.Concrete
                 x.VideosPath = new List<string>();
                 x.OrganizationData = new object();
                 x.BloodThinnersTitle = new List<object>();
-
+                x.ServiceLines = new List<ServiceLineVM>();
                 if (!string.IsNullOrEmpty(x.Attachments) && !string.IsNullOrWhiteSpace(x.Attachments))
                 {
                     string path = this._RootPath + x.Attachments; //this._RootPath  + x.Attachments;
@@ -4184,6 +4340,15 @@ namespace Web.Services.Concrete
                         }
                     }
                 }
+                var serviceIds = this._activeCodeRepo.Table.Where(s => s.OrganizationIdFk == x.OrganizationIdFk && s.CodeIdFk == UCLEnums.Blue.ToInt() && !s.IsDeleted).Select(s => new { s.ServiceLineIds, s.DefaultServiceLineId }).FirstOrDefault();
+                var serviceLineIds = (from s in this._codesServiceLinesMappingRepo.Table
+                                      where s.OrganizationIdFk == x.OrganizationIdFk && s.CodeIdFk == UCLEnums.Blue.ToInt()
+                                      && s.ActiveCodeId == x.CodeBlueId && s.ActiveCodeName == UCLEnums.Blue.ToString() && s.ServiceLineIdFk != serviceIds.DefaultServiceLineId
+                                      select s.ServiceLineIdFk).ToList();
+                x.ServiceLines = this._serviceLineRepo.Table.Where(s => serviceIds.ServiceLineIds.ToIntList().Distinct().Contains(s.ServiceLineId) && s.ServiceLineId != serviceIds.DefaultServiceLineId && !s.IsDeleted).Select(s => new ServiceLineVM() { ServiceLineId = s.ServiceLineId, ServiceName = s.ServiceName, IsSelected = serviceLineIds.Contains(s.ServiceLineId) }).ToList();
+                x.DefaultServiceLineId = serviceIds.DefaultServiceLineId;
+                x.DefaultServiceLine = this._serviceLineRepo.Table.Where(s => s.ServiceLineId == serviceIds.DefaultServiceLineId && !s.IsDeleted).Select(s => new ServiceLineVM() { ServiceLineId = s.ServiceLineId, ServiceName = s.ServiceName }).FirstOrDefault();
+                x.SelectedServiceLineIds = string.Join(",", serviceLineIds);
                 x.LastKnownWellStr = x.LastKnownWell?.ToString("yyyy-MM-dd hh:mm:ss tt");
                 x.DobStr = x.Dob?.ToString("yyyy-MM-dd hh:mm:ss tt");
                 x.OrganizationData = orgData;
@@ -4243,26 +4408,15 @@ namespace Web.Services.Concrete
                         }
                     }
                 }
-
-                //var org = this._orgRepo.Table.Where(o => o.OrganizationId == StrokeDataVM.OrganizationIdFk && !o.IsDeleted).FirstOrDefault();
-                //if (org != null)
-                //{
-                //    var state = this._controlListDetailsRepo.Table.Where(s => s.ControlListDetailId == org.StateIdFk).Select(s => new { Id = s.ControlListDetailId, s.Title, s.Description }).FirstOrDefault();
-                //    if (state != null)
-                //    {
-                //        string add = $"{org.PrimaryAddress} {org.City}, {state.Title} {org.Zip}";
-                //        string url = "https://maps.googleapis.com/maps/api/geocode/json?address=" + add.Replace(" ", "%20") + "&key=" + this._GoogleApiKey;
-                //        var googleApiLatLng = this._httpClient.GetAsync(url).Result;
-
-                //        dynamic Apiresults = googleApiLatLng["results"];
-                //        var formatted_address = Convert.ToString(Apiresults[0]["formatted_address"]);
-                //        var geometry = Apiresults[0]["geometry"];
-                //        var location = geometry["location"];
-                //        var longLat = new List<double> { Convert.ToDouble(location["lat"]), Convert.ToDouble(location["lng"]) };
-
-                //        StrokeDataVM.OrganizationData = new { OrganizationId = org.OrganizationId, Address = formatted_address, DestinationCoords = string.Join(",", longLat), org.OrganizationName };
-                //    }
-                //}
+                var serviceIds = this._activeCodeRepo.Table.Where(s => s.OrganizationIdFk == BlueDataVM.OrganizationIdFk && s.CodeIdFk == UCLEnums.Blue.ToInt() && !s.IsDeleted).Select(s => new { s.ServiceLineIds, s.DefaultServiceLineId }).FirstOrDefault();
+                var serviceLineIds = (from s in this._codesServiceLinesMappingRepo.Table
+                                      where s.OrganizationIdFk == BlueDataVM.OrganizationIdFk && s.CodeIdFk == UCLEnums.Blue.ToInt()
+                                      && s.ActiveCodeId == BlueDataVM.CodeBlueId && s.ActiveCodeName == UCLEnums.Blue.ToString() && s.ServiceLineIdFk != serviceIds.DefaultServiceLineId
+                                      select s.ServiceLineIdFk).ToList();
+                BlueDataVM.ServiceLines = this._serviceLineRepo.Table.Where(s => serviceIds.ServiceLineIds.ToIntList().Distinct().Contains(s.ServiceLineId) && s.ServiceLineId != serviceIds.DefaultServiceLineId && !s.IsDeleted).Select(s => new ServiceLineVM() { ServiceLineId = s.ServiceLineId, ServiceName = s.ServiceName, IsSelected = serviceLineIds.Contains(s.ServiceLineId) }).ToList();
+                BlueDataVM.DefaultServiceLineId = serviceIds.DefaultServiceLineId;
+                BlueDataVM.DefaultServiceLine = this._serviceLineRepo.Table.Where(s => s.ServiceLineId == serviceIds.DefaultServiceLineId && !s.IsDeleted).Select(s => new ServiceLineVM() { ServiceLineId = s.ServiceLineId, ServiceName = s.ServiceName }).FirstOrDefault();
+                BlueDataVM.SelectedServiceLineIds = string.Join(",", serviceLineIds);
 
                 BlueDataVM.OrganizationData = GetHosplitalAddressObject(BlueDataVM.OrganizationIdFk);
                 BlueDataVM.LastKnownWellStr = BlueDataVM.LastKnownWell?.ToString("yyyy-MM-dd hh:mm:ss tt");
@@ -4594,12 +4748,35 @@ namespace Web.Services.Concrete
 
                 this._codeBlueRepo.Update(row);
 
-                var serviceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == row.OrganizationIdFk && x.CodeIdFk == UCLEnums.Blue.ToInt() && !x.IsDeleted).Select(x => x.ServiceLineIds).FirstOrDefault();
-                if (serviceLineIds != null && serviceLineIds != "")
+
+                //var serviceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == row.OrganizationIdFk && x.CodeIdFk == UCLEnums.Blue.ToInt() && !x.IsDeleted).Select(x => x.ServiceLineIds).FirstOrDefault();
+                if (codeBlue.SelectedServiceLineIds != null && codeBlue.SelectedServiceLineIds != "")
                 {
+                    var serviceLineIds = codeBlue.SelectedServiceLineIds.ToIntList();
+                    var codeServiceMapping = this._codesServiceLinesMappingRepo.Table.Where(x => x.OrganizationIdFk == row.OrganizationIdFk && x.CodeIdFk == UCLEnums.Blue.ToInt() && x.ActiveCodeId == row.CodeBlueId).ToList();
+                    var rowsToDelete = codeServiceMapping.Where(x => !serviceLineIds.Contains(x.ServiceLineIdFk)).ToList();
+                    if (rowsToDelete.Count > 0)
+                        this._codesServiceLinesMappingRepo.DeleteRange(rowsToDelete);
+
+                    serviceLineIds.RemoveAll(x => codeServiceMapping.Select(s => s.ServiceLineIdFk).Contains(x));
+                    var codeServiceMappingList = new List<CodesServiceLinesMapping>();
+                    foreach (var item in serviceLineIds)
+                    {
+                        var codeService = new CodesServiceLinesMapping()
+                        {
+                            OrganizationIdFk = row.OrganizationIdFk,
+                            CodeIdFk = UCLEnums.Blue.ToInt(),
+                            ServiceLineIdFk = item,
+                            ActiveCodeId = row.CodeBlueId,
+                            ActiveCodeName = UCLEnums.Blue.ToString()
+                        };
+                        codeServiceMappingList.Add(codeService);
+                    }
+                    this._codesServiceLinesMappingRepo.Insert(codeServiceMappingList);
+
                     var UserChannelSid = (from us in this._userSchedulesRepo.Table
                                           join u in this._userRepo.Table on us.UserIdFk equals u.UserId
-                                          where serviceLineIds.ToIntList().Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.Now && us.ScheduleDateEnd >= DateTime.Now && !us.IsDeleted && !u.IsDeleted
+                                          where serviceLineIds.Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.Now && us.ScheduleDateEnd >= DateTime.Now && !us.IsDeleted && !u.IsDeleted
                                           select u.UserChannelSid).ToList();
 
                     var notification = new PushNotificationVM()
@@ -4663,9 +4840,10 @@ namespace Web.Services.Concrete
             }
             else
             {
-                var serviceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeBlue.OrganizationIdFk && x.CodeIdFk == UCLEnums.Blue.ToInt() && !x.IsDeleted).Select(x => x.ServiceLineIds).FirstOrDefault();
-                if (serviceLineIds != null && serviceLineIds != "")
+                //var serviceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeBlue.OrganizationIdFk && x.CodeIdFk == UCLEnums.Blue.ToInt() && !x.IsDeleted).Select(x => x.ServiceLineIds).FirstOrDefault();
+                if (codeBlue.SelectedServiceLineIds != null && codeBlue.SelectedServiceLineIds != "")
                 {
+                    var serviceLineIds = codeBlue.SelectedServiceLineIds.ToIntList();
                     codeBlue.CreatedDate = DateTime.UtcNow;
                     var blue = AutoMapperHelper.MapSingleRow<CodeBlueVM, CodeBlue>(codeBlue);
 
@@ -4961,10 +5139,24 @@ namespace Web.Services.Concrete
 
                     this._codeBlueRepo.Insert(blue);
 
+                    var codeServiceMappingList = new List<CodesServiceLinesMapping>();
+                    foreach (var item in serviceLineIds)
+                    {
+                        var codeServiceMapping = new CodesServiceLinesMapping()
+                        {
+                            OrganizationIdFk = codeBlue.OrganizationIdFk,
+                            CodeIdFk = UCLEnums.Blue.ToInt(),
+                            ServiceLineIdFk = item,
+                            ActiveCodeId = codeBlue.CodeBlueId,
+                            ActiveCodeName = UCLEnums.Blue.ToString()
+                        };
+                        codeServiceMappingList.Add(codeServiceMapping);
+                    }
+                    this._codesServiceLinesMappingRepo.Insert(codeServiceMappingList);
 
                     var UserChannelSid = (from us in this._userSchedulesRepo.Table
                                           join u in this._userRepo.Table on us.UserIdFk equals u.UserId
-                                          where serviceLineIds.ToIntList().Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
+                                          where serviceLineIds.Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
                                           select new { u.UserUniqueId, u.UserId }).ToList();
                     var loggedUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).FirstOrDefault();
                     UserChannelSid.Add(loggedUser);
