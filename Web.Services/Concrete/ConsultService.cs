@@ -463,7 +463,7 @@ namespace Web.Services.Concrete
                                     msg.channelSid = channel.Sid;
                                     msg.author = "System";
                                     msg.attributes = "";
-                                    msg.body = $"{consultType} {ServiceName} </br></br>";
+                                    msg.body = $"<strong> {consultType} {ServiceName} </strong></br></br>";
                                     if (keyValues.ContainsKey("PatientFirstName") && keyValues.ContainsKey("PatientLastName"))
                                     {
                                         msg.body += $"<strong>Patient Name:</strong> {keyValues["PatientFirstName"].ToString()} {keyValues["PatientLastName"].ToString()} </br>";
