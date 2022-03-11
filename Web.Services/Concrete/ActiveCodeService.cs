@@ -1365,13 +1365,19 @@ namespace Web.Services.Concrete
                             }
                         }
                         var isMembersAdded = AddGroupMembers(ACodeGroupMembers);
-                        var msg = new ConversationMessageVM()
-                        {
-                            author = "System",
-                            attributes = "",
-                            body = $"This Group created by system for EMS Code {UCLEnums.Stroke.ToString()} purpose",
-                            channelSid = channel.Sid
-                        };
+                        var msg = new ConversationMessageVM();
+                        msg.channelSid = channel.Sid;
+                        msg.author = "System";
+                        msg.attributes = "";
+                        msg.body = $"{(codeStroke.IsEms.HasValue && codeStroke.IsEms.Value ? "EMS" : "Active Code")} {UCLEnums.Stroke.ToString()} </br>";
+                        if (codeStroke.PatientName != null && codeStroke.PatientName != "")
+                            msg.body += $"<strong>Patient Name: </strong> {codeStroke.PatientName} </br>";
+                        msg.body += $"<strong>Dob: </strong> {codeStroke.Dob:MM-dd-yyyy} </br>";
+                        msg.body += $"<strong>Last Well Known: </strong> {codeStroke.LastKnownWell:MM-dd-yyyy} </br>";
+                        if (codeStroke.ChiefComplant != null && codeStroke.ChiefComplant != "")
+                            msg.body += $"<strong>Chief Complaint: </strong> {codeStroke.ChiefComplant} </br>";
+                        if (codeStroke.Hpi != null && codeStroke.Hpi != "")
+                            msg.body += $"<strong>Hpi: </strong> {codeStroke.Hpi} </br>";
                         var sendMsg = _communication.sendPushNotification(msg);
                     }
                     return GetStrokeDataById(stroke.CodeStrokeId);
@@ -1923,52 +1929,6 @@ namespace Web.Services.Concrete
 
                 }
 
-                //codeSepsis.AttachmentsPath = new List<string>();
-                //codeSepsis.AudiosPath = new List<string>();
-                //codeSepsis.VideosPath = new List<string>();
-
-                //if (!string.IsNullOrEmpty(codeSepsis.AttachmentsFolderRoot) && !string.IsNullOrWhiteSpace(codeSepsis.AttachmentsFolderRoot))
-                //{
-                //    string path = this._RootPath + codeSepsis.AttachmentsFolderRoot; //_environment.WebRootFileProvider.GetFileInfo(codeSepsis.AttachmentsFolderRoot)?.PhysicalPath;
-                //    if (Directory.Exists(path))
-                //    {
-                //        DirectoryInfo AttachFiles = new DirectoryInfo(path);
-                //        foreach (var item in AttachFiles.GetFiles())
-                //        {
-                //            codeSepsis.AttachmentsPath.Add(codeSepsis.AttachmentsFolderRoot + "/" + item.Name);
-                //        }
-                //    }
-                //}
-
-                //if (!string.IsNullOrEmpty(codeSepsis.AudioFolderRoot) && !string.IsNullOrWhiteSpace(codeSepsis.AudioFolderRoot))
-                //{
-                //    string path = this._RootPath + codeSepsis.AudioFolderRoot; //_environment.WebRootFileProvider.GetFileInfo(codeSepsis.AudioFolderRoot)?.PhysicalPath;
-                //    if (Directory.Exists(path))
-                //    {
-                //        DirectoryInfo AudioFiles = new DirectoryInfo(path);
-                //        foreach (var item in AudioFiles.GetFiles())
-                //        {
-                //            codeSepsis.AudiosPath.Add(codeSepsis.AudioFolderRoot + "/" + item.Name);
-                //        }
-                //    }
-                //}
-
-                //if (!string.IsNullOrEmpty(codeSepsis.VideoFolderRoot) && !string.IsNullOrWhiteSpace(codeSepsis.VideoFolderRoot))
-                //{
-                //    var path = this._RootPath + codeSepsis.VideoFolderRoot; //_environment.WebRootFileProvider.GetFileInfo(codeSepsis.VideoFolderRoot)?.PhysicalPath;
-                //    if (Directory.Exists(path))
-                //    {
-                //        DirectoryInfo VideoFiles = new DirectoryInfo(path);
-                //        foreach (var item in VideoFiles.GetFiles())
-                //        {
-                //            codeSepsis.VideosPath.Add(codeSepsis.VideoFolderRoot + "/" + item.Name);
-                //        }
-                //    }
-                //}
-
-
-
-
                 return GetSepsisDataById(row.CodeSepsisId);
             }
             else
@@ -2327,14 +2287,21 @@ namespace Web.Services.Concrete
                             }
                         }
                         var isMembersAdded = AddGroupMembers(ACodeGroupMembers);
+                       
+                        var msg = new ConversationMessageVM();
+                        msg.channelSid = channel.Sid;
+                        msg.author = "System";
+                        msg.attributes = "";
+                        msg.body = $"{(codeSepsis.IsEms ? "EMS" : "Active Code")} {UCLEnums.Sepsis.ToString()} </br>";
+                        if (codeSepsis.PatientName != null && codeSepsis.PatientName != "")
+                            msg.body += $"<strong>Patient Name: </strong> {codeSepsis.PatientName} </br>";
+                        msg.body += $"<strong>Dob: </strong> {codeSepsis.Dob:MM-dd-yyyy} </br>";
+                        msg.body += $"<strong>Last Well Known: </strong> {codeSepsis.LastKnownWell:MM-dd-yyyy} </br>";
+                        if(codeSepsis.ChiefComplant != null && codeSepsis.ChiefComplant != "")
+                        msg.body += $"<strong>Chief Complaint: </strong> {codeSepsis.ChiefComplant} </br>";
+                        if (codeSepsis.Hpi != null && codeSepsis.Hpi != "")
+                            msg.body += $"<strong>Hpi: </strong> {codeSepsis.Hpi} </br>";
 
-                        var msg = new ConversationMessageVM()
-                        {
-                            author = "System",
-                            attributes = "",
-                            body = $"This Group created by system for EMS Code {UCLEnums.Sepsis.ToString()} purpose",
-                            channelSid = channel.Sid
-                        };
                         var sendMsg = _communication.sendPushNotification(msg);
                     }
                     return GetSepsisDataById(Sepsis.CodeSepsisId);
@@ -3289,13 +3256,19 @@ namespace Web.Services.Concrete
                             }
                         }
                         var isMembersAdded = AddGroupMembers(ACodeGroupMembers);
-                        var msg = new ConversationMessageVM()
-                        {
-                            author = "System",
-                            attributes = "",
-                            body = $"This Group created by system for EMS Code {UCLEnums.STEMI.ToString()} purpose",
-                            channelSid = channel.Sid
-                        };
+                        var msg = new ConversationMessageVM();
+                        msg.channelSid = channel.Sid;
+                        msg.author = "System";
+                        msg.attributes = "";
+                        msg.body = $"{(codeSTEMI.IsEms.HasValue && codeSTEMI.IsEms.Value ? "EMS" : "Active Code")} {UCLEnums.STEMI.ToString()} </br>";
+                        if (codeSTEMI.PatientName != null && codeSTEMI.PatientName != "")
+                            msg.body += $"<strong>Patient Name: </strong> {codeSTEMI.PatientName} </br>";
+                        msg.body += $"<strong>Dob: </strong> {codeSTEMI.Dob:MM-dd-yyyy} </br>";
+                        msg.body += $"<strong>Last Well Known: </strong> {codeSTEMI.LastKnownWell:MM-dd-yyyy} </br>";
+                        if (codeSTEMI.ChiefComplant != null && codeSTEMI.ChiefComplant != "")
+                            msg.body += $"<strong>Chief Complaint: </strong> {codeSTEMI.ChiefComplant} </br>";
+                        if (codeSTEMI.Hpi != null && codeSTEMI.Hpi != "")
+                            msg.body += $"<strong>Hpi: </strong> {codeSTEMI.Hpi} </br>";
                         var sendMsg = _communication.sendPushNotification(msg);
                     }
                     return GetSTEMIDataById(STEMI.CodeStemiid);
@@ -4245,13 +4218,19 @@ namespace Web.Services.Concrete
                             }
                         }
                         var isMembersAdded = AddGroupMembers(ACodeGroupMembers);
-                        var msg = new ConversationMessageVM()
-                        {
-                            author = "System",
-                            attributes = "",
-                            body = $"This Group created by system for EMS Code {UCLEnums.Trauma.ToString()} purpose",
-                            channelSid = channel.Sid
-                        };
+                        var msg = new ConversationMessageVM();
+                        msg.channelSid = channel.Sid;
+                        msg.author = "System";
+                        msg.attributes = "";
+                        msg.body = $"{(codeTruma.IsEms.HasValue && codeTruma.IsEms.Value ? "EMS" : "Active Code")} {UCLEnums.Trauma.ToString()} </br>";
+                        if (codeTruma.PatientName != null && codeTruma.PatientName != "")
+                            msg.body += $"<strong>Patient Name: </strong> {codeTruma.PatientName} </br>";
+                        msg.body += $"<strong>Dob: </strong> {codeTruma.Dob:MM-dd-yyyy} </br>";
+                        msg.body += $"<strong>Last Well Known: </strong> {codeTruma.LastKnownWell:MM-dd-yyyy} </br>";
+                        if (codeTruma.ChiefComplant != null && codeTruma.ChiefComplant != "")
+                            msg.body += $"<strong>Chief Complaint: </strong> {codeTruma.ChiefComplant} </br>";
+                        if (codeTruma.Hpi != null && codeTruma.Hpi != "")
+                            msg.body += $"<strong>Hpi: </strong> {codeTruma.Hpi} </br>";
                         var sendMsg = _communication.sendPushNotification(msg);
                     }
                     return GetTrumaDataById(Truma.CodeTraumaId);
@@ -5197,13 +5176,19 @@ namespace Web.Services.Concrete
                             }
                         }
                         var isMembersAdded = AddGroupMembers(ACodeGroupMembers);
-                        var msg = new ConversationMessageVM()
-                        {
-                            author = "System",
-                            attributes = "",
-                            body = $"This Group created by system for EMS_{UCLEnums.Blue.ToString()} purpose",
-                            channelSid = channel.Sid
-                        };
+                        var msg = new ConversationMessageVM();
+                        msg.channelSid = channel.Sid;
+                        msg.author = "System";
+                        msg.attributes = "";
+                        msg.body = $"{(codeBlue.IsEms.HasValue && codeBlue.IsEms.Value ? "EMS" : "Active Code")} {UCLEnums.Blue.ToString()} </br>";
+                        if (codeBlue.PatientName != null && codeBlue.PatientName != "")
+                            msg.body += $"<strong>Patient Name: </strong> {codeBlue.PatientName} </br>";
+                        msg.body += $"<strong>Dob: </strong> {codeBlue.Dob:MM-dd-yyyy} </br>";
+                        msg.body += $"<strong>Last Well Known: </strong> {codeBlue.LastKnownWell:MM-dd-yyyy} </br>";
+                        if (codeBlue.ChiefComplant != null && codeBlue.ChiefComplant != "")
+                            msg.body += $"<strong>Chief Complaint: </strong> {codeBlue.ChiefComplant} </br>";
+                        if (codeBlue.Hpi != null && codeBlue.Hpi != "")
+                            msg.body += $"<strong>Hpi: </strong> {codeBlue.Hpi} </br>";
                         var sendMsg = _communication.sendPushNotification(msg);
                     }
                     return GetBlueDataById(blue.CodeBlueId);
