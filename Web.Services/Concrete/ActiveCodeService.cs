@@ -258,7 +258,7 @@ namespace Web.Services.Concrete
         {
 
             var today = DateTime.Today;
-            var lastWeek = today.AddDays(-7);
+            var lastWeek = today.AddDays(-5);
             //     var thisWeekStart = DateTime.Today.AddDays(-1 * (int)(DateTime.Today.DayOfWeek)).AddDays(1);
             //   var thisWeekEnd = thisWeekStart.AddDays(7).AddSeconds(-1);
             var ActiveCodes = this._dbContext.LoadStoredProcedure("md_getEMSandActiveCodesGraphDataForDashboard")
@@ -274,9 +274,9 @@ namespace Web.Services.Concrete
                 lastWeek = lastWeek.AddDays(1);
             }
             // thisWeekStart = DateTime.Today.AddDays(-1 * (int)(DateTime.Today.DayOfWeek)).AddDays(1);
-            lastWeek = today.AddDays(-7);
+            lastWeek = today.AddDays(-5);
             var datasets = new List<object>();
-            if (ActiveCodes.Count < 7)
+            if (ActiveCodes.Count < 5)
             {
                 List<int> EMS = new();
                 List<int> activeCodes = new();

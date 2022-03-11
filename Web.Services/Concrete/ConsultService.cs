@@ -88,7 +88,7 @@ namespace Web.Services.Concrete
         {
 
             var today = DateTime.Today;
-            var lastweek = today.AddDays(-7);
+            var lastweek = today.AddDays(-6);
             var consultFields = this._dbContext.LoadStoredProcedure("md_getConsultGraphDataForDashboard")
                 .WithSqlParam("@OrganizationId", OrgId)
                 .WithSqlParam("@StartDate", lastweek)
@@ -101,8 +101,8 @@ namespace Web.Services.Concrete
                 Label.Add(lastweek.ToString("MMM-dd"));
                 lastweek = lastweek.AddDays(1);
             }
-            lastweek = today.AddDays(-7);
-            if (consultFields.Count < 7)
+            lastweek = today.AddDays(-6);
+            if (consultFields.Count < 6)
             {
                 List<int> Urgent = new();
                 List<int> Routine = new();
