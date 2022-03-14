@@ -18,7 +18,7 @@ namespace Web.Model.Common
         public int? ModifiedBy { get; set; }
         public DateTime? ModifiedDate { get; set; }
         public bool IsDeleted { get; set; }
-
+        public bool IsEMS { get; set; }
         public bool showAllActiveCodes { get; set; }
         public bool fromDashboard { get; set; }
 

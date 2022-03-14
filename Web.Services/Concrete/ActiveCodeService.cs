@@ -254,11 +254,11 @@ namespace Web.Services.Concrete
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = activeCodesData };
         }
 
-        public BaseResponse GetEMSandActiveCodesForDashboard(int OrgId)
+        public BaseResponse GetEMSandActiveCodesForDashboard(int OrgId,int days = 6)
         {
 
             var today = DateTime.Today;
-            var lastWeek = today.AddDays(-5);
+            var lastWeek = today.AddDays(-days);
             //     var thisWeekStart = DateTime.Today.AddDays(-1 * (int)(DateTime.Today.DayOfWeek)).AddDays(1);
             //   var thisWeekEnd = thisWeekStart.AddDays(7).AddSeconds(-1);
             var ActiveCodes = this._dbContext.LoadStoredProcedure("md_getEMSandActiveCodesGraphDataForDashboard")
@@ -274,9 +274,9 @@ namespace Web.Services.Concrete
                 lastWeek = lastWeek.AddDays(1);
             }
             // thisWeekStart = DateTime.Today.AddDays(-1 * (int)(DateTime.Today.DayOfWeek)).AddDays(1);
-            lastWeek = today.AddDays(-5);
+            lastWeek = today.AddDays(-days);
             var datasets = new List<object>();
-            if (ActiveCodes.Count < 5)
+            if (ActiveCodes.Count < days)
             {
                 List<int> EMS = new();
                 List<int> activeCodes = new();
@@ -492,11 +492,23 @@ namespace Web.Services.Concrete
             }
             else if (activeCode.showAllActiveCodes)
             {
-                strokeData = this._codeStrokeRepo.Table.Where(x => x.OrganizationIdFk == activeCode.OrganizationIdFk && !x.IsDeleted).OrderByDescending(x => x.CodeStrokeId).ToList();
+                if (activeCode.IsEMS)
+                {
+                    strokeData = this._codeStrokeRepo.Table.Where(x => x.IsEms.HasValue && x.IsEms.Value && !x.IsDeleted).OrderByDescending(x => x.CodeStrokeId).ToList();
+                }
+                else
+                {
+                    strokeData = this._codeStrokeRepo.Table.Where(x => x.OrganizationIdFk == activeCode.OrganizationIdFk && !x.IsDeleted).OrderByDescending(x => x.CodeStrokeId).ToList();
+                }
             }
             else
             {
-                strokeData = this._codeStrokeRepo.Table.Where(x => x.CreatedBy == ApplicationSettings.UserId && !x.IsDeleted).OrderByDescending(x => x.CodeStrokeId).ToList();
+                strokeData = (from cs in this._codeStrokeRepo.Table
+                              join agm in this._activeCodesGroupMembersRepo.Table on cs.CodeStrokeId equals agm.ActiveCodeIdFk
+                              where agm.UserIdFk == ApplicationSettings.UserId && agm.ActiveCodeName == UCLEnums.Stroke.ToString() && !cs.IsDeleted
+                              select cs).OrderByDescending(x => x.CodeStrokeId).AsQueryable().ToList();
+
+                //strokeData = this._codeStrokeRepo.Table.Where(x => x.CreatedBy == ApplicationSettings.UserId && !x.IsDeleted).OrderByDescending(x => x.CodeStrokeId).ToList();
             }
             var strokeDataVM = AutoMapperHelper.MapList<CodeStroke, CodeStrokeVM>(strokeData);
             var orgData = GetHosplitalAddressObject(activeCode.OrganizationIdFk);
@@ -998,7 +1010,8 @@ namespace Web.Services.Concrete
                         UserChannelSid = UserChannelSid,
                         From = AuthorEnums.Stroke.ToString(),
                         Msg = "Stroke From is Changed",
-                        RouteLink = "/Home/Activate%20Code/code-strok-form"
+                        RouteLink = "/Home/Activate%20Code/code-strok-form",
+                        RouteLinkEMS = ""
                     };
 
                     _communication.pushNotification(notification);
@@ -1411,11 +1424,23 @@ namespace Web.Services.Concrete
             }
             else if (activeCode.showAllActiveCodes)
             {
-                SepsisData = this._codeSepsisRepo.Table.Where(x => x.OrganizationIdFk == activeCode.OrganizationIdFk && !x.IsDeleted).OrderByDescending(x => x.CodeSepsisId).ToList();
+                if (activeCode.IsEMS)
+                {
+                    SepsisData = this._codeSepsisRepo.Table.Where(x => x.IsEms && !x.IsDeleted).OrderByDescending(x => x.CodeSepsisId).ToList();
+                }
+                else
+                {
+                    SepsisData = this._codeSepsisRepo.Table.Where(x => x.OrganizationIdFk == activeCode.OrganizationIdFk && !x.IsDeleted).OrderByDescending(x => x.CodeSepsisId).ToList();
+                }
             }
             else
             {
-                SepsisData = this._codeSepsisRepo.Table.Where(x => x.CreatedBy == ApplicationSettings.UserId && !x.IsDeleted).OrderByDescending(x => x.CodeSepsisId).ToList();
+                SepsisData = (from cs in this._codeSepsisRepo.Table
+                              join agm in this._activeCodesGroupMembersRepo.Table on cs.CodeSepsisId equals agm.ActiveCodeIdFk
+                              where agm.UserIdFk == ApplicationSettings.UserId && agm.ActiveCodeName == UCLEnums.Sepsis.ToString() && !cs.IsDeleted
+                              select cs).OrderByDescending(x => x.CodeSepsisId).AsQueryable().ToList();
+
+                //SepsisData = this._codeSepsisRepo.Table.Where(x => x.CreatedBy == ApplicationSettings.UserId && !x.IsDeleted).OrderByDescending(x => x.CodeSepsisId).ToList();
             }
             var SepsisDataVM = AutoMapperHelper.MapList<CodeSepsi, CodeSepsisVM>(SepsisData);
 
@@ -2335,11 +2360,24 @@ namespace Web.Services.Concrete
             }
             else if (activeCode.showAllActiveCodes)
             {
-                STEMIData = this._codeSTEMIRepo.Table.Where(x => x.OrganizationIdFk == activeCode.OrganizationIdFk && !x.IsDeleted).OrderByDescending(x => x.CodeStemiid).ToList();
+                if (activeCode.IsEMS)
+                {
+                    STEMIData = this._codeSTEMIRepo.Table.Where(x => x.IsEms.HasValue && x.IsEms.Value && !x.IsDeleted).OrderByDescending(x => x.CodeStemiid).ToList();
+                }
+                else
+                {
+                    STEMIData = this._codeSTEMIRepo.Table.Where(x => x.OrganizationIdFk == activeCode.OrganizationIdFk && !x.IsDeleted).OrderByDescending(x => x.CodeStemiid).ToList();
+                }
             }
             else
             {
-                STEMIData = this._codeSTEMIRepo.Table.Where(x => x.CreatedBy == ApplicationSettings.UserId && !x.IsDeleted).OrderByDescending(x => x.CodeStemiid).ToList();
+                STEMIData = (from cs in this._codeSTEMIRepo.Table
+                             join agm in this._activeCodesGroupMembersRepo.Table on cs.CodeStemiid equals agm.ActiveCodeIdFk
+                             where agm.UserIdFk == ApplicationSettings.UserId && agm.ActiveCodeName == UCLEnums.STEMI.ToString() && !cs.IsDeleted
+                             select cs).OrderByDescending(x => x.CodeStemiid).AsQueryable().ToList();
+
+
+                //STEMIData = this._codeSTEMIRepo.Table.Where(x => x.CreatedBy == ApplicationSettings.UserId && !x.IsDeleted).OrderByDescending(x => x.CodeStemiid).ToList();
             }
             var STEMIDataVM = AutoMapperHelper.MapList<CodeStemi, CodeSTEMIVM>(STEMIData);
 
@@ -3302,11 +3340,23 @@ namespace Web.Services.Concrete
             }
             else if (activeCode.showAllActiveCodes)
             {
-                TrumaData = this._codeTrumaRepo.Table.Where(x => x.OrganizationIdFk == activeCode.OrganizationIdFk && !x.IsDeleted).OrderByDescending(x => x.CodeTraumaId).ToList();
+                if (activeCode.IsEMS)
+                {
+                    TrumaData = this._codeTrumaRepo.Table.Where(x => x.IsEms.HasValue && x.IsEms.Value && !x.IsDeleted).OrderByDescending(x => x.CodeTraumaId).ToList();
+                }
+                else
+                {
+                    TrumaData = this._codeTrumaRepo.Table.Where(x => x.OrganizationIdFk == activeCode.OrganizationIdFk && !x.IsDeleted).OrderByDescending(x => x.CodeTraumaId).ToList();
+                }
             }
             else
             {
-                TrumaData = this._codeTrumaRepo.Table.Where(x => x.CreatedBy == ApplicationSettings.UserId && !x.IsDeleted).OrderByDescending(x => x.CodeTraumaId).ToList();
+                TrumaData = (from cs in this._codeTrumaRepo.Table
+                             join agm in this._activeCodesGroupMembersRepo.Table on cs.CodeTraumaId equals agm.ActiveCodeIdFk
+                             where agm.UserIdFk == ApplicationSettings.UserId && agm.ActiveCodeName == UCLEnums.Trauma.ToString() && !cs.IsDeleted
+                             select cs).OrderByDescending(x => x.CodeTraumaId).AsQueryable().ToList();
+
+                //TrumaData = this._codeTrumaRepo.Table.Where(x => x.CreatedBy == ApplicationSettings.UserId && !x.IsDeleted).OrderByDescending(x => x.CodeTraumaId).ToList();
             }
 
             var TrumaDataVM = AutoMapperHelper.MapList<CodeTrauma, CodeTrumaVM>(TrumaData);
@@ -4264,11 +4314,25 @@ namespace Web.Services.Concrete
             }
             if (activeCode.showAllActiveCodes)
             {
-                blueData = this._codeBlueRepo.Table.Where(x => x.OrganizationIdFk == activeCode.OrganizationIdFk && !x.IsDeleted).OrderByDescending(x => x.CodeBlueId).ToList();
+                if (activeCode.IsEMS)
+                {
+
+                    blueData = this._codeBlueRepo.Table.Where(x => x.IsEms.HasValue && x.IsEms.Value && !x.IsDeleted).OrderByDescending(x => x.CodeBlueId).ToList();
+                }
+                else
+                {
+                    blueData = this._codeBlueRepo.Table.Where(x => x.OrganizationIdFk == activeCode.OrganizationIdFk && !x.IsDeleted).OrderByDescending(x => x.CodeBlueId).ToList();
+                }
+
             }
             else
             {
-                blueData = this._codeBlueRepo.Table.Where(x => x.CreatedBy == ApplicationSettings.UserId && !x.IsDeleted).OrderByDescending(x => x.CodeBlueId).ToList();
+                blueData = (from cs in this._codeBlueRepo.Table
+                            join agm in this._activeCodesGroupMembersRepo.Table on cs.CodeBlueId equals agm.ActiveCodeIdFk
+                            where agm.UserIdFk == ApplicationSettings.UserId && agm.ActiveCodeName == UCLEnums.Blue.ToString() && !cs.IsDeleted
+                            select cs).OrderByDescending(x => x.BloodThinners).AsQueryable().ToList();
+
+                //blueData = this._codeBlueRepo.Table.Where(x => x.CreatedBy == ApplicationSettings.UserId && !x.IsDeleted).OrderByDescending(x => x.CodeBlueId).ToList();
             }
             var blueDataVM = AutoMapperHelper.MapList<CodeBlue, CodeBlueVM>(blueData);
             var orgData = GetHosplitalAddressObject(activeCode.OrganizationIdFk);
@@ -5226,11 +5290,12 @@ namespace Web.Services.Concrete
 
         #region EMS
 
-        public BaseResponse GetActiveEMS()
+        public BaseResponse GetActiveEMS(bool showAll)
         {
             var activeEMS = this._dbContext.LoadStoredProcedure("md_getActiveEMS")
                             .WithSqlParam("@currentUserId", ApplicationSettings.UserId)
                             .WithSqlParam("@isSuperAdmin", ApplicationSettings.isSuperAdmin)
+                            .WithSqlParam("@showAll", showAll)
                             .ExecuteStoredProc<CodeStrokeVM>();
 
             var orgDataList = new List<dynamic>();
