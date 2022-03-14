@@ -253,6 +253,11 @@ namespace Web.Services.Concrete
             }
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = activeCodesData };
         }
+        public BaseResponse GetAllEMSForDashboard() 
+        {
+
+            return new BaseResponse();
+        }
 
         public BaseResponse GetEMSandActiveCodesForDashboard(int OrgId, int days = 6)
         {
@@ -991,14 +996,20 @@ namespace Web.Services.Concrete
                     this._codesServiceLinesMappingRepo.Insert(codeServiceMappingList);
 
 
-                    var UserChannelSid = (from us in this._userSchedulesRepo.Table
-                                          join u in this._userRepo.Table on us.UserIdFk equals u.UserId
-                                          where codeStroke.SelectedServiceLineIds.ToIntList().Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.Now && us.ScheduleDateEnd >= DateTime.Now && !us.IsDeleted && !u.IsDeleted
-                                          select u.UserChannelSid).ToList();
-                    var loggedInUserChannelId = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => x.UserChannelSid).FirstOrDefault();
+                    //var UserChannelSid = (from us in this._userSchedulesRepo.Table
+                    //                      join u in this._userRepo.Table on us.UserIdFk equals u.UserId
+                    //                      where codeStroke.SelectedServiceLineIds.ToIntList().Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.Now && us.ScheduleDateEnd >= DateTime.Now && !us.IsDeleted && !u.IsDeleted
+                    //                      select u.UserChannelSid).ToList();
 
-                    UserChannelSid.Add(loggedInUserChannelId);
-                    UserChannelSid = UserChannelSid.Distinct().ToList();
+                    var UserChannelSid = (from u in this._userRepo.Table
+                                      join gm in this._activeCodesGroupMembersRepo.Table on u.UserId equals gm.UserIdFk
+                                      where gm.ActiveCodeIdFk == codeStroke.CodeStrokeId && gm.ActiveCodeName == UCLEnums.Stroke.ToString() && !u.IsDeleted
+                                      select u.UserChannelSid).Distinct().ToList();
+
+                    //var loggedInUserChannelId = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => x.UserChannelSid).FirstOrDefault();
+
+                    //UserChannelSid.Add(loggedInUserChannelId);
+                    //UserChannelSid = UserChannelSid.Distinct().ToList();
 
                     var notification = new PushNotificationVM()
                     {
