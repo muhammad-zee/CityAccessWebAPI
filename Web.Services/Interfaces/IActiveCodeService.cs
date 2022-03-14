@@ -58,7 +58,7 @@ namespace Web.Services.Interfaces
         #endregion
 
         #region EMS
-        BaseResponse GetActiveEMS();
+        BaseResponse GetActiveEMS(bool showAll);
         #endregion
 
         #region Map and Addresses
