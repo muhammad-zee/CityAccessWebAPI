@@ -64,7 +64,7 @@ namespace Web.API.Controllers
             }
         }
         [Description("Get Consult Fields For Org")]
-        [HttpGet("consult/GetConsultGraphDataForOrg/{OrgId}")]
+        [HttpGet("consult/GetConsultGraphDataForOrg/{OrgId}/{days}")]
         public BaseResponse GetConsultGraphDataForOrg(int OrgId,int days = 6 )
         {
             try
