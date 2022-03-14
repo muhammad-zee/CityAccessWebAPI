@@ -1002,7 +1002,11 @@ namespace Web.Services.Concrete
                                           join u in this._userRepo.Table on us.UserIdFk equals u.UserId
                                           where codeStroke.SelectedServiceLineIds.ToIntList().Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.Now && us.ScheduleDateEnd >= DateTime.Now && !us.IsDeleted && !u.IsDeleted
                                           select u.UserChannelSid).ToList();
+                    var loggedInUserChannelId = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => x.UserChannelSid).FirstOrDefault();
 
+                    UserChannelSid.Add(loggedInUserChannelId);
+                    UserChannelSid = UserChannelSid.Distinct().ToList();
+                    
                     var notification = new PushNotificationVM()
                     {
                         Id = row.CodeStrokeId,
