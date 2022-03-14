@@ -254,7 +254,7 @@ namespace Web.Services.Concrete
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = activeCodesData };
         }
 
-        public BaseResponse GetEMSandActiveCodesForDashboard(int OrgId,int days = 6)
+        public BaseResponse GetEMSandActiveCodesForDashboard(int OrgId, int days = 6)
         {
 
             var today = DateTime.Today;
@@ -492,14 +492,7 @@ namespace Web.Services.Concrete
             }
             else if (activeCode.showAllActiveCodes)
             {
-                if (activeCode.IsEMS)
-                {
-                    strokeData = this._codeStrokeRepo.Table.Where(x => x.IsEms.HasValue && x.IsEms.Value && !x.IsDeleted).OrderByDescending(x => x.CodeStrokeId).ToList();
-                }
-                else
-                {
-                    strokeData = this._codeStrokeRepo.Table.Where(x => x.OrganizationIdFk == activeCode.OrganizationIdFk && !x.IsDeleted).OrderByDescending(x => x.CodeStrokeId).ToList();
-                }
+                strokeData = this._codeStrokeRepo.Table.Where(x => x.OrganizationIdFk == activeCode.OrganizationIdFk && !x.IsDeleted).OrderByDescending(x => x.CodeStrokeId).ToList();
             }
             else
             {
@@ -1006,7 +999,7 @@ namespace Web.Services.Concrete
 
                     UserChannelSid.Add(loggedInUserChannelId);
                     UserChannelSid = UserChannelSid.Distinct().ToList();
-                    
+
                     var notification = new PushNotificationVM()
                     {
                         Id = row.CodeStrokeId,
@@ -1428,14 +1421,7 @@ namespace Web.Services.Concrete
             }
             else if (activeCode.showAllActiveCodes)
             {
-                if (activeCode.IsEMS)
-                {
-                    SepsisData = this._codeSepsisRepo.Table.Where(x => x.IsEms && !x.IsDeleted).OrderByDescending(x => x.CodeSepsisId).ToList();
-                }
-                else
-                {
-                    SepsisData = this._codeSepsisRepo.Table.Where(x => x.OrganizationIdFk == activeCode.OrganizationIdFk && !x.IsDeleted).OrderByDescending(x => x.CodeSepsisId).ToList();
-                }
+                SepsisData = this._codeSepsisRepo.Table.Where(x => x.OrganizationIdFk == activeCode.OrganizationIdFk && !x.IsDeleted).OrderByDescending(x => x.CodeSepsisId).ToList();
             }
             else
             {
@@ -2364,14 +2350,7 @@ namespace Web.Services.Concrete
             }
             else if (activeCode.showAllActiveCodes)
             {
-                if (activeCode.IsEMS)
-                {
-                    STEMIData = this._codeSTEMIRepo.Table.Where(x => x.IsEms.HasValue && x.IsEms.Value && !x.IsDeleted).OrderByDescending(x => x.CodeStemiid).ToList();
-                }
-                else
-                {
-                    STEMIData = this._codeSTEMIRepo.Table.Where(x => x.OrganizationIdFk == activeCode.OrganizationIdFk && !x.IsDeleted).OrderByDescending(x => x.CodeStemiid).ToList();
-                }
+                STEMIData = this._codeSTEMIRepo.Table.Where(x => x.OrganizationIdFk == activeCode.OrganizationIdFk && !x.IsDeleted).OrderByDescending(x => x.CodeStemiid).ToList();
             }
             else
             {
@@ -3344,14 +3323,7 @@ namespace Web.Services.Concrete
             }
             else if (activeCode.showAllActiveCodes)
             {
-                if (activeCode.IsEMS)
-                {
-                    TrumaData = this._codeTrumaRepo.Table.Where(x => x.IsEms.HasValue && x.IsEms.Value && !x.IsDeleted).OrderByDescending(x => x.CodeTraumaId).ToList();
-                }
-                else
-                {
-                    TrumaData = this._codeTrumaRepo.Table.Where(x => x.OrganizationIdFk == activeCode.OrganizationIdFk && !x.IsDeleted).OrderByDescending(x => x.CodeTraumaId).ToList();
-                }
+                TrumaData = this._codeTrumaRepo.Table.Where(x => x.OrganizationIdFk == activeCode.OrganizationIdFk && !x.IsDeleted).OrderByDescending(x => x.CodeTraumaId).ToList();
             }
             else
             {
@@ -4318,16 +4290,7 @@ namespace Web.Services.Concrete
             }
             if (activeCode.showAllActiveCodes)
             {
-                if (activeCode.IsEMS)
-                {
-
-                    blueData = this._codeBlueRepo.Table.Where(x => x.IsEms.HasValue && x.IsEms.Value && !x.IsDeleted).OrderByDescending(x => x.CodeBlueId).ToList();
-                }
-                else
-                {
-                    blueData = this._codeBlueRepo.Table.Where(x => x.OrganizationIdFk == activeCode.OrganizationIdFk && !x.IsDeleted).OrderByDescending(x => x.CodeBlueId).ToList();
-                }
-
+                blueData = this._codeBlueRepo.Table.Where(x => x.OrganizationIdFk == activeCode.OrganizationIdFk && !x.IsDeleted).OrderByDescending(x => x.CodeBlueId).ToList();
             }
             else
             {
