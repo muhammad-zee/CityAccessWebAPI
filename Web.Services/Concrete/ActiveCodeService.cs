@@ -1012,9 +1012,9 @@ namespace Web.Services.Concrete
                         OrgId = row.OrganizationIdFk,
                         UserChannelSid = UserChannelSid,
                         From = AuthorEnums.Stroke.ToString(),
-                        Msg = "Stroke From is Changed",
+                        Msg = (codeStroke.IsEms.HasValue && codeStroke.IsEms.Value ? "EMS" : "Active") + " Code Stroke From is Changed",
                         RouteLink = "/Home/Activate%20Code/code-strok-form",
-                        RouteLinkEMS = ""
+                        RouteLinkEMS = "/Home/EMS/activateCode"
                     };
 
                     _communication.pushNotification(notification);
@@ -1931,10 +1931,15 @@ namespace Web.Services.Concrete
                     this._codesServiceLinesMappingRepo.Insert(codeServiceMappingList);
 
 
-                    var UserChannelSid = (from us in this._userSchedulesRepo.Table
-                                          join u in this._userRepo.Table on us.UserIdFk equals u.UserId
-                                          where serviceLineIds.Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
-                                          select u.UserChannelSid).ToList();
+                    //var UserChannelSid = (from us in this._userSchedulesRepo.Table
+                    //                      join u in this._userRepo.Table on us.UserIdFk equals u.UserId
+                    //                      where serviceLineIds.Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
+                    //                      select u.UserChannelSid).ToList();
+
+                    var UserChannelSid = (from u in this._userRepo.Table
+                                          join gm in this._activeCodesGroupMembersRepo.Table on u.UserId equals gm.UserIdFk
+                                          where gm.ActiveCodeIdFk == codeSepsis.CodeSepsisId && gm.ActiveCodeName == UCLEnums.Sepsis.ToString() && !u.IsDeleted
+                                          select u.UserChannelSid).Distinct().ToList();
 
                     var notification = new PushNotificationVM()
                     {
@@ -1942,8 +1947,9 @@ namespace Web.Services.Concrete
                         OrgId = row.OrganizationIdFk,
                         UserChannelSid = UserChannelSid,
                         From = AuthorEnums.Sepsis.ToString(),
-                        Msg = "Sepsis From is Changed",
-                        RouteLink = "/Home/Activate%20Code/code-sepsis-form"
+                        Msg = (codeSepsis.IsEms ? "EMS" : "Active") + " Code Sepsis From is Changed",
+                        RouteLink = "/Home/Activate%20Code/code-sepsis-form",
+                        RouteLinkEMS = "/Home/EMS/activateCode"
                     };
 
                     _communication.pushNotification(notification);
@@ -2858,10 +2864,15 @@ namespace Web.Services.Concrete
                     }
                     this._codesServiceLinesMappingRepo.Insert(codeServiceMappingList);
 
-                    var UserChannelSid = (from us in this._userSchedulesRepo.Table
-                                          join u in this._userRepo.Table on us.UserIdFk equals u.UserId
-                                          where serviceLineIds.Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
-                                          select u.UserChannelSid).ToList();
+                    //var UserChannelSid = (from us in this._userSchedulesRepo.Table
+                    //                      join u in this._userRepo.Table on us.UserIdFk equals u.UserId
+                    //                      where serviceLineIds.Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
+                    //                      select u.UserChannelSid).ToList();
+
+                    var UserChannelSid = (from u in this._userRepo.Table
+                                          join gm in this._activeCodesGroupMembersRepo.Table on u.UserId equals gm.UserIdFk
+                                          where gm.ActiveCodeIdFk == codeSTEMI.CodeStemiid && gm.ActiveCodeName == UCLEnums.STEMI.ToString() && !u.IsDeleted
+                                          select u.UserChannelSid).Distinct().ToList();
 
                     var notification = new PushNotificationVM()
                     {
@@ -2869,8 +2880,9 @@ namespace Web.Services.Concrete
                         OrgId = row.OrganizationIdFk,
                         UserChannelSid = UserChannelSid,
                         From = AuthorEnums.STEMI.ToString(),
-                        Msg = "STEMI From is Changed",
-                        RouteLink = "/Home/Activate%20Code/code-STEMI-form"
+                        Msg = (codeSTEMI.IsEms.HasValue && codeSTEMI.IsEms.Value ? "EMS" : "Active") + " Code STEMI From is Changed",
+                        RouteLink = "/Home/Activate%20Code/code-STEMI-form",
+                        RouteLinkEMS = "/Home/EMS/activateCode"
                     };
 
                     _communication.pushNotification(notification);
@@ -3828,10 +3840,15 @@ namespace Web.Services.Concrete
                         codeServiceMappingList.Add(codeService);
                     }
                     this._codesServiceLinesMappingRepo.Insert(codeServiceMappingList);
-                    var UserChannelSid = (from us in this._userSchedulesRepo.Table
-                                          join u in this._userRepo.Table on us.UserIdFk equals u.UserId
-                                          where serviceLineIds.Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
-                                          select u.UserChannelSid).ToList();
+                    //var UserChannelSid = (from us in this._userSchedulesRepo.Table
+                    //                      join u in this._userRepo.Table on us.UserIdFk equals u.UserId
+                    //                      where serviceLineIds.Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
+                    //                      select u.UserChannelSid).ToList();
+
+                    var UserChannelSid = (from u in this._userRepo.Table
+                                          join gm in this._activeCodesGroupMembersRepo.Table on u.UserId equals gm.UserIdFk
+                                          where gm.ActiveCodeIdFk == codeTruma.CodeTraumaId && gm.ActiveCodeName == UCLEnums.Trauma.ToString() && !u.IsDeleted
+                                          select u.UserChannelSid).Distinct().ToList();
 
                     var notification = new PushNotificationVM()
                     {
@@ -3839,8 +3856,9 @@ namespace Web.Services.Concrete
                         OrgId = row.OrganizationIdFk,
                         UserChannelSid = UserChannelSid,
                         From = AuthorEnums.Trauma.ToString(),
-                        Msg = "Trauma From is Changed",
-                        RouteLink = "/Home/Activate%20Code/code-trauma-form"
+                        Msg = (codeTruma.IsEms.HasValue && codeTruma.IsEms.Value ? "EMS" : "Active") + " Code Trauma From is Changed",
+                        RouteLink = "/Home/Activate%20Code/code-trauma-form",
+                        RouteLinkEMS = "/Home/EMS/activateCode"
                     };
 
                     _communication.pushNotification(notification);
@@ -4790,10 +4808,15 @@ namespace Web.Services.Concrete
                     }
                     this._codesServiceLinesMappingRepo.Insert(codeServiceMappingList);
 
-                    var UserChannelSid = (from us in this._userSchedulesRepo.Table
-                                          join u in this._userRepo.Table on us.UserIdFk equals u.UserId
-                                          where serviceLineIds.Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.Now && us.ScheduleDateEnd >= DateTime.Now && !us.IsDeleted && !u.IsDeleted
-                                          select u.UserChannelSid).ToList();
+                    //var UserChannelSid = (from us in this._userSchedulesRepo.Table
+                    //                      join u in this._userRepo.Table on us.UserIdFk equals u.UserId
+                    //                      where serviceLineIds.Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.Now && us.ScheduleDateEnd >= DateTime.Now && !us.IsDeleted && !u.IsDeleted
+                    //                      select u.UserChannelSid).ToList();
+
+                    var UserChannelSid = (from u in this._userRepo.Table
+                                          join gm in this._activeCodesGroupMembersRepo.Table on u.UserId equals gm.UserIdFk
+                                          where gm.ActiveCodeIdFk == codeBlue.CodeBlueId && gm.ActiveCodeName == UCLEnums.Blue.ToString() && !u.IsDeleted
+                                          select u.UserChannelSid).Distinct().ToList();
 
                     var notification = new PushNotificationVM()
                     {
@@ -4801,8 +4824,9 @@ namespace Web.Services.Concrete
                         OrgId = row.OrganizationIdFk,
                         UserChannelSid = UserChannelSid,
                         From = AuthorEnums.Blue.ToString(),
-                        Msg = "Blue From is Changed",
-                        RouteLink = "/Home/Activate%20Code/code-blue-form"
+                        Msg = (codeBlue.IsEms.HasValue && codeBlue.IsEms.Value ? "EMS" : "Active") + " Code Blue From is Changed",
+                        RouteLink = "/Home/Activate%20Code/code-blue-form",
+                        RouteLinkEMS = "/Home/EMS/activateCode"
                     };
 
                     _communication.pushNotification(notification);
