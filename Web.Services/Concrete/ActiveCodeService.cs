@@ -253,12 +253,7 @@ namespace Web.Services.Concrete
             }
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = activeCodesData };
         }
-        public BaseResponse GetAllEMSForDashboard() 
-        {
-
-            return new BaseResponse();
-        }
-
+        
         public BaseResponse GetEMSandActiveCodesForDashboard(int OrgId, int days = 6)
         {
 
@@ -5268,9 +5263,10 @@ namespace Web.Services.Concrete
 
         #region EMS
 
-        public BaseResponse GetActiveEMS(bool showAll)
+        public BaseResponse GetActiveEMS(bool showAll, bool fromDashboard = false)
         {
             var activeEMS = this._dbContext.LoadStoredProcedure("md_getActiveEMS")
+                            .WithSqlParam("@IsFromDashboard", fromDashboard)
                             .WithSqlParam("@currentUserId", ApplicationSettings.UserId)
                             .WithSqlParam("@isSuperAdmin", ApplicationSettings.isSuperAdmin)
                             .WithSqlParam("@showAll", showAll)

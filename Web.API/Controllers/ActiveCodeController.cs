@@ -488,12 +488,12 @@ namespace Web.API.Controllers
         #region EMS
 
         [Description("Get All Active EMS")]
-        [HttpGet("EMS/GetActiveEMS/{showAll}")]
-        public BaseResponse GetActiveEMS(bool showAll)
+        [HttpGet("EMS/GetActiveEMS/{showAll}/{fromDashbord}")]
+        public BaseResponse GetActiveEMS(bool showAll, bool fromDashbord = false)
         {
             try
             {
-                return _activeCodesService.GetActiveEMS(showAll);
+                return _activeCodesService.GetActiveEMS(showAll, fromDashbord);
             }
             catch (Exception ex)
             {
