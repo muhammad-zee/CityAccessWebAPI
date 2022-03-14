@@ -463,7 +463,7 @@ namespace Web.Services.Concrete
                                     msg.channelSid = channel.Sid;
                                     msg.author = "System";
                                     msg.attributes = "";
-                                    msg.body = $"<strong> {consultType} {ServiceName} </strong></br></br>";
+                                    msg.body = $"<strong> {consultType} {ServiceName} Consult</strong></br></br>";
                                     if (keyValues.ContainsKey("PatientFirstName") && keyValues.ContainsKey("PatientLastName"))
                                     {
                                         msg.body += $"<strong>Patient Name:</strong> {keyValues["PatientFirstName"].ToString()} {keyValues["PatientLastName"].ToString()} </br>";
@@ -523,7 +523,7 @@ namespace Web.Services.Concrete
                             var msg = new ConversationMessageVM();
                             msg.author = "System";
                             msg.attributes = "";
-                            msg.body = $"{consultType} {ServiceName} </br>";
+                            msg.body = $"<strong>{consultType} {ServiceName} Consult </strong> </br></br>";
                             if (keyValues.ContainsKey("PatientFirstName") && keyValues.ContainsKey("PatientLastName"))
                             {
                                 msg.body += $"<strong>Patient Name:</strong> {keyValues["PatientFirstName"].ToString()} {keyValues["PatientLastName"].ToString()} </br>";
