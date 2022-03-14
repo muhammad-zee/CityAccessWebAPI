@@ -254,11 +254,11 @@ namespace Web.Services.Concrete
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = activeCodesData };
         }
 
-        public BaseResponse GetEMSandActiveCodesForDashboard(int OrgId)
+        public BaseResponse GetEMSandActiveCodesForDashboard(int OrgId,int days = 6)
         {
 
             var today = DateTime.Today;
-            var lastWeek = today.AddDays(-5);
+            var lastWeek = today.AddDays(-days);
             //     var thisWeekStart = DateTime.Today.AddDays(-1 * (int)(DateTime.Today.DayOfWeek)).AddDays(1);
             //   var thisWeekEnd = thisWeekStart.AddDays(7).AddSeconds(-1);
             var ActiveCodes = this._dbContext.LoadStoredProcedure("md_getEMSandActiveCodesGraphDataForDashboard")
@@ -274,9 +274,9 @@ namespace Web.Services.Concrete
                 lastWeek = lastWeek.AddDays(1);
             }
             // thisWeekStart = DateTime.Today.AddDays(-1 * (int)(DateTime.Today.DayOfWeek)).AddDays(1);
-            lastWeek = today.AddDays(-5);
+            lastWeek = today.AddDays(-days);
             var datasets = new List<object>();
-            if (ActiveCodes.Count < 5)
+            if (ActiveCodes.Count < days)
             {
                 List<int> EMS = new();
                 List<int> activeCodes = new();

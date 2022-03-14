@@ -63,13 +63,13 @@ namespace Web.API.Controllers
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
         }
-        [Description("Get Consult Feilds For Org")]
+        [Description("Get Consult Fields For Org")]
         [HttpGet("consult/GetConsultGraphDataForOrg/{OrgId}")]
-        public BaseResponse GetConsultGraphDataForOrg(int OrgId)
+        public BaseResponse GetConsultGraphDataForOrg(int OrgId,int days = 6 )
         {
             try
             {
-                return _consultService.GetConsultGraphDataForOrg(OrgId);
+                return _consultService.GetConsultGraphDataForOrg(OrgId, days);
             }
             catch (Exception ex)
             {

@@ -84,11 +84,11 @@ namespace Web.Services.Concrete
 
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Found", Body = consultFieldVM };
         }
-        public BaseResponse GetConsultGraphDataForOrg(int OrgId)
+        public BaseResponse GetConsultGraphDataForOrg(int OrgId,int days = 6)
         {
 
             var today = DateTime.Today;
-            var lastweek = today.AddDays(-6);
+            var lastweek = today.AddDays(-days);
             var consultFields = this._dbContext.LoadStoredProcedure("md_getConsultGraphDataForDashboard")
                 .WithSqlParam("@OrganizationId", OrgId)
                 .WithSqlParam("@StartDate", lastweek)
@@ -101,8 +101,8 @@ namespace Web.Services.Concrete
                 Label.Add(lastweek.ToString("MMM-dd"));
                 lastweek = lastweek.AddDays(1);
             }
-            lastweek = today.AddDays(-6);
-            if (consultFields.Count < 6)
+            lastweek = today.AddDays(-days);
+            if (consultFields.Count < days)
             {
                 List<int> Urgent = new();
                 List<int> Routine = new();

@@ -97,11 +97,11 @@ namespace Web.API.Controllers
 
         [Description("Get All Active Codes")]
         [HttpGet("activecode/GetEMSandActiveCodesForDashboard/{OrgId}")]
-        public BaseResponse GetEMSandActiveCodesForDashboard(int OrgId)
+        public BaseResponse GetEMSandActiveCodesForDashboard(int OrgId,int days = 6)
         {
             try
             {
-                return _activeCodesService.GetEMSandActiveCodesForDashboard(OrgId);
+                return _activeCodesService.GetEMSandActiveCodesForDashboard(OrgId, days);
             }
             catch (Exception ex)
             {
