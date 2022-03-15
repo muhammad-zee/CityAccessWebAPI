@@ -154,12 +154,12 @@ namespace Web.Services.Concrete
                 item.UserRole = getRoleListByUserId(item.UserId).ToList();
                 item.GenderId = Convert.ToInt32(item.Gender);
                 item.Gender = genders.Where(x => x.ControlListDetailId == item.GenderId).Select(x => x.Title).FirstOrDefault();
-                item.UserImage = String.IsNullOrEmpty(item.UserImage) ? "" : item.UserImage.Replace(Directory.GetCurrentDirectory() + "/", "");
-                item.DobStr = item.Dob?.ToString("yyyy-MM-dd");
-                var dptids = _serviceRepo.Table.Where(x => userRelationIds.Where(x => x.UserIdFk == item.UserId).Select(x => x.ServiceLineIdFk).Distinct().Contains(x.ServiceLineId) && x.IsDeleted != true).Select(x => x.DepartmentIdFk).Distinct().ToList();
-                item.ServiceLineIdsList = userRelationIds.Where(x => x.UserIdFk == item.UserId).Select(x => x.ServiceLineIdFk).Distinct().ToList();
-                item.DptIdsList = dptids;
-                item.OrgIdsList = _departmentRepo.Table.Where(x => x.IsDeleted != true && dptids.Contains(x.DepartmentId)).Select(x => x.OrganizationIdFk.Value).Distinct().ToList();
+                //item.UserImage = String.IsNullOrEmpty(item.UserImage) ? "" : item.UserImage.Replace(Directory.GetCurrentDirectory() + "/", "");
+                //item.DobStr = item.Dob?.ToString("yyyy-MM-dd");
+                //var dptids = _serviceRepo.Table.Where(x => userRelationIds.Where(x => x.UserIdFk == item.UserId).Select(x => x.ServiceLineIdFk).Distinct().Contains(x.ServiceLineId) && x.IsDeleted != true).Select(x => x.DepartmentIdFk).Distinct().ToList();
+                //item.ServiceLineIdsList = userRelationIds.Where(x => x.UserIdFk == item.UserId).Select(x => x.ServiceLineIdFk).Distinct().ToList();
+                //item.DptIdsList = dptids;
+                //item.OrgIdsList = _departmentRepo.Table.Where(x => x.IsDeleted != true && dptids.Contains(x.DepartmentId)).Select(x => x.OrganizationIdFk.Value).Distinct().ToList();
 
             }
             return new BaseResponse { Status = HttpStatusCode.OK, Message = "Users List Returned", Body = users };
@@ -180,15 +180,15 @@ namespace Web.Services.Concrete
                 item.UserRole = getRoleListByUserId(item.UserId).ToList();
                 item.GenderId = Convert.ToInt32(item.Gender);
                 item.Gender = genders.Where(x => x.ControlListDetailId == item.GenderId).Select(x => x.Title).FirstOrDefault();
-                item.UserImage = String.IsNullOrEmpty(item.UserImage) ? "" : item.UserImage.Replace(Directory.GetCurrentDirectory() + "/", "");
-                item.DobStr = item.Dob?.ToString("yyyy-MM-dd");
-                var dptids = _serviceRepo.Table.Where(x => userRelationIds.Where(x => x.UserIdFk == item.UserId).Select(x => x.ServiceLineIdFk).Distinct().ToList().Contains(x.ServiceLineId) && x.IsDeleted != true).Select(x => x.DepartmentIdFk).Distinct().ToList();
-                item.ServiceLineIdsList = userRelationIds.Where(x => x.UserIdFk == item.UserId).Select(x => x.ServiceLineIdFk).Distinct().ToList();
-                item.DptIdsList = dptids;
-                item.OrgIdsList = item.ServiceLineIdsList.Count > 0 ? _departmentRepo.Table.Where(x => x.IsDeleted != true && dptids.Contains(x.DepartmentId)).Select(x => x.OrganizationIdFk.Value).Distinct().ToList() : this._role.Table.Where(x => item.UserRole.Select(r => r.RoleId).Contains(x.RoleId) && !x.IsDeleted && x.OrganizationIdFk.HasValue).Select(x => x.OrganizationIdFk.Value).Distinct().ToList();
-                item.serviceIdsFT = _favouriteTeam.Table.Where(x => x.UserIdFk == item.UserId).Select(x => x.ServiceLineIdFk).ToList();
-                item.dptIdsFT = _serviceRepo.Table.Where(x => item.serviceIdsFT.Contains(x.ServiceLineId) && !x.IsDeleted).Select(x => x.DepartmentIdFk).Distinct().ToList();
-                item.orgIdsFT = _departmentRepo.Table.Where(x => item.dptIdsFT.Contains(x.DepartmentId) && !x.IsDeleted).Select(x => x.OrganizationIdFk).Distinct().ToList();
+                //item.UserImage = String.IsNullOrEmpty(item.UserImage) ? "" : item.UserImage.Replace(Directory.GetCurrentDirectory() + "/", "");
+                //item.DobStr = item.Dob?.ToString("yyyy-MM-dd");
+                //var dptids = _serviceRepo.Table.Where(x => userRelationIds.Where(x => x.UserIdFk == item.UserId).Select(x => x.ServiceLineIdFk).Distinct().ToList().Contains(x.ServiceLineId) && x.IsDeleted != true).Select(x => x.DepartmentIdFk).Distinct().ToList();
+                //item.ServiceLineIdsList = userRelationIds.Where(x => x.UserIdFk == item.UserId).Select(x => x.ServiceLineIdFk).Distinct().ToList();
+                //item.DptIdsList = dptids;
+                //item.OrgIdsList = item.ServiceLineIdsList.Count > 0 ? _departmentRepo.Table.Where(x => x.IsDeleted != true && dptids.Contains(x.DepartmentId)).Select(x => x.OrganizationIdFk.Value).Distinct().ToList() : this._role.Table.Where(x => item.UserRole.Select(r => r.RoleId).Contains(x.RoleId) && !x.IsDeleted && x.OrganizationIdFk.HasValue).Select(x => x.OrganizationIdFk.Value).Distinct().ToList();
+                //item.serviceIdsFT = _favouriteTeam.Table.Where(x => x.UserIdFk == item.UserId).Select(x => x.ServiceLineIdFk).ToList();
+                //item.dptIdsFT = _serviceRepo.Table.Where(x => item.serviceIdsFT.Contains(x.ServiceLineId) && !x.IsDeleted).Select(x => x.DepartmentIdFk).Distinct().ToList();
+                //item.orgIdsFT = _departmentRepo.Table.Where(x => item.dptIdsFT.Contains(x.DepartmentId) && !x.IsDeleted).Select(x => x.OrganizationIdFk).Distinct().ToList();
             }
             return new BaseResponse { Status = HttpStatusCode.OK, Message = "Users List Returned", Body = users };
         }
@@ -230,7 +230,9 @@ namespace Web.Services.Concrete
                                      select new ServiceLineVM() { ServiceLineId = s.ServiceLineId, ServiceName = s.ServiceName, DepartmentIdFk = s.DepartmentIdFk }).ToList();
                 user.Departments = _departmentRepo.Table.Where(x => user.UserServices.Select(y => y.DepartmentIdFk).Contains(x.DepartmentId) && !x.IsDeleted).Select(x => new DepartmentVM() { DepartmentId = x.DepartmentId, DepartmentName = x.DepartmentName, OrganizationIdFk = x.OrganizationIdFk }).ToList();
                 user.Organizations = user.Departments.Count > 0 ? _organizationRepo.Table.Where(x => user.Departments.Select(z => z.OrganizationIdFk).Contains(x.OrganizationId)).Select(x => new OrganizationVM() { OrganizationId = x.OrganizationId, OrganizationName = x.OrganizationName }).ToList() : this._organizationRepo.Table.Where(x => this._role.Table.Where(r => user.UserRole.Select(id => id.RoleId).Contains(r.RoleId) && !r.IsDeleted).Select(r => r.OrganizationIdFk).Contains(x.OrganizationId) && !x.IsDeleted).Select(x => new OrganizationVM() { OrganizationId = x.OrganizationId, OrganizationName = x.OrganizationName }).ToList();
-
+                user.serviceIdsFT = _favouriteTeam.Table.Where(x => x.UserIdFk == user.UserId).Select(x => x.ServiceLineIdFk).ToList();
+                user.dptIdsFT = _serviceRepo.Table.Where(x => user.serviceIdsFT.Contains(x.ServiceLineId) && !x.IsDeleted).Select(x => x.DepartmentIdFk).Distinct().ToList();
+                user.orgIdsFT = _departmentRepo.Table.Where(x => user.dptIdsFT.Contains(x.DepartmentId) && !x.IsDeleted).Select(x => x.OrganizationIdFk).Distinct().ToList();
                 var schedule = this._userScheduleRepo.Table.Where(x => user.UserRole.Select(r => r.RoleId).Contains(x.RoleIdFk) && user.UserServices.Select(u => u.ServiceLineId).Contains(x.ServiceLineIdFk.Value) && x.UserIdFk == Id && x.ScheduleDate.Value.Date >= DateTime.UtcNow.Date && !x.IsDeleted).ToList();
 
                 List<UserProfileSchedulesVM> UserProfileSchedules = new();
@@ -280,15 +282,18 @@ namespace Web.Services.Concrete
 
         public BaseResponse GetUsersByRoleId(int roleId)
         {
-            var roleUsers = (from ur in _userRole.Table
-                             join u in _user.Table on ur.UserIdFk equals u.UserId
-                             where ur.RoleIdFk == roleId && u.IsDeleted == false
-                             select new
-                             {
-                                 UserId = u.UserId,
-                                 Name = u.FirstName + " " + u.LastName
-                             }).OrderBy("Name").ToList();
+            //var roleUsers = (from ur in _userRole.Table
+            //                 join u in _user.Table on ur.UserIdFk equals u.UserId
+            //                 where ur.RoleIdFk == roleId && u.IsDeleted == false
+            //                 select new
+            //                 {
+            //                     UserId = u.UserId,
+            //                     Name = u.FirstName + " " + u.LastName
+            //                 }).OrderBy("Name").ToList();
             //var roleUsersVM = AutoMapperHelper.MapList<User, RegisterCredentialVM>(roleUsers);
+            var roleUsers = this._dbContext.LoadStoredProcedure("md_GetUsersByRoleId")
+                            .WithSqlParam("@roleId", roleId)
+                            .ExecuteStoredProc_ToDictionary();
             var response = new BaseResponse();
 
             if (roleUsers.Count() > 0)
@@ -421,6 +426,17 @@ namespace Web.Services.Concrete
             return response;
         }
 
+        public BaseResponse GetRoleById(int roleId) 
+        {
+            var role = this._role.Table.Where(x => x.RoleId == roleId && !x.IsDeleted).AsQueryable().FirstOrDefault();
+            if (role != null)
+            {
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Role Return", Body = role };
+            }
+            else {
+                return new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "No Role Found against this id" };
+            }
+        }
         public BaseResponse DeleteRole(int Id)
         {
             var Role = _role.Table.Where(x => x.RoleId == Id && x.IsDeleted == false).FirstOrDefault();

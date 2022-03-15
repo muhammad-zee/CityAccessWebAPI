@@ -49,6 +49,7 @@ namespace Web.Services.Interfaces
         IQueryable<Role> getRoleListByOrganizationIds(string OrganizationIds);
         List<UserRoleVM> getRoleListByUserId(int UserId);
         string SaveRole(List<RoleVM> role);
+        BaseResponse GetRoleById(int roleId);
         BaseResponse DeleteRole(int Id);
 
         #endregion

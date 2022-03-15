@@ -178,79 +178,79 @@ namespace Web.Services.Concrete
                                     .WithSqlParam("@organizationId", orgId)
                                     .ExecuteStoredProc<CodeStrokeVM>();
             var orgDataList = new List<dynamic>();
-            foreach (var item in activeCodesData.Select(x => x.OrganizationIdFk).Distinct().ToList())
-            {
-                var orgData = GetHosplitalAddressObject(item);
-                if (orgData != null)
-                    orgDataList.Add(orgData);
-            }
-            foreach (var item in activeCodesData)
-            {
-                item.OrganizationData = orgDataList.Where(x => x.OrganizationId == item.OrganizationIdFk).FirstOrDefault();
+            //foreach (var item in activeCodesData.Select(x => x.OrganizationIdFk).Distinct().ToList())
+            //{
+            //    var orgData = GetHosplitalAddressObject(item);
+            //    if (orgData != null)
+            //        orgDataList.Add(orgData);
+            //}
+            //foreach (var item in activeCodesData)
+            //{
+            //    item.OrganizationData = orgDataList.Where(x => x.OrganizationId == item.OrganizationIdFk).FirstOrDefault();
 
-                item.AttachmentsPath = new List<string>();
-                item.AudiosPath = new List<string>();
-                item.VideosPath = new List<string>();
-                item.BloodThinnersTitle = new List<object>();
-                item.ServiceLines = new List<ServiceLineVM>();
-                if (!string.IsNullOrEmpty(item.Attachments) && !string.IsNullOrWhiteSpace(item.Attachments))
-                {
-                    string path = this._RootPath + item.Attachments;
-                    if (Directory.Exists(path))
-                    {
-                        DirectoryInfo AttachFiles = new DirectoryInfo(path);
-                        foreach (var file in AttachFiles.GetFiles())
-                        {
-                            item.AttachmentsPath.Add(item.Attachments + "/" + file.Name);
-                        }
-                    }
-                }
+            //    item.AttachmentsPath = new List<string>();
+            //    item.AudiosPath = new List<string>();
+            //    item.VideosPath = new List<string>();
+            //    item.BloodThinnersTitle = new List<object>();
+            //    item.ServiceLines = new List<ServiceLineVM>();
+            //    if (!string.IsNullOrEmpty(item.Attachments) && !string.IsNullOrWhiteSpace(item.Attachments))
+            //    {
+            //        string path = this._RootPath + item.Attachments;
+            //        if (Directory.Exists(path))
+            //        {
+            //            DirectoryInfo AttachFiles = new DirectoryInfo(path);
+            //            foreach (var file in AttachFiles.GetFiles())
+            //            {
+            //                item.AttachmentsPath.Add(item.Attachments + "/" + file.Name);
+            //            }
+            //        }
+            //    }
 
-                if (!string.IsNullOrEmpty(item.Audio) && !string.IsNullOrWhiteSpace(item.Audio))
-                {
-                    string path = this._RootPath + item.Audio;
-                    if (Directory.Exists(path))
-                    {
-                        DirectoryInfo AudioFiles = new DirectoryInfo(path);
-                        foreach (var file in AudioFiles.GetFiles())
-                        {
-                            item.AudiosPath.Add(item.Audio + "/" + file.Name);
-                        }
-                    }
-                }
+            //    if (!string.IsNullOrEmpty(item.Audio) && !string.IsNullOrWhiteSpace(item.Audio))
+            //    {
+            //        string path = this._RootPath + item.Audio;
+            //        if (Directory.Exists(path))
+            //        {
+            //            DirectoryInfo AudioFiles = new DirectoryInfo(path);
+            //            foreach (var file in AudioFiles.GetFiles())
+            //            {
+            //                item.AudiosPath.Add(item.Audio + "/" + file.Name);
+            //            }
+            //        }
+            //    }
 
-                if (!string.IsNullOrEmpty(item.Video) && !string.IsNullOrWhiteSpace(item.Video))
-                {
-                    var path = this._RootPath + item.Video;
-                    if (Directory.Exists(path))
-                    {
-                        DirectoryInfo VideoFiles = new DirectoryInfo(path);
-                        foreach (var file in VideoFiles.GetFiles())
-                        {
-                            item.VideosPath.Add(item.Video + "/" + file.Name);
-                        }
-                    }
-                }
+            //    if (!string.IsNullOrEmpty(item.Video) && !string.IsNullOrWhiteSpace(item.Video))
+            //    {
+            //        var path = this._RootPath + item.Video;
+            //        if (Directory.Exists(path))
+            //        {
+            //            DirectoryInfo VideoFiles = new DirectoryInfo(path);
+            //            foreach (var file in VideoFiles.GetFiles())
+            //            {
+            //                item.VideosPath.Add(item.Video + "/" + file.Name);
+            //            }
+            //        }
+            //    }
 
-                var serviceIds = this._activeCodeRepo.Table.Where(s => s.OrganizationIdFk == item.OrganizationIdFk && s.CodeIdFk == item.CodeName.GetActiveCodeId() && !s.IsDeleted).Select(s => new { s.ServiceLineIds, s.DefaultServiceLineId }).FirstOrDefault();
-                var serviceLineIds = (from s in this._codesServiceLinesMappingRepo.Table
-                                      where s.OrganizationIdFk == item.OrganizationIdFk && s.CodeIdFk == item.CodeName.GetActiveCodeId()
-                                      && s.ActiveCodeId == item.Id && s.ActiveCodeName == item.CodeName && s.ServiceLineIdFk != serviceIds.DefaultServiceLineId
-                                      select s.ServiceLineIdFk).ToList();
-                item.ServiceLines = this._serviceLineRepo.Table.Where(s => serviceIds.ServiceLineIds.ToIntList().Distinct().Contains(s.ServiceLineId) && s.ServiceLineId != serviceIds.DefaultServiceLineId && !s.IsDeleted).Select(s => new ServiceLineVM() { ServiceLineId = s.ServiceLineId, ServiceName = s.ServiceName, IsSelected = serviceLineIds.Contains(s.ServiceLineId) }).ToList();
-                item.DefaultServiceLineId = serviceIds.DefaultServiceLineId;
-                item.DefaultServiceLine = this._serviceLineRepo.Table.Where(s => s.ServiceLineId == serviceIds.DefaultServiceLineId && !s.IsDeleted).Select(s => new ServiceLineVM() { ServiceLineId = s.ServiceLineId, ServiceName = s.ServiceName }).FirstOrDefault();
-                item.SelectedServiceLineIds = string.Join(",", serviceLineIds);
+            //    var serviceIds = this._activeCodeRepo.Table.Where(s => s.OrganizationIdFk == item.OrganizationIdFk && s.CodeIdFk == item.CodeName.GetActiveCodeId() && !s.IsDeleted).Select(s => new { s.ServiceLineIds, s.DefaultServiceLineId }).FirstOrDefault();
+            //    var serviceLineIds = (from s in this._codesServiceLinesMappingRepo.Table
+            //                          where s.OrganizationIdFk == item.OrganizationIdFk && s.CodeIdFk == item.CodeName.GetActiveCodeId()
+            //                          && s.ActiveCodeId == item.Id && s.ActiveCodeName == item.CodeName && s.ServiceLineIdFk != serviceIds.DefaultServiceLineId
+            //                          select s.ServiceLineIdFk).ToList();
+            //    item.ServiceLines = this._serviceLineRepo.Table.Where(s => serviceIds.ServiceLineIds.ToIntList().Distinct().Contains(s.ServiceLineId) && s.ServiceLineId != serviceIds.DefaultServiceLineId && !s.IsDeleted).Select(s => new ServiceLineVM() { ServiceLineId = s.ServiceLineId, ServiceName = s.ServiceName, IsSelected = serviceLineIds.Contains(s.ServiceLineId) }).ToList();
+            //    item.DefaultServiceLineId = serviceIds.DefaultServiceLineId;
+            //    item.DefaultServiceLine = this._serviceLineRepo.Table.Where(s => s.ServiceLineId == serviceIds.DefaultServiceLineId && !s.IsDeleted).Select(s => new ServiceLineVM() { ServiceLineId = s.ServiceLineId, ServiceName = s.ServiceName }).FirstOrDefault();
+            //    item.SelectedServiceLineIds = string.Join(",", serviceLineIds);
 
-                item.LastKnownWellStr = item.LastKnownWell?.ToString("yyyy-MM-dd hh:mm:ss tt");
-                //new
-                item.CreatedDateStr = item.CreatedDate.ToString("yyyy-MM-dd hh:mm:ss tt");
-                item.DobStr = item.Dob?.ToString("yyyy-MM-dd hh:mm:ss tt");
-                //item.OrganizationData = orgData;
-                item.GenderTitle = _controlListDetailsRepo.Table.Where(g => g.ControlListDetailId == item.Gender).Select(g => g.Title).FirstOrDefault();
-                item.BloodThinnersTitle.AddRange(_controlListDetailsRepo.Table.Where(b => item.BloodThinners.ToIntList().Contains(b.ControlListDetailId)).Select(b => new { Id = b.ControlListDetailId, b.Title }).ToList());
+            //    item.LastKnownWellStr = item.LastKnownWell?.ToString("yyyy-MM-dd hh:mm:ss tt");
+            //    //new
+            //    item.CreatedDateStr = item.CreatedDate.ToString("yyyy-MM-dd hh:mm:ss tt");
+            //    item.DobStr = item.Dob?.ToString("yyyy-MM-dd hh:mm:ss tt");
+            //    //item.OrganizationData = orgData;
+            //    item.GenderTitle = _controlListDetailsRepo.Table.Where(g => g.ControlListDetailId == item.Gender).Select(g => g.Title).FirstOrDefault();
+            //    item.BloodThinnersTitle.AddRange(_controlListDetailsRepo.Table.Where(b => item.BloodThinners.ToIntList().Contains(b.ControlListDetailId)).Select(b => new { Id = b.ControlListDetailId, b.Title }).ToList());
 
-            }
+            //}
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = activeCodesData };
         }
         
@@ -504,7 +504,7 @@ namespace Web.Services.Concrete
                 //strokeData = this._codeStrokeRepo.Table.Where(x => x.CreatedBy == ApplicationSettings.UserId && !x.IsDeleted).OrderByDescending(x => x.CodeStrokeId).ToList();
             }
             var strokeDataVM = AutoMapperHelper.MapList<CodeStroke, CodeStrokeVM>(strokeData);
-            var orgData = GetHosplitalAddressObject(activeCode.OrganizationIdFk);
+            //var orgData = GetHosplitalAddressObject(activeCode.OrganizationIdFk);
 
             strokeDataVM.ForEach(x =>
             {
@@ -515,58 +515,58 @@ namespace Web.Services.Concrete
                 x.BloodThinnersTitle = new List<object>();
                 x.ServiceLines = new List<ServiceLineVM>();
 
-                if (!string.IsNullOrEmpty(x.Attachments) && !string.IsNullOrWhiteSpace(x.Attachments))
-                {
-                    string path = this._RootPath + x.Attachments; //this._RootPath  + x.Attachments;
-                    if (Directory.Exists(path))
-                    {
-                        DirectoryInfo AttachFiles = new DirectoryInfo(path);
-                        foreach (var item in AttachFiles.GetFiles())
-                        {
-                            x.AttachmentsPath.Add(x.Attachments + "/" + item.Name);
-                        }
-                    }
-                }
+                //if (!string.IsNullOrEmpty(x.Attachments) && !string.IsNullOrWhiteSpace(x.Attachments))
+                //{
+                //    string path = this._RootPath + x.Attachments; //this._RootPath  + x.Attachments;
+                //    if (Directory.Exists(path))
+                //    {
+                //        DirectoryInfo AttachFiles = new DirectoryInfo(path);
+                //        foreach (var item in AttachFiles.GetFiles())
+                //        {
+                //            x.AttachmentsPath.Add(x.Attachments + "/" + item.Name);
+                //        }
+                //    }
+                //}
 
-                if (!string.IsNullOrEmpty(x.Audio) && !string.IsNullOrWhiteSpace(x.Audio))
-                {
-                    string path = this._RootPath + x.Audio; //this._RootPath  + x.Audio;
-                    if (Directory.Exists(path))
-                    {
-                        DirectoryInfo AudioFiles = new DirectoryInfo(path);
-                        foreach (var item in AudioFiles.GetFiles())
-                        {
-                            x.AudiosPath.Add(x.Audio + "/" + item.Name);
-                        }
-                    }
-                }
+                //if (!string.IsNullOrEmpty(x.Audio) && !string.IsNullOrWhiteSpace(x.Audio))
+                //{
+                //    string path = this._RootPath + x.Audio; //this._RootPath  + x.Audio;
+                //    if (Directory.Exists(path))
+                //    {
+                //        DirectoryInfo AudioFiles = new DirectoryInfo(path);
+                //        foreach (var item in AudioFiles.GetFiles())
+                //        {
+                //            x.AudiosPath.Add(x.Audio + "/" + item.Name);
+                //        }
+                //    }
+                //}
 
-                if (!string.IsNullOrEmpty(x.Video) && !string.IsNullOrWhiteSpace(x.Video))
-                {
-                    var path = this._RootPath + x.Video; //this._RootPath  + x.Video;
-                    if (Directory.Exists(path))
-                    {
-                        DirectoryInfo VideoFiles = new DirectoryInfo(path);
-                        foreach (var item in VideoFiles.GetFiles())
-                        {
-                            x.VideosPath.Add(x.Video + "/" + item.Name);
-                        }
-                    }
-                }
+                //if (!string.IsNullOrEmpty(x.Video) && !string.IsNullOrWhiteSpace(x.Video))
+                //{
+                //    var path = this._RootPath + x.Video; //this._RootPath  + x.Video;
+                //    if (Directory.Exists(path))
+                //    {
+                //        DirectoryInfo VideoFiles = new DirectoryInfo(path);
+                //        foreach (var item in VideoFiles.GetFiles())
+                //        {
+                //            x.VideosPath.Add(x.Video + "/" + item.Name);
+                //        }
+                //    }
+                //}
 
 
-                var serviceIds = this._activeCodeRepo.Table.Where(s => s.OrganizationIdFk == x.OrganizationIdFk && s.CodeIdFk == UCLEnums.Stroke.ToInt() && !s.IsDeleted).Select(s => new { s.ServiceLineIds, s.DefaultServiceLineId }).FirstOrDefault();
-                var serviceLineIds = (from s in this._codesServiceLinesMappingRepo.Table
-                                      where s.OrganizationIdFk == x.OrganizationIdFk && s.CodeIdFk == UCLEnums.Stroke.ToInt()
-                                      && s.ActiveCodeId == x.CodeStrokeId && s.ActiveCodeName == UCLEnums.Stroke.ToString() && s.ServiceLineIdFk != serviceIds.DefaultServiceLineId
-                                      select s.ServiceLineIdFk).ToList();
-                x.ServiceLines = this._serviceLineRepo.Table.Where(s => serviceIds.ServiceLineIds.ToIntList().Distinct().Contains(s.ServiceLineId) && s.ServiceLineId != serviceIds.DefaultServiceLineId && !s.IsDeleted).Select(s => new ServiceLineVM() { ServiceLineId = s.ServiceLineId, ServiceName = s.ServiceName, IsSelected = serviceLineIds.Contains(s.ServiceLineId) }).ToList();
-                x.DefaultServiceLineId = serviceIds.DefaultServiceLineId;
-                x.DefaultServiceLine = this._serviceLineRepo.Table.Where(s => s.ServiceLineId == serviceIds.DefaultServiceLineId && !s.IsDeleted).Select(s => new ServiceLineVM() { ServiceLineId = s.ServiceLineId, ServiceName = s.ServiceName }).FirstOrDefault();
-                x.SelectedServiceLineIds = string.Join(",", serviceLineIds);
+                //var serviceIds = this._activeCodeRepo.Table.Where(s => s.OrganizationIdFk == x.OrganizationIdFk && s.CodeIdFk == UCLEnums.Stroke.ToInt() && !s.IsDeleted).Select(s => new { s.ServiceLineIds, s.DefaultServiceLineId }).FirstOrDefault();
+                //var serviceLineIds = (from s in this._codesServiceLinesMappingRepo.Table
+                //                      where s.OrganizationIdFk == x.OrganizationIdFk && s.CodeIdFk == UCLEnums.Stroke.ToInt()
+                //                      && s.ActiveCodeId == x.CodeStrokeId && s.ActiveCodeName == UCLEnums.Stroke.ToString() && s.ServiceLineIdFk != serviceIds.DefaultServiceLineId
+                //                      select s.ServiceLineIdFk).ToList();
+                //x.ServiceLines = this._serviceLineRepo.Table.Where(s => serviceIds.ServiceLineIds.ToIntList().Distinct().Contains(s.ServiceLineId) && s.ServiceLineId != serviceIds.DefaultServiceLineId && !s.IsDeleted).Select(s => new ServiceLineVM() { ServiceLineId = s.ServiceLineId, ServiceName = s.ServiceName, IsSelected = serviceLineIds.Contains(s.ServiceLineId) }).ToList();
+                //x.DefaultServiceLineId = serviceIds.DefaultServiceLineId;
+                //x.DefaultServiceLine = this._serviceLineRepo.Table.Where(s => s.ServiceLineId == serviceIds.DefaultServiceLineId && !s.IsDeleted).Select(s => new ServiceLineVM() { ServiceLineId = s.ServiceLineId, ServiceName = s.ServiceName }).FirstOrDefault();
+                //x.SelectedServiceLineIds = string.Join(",", serviceLineIds);
                 x.LastKnownWellStr = x.LastKnownWell?.ToString("yyyy-MM-dd hh:mm:ss tt");
                 x.DobStr = x.Dob?.ToString("yyyy-MM-dd hh:mm:ss tt");
-                x.OrganizationData = orgData;
+                //x.OrganizationData = orgData;
                 x.GenderTitle = _controlListDetailsRepo.Table.Where(g => g.ControlListDetailId == x.Gender).Select(g => g.Title).FirstOrDefault();
                 x.BloodThinnersTitle.AddRange(_controlListDetailsRepo.Table.Where(b => x.BloodThinners.ToIntList().Contains(b.ControlListDetailId)).Select(b => new { Id = b.ControlListDetailId, b.Title }).ToList());
             });
@@ -1440,7 +1440,7 @@ namespace Web.Services.Concrete
             }
             var SepsisDataVM = AutoMapperHelper.MapList<CodeSepsi, CodeSepsisVM>(SepsisData);
 
-            var orgData = GetHosplitalAddressObject(activeCode.OrganizationIdFk);
+            //var orgData = GetHosplitalAddressObject(activeCode.OrganizationIdFk);
 
             SepsisDataVM.ForEach(x =>
             {
@@ -1451,56 +1451,56 @@ namespace Web.Services.Concrete
                 x.ServiceLines = new List<ServiceLineVM>();
                 //x.OrganizationData == new object();
 
-                if (!string.IsNullOrEmpty(x.Attachments) && !string.IsNullOrWhiteSpace(x.Attachments))
-                {
-                    string path = this._RootPath + x.Attachments;
-                    if (Directory.Exists(path))
-                    {
-                        DirectoryInfo AttachFiles = new DirectoryInfo(path);
-                        foreach (var item in AttachFiles.GetFiles())
-                        {
-                            x.AttachmentsPath.Add(x.Attachments + "/" + item.Name);
-                        }
-                    }
-                }
+                //if (!string.IsNullOrEmpty(x.Attachments) && !string.IsNullOrWhiteSpace(x.Attachments))
+                //{
+                //    string path = this._RootPath + x.Attachments;
+                //    if (Directory.Exists(path))
+                //    {
+                //        DirectoryInfo AttachFiles = new DirectoryInfo(path);
+                //        foreach (var item in AttachFiles.GetFiles())
+                //        {
+                //            x.AttachmentsPath.Add(x.Attachments + "/" + item.Name);
+                //        }
+                //    }
+                //}
 
-                if (!string.IsNullOrEmpty(x.Audio) && !string.IsNullOrWhiteSpace(x.Audio))
-                {
-                    string path = this._RootPath + x.Audio;
-                    if (Directory.Exists(path))
-                    {
-                        DirectoryInfo AudioFiles = new DirectoryInfo(path);
-                        foreach (var item in AudioFiles.GetFiles())
-                        {
-                            x.AudiosPath.Add(x.Audio + "/" + item.Name);
-                        }
-                    }
-                }
+                //if (!string.IsNullOrEmpty(x.Audio) && !string.IsNullOrWhiteSpace(x.Audio))
+                //{
+                //    string path = this._RootPath + x.Audio;
+                //    if (Directory.Exists(path))
+                //    {
+                //        DirectoryInfo AudioFiles = new DirectoryInfo(path);
+                //        foreach (var item in AudioFiles.GetFiles())
+                //        {
+                //            x.AudiosPath.Add(x.Audio + "/" + item.Name);
+                //        }
+                //    }
+                //}
 
-                if (!string.IsNullOrEmpty(x.Video) && !string.IsNullOrWhiteSpace(x.Video))
-                {
-                    var path = this._RootPath + x.Video;
-                    if (Directory.Exists(path))
-                    {
-                        DirectoryInfo VideoFiles = new DirectoryInfo(path);
-                        foreach (var item in VideoFiles.GetFiles())
-                        {
-                            x.VideosPath.Add(x.Video + "/" + item.Name);
-                        }
-                    }
-                }
-                var serviceIds = this._activeCodeRepo.Table.Where(s => s.OrganizationIdFk == x.OrganizationIdFk && s.CodeIdFk == UCLEnums.Sepsis.ToInt() && !s.IsDeleted).Select(s => new { s.ServiceLineIds, s.DefaultServiceLineId }).FirstOrDefault();
-                var serviceLineIds = (from s in this._codesServiceLinesMappingRepo.Table
-                                      where s.OrganizationIdFk == x.OrganizationIdFk && s.CodeIdFk == UCLEnums.Sepsis.ToInt()
-                                      && s.ActiveCodeId == x.CodeSepsisId && s.ActiveCodeName == UCLEnums.Sepsis.ToString() && s.ServiceLineIdFk != serviceIds.DefaultServiceLineId
-                                      select s.ServiceLineIdFk).ToList();
-                x.ServiceLines = this._serviceLineRepo.Table.Where(s => serviceIds.ServiceLineIds.ToIntList().Distinct().Contains(s.ServiceLineId) && s.ServiceLineId != serviceIds.DefaultServiceLineId && !s.IsDeleted).Select(s => new ServiceLineVM() { ServiceLineId = s.ServiceLineId, ServiceName = s.ServiceName, IsSelected = serviceLineIds.Contains(s.ServiceLineId) }).ToList();
-                x.DefaultServiceLineId = serviceIds.DefaultServiceLineId;
-                x.DefaultServiceLine = this._serviceLineRepo.Table.Where(s => s.ServiceLineId == serviceIds.DefaultServiceLineId && !s.IsDeleted).Select(s => new ServiceLineVM() { ServiceLineId = s.ServiceLineId, ServiceName = s.ServiceName }).FirstOrDefault();
-                x.SelectedServiceLineIds = string.Join(",", serviceLineIds);
+                //if (!string.IsNullOrEmpty(x.Video) && !string.IsNullOrWhiteSpace(x.Video))
+                //{
+                //    var path = this._RootPath + x.Video;
+                //    if (Directory.Exists(path))
+                //    {
+                //        DirectoryInfo VideoFiles = new DirectoryInfo(path);
+                //        foreach (var item in VideoFiles.GetFiles())
+                //        {
+                //            x.VideosPath.Add(x.Video + "/" + item.Name);
+                //        }
+                //    }
+                //}
+                //var serviceIds = this._activeCodeRepo.Table.Where(s => s.OrganizationIdFk == x.OrganizationIdFk && s.CodeIdFk == UCLEnums.Sepsis.ToInt() && !s.IsDeleted).Select(s => new { s.ServiceLineIds, s.DefaultServiceLineId }).FirstOrDefault();
+                //var serviceLineIds = (from s in this._codesServiceLinesMappingRepo.Table
+                //                      where s.OrganizationIdFk == x.OrganizationIdFk && s.CodeIdFk == UCLEnums.Sepsis.ToInt()
+                //                      && s.ActiveCodeId == x.CodeSepsisId && s.ActiveCodeName == UCLEnums.Sepsis.ToString() && s.ServiceLineIdFk != serviceIds.DefaultServiceLineId
+                //                      select s.ServiceLineIdFk).ToList();
+                //x.ServiceLines = this._serviceLineRepo.Table.Where(s => serviceIds.ServiceLineIds.ToIntList().Distinct().Contains(s.ServiceLineId) && s.ServiceLineId != serviceIds.DefaultServiceLineId && !s.IsDeleted).Select(s => new ServiceLineVM() { ServiceLineId = s.ServiceLineId, ServiceName = s.ServiceName, IsSelected = serviceLineIds.Contains(s.ServiceLineId) }).ToList();
+                //x.DefaultServiceLineId = serviceIds.DefaultServiceLineId;
+                //x.DefaultServiceLine = this._serviceLineRepo.Table.Where(s => s.ServiceLineId == serviceIds.DefaultServiceLineId && !s.IsDeleted).Select(s => new ServiceLineVM() { ServiceLineId = s.ServiceLineId, ServiceName = s.ServiceName }).FirstOrDefault();
+                //x.SelectedServiceLineIds = string.Join(",", serviceLineIds);
                 x.LastKnownWellStr = x.LastKnownWell.ToString("yyyy-MM-dd hh:mm:ss tt");
                 x.DobStr = x.Dob.ToString("yyyy-MM-dd hh:mm:ss tt");
-                x.OrganizationData = orgData;
+                //x.OrganizationData = orgData;
                 x.GenderTitle = _controlListDetailsRepo.Table.Where(g => g.ControlListDetailId == x.Gender).Select(g => g.Title).FirstOrDefault();
                 x.BloodThinnersTitle.AddRange(_controlListDetailsRepo.Table.Where(b => x.BloodThinners.ToIntList().Contains(b.ControlListDetailId)).Select(b => new { Id = b.ControlListDetailId, b.Title }).ToList());
             });
@@ -2376,7 +2376,7 @@ namespace Web.Services.Concrete
             }
             var STEMIDataVM = AutoMapperHelper.MapList<CodeStemi, CodeSTEMIVM>(STEMIData);
 
-            var orgData = GetHosplitalAddressObject(activeCode.OrganizationIdFk);
+            //var orgData = GetHosplitalAddressObject(activeCode.OrganizationIdFk);
 
             STEMIDataVM.ForEach(x =>
             {
@@ -2386,57 +2386,57 @@ namespace Web.Services.Concrete
                 x.BloodThinnersTitle = new List<object>();
                 x.ServiceLines = new List<ServiceLineVM>();
 
-                if (!string.IsNullOrEmpty(x.Attachments) && !string.IsNullOrWhiteSpace(x.Attachments))
-                {
-                    string path = this._RootPath + x.Attachments;
-                    if (Directory.Exists(path))
-                    {
-                        DirectoryInfo AttachFiles = new DirectoryInfo(path);
-                        foreach (var item in AttachFiles.GetFiles())
-                        {
-                            x.AttachmentsPath.Add(x.Attachments + "/" + item.Name);
-                        }
-                    }
-                }
+                //if (!string.IsNullOrEmpty(x.Attachments) && !string.IsNullOrWhiteSpace(x.Attachments))
+                //{
+                //    string path = this._RootPath + x.Attachments;
+                //    if (Directory.Exists(path))
+                //    {
+                //        DirectoryInfo AttachFiles = new DirectoryInfo(path);
+                //        foreach (var item in AttachFiles.GetFiles())
+                //        {
+                //            x.AttachmentsPath.Add(x.Attachments + "/" + item.Name);
+                //        }
+                //    }
+                //}
 
-                if (!string.IsNullOrEmpty(x.Audio) && !string.IsNullOrWhiteSpace(x.Audio))
-                {
-                    string path = this._RootPath + x.Audio;
-                    if (Directory.Exists(path))
-                    {
-                        DirectoryInfo AudioFiles = new DirectoryInfo(path);
-                        foreach (var item in AudioFiles.GetFiles())
-                        {
-                            x.AudiosPath.Add(x.Audio + "/" + item.Name);
-                        }
-                    }
-                }
+                //if (!string.IsNullOrEmpty(x.Audio) && !string.IsNullOrWhiteSpace(x.Audio))
+                //{
+                //    string path = this._RootPath + x.Audio;
+                //    if (Directory.Exists(path))
+                //    {
+                //        DirectoryInfo AudioFiles = new DirectoryInfo(path);
+                //        foreach (var item in AudioFiles.GetFiles())
+                //        {
+                //            x.AudiosPath.Add(x.Audio + "/" + item.Name);
+                //        }
+                //    }
+                //}
 
-                if (!string.IsNullOrEmpty(x.Video) && !string.IsNullOrWhiteSpace(x.Video))
-                {
-                    var path = this._RootPath + x.Video;
-                    if (Directory.Exists(path))
-                    {
-                        DirectoryInfo VideoFiles = new DirectoryInfo(path);
-                        foreach (var item in VideoFiles.GetFiles())
-                        {
-                            x.VideosPath.Add(x.Video + "/" + item.Name);
-                        }
-                    }
-                }
+                //if (!string.IsNullOrEmpty(x.Video) && !string.IsNullOrWhiteSpace(x.Video))
+                //{
+                //    var path = this._RootPath + x.Video;
+                //    if (Directory.Exists(path))
+                //    {
+                //        DirectoryInfo VideoFiles = new DirectoryInfo(path);
+                //        foreach (var item in VideoFiles.GetFiles())
+                //        {
+                //            x.VideosPath.Add(x.Video + "/" + item.Name);
+                //        }
+                //    }
+                //}
 
-                var serviceIds = this._activeCodeRepo.Table.Where(s => s.OrganizationIdFk == x.OrganizationIdFk && s.CodeIdFk == UCLEnums.STEMI.ToInt() && !s.IsDeleted).Select(s => new { s.ServiceLineIds, s.DefaultServiceLineId }).FirstOrDefault();
-                var serviceLineIds = (from s in this._codesServiceLinesMappingRepo.Table
-                                      where s.OrganizationIdFk == x.OrganizationIdFk && s.CodeIdFk == UCLEnums.STEMI.ToInt()
-                                      && s.ActiveCodeId == x.CodeStemiid && s.ActiveCodeName == UCLEnums.STEMI.ToString() && s.ServiceLineIdFk != serviceIds.DefaultServiceLineId
-                                      select s.ServiceLineIdFk).ToList();
-                x.ServiceLines = this._serviceLineRepo.Table.Where(s => serviceIds.ServiceLineIds.ToIntList().Distinct().Contains(s.ServiceLineId) && s.ServiceLineId != serviceIds.DefaultServiceLineId && !s.IsDeleted).Select(s => new ServiceLineVM() { ServiceLineId = s.ServiceLineId, ServiceName = s.ServiceName, IsSelected = serviceLineIds.Contains(s.ServiceLineId) }).ToList();
-                x.DefaultServiceLineId = serviceIds.DefaultServiceLineId;
-                x.DefaultServiceLine = this._serviceLineRepo.Table.Where(s => s.ServiceLineId == serviceIds.DefaultServiceLineId && !s.IsDeleted).Select(s => new ServiceLineVM() { ServiceLineId = s.ServiceLineId, ServiceName = s.ServiceName }).FirstOrDefault();
-                x.SelectedServiceLineIds = string.Join(",", serviceLineIds);
+                //var serviceIds = this._activeCodeRepo.Table.Where(s => s.OrganizationIdFk == x.OrganizationIdFk && s.CodeIdFk == UCLEnums.STEMI.ToInt() && !s.IsDeleted).Select(s => new { s.ServiceLineIds, s.DefaultServiceLineId }).FirstOrDefault();
+                //var serviceLineIds = (from s in this._codesServiceLinesMappingRepo.Table
+                //                      where s.OrganizationIdFk == x.OrganizationIdFk && s.CodeIdFk == UCLEnums.STEMI.ToInt()
+                //                      && s.ActiveCodeId == x.CodeStemiid && s.ActiveCodeName == UCLEnums.STEMI.ToString() && s.ServiceLineIdFk != serviceIds.DefaultServiceLineId
+                //                      select s.ServiceLineIdFk).ToList();
+                //x.ServiceLines = this._serviceLineRepo.Table.Where(s => serviceIds.ServiceLineIds.ToIntList().Distinct().Contains(s.ServiceLineId) && s.ServiceLineId != serviceIds.DefaultServiceLineId && !s.IsDeleted).Select(s => new ServiceLineVM() { ServiceLineId = s.ServiceLineId, ServiceName = s.ServiceName, IsSelected = serviceLineIds.Contains(s.ServiceLineId) }).ToList();
+                //x.DefaultServiceLineId = serviceIds.DefaultServiceLineId;
+                //x.DefaultServiceLine = this._serviceLineRepo.Table.Where(s => s.ServiceLineId == serviceIds.DefaultServiceLineId && !s.IsDeleted).Select(s => new ServiceLineVM() { ServiceLineId = s.ServiceLineId, ServiceName = s.ServiceName }).FirstOrDefault();
+                //x.SelectedServiceLineIds = string.Join(",", serviceLineIds);
                 x.LastKnownWellStr = x.LastKnownWell?.ToString("yyyy-MM-dd hh:mm:ss tt");
                 x.DobStr = x.Dob?.ToString("yyyy-MM-dd hh:mm:ss tt");
-                x.OrganizationData = orgData;
+                //x.OrganizationData = orgData;
                 x.GenderTitle = _controlListDetailsRepo.Table.Where(g => g.ControlListDetailId == x.Gender).Select(g => g.Title).FirstOrDefault();
                 x.BloodThinnersTitle.AddRange(_controlListDetailsRepo.Table.Where(b => x.BloodThinners.ToIntList().Contains(b.ControlListDetailId)).Select(b => new { Id = b.ControlListDetailId, b.Title }).ToList());
             });
@@ -3355,7 +3355,7 @@ namespace Web.Services.Concrete
 
             var TrumaDataVM = AutoMapperHelper.MapList<CodeTrauma, CodeTrumaVM>(TrumaData);
 
-            var orgData = GetHosplitalAddressObject(activeCode.OrganizationIdFk);
+            //var orgData = GetHosplitalAddressObject(activeCode.OrganizationIdFk);
 
             TrumaDataVM.ForEach(x =>
             {
@@ -3363,58 +3363,58 @@ namespace Web.Services.Concrete
                 x.AudiosPath = new List<string>();
                 x.VideosPath = new List<string>();
                 x.BloodThinnersTitle = new List<object>();
-                if (!string.IsNullOrEmpty(x.Attachments) && !string.IsNullOrWhiteSpace(x.Attachments))
-                {
-                    string path = this._RootPath + x.Attachments;
-                    if (Directory.Exists(path))
-                    {
-                        DirectoryInfo AttachFiles = new DirectoryInfo(path);
-                        foreach (var item in AttachFiles.GetFiles())
-                        {
-                            x.AttachmentsPath.Add(x.Attachments + "/" + item.Name);
-                        }
-                    }
-                }
+                //if (!string.IsNullOrEmpty(x.Attachments) && !string.IsNullOrWhiteSpace(x.Attachments))
+                //{
+                //    string path = this._RootPath + x.Attachments;
+                //    if (Directory.Exists(path))
+                //    {
+                //        DirectoryInfo AttachFiles = new DirectoryInfo(path);
+                //        foreach (var item in AttachFiles.GetFiles())
+                //        {
+                //            x.AttachmentsPath.Add(x.Attachments + "/" + item.Name);
+                //        }
+                //    }
+                //}
 
-                if (!string.IsNullOrEmpty(x.Audio) && !string.IsNullOrWhiteSpace(x.Audio))
-                {
-                    string path = this._RootPath + x.Audio;
-                    if (Directory.Exists(path))
-                    {
-                        DirectoryInfo AudioFiles = new DirectoryInfo(path);
-                        foreach (var item in AudioFiles.GetFiles())
-                        {
-                            x.AudiosPath.Add(x.Audio + "/" + item.Name);
-                        }
-                    }
-                }
+                //if (!string.IsNullOrEmpty(x.Audio) && !string.IsNullOrWhiteSpace(x.Audio))
+                //{
+                //    string path = this._RootPath + x.Audio;
+                //    if (Directory.Exists(path))
+                //    {
+                //        DirectoryInfo AudioFiles = new DirectoryInfo(path);
+                //        foreach (var item in AudioFiles.GetFiles())
+                //        {
+                //            x.AudiosPath.Add(x.Audio + "/" + item.Name);
+                //        }
+                //    }
+                //}
 
-                if (!string.IsNullOrEmpty(x.Video) && !string.IsNullOrWhiteSpace(x.Video))
-                {
-                    var path = this._RootPath + x.Video;
-                    if (Directory.Exists(path))
-                    {
-                        DirectoryInfo VideoFiles = new DirectoryInfo(path);
-                        foreach (var item in VideoFiles.GetFiles())
-                        {
-                            x.VideosPath.Add(x.Video + "/" + item.Name);
-                        }
-                    }
-                }
+                //if (!string.IsNullOrEmpty(x.Video) && !string.IsNullOrWhiteSpace(x.Video))
+                //{
+                //    var path = this._RootPath + x.Video;
+                //    if (Directory.Exists(path))
+                //    {
+                //        DirectoryInfo VideoFiles = new DirectoryInfo(path);
+                //        foreach (var item in VideoFiles.GetFiles())
+                //        {
+                //            x.VideosPath.Add(x.Video + "/" + item.Name);
+                //        }
+                //    }
+                //}
 
-                var serviceIds = this._activeCodeRepo.Table.Where(s => s.OrganizationIdFk == x.OrganizationIdFk && s.CodeIdFk == UCLEnums.Trauma.ToInt() && !s.IsDeleted).Select(s => new { s.ServiceLineIds, s.DefaultServiceLineId }).FirstOrDefault();
-                var serviceLineIds = (from s in this._codesServiceLinesMappingRepo.Table
-                                      where s.OrganizationIdFk == x.OrganizationIdFk && s.CodeIdFk == UCLEnums.Trauma.ToInt()
-                                      && s.ActiveCodeId == x.CodeTraumaId && s.ActiveCodeName == UCLEnums.Trauma.ToString() && s.ServiceLineIdFk != serviceIds.DefaultServiceLineId
-                                      select s.ServiceLineIdFk).ToList();
-                x.ServiceLines = this._serviceLineRepo.Table.Where(s => serviceIds.ServiceLineIds.ToIntList().Distinct().Contains(s.ServiceLineId) && s.ServiceLineId != serviceIds.DefaultServiceLineId && !s.IsDeleted).Select(s => new ServiceLineVM() { ServiceLineId = s.ServiceLineId, ServiceName = s.ServiceName, IsSelected = serviceLineIds.Contains(s.ServiceLineId) }).ToList();
-                x.DefaultServiceLineId = serviceIds.DefaultServiceLineId;
-                x.DefaultServiceLine = this._serviceLineRepo.Table.Where(s => s.ServiceLineId == serviceIds.DefaultServiceLineId && !s.IsDeleted).Select(s => new ServiceLineVM() { ServiceLineId = s.ServiceLineId, ServiceName = s.ServiceName }).FirstOrDefault();
-                x.SelectedServiceLineIds = string.Join(",", serviceLineIds);
+                //var serviceIds = this._activeCodeRepo.Table.Where(s => s.OrganizationIdFk == x.OrganizationIdFk && s.CodeIdFk == UCLEnums.Trauma.ToInt() && !s.IsDeleted).Select(s => new { s.ServiceLineIds, s.DefaultServiceLineId }).FirstOrDefault();
+                //var serviceLineIds = (from s in this._codesServiceLinesMappingRepo.Table
+                //                      where s.OrganizationIdFk == x.OrganizationIdFk && s.CodeIdFk == UCLEnums.Trauma.ToInt()
+                //                      && s.ActiveCodeId == x.CodeTraumaId && s.ActiveCodeName == UCLEnums.Trauma.ToString() && s.ServiceLineIdFk != serviceIds.DefaultServiceLineId
+                //                      select s.ServiceLineIdFk).ToList();
+                //x.ServiceLines = this._serviceLineRepo.Table.Where(s => serviceIds.ServiceLineIds.ToIntList().Distinct().Contains(s.ServiceLineId) && s.ServiceLineId != serviceIds.DefaultServiceLineId && !s.IsDeleted).Select(s => new ServiceLineVM() { ServiceLineId = s.ServiceLineId, ServiceName = s.ServiceName, IsSelected = serviceLineIds.Contains(s.ServiceLineId) }).ToList();
+                //x.DefaultServiceLineId = serviceIds.DefaultServiceLineId;
+                //x.DefaultServiceLine = this._serviceLineRepo.Table.Where(s => s.ServiceLineId == serviceIds.DefaultServiceLineId && !s.IsDeleted).Select(s => new ServiceLineVM() { ServiceLineId = s.ServiceLineId, ServiceName = s.ServiceName }).FirstOrDefault();
+                //x.SelectedServiceLineIds = string.Join(",", serviceLineIds);
 
                 x.LastKnownWellStr = x.LastKnownWell?.ToString("yyyy-MM-dd hh:mm:ss tt");
                 x.DobStr = x.Dob?.ToString("yyyy-MM-dd hh:mm:ss tt");
-                x.OrganizationData = orgData;
+                //x.OrganizationData = orgData;
                 x.GenderTitle = _controlListDetailsRepo.Table.Where(g => g.ControlListDetailId == x.Gender).Select(g => g.Title).FirstOrDefault();
                 x.BloodThinnersTitle.AddRange(_controlListDetailsRepo.Table.Where(b => x.BloodThinners.ToIntList().Contains(b.ControlListDetailId)).Select(b => new { Id = b.ControlListDetailId, b.Title }).ToList());
             });
@@ -4326,7 +4326,7 @@ namespace Web.Services.Concrete
                 //blueData = this._codeBlueRepo.Table.Where(x => x.CreatedBy == ApplicationSettings.UserId && !x.IsDeleted).OrderByDescending(x => x.CodeBlueId).ToList();
             }
             var blueDataVM = AutoMapperHelper.MapList<CodeBlue, CodeBlueVM>(blueData);
-            var orgData = GetHosplitalAddressObject(activeCode.OrganizationIdFk);
+            //var orgData = GetHosplitalAddressObject(activeCode.OrganizationIdFk);
 
             blueDataVM.ForEach(x =>
             {
@@ -4336,56 +4336,56 @@ namespace Web.Services.Concrete
                 x.OrganizationData = new object();
                 x.BloodThinnersTitle = new List<object>();
                 x.ServiceLines = new List<ServiceLineVM>();
-                if (!string.IsNullOrEmpty(x.Attachments) && !string.IsNullOrWhiteSpace(x.Attachments))
-                {
-                    string path = this._RootPath + x.Attachments; //this._RootPath  + x.Attachments;
-                    if (Directory.Exists(path))
-                    {
-                        DirectoryInfo AttachFiles = new DirectoryInfo(path);
-                        foreach (var item in AttachFiles.GetFiles())
-                        {
-                            x.AttachmentsPath.Add(x.Attachments + "/" + item.Name);
-                        }
-                    }
-                }
+                //if (!string.IsNullOrEmpty(x.Attachments) && !string.IsNullOrWhiteSpace(x.Attachments))
+                //{
+                //    string path = this._RootPath + x.Attachments; //this._RootPath  + x.Attachments;
+                //    if (Directory.Exists(path))
+                //    {
+                //        DirectoryInfo AttachFiles = new DirectoryInfo(path);
+                //        foreach (var item in AttachFiles.GetFiles())
+                //        {
+                //            x.AttachmentsPath.Add(x.Attachments + "/" + item.Name);
+                //        }
+                //    }
+                //}
 
-                if (!string.IsNullOrEmpty(x.Audio) && !string.IsNullOrWhiteSpace(x.Audio))
-                {
-                    string path = this._RootPath + x.Audio; //this._RootPath  + x.Audio;
-                    if (Directory.Exists(path))
-                    {
-                        DirectoryInfo AudioFiles = new DirectoryInfo(path);
-                        foreach (var item in AudioFiles.GetFiles())
-                        {
-                            x.AudiosPath.Add(x.Audio + "/" + item.Name);
-                        }
-                    }
-                }
+                //if (!string.IsNullOrEmpty(x.Audio) && !string.IsNullOrWhiteSpace(x.Audio))
+                //{
+                //    string path = this._RootPath + x.Audio; //this._RootPath  + x.Audio;
+                //    if (Directory.Exists(path))
+                //    {
+                //        DirectoryInfo AudioFiles = new DirectoryInfo(path);
+                //        foreach (var item in AudioFiles.GetFiles())
+                //        {
+                //            x.AudiosPath.Add(x.Audio + "/" + item.Name);
+                //        }
+                //    }
+                //}
 
-                if (!string.IsNullOrEmpty(x.Video) && !string.IsNullOrWhiteSpace(x.Video))
-                {
-                    var path = this._RootPath + x.Video; //this._RootPath  + x.Video;
-                    if (Directory.Exists(path))
-                    {
-                        DirectoryInfo VideoFiles = new DirectoryInfo(path);
-                        foreach (var item in VideoFiles.GetFiles())
-                        {
-                            x.VideosPath.Add(x.Video + "/" + item.Name);
-                        }
-                    }
-                }
-                var serviceIds = this._activeCodeRepo.Table.Where(s => s.OrganizationIdFk == x.OrganizationIdFk && s.CodeIdFk == UCLEnums.Blue.ToInt() && !s.IsDeleted).Select(s => new { s.ServiceLineIds, s.DefaultServiceLineId }).FirstOrDefault();
-                var serviceLineIds = (from s in this._codesServiceLinesMappingRepo.Table
-                                      where s.OrganizationIdFk == x.OrganizationIdFk && s.CodeIdFk == UCLEnums.Blue.ToInt()
-                                      && s.ActiveCodeId == x.CodeBlueId && s.ActiveCodeName == UCLEnums.Blue.ToString() && s.ServiceLineIdFk != serviceIds.DefaultServiceLineId
-                                      select s.ServiceLineIdFk).ToList();
-                x.ServiceLines = this._serviceLineRepo.Table.Where(s => serviceIds.ServiceLineIds.ToIntList().Distinct().Contains(s.ServiceLineId) && s.ServiceLineId != serviceIds.DefaultServiceLineId && !s.IsDeleted).Select(s => new ServiceLineVM() { ServiceLineId = s.ServiceLineId, ServiceName = s.ServiceName, IsSelected = serviceLineIds.Contains(s.ServiceLineId) }).ToList();
-                x.DefaultServiceLineId = serviceIds.DefaultServiceLineId;
-                x.DefaultServiceLine = this._serviceLineRepo.Table.Where(s => s.ServiceLineId == serviceIds.DefaultServiceLineId && !s.IsDeleted).Select(s => new ServiceLineVM() { ServiceLineId = s.ServiceLineId, ServiceName = s.ServiceName }).FirstOrDefault();
-                x.SelectedServiceLineIds = string.Join(",", serviceLineIds);
+                //if (!string.IsNullOrEmpty(x.Video) && !string.IsNullOrWhiteSpace(x.Video))
+                //{
+                //    var path = this._RootPath + x.Video; //this._RootPath  + x.Video;
+                //    if (Directory.Exists(path))
+                //    {
+                //        DirectoryInfo VideoFiles = new DirectoryInfo(path);
+                //        foreach (var item in VideoFiles.GetFiles())
+                //        {
+                //            x.VideosPath.Add(x.Video + "/" + item.Name);
+                //        }
+                //    }
+                //}
+                //var serviceIds = this._activeCodeRepo.Table.Where(s => s.OrganizationIdFk == x.OrganizationIdFk && s.CodeIdFk == UCLEnums.Blue.ToInt() && !s.IsDeleted).Select(s => new { s.ServiceLineIds, s.DefaultServiceLineId }).FirstOrDefault();
+                //var serviceLineIds = (from s in this._codesServiceLinesMappingRepo.Table
+                //                      where s.OrganizationIdFk == x.OrganizationIdFk && s.CodeIdFk == UCLEnums.Blue.ToInt()
+                //                      && s.ActiveCodeId == x.CodeBlueId && s.ActiveCodeName == UCLEnums.Blue.ToString() && s.ServiceLineIdFk != serviceIds.DefaultServiceLineId
+                //                      select s.ServiceLineIdFk).ToList();
+                //x.ServiceLines = this._serviceLineRepo.Table.Where(s => serviceIds.ServiceLineIds.ToIntList().Distinct().Contains(s.ServiceLineId) && s.ServiceLineId != serviceIds.DefaultServiceLineId && !s.IsDeleted).Select(s => new ServiceLineVM() { ServiceLineId = s.ServiceLineId, ServiceName = s.ServiceName, IsSelected = serviceLineIds.Contains(s.ServiceLineId) }).ToList();
+                //x.DefaultServiceLineId = serviceIds.DefaultServiceLineId;
+                //x.DefaultServiceLine = this._serviceLineRepo.Table.Where(s => s.ServiceLineId == serviceIds.DefaultServiceLineId && !s.IsDeleted).Select(s => new ServiceLineVM() { ServiceLineId = s.ServiceLineId, ServiceName = s.ServiceName }).FirstOrDefault();
+                //x.SelectedServiceLineIds = string.Join(",", serviceLineIds);
                 x.LastKnownWellStr = x.LastKnownWell?.ToString("yyyy-MM-dd hh:mm:ss tt");
                 x.DobStr = x.Dob?.ToString("yyyy-MM-dd hh:mm:ss tt");
-                x.OrganizationData = orgData;
+                //x.OrganizationData = orgData;
                 x.GenderTitle = _controlListDetailsRepo.Table.Where(g => g.ControlListDetailId == x.Gender).Select(g => g.Title).FirstOrDefault();
                 x.BloodThinnersTitle.AddRange(_controlListDetailsRepo.Table.Where(b => x.BloodThinners.ToIntList().Contains(b.ControlListDetailId)).Select(b => new { Id = b.ControlListDetailId, b.Title }).ToList());
             });
@@ -5296,76 +5296,76 @@ namespace Web.Services.Concrete
                             .WithSqlParam("@showAll", showAll)
                             .ExecuteStoredProc<CodeStrokeVM>();
 
-            var orgDataList = new List<dynamic>();
-            foreach (var item in activeEMS.Select(x => x.OrganizationIdFk).Distinct().ToList())
-            {
-                var orgData = GetHosplitalAddressObject(item);
-                if (orgData != null)
-                    orgDataList.Add(orgData);
-            }
-            foreach (var item in activeEMS)
-            {
-                item.OrganizationData = orgDataList.Where(x => x.OrganizationId == item.OrganizationIdFk).FirstOrDefault();
+            //var orgDataList = new List<dynamic>();
+            //foreach (var item in activeEMS.Select(x => x.OrganizationIdFk).Distinct().ToList())
+            //{
+            //    var orgData = GetHosplitalAddressObject(item);
+            //    if (orgData != null)
+            //        orgDataList.Add(orgData);
+            //}
+            //foreach (var item in activeEMS)
+            //{
+            //    item.OrganizationData = orgDataList.Where(x => x.OrganizationId == item.OrganizationIdFk).FirstOrDefault();
 
-                item.AttachmentsPath = new List<string>();
-                item.AudiosPath = new List<string>();
-                item.VideosPath = new List<string>();
-                item.BloodThinnersTitle = new List<object>();
-                if (!string.IsNullOrEmpty(item.Attachments) && !string.IsNullOrWhiteSpace(item.Attachments))
-                {
-                    string path = this._RootPath + item.Attachments;
-                    if (Directory.Exists(path))
-                    {
-                        DirectoryInfo AttachFiles = new DirectoryInfo(path);
-                        foreach (var file in AttachFiles.GetFiles())
-                        {
-                            item.AttachmentsPath.Add(item.Attachments + "/" + file.Name);
-                        }
-                    }
-                }
+            //    item.AttachmentsPath = new List<string>();
+            //    item.AudiosPath = new List<string>();
+            //    item.VideosPath = new List<string>();
+            //    item.BloodThinnersTitle = new List<object>();
+            //    if (!string.IsNullOrEmpty(item.Attachments) && !string.IsNullOrWhiteSpace(item.Attachments))
+            //    {
+            //        string path = this._RootPath + item.Attachments;
+            //        if (Directory.Exists(path))
+            //        {
+            //            DirectoryInfo AttachFiles = new DirectoryInfo(path);
+            //            foreach (var file in AttachFiles.GetFiles())
+            //            {
+            //                item.AttachmentsPath.Add(item.Attachments + "/" + file.Name);
+            //            }
+            //        }
+            //    }
 
-                if (!string.IsNullOrEmpty(item.Audio) && !string.IsNullOrWhiteSpace(item.Audio))
-                {
-                    string path = this._RootPath + item.Audio;
-                    if (Directory.Exists(path))
-                    {
-                        DirectoryInfo AudioFiles = new DirectoryInfo(path);
-                        foreach (var file in AudioFiles.GetFiles())
-                        {
-                            item.AudiosPath.Add(item.Audio + "/" + file.Name);
-                        }
-                    }
-                }
+            //    if (!string.IsNullOrEmpty(item.Audio) && !string.IsNullOrWhiteSpace(item.Audio))
+            //    {
+            //        string path = this._RootPath + item.Audio;
+            //        if (Directory.Exists(path))
+            //        {
+            //            DirectoryInfo AudioFiles = new DirectoryInfo(path);
+            //            foreach (var file in AudioFiles.GetFiles())
+            //            {
+            //                item.AudiosPath.Add(item.Audio + "/" + file.Name);
+            //            }
+            //        }
+            //    }
 
-                if (!string.IsNullOrEmpty(item.Video) && !string.IsNullOrWhiteSpace(item.Video))
-                {
-                    var path = this._RootPath + item.Video;
-                    if (Directory.Exists(path))
-                    {
-                        DirectoryInfo VideoFiles = new DirectoryInfo(path);
-                        foreach (var file in VideoFiles.GetFiles())
-                        {
-                            item.VideosPath.Add(item.Video + "/" + file.Name);
-                        }
-                    }
-                }
+            //    if (!string.IsNullOrEmpty(item.Video) && !string.IsNullOrWhiteSpace(item.Video))
+            //    {
+            //        var path = this._RootPath + item.Video;
+            //        if (Directory.Exists(path))
+            //        {
+            //            DirectoryInfo VideoFiles = new DirectoryInfo(path);
+            //            foreach (var file in VideoFiles.GetFiles())
+            //            {
+            //                item.VideosPath.Add(item.Video + "/" + file.Name);
+            //            }
+            //        }
+            //    }
 
-                var serviceIds = this._activeCodeRepo.Table.Where(s => s.OrganizationIdFk == item.OrganizationIdFk && s.CodeIdFk == item.CodeName.GetActiveCodeId() && !s.IsDeleted).Select(s => new { s.ServiceLineIds, s.DefaultServiceLineId }).FirstOrDefault();
+            //    var serviceIds = this._activeCodeRepo.Table.Where(s => s.OrganizationIdFk == item.OrganizationIdFk && s.CodeIdFk == item.CodeName.GetActiveCodeId() && !s.IsDeleted).Select(s => new { s.ServiceLineIds, s.DefaultServiceLineId }).FirstOrDefault();
 
-                var serviceLineIds = (from s in this._codesServiceLinesMappingRepo.Table
-                                      where s.OrganizationIdFk == item.OrganizationIdFk && s.CodeIdFk == item.CodeName.GetActiveCodeId()
-                                      && s.ActiveCodeId == item.Id && s.ActiveCodeName == item.CodeName && s.ServiceLineIdFk != serviceIds.DefaultServiceLineId
-                                      select s.ServiceLineIdFk).ToList();
-                item.ServiceLines = this._serviceLineRepo.Table.Where(s => serviceIds.ServiceLineIds.ToIntList().Distinct().Contains(s.ServiceLineId) && s.ServiceLineId != serviceIds.DefaultServiceLineId && !s.IsDeleted).Select(s => new ServiceLineVM() { ServiceLineId = s.ServiceLineId, ServiceName = s.ServiceName, IsSelected = serviceLineIds.Contains(s.ServiceLineId) }).ToList();
-                item.DefaultServiceLineId = serviceIds.DefaultServiceLineId;
-                item.DefaultServiceLine = this._serviceLineRepo.Table.Where(s => s.ServiceLineId == serviceIds.DefaultServiceLineId && !s.IsDeleted).Select(s => new ServiceLineVM() { ServiceLineId = s.ServiceLineId, ServiceName = s.ServiceName }).FirstOrDefault();
-                item.SelectedServiceLineIds = string.Join(",", serviceLineIds);
+            //    var serviceLineIds = (from s in this._codesServiceLinesMappingRepo.Table
+            //                          where s.OrganizationIdFk == item.OrganizationIdFk && s.CodeIdFk == item.CodeName.GetActiveCodeId()
+            //                          && s.ActiveCodeId == item.Id && s.ActiveCodeName == item.CodeName && s.ServiceLineIdFk != serviceIds.DefaultServiceLineId
+            //                          select s.ServiceLineIdFk).ToList();
+            //    item.ServiceLines = this._serviceLineRepo.Table.Where(s => serviceIds.ServiceLineIds.ToIntList().Distinct().Contains(s.ServiceLineId) && s.ServiceLineId != serviceIds.DefaultServiceLineId && !s.IsDeleted).Select(s => new ServiceLineVM() { ServiceLineId = s.ServiceLineId, ServiceName = s.ServiceName, IsSelected = serviceLineIds.Contains(s.ServiceLineId) }).ToList();
+            //    item.DefaultServiceLineId = serviceIds.DefaultServiceLineId;
+            //    item.DefaultServiceLine = this._serviceLineRepo.Table.Where(s => s.ServiceLineId == serviceIds.DefaultServiceLineId && !s.IsDeleted).Select(s => new ServiceLineVM() { ServiceLineId = s.ServiceLineId, ServiceName = s.ServiceName }).FirstOrDefault();
+            //    item.SelectedServiceLineIds = string.Join(",", serviceLineIds);
 
-                item.LastKnownWellStr = item.LastKnownWell?.ToString("yyyy-MM-dd hh:mm:ss tt");
-                //item.OrganizationData = orgData;
-                item.GenderTitle = _controlListDetailsRepo.Table.Where(g => g.ControlListDetailId == item.Gender).Select(g => g.Title).FirstOrDefault();
-                item.BloodThinnersTitle.AddRange(_controlListDetailsRepo.Table.Where(b => item.BloodThinners.ToIntList().Contains(b.ControlListDetailId)).Select(b => new { Id = b.ControlListDetailId, b.Title }).ToList());
-            }
+            //    item.LastKnownWellStr = item.LastKnownWell?.ToString("yyyy-MM-dd hh:mm:ss tt");
+            //    //item.OrganizationData = orgData;
+            //    item.GenderTitle = _controlListDetailsRepo.Table.Where(g => g.ControlListDetailId == item.Gender).Select(g => g.Title).FirstOrDefault();
+            //    item.BloodThinnersTitle.AddRange(_controlListDetailsRepo.Table.Where(b => item.BloodThinners.ToIntList().Contains(b.ControlListDetailId)).Select(b => new { Id = b.ControlListDetailId, b.Title }).ToList());
+            //}
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = activeEMS };
         }
 

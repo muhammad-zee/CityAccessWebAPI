@@ -8,6 +8,7 @@ using System.Linq;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
 using Web.Model.Common;
 
 
@@ -378,7 +379,7 @@ namespace Web.Services.Helper
                     {
                         var objList = new List<object>();
                         var dr = ds.Tables[0];
-                        var colMapping = dr.Columns.Cast<DataColumn>().ToDictionary(key => key.ColumnName.ToLower());
+                        var colMapping = dr.Columns.Cast<DataColumn>().ToDictionary(key => key.ColumnName);
 
                         if (dr.Rows.Count > 0)
                         {
@@ -390,11 +391,11 @@ namespace Web.Services.Helper
                                 {
                                     try
                                     {                                                                                                                  //string colName = colMapping[prop.Name.ToLower()].ColumnName;
-                                        var val = row[col.Key];
+                                        var val = row[col.Key.ToLower()];
                                         if (val.ToString() != "")
-                                            objRow.Add(col.Key, val);
+                                            objRow.Add(col.Key.ToCamelCase(), val);
                                         else
-                                            objRow.Add(col.Key, null);
+                                            objRow.Add(col.Key.ToCamelCase(), null);
                                     }
                                     catch
                                     {
@@ -424,6 +425,19 @@ namespace Web.Services.Helper
 
         #endregion
 
+        public static string ToCamelCase(this string str)
+        {
+            var words = str.Split(new[] { "_", " " }, StringSplitOptions.RemoveEmptyEntries);
+            var leadWord = Regex.Replace(words[0], @"([A-Z])([A-Z]+|[a-z0-9]+)($|[A-Z]\w*)",
+                m =>
+                {
+                    return m.Groups[1].Value.ToLower() + m.Groups[2].Value.ToLower() + m.Groups[3].Value;
+                });
+            var tailWords = words.Skip(1)
+                .Select(word => char.ToUpper(word[0]) + word.Substring(1))
+                .ToArray();
+            return $"{leadWord}{string.Join(string.Empty, tailWords)}";
+        }
 
     }
 }

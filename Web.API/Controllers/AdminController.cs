@@ -327,6 +327,24 @@ namespace Web.API.Controllers
             }
         }
 
+        [Description("Get Role By Id")]
+        [HttpGet("admin/GetRoleById/{Id}")]
+        public async Task<BaseResponse> GetRoleById(int Id)
+        {
+            try
+            {
+                var response = _adminService.GetRoleById(Id);
+                return response;
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
+
         [Description("Delete Role")]
         [HttpGet("admin/DeleteRole/{Id}")]
         public async Task<BaseResponse> DeleteRole(int Id)
