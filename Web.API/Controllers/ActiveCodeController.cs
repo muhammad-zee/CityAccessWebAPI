@@ -97,7 +97,7 @@ namespace Web.API.Controllers
 
         [Description("Get All Active Codes")]
         [HttpGet("activecode/GetEMSandActiveCodesForDashboard/{OrgId}/{days}")]
-        public BaseResponse GetEMSandActiveCodesForDashboard(int OrgId,int days = 6)
+        public BaseResponse GetEMSandActiveCodesForDashboard(int OrgId, int days = 6)
         {
             try
             {

@@ -145,8 +145,6 @@ namespace Web.Data.Models
 
             modelBuilder.Entity<CodeBlue>(entity =>
             {
-                entity.ToTable("CodeBlue");
-
                 entity.Property(e => e.Attachments).HasMaxLength(500);
 
                 entity.Property(e => e.Audio).HasMaxLength(500);

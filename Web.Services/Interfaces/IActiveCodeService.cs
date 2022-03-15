@@ -11,7 +11,7 @@ namespace Web.Services.Interfaces
         BaseResponse MapActiveCodes(List<ActiveCodeVM> activeCodes);
         BaseResponse DetachActiveCodes(int activeCodeId);
         BaseResponse GetAllActiveCodes(int orgId);
-        BaseResponse GetEMSandActiveCodesForDashboard(int OrgId, int days  = 6);
+        BaseResponse GetEMSandActiveCodesForDashboard(int OrgId, int days = 6);
         #endregion
 
         #region Delete Files

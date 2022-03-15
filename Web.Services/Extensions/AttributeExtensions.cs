@@ -205,7 +205,7 @@ namespace Web.Services.Extensions
             }
         }
 
-        public static int GetActiveCodeId(this string codeName) 
+        public static int GetActiveCodeId(this string codeName)
         {
             var val = typeof(UCLEnums).GetField(codeName).GetRawConstantValue();
             try
@@ -213,7 +213,7 @@ namespace Web.Services.Extensions
                 int codeId = val.ToInt();
                 return codeId;
             }
-            catch 
+            catch
             {
                 return 0;
             }

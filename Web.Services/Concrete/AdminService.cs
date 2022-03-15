@@ -426,14 +426,15 @@ namespace Web.Services.Concrete
             return response;
         }
 
-        public BaseResponse GetRoleById(int roleId) 
+        public BaseResponse GetRoleById(int roleId)
         {
             var role = this._role.Table.Where(x => x.RoleId == roleId && !x.IsDeleted).AsQueryable().FirstOrDefault();
             if (role != null)
             {
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Role Return", Body = role };
             }
-            else {
+            else
+            {
                 return new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "No Role Found against this id" };
             }
         }

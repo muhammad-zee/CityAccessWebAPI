@@ -84,7 +84,7 @@ namespace Web.Services.Concrete
 
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Found", Body = consultFieldVM };
         }
-        public BaseResponse GetConsultGraphDataForOrg(int OrgId,int days = 6)
+        public BaseResponse GetConsultGraphDataForOrg(int OrgId, int days = 6)
         {
 
             var today = DateTime.Today;

@@ -257,7 +257,7 @@ namespace Web.Services.Concrete
                                            author: msg.author,
                                            body: msg.body,
                                            attributes: msg.attributes,
-                                           pathChatServiceSid:  Twilio_ChatServiceSid,
+                                           pathChatServiceSid: Twilio_ChatServiceSid,
                                            pathConversationSid: msg.channelSid
                                            );
                 //var Notify = Twilio.Rest.Chat.V2.Service.Channel.MessageResource.Create(
