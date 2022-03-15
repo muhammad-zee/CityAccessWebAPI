@@ -10,6 +10,10 @@ namespace Web.Model.Common
         public int OrganizationIdFk { get; set; }
         public string OrganizationName { get; set; }
         public int CodeIdFk { get; set; }
+        public string Type { get; set; }
+        public string DefaultServiceLineTeam { get; set; }
+        public string ServiceLineTeam1 { get; set; }
+        public string ServiceLineTeam2 { get; set; }
         public string ServiceLineIds { get; set; }
         public int DefaultServiceLineId { get; set; }
         public string DefaultServiceLineName { get; set; }

@@ -9,8 +9,10 @@ namespace Web.Data.Models
         public int ActiveCodeId { get; set; }
         public int OrganizationIdFk { get; set; }
         public int CodeIdFk { get; set; }
-        public string ServiceLineIds { get; set; }
-        public int DefaultServiceLineId { get; set; }
+        public string Type { get; set; }
+        public string DefaultServiceLineTeam { get; set; }
+        public string ServiceLineTeam1 { get; set; }
+        public string ServiceLineTeam2 { get; set; }
         public int CreatedBy { get; set; }
         public DateTime CreatedDate { get; set; }
         public int? ModifiedBy { get; set; }

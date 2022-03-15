@@ -73,7 +73,9 @@ namespace Web.Data.Models
 
                 entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
 
-                entity.Property(e => e.ServiceLineIds).IsRequired();
+                entity.Property(e => e.Type)
+                    .IsRequired()
+                    .HasMaxLength(15);
 
                 entity.HasOne(d => d.OrganizationIdFkNavigation)
                     .WithMany(p => p.ActiveCodesNavigation)
