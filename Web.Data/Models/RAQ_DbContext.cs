@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 #nullable disable
 
@@ -60,7 +62,7 @@ namespace Web.Data.Models
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseSqlServer("Data Source=192.168.0.4;Initial Catalog=RouteAndQueue;User Id=sa;Password=4292;");
+                optionsBuilder.UseSqlServer("Data Source=192.168.0.04;Initial Catalog=RouteAndQueue;User Id=sa;Password=4292;");
             }
         }
 
@@ -102,119 +104,33 @@ namespace Web.Data.Models
             {
                 entity.ToTable("CallLog");
 
-                entity.Property(e => e.Action)
-                    .HasMaxLength(50)
-                    .IsUnicode(false)
-                    .HasColumnName("action");
+                entity.Property(e => e.CallSid).HasMaxLength(50);
 
-                entity.Property(e => e.Callsource)
-                    .HasMaxLength(50)
-                    .IsUnicode(false)
-                    .HasColumnName("callsource");
+                entity.Property(e => e.CallStatus).HasMaxLength(50);
 
-                entity.Property(e => e.Cd)
-                    .HasColumnType("datetime")
-                    .HasColumnName("cd");
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
 
-                entity.Property(e => e.ConferenceName)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.Direction)
-                    .HasMaxLength(50)
-                    .IsUnicode(false)
-                    .HasColumnName("direction");
+                entity.Property(e => e.Direction).HasMaxLength(50);
 
                 entity.Property(e => e.Duration)
-                    .HasMaxLength(50)
-                    .IsUnicode(false)
-                    .HasColumnName("duration");
+                    .IsRequired()
+                    .HasMaxLength(50);
 
-                entity.Property(e => e.Fromlocation)
-                    .HasMaxLength(50)
-                    .IsUnicode(false)
-                    .HasColumnName("fromlocation");
+                entity.Property(e => e.EndTime).HasColumnType("datetime");
 
-                entity.Property(e => e.Fromname)
-                    .HasMaxLength(50)
-                    .IsUnicode(false)
-                    .HasColumnName("fromname");
+                entity.Property(e => e.FromName).HasMaxLength(50);
 
-                entity.Property(e => e.FromphoneNumber)
-                    .HasMaxLength(50)
-                    .IsUnicode(false)
-                    .HasColumnName("fromphoneNumber");
+                entity.Property(e => e.FromPhoneNumber).HasMaxLength(50);
 
-                entity.Property(e => e.Isrecorded)
-                    .HasMaxLength(50)
-                    .IsUnicode(false)
-                    .HasColumnName("isrecorded");
+                entity.Property(e => e.ParentCallSid).HasMaxLength(50);
 
-                entity.Property(e => e.ParentCallSid)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
+                entity.Property(e => e.RecordingName).HasMaxLength(50);
 
-                entity.Property(e => e.PatientId)
-                    .HasMaxLength(50)
-                    .IsUnicode(false)
-                    .HasColumnName("PatientID");
+                entity.Property(e => e.StartTime).HasColumnType("datetime");
 
-                entity.Property(e => e.Reason)
-                    .HasMaxLength(50)
-                    .IsUnicode(false)
-                    .HasColumnName("reason");
+                entity.Property(e => e.ToName).HasMaxLength(50);
 
-                entity.Property(e => e.ReasonDescription)
-                    .IsUnicode(false)
-                    .HasColumnName("reasonDescription");
-
-                entity.Property(e => e.RecordingContentUri)
-                    .IsUnicode(false)
-                    .HasColumnName("recordingContentUri");
-
-                entity.Property(e => e.RecordingDateTime)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.RecordingName)
-                    .HasMaxLength(100)
-                    .IsUnicode(false)
-                    .HasColumnName("recordingName");
-
-                entity.Property(e => e.RecordingType)
-                    .HasMaxLength(50)
-                    .IsUnicode(false)
-                    .HasColumnName("recordingType");
-
-                entity.Property(e => e.RecordingUri)
-                    .IsUnicode(false)
-                    .HasColumnName("recordingUri");
-
-                entity.Property(e => e.Result)
-                    .HasMaxLength(50)
-                    .IsUnicode(false)
-                    .HasColumnName("result");
-
-                entity.Property(e => e.StartTime)
-                    .HasColumnType("datetime")
-                    .HasColumnName("startTime");
-
-                entity.Property(e => e.Taskgenerated).HasColumnName("taskgenerated");
-
-                entity.Property(e => e.Toname)
-                    .HasMaxLength(50)
-                    .IsUnicode(false)
-                    .HasColumnName("toname");
-
-                entity.Property(e => e.TophoneNumber)
-                    .HasMaxLength(50)
-                    .IsUnicode(false)
-                    .HasColumnName("tophoneNumber");
-
-                entity.Property(e => e.Type)
-                    .HasMaxLength(50)
-                    .IsUnicode(false)
-                    .HasColumnName("type");
+                entity.Property(e => e.ToPhoneNumber).HasMaxLength(50);
             });
 
             modelBuilder.Entity<ClinicalHoliday>(entity =>
