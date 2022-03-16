@@ -25,6 +25,8 @@ namespace Web.Services.Interfaces
         BaseResponse saveIvrNode(IvrSettingVM model);
         BaseResponse DeleteIVRNode(int Id, int userId);
 
+        BaseResponse saveCallLog(CallLogVM log);
+
 
         #region IVR
 

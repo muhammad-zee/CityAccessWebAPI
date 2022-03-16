@@ -28,6 +28,7 @@ namespace Web.Services.Concrete
         private readonly ICommunicationService _communicationService;
         private readonly IRepository<Ivrsetting> _ivrSettingsRepo;
         private readonly IRepository<InteractiveVoiceResponse> _IVRRepo;
+        private readonly IRepository<CallLog> _callLogRepo;
         private IRepository<ControlListDetail> _controlListDetailsRepo;
         IConfiguration _config;
         private readonly UnitOfWork unitorWork;
@@ -43,12 +44,14 @@ namespace Web.Services.Concrete
             ICommunicationService communicationService,
             IRepository<Ivrsetting> ivrSettings,
             IRepository<InteractiveVoiceResponse> IVR,
-            IRepository<ControlListDetail> controlListDetails)
+            IRepository<ControlListDetail> controlListDetails,
+            IRepository<CallLog> callLog)
         {
             this._config = config;
             this._communicationService = communicationService;
             this._ivrSettingsRepo = ivrSettings;
             this._IVRRepo = IVR;
+            this._callLogRepo = callLog;
             this._controlListDetailsRepo = controlListDetails;
             this.origin = this._config["Twilio:CallbackDomain"].ToString();
 
@@ -225,6 +228,60 @@ namespace Web.Services.Concrete
             VoiceResponse response = new VoiceResponse();
             response.Say(ex.Message.ToString());
             return TwiML(response);
+        }
+
+        public BaseResponse saveCallLog(CallLogVM log)
+        {
+            CallLog record = null;
+            if (log.CallLogId > 0)
+            {
+                record = this._callLogRepo.Table.Where(i => i.CallSid == log.CallSid ).FirstOrDefault();
+                if (record != null)
+                {
+                    record.CallLogId = log.CallLogId;
+                    record.StartTime = log.StartTime;
+                    record.EndTime = log.EndTime;
+                    record.Duration = log.Duration;
+                    record.Direction = log.Direction;
+                    record.CallStatus = log.CallStatus;
+                    record.ToPhoneNumber = log.ToPhoneNumber;
+                    record.ToName = log.ToName;
+                    record.FromPhoneNumber = log.FromPhoneNumber;
+                    record.FromName = log.FromName;
+                    record.ParentCallSid = log.ParentCallSid;
+                    record.RecordingName = log.RecordingName;
+                    record.IsRecorded = log.IsRecorded;
+                    record.CreatedDate = DateTime.UtcNow;
+
+                    this._callLogRepo.Update(record);
+                }
+
+            }
+            else
+            {
+                record.CallLogId = log.CallLogId;
+                record.StartTime = log.StartTime;
+                record.EndTime = log.EndTime;
+                record.Duration = log.Duration;
+                record.Direction = log.Direction;
+                record.CallStatus = log.CallStatus;
+                record.ToPhoneNumber = log.ToPhoneNumber;
+                record.ToName = log.ToName;
+                record.FromPhoneNumber = log.FromPhoneNumber;
+                record.FromName = log.FromName;
+                record.ParentCallSid = log.ParentCallSid;
+                record.RecordingName = log.RecordingName;
+                record.IsRecorded = log.IsRecorded;
+                record.CreatedDate = DateTime.UtcNow;
+
+                this._callLogRepo.Insert(record);
+            }
+            return new BaseResponse()
+            {
+                Status = HttpStatusCode.OK,
+                Message = "Record Saved",
+                Body = record
+            };
         }
 
         #region IVR Settings
