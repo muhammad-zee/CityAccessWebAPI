@@ -3404,7 +3404,7 @@ namespace Web.Services.Concrete
                             ServiceLineId1Fk = ServiceLineTeam1Ids.Count > i ? ServiceLineTeam1Ids.ElementAt(i) : null,
                             ServiceLineId2Fk = ServiceLineTeam2Ids.Count > i ? ServiceLineTeam2Ids.ElementAt(i) : null,
                             ActiveCodeId = STEMI.CodeStemiid,
-                            ActiveCodeName = UCLEnums.Sepsis.ToString()
+                            ActiveCodeName = UCLEnums.STEMI.ToString()
                         };
                         codeServiceMappingList.Add(codeService);
                     }
