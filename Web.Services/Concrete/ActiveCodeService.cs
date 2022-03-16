@@ -91,7 +91,9 @@ namespace Web.Services.Concrete
                 .ExecuteStoredProc<ActiveCodeVM>();
             foreach (var item in codes)
             {
-                item.serviceLines = this._serviceLineRepo.Table.Where(x => !x.IsDeleted && item.ServiceLineIds.ToIntList().Contains(x.ServiceLineId)).Select(x => new ServiceLineVM() { ServiceLineId = x.ServiceLineId, ServiceName = x.ServiceName }).ToList();
+                item.DefaultServiceLineTeamList = this._serviceLineRepo.Table.Where(x => !x.IsDeleted && item.DefaultServiceLineTeam.ToIntList().Contains(x.ServiceLineId)).Select(x => new ServiceLineVM() { ServiceLineId = x.ServiceLineId, ServiceName = x.ServiceName }).ToList();
+                item.ServiceLineTeam1List = this._serviceLineRepo.Table.Where(x => !x.IsDeleted && item.ServiceLineTeam1.ToIntList().Contains(x.ServiceLineId)).Select(x => new ServiceLineVM() { ServiceLineId = x.ServiceLineId, ServiceName = x.ServiceName }).ToList();
+                item.ServiceLineTeam2List = this._serviceLineRepo.Table.Where(x => !x.IsDeleted && item.ServiceLineTeam2.ToIntList().Contains(x.ServiceLineId)).Select(x => new ServiceLineVM() { ServiceLineId = x.ServiceLineId, ServiceName = x.ServiceName }).ToList();
             }
             if (codes.Count > 0)
             {
