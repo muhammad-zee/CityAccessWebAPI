@@ -1028,16 +1028,51 @@ namespace Web.Services.Concrete
                     //}
                     this._codesServiceLinesMappingRepo.Insert(codeServiceMappingList);
 
+                    var channelSid = this._activeCodesGroupMembersRepo.Table.Where(x => x.ActiveCodeName == UCLEnums.Stroke.ToString() && x.ActiveCodeIdFk == row.CodeStrokeId && !x.IsDeleted).Select(x => x.ChannelSid).FirstOrDefault();
 
+                    var UserChannelSid = (from us in this._userSchedulesRepo.Table
+                                          join u in this._userRepo.Table on us.UserIdFk equals u.UserId
+                                          where (DefaultServiceLineIds.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam1Ids.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam2Ids.Contains(us.ServiceLineIdFk.Value)) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
+                                          select new { u.UserUniqueId, u.UserId }).Distinct().ToList();
+
+
+                    if (channelSid != null)
+                    {
+                        List<ActiveCodesGroupMember> ACodeGroupMembers = new List<ActiveCodesGroupMember>();
+                        foreach (var item in UserChannelSid)
+                        {
+                            try
+                            {
+                                var codeGroupMember = new ActiveCodesGroupMember()
+                                {
+                                    ChannelSid = channelSid,
+                                    UserIdFk = item.UserId,
+                                    ActiveCodeIdFk = row.CodeStrokeId,
+                                    ActiveCodeName = UCLEnums.Stroke.ToString(),
+                                    IsAcknowledge = false,
+                                    CreatedBy = ApplicationSettings.UserId,
+                                    CreatedDate = DateTime.UtcNow,
+                                    IsDeleted = false
+                                };
+                                ACodeGroupMembers.Add(codeGroupMember);
+                                _communication.addNewUserToConversationChannel(channelSid, item.UserUniqueId);
+                            }
+                            catch (Exception ex)
+                            {
+                                ElmahExtensions.RiseError(ex);
+                            }
+                        }
+
+                    }
                     //var UserChannelSid = (from us in this._userSchedulesRepo.Table
                     //                      join u in this._userRepo.Table on us.UserIdFk equals u.UserId
                     //                      where codeStroke.SelectedServiceLineIds.ToIntList().Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.Now && us.ScheduleDateEnd >= DateTime.Now && !us.IsDeleted && !u.IsDeleted
                     //                      select u.UserChannelSid).ToList();
 
-                    var UserChannelSid = (from u in this._userRepo.Table
-                                          join gm in this._activeCodesGroupMembersRepo.Table on u.UserId equals gm.UserIdFk
-                                          where gm.ActiveCodeIdFk == codeStroke.CodeStrokeId && gm.ActiveCodeName == UCLEnums.Stroke.ToString() && !u.IsDeleted
-                                          select u.UserChannelSid).Distinct().ToList();
+                    //UserChannelSid = (from u in this._userRepo.Table
+                    //                      join gm in this._activeCodesGroupMembersRepo.Table on u.UserId equals gm.UserIdFk
+                    //                      where gm.ActiveCodeIdFk == codeStroke.CodeStrokeId && gm.ActiveCodeName == UCLEnums.Stroke.ToString() && !u.IsDeleted
+                    //                      select u.UserChannelSid).Distinct().ToList();
 
                     //var loggedInUserChannelId = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => x.UserChannelSid).FirstOrDefault();
 
@@ -1048,7 +1083,7 @@ namespace Web.Services.Concrete
                     {
                         Id = row.CodeStrokeId,
                         OrgId = row.OrganizationIdFk,
-                        UserChannelSid = UserChannelSid,
+                        UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).ToList(),
                         From = AuthorEnums.Stroke.ToString(),
                         Msg = (codeStroke.IsEms.HasValue && codeStroke.IsEms.Value ? "EMS" : "Active") + " Code Stroke From is Changed",
                         RouteLink = "/Home/Activate%20Code/code-strok-form",
@@ -1385,7 +1420,7 @@ namespace Web.Services.Concrete
                     var UserChannelSid = (from us in this._userSchedulesRepo.Table
                                           join u in this._userRepo.Table on us.UserIdFk equals u.UserId
                                           where DefaultServiceLineIds.Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
-                                          select new { u.UserUniqueId, u.UserId }).ToList();
+                                          select new { u.UserUniqueId, u.UserId }).Distinct().ToList();
                     var loggedUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).FirstOrDefault();
                     UserChannelSid.Add(loggedUser);
                     var conversationChannelAttributes = JsonConvert.SerializeObject(new Dictionary<string, Object>()
@@ -1407,6 +1442,7 @@ namespace Web.Services.Concrete
                             {
                                 var codeGroupMember = new ActiveCodesGroupMember()
                                 {
+                                    ChannelSid = channel.Sid,
                                     UserIdFk = item.UserId,
                                     ActiveCodeIdFk = stroke.CodeStrokeId,
                                     ActiveCodeName = UCLEnums.Stroke.ToString(),
@@ -2369,6 +2405,7 @@ namespace Web.Services.Concrete
                             {
                                 var codeGroupMember = new ActiveCodesGroupMember()
                                 {
+                                    ChannelSid = channel.Sid,
                                     UserIdFk = item.UserId,
                                     ActiveCodeIdFk = Sepsis.CodeSepsisId,
                                     ActiveCodeName = UCLEnums.Sepsis.ToString(),
@@ -3328,6 +3365,7 @@ namespace Web.Services.Concrete
                             {
                                 var codeGroupMember = new ActiveCodesGroupMember()
                                 {
+                                    ChannelSid = channel.Sid,
                                     UserIdFk = item.UserId,
                                     ActiveCodeIdFk = STEMI.CodeStemiid,
                                     ActiveCodeName = UCLEnums.STEMI.ToString(),
@@ -4327,6 +4365,7 @@ namespace Web.Services.Concrete
                             {
                                 var codeGroupMember = new ActiveCodesGroupMember()
                                 {
+                                    ChannelSid = channel.Sid,
                                     UserIdFk = item.UserId,
                                     ActiveCodeIdFk = Truma.CodeTraumaId,
                                     ActiveCodeName = UCLEnums.Trauma.ToString(),
@@ -5321,6 +5360,7 @@ namespace Web.Services.Concrete
                             {
                                 var codeGroupMember = new ActiveCodesGroupMember()
                                 {
+                                    ChannelSid = channel.Sid,
                                     UserIdFk = item.UserId,
                                     ActiveCodeIdFk = blue.CodeBlueId,
                                     ActiveCodeName = UCLEnums.Blue.ToString(),
