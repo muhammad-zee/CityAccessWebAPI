@@ -1028,18 +1028,24 @@ namespace Web.Services.Concrete
                     //}
                     this._codesServiceLinesMappingRepo.Insert(codeServiceMappingList);
 
-                    var channelSid = this._activeCodesGroupMembersRepo.Table.Where(x => x.ActiveCodeName == UCLEnums.Stroke.ToString() && x.ActiveCodeIdFk == row.CodeStrokeId && !x.IsDeleted).Select(x => x.ChannelSid).FirstOrDefault();
+                    var channel = this._activeCodesGroupMembersRepo.Table.Where(x => x.ActiveCodeName == UCLEnums.Stroke.ToString() && x.ActiveCodeIdFk == row.CodeStrokeId && !x.IsDeleted).ToList();
 
                     var UserChannelSid = (from us in this._userSchedulesRepo.Table
                                           join u in this._userRepo.Table on us.UserIdFk equals u.UserId
                                           where (DefaultServiceLineIds.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam1Ids.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam2Ids.Contains(us.ServiceLineIdFk.Value)) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
                                           select new { u.UserUniqueId, u.UserId }).Distinct().ToList();
 
+                    var loggedInUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).FirstOrDefault();
+                    UserChannelSid.Add(loggedInUser);
 
-                    if (channelSid != null)
+                    if (channel != null && channel.Count > 0)
                     {
+                        var channelSid = channel.Select(x => x.ChannelSid).FirstOrDefault();
+
+                        this._activeCodesGroupMembersRepo.DeleteRange(channel);
+
                         List<ActiveCodesGroupMember> ACodeGroupMembers = new List<ActiveCodesGroupMember>();
-                        foreach (var item in UserChannelSid)
+                        foreach (var item in UserChannelSid.Distinct())
                         {
                             try
                             {
@@ -1062,7 +1068,7 @@ namespace Web.Services.Concrete
                                 //ElmahExtensions.RiseError(ex);
                             }
                         }
-
+                        var isMembersAdded = AddGroupMembers(ACodeGroupMembers);
                     }
                     //var UserChannelSid = (from us in this._userSchedulesRepo.Table
                     //                      join u in this._userRepo.Table on us.UserIdFk equals u.UserId
@@ -1083,7 +1089,7 @@ namespace Web.Services.Concrete
                     {
                         Id = row.CodeStrokeId,
                         OrgId = row.OrganizationIdFk,
-                        UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).ToList(),
+                        UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).Distinct().ToList(),
                         From = AuthorEnums.Stroke.ToString(),
                         Msg = (codeStroke.IsEms.HasValue && codeStroke.IsEms.Value ? "EMS" : "Active") + " Code Stroke From is Changed",
                         RouteLink = "/Home/Activate%20Code/code-strok-form",
@@ -2033,18 +2039,23 @@ namespace Web.Services.Concrete
 
                     this._codesServiceLinesMappingRepo.Insert(codeServiceMappingList);
 
-                    var channelSid = this._activeCodesGroupMembersRepo.Table.Where(x => x.ActiveCodeName == UCLEnums.Sepsis.ToString() && x.ActiveCodeIdFk == row.CodeSepsisId && !x.IsDeleted).Select(x => x.ChannelSid).FirstOrDefault();
+                    var channel = this._activeCodesGroupMembersRepo.Table.Where(x => x.ActiveCodeName == UCLEnums.Sepsis.ToString() && x.ActiveCodeIdFk == row.CodeSepsisId && !x.IsDeleted).ToList();
 
                     var UserChannelSid = (from us in this._userSchedulesRepo.Table
                                           join u in this._userRepo.Table on us.UserIdFk equals u.UserId
                                           where (DefaultServiceLineIds.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam1Ids.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam2Ids.Contains(us.ServiceLineIdFk.Value)) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
                                           select new { u.UserUniqueId, u.UserId }).Distinct().ToList();
+                    var loggedInUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).FirstOrDefault();
+                    UserChannelSid.Add(loggedInUser);
 
-
-                    if (channelSid != null)
+                    if (channel != null && channel.Count > 0)
                     {
+                        var channelSid = channel.Select(x => x.ChannelSid).FirstOrDefault();
+
+                        this._activeCodesGroupMembersRepo.DeleteRange(channel);
+
                         List<ActiveCodesGroupMember> ACodeGroupMembers = new List<ActiveCodesGroupMember>();
-                        foreach (var item in UserChannelSid)
+                        foreach (var item in UserChannelSid.Distinct())
                         {
                             try
                             {
@@ -2067,7 +2078,7 @@ namespace Web.Services.Concrete
                                 //ElmahExtensions.RiseError(ex);
                             }
                         }
-
+                        var isMembersAdded = AddGroupMembers(ACodeGroupMembers);
                     }
                     //var UserChannelSid = (from us in this._userSchedulesRepo.Table
                     //                      join u in this._userRepo.Table on us.UserIdFk equals u.UserId
@@ -3029,18 +3040,23 @@ namespace Web.Services.Concrete
 
                     this._codesServiceLinesMappingRepo.Insert(codeServiceMappingList);
 
-                    var channelSid = this._activeCodesGroupMembersRepo.Table.Where(x => x.ActiveCodeName == UCLEnums.STEMI.ToString() && x.ActiveCodeIdFk == row.CodeStemiid && !x.IsDeleted).Select(x => x.ChannelSid).FirstOrDefault();
+                    var channel = this._activeCodesGroupMembersRepo.Table.Where(x => x.ActiveCodeName == UCLEnums.STEMI.ToString() && x.ActiveCodeIdFk == row.CodeStemiid && !x.IsDeleted).ToList();
 
                     var UserChannelSid = (from us in this._userSchedulesRepo.Table
                                           join u in this._userRepo.Table on us.UserIdFk equals u.UserId
                                           where (DefaultServiceLineIds.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam1Ids.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam2Ids.Contains(us.ServiceLineIdFk.Value)) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
                                           select new { u.UserUniqueId, u.UserId }).Distinct().ToList();
+                    var loggedInUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).FirstOrDefault();
+                    UserChannelSid.Add(loggedInUser);
 
-
-                    if (channelSid != null)
+                    if (channel != null && channel.Count > 0)
                     {
+                        var channelSid = channel.Select(x => x.ChannelSid).FirstOrDefault();
+
+                        this._activeCodesGroupMembersRepo.DeleteRange(channel);
+
                         List<ActiveCodesGroupMember> ACodeGroupMembers = new List<ActiveCodesGroupMember>();
-                        foreach (var item in UserChannelSid)
+                        foreach (var item in UserChannelSid.Distinct())
                         {
                             try
                             {
@@ -3063,7 +3079,7 @@ namespace Web.Services.Concrete
                                 //ElmahExtensions.RiseError(ex);
                             }
                         }
-
+                        var isMembersAdded = AddGroupMembers(ACodeGroupMembers);
                     }
                     //var UserChannelSid = (from us in this._userSchedulesRepo.Table
                     //                      join u in this._userRepo.Table on us.UserIdFk equals u.UserId
@@ -4022,18 +4038,23 @@ namespace Web.Services.Concrete
                     }
                     this._codesServiceLinesMappingRepo.Insert(codeServiceMappingList);
 
-                    var channelSid = this._activeCodesGroupMembersRepo.Table.Where(x => x.ActiveCodeName == UCLEnums.Trauma.ToString() && x.ActiveCodeIdFk == row.CodeTraumaId && !x.IsDeleted).Select(x => x.ChannelSid).FirstOrDefault();
+                    var channel = this._activeCodesGroupMembersRepo.Table.Where(x => x.ActiveCodeName == UCLEnums.Trauma.ToString() && x.ActiveCodeIdFk == row.CodeTraumaId && !x.IsDeleted).ToList();
 
                     var UserChannelSid = (from us in this._userSchedulesRepo.Table
                                           join u in this._userRepo.Table on us.UserIdFk equals u.UserId
                                           where (DefaultServiceLineIds.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam1Ids.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam2Ids.Contains(us.ServiceLineIdFk.Value)) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
                                           select new { u.UserUniqueId, u.UserId }).Distinct().ToList();
+                    var loggedInUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).FirstOrDefault();
+                    UserChannelSid.Add(loggedInUser);
 
-
-                    if (channelSid != null)
+                    if (channel != null && channel.Count > 0)
                     {
+                        var channelSid = channel.Select(x => x.ChannelSid).FirstOrDefault();
+
+                        this._activeCodesGroupMembersRepo.DeleteRange(channel);
+
                         List<ActiveCodesGroupMember> ACodeGroupMembers = new List<ActiveCodesGroupMember>();
-                        foreach (var item in UserChannelSid)
+                        foreach (var item in UserChannelSid.Distinct())
                         {
                             try
                             {
@@ -4056,7 +4077,7 @@ namespace Web.Services.Concrete
                                 //ElmahExtensions.RiseError(ex);
                             }
                         }
-
+                        var isMembersAdded = AddGroupMembers(ACodeGroupMembers);
                     }
                     //var UserChannelSid = (from us in this._userSchedulesRepo.Table
                     //                      join u in this._userRepo.Table on us.UserIdFk equals u.UserId
@@ -5052,18 +5073,23 @@ namespace Web.Services.Concrete
                     }
                     this._codesServiceLinesMappingRepo.Insert(codeServiceMappingList);
 
-                    var channelSid = this._activeCodesGroupMembersRepo.Table.Where(x => x.ActiveCodeName == UCLEnums.Blue.ToString() && x.ActiveCodeIdFk == row.CodeBlueId && !x.IsDeleted).Select(x => x.ChannelSid).FirstOrDefault();
+                    var channel = this._activeCodesGroupMembersRepo.Table.Where(x => x.ActiveCodeName == UCLEnums.Blue.ToString() && x.ActiveCodeIdFk == row.CodeBlueId && !x.IsDeleted).ToList();
 
                     var UserChannelSid = (from us in this._userSchedulesRepo.Table
                                           join u in this._userRepo.Table on us.UserIdFk equals u.UserId
                                           where (DefaultServiceLineIds.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam1Ids.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam2Ids.Contains(us.ServiceLineIdFk.Value)) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
                                           select new { u.UserUniqueId, u.UserId }).Distinct().ToList();
+                    var loggedInUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).FirstOrDefault();
+                    UserChannelSid.Add(loggedInUser);
 
-
-                    if (channelSid != null)
+                    if (channel != null && channel.Count > 0)
                     {
+                        var channelSid = channel.Select(x => x.ChannelSid).FirstOrDefault();
+
+                        this._activeCodesGroupMembersRepo.DeleteRange(channel);
+
                         List<ActiveCodesGroupMember> ACodeGroupMembers = new List<ActiveCodesGroupMember>();
-                        foreach (var item in UserChannelSid)
+                        foreach (var item in UserChannelSid.Distinct())
                         {
                             try
                             {
@@ -5086,7 +5112,7 @@ namespace Web.Services.Concrete
                                 //ElmahExtensions.RiseError(ex);
                             }
                         }
-
+                        var isMembersAdded = AddGroupMembers(ACodeGroupMembers);
                     }
 
                     //var UserChannelSid = (from us in this._userSchedulesRepo.Table
