@@ -37,6 +37,15 @@ namespace Web.Model.Common
         public string SelectedServiceLineIds { get; set; }
         public ServiceLineVM DefaultServiceLine { get; set; }
         public List<ServiceLineVM> ServiceLines { get; set; }
+
+        public string DefaultServiceLineIds { get; set; }
+        public string ServiceLineTeam1Ids { get; set; }
+        public string ServiceLineTeam2Ids { get; set; }
+
+        public List<ServiceLineVM> DefaultServiceLineTeam { get; set; }
+        public List<ServiceLineVM> ServiceLineTeam1 { get; set; }
+        public List<ServiceLineVM> ServiceLineTeam2 { get; set; }
+
         public List<FilesVM> Audios { get; set; }
         public List<FilesVM> Videos { get; set; }
         public List<FilesVM> Attachment { get; set; }
