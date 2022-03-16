@@ -136,29 +136,29 @@ namespace Web.Services.Concrete
                         var newServicesDefault = new List<string>();
                         if (!string.IsNullOrEmpty(item.DefaultServiceLineTeam) && !string.IsNullOrWhiteSpace(item.DefaultServiceLineTeam))
                         {
-                            newServicesDefault = item.ServiceLineIds.Split(",").ToList();
+                            newServicesDefault = item.DefaultServiceLineTeam.Split(",").ToList();
                         }
                         oldServicesDefault.AddRange(newServicesDefault);
                         var oldServices1 = new List<string>();
-                        if (!string.IsNullOrEmpty(row.DefaultServiceLineTeam) && !string.IsNullOrWhiteSpace(row.DefaultServiceLineTeam))
+                        if (!string.IsNullOrEmpty(row.ServiceLineTeam1) && !string.IsNullOrWhiteSpace(row.ServiceLineTeam1))
                         {
-                            oldServices1 = row.DefaultServiceLineTeam.Split(",").ToList();
+                            oldServices1 = row.ServiceLineTeam1.Split(",").ToList();
                         }
                         var newServices1 = new List<string>();
-                        if (!string.IsNullOrEmpty(item.DefaultServiceLineTeam) && !string.IsNullOrWhiteSpace(item.DefaultServiceLineTeam))
+                        if (!string.IsNullOrEmpty(item.ServiceLineTeam1) && !string.IsNullOrWhiteSpace(item.ServiceLineTeam1))
                         {
-                            newServices1 = item.ServiceLineIds.Split(",").ToList();
+                            newServices1 = item.ServiceLineTeam1.Split(",").ToList();
                         }
                         oldServices1.AddRange(newServices1);
                         var oldServices2 = new List<string>();
-                        if (!string.IsNullOrEmpty(row.DefaultServiceLineTeam) && !string.IsNullOrWhiteSpace(row.DefaultServiceLineTeam))
+                        if (!string.IsNullOrEmpty(row.ServiceLineTeam2) && !string.IsNullOrWhiteSpace(row.ServiceLineTeam2))
                         {
-                            oldServices2 = row.DefaultServiceLineTeam.Split(",").ToList();
+                            oldServices2 = row.ServiceLineTeam2.Split(",").ToList();
                         }
                         var newServices2 = new List<string>();
-                        if (!string.IsNullOrEmpty(item.DefaultServiceLineTeam) && !string.IsNullOrWhiteSpace(item.DefaultServiceLineTeam))
+                        if (!string.IsNullOrEmpty(item.ServiceLineTeam2) && !string.IsNullOrWhiteSpace(item.ServiceLineTeam2))
                         {
-                            newServices2 = item.ServiceLineIds.Split(",").ToList();
+                            newServices2 = item.ServiceLineTeam2.Split(",").ToList();
                         }
                         oldServices2.AddRange(newServices2);
 
