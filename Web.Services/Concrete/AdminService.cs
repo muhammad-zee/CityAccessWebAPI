@@ -530,7 +530,7 @@ namespace Web.Services.Concrete
         public BaseResponse GetAllComponents()
         {
             var response = new BaseResponse();
-            var result = _component.Table.Where(x => !x.IsDeleted).ToList();
+            var result = _component.Table.Where(x => !x.IsDeleted && x.Status).ToList();
             if (result.Count() > 0)
             {
                 response = new BaseResponse()
@@ -556,7 +556,7 @@ namespace Web.Services.Concrete
         public BaseResponse GetComponentById(int Id)
         {
             var response = new BaseResponse();
-            var result = _component.Table.Where(x => x.ComponentId == Id && x.IsDeleted == false).FirstOrDefault();
+            var result = _component.Table.Where(x => x.ComponentId == Id && x.Status && x.IsDeleted == false).FirstOrDefault();
             if (result != null)
             {
                 response = new BaseResponse()
