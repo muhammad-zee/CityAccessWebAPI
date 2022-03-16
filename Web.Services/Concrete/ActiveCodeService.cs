@@ -1059,7 +1059,7 @@ namespace Web.Services.Concrete
                             }
                             catch (Exception ex)
                             {
-                                ElmahExtensions.RiseError(ex);
+                                //ElmahExtensions.RiseError(ex);
                             }
                         }
 
@@ -1456,7 +1456,7 @@ namespace Web.Services.Concrete
                             }
                             catch (Exception ex)
                             {
-                                ElmahExtensions.RiseError(ex);
+                                //ElmahExtensions.RiseError(ex);
                             }
                         }
                         var isMembersAdded = AddGroupMembers(ACodeGroupMembers);
@@ -2064,7 +2064,7 @@ namespace Web.Services.Concrete
                             }
                             catch (Exception ex)
                             {
-                                ElmahExtensions.RiseError(ex);
+                                //ElmahExtensions.RiseError(ex);
                             }
                         }
 
@@ -2454,7 +2454,7 @@ namespace Web.Services.Concrete
                             }
                             catch (Exception ex)
                             {
-                                ElmahExtensions.RiseError(ex);
+                                //ElmahExtensions.RiseError(ex);
                             }
                         }
                         var isMembersAdded = AddGroupMembers(ACodeGroupMembers);
@@ -3060,7 +3060,7 @@ namespace Web.Services.Concrete
                             }
                             catch (Exception ex)
                             {
-                                ElmahExtensions.RiseError(ex);
+                                //ElmahExtensions.RiseError(ex);
                             }
                         }
 
@@ -3451,7 +3451,7 @@ namespace Web.Services.Concrete
                             }
                             catch (Exception ex)
                             {
-                                ElmahExtensions.RiseError(ex);
+                                //ElmahExtensions.RiseError(ex);
                             }
                         }
                         var isMembersAdded = AddGroupMembers(ACodeGroupMembers);
@@ -4053,7 +4053,7 @@ namespace Web.Services.Concrete
                             }
                             catch (Exception ex)
                             {
-                                ElmahExtensions.RiseError(ex);
+                                //ElmahExtensions.RiseError(ex);
                             }
                         }
 
@@ -4488,7 +4488,7 @@ namespace Web.Services.Concrete
                             }
                             catch (Exception ex)
                             {
-                                ElmahExtensions.RiseError(ex);
+                                //ElmahExtensions.RiseError(ex);
                             }
                         }
                         var isMembersAdded = AddGroupMembers(ACodeGroupMembers);
@@ -5083,7 +5083,7 @@ namespace Web.Services.Concrete
                             }
                             catch (Exception ex)
                             {
-                                ElmahExtensions.RiseError(ex);
+                                //ElmahExtensions.RiseError(ex);
                             }
                         }
 
@@ -5520,7 +5520,7 @@ namespace Web.Services.Concrete
                             }
                             catch (Exception ex)
                             {
-                                ElmahExtensions.RiseError(ex);
+                                //ElmahExtensions.RiseError(ex);
                             }
                         }
                         var isMembersAdded = AddGroupMembers(ACodeGroupMembers);
