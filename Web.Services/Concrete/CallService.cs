@@ -26,9 +26,9 @@ namespace Web.Services.Concrete
     public class CallService : TwilioController, ICallService
     {
         private readonly ICommunicationService _communicationService;
-        private readonly IRepository<Ivrsetting> _ivrSettings;
-        private readonly IRepository<InteractiveVoiceResponse> _IVR;
-        private IRepository<ControlListDetail> _controlListDetails;
+        private readonly IRepository<Ivrsetting> _ivrSettingsRepo;
+        private readonly IRepository<InteractiveVoiceResponse> _IVRRepo;
+        private IRepository<ControlListDetail> _controlListDetailsRepo;
         IConfiguration _config;
         private readonly UnitOfWork unitorWork;
         private string origin = "";
@@ -47,9 +47,9 @@ namespace Web.Services.Concrete
         {
             this._config = config;
             this._communicationService = communicationService;
-            this._ivrSettings = ivrSettings;
-            this._IVR = IVR;
-            this._controlListDetails = controlListDetails;
+            this._ivrSettingsRepo = ivrSettings;
+            this._IVRRepo = IVR;
+            this._controlListDetailsRepo = controlListDetails;
             this.origin = this._config["Twilio:CallbackDomain"].ToString();
 
             //Twilio Credentials
@@ -230,7 +230,7 @@ namespace Web.Services.Concrete
         #region IVR Settings
         public BaseResponse getIvrTree()
         {
-            var IvrSetting = this._ivrSettings.Table.Where(i => !i.IsDeleted).ToList();
+            var IvrSetting = this._ivrSettingsRepo.Table.Where(i => !i.IsDeleted).ToList();
             if (IvrSetting.Count() > 0)
             {
                 var treeItems = IvrSetting.Select(x => new IvrTreeVM()
@@ -254,7 +254,7 @@ namespace Web.Services.Concrete
         }
         public BaseResponse getIvrTree(int Id)
         {
-            var IvrSetting = this._ivrSettings.Table.Where(i => !i.IsDeleted && i.IvrIdFk == Id).ToList();
+            var IvrSetting = this._ivrSettingsRepo.Table.Where(i => !i.IsDeleted && i.IvrIdFk == Id).ToList();
             if (IvrSetting.Count() > 0)
             {
                 var treeItems = IvrSetting.Select(x => new IvrTreeVM()
@@ -279,7 +279,7 @@ namespace Web.Services.Concrete
 
         public BaseResponse getIvrNodes()
         {
-            var IVRs = _ivrSettings.Table.Where(x => x.IsDeleted != true).ToList();
+            var IVRs = _ivrSettingsRepo.Table.Where(x => x.IsDeleted != true).ToList();
             return new BaseResponse()
             {
                 Status = HttpStatusCode.OK,
@@ -289,7 +289,7 @@ namespace Web.Services.Concrete
         }
         public BaseResponse getIvrNodes(int Id)
         {
-            var IVRs = _ivrSettings.Table.Where(x => x.IsDeleted != true && x.IvrIdFk == Id).ToList();
+            var IVRs = _ivrSettingsRepo.Table.Where(x => x.IsDeleted != true && x.IvrIdFk == Id).ToList();
             return new BaseResponse()
             {
                 Status = HttpStatusCode.OK,
@@ -302,7 +302,7 @@ namespace Web.Services.Concrete
             Ivrsetting ivrNode = null;
             if (model.IvrSettingsId > 0)
             {
-                ivrNode = this._ivrSettings.Table.Where(i => i.IvrSettingsId == model.IvrSettingsId && !i.IsDeleted).FirstOrDefault();
+                ivrNode = this._ivrSettingsRepo.Table.Where(i => i.IvrSettingsId == model.IvrSettingsId && !i.IsDeleted).FirstOrDefault();
                 if (ivrNode != null)
                 {
                     ivrNode.IvrIdFk = model.IvrIdFk;
@@ -313,7 +313,7 @@ namespace Web.Services.Concrete
                     ivrNode.ModifiedBy = model.ModifiedBy;
                     ivrNode.ModifiedDate = DateTime.UtcNow;
                     ivrNode.IsDeleted = false;
-                    this._ivrSettings.Update(ivrNode);
+                    this._ivrSettingsRepo.Update(ivrNode);
                 }
 
             }
@@ -331,7 +331,7 @@ namespace Web.Services.Concrete
                 //ivrNode.ModifiedBy = model.ModifiedBy;
                 //ivrNode.ModifiedDate = DateTime.UtcNow;
                 ivrNode.IsDeleted = false;
-                this._ivrSettings.Insert(ivrNode);
+                this._ivrSettingsRepo.Insert(ivrNode);
             }
             return new BaseResponse()
             {
@@ -343,18 +343,18 @@ namespace Web.Services.Concrete
 
         public BaseResponse DeleteIVRNode(int Id, int userId)
         {
-            var IVRNode = _ivrSettings.Table.Where(x => x.IvrSettingsId == Id && x.IsDeleted != true).FirstOrDefault();
+            var IVRNode = _ivrSettingsRepo.Table.Where(x => x.IvrSettingsId == Id && x.IsDeleted != true).FirstOrDefault();
             if (IVRNode != null)
             {
                 IVRNode.IsDeleted = true;
                 IVRNode.ModifiedBy = userId;
                 IVRNode.ModifiedDate = DateTime.UtcNow;
-                _ivrSettings.Update(IVRNode);
+                _ivrSettingsRepo.Update(IVRNode);
 
-                var childNodes = _ivrSettings.Table.Where(x => x.IvrparentId == Id && x.IsDeleted != true).ToList();
+                var childNodes = _ivrSettingsRepo.Table.Where(x => x.IvrparentId == Id && x.IsDeleted != true).ToList();
                 childNodes.ForEach(x => { x.IsDeleted = true; x.ModifiedBy = userId; x.ModifiedDate = DateTime.UtcNow; });
 
-                _ivrSettings.Update(childNodes);
+                _ivrSettingsRepo.Update(childNodes);
 
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Successfully Deleted" };
             }
@@ -372,8 +372,8 @@ namespace Web.Services.Concrete
 
         public BaseResponse getAllIvrs()
         {
-            var IVRs = _IVR.Table.Where(x => x.IsDeleted != true).ToList();
-            var types = _controlListDetails.Table.Where(x => x.ControlListIdFk == UCLEnums.OrgType.ToInt()).Select(x => new { x.ControlListDetailId, x.Title });
+            var IVRs = _IVRRepo.Table.Where(x => x.IsDeleted != true).ToList();
+            var types = _controlListDetailsRepo.Table.Where(x => x.ControlListIdFk == UCLEnums.OrgType.ToInt()).Select(x => new { x.ControlListDetailId, x.Title });
             var IVRVMs = AutoMapperHelper.MapList<InteractiveVoiceResponse, IVRVM>(IVRs);
             IVRVMs.ForEach(x => x.OrganizationType = types.Where(t => t.ControlListDetailId == x.OrganizationTypeIdFk).Select(ty => ty.Title).FirstOrDefault());
             return new BaseResponse()
@@ -388,7 +388,7 @@ namespace Web.Services.Concrete
             InteractiveVoiceResponse ivr = null;
             if (model.IvrId > 0)
             {
-                ivr = this._IVR.Table.Where(i => i.IvrId == model.IvrId && !i.IsDeleted).FirstOrDefault();
+                ivr = this._IVRRepo.Table.Where(i => i.IvrId == model.IvrId && !i.IsDeleted).FirstOrDefault();
                 if (ivr != null)
                 {
                     ivr.OrganizationTypeIdFk = model.OrganizationTypeIdFk;
@@ -397,7 +397,7 @@ namespace Web.Services.Concrete
                     ivr.ModifiedBy = model.ModifiedBy;
                     ivr.ModifiedDate = DateTime.UtcNow;
                     ivr.IsDeleted = false;
-                    this._IVR.Update(ivr);
+                    this._IVRRepo.Update(ivr);
                 }
 
             }
@@ -410,7 +410,7 @@ namespace Web.Services.Concrete
                 ivr.CreatedBy = model.CreatedBy;
                 ivr.CreatedDate = DateTime.UtcNow;
                 ivr.IsDeleted = false;
-                this._IVR.Insert(ivr);
+                this._IVRRepo.Insert(ivr);
             }
             return new BaseResponse()
             {
@@ -422,18 +422,18 @@ namespace Web.Services.Concrete
 
         public BaseResponse DeleteIVR(int Id, int userId)
         {
-            var IVRNode = this._IVR.Table.Where(x => x.IvrId == Id && x.IsDeleted != true).FirstOrDefault();
+            var IVRNode = this._IVRRepo.Table.Where(x => x.IvrId == Id && x.IsDeleted != true).FirstOrDefault();
             if (IVRNode != null)
             {
                 IVRNode.IsDeleted = true;
                 IVRNode.ModifiedBy = userId;
                 IVRNode.ModifiedDate = DateTime.UtcNow;
-                this._IVR.Update(IVRNode);
+                this._IVRRepo.Update(IVRNode);
 
-                var childNodes = _ivrSettings.Table.Where(x => x.IvrIdFk == Id && x.IsDeleted != true).ToList();
+                var childNodes = _ivrSettingsRepo.Table.Where(x => x.IvrIdFk == Id && x.IsDeleted != true).ToList();
                 childNodes.ForEach(x => { x.IsDeleted = true; x.ModifiedBy = userId; x.ModifiedDate = DateTime.UtcNow; });
 
-                _ivrSettings.Update(childNodes);
+                _ivrSettingsRepo.Update(childNodes);
 
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Successfully Deleted" };
             }
