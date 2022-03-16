@@ -163,9 +163,9 @@ namespace Web.Services.Concrete
                         oldServices2.AddRange(newServices2);
 
                         //row.DefaultServiceLineId = item.DefaultServiceLineId;
-                        row.DefaultServiceLineTeam = string.Join(",", newServicesDefault);
-                        row.ServiceLineTeam1 = string.Join(",", newServices1);
-                        row.ServiceLineTeam2 = string.Join(",", newServices2);
+                        row.DefaultServiceLineTeam = string.Join(",", oldServicesDefault.Distinct());
+                        row.ServiceLineTeam1 = string.Join(",", oldServices1.Distinct());
+                        row.ServiceLineTeam2 = string.Join(",", oldServices2.Distinct());
                         row.ModifiedBy = item.CreatedBy;
                         row.ModifiedDate = DateTime.Now;
                         row.IsDeleted = false;
@@ -1015,8 +1015,8 @@ namespace Web.Services.Concrete
                             OrganizationIdFk = row.OrganizationIdFk,
                             CodeIdFk = UCLEnums.Stroke.ToInt(),
                             DefaultServiceLineIdFk = DefaultServiceLineIds.ElementAt(i),
-                            ServiceLineId1Fk = ServiceLineTeam1Ids.Count <= i ? ServiceLineTeam1Ids.ElementAt(i) : null,
-                            ServiceLineId2Fk = ServiceLineTeam2Ids.Count <= i ? ServiceLineTeam2Ids.ElementAt(i) : null,
+                            ServiceLineId1Fk = ServiceLineTeam1Ids.Count > i ? ServiceLineTeam1Ids.ElementAt(i) : null,
+                            ServiceLineId2Fk = ServiceLineTeam2Ids.Count > i ? ServiceLineTeam2Ids.ElementAt(i) : null,
                             ActiveCodeId = row.CodeStrokeId,
                             ActiveCodeName = UCLEnums.Stroke.ToString()
                         };
@@ -1373,8 +1373,8 @@ namespace Web.Services.Concrete
                             OrganizationIdFk = stroke.OrganizationIdFk,
                             CodeIdFk = UCLEnums.Stroke.ToInt(),
                             DefaultServiceLineIdFk = DefaultServiceLineIds.ElementAt(i),
-                            ServiceLineId1Fk = ServiceLineTeam1Ids.Count <= i ? ServiceLineTeam1Ids.ElementAt(i) : null,
-                            ServiceLineId2Fk = ServiceLineTeam2Ids.Count <= i ? ServiceLineTeam2Ids.ElementAt(i) : null,
+                            ServiceLineId1Fk = ServiceLineTeam1Ids.Count > i ? ServiceLineTeam1Ids.ElementAt(i) : null,
+                            ServiceLineId2Fk = ServiceLineTeam2Ids.Count > i ? ServiceLineTeam2Ids.ElementAt(i) : null,
                             ActiveCodeId = stroke.CodeStrokeId,
                             ActiveCodeName = UCLEnums.Stroke.ToString()
                         };
@@ -1987,8 +1987,8 @@ namespace Web.Services.Concrete
                             OrganizationIdFk = row.OrganizationIdFk,
                             CodeIdFk = UCLEnums.Sepsis.ToInt(),
                             DefaultServiceLineIdFk = DefaultServiceLineIds.ElementAt(i),
-                            ServiceLineId1Fk = ServiceLineTeam1Ids.Count <= i ? ServiceLineTeam1Ids.ElementAt(i) : null,
-                            ServiceLineId2Fk = ServiceLineTeam2Ids.Count <= i ? ServiceLineTeam2Ids.ElementAt(i) : null,
+                            ServiceLineId1Fk = ServiceLineTeam1Ids.Count > i ? ServiceLineTeam1Ids.ElementAt(i) : null,
+                            ServiceLineId2Fk = ServiceLineTeam2Ids.Count > i ? ServiceLineTeam2Ids.ElementAt(i) : null,
                             ActiveCodeId = row.CodeSepsisId,
                             ActiveCodeName = UCLEnums.Stroke.ToString()
                         };
@@ -2334,8 +2334,8 @@ namespace Web.Services.Concrete
                             OrganizationIdFk = Sepsis.OrganizationIdFk,
                             CodeIdFk = UCLEnums.Sepsis.ToInt(),
                             DefaultServiceLineIdFk = DefaultServiceLineIds.ElementAt(i),
-                            ServiceLineId1Fk = ServiceLineTeam1Ids.Count <= i ? ServiceLineTeam1Ids.ElementAt(i) : null,
-                            ServiceLineId2Fk = ServiceLineTeam2Ids.Count <= i ? ServiceLineTeam2Ids.ElementAt(i) : null,
+                            ServiceLineId1Fk = ServiceLineTeam1Ids.Count > i ? ServiceLineTeam1Ids.ElementAt(i) : null,
+                            ServiceLineId2Fk = ServiceLineTeam2Ids.Count > i ? ServiceLineTeam2Ids.ElementAt(i) : null,
                             ActiveCodeId = Sepsis.CodeSepsisId,
                             ActiveCodeName = UCLEnums.Sepsis.ToString()
                         };
@@ -2947,8 +2947,8 @@ namespace Web.Services.Concrete
                             OrganizationIdFk = row.OrganizationIdFk,
                             CodeIdFk = UCLEnums.STEMI.ToInt(),
                             DefaultServiceLineIdFk = DefaultServiceLineIds.ElementAt(i),
-                            ServiceLineId1Fk = ServiceLineTeam1Ids.Count <= i ? ServiceLineTeam1Ids.ElementAt(i) : null,
-                            ServiceLineId2Fk = ServiceLineTeam2Ids.Count <= i ? ServiceLineTeam2Ids.ElementAt(i) : null,
+                            ServiceLineId1Fk = ServiceLineTeam1Ids.Count > i ? ServiceLineTeam1Ids.ElementAt(i) : null,
+                            ServiceLineId2Fk = ServiceLineTeam2Ids.Count > i ? ServiceLineTeam2Ids.ElementAt(i) : null,
                             ActiveCodeId = row.CodeStemiid,
                             ActiveCodeName = UCLEnums.STEMI.ToString()
                         };
@@ -3292,8 +3292,8 @@ namespace Web.Services.Concrete
                             OrganizationIdFk = STEMI.OrganizationIdFk,
                             CodeIdFk = UCLEnums.STEMI.ToInt(),
                             DefaultServiceLineIdFk = DefaultServiceLineIds.ElementAt(i),
-                            ServiceLineId1Fk = ServiceLineTeam1Ids.Count <= i ? ServiceLineTeam1Ids.ElementAt(i) : null,
-                            ServiceLineId2Fk = ServiceLineTeam2Ids.Count <= i ? ServiceLineTeam2Ids.ElementAt(i) : null,
+                            ServiceLineId1Fk = ServiceLineTeam1Ids.Count > i ? ServiceLineTeam1Ids.ElementAt(i) : null,
+                            ServiceLineId2Fk = ServiceLineTeam2Ids.Count > i ? ServiceLineTeam2Ids.ElementAt(i) : null,
                             ActiveCodeId = STEMI.CodeStemiid,
                             ActiveCodeName = UCLEnums.Sepsis.ToString()
                         };
@@ -3903,8 +3903,8 @@ namespace Web.Services.Concrete
                             OrganizationIdFk = row.OrganizationIdFk,
                             CodeIdFk = UCLEnums.Trauma.ToInt(),
                             DefaultServiceLineIdFk = DefaultServiceLineIds.ElementAt(i),
-                            ServiceLineId1Fk = ServiceLineTeam1Ids.Count <= i ? ServiceLineTeam1Ids.ElementAt(i) : null,
-                            ServiceLineId2Fk = ServiceLineTeam2Ids.Count <= i ? ServiceLineTeam2Ids.ElementAt(i) : null,
+                            ServiceLineId1Fk = ServiceLineTeam1Ids.Count > i ? ServiceLineTeam1Ids.ElementAt(i) : null,
+                            ServiceLineId2Fk = ServiceLineTeam2Ids.Count > i ? ServiceLineTeam2Ids.ElementAt(i) : null,
                             ActiveCodeId = row.CodeTraumaId,
                             ActiveCodeName = UCLEnums.Trauma.ToString()
                         };
@@ -4292,8 +4292,8 @@ namespace Web.Services.Concrete
                             OrganizationIdFk = Truma.OrganizationIdFk,
                             CodeIdFk = UCLEnums.Trauma.ToInt(),
                             DefaultServiceLineIdFk = DefaultServiceLineIds.ElementAt(i),
-                            ServiceLineId1Fk = ServiceLineTeam1Ids.Count <= i ? ServiceLineTeam1Ids.ElementAt(i) : null,
-                            ServiceLineId2Fk = ServiceLineTeam2Ids.Count <= i ? ServiceLineTeam2Ids.ElementAt(i) : null,
+                            ServiceLineId1Fk = ServiceLineTeam1Ids.Count > i ? ServiceLineTeam1Ids.ElementAt(i) : null,
+                            ServiceLineId2Fk = ServiceLineTeam2Ids.Count > i ? ServiceLineTeam2Ids.ElementAt(i) : null,
                             ActiveCodeId = Truma.CodeTraumaId,
                             ActiveCodeName = UCLEnums.Trauma.ToString()
                         };
@@ -4895,8 +4895,8 @@ namespace Web.Services.Concrete
                             OrganizationIdFk = row.OrganizationIdFk,
                             CodeIdFk = UCLEnums.Blue.ToInt(),
                             DefaultServiceLineIdFk = DefaultServiceLineIds.ElementAt(i),
-                            ServiceLineId1Fk = ServiceLineTeam1Ids.Count <= i ? ServiceLineTeam1Ids.ElementAt(i) : null,
-                            ServiceLineId2Fk = ServiceLineTeam2Ids.Count <= i ? ServiceLineTeam2Ids.ElementAt(i) : null,
+                            ServiceLineId1Fk = ServiceLineTeam1Ids.Count > i ? ServiceLineTeam1Ids.ElementAt(i) : null,
+                            ServiceLineId2Fk = ServiceLineTeam2Ids.Count > i ? ServiceLineTeam2Ids.ElementAt(i) : null,
                             ActiveCodeId = row.CodeBlueId,
                             ActiveCodeName = UCLEnums.Blue.ToString()
                         };
@@ -5286,8 +5286,8 @@ namespace Web.Services.Concrete
                             OrganizationIdFk = blue.OrganizationIdFk,
                             CodeIdFk = UCLEnums.Blue.ToInt(),
                             DefaultServiceLineIdFk = DefaultServiceLineIds.ElementAt(i),
-                            ServiceLineId1Fk = ServiceLineTeam1Ids.Count <= i ? ServiceLineTeam1Ids.ElementAt(i) : null,
-                            ServiceLineId2Fk = ServiceLineTeam2Ids.Count <= i ? ServiceLineTeam2Ids.ElementAt(i) : null,
+                            ServiceLineId1Fk = ServiceLineTeam1Ids.Count > i ? ServiceLineTeam1Ids.ElementAt(i) : null,
+                            ServiceLineId2Fk = ServiceLineTeam2Ids.Count > i ? ServiceLineTeam2Ids.ElementAt(i) : null,
                             ActiveCodeId = blue.CodeBlueId,
                             ActiveCodeName = UCLEnums.Blue.ToString()
                         };
