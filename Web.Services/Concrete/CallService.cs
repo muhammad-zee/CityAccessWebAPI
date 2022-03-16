@@ -233,7 +233,7 @@ namespace Web.Services.Concrete
         public BaseResponse saveCallLog(CallLogVM log)
         {
             CallLog record = null;
-            if (log.CallLogId > 0)
+            if (!string.IsNullOrEmpty(log.CallSid))
             {
                 record = this._callLogRepo.Table.Where(i => i.CallSid == log.CallSid ).FirstOrDefault();
                 if (record != null)

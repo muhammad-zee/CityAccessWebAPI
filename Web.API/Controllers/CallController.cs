@@ -153,6 +153,22 @@ namespace Web.API.Controllers
             }
         }
 
+        [HttpPost("Call/saveCallRecord")]
+        public BaseResponse saveCallLog([FromBody] CallLogVM log)
+        {
+            try
+            {
+                return this._callService.saveCallLog(log);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+
+        }
+
 
         #region IVR Settings
 
