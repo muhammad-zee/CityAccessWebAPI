@@ -26,6 +26,10 @@ namespace Web.Model.Common
         public bool showAllActiveCodes { get; set; }
         public bool fromDashboard { get; set; }
 
+        public List<ServiceLineVM> DefaultServiceLineTeamList { get; set; }
+        public List<ServiceLineVM> ServiceLineTeam1List { get; set; }
+        public List<ServiceLineVM> ServiceLineTeam2List { get; set; }
+
         public List<ServiceLineVM> serviceLines { get; set; }
     }
 }
