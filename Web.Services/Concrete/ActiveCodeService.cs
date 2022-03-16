@@ -1043,7 +1043,7 @@ namespace Web.Services.Concrete
                         var channelSid = channel.Select(x => x.ChannelSid).FirstOrDefault();
 
                         this._activeCodesGroupMembersRepo.DeleteRange(channel);
-
+                        bool isDeleted = _communication.DeleteUserToConversationChannel(channelSid);
                         List<ActiveCodesGroupMember> ACodeGroupMembers = new List<ActiveCodesGroupMember>();
                         foreach (var item in UserChannelSid.Distinct())
                         {
@@ -2053,7 +2053,7 @@ namespace Web.Services.Concrete
                         var channelSid = channel.Select(x => x.ChannelSid).FirstOrDefault();
 
                         this._activeCodesGroupMembersRepo.DeleteRange(channel);
-
+                        bool isDeleted = _communication.DeleteUserToConversationChannel(channelSid);
                         List<ActiveCodesGroupMember> ACodeGroupMembers = new List<ActiveCodesGroupMember>();
                         foreach (var item in UserChannelSid.Distinct())
                         {
@@ -3054,7 +3054,7 @@ namespace Web.Services.Concrete
                         var channelSid = channel.Select(x => x.ChannelSid).FirstOrDefault();
 
                         this._activeCodesGroupMembersRepo.DeleteRange(channel);
-
+                        bool isDeleted = _communication.DeleteUserToConversationChannel(channelSid);
                         List<ActiveCodesGroupMember> ACodeGroupMembers = new List<ActiveCodesGroupMember>();
                         foreach (var item in UserChannelSid.Distinct())
                         {
@@ -4052,7 +4052,7 @@ namespace Web.Services.Concrete
                         var channelSid = channel.Select(x => x.ChannelSid).FirstOrDefault();
 
                         this._activeCodesGroupMembersRepo.DeleteRange(channel);
-
+                        bool isDeleted = _communication.DeleteUserToConversationChannel(channelSid);
                         List<ActiveCodesGroupMember> ACodeGroupMembers = new List<ActiveCodesGroupMember>();
                         foreach (var item in UserChannelSid.Distinct())
                         {
@@ -5087,7 +5087,7 @@ namespace Web.Services.Concrete
                         var channelSid = channel.Select(x => x.ChannelSid).FirstOrDefault();
 
                         this._activeCodesGroupMembersRepo.DeleteRange(channel);
-
+                        bool isDeleted = _communication.DeleteUserToConversationChannel(channelSid);
                         List<ActiveCodesGroupMember> ACodeGroupMembers = new List<ActiveCodesGroupMember>();
                         foreach (var item in UserChannelSid.Distinct())
                         {

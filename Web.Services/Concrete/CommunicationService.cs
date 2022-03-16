@@ -602,6 +602,36 @@ namespace Web.Services.Concrete
             }
 
         }
+        public bool DeleteUserToConversationChannel(string ChannelSid)
+        {
+            try
+            {
+                TwilioClient.Init(this.Twilio_AccountSid, this.Twilio_AuthToken);
+                var Participants = MemberResource.Read(pathServiceSid: this.Twilio_ChatServiceSid, pathChannelSid: ChannelSid);
+                bool delete = false;
+                var channelId = this._conversationChannelsRepo.Table.Where(x => x.ChannelSid == ChannelSid && !x.IsDeleted).Select(x => x.ConversationChannelId).FirstOrDefault();
+                var participantsList = new List<ConversationParticipant>();
+                foreach (var item in Participants)
+                {
+                    var participant = new ConversationParticipant();
+                    delete = MemberResource.Delete(pathServiceSid: this.Twilio_ChatServiceSid, pathChannelSid: ChannelSid, pathSid: item.Sid);
+                    participant = this._conversationParticipantsRepo.Table.Where(x => x.ConversationChannelIdFk == channelId && !x.IsDeleted).FirstOrDefault();
+                    participant.IsDeleted = true;
+                    participant.ModifiedBy = ApplicationSettings.UserId;
+                    participant.ModifiedDate = DateTime.UtcNow;
+                    participantsList.Add(participant);
+                }
+                if (participantsList.Count > 0)
+                    this._conversationParticipantsRepo.Update(participantsList);
+
+                return delete;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+
+        }
         public BaseResponse getConversationUsersStatus(string UserSid)
         {
             List<ConversationUserStatus> statusList = new();
