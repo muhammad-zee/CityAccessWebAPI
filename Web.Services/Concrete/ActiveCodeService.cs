@@ -5071,7 +5071,7 @@ namespace Web.Services.Concrete
                                 {
                                     ChannelSid = channelSid,
                                     UserIdFk = item.UserId,
-                                    ActiveCodeIdFk = row.BloodThinners,
+                                    ActiveCodeIdFk = row.CodeBlueId,
                                     ActiveCodeName = UCLEnums.Blue.ToString(),
                                     IsAcknowledge = false,
                                     CreatedBy = ApplicationSettings.UserId,
