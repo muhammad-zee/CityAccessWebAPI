@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Net;
 using Twilio;
@@ -26,6 +28,7 @@ namespace Web.Services.Concrete
 {
     public class CallService : TwilioController, ICallService
     {
+        private RAQ_DbContext _dbContext;
         private readonly ICommunicationService _communicationService;
         private readonly IRepository<Ivrsetting> _ivrSettingsRepo;
         private readonly IRepository<InteractiveVoiceResponse> _IVRRepo;
@@ -41,13 +44,16 @@ namespace Web.Services.Concrete
         private string Twillio_VoiceApiKeySecret;
 
 
-        public CallService(IConfiguration config,
+        public CallService(RAQ_DbContext dbContext, 
+            IConfiguration config,
             ICommunicationService communicationService,
             IRepository<Ivrsetting> ivrSettings,
             IRepository<InteractiveVoiceResponse> IVR,
             IRepository<ControlListDetail> controlListDetails,
             IRepository<CallLog> callLog)
         {
+
+            this._dbContext = dbContext;
             this._config = config;
             this._communicationService = communicationService;
             this._ivrSettingsRepo = ivrSettings;
@@ -188,6 +194,7 @@ namespace Web.Services.Concrete
 
             callRec.Duration = CallStatus == "completed" ? Reruest["DialCallDuration"].ToString() : "0";
             callRec.CallStatus = CallStatus;
+            callRec.EndTime = DateTime.Now;
             this.saveCallLog(callRec);
             return "ok";
         }
@@ -265,36 +272,53 @@ namespace Web.Services.Concrete
             CallLog record = null;
             if (!string.IsNullOrEmpty(log.CallSid))
             {
-                record = this._callLogRepo.Table.Where(i => i.CallSid == log.CallSid).FirstOrDefault();
-                if (record != null)
-                {
-                    record.EndTime = log.CallStatus== "completed"?DateTime.Now: record.EndTime;
-                    record.CallStatus = log.CallStatus;
-                    record.Duration = log.Duration;
+                //record = this._callLogRepo.Table.Where(i => i.CallSid == log.CallSid).FirstOrDefault();
+                //if (record != null)
+                //{
+                //    record.EndTime = log.CallStatus == "completed" ? DateTime.Now : record.EndTime;
+                //    record.CallStatus = log.CallStatus;
+                //    record.Duration = log.Duration;
 
-                    this._callLogRepo.Update(record);
-                }
-                else
-                {
-                    record = new();
-                    record.CallLogId = log.CallLogId;
-                    record.StartTime = log.StartTime;
-                    record.EndTime = log.EndTime;
-                    record.Duration = "0";
-                    record.Direction = log.Direction;
-                    record.CallStatus = log.CallStatus;
-                    record.ToPhoneNumber = log.ToPhoneNumber;
-                    record.ToName = log.ToName;
-                    record.FromPhoneNumber = log.FromPhoneNumber;
-                    record.FromName = log.FromName;
-                    record.CallSid = log.CallSid;
-                    record.ParentCallSid = log.ParentCallSid;
-                    record.RecordingName = log.RecordingName;
-                    record.IsRecorded = log.IsRecorded;
-                    record.CreatedDate = DateTime.UtcNow;
+                //    this._callLogRepo.Update(record);
 
-                    this._callLogRepo.Insert(record);
-                }
+
+                //}
+                //else
+                //{
+                //    record = new();
+                //    record.CallLogId = log.CallLogId;
+                //    record.StartTime = log.StartTime;
+                //    record.EndTime = log.EndTime;
+                //    record.Duration = "0";
+                //    record.Direction = log.Direction;
+                //    record.CallStatus = log.CallStatus;
+                //    record.ToPhoneNumber = log.ToPhoneNumber;
+                //    record.ToName = log.ToName;
+                //    record.FromPhoneNumber = log.FromPhoneNumber;
+                //    record.FromName = log.FromName;
+                //    record.CallSid = log.CallSid;
+                //    record.ParentCallSid = log.ParentCallSid;
+                //    record.RecordingName = log.RecordingName;
+                //    record.IsRecorded = log.IsRecorded;
+                //    record.CreatedDate = DateTime.UtcNow;
+
+                //    this._callLogRepo.Insert(record);
+                //}
+
+                int rowsAffected;
+                string sql = "EXEC md_InsertUpdateCallLog @pStartTime, @pEndTime, @pDuration, @pDirection, " +
+                    "@pCallStatus, @pToPhoneNumber, @pToName, @pFromPhoneNumber, @pFromName, @pCallSid, " +
+                    "@pParentCallSid, @pRecordingName, @pIsRecorded, @pCreatedDate";
+
+                List<SqlParameter> parms = new List<SqlParameter>
+                    { 
+                        // Create parameters    
+                        new SqlParameter { ParameterName = "@pEndTime", Value = DateTime.Now },
+                        new SqlParameter { ParameterName = "@pDuration", Value = 1500 },
+                        new SqlParameter { ParameterName = "@pCallStatus", Value = 1500 }
+                    };
+
+                rowsAffected = this._dbContext.Database.ExecuteSqlRaw(sql, parms.ToArray());
             }
             return new BaseResponse()
             {
