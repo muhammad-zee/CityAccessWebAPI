@@ -2037,7 +2037,7 @@ namespace Web.Services.Concrete
                             ServiceLineId1Fk = ServiceLineTeam1Ids.Count > i ? ServiceLineTeam1Ids.ElementAt(i) : null,
                             ServiceLineId2Fk = ServiceLineTeam2Ids.Count > i ? ServiceLineTeam2Ids.ElementAt(i) : null,
                             ActiveCodeId = row.CodeSepsisId,
-                            ActiveCodeName = UCLEnums.Stroke.ToString()
+                            ActiveCodeName = UCLEnums.Sepsis.ToString()
                         };
                         codeServiceMappingList.Add(codeService);
                     }
