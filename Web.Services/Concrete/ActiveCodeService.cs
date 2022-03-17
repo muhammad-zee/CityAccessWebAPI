@@ -1104,12 +1104,13 @@ namespace Web.Services.Concrete
             }
             else
             {
-                //var serviceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeStroke.OrganizationIdFk && x.CodeIdFk == UCLEnums.Stroke.ToInt() && !x.IsDeleted).Select(x => x.ServiceLineIds).FirstOrDefault();
-                if (codeStroke.DefaultServiceLineIds != null && codeStroke.DefaultServiceLineIds != "")
+                string IsEMS = codeStroke.IsEms.HasValue && codeStroke.IsEms.Value ? "EMS" : "Active Code";
+                var DefaultServiceLineTeam = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeStroke.OrganizationIdFk && x.CodeIdFk == UCLEnums.Stroke.ToInt() && x.Type == IsEMS && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
+                if (DefaultServiceLineTeam != null && DefaultServiceLineTeam != "")
                 {
-                    var DefaultServiceLineIds = codeStroke.DefaultServiceLineIds.ToIntList();
-                    var ServiceLineTeam1Ids = codeStroke.ServiceLineTeam1Ids.ToIntList();
-                    var ServiceLineTeam2Ids = codeStroke.ServiceLineTeam2Ids.ToIntList();
+                    var DefaultServiceLineIds = DefaultServiceLineTeam.ToIntList();
+                    //var ServiceLineTeam1Ids = codeStroke.ServiceLineTeam1Ids.ToIntList();
+                    //var ServiceLineTeam2Ids = codeStroke.ServiceLineTeam2Ids.ToIntList();
 
                     codeStroke.CreatedDate = DateTime.UtcNow;
                     var stroke = AutoMapperHelper.MapSingleRow<CodeStrokeVM, CodeStroke>(codeStroke);
@@ -1414,8 +1415,8 @@ namespace Web.Services.Concrete
                             OrganizationIdFk = stroke.OrganizationIdFk,
                             CodeIdFk = UCLEnums.Stroke.ToInt(),
                             DefaultServiceLineIdFk = DefaultServiceLineIds.ElementAt(i),
-                            ServiceLineId1Fk = ServiceLineTeam1Ids.Count > i ? ServiceLineTeam1Ids.ElementAt(i) : null,
-                            ServiceLineId2Fk = ServiceLineTeam2Ids.Count > i ? ServiceLineTeam2Ids.ElementAt(i) : null,
+                            //ServiceLineId1Fk = ServiceLineTeam1Ids.Count > i ? ServiceLineTeam1Ids.ElementAt(i) : null,
+                            //ServiceLineId2Fk = ServiceLineTeam2Ids.Count > i ? ServiceLineTeam2Ids.ElementAt(i) : null,
                             ActiveCodeId = stroke.CodeStrokeId,
                             ActiveCodeName = UCLEnums.Stroke.ToString()
                         };
@@ -2110,12 +2111,13 @@ namespace Web.Services.Concrete
             else
             {
 
-                //var serviceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeSepsis.OrganizationIdFk && x.CodeIdFk == UCLEnums.Sepsis.ToInt() && !x.IsDeleted).Select(x => x.ServiceLineIds).FirstOrDefault();
-                if (codeSepsis.DefaultServiceLineIds != null && codeSepsis.DefaultServiceLineIds != "")
+                string IsEMS = codeSepsis.IsEms ? "EMS" : "Active Code";
+                var DefaultServiceLineTeam = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeSepsis.OrganizationIdFk && x.CodeIdFk == UCLEnums.Sepsis.ToInt() && x.Type == IsEMS && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
+                if (DefaultServiceLineTeam != null && DefaultServiceLineTeam != "")
                 {
-                    var DefaultServiceLineIds = codeSepsis.DefaultServiceLineIds.ToIntList();
-                    var ServiceLineTeam1Ids = codeSepsis.ServiceLineTeam1Ids.ToIntList();
-                    var ServiceLineTeam2Ids = codeSepsis.ServiceLineTeam2Ids.ToIntList();
+                    var DefaultServiceLineIds = DefaultServiceLineTeam.ToIntList();
+                    //var ServiceLineTeam1Ids = codeSepsis.ServiceLineTeam1Ids.ToIntList();
+                    //var ServiceLineTeam2Ids = codeSepsis.ServiceLineTeam2Ids.ToIntList();
 
                     codeSepsis.CreatedDate = DateTime.UtcNow;
                     var Sepsis = AutoMapperHelper.MapSingleRow<CodeSepsisVM, CodeSepsi>(codeSepsis);
@@ -2416,8 +2418,8 @@ namespace Web.Services.Concrete
                             OrganizationIdFk = Sepsis.OrganizationIdFk,
                             CodeIdFk = UCLEnums.Sepsis.ToInt(),
                             DefaultServiceLineIdFk = DefaultServiceLineIds.ElementAt(i),
-                            ServiceLineId1Fk = ServiceLineTeam1Ids.Count > i ? ServiceLineTeam1Ids.ElementAt(i) : null,
-                            ServiceLineId2Fk = ServiceLineTeam2Ids.Count > i ? ServiceLineTeam2Ids.ElementAt(i) : null,
+                            //ServiceLineId1Fk = ServiceLineTeam1Ids.Count > i ? ServiceLineTeam1Ids.ElementAt(i) : null,
+                            //ServiceLineId2Fk = ServiceLineTeam2Ids.Count > i ? ServiceLineTeam2Ids.ElementAt(i) : null,
                             ActiveCodeId = Sepsis.CodeSepsisId,
                             ActiveCodeName = UCLEnums.Sepsis.ToString()
                         };
@@ -3110,12 +3112,13 @@ namespace Web.Services.Concrete
             }
             else
             {
-                //var serviceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeSTEMI.OrganizationIdFk && x.CodeIdFk == UCLEnums.STEMI.ToInt() && !x.IsDeleted).Select(x => x.ServiceLineIds).FirstOrDefault();
-                if (codeSTEMI.DefaultServiceLineIds != null && codeSTEMI.DefaultServiceLineIds != "")
+                string IsEMS = codeSTEMI.IsEms.HasValue && codeSTEMI.IsEms.Value ? "EMS" : "Active Code";
+                var DefaultServiceLineTeam = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeSTEMI.OrganizationIdFk && x.CodeIdFk == UCLEnums.STEMI.ToInt() && x.Type == IsEMS && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
+                if (DefaultServiceLineTeam != null && DefaultServiceLineTeam != "")
                 {
-                    var DefaultServiceLineIds = codeSTEMI.DefaultServiceLineIds.ToIntList();
-                    var ServiceLineTeam1Ids = codeSTEMI.ServiceLineTeam1Ids.ToIntList();
-                    var ServiceLineTeam2Ids = codeSTEMI.ServiceLineTeam2Ids.ToIntList();
+                    var DefaultServiceLineIds = DefaultServiceLineTeam.ToIntList();
+                    //var ServiceLineTeam1Ids = codeSTEMI.ServiceLineTeam1Ids.ToIntList();
+                    //var ServiceLineTeam2Ids = codeSTEMI.ServiceLineTeam2Ids.ToIntList();
 
                     codeSTEMI.CreatedDate = DateTime.UtcNow;
                     var STEMI = AutoMapperHelper.MapSingleRow<CodeSTEMIVM, CodeStemi>(codeSTEMI);
@@ -3417,8 +3420,8 @@ namespace Web.Services.Concrete
                             OrganizationIdFk = STEMI.OrganizationIdFk,
                             CodeIdFk = UCLEnums.STEMI.ToInt(),
                             DefaultServiceLineIdFk = DefaultServiceLineIds.ElementAt(i),
-                            ServiceLineId1Fk = ServiceLineTeam1Ids.Count > i ? ServiceLineTeam1Ids.ElementAt(i) : null,
-                            ServiceLineId2Fk = ServiceLineTeam2Ids.Count > i ? ServiceLineTeam2Ids.ElementAt(i) : null,
+                            //ServiceLineId1Fk = ServiceLineTeam1Ids.Count > i ? ServiceLineTeam1Ids.ElementAt(i) : null,
+                            //ServiceLineId2Fk = ServiceLineTeam2Ids.Count > i ? ServiceLineTeam2Ids.ElementAt(i) : null,
                             ActiveCodeId = STEMI.CodeStemiid,
                             ActiveCodeName = UCLEnums.STEMI.ToString()
                         };
@@ -4154,12 +4157,13 @@ namespace Web.Services.Concrete
             else
             {
 
-                //var serviceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeTruma.OrganizationIdFk && x.CodeIdFk == UCLEnums.Trauma.ToInt() && !x.IsDeleted).Select(x => x.ServiceLineIds).FirstOrDefault();
-                if (codeTruma.DefaultServiceLineIds != null && codeTruma.DefaultServiceLineIds != "")
+                string IsEMS = codeTruma.IsEms.HasValue && codeTruma.IsEms.Value ? "EMS" : "Active Code";
+                var DefaultServiceLineTeam = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeTruma.OrganizationIdFk && x.CodeIdFk == UCLEnums.Trauma.ToInt() && x.Type == IsEMS && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
+                if (DefaultServiceLineTeam != null && DefaultServiceLineTeam != "")
                 {
-                    var DefaultServiceLineIds = codeTruma.DefaultServiceLineIds.ToIntList();
-                    var ServiceLineTeam1Ids = codeTruma.ServiceLineTeam1Ids.ToIntList();
-                    var ServiceLineTeam2Ids = codeTruma.ServiceLineTeam2Ids.ToIntList();
+                    var DefaultServiceLineIds = DefaultServiceLineTeam.ToIntList();
+                    //var ServiceLineTeam1Ids = codeTruma.ServiceLineTeam1Ids.ToIntList();
+                    //var ServiceLineTeam2Ids = codeTruma.ServiceLineTeam2Ids.ToIntList();
 
                     codeTruma.CreatedDate = DateTime.UtcNow;
                     var Truma = AutoMapperHelper.MapSingleRow<CodeTrumaVM, CodeTrauma>(codeTruma);
@@ -4460,8 +4464,8 @@ namespace Web.Services.Concrete
                             OrganizationIdFk = Truma.OrganizationIdFk,
                             CodeIdFk = UCLEnums.Trauma.ToInt(),
                             DefaultServiceLineIdFk = DefaultServiceLineIds.ElementAt(i),
-                            ServiceLineId1Fk = ServiceLineTeam1Ids.Count > i ? ServiceLineTeam1Ids.ElementAt(i) : null,
-                            ServiceLineId2Fk = ServiceLineTeam2Ids.Count > i ? ServiceLineTeam2Ids.ElementAt(i) : null,
+                            //ServiceLineId1Fk = ServiceLineTeam1Ids.Count > i ? ServiceLineTeam1Ids.ElementAt(i) : null,
+                            //ServiceLineId2Fk = ServiceLineTeam2Ids.Count > i ? ServiceLineTeam2Ids.ElementAt(i) : null,
                             ActiveCodeId = Truma.CodeTraumaId,
                             ActiveCodeName = UCLEnums.Trauma.ToString()
                         };
@@ -5187,12 +5191,13 @@ namespace Web.Services.Concrete
             }
             else
             {
-                //var serviceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeBlue.OrganizationIdFk && x.CodeIdFk == UCLEnums.Blue.ToInt() && !x.IsDeleted).Select(x => x.ServiceLineIds).FirstOrDefault();
-                if (codeBlue.DefaultServiceLineIds != null && codeBlue.DefaultServiceLineIds != "")
+                string IsEMS = codeBlue.IsEms.HasValue && codeBlue.IsEms.Value ? "EMS" : "Active Code";
+                var DefaultServiceLineTeam = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeBlue.OrganizationIdFk && x.CodeIdFk == UCLEnums.Blue.ToInt() && x.Type == IsEMS && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
+                if (DefaultServiceLineTeam != null && DefaultServiceLineTeam != "")
                 {
-                    var DefaultServiceLineIds = codeBlue.DefaultServiceLineIds.ToIntList();
-                    var ServiceLineTeam1Ids = codeBlue.ServiceLineTeam1Ids.ToIntList();
-                    var ServiceLineTeam2Ids = codeBlue.ServiceLineTeam2Ids.ToIntList();
+                    var DefaultServiceLineIds = DefaultServiceLineTeam.ToIntList();
+                    //var ServiceLineTeam1Ids = codeBlue.ServiceLineTeam1Ids.ToIntList();
+                    //var ServiceLineTeam2Ids = codeBlue.ServiceLineTeam2Ids.ToIntList();
 
                     codeBlue.CreatedDate = DateTime.UtcNow;
                     var blue = AutoMapperHelper.MapSingleRow<CodeBlueVM, CodeBlue>(codeBlue);
@@ -5497,8 +5502,8 @@ namespace Web.Services.Concrete
                             OrganizationIdFk = blue.OrganizationIdFk,
                             CodeIdFk = UCLEnums.Blue.ToInt(),
                             DefaultServiceLineIdFk = DefaultServiceLineIds.ElementAt(i),
-                            ServiceLineId1Fk = ServiceLineTeam1Ids.Count > i ? ServiceLineTeam1Ids.ElementAt(i) : null,
-                            ServiceLineId2Fk = ServiceLineTeam2Ids.Count > i ? ServiceLineTeam2Ids.ElementAt(i) : null,
+                            //ServiceLineId1Fk = ServiceLineTeam1Ids.Count > i ? ServiceLineTeam1Ids.ElementAt(i) : null,
+                            //ServiceLineId2Fk = ServiceLineTeam2Ids.Count > i ? ServiceLineTeam2Ids.ElementAt(i) : null,
                             ActiveCodeId = blue.CodeBlueId,
                             ActiveCodeName = UCLEnums.Blue.ToString()
                         };
