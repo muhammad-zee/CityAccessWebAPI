@@ -1,5 +1,6 @@
 ﻿using ElmahCore;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -95,11 +96,11 @@ namespace Web.API.Controllers
         }
 
         [HttpPost("Call/CallbackStatus")]
-        public string CallbackStatus(string CallSid, string CallStatus )
+        public string CallbackStatus()
         {
             try
             {
-                return this._callService.CallbackStatus(CallSid, CallStatus);
+                return this._callService.CallbackStatus(HttpContext.Request.Form);
             }
             catch (Exception ex)
             {

@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,7 +20,7 @@ using Web.Services.Enums;
 using Web.Services.Extensions;
 using Web.Services.Helper;
 using Web.Services.Interfaces;
-
+using static Twilio.Rest.Api.V2010.Account.CallResource;
 
 namespace Web.Services.Concrete
 {
@@ -168,8 +169,26 @@ namespace Web.Services.Concrete
             return call;
         }
 
-        public string CallbackStatus(string Callsid, string CallStatus)
+        public string CallbackStatus(IFormCollection Reruest)
         {
+            var Callsid = Reruest["CallSid"].ToString();
+            var CallStatus = Reruest["CallStatus"].ToString();
+            var Direction = Reruest["Direction"].ToString();
+
+            CallLogVM callRec = new();
+            if(Direction == "inbound")
+            {
+                callRec.CallSid = Reruest["CallSid"].ToString();
+
+            }
+            else if(Direction == "outbound-dial")
+            {
+                callRec.CallSid = Reruest["ParentCallSid"].ToString();
+            }
+
+            callRec.Duration = CallStatus == "completed" ? Reruest["DialCallDuration"].ToString() : "0";
+            callRec.CallStatus = CallStatus;
+            this.saveCallLog(callRec);
             return "ok";
         }
         public TwiMLResult CallConnected()
@@ -249,20 +268,9 @@ namespace Web.Services.Concrete
                 record = this._callLogRepo.Table.Where(i => i.CallSid == log.CallSid).FirstOrDefault();
                 if (record != null)
                 {
-                    record.CallLogId = log.CallLogId;
-                    record.StartTime = log.StartTime;
-                    record.EndTime = log.EndTime;
-                    record.Duration = log.Duration;
-                    record.Direction = log.Direction;
+                    record.EndTime = log.CallStatus== "completed"?DateTime.Now: record.EndTime;
                     record.CallStatus = log.CallStatus;
-                    record.ToPhoneNumber = log.ToPhoneNumber;
-                    record.ToName = log.ToName;
-                    record.FromPhoneNumber = log.FromPhoneNumber;
-                    record.FromName = log.FromName;
-                    record.ParentCallSid = log.ParentCallSid;
-                    record.RecordingName = log.RecordingName;
-                    record.IsRecorded = log.IsRecorded;
-                    record.CreatedDate = DateTime.UtcNow;
+                    record.Duration = log.Duration;
 
                     this._callLogRepo.Update(record);
                 }

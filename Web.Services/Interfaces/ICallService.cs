@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using Twilio.AspNet.Core;
 using Twilio.Rest.Api.V2010.Account;
 using Web.Model;
@@ -12,7 +13,7 @@ namespace Web.Services.Interfaces
         TwiMLResult EnqueueCall();
         TwiMLResult Connect(string phoneNumber, string Twilio_PhoneNumber, string From, string CallSid, string CallStatus);
         CallResource Call();
-        string CallbackStatus(string Callsid, string CallStatus);
+        string CallbackStatus(IFormCollection Request);
         TwiMLResult CallConnected();
         TwiMLResult PromptResponse(int Digits);
         TwiMLResult ExceptionResponse(Exception ex);
