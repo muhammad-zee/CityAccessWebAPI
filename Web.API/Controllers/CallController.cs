@@ -63,11 +63,11 @@ namespace Web.API.Controllers
         }
 
         [HttpPost("Call/Connect")]
-        public TwiMLResult Connect(string phoneNumber, string Twilio_PhoneNumber)
+        public TwiMLResult Connect(string phoneNumber, string Twilio_PhoneNumber, string From, string CallSid, string CallStatus)
         {
             try
             {
-                return this._callService.Connect(phoneNumber, Twilio_PhoneNumber);
+                return this._callService.Connect(phoneNumber, Twilio_PhoneNumber,From,CallSid,CallStatus);
             }
             catch (Exception ex)
             {
@@ -95,11 +95,11 @@ namespace Web.API.Controllers
         }
 
         [HttpPost("Call/CallbackStatus")]
-        public string CallbackStatus(string Callsid, string CallStatus)
+        public string CallbackStatus(string CallSid, string CallStatus,string )
         {
             try
             {
-                return this._callService.CallbackStatus(Callsid, CallStatus);
+                return this._callService.CallbackStatus(CallSid, CallStatus);
             }
             catch (Exception ex)
             {

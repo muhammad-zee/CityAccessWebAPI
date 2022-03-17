@@ -28,8 +28,8 @@ namespace Web.Services.Concrete
         private readonly ICommunicationService _communicationService;
         private readonly IRepository<Ivrsetting> _ivrSettingsRepo;
         private readonly IRepository<InteractiveVoiceResponse> _IVRRepo;
+        private readonly IRepository<ControlListDetail> _controlListDetailsRepo;
         private readonly IRepository<CallLog> _callLogRepo;
-        private IRepository<ControlListDetail> _controlListDetailsRepo;
         IConfiguration _config;
         private readonly UnitOfWork unitorWork;
         private string origin = "";
@@ -51,8 +51,8 @@ namespace Web.Services.Concrete
             this._communicationService = communicationService;
             this._ivrSettingsRepo = ivrSettings;
             this._IVRRepo = IVR;
-            this._callLogRepo = callLog;
             this._controlListDetailsRepo = controlListDetails;
+            this._callLogRepo = callLog;
             this.origin = this._config["Twilio:CallbackDomain"].ToString();
 
             //Twilio Credentials
@@ -110,20 +110,34 @@ namespace Web.Services.Concrete
         #endregion
 
 
-        public TwiMLResult Connect(string phoneNumber, string Twilio_PhoneNumber)
+        public TwiMLResult Connect(string phoneNumber, string Twilio_PhoneNumber,string From, string CallSid, string CallStatus)
         {
             var response = new VoiceResponse();
-            var dial = new Dial(callerId: Twilio_PhoneNumber/*, record: Dial.RecordEnum.RecordFromAnswer*/);
+            var CallbackStatusUrl = $"{origin}/Call/CallbackStatus";
+            var dial = new Dial(callerId: Twilio_PhoneNumber,action: new Uri(CallbackStatusUrl), method:Twilio.Http.HttpMethod.Post /*, record: Dial.RecordEnum.RecordFromAnswer*/);
             if (phoneNumber.Contains("client"))
             {
                 dial.Client(phoneNumber.Replace("client:", ""));
             }
             else
             {
-                dial.Number(phoneNumber);
+                dial.Number(phoneNumber: new PhoneNumber(phoneNumber), url: new Uri(CallbackStatusUrl),method: Twilio.Http.HttpMethod.Post);
             }
-
             response.Append(dial);
+
+            var call = new CallLogVM()
+            {
+                FromName = From,
+                FromPhoneNumber = From,
+                ToPhoneNumber = phoneNumber,
+                StartTime = DateTime.Now,
+                EndTime = DateTime.Now,
+                CallStatus = CallStatus,
+                Direction = CallDirectionEnums.Outbound.ToString(),
+                CreatedDate = DateTime.Now,
+                CallSid = CallSid
+            };
+            this.saveCallLog(call);
             return TwiML(response);
         }
         public TwiMLResult EnqueueCall()
@@ -220,9 +234,6 @@ namespace Web.Services.Concrete
             string responseXML = response.ToString();
             return TwiML(response);
         }
-
-
-
         public TwiMLResult ExceptionResponse(Exception ex)
         {
             VoiceResponse response = new VoiceResponse();
@@ -253,22 +264,22 @@ namespace Web.Services.Concrete
                     record.IsRecorded = log.IsRecorded;
                     record.CreatedDate = DateTime.UtcNow;
 
-                    this._callLogRepo.Update(record);
-                }
-
+                this._callLogRepo.Update(record);
             }
             else
             {
+                record = new();
                 record.CallLogId = log.CallLogId;
                 record.StartTime = log.StartTime;
                 record.EndTime = log.EndTime;
-                record.Duration = log.Duration;
+                record.Duration = "0";
                 record.Direction = log.Direction;
                 record.CallStatus = log.CallStatus;
                 record.ToPhoneNumber = log.ToPhoneNumber;
                 record.ToName = log.ToName;
                 record.FromPhoneNumber = log.FromPhoneNumber;
                 record.FromName = log.FromName;
+                record.CallSid = log.CallSid;
                 record.ParentCallSid = log.ParentCallSid;
                 record.RecordingName = log.RecordingName;
                 record.IsRecorded = log.IsRecorded;
@@ -282,6 +293,7 @@ namespace Web.Services.Concrete
                 Message = "Record Saved",
                 Body = record
             };
+
         }
 
         #region IVR Settings

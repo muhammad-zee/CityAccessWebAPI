@@ -6,4 +6,10 @@
         Accepted,
         HangedUp,
     }
+    public enum CallDirectionEnums
+    {
+        Outbound,
+        Inbound
+    }
+
 }

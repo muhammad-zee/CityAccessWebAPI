@@ -10,7 +10,7 @@ namespace Web.Services.Interfaces
     {
         BaseResponse GenerateToken(string Identity);
         TwiMLResult EnqueueCall();
-        TwiMLResult Connect(string phoneNumber, string Twilio_PhoneNumber);
+        TwiMLResult Connect(string phoneNumber, string Twilio_PhoneNumber, string From, string CallSid, string CallStatus);
         CallResource Call();
         string CallbackStatus(string Callsid, string CallStatus);
         TwiMLResult CallConnected();
