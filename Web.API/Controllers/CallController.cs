@@ -95,7 +95,7 @@ namespace Web.API.Controllers
         }
 
         [HttpPost("Call/CallbackStatus")]
-        public string CallbackStatus(string CallSid, string CallStatus,string )
+        public string CallbackStatus(string CallSid, string CallStatus )
         {
             try
             {
