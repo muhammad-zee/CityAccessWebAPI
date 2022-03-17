@@ -44,7 +44,7 @@ namespace Web.Services.Concrete
         private string Twillio_VoiceApiKeySecret;
 
 
-        public CallService(RAQ_DbContext dbContext, 
+        public CallService(RAQ_DbContext dbContext,
             IConfiguration config,
             ICommunicationService communicationService,
             IRepository<Ivrsetting> ivrSettings,
@@ -117,18 +117,18 @@ namespace Web.Services.Concrete
         #endregion
 
 
-        public TwiMLResult Connect(string phoneNumber, string Twilio_PhoneNumber,string From, string CallSid, string CallStatus)
+        public TwiMLResult Connect(string phoneNumber, string Twilio_PhoneNumber, string From, string CallSid, string CallStatus)
         {
             var response = new VoiceResponse();
             var CallbackStatusUrl = $"{origin}/Call/CallbackStatus";
-            var dial = new Dial(callerId: Twilio_PhoneNumber,action: new Uri(CallbackStatusUrl), method:Twilio.Http.HttpMethod.Post /*, record: Dial.RecordEnum.RecordFromAnswer*/);
+            var dial = new Dial(callerId: Twilio_PhoneNumber, action: new Uri(CallbackStatusUrl), method: Twilio.Http.HttpMethod.Post /*, record: Dial.RecordEnum.RecordFromAnswer*/);
             if (phoneNumber.Contains("client"))
             {
                 dial.Client(phoneNumber.Replace("client:", ""));
             }
             else
             {
-                dial.Number(phoneNumber: new PhoneNumber(phoneNumber), url: new Uri(CallbackStatusUrl),method: Twilio.Http.HttpMethod.Post);
+                dial.Number(phoneNumber: new PhoneNumber(phoneNumber), url: new Uri(CallbackStatusUrl), method: Twilio.Http.HttpMethod.Post);
             }
             response.Append(dial);
 
@@ -182,12 +182,12 @@ namespace Web.Services.Concrete
             var Direction = Reruest["Direction"].ToString();
 
             CallLogVM callRec = new();
-            if(Direction == "inbound")
+            if (Direction == "inbound")
             {
                 callRec.CallSid = Reruest["CallSid"].ToString();
 
             }
-            else if(Direction == "outbound-dial")
+            else if (Direction == "outbound-dial")
             {
                 callRec.CallSid = Reruest["ParentCallSid"].ToString();
             }
