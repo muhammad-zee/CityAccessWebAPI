@@ -246,7 +246,7 @@ namespace Web.Services.Concrete
             CallLog record = null;
             if (!string.IsNullOrEmpty(log.CallSid))
             {
-                record = this._callLogRepo.Table.Where(i => i.CallSid == log.CallSid ).FirstOrDefault();
+                record = this._callLogRepo.Table.Where(i => i.CallSid == log.CallSid).FirstOrDefault();
                 if (record != null)
                 {
                     record.CallLogId = log.CallLogId;
@@ -264,28 +264,29 @@ namespace Web.Services.Concrete
                     record.IsRecorded = log.IsRecorded;
                     record.CreatedDate = DateTime.UtcNow;
 
-                this._callLogRepo.Update(record);
-            }
-            else
-            {
-                record = new();
-                record.CallLogId = log.CallLogId;
-                record.StartTime = log.StartTime;
-                record.EndTime = log.EndTime;
-                record.Duration = "0";
-                record.Direction = log.Direction;
-                record.CallStatus = log.CallStatus;
-                record.ToPhoneNumber = log.ToPhoneNumber;
-                record.ToName = log.ToName;
-                record.FromPhoneNumber = log.FromPhoneNumber;
-                record.FromName = log.FromName;
-                record.CallSid = log.CallSid;
-                record.ParentCallSid = log.ParentCallSid;
-                record.RecordingName = log.RecordingName;
-                record.IsRecorded = log.IsRecorded;
-                record.CreatedDate = DateTime.UtcNow;
+                    this._callLogRepo.Update(record);
+                }
+                else
+                {
+                    record = new();
+                    record.CallLogId = log.CallLogId;
+                    record.StartTime = log.StartTime;
+                    record.EndTime = log.EndTime;
+                    record.Duration = "0";
+                    record.Direction = log.Direction;
+                    record.CallStatus = log.CallStatus;
+                    record.ToPhoneNumber = log.ToPhoneNumber;
+                    record.ToName = log.ToName;
+                    record.FromPhoneNumber = log.FromPhoneNumber;
+                    record.FromName = log.FromName;
+                    record.CallSid = log.CallSid;
+                    record.ParentCallSid = log.ParentCallSid;
+                    record.RecordingName = log.RecordingName;
+                    record.IsRecorded = log.IsRecorded;
+                    record.CreatedDate = DateTime.UtcNow;
 
-                this._callLogRepo.Insert(record);
+                    this._callLogRepo.Insert(record);
+                }
             }
             return new BaseResponse()
             {
