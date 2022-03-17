@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using System.Linq;
 using System.Net;
 using Twilio;
@@ -119,30 +119,44 @@ namespace Web.Services.Concrete
 
         public TwiMLResult Connect(string phoneNumber, string Twilio_PhoneNumber, string From, string CallSid, string CallStatus)
         {
+
+
             var response = new VoiceResponse();
             var CallbackStatusUrl = $"{origin}/Call/CallbackStatus";
-            var dial = new Dial(callerId: Twilio_PhoneNumber, action: new Uri(CallbackStatusUrl), method: Twilio.Http.HttpMethod.Post /*, record: Dial.RecordEnum.RecordFromAnswer*/);
+            var statusCallbackEventList = new[]{
+                //Number.EventEnum.Initiated,
+                //Number.EventEnum.Ringing,
+                Number.EventEnum.Answered,
+                Number.EventEnum.Completed
+            }.ToList();
+            var dial = new Dial(callerId: Twilio_PhoneNumber/*, record: Dial.RecordEnum.RecordFromAnswer*/);
             if (phoneNumber.Contains("client"))
             {
                 dial.Client(phoneNumber.Replace("client:", ""));
             }
             else
             {
-                dial.Number(phoneNumber: new PhoneNumber(phoneNumber), url: new Uri(CallbackStatusUrl), method: Twilio.Http.HttpMethod.Post);
+                dial.Number(phoneNumber: new PhoneNumber(phoneNumber), statusCallback: new Uri(CallbackStatusUrl), statusCallbackMethod: Twilio.Http.HttpMethod.Post,statusCallbackEvent: statusCallbackEventList);
             }
             response.Append(dial);
+
+
+
+            //ServicePointManager.SecurityProtocol = (SecurityProtocolType)3072; //TLS 1.2
+            //var call = CallResource.Create(to, from, Twillio_AccountSID, sendDigits: pin, url: new Uri(url), statusCallback: new Uri(CallStatusUrl), record: true, timeout: 30);
 
             var call = new CallLogVM()
             {
                 FromName = From,
                 FromPhoneNumber = From,
                 ToPhoneNumber = phoneNumber,
-                StartTime = DateTime.Now,
-                EndTime = DateTime.Now,
+                StartTime = DateTime.UtcNow,
+                EndTime = DateTime.UtcNow,
                 CallStatus = CallStatus,
                 Direction = CallDirectionEnums.Outbound.ToString(),
-                CreatedDate = DateTime.Now,
-                CallSid = CallSid
+                CreatedDate = DateTime.UtcNow,
+                CallSid = CallSid,
+                Duration = "0"
             };
             this.saveCallLog(call);
             return TwiML(response);
@@ -192,9 +206,13 @@ namespace Web.Services.Concrete
                 callRec.CallSid = Reruest["ParentCallSid"].ToString();
             }
 
-            callRec.Duration = CallStatus == "completed" ? Reruest["DialCallDuration"].ToString() : "0";
+            callRec = this._dbContext.LoadStoredProcedure("md_getCallByCallSid")
+               .WithSqlParam("@pCallSid", callRec.CallSid)
+               .ExecuteStoredProc<CallLogVM>().FirstOrDefault();
+
+            callRec.Duration = Reruest["CallDuration"].ToString();
             callRec.CallStatus = CallStatus;
-            callRec.EndTime = DateTime.Now;
+            callRec.EndTime = DateTime.UtcNow;
             this.saveCallLog(callRec);
             return "ok";
         }
@@ -275,7 +293,7 @@ namespace Web.Services.Concrete
                 //record = this._callLogRepo.Table.Where(i => i.CallSid == log.CallSid).FirstOrDefault();
                 //if (record != null)
                 //{
-                //    record.EndTime = log.CallStatus == "completed" ? DateTime.Now : record.EndTime;
+                //    record.EndTime = log.CallStatus == "completed" ? DateTime.UtcNow : record.EndTime;
                 //    record.CallStatus = log.CallStatus;
                 //    record.Duration = log.Duration;
 
@@ -306,25 +324,38 @@ namespace Web.Services.Concrete
                 //}
 
                 int rowsAffected;
-                string sql = "EXEC md_InsertUpdateCallLog @pStartTime, @pEndTime, @pDuration, @pDirection, " +
-                    "@pCallStatus, @pToPhoneNumber, @pToName, @pFromPhoneNumber, @pFromName, @pCallSid, " +
-                    "@pParentCallSid, @pRecordingName, @pIsRecorded, @pCreatedDate";
+                string sql = "EXEC md_InsertUpdateCallLog " +
+                    "@pStartTime, " +
+                    "@pEndTime, " +
+                    "@pDuration, " +
+                    "@pDirection, " +
+                    "@pCallStatus, " +
+                    "@pToPhoneNumber, " +
+                    //"@pToName, " +
+                    "@pFromPhoneNumber, " +
+                    "@pFromName, " +
+                    "@pCallSid, " +
+                    //"@pParentCallSid, " +
+                    //"@pRecordingName, " +
+                    //"@pIsRecorded, " +
+                    "@pCreatedDate";
 
                 List<SqlParameter> parms = new List<SqlParameter>
                     { 
                         // Create parameters    
-                        new SqlParameter { ParameterName = "@pEndTime", Value = DateTime.Now },
+                        new SqlParameter { ParameterName = "@pStartTime", Value = log.StartTime },
+                        new SqlParameter { ParameterName = "@pEndTime", Value = DateTime.UtcNow },
                         new SqlParameter { ParameterName = "@pDuration", Value = log.Duration },
                         new SqlParameter { ParameterName = "@pDirection", Value = log.Direction },
                         new SqlParameter { ParameterName = "@pCallStatus", Value = log.CallStatus },
                         new SqlParameter { ParameterName = "@pToPhoneNumber", Value = log.ToPhoneNumber },
-                        new SqlParameter { ParameterName = "@pToName", Value = log.ToName },
+                        //new SqlParameter { ParameterName = "@pToName", Value = log.ToName },
                         new SqlParameter { ParameterName = "@pFromPhoneNumber", Value = log.FromPhoneNumber },
                         new SqlParameter { ParameterName = "@pFromName", Value = log.FromName },
                         new SqlParameter { ParameterName = "@pCallSid", Value = log.CallSid },
-                        new SqlParameter { ParameterName = "@pParentCallSid", Value = log.ParentCallSid },
-                        new SqlParameter { ParameterName = "@pRecordingname", Value = log.RecordingName },
-                        new SqlParameter { ParameterName = "@pIsRecorded", Value = log.IsRecorded },
+                        //new SqlParameter { ParameterName = "@pParentCallSid", Value = log.ParentCallSid },
+                        //new SqlParameter { ParameterName = "@pRecordingname", Value = log.RecordingName },
+                        //new SqlParameter { ParameterName = "@pIsRecorded", Value = log.IsRecorded },
                         new SqlParameter { ParameterName = "@pCreatedDate", Value = DateTime.UtcNow }
                     };
 
