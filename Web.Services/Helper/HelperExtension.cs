@@ -9,6 +9,7 @@ using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
+using Web.Data.Models;
 using Web.Model.Common;
 
 
@@ -437,6 +438,15 @@ namespace Web.Services.Helper
                 .Select(word => char.ToUpper(word[0]) + word.Substring(1))
                 .ToArray();
             return $"{leadWord}{string.Join(string.Empty, tailWords)}";
+        }
+
+        public static string GetUserName(this int userId)
+        {
+            using (var dbContext = new RAQ_DbContext()) 
+            {
+                var userName = dbContext.Users.Where(x => x.UserId == userId && !x.IsDeleted).Select(x => x.FirstName + " " + x.LastName).AsQueryable().FirstOrDefault();
+                return userName;
+            }
         }
 
     }
