@@ -649,8 +649,8 @@ namespace Web.Services.Concrete
                         }
                     }
                 }
-
-                var serviceIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == strokeData.OrganizationIdFk && x.CodeIdFk == UCLEnums.Stroke.ToInt() && !x.IsDeleted).Select(x => new { x.DefaultServiceLineTeam, x.ServiceLineTeam1, x.ServiceLineTeam2 }).FirstOrDefault();
+                string Type = StrokeDataVM.IsEms.HasValue && StrokeDataVM.IsEms.Value ? "EMS" : "Active Code";
+                var serviceIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == strokeData.OrganizationIdFk && x.CodeIdFk == UCLEnums.Stroke.ToInt() && x.Type == Type && !x.IsDeleted).Select(x => new { x.DefaultServiceLineTeam, x.ServiceLineTeam1, x.ServiceLineTeam2 }).FirstOrDefault();
                 var serviceLineIds = (from x in this._codesServiceLinesMappingRepo.Table
                                       where x.OrganizationIdFk == strokeData.OrganizationIdFk && x.CodeIdFk == UCLEnums.Stroke.ToInt()
                                       && x.ActiveCodeId == strokeData.CodeStrokeId && x.ActiveCodeName == UCLEnums.Stroke.ToString() && (serviceIds.DefaultServiceLineTeam.ToIntList().Contains(x.DefaultServiceLineIdFk)
@@ -1104,83 +1104,93 @@ namespace Web.Services.Concrete
             }
             else
             {
-                string IsEMS = codeStroke.IsEms.HasValue && codeStroke.IsEms.Value ? "EMS" : "Active Code";
-                var DefaultServiceLineTeam = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeStroke.OrganizationIdFk && x.CodeIdFk == UCLEnums.Stroke.ToInt() && x.Type == IsEMS && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
-                if (DefaultServiceLineTeam != null && DefaultServiceLineTeam != "")
+                if (codeStroke.OrganizationIdFk > 0) 
                 {
-                    var DefaultServiceLineIds = DefaultServiceLineTeam.ToIntList();
-                    //var ServiceLineTeam1Ids = codeStroke.ServiceLineTeam1Ids.ToIntList();
-                    //var ServiceLineTeam2Ids = codeStroke.ServiceLineTeam2Ids.ToIntList();
-
-                    codeStroke.CreatedDate = DateTime.UtcNow;
-                    var stroke = AutoMapperHelper.MapSingleRow<CodeStrokeVM, CodeStroke>(codeStroke);
-
-                    if (codeStroke.Attachment != null && codeStroke.Attachment.Count > 0)
+                    string IsEMS = codeStroke.IsEms.HasValue && codeStroke.IsEms.Value ? "EMS" : "Active Code";
+                    var DefaultServiceLineTeam = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeStroke.OrganizationIdFk && x.CodeIdFk == UCLEnums.Stroke.ToInt() && x.Type == IsEMS && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
+                    if (DefaultServiceLineTeam != null && DefaultServiceLineTeam != "")
                     {
-                        var RootPath = this._RootPath + "/Organizations";
-                        string FileRoot = null;
-                        List<string> Attachments = new();
+                        var DefaultServiceLineIds = DefaultServiceLineTeam.ToIntList();
+                        //var ServiceLineTeam1Ids = codeStroke.ServiceLineTeam1Ids.ToIntList();
+                        //var ServiceLineTeam2Ids = codeStroke.ServiceLineTeam2Ids.ToIntList();
+
+                        codeStroke.CreatedDate = DateTime.UtcNow;
+                        var stroke = AutoMapperHelper.MapSingleRow<CodeStrokeVM, CodeStroke>(codeStroke);
+
+                        if (codeStroke.Attachment != null && codeStroke.Attachment.Count > 0)
+                        {
+                            var RootPath = this._RootPath + "/Organizations";
+                            string FileRoot = null;
+                            List<string> Attachments = new();
 
 
-                        FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeStroke.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
-                        FileRoot = Path.Combine(RootPath, FileRoot);
-                        if (!Directory.Exists(FileRoot))
-                        {
-                            Directory.CreateDirectory(FileRoot);
-                        }
-                        FileRoot = Path.Combine(FileRoot, UCLEnums.Stroke.ToString());
-                        if (!Directory.Exists(FileRoot))
-                        {
-                            Directory.CreateDirectory(FileRoot);
-                        }
-                        FileRoot = Path.Combine(FileRoot, stroke.CodeStrokeId.ToString());
-                        if (!Directory.Exists(FileRoot))
-                        {
-                            Directory.CreateDirectory(FileRoot);
-                        }
-                        FileRoot = Path.Combine(FileRoot, "Attachments");
-
-                        if (!Directory.Exists(FileRoot))
-                        {
-                            Directory.CreateDirectory(FileRoot);
-                        }
-                        //else
-                        //{
-                        //    DirectoryInfo dir = new DirectoryInfo(FileRoot);
-                        //    foreach (FileInfo fi in dir.GetFiles())
-                        //    {
-                        //        fi.Delete();
-                        //    }
-                        //}
-                        foreach (var item in codeStroke.Attachment)
-                        {
-                            if (!string.IsNullOrEmpty(item.Base64Str))
+                            FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeStroke.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
+                            FileRoot = Path.Combine(RootPath, FileRoot);
+                            if (!Directory.Exists(FileRoot))
                             {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, UCLEnums.Stroke.ToString());
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, stroke.CodeStrokeId.ToString());
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, "Attachments");
 
-                                var fileInfo = item.Base64Str.Split("base64,");
-                                string fileExtension = fileInfo[0].GetFileExtenstion();
-                                var ByteFile = Convert.FromBase64String(fileInfo[1]);
-                                string FilePath = Path.Combine(FileRoot, item.FileName);
-
-                                if (File.Exists(FilePath))
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            //else
+                            //{
+                            //    DirectoryInfo dir = new DirectoryInfo(FileRoot);
+                            //    foreach (FileInfo fi in dir.GetFiles())
+                            //    {
+                            //        fi.Delete();
+                            //    }
+                            //}
+                            foreach (var item in codeStroke.Attachment)
+                            {
+                                if (!string.IsNullOrEmpty(item.Base64Str))
                                 {
-                                    long existingFileSize = 0;
-                                    long newFileSize = ByteFile.LongLength;
-                                    FileInfo ExistingfileInfo = new FileInfo(FilePath);
-                                    existingFileSize = ExistingfileInfo.Length;
 
-                                    if (existingFileSize > 0 && newFileSize != existingFileSize)
+                                    var fileInfo = item.Base64Str.Split("base64,");
+                                    string fileExtension = fileInfo[0].GetFileExtenstion();
+                                    var ByteFile = Convert.FromBase64String(fileInfo[1]);
+                                    string FilePath = Path.Combine(FileRoot, item.FileName);
+
+                                    if (File.Exists(FilePath))
                                     {
-                                        var alterFile = item.FileName.Split('.');
-                                        string extention = alterFile.LastOrDefault();
-                                        var alterFileName = alterFile.ToList();
-                                        alterFileName.RemoveAt(alterFileName.Count - 1);
-                                        string fileName = string.Join(".", alterFileName);
-                                        fileName = fileName + "_" + HelperExtension.CreateRandomString(7) + "." + extention;
-                                        FilePath = Path.Combine(FileRoot, fileName);
-                                        using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                        long existingFileSize = 0;
+                                        long newFileSize = ByteFile.LongLength;
+                                        FileInfo ExistingfileInfo = new FileInfo(FilePath);
+                                        existingFileSize = ExistingfileInfo.Length;
+
+                                        if (existingFileSize > 0 && newFileSize != existingFileSize)
                                         {
-                                            fs.Write(ByteFile);
+                                            var alterFile = item.FileName.Split('.');
+                                            string extention = alterFile.LastOrDefault();
+                                            var alterFileName = alterFile.ToList();
+                                            alterFileName.RemoveAt(alterFileName.Count - 1);
+                                            string fileName = string.Join(".", alterFileName);
+                                            fileName = fileName + "_" + HelperExtension.CreateRandomString(7) + "." + extention;
+                                            FilePath = Path.Combine(FileRoot, fileName);
+                                            using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                            {
+                                                fs.Write(ByteFile);
+                                            }
+                                        }
+                                        else
+                                        {
+                                            using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                            {
+                                                fs.Write(ByteFile);
+                                            }
                                         }
                                     }
                                     else
@@ -1191,88 +1201,88 @@ namespace Web.Services.Concrete
                                         }
                                     }
                                 }
-                                else
-                                {
-                                    using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
-                                    {
-                                        fs.Write(ByteFile);
-                                    }
-                                }
+
+
                             }
-
-
-                        }
-                        if (FileRoot != null && FileRoot != "")
-                        {
-                            codeStroke.AttachmentsFolderRoot = FileRoot.Replace(this._RootPath, "").Replace("\\", "/");
-                        }
-                    }
-                    if (codeStroke.Videos != null && codeStroke.Videos.Count > 0)
-                    {
-                        var RootPath = this._RootPath + "/Organizations";
-                        string FileRoot = null;
-                        List<string> Attachments = new();
-
-
-                        FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeStroke.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
-                        FileRoot = Path.Combine(RootPath, FileRoot);
-                        if (!Directory.Exists(FileRoot))
-                        {
-                            Directory.CreateDirectory(FileRoot);
-                        }
-                        FileRoot = Path.Combine(FileRoot, UCLEnums.Stroke.ToString());
-                        if (!Directory.Exists(FileRoot))
-                        {
-                            Directory.CreateDirectory(FileRoot);
-                        }
-                        FileRoot = Path.Combine(FileRoot, stroke.CodeStrokeId.ToString());
-                        if (!Directory.Exists(FileRoot))
-                        {
-                            Directory.CreateDirectory(FileRoot);
-                        }
-                        FileRoot = Path.Combine(FileRoot, "Videos");
-
-                        if (!Directory.Exists(FileRoot))
-                        {
-                            Directory.CreateDirectory(FileRoot);
-                        }
-                        //else
-                        //{
-                        //    DirectoryInfo dir = new DirectoryInfo(FileRoot);
-                        //    foreach (FileInfo fi in dir.GetFiles())
-                        //    {
-                        //        fi.Delete();
-                        //    }
-                        //}
-                        foreach (var item in codeStroke.Videos)
-                        {
-                            if (!string.IsNullOrEmpty(item.Base64Str))
+                            if (FileRoot != null && FileRoot != "")
                             {
+                                codeStroke.AttachmentsFolderRoot = FileRoot.Replace(this._RootPath, "").Replace("\\", "/");
+                            }
+                        }
+                        if (codeStroke.Videos != null && codeStroke.Videos.Count > 0)
+                        {
+                            var RootPath = this._RootPath + "/Organizations";
+                            string FileRoot = null;
+                            List<string> Attachments = new();
 
-                                var fileInfo = item.Base64Str.Split("base64,");
-                                string fileExtension = fileInfo[0].GetFileExtenstion();
-                                var ByteFile = Convert.FromBase64String(fileInfo[1]);
-                                string FilePath = Path.Combine(FileRoot, item.FileName);
 
-                                if (File.Exists(FilePath))
+                            FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeStroke.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
+                            FileRoot = Path.Combine(RootPath, FileRoot);
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, UCLEnums.Stroke.ToString());
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, stroke.CodeStrokeId.ToString());
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, "Videos");
+
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            //else
+                            //{
+                            //    DirectoryInfo dir = new DirectoryInfo(FileRoot);
+                            //    foreach (FileInfo fi in dir.GetFiles())
+                            //    {
+                            //        fi.Delete();
+                            //    }
+                            //}
+                            foreach (var item in codeStroke.Videos)
+                            {
+                                if (!string.IsNullOrEmpty(item.Base64Str))
                                 {
-                                    long existingFileSize = 0;
-                                    long newFileSize = ByteFile.LongLength;
-                                    FileInfo ExistingfileInfo = new FileInfo(FilePath);
-                                    existingFileSize = ExistingfileInfo.Length;
 
-                                    if (existingFileSize > 0 && newFileSize != existingFileSize)
+                                    var fileInfo = item.Base64Str.Split("base64,");
+                                    string fileExtension = fileInfo[0].GetFileExtenstion();
+                                    var ByteFile = Convert.FromBase64String(fileInfo[1]);
+                                    string FilePath = Path.Combine(FileRoot, item.FileName);
+
+                                    if (File.Exists(FilePath))
                                     {
-                                        var alterFile = item.FileName.Split('.');
-                                        string extention = alterFile.LastOrDefault();
-                                        var alterFileName = alterFile.ToList();
-                                        alterFileName.RemoveAt(alterFileName.Count - 1);
-                                        string fileName = string.Join(".", alterFileName);
-                                        fileName = fileName + "_" + HelperExtension.CreateRandomString(7) + "." + extention;
-                                        FilePath = Path.Combine(FileRoot, fileName);
-                                        using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                        long existingFileSize = 0;
+                                        long newFileSize = ByteFile.LongLength;
+                                        FileInfo ExistingfileInfo = new FileInfo(FilePath);
+                                        existingFileSize = ExistingfileInfo.Length;
+
+                                        if (existingFileSize > 0 && newFileSize != existingFileSize)
                                         {
-                                            fs.Write(ByteFile);
+                                            var alterFile = item.FileName.Split('.');
+                                            string extention = alterFile.LastOrDefault();
+                                            var alterFileName = alterFile.ToList();
+                                            alterFileName.RemoveAt(alterFileName.Count - 1);
+                                            string fileName = string.Join(".", alterFileName);
+                                            fileName = fileName + "_" + HelperExtension.CreateRandomString(7) + "." + extention;
+                                            FilePath = Path.Combine(FileRoot, fileName);
+                                            using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                            {
+                                                fs.Write(ByteFile);
+                                            }
+                                        }
+                                        else
+                                        {
+                                            using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                            {
+                                                fs.Write(ByteFile);
+                                            }
                                         }
                                     }
                                     else
@@ -1283,88 +1293,88 @@ namespace Web.Services.Concrete
                                         }
                                     }
                                 }
-                                else
-                                {
-                                    using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
-                                    {
-                                        fs.Write(ByteFile);
-                                    }
-                                }
+
+
                             }
-
-
-                        }
-                        if (FileRoot != null && FileRoot != "")
-                        {
-                            codeStroke.VideoFolderRoot = FileRoot.Replace(this._RootPath, "").Replace("\\", "/");
-                        }
-                    }
-                    if (codeStroke.Audios != null && codeStroke.Audios.Count > 0)
-                    {
-                        var RootPath = this._RootPath + "/Organizations";
-                        string FileRoot = null;
-                        List<string> Attachments = new();
-
-
-                        FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeStroke.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
-                        FileRoot = Path.Combine(RootPath, FileRoot);
-                        if (!Directory.Exists(FileRoot))
-                        {
-                            Directory.CreateDirectory(FileRoot);
-                        }
-                        FileRoot = Path.Combine(FileRoot, UCLEnums.Stroke.ToString());
-                        if (!Directory.Exists(FileRoot))
-                        {
-                            Directory.CreateDirectory(FileRoot);
-                        }
-                        FileRoot = Path.Combine(FileRoot, stroke.CodeStrokeId.ToString());
-                        if (!Directory.Exists(FileRoot))
-                        {
-                            Directory.CreateDirectory(FileRoot);
-                        }
-                        FileRoot = Path.Combine(FileRoot, "Audios");
-
-                        if (!Directory.Exists(FileRoot))
-                        {
-                            Directory.CreateDirectory(FileRoot);
-                        }
-                        //else
-                        //{
-                        //    DirectoryInfo dir = new DirectoryInfo(FileRoot);
-                        //    foreach (FileInfo fi in dir.GetFiles())
-                        //    {
-                        //        fi.Delete();
-                        //    }
-                        //}
-                        foreach (var item in codeStroke.Audios)
-                        {
-                            if (!string.IsNullOrEmpty(item.Base64Str))
+                            if (FileRoot != null && FileRoot != "")
                             {
+                                codeStroke.VideoFolderRoot = FileRoot.Replace(this._RootPath, "").Replace("\\", "/");
+                            }
+                        }
+                        if (codeStroke.Audios != null && codeStroke.Audios.Count > 0)
+                        {
+                            var RootPath = this._RootPath + "/Organizations";
+                            string FileRoot = null;
+                            List<string> Attachments = new();
 
-                                var fileInfo = item.Base64Str.Split("base64,");
-                                string fileExtension = fileInfo[0].GetFileExtenstion();
-                                var ByteFile = Convert.FromBase64String(fileInfo[1]);
-                                string FilePath = Path.Combine(FileRoot, item.FileName);
 
-                                if (File.Exists(FilePath))
+                            FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeStroke.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
+                            FileRoot = Path.Combine(RootPath, FileRoot);
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, UCLEnums.Stroke.ToString());
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, stroke.CodeStrokeId.ToString());
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, "Audios");
+
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            //else
+                            //{
+                            //    DirectoryInfo dir = new DirectoryInfo(FileRoot);
+                            //    foreach (FileInfo fi in dir.GetFiles())
+                            //    {
+                            //        fi.Delete();
+                            //    }
+                            //}
+                            foreach (var item in codeStroke.Audios)
+                            {
+                                if (!string.IsNullOrEmpty(item.Base64Str))
                                 {
-                                    long existingFileSize = 0;
-                                    long newFileSize = ByteFile.LongLength;
-                                    FileInfo ExistingfileInfo = new FileInfo(FilePath);
-                                    existingFileSize = ExistingfileInfo.Length;
 
-                                    if (existingFileSize > 0 && newFileSize != existingFileSize)
+                                    var fileInfo = item.Base64Str.Split("base64,");
+                                    string fileExtension = fileInfo[0].GetFileExtenstion();
+                                    var ByteFile = Convert.FromBase64String(fileInfo[1]);
+                                    string FilePath = Path.Combine(FileRoot, item.FileName);
+
+                                    if (File.Exists(FilePath))
                                     {
-                                        var alterFile = item.FileName.Split('.');
-                                        string extention = alterFile.LastOrDefault();
-                                        var alterFileName = alterFile.ToList();
-                                        alterFileName.RemoveAt(alterFileName.Count - 1);
-                                        string fileName = string.Join(".", alterFileName);
-                                        fileName = fileName + "_" + HelperExtension.CreateRandomString(7) + "." + extention;
-                                        FilePath = Path.Combine(FileRoot, fileName);
-                                        using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                        long existingFileSize = 0;
+                                        long newFileSize = ByteFile.LongLength;
+                                        FileInfo ExistingfileInfo = new FileInfo(FilePath);
+                                        existingFileSize = ExistingfileInfo.Length;
+
+                                        if (existingFileSize > 0 && newFileSize != existingFileSize)
                                         {
-                                            fs.Write(ByteFile);
+                                            var alterFile = item.FileName.Split('.');
+                                            string extention = alterFile.LastOrDefault();
+                                            var alterFileName = alterFile.ToList();
+                                            alterFileName.RemoveAt(alterFileName.Count - 1);
+                                            string fileName = string.Join(".", alterFileName);
+                                            fileName = fileName + "_" + HelperExtension.CreateRandomString(7) + "." + extention;
+                                            FilePath = Path.Combine(FileRoot, fileName);
+                                            using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                            {
+                                                fs.Write(ByteFile);
+                                            }
+                                        }
+                                        else
+                                        {
+                                            using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                            {
+                                                fs.Write(ByteFile);
+                                            }
                                         }
                                     }
                                     else
@@ -1375,116 +1385,110 @@ namespace Web.Services.Concrete
                                         }
                                     }
                                 }
-                                else
-                                {
-                                    using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
-                                    {
-                                        fs.Write(ByteFile);
-                                    }
-                                }
+
+
                             }
-
-
+                            if (FileRoot != null && FileRoot != "")
+                            {
+                                codeStroke.AudioFolderRoot = FileRoot.Replace(this._RootPath, "").Replace("\\", "/");
+                            }
                         }
-                        if (FileRoot != null && FileRoot != "")
+
+                        if (codeStroke.AttachmentsFolderRoot != null)
                         {
-                            codeStroke.AudioFolderRoot = FileRoot.Replace(this._RootPath, "").Replace("\\", "/");
+                            stroke.Attachments = codeStroke.AttachmentsFolderRoot;
                         }
-                    }
-
-                    if (codeStroke.AttachmentsFolderRoot != null)
-                    {
-                        stroke.Attachments = codeStroke.AttachmentsFolderRoot;
-                    }
-                    if (codeStroke.VideoFolderRoot != null)
-                    {
-                        stroke.Video = codeStroke.VideoFolderRoot;
-                    }
-                    if (codeStroke.AudioFolderRoot != null)
-                    {
-                        stroke.Audio = codeStroke.AudioFolderRoot;
-                    }
-
-                    this._codeStrokeRepo.Insert(stroke);
-
-                    var codeServiceMappingList = new List<CodesServiceLinesMapping>();
-                    for (int i = 0; i < DefaultServiceLineIds.Count; i++)
-                    {
-                        var codeService = new CodesServiceLinesMapping()
+                        if (codeStroke.VideoFolderRoot != null)
                         {
-                            OrganizationIdFk = stroke.OrganizationIdFk,
-                            CodeIdFk = UCLEnums.Stroke.ToInt(),
-                            DefaultServiceLineIdFk = DefaultServiceLineIds.ElementAt(i),
-                            //ServiceLineId1Fk = ServiceLineTeam1Ids.Count > i ? ServiceLineTeam1Ids.ElementAt(i) : null,
-                            //ServiceLineId2Fk = ServiceLineTeam2Ids.Count > i ? ServiceLineTeam2Ids.ElementAt(i) : null,
-                            ActiveCodeId = stroke.CodeStrokeId,
-                            ActiveCodeName = UCLEnums.Stroke.ToString()
-                        };
-                        codeServiceMappingList.Add(codeService);
-                    }
-                    this._codesServiceLinesMappingRepo.Insert(codeServiceMappingList);
+                            stroke.Video = codeStroke.VideoFolderRoot;
+                        }
+                        if (codeStroke.AudioFolderRoot != null)
+                        {
+                            stroke.Audio = codeStroke.AudioFolderRoot;
+                        }
 
-                    var UserChannelSid = (from us in this._userSchedulesRepo.Table
-                                          join u in this._userRepo.Table on us.UserIdFk equals u.UserId
-                                          where DefaultServiceLineIds.Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
-                                          select new { u.UserUniqueId, u.UserId }).Distinct().ToList();
-                    var loggedUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).FirstOrDefault();
-                    UserChannelSid.Add(loggedUser);
-                    var conversationChannelAttributes = JsonConvert.SerializeObject(new Dictionary<string, Object>()
+                        this._codeStrokeRepo.Insert(stroke);
+
+                        var codeServiceMappingList = new List<CodesServiceLinesMapping>();
+                        for (int i = 0; i < DefaultServiceLineIds.Count; i++)
+                        {
+                            var codeService = new CodesServiceLinesMapping()
+                            {
+                                OrganizationIdFk = stroke.OrganizationIdFk,
+                                CodeIdFk = UCLEnums.Stroke.ToInt(),
+                                DefaultServiceLineIdFk = DefaultServiceLineIds.ElementAt(i),
+                                //ServiceLineId1Fk = ServiceLineTeam1Ids.Count > i ? ServiceLineTeam1Ids.ElementAt(i) : null,
+                                //ServiceLineId2Fk = ServiceLineTeam2Ids.Count > i ? ServiceLineTeam2Ids.ElementAt(i) : null,
+                                ActiveCodeId = stroke.CodeStrokeId,
+                                ActiveCodeName = UCLEnums.Stroke.ToString()
+                            };
+                            codeServiceMappingList.Add(codeService);
+                        }
+                        this._codesServiceLinesMappingRepo.Insert(codeServiceMappingList);
+
+                        var UserChannelSid = (from us in this._userSchedulesRepo.Table
+                                              join u in this._userRepo.Table on us.UserIdFk equals u.UserId
+                                              where DefaultServiceLineIds.Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
+                                              select new { u.UserUniqueId, u.UserId }).Distinct().ToList();
+                        var loggedUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).FirstOrDefault();
+                        UserChannelSid.Add(loggedUser);
+                        var conversationChannelAttributes = JsonConvert.SerializeObject(new Dictionary<string, Object>()
                                     {
                                         {ChannelAttributeEnums.ChannelType.ToString(), ChannelTypeEnums.EMS.ToString()},
                                         {ChannelAttributeEnums.CodeType.ToString(), ChannelTypeEnums.Stroke.ToString()},
                                         {ChannelAttributeEnums.StrokeId.ToString(), stroke.CodeStrokeId}
                                     }, Formatting.Indented);
-                    List<ActiveCodesGroupMember> ACodeGroupMembers = new List<ActiveCodesGroupMember>();
-                    if (UserChannelSid != null && UserChannelSid.Count > 0)
-                    {
-                        string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
-                        string friendlyName = stroke.IsEms.HasValue && stroke.IsEms.Value ? $"EMS Code {UCLEnums.Stroke.ToString()} {stroke.CodeStrokeId}" : $"Active Code {UCLEnums.Stroke.ToString()} {stroke.CodeStrokeId}";
-                        var channel = _communication.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
-                        UserChannelSid = UserChannelSid.Distinct().ToList();
-                        foreach (var item in UserChannelSid)
+                        List<ActiveCodesGroupMember> ACodeGroupMembers = new List<ActiveCodesGroupMember>();
+                        if (UserChannelSid != null && UserChannelSid.Count > 0)
                         {
-                            try
+                            string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
+                            string friendlyName = stroke.IsEms.HasValue && stroke.IsEms.Value ? $"EMS Code {UCLEnums.Stroke.ToString()} {stroke.CodeStrokeId}" : $"Active Code {UCLEnums.Stroke.ToString()} {stroke.CodeStrokeId}";
+                            var channel = _communication.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
+                            UserChannelSid = UserChannelSid.Distinct().ToList();
+                            foreach (var item in UserChannelSid)
                             {
-                                var codeGroupMember = new ActiveCodesGroupMember()
+                                try
                                 {
-                                    ChannelSid = channel.Sid,
-                                    UserIdFk = item.UserId,
-                                    ActiveCodeIdFk = stroke.CodeStrokeId,
-                                    ActiveCodeName = UCLEnums.Stroke.ToString(),
-                                    IsAcknowledge = false,
-                                    CreatedBy = ApplicationSettings.UserId,
-                                    CreatedDate = DateTime.UtcNow,
-                                    IsDeleted = false
-                                };
-                                ACodeGroupMembers.Add(codeGroupMember);
-                                _communication.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
+                                    var codeGroupMember = new ActiveCodesGroupMember()
+                                    {
+                                        ChannelSid = channel.Sid,
+                                        UserIdFk = item.UserId,
+                                        ActiveCodeIdFk = stroke.CodeStrokeId,
+                                        ActiveCodeName = UCLEnums.Stroke.ToString(),
+                                        IsAcknowledge = false,
+                                        CreatedBy = ApplicationSettings.UserId,
+                                        CreatedDate = DateTime.UtcNow,
+                                        IsDeleted = false
+                                    };
+                                    ACodeGroupMembers.Add(codeGroupMember);
+                                    _communication.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
+                                }
+                                catch (Exception ex)
+                                {
+                                    //ElmahExtensions.RiseError(ex);
+                                }
                             }
-                            catch (Exception ex)
-                            {
-                                //ElmahExtensions.RiseError(ex);
-                            }
+                            var isMembersAdded = AddGroupMembers(ACodeGroupMembers);
+                            var msg = new ConversationMessageVM();
+                            msg.channelSid = channel.Sid;
+                            msg.author = "System";
+                            msg.attributes = "";
+                            msg.body = $"<strong> {(codeStroke.IsEms.HasValue && codeStroke.IsEms.Value ? "EMS Code" : "Active Code")} {UCLEnums.Stroke.ToString()} </strong></br></br>";
+                            if (codeStroke.PatientName != null && codeStroke.PatientName != "")
+                                msg.body += $"<strong>Patient Name: </strong> {codeStroke.PatientName} </br>";
+                            msg.body += $"<strong>Dob: </strong> {codeStroke.Dob:MM-dd-yyyy} </br>";
+                            msg.body += $"<strong>Last Well Known: </strong> {codeStroke.LastKnownWell:MM-dd-yyyy hh:mm tt} </br>";
+                            if (codeStroke.ChiefComplant != null && codeStroke.ChiefComplant != "")
+                                msg.body += $"<strong>Chief Complaint: </strong> {codeStroke.ChiefComplant} </br>";
+                            if (codeStroke.Hpi != null && codeStroke.Hpi != "")
+                                msg.body += $"<strong>Hpi: </strong> {codeStroke.Hpi} </br>";
+                            var sendMsg = _communication.sendPushNotification(msg);
                         }
-                        var isMembersAdded = AddGroupMembers(ACodeGroupMembers);
-                        var msg = new ConversationMessageVM();
-                        msg.channelSid = channel.Sid;
-                        msg.author = "System";
-                        msg.attributes = "";
-                        msg.body = $"<strong> {(codeStroke.IsEms.HasValue && codeStroke.IsEms.Value ? "EMS Code" : "Active Code")} {UCLEnums.Stroke.ToString()} </strong></br></br>";
-                        if (codeStroke.PatientName != null && codeStroke.PatientName != "")
-                            msg.body += $"<strong>Patient Name: </strong> {codeStroke.PatientName} </br>";
-                        msg.body += $"<strong>Dob: </strong> {codeStroke.Dob:MM-dd-yyyy} </br>";
-                        msg.body += $"<strong>Last Well Known: </strong> {codeStroke.LastKnownWell:MM-dd-yyyy hh:mm tt} </br>";
-                        if (codeStroke.ChiefComplant != null && codeStroke.ChiefComplant != "")
-                            msg.body += $"<strong>Chief Complaint: </strong> {codeStroke.ChiefComplant} </br>";
-                        if (codeStroke.Hpi != null && codeStroke.Hpi != "")
-                            msg.body += $"<strong>Hpi: </strong> {codeStroke.Hpi} </br>";
-                        var sendMsg = _communication.sendPushNotification(msg);
+                        return GetStrokeDataById(stroke.CodeStrokeId);
                     }
-                    return GetStrokeDataById(stroke.CodeStrokeId);
+                    return new BaseResponse() { Status = HttpStatusCode.NotAcceptable, Message = "There is no Service Line in this organization related to Code Stroke" };
                 }
-                return new BaseResponse() { Status = HttpStatusCode.NotAcceptable, Message = "There is no Service Line in this organization related to Code Stroke" };
+                return new BaseResponse() { Status = HttpStatusCode.NotAcceptable, Message = "Organization is not selected" };
             }
         }
 
@@ -1658,8 +1662,8 @@ namespace Web.Services.Concrete
                         }
                     }
                 }
-
-                var serviceIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == SepsisData.OrganizationIdFk && x.CodeIdFk == UCLEnums.Sepsis.ToInt() && !x.IsDeleted).Select(x => new { x.DefaultServiceLineTeam, x.ServiceLineTeam1, x.ServiceLineTeam2 }).FirstOrDefault();
+                string Type = SepsisDataVM.IsEms ? "EMS" : "Active Code";
+                var serviceIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == SepsisData.OrganizationIdFk && x.CodeIdFk == UCLEnums.Sepsis.ToInt() && x.Type == Type && !x.IsDeleted).Select(x => new { x.DefaultServiceLineTeam, x.ServiceLineTeam1, x.ServiceLineTeam2 }).FirstOrDefault();
                 var serviceLineIds = (from x in this._codesServiceLinesMappingRepo.Table
                                       where x.OrganizationIdFk == SepsisData.OrganizationIdFk && x.CodeIdFk == UCLEnums.Sepsis.ToInt()
                                       && x.ActiveCodeId == SepsisData.CodeSepsisId && x.ActiveCodeName == UCLEnums.Sepsis.ToString() && (serviceIds.DefaultServiceLineTeam.ToIntList().Contains(x.DefaultServiceLineIdFk)
@@ -2111,83 +2115,93 @@ namespace Web.Services.Concrete
             else
             {
 
-                string IsEMS = codeSepsis.IsEms ? "EMS" : "Active Code";
-                var DefaultServiceLineTeam = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeSepsis.OrganizationIdFk && x.CodeIdFk == UCLEnums.Sepsis.ToInt() && x.Type == IsEMS && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
-                if (DefaultServiceLineTeam != null && DefaultServiceLineTeam != "")
+                if (codeSepsis.OrganizationIdFk > 0)
                 {
-                    var DefaultServiceLineIds = DefaultServiceLineTeam.ToIntList();
-                    //var ServiceLineTeam1Ids = codeSepsis.ServiceLineTeam1Ids.ToIntList();
-                    //var ServiceLineTeam2Ids = codeSepsis.ServiceLineTeam2Ids.ToIntList();
-
-                    codeSepsis.CreatedDate = DateTime.UtcNow;
-                    var Sepsis = AutoMapperHelper.MapSingleRow<CodeSepsisVM, CodeSepsi>(codeSepsis);
-
-                    if (codeSepsis.Attachment != null && codeSepsis.Attachment.Count > 0)
+                    string IsEMS = codeSepsis.IsEms ? "EMS" : "Active Code";
+                    var DefaultServiceLineTeam = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeSepsis.OrganizationIdFk && x.CodeIdFk == UCLEnums.Sepsis.ToInt() && x.Type == IsEMS && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
+                    if (DefaultServiceLineTeam != null && DefaultServiceLineTeam != "")
                     {
-                        var RootPath = this._RootPath + "/Organizations";
-                        string FileRoot = null;
-                        List<string> Attachments = new();
+                        var DefaultServiceLineIds = DefaultServiceLineTeam.ToIntList();
+                        //var ServiceLineTeam1Ids = codeSepsis.ServiceLineTeam1Ids.ToIntList();
+                        //var ServiceLineTeam2Ids = codeSepsis.ServiceLineTeam2Ids.ToIntList();
+
+                        codeSepsis.CreatedDate = DateTime.UtcNow;
+                        var Sepsis = AutoMapperHelper.MapSingleRow<CodeSepsisVM, CodeSepsi>(codeSepsis);
+
+                        if (codeSepsis.Attachment != null && codeSepsis.Attachment.Count > 0)
+                        {
+                            var RootPath = this._RootPath + "/Organizations";
+                            string FileRoot = null;
+                            List<string> Attachments = new();
 
 
-                        FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeSepsis.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
-                        FileRoot = Path.Combine(RootPath, FileRoot);
-                        if (!Directory.Exists(FileRoot))
-                        {
-                            Directory.CreateDirectory(FileRoot);
-                        }
-                        FileRoot = Path.Combine(FileRoot, UCLEnums.Sepsis.ToString());
-                        if (!Directory.Exists(FileRoot))
-                        {
-                            Directory.CreateDirectory(FileRoot);
-                        }
-                        FileRoot = Path.Combine(FileRoot, Sepsis.CodeSepsisId.ToString());
-                        if (!Directory.Exists(FileRoot))
-                        {
-                            Directory.CreateDirectory(FileRoot);
-                        }
-                        FileRoot = Path.Combine(FileRoot, "Attachments");
-
-                        if (!Directory.Exists(FileRoot))
-                        {
-                            Directory.CreateDirectory(FileRoot);
-                        }
-                        //else
-                        //{
-                        //    DirectoryInfo dir = new DirectoryInfo(FileRoot);
-                        //    foreach (FileInfo fi in dir.GetFiles())
-                        //    {
-                        //        fi.Delete();
-                        //    }
-                        //}
-                        foreach (var item in codeSepsis.Attachment)
-                        {
-                            if (!string.IsNullOrEmpty(item.Base64Str))
+                            FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeSepsis.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
+                            FileRoot = Path.Combine(RootPath, FileRoot);
+                            if (!Directory.Exists(FileRoot))
                             {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, UCLEnums.Sepsis.ToString());
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, Sepsis.CodeSepsisId.ToString());
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, "Attachments");
 
-                                var fileInfo = item.Base64Str.Split("base64,");
-                                string fileExtension = fileInfo[0].GetFileExtenstion();
-                                var ByteFile = Convert.FromBase64String(fileInfo[1]);
-                                string FilePath = Path.Combine(FileRoot, item.FileName);
-
-                                if (File.Exists(FilePath))
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            //else
+                            //{
+                            //    DirectoryInfo dir = new DirectoryInfo(FileRoot);
+                            //    foreach (FileInfo fi in dir.GetFiles())
+                            //    {
+                            //        fi.Delete();
+                            //    }
+                            //}
+                            foreach (var item in codeSepsis.Attachment)
+                            {
+                                if (!string.IsNullOrEmpty(item.Base64Str))
                                 {
-                                    long existingFileSize = 0;
-                                    long newFileSize = ByteFile.LongLength;
-                                    FileInfo ExistingfileInfo = new FileInfo(FilePath);
-                                    existingFileSize = ExistingfileInfo.Length;
 
-                                    if (existingFileSize > 0 && newFileSize != existingFileSize)
+                                    var fileInfo = item.Base64Str.Split("base64,");
+                                    string fileExtension = fileInfo[0].GetFileExtenstion();
+                                    var ByteFile = Convert.FromBase64String(fileInfo[1]);
+                                    string FilePath = Path.Combine(FileRoot, item.FileName);
+
+                                    if (File.Exists(FilePath))
                                     {
-                                        var alterFile = item.FileName.Split('.');
-                                        string extention = alterFile.LastOrDefault();
-                                        var alterFileName = alterFile.ToList();
-                                        alterFileName.RemoveAt(alterFileName.Count - 1);
-                                        string fileName = string.Join(".", alterFileName);
-                                        fileName = fileName + "_" + HelperExtension.CreateRandomString(7) + "." + extention;
-                                        FilePath = Path.Combine(FileRoot, fileName);
-                                        using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                        long existingFileSize = 0;
+                                        long newFileSize = ByteFile.LongLength;
+                                        FileInfo ExistingfileInfo = new FileInfo(FilePath);
+                                        existingFileSize = ExistingfileInfo.Length;
+
+                                        if (existingFileSize > 0 && newFileSize != existingFileSize)
                                         {
-                                            fs.Write(ByteFile);
+                                            var alterFile = item.FileName.Split('.');
+                                            string extention = alterFile.LastOrDefault();
+                                            var alterFileName = alterFile.ToList();
+                                            alterFileName.RemoveAt(alterFileName.Count - 1);
+                                            string fileName = string.Join(".", alterFileName);
+                                            fileName = fileName + "_" + HelperExtension.CreateRandomString(7) + "." + extention;
+                                            FilePath = Path.Combine(FileRoot, fileName);
+                                            using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                            {
+                                                fs.Write(ByteFile);
+                                            }
+                                        }
+                                        else
+                                        {
+                                            using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                            {
+                                                fs.Write(ByteFile);
+                                            }
                                         }
                                     }
                                     else
@@ -2198,87 +2212,87 @@ namespace Web.Services.Concrete
                                         }
                                     }
                                 }
-                                else
-                                {
-                                    using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
-                                    {
-                                        fs.Write(ByteFile);
-                                    }
-                                }
+
                             }
-
-                        }
-                        if (FileRoot != null && FileRoot != "")
-                        {
-                            codeSepsis.AttachmentsFolderRoot = FileRoot.Replace(this._RootPath, "").Replace("\\", "/");
-                        }
-                    }
-                    if (codeSepsis.Videos != null && codeSepsis.Videos.Count > 0)
-                    {
-                        var RootPath = this._RootPath + "/Organizations";
-                        string FileRoot = null;
-                        List<string> Attachments = new();
-
-
-                        FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeSepsis.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
-                        FileRoot = Path.Combine(RootPath, FileRoot);
-                        if (!Directory.Exists(FileRoot))
-                        {
-                            Directory.CreateDirectory(FileRoot);
-                        }
-                        FileRoot = Path.Combine(FileRoot, UCLEnums.Sepsis.ToString());
-                        if (!Directory.Exists(FileRoot))
-                        {
-                            Directory.CreateDirectory(FileRoot);
-                        }
-                        FileRoot = Path.Combine(FileRoot, Sepsis.CodeSepsisId.ToString());
-                        if (!Directory.Exists(FileRoot))
-                        {
-                            Directory.CreateDirectory(FileRoot);
-                        }
-                        FileRoot = Path.Combine(FileRoot, "Videos");
-
-                        if (!Directory.Exists(FileRoot))
-                        {
-                            Directory.CreateDirectory(FileRoot);
-                        }
-                        //else
-                        //{
-                        //    DirectoryInfo dir = new DirectoryInfo(FileRoot);
-                        //    foreach (FileInfo fi in dir.GetFiles())
-                        //    {
-                        //        fi.Delete();
-                        //    }
-                        //}
-                        foreach (var item in codeSepsis.Videos)
-                        {
-                            if (!string.IsNullOrEmpty(item.Base64Str))
+                            if (FileRoot != null && FileRoot != "")
                             {
+                                codeSepsis.AttachmentsFolderRoot = FileRoot.Replace(this._RootPath, "").Replace("\\", "/");
+                            }
+                        }
+                        if (codeSepsis.Videos != null && codeSepsis.Videos.Count > 0)
+                        {
+                            var RootPath = this._RootPath + "/Organizations";
+                            string FileRoot = null;
+                            List<string> Attachments = new();
 
-                                var fileInfo = item.Base64Str.Split("base64,");
-                                string fileExtension = fileInfo[0].GetFileExtenstion();
-                                var ByteFile = Convert.FromBase64String(fileInfo[1]);
-                                string FilePath = Path.Combine(FileRoot, item.FileName);
 
-                                if (File.Exists(FilePath))
+                            FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeSepsis.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
+                            FileRoot = Path.Combine(RootPath, FileRoot);
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, UCLEnums.Sepsis.ToString());
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, Sepsis.CodeSepsisId.ToString());
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, "Videos");
+
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            //else
+                            //{
+                            //    DirectoryInfo dir = new DirectoryInfo(FileRoot);
+                            //    foreach (FileInfo fi in dir.GetFiles())
+                            //    {
+                            //        fi.Delete();
+                            //    }
+                            //}
+                            foreach (var item in codeSepsis.Videos)
+                            {
+                                if (!string.IsNullOrEmpty(item.Base64Str))
                                 {
-                                    long existingFileSize = 0;
-                                    long newFileSize = ByteFile.LongLength;
-                                    FileInfo ExistingfileInfo = new FileInfo(FilePath);
-                                    existingFileSize = ExistingfileInfo.Length;
 
-                                    if (existingFileSize > 0 && newFileSize != existingFileSize)
+                                    var fileInfo = item.Base64Str.Split("base64,");
+                                    string fileExtension = fileInfo[0].GetFileExtenstion();
+                                    var ByteFile = Convert.FromBase64String(fileInfo[1]);
+                                    string FilePath = Path.Combine(FileRoot, item.FileName);
+
+                                    if (File.Exists(FilePath))
                                     {
-                                        var alterFile = item.FileName.Split('.');
-                                        string extention = alterFile.LastOrDefault();
-                                        var alterFileName = alterFile.ToList();
-                                        alterFileName.RemoveAt(alterFileName.Count - 1);
-                                        string fileName = string.Join(".", alterFileName);
-                                        fileName = fileName + "_" + HelperExtension.CreateRandomString(7) + "." + extention;
-                                        FilePath = Path.Combine(FileRoot, fileName);
-                                        using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                        long existingFileSize = 0;
+                                        long newFileSize = ByteFile.LongLength;
+                                        FileInfo ExistingfileInfo = new FileInfo(FilePath);
+                                        existingFileSize = ExistingfileInfo.Length;
+
+                                        if (existingFileSize > 0 && newFileSize != existingFileSize)
                                         {
-                                            fs.Write(ByteFile);
+                                            var alterFile = item.FileName.Split('.');
+                                            string extention = alterFile.LastOrDefault();
+                                            var alterFileName = alterFile.ToList();
+                                            alterFileName.RemoveAt(alterFileName.Count - 1);
+                                            string fileName = string.Join(".", alterFileName);
+                                            fileName = fileName + "_" + HelperExtension.CreateRandomString(7) + "." + extention;
+                                            FilePath = Path.Combine(FileRoot, fileName);
+                                            using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                            {
+                                                fs.Write(ByteFile);
+                                            }
+                                        }
+                                        else
+                                        {
+                                            using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                            {
+                                                fs.Write(ByteFile);
+                                            }
                                         }
                                     }
                                     else
@@ -2289,87 +2303,87 @@ namespace Web.Services.Concrete
                                         }
                                     }
                                 }
-                                else
-                                {
-                                    using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
-                                    {
-                                        fs.Write(ByteFile);
-                                    }
-                                }
+
                             }
-
-                        }
-                        if (FileRoot != null && FileRoot != "")
-                        {
-                            codeSepsis.VideoFolderRoot = FileRoot.Replace(this._RootPath, "").Replace("\\", "/");
-                        }
-                    }
-                    if (codeSepsis.Audios != null && codeSepsis.Audios.Count > 0)
-                    {
-                        var RootPath = this._RootPath + "/Organizations";
-                        string FileRoot = null;
-                        List<string> Attachments = new();
-                        //var outPath = Directory.GetCurrentDirectory();
-
-                        FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeSepsis.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
-                        FileRoot = Path.Combine(RootPath, FileRoot);
-                        if (!Directory.Exists(FileRoot))
-                        {
-                            Directory.CreateDirectory(FileRoot);
-                        }
-                        FileRoot = Path.Combine(FileRoot, UCLEnums.Sepsis.ToString());
-                        if (!Directory.Exists(FileRoot))
-                        {
-                            Directory.CreateDirectory(FileRoot);
-                        }
-                        FileRoot = Path.Combine(FileRoot, Sepsis.CodeSepsisId.ToString());
-                        if (!Directory.Exists(FileRoot))
-                        {
-                            Directory.CreateDirectory(FileRoot);
-                        }
-                        FileRoot = Path.Combine(FileRoot, "Audios");
-
-                        if (!Directory.Exists(FileRoot))
-                        {
-                            Directory.CreateDirectory(FileRoot);
-                        }
-                        //else
-                        //{
-                        //    DirectoryInfo dir = new DirectoryInfo(FileRoot);
-                        //    foreach (FileInfo fi in dir.GetFiles())
-                        //    {
-                        //        fi.Delete();
-                        //    }
-                        //}
-                        foreach (var item in codeSepsis.Audios)
-                        {
-                            if (!string.IsNullOrEmpty(item.Base64Str))
+                            if (FileRoot != null && FileRoot != "")
                             {
+                                codeSepsis.VideoFolderRoot = FileRoot.Replace(this._RootPath, "").Replace("\\", "/");
+                            }
+                        }
+                        if (codeSepsis.Audios != null && codeSepsis.Audios.Count > 0)
+                        {
+                            var RootPath = this._RootPath + "/Organizations";
+                            string FileRoot = null;
+                            List<string> Attachments = new();
+                            //var outPath = Directory.GetCurrentDirectory();
 
-                                var fileInfo = item.Base64Str.Split("base64,");
-                                string fileExtension = fileInfo[0].GetFileExtenstion();
-                                var ByteFile = Convert.FromBase64String(fileInfo[1]);
-                                string FilePath = Path.Combine(FileRoot, item.FileName);
+                            FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeSepsis.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
+                            FileRoot = Path.Combine(RootPath, FileRoot);
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, UCLEnums.Sepsis.ToString());
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, Sepsis.CodeSepsisId.ToString());
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, "Audios");
 
-                                if (File.Exists(FilePath))
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            //else
+                            //{
+                            //    DirectoryInfo dir = new DirectoryInfo(FileRoot);
+                            //    foreach (FileInfo fi in dir.GetFiles())
+                            //    {
+                            //        fi.Delete();
+                            //    }
+                            //}
+                            foreach (var item in codeSepsis.Audios)
+                            {
+                                if (!string.IsNullOrEmpty(item.Base64Str))
                                 {
-                                    long existingFileSize = 0;
-                                    long newFileSize = ByteFile.LongLength;
-                                    FileInfo ExistingfileInfo = new FileInfo(FilePath);
-                                    existingFileSize = ExistingfileInfo.Length;
 
-                                    if (existingFileSize > 0 && newFileSize != existingFileSize)
+                                    var fileInfo = item.Base64Str.Split("base64,");
+                                    string fileExtension = fileInfo[0].GetFileExtenstion();
+                                    var ByteFile = Convert.FromBase64String(fileInfo[1]);
+                                    string FilePath = Path.Combine(FileRoot, item.FileName);
+
+                                    if (File.Exists(FilePath))
                                     {
-                                        var alterFile = item.FileName.Split('.');
-                                        string extention = alterFile.LastOrDefault();
-                                        var alterFileName = alterFile.ToList();
-                                        alterFileName.RemoveAt(alterFileName.Count - 1);
-                                        string fileName = string.Join(".", alterFileName);
-                                        fileName = fileName + "_" + HelperExtension.CreateRandomString(7) + "." + extention;
-                                        FilePath = Path.Combine(FileRoot, fileName);
-                                        using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                        long existingFileSize = 0;
+                                        long newFileSize = ByteFile.LongLength;
+                                        FileInfo ExistingfileInfo = new FileInfo(FilePath);
+                                        existingFileSize = ExistingfileInfo.Length;
+
+                                        if (existingFileSize > 0 && newFileSize != existingFileSize)
                                         {
-                                            fs.Write(ByteFile);
+                                            var alterFile = item.FileName.Split('.');
+                                            string extention = alterFile.LastOrDefault();
+                                            var alterFileName = alterFile.ToList();
+                                            alterFileName.RemoveAt(alterFileName.Count - 1);
+                                            string fileName = string.Join(".", alterFileName);
+                                            fileName = fileName + "_" + HelperExtension.CreateRandomString(7) + "." + extention;
+                                            FilePath = Path.Combine(FileRoot, fileName);
+                                            using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                            {
+                                                fs.Write(ByteFile);
+                                            }
+                                        }
+                                        else
+                                        {
+                                            using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                            {
+                                                fs.Write(ByteFile);
+                                            }
                                         }
                                     }
                                     else
@@ -2380,117 +2394,111 @@ namespace Web.Services.Concrete
                                         }
                                     }
                                 }
-                                else
-                                {
-                                    using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
-                                    {
-                                        fs.Write(ByteFile);
-                                    }
-                                }
+
                             }
-
+                            if (FileRoot != null && FileRoot != "")
+                            {
+                                codeSepsis.AudioFolderRoot = FileRoot.Replace(this._RootPath, "").Replace("\\", "/");
+                            }
                         }
-                        if (FileRoot != null && FileRoot != "")
+
+                        if (codeSepsis.AttachmentsFolderRoot != null)
                         {
-                            codeSepsis.AudioFolderRoot = FileRoot.Replace(this._RootPath, "").Replace("\\", "/");
+                            Sepsis.Attachments = codeSepsis.AttachmentsFolderRoot;
                         }
-                    }
-
-                    if (codeSepsis.AttachmentsFolderRoot != null)
-                    {
-                        Sepsis.Attachments = codeSepsis.AttachmentsFolderRoot;
-                    }
-                    if (codeSepsis.VideoFolderRoot != null)
-                    {
-                        Sepsis.Video = codeSepsis.VideoFolderRoot;
-                    }
-                    if (codeSepsis.AudioFolderRoot != null)
-                    {
-                        Sepsis.Audio = codeSepsis.AudioFolderRoot;
-                    }
-                    this._codeSepsisRepo.Insert(Sepsis);
-
-                    var codeServiceMappingList = new List<CodesServiceLinesMapping>();
-                    for (int i = 0; i < DefaultServiceLineIds.Count; i++)
-                    {
-                        var codeService = new CodesServiceLinesMapping()
+                        if (codeSepsis.VideoFolderRoot != null)
                         {
-                            OrganizationIdFk = Sepsis.OrganizationIdFk,
-                            CodeIdFk = UCLEnums.Sepsis.ToInt(),
-                            DefaultServiceLineIdFk = DefaultServiceLineIds.ElementAt(i),
-                            //ServiceLineId1Fk = ServiceLineTeam1Ids.Count > i ? ServiceLineTeam1Ids.ElementAt(i) : null,
-                            //ServiceLineId2Fk = ServiceLineTeam2Ids.Count > i ? ServiceLineTeam2Ids.ElementAt(i) : null,
-                            ActiveCodeId = Sepsis.CodeSepsisId,
-                            ActiveCodeName = UCLEnums.Sepsis.ToString()
-                        };
-                        codeServiceMappingList.Add(codeService);
-                    }
-                    this._codesServiceLinesMappingRepo.Insert(codeServiceMappingList);
+                            Sepsis.Video = codeSepsis.VideoFolderRoot;
+                        }
+                        if (codeSepsis.AudioFolderRoot != null)
+                        {
+                            Sepsis.Audio = codeSepsis.AudioFolderRoot;
+                        }
+                        this._codeSepsisRepo.Insert(Sepsis);
 
-                    var UserChannelSid = (from us in this._userSchedulesRepo.Table
-                                          join u in this._userRepo.Table on us.UserIdFk equals u.UserId
-                                          where DefaultServiceLineIds.Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
-                                          select new { u.UserUniqueId, u.UserId }).ToList();
-                    var loggedUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).FirstOrDefault();
-                    UserChannelSid.Add(loggedUser);
-                    List<ActiveCodesGroupMember> ACodeGroupMembers = new List<ActiveCodesGroupMember>();
-                    if (UserChannelSid != null && UserChannelSid.Count > 0)
-                    {
-                        //string uniqueName = $"CONSULT_{Consult_Counter.Counter_Value.ToString()}";
-                        string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
-                        string friendlyName = Sepsis.IsEms ? $"EMS Code {UCLEnums.Sepsis.ToString()} {Sepsis.CodeSepsisId}" : $"Active Code {UCLEnums.Sepsis.ToString()} {Sepsis.CodeSepsisId}";
-                        var conversationChannelAttributes = JsonConvert.SerializeObject(new Dictionary<string, Object>()
+                        var codeServiceMappingList = new List<CodesServiceLinesMapping>();
+                        for (int i = 0; i < DefaultServiceLineIds.Count; i++)
+                        {
+                            var codeService = new CodesServiceLinesMapping()
+                            {
+                                OrganizationIdFk = Sepsis.OrganizationIdFk,
+                                CodeIdFk = UCLEnums.Sepsis.ToInt(),
+                                DefaultServiceLineIdFk = DefaultServiceLineIds.ElementAt(i),
+                                //ServiceLineId1Fk = ServiceLineTeam1Ids.Count > i ? ServiceLineTeam1Ids.ElementAt(i) : null,
+                                //ServiceLineId2Fk = ServiceLineTeam2Ids.Count > i ? ServiceLineTeam2Ids.ElementAt(i) : null,
+                                ActiveCodeId = Sepsis.CodeSepsisId,
+                                ActiveCodeName = UCLEnums.Sepsis.ToString()
+                            };
+                            codeServiceMappingList.Add(codeService);
+                        }
+                        this._codesServiceLinesMappingRepo.Insert(codeServiceMappingList);
+
+                        var UserChannelSid = (from us in this._userSchedulesRepo.Table
+                                              join u in this._userRepo.Table on us.UserIdFk equals u.UserId
+                                              where DefaultServiceLineIds.Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
+                                              select new { u.UserUniqueId, u.UserId }).ToList();
+                        var loggedUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).FirstOrDefault();
+                        UserChannelSid.Add(loggedUser);
+                        List<ActiveCodesGroupMember> ACodeGroupMembers = new List<ActiveCodesGroupMember>();
+                        if (UserChannelSid != null && UserChannelSid.Count > 0)
+                        {
+                            //string uniqueName = $"CONSULT_{Consult_Counter.Counter_Value.ToString()}";
+                            string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
+                            string friendlyName = Sepsis.IsEms ? $"EMS Code {UCLEnums.Sepsis.ToString()} {Sepsis.CodeSepsisId}" : $"Active Code {UCLEnums.Sepsis.ToString()} {Sepsis.CodeSepsisId}";
+                            var conversationChannelAttributes = JsonConvert.SerializeObject(new Dictionary<string, Object>()
                                     {
                                         {ChannelAttributeEnums.ChannelType.ToString(), ChannelTypeEnums.EMS.ToString()},
                                         {ChannelAttributeEnums.CodeType.ToString(), ChannelTypeEnums.Sepsis.ToString()},
                                         {ChannelAttributeEnums.SepsisId.ToString(), Sepsis.CodeSepsisId}
                                     }, Formatting.Indented);
-                        var channel = _communication.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
-                        UserChannelSid = UserChannelSid.Distinct().ToList();
-                        foreach (var item in UserChannelSid)
-                        {
-                            try
+                            var channel = _communication.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
+                            UserChannelSid = UserChannelSid.Distinct().ToList();
+                            foreach (var item in UserChannelSid)
                             {
-                                var codeGroupMember = new ActiveCodesGroupMember()
+                                try
                                 {
-                                    ChannelSid = channel.Sid,
-                                    UserIdFk = item.UserId,
-                                    ActiveCodeIdFk = Sepsis.CodeSepsisId,
-                                    ActiveCodeName = UCLEnums.Sepsis.ToString(),
-                                    IsAcknowledge = false,
-                                    CreatedBy = ApplicationSettings.UserId,
-                                    CreatedDate = DateTime.UtcNow,
-                                    IsDeleted = false
-                                };
-                                ACodeGroupMembers.Add(codeGroupMember);
-                                _communication.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
+                                    var codeGroupMember = new ActiveCodesGroupMember()
+                                    {
+                                        ChannelSid = channel.Sid,
+                                        UserIdFk = item.UserId,
+                                        ActiveCodeIdFk = Sepsis.CodeSepsisId,
+                                        ActiveCodeName = UCLEnums.Sepsis.ToString(),
+                                        IsAcknowledge = false,
+                                        CreatedBy = ApplicationSettings.UserId,
+                                        CreatedDate = DateTime.UtcNow,
+                                        IsDeleted = false
+                                    };
+                                    ACodeGroupMembers.Add(codeGroupMember);
+                                    _communication.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
+                                }
+                                catch (Exception ex)
+                                {
+                                    //ElmahExtensions.RiseError(ex);
+                                }
                             }
-                            catch (Exception ex)
-                            {
-                                //ElmahExtensions.RiseError(ex);
-                            }
+                            var isMembersAdded = AddGroupMembers(ACodeGroupMembers);
+
+                            var msg = new ConversationMessageVM();
+                            msg.channelSid = channel.Sid;
+                            msg.author = "System";
+                            msg.attributes = "";
+                            msg.body = $"<strong> {(codeSepsis.IsEms ? "EMS Code" : "Active Code")} {UCLEnums.Sepsis.ToString()} </strong></br></br>";
+                            if (codeSepsis.PatientName != null && codeSepsis.PatientName != "")
+                                msg.body += $"<strong>Patient Name: </strong> {codeSepsis.PatientName} </br>";
+                            msg.body += $"<strong>Dob: </strong> {codeSepsis.Dob:MM-dd-yyyy} </br>";
+                            msg.body += $"<strong>Last Well Known: </strong> {codeSepsis.LastKnownWell:MM-dd-yyyy hh:mm tt} </br>";
+                            if (codeSepsis.ChiefComplant != null && codeSepsis.ChiefComplant != "")
+                                msg.body += $"<strong>Chief Complaint: </strong> {codeSepsis.ChiefComplant} </br>";
+                            if (codeSepsis.Hpi != null && codeSepsis.Hpi != "")
+                                msg.body += $"<strong>Hpi: </strong> {codeSepsis.Hpi} </br>";
+
+                            var sendMsg = _communication.sendPushNotification(msg);
                         }
-                        var isMembersAdded = AddGroupMembers(ACodeGroupMembers);
-
-                        var msg = new ConversationMessageVM();
-                        msg.channelSid = channel.Sid;
-                        msg.author = "System";
-                        msg.attributes = "";
-                        msg.body = $"<strong> {(codeSepsis.IsEms ? "EMS Code" : "Active Code")} {UCLEnums.Sepsis.ToString()} </strong></br></br>";
-                        if (codeSepsis.PatientName != null && codeSepsis.PatientName != "")
-                            msg.body += $"<strong>Patient Name: </strong> {codeSepsis.PatientName} </br>";
-                        msg.body += $"<strong>Dob: </strong> {codeSepsis.Dob:MM-dd-yyyy} </br>";
-                        msg.body += $"<strong>Last Well Known: </strong> {codeSepsis.LastKnownWell:MM-dd-yyyy hh:mm tt} </br>";
-                        if (codeSepsis.ChiefComplant != null && codeSepsis.ChiefComplant != "")
-                            msg.body += $"<strong>Chief Complaint: </strong> {codeSepsis.ChiefComplant} </br>";
-                        if (codeSepsis.Hpi != null && codeSepsis.Hpi != "")
-                            msg.body += $"<strong>Hpi: </strong> {codeSepsis.Hpi} </br>";
-
-                        var sendMsg = _communication.sendPushNotification(msg);
+                        return GetSepsisDataById(Sepsis.CodeSepsisId);
                     }
-                    return GetSepsisDataById(Sepsis.CodeSepsisId);
+                    return new BaseResponse() { Status = HttpStatusCode.NotAcceptable, Message = "There is no Service Line in this organization related to Code Sepsis" }; 
                 }
-                return new BaseResponse() { Status = HttpStatusCode.NotAcceptable, Message = "There is no Service Line in this organization related to Code Sepsis" };
+                return new BaseResponse() { Status = HttpStatusCode.NotAcceptable, Message = "Organization is not selected" };
             }
         }
 
@@ -2665,7 +2673,8 @@ namespace Web.Services.Concrete
                         }
                     }
                 }
-                var serviceIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == STEMIData.OrganizationIdFk && x.CodeIdFk == UCLEnums.STEMI.ToInt() && !x.IsDeleted).Select(x => new { x.DefaultServiceLineTeam, x.ServiceLineTeam1, x.ServiceLineTeam2 }).FirstOrDefault();
+                string Type = STEMIDataVM.IsEms.HasValue && STEMIDataVM.IsEms.Value ? "EMS" : "Active Code";
+                var serviceIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == STEMIData.OrganizationIdFk && x.CodeIdFk == UCLEnums.STEMI.ToInt() && x.Type == Type && !x.IsDeleted).Select(x => new { x.DefaultServiceLineTeam, x.ServiceLineTeam1, x.ServiceLineTeam2 }).FirstOrDefault();
                 var serviceLineIds = (from x in this._codesServiceLinesMappingRepo.Table
                                       where x.OrganizationIdFk == STEMIData.OrganizationIdFk && x.CodeIdFk == UCLEnums.STEMI.ToInt()
                                       && x.ActiveCodeId == STEMIData.CodeStemiid && x.ActiveCodeName == UCLEnums.STEMI.ToString() && (serviceIds.DefaultServiceLineTeam.ToIntList().Contains(x.DefaultServiceLineIdFk)
@@ -3112,83 +3121,93 @@ namespace Web.Services.Concrete
             }
             else
             {
-                string IsEMS = codeSTEMI.IsEms.HasValue && codeSTEMI.IsEms.Value ? "EMS" : "Active Code";
-                var DefaultServiceLineTeam = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeSTEMI.OrganizationIdFk && x.CodeIdFk == UCLEnums.STEMI.ToInt() && x.Type == IsEMS && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
-                if (DefaultServiceLineTeam != null && DefaultServiceLineTeam != "")
+                if (codeSTEMI.OrganizationIdFk > 0)
                 {
-                    var DefaultServiceLineIds = DefaultServiceLineTeam.ToIntList();
-                    //var ServiceLineTeam1Ids = codeSTEMI.ServiceLineTeam1Ids.ToIntList();
-                    //var ServiceLineTeam2Ids = codeSTEMI.ServiceLineTeam2Ids.ToIntList();
-
-                    codeSTEMI.CreatedDate = DateTime.UtcNow;
-                    var STEMI = AutoMapperHelper.MapSingleRow<CodeSTEMIVM, CodeStemi>(codeSTEMI);
-
-                    if (codeSTEMI.Attachment != null && codeSTEMI.Attachment.Count > 0)
+                    string IsEMS = codeSTEMI.IsEms.HasValue && codeSTEMI.IsEms.Value ? "EMS" : "Active Code";
+                    var DefaultServiceLineTeam = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeSTEMI.OrganizationIdFk && x.CodeIdFk == UCLEnums.STEMI.ToInt() && x.Type == IsEMS && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
+                    if (DefaultServiceLineTeam != null && DefaultServiceLineTeam != "")
                     {
-                        var RootPath = this._RootPath + "/Organizations";
-                        string FileRoot = null;
-                        List<string> Attachments = new();
-                        //var outPath = Directory.GetCurrentDirectory();
+                        var DefaultServiceLineIds = DefaultServiceLineTeam.ToIntList();
+                        //var ServiceLineTeam1Ids = codeSTEMI.ServiceLineTeam1Ids.ToIntList();
+                        //var ServiceLineTeam2Ids = codeSTEMI.ServiceLineTeam2Ids.ToIntList();
 
-                        FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeSTEMI.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
-                        FileRoot = Path.Combine(RootPath, FileRoot);
-                        if (!Directory.Exists(FileRoot))
-                        {
-                            Directory.CreateDirectory(FileRoot);
-                        }
-                        FileRoot = Path.Combine(FileRoot, UCLEnums.STEMI.ToString());
-                        if (!Directory.Exists(FileRoot))
-                        {
-                            Directory.CreateDirectory(FileRoot);
-                        }
-                        FileRoot = Path.Combine(FileRoot, STEMI.CodeStemiid.ToString());
-                        if (!Directory.Exists(FileRoot))
-                        {
-                            Directory.CreateDirectory(FileRoot);
-                        }
-                        FileRoot = Path.Combine(FileRoot, "Attachments");
+                        codeSTEMI.CreatedDate = DateTime.UtcNow;
+                        var STEMI = AutoMapperHelper.MapSingleRow<CodeSTEMIVM, CodeStemi>(codeSTEMI);
 
-                        if (!Directory.Exists(FileRoot))
+                        if (codeSTEMI.Attachment != null && codeSTEMI.Attachment.Count > 0)
                         {
-                            Directory.CreateDirectory(FileRoot);
-                        }
-                        //else
-                        //{
-                        //    DirectoryInfo dir = new DirectoryInfo(FileRoot);
-                        //    foreach (FileInfo fi in dir.GetFiles())
-                        //    {
-                        //        fi.Delete();
-                        //    }
-                        //}
-                        foreach (var item in codeSTEMI.Attachment)
-                        {
-                            if (!string.IsNullOrEmpty(item.Base64Str))
+                            var RootPath = this._RootPath + "/Organizations";
+                            string FileRoot = null;
+                            List<string> Attachments = new();
+                            //var outPath = Directory.GetCurrentDirectory();
+
+                            FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeSTEMI.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
+                            FileRoot = Path.Combine(RootPath, FileRoot);
+                            if (!Directory.Exists(FileRoot))
                             {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, UCLEnums.STEMI.ToString());
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, STEMI.CodeStemiid.ToString());
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, "Attachments");
 
-                                var fileInfo = item.Base64Str.Split("base64,");
-                                string fileExtension = fileInfo[0].GetFileExtenstion();
-                                var ByteFile = Convert.FromBase64String(fileInfo[1]);
-                                string FilePath = Path.Combine(FileRoot, item.FileName);
-
-                                if (File.Exists(FilePath))
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            //else
+                            //{
+                            //    DirectoryInfo dir = new DirectoryInfo(FileRoot);
+                            //    foreach (FileInfo fi in dir.GetFiles())
+                            //    {
+                            //        fi.Delete();
+                            //    }
+                            //}
+                            foreach (var item in codeSTEMI.Attachment)
+                            {
+                                if (!string.IsNullOrEmpty(item.Base64Str))
                                 {
-                                    long existingFileSize = 0;
-                                    long newFileSize = ByteFile.LongLength;
-                                    FileInfo ExistingfileInfo = new FileInfo(FilePath);
-                                    existingFileSize = ExistingfileInfo.Length;
 
-                                    if (existingFileSize > 0 && newFileSize != existingFileSize)
+                                    var fileInfo = item.Base64Str.Split("base64,");
+                                    string fileExtension = fileInfo[0].GetFileExtenstion();
+                                    var ByteFile = Convert.FromBase64String(fileInfo[1]);
+                                    string FilePath = Path.Combine(FileRoot, item.FileName);
+
+                                    if (File.Exists(FilePath))
                                     {
-                                        var alterFile = item.FileName.Split('.');
-                                        string extention = alterFile.LastOrDefault();
-                                        var alterFileName = alterFile.ToList();
-                                        alterFileName.RemoveAt(alterFileName.Count - 1);
-                                        string fileName = string.Join(".", alterFileName);
-                                        fileName = fileName + "_" + HelperExtension.CreateRandomString(7) + "." + extention;
-                                        FilePath = Path.Combine(FileRoot, fileName);
-                                        using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                        long existingFileSize = 0;
+                                        long newFileSize = ByteFile.LongLength;
+                                        FileInfo ExistingfileInfo = new FileInfo(FilePath);
+                                        existingFileSize = ExistingfileInfo.Length;
+
+                                        if (existingFileSize > 0 && newFileSize != existingFileSize)
                                         {
-                                            fs.Write(ByteFile);
+                                            var alterFile = item.FileName.Split('.');
+                                            string extention = alterFile.LastOrDefault();
+                                            var alterFileName = alterFile.ToList();
+                                            alterFileName.RemoveAt(alterFileName.Count - 1);
+                                            string fileName = string.Join(".", alterFileName);
+                                            fileName = fileName + "_" + HelperExtension.CreateRandomString(7) + "." + extention;
+                                            FilePath = Path.Combine(FileRoot, fileName);
+                                            using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                            {
+                                                fs.Write(ByteFile);
+                                            }
+                                        }
+                                        else
+                                        {
+                                            using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                            {
+                                                fs.Write(ByteFile);
+                                            }
                                         }
                                     }
                                     else
@@ -3199,87 +3218,87 @@ namespace Web.Services.Concrete
                                         }
                                     }
                                 }
-                                else
-                                {
-                                    using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
-                                    {
-                                        fs.Write(ByteFile);
-                                    }
-                                }
+
                             }
-
-                        }
-                        if (FileRoot != null && FileRoot != "")
-                        {
-                            codeSTEMI.AttachmentsFolderRoot = FileRoot.Replace(this._RootPath, "").Replace("\\", "/");
-                        }
-                    }
-                    if (codeSTEMI.Videos != null && codeSTEMI.Videos.Count > 0)
-                    {
-                        var RootPath = this._RootPath + "/Organizations";
-                        string FileRoot = null;
-                        List<string> Attachments = new();
-                        //var outPath = Directory.GetCurrentDirectory();
-
-                        FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeSTEMI.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
-                        FileRoot = Path.Combine(RootPath, FileRoot);
-                        if (!Directory.Exists(FileRoot))
-                        {
-                            Directory.CreateDirectory(FileRoot);
-                        }
-                        FileRoot = Path.Combine(FileRoot, UCLEnums.STEMI.ToString());
-                        if (!Directory.Exists(FileRoot))
-                        {
-                            Directory.CreateDirectory(FileRoot);
-                        }
-                        FileRoot = Path.Combine(FileRoot, STEMI.CodeStemiid.ToString());
-                        if (!Directory.Exists(FileRoot))
-                        {
-                            Directory.CreateDirectory(FileRoot);
-                        }
-                        FileRoot = Path.Combine(FileRoot, "Videos");
-
-                        if (!Directory.Exists(FileRoot))
-                        {
-                            Directory.CreateDirectory(FileRoot);
-                        }
-                        //else
-                        //{
-                        //    DirectoryInfo dir = new DirectoryInfo(FileRoot);
-                        //    foreach (FileInfo fi in dir.GetFiles())
-                        //    {
-                        //        fi.Delete();
-                        //    }
-                        //}
-                        foreach (var item in codeSTEMI.Videos)
-                        {
-                            if (!string.IsNullOrEmpty(item.Base64Str))
+                            if (FileRoot != null && FileRoot != "")
                             {
+                                codeSTEMI.AttachmentsFolderRoot = FileRoot.Replace(this._RootPath, "").Replace("\\", "/");
+                            }
+                        }
+                        if (codeSTEMI.Videos != null && codeSTEMI.Videos.Count > 0)
+                        {
+                            var RootPath = this._RootPath + "/Organizations";
+                            string FileRoot = null;
+                            List<string> Attachments = new();
+                            //var outPath = Directory.GetCurrentDirectory();
 
-                                var fileInfo = item.Base64Str.Split("base64,");
-                                string fileExtension = fileInfo[0].GetFileExtenstion();
-                                var ByteFile = Convert.FromBase64String(fileInfo[1]);
-                                string FilePath = Path.Combine(FileRoot, item.FileName);
+                            FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeSTEMI.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
+                            FileRoot = Path.Combine(RootPath, FileRoot);
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, UCLEnums.STEMI.ToString());
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, STEMI.CodeStemiid.ToString());
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, "Videos");
 
-                                if (File.Exists(FilePath))
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            //else
+                            //{
+                            //    DirectoryInfo dir = new DirectoryInfo(FileRoot);
+                            //    foreach (FileInfo fi in dir.GetFiles())
+                            //    {
+                            //        fi.Delete();
+                            //    }
+                            //}
+                            foreach (var item in codeSTEMI.Videos)
+                            {
+                                if (!string.IsNullOrEmpty(item.Base64Str))
                                 {
-                                    long existingFileSize = 0;
-                                    long newFileSize = ByteFile.LongLength;
-                                    FileInfo ExistingfileInfo = new FileInfo(FilePath);
-                                    existingFileSize = ExistingfileInfo.Length;
 
-                                    if (existingFileSize > 0 && newFileSize != existingFileSize)
+                                    var fileInfo = item.Base64Str.Split("base64,");
+                                    string fileExtension = fileInfo[0].GetFileExtenstion();
+                                    var ByteFile = Convert.FromBase64String(fileInfo[1]);
+                                    string FilePath = Path.Combine(FileRoot, item.FileName);
+
+                                    if (File.Exists(FilePath))
                                     {
-                                        var alterFile = item.FileName.Split('.');
-                                        string extention = alterFile.LastOrDefault();
-                                        var alterFileName = alterFile.ToList();
-                                        alterFileName.RemoveAt(alterFileName.Count - 1);
-                                        string fileName = string.Join(".", alterFileName);
-                                        fileName = fileName + "_" + HelperExtension.CreateRandomString(7) + "." + extention;
-                                        FilePath = Path.Combine(FileRoot, fileName);
-                                        using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                        long existingFileSize = 0;
+                                        long newFileSize = ByteFile.LongLength;
+                                        FileInfo ExistingfileInfo = new FileInfo(FilePath);
+                                        existingFileSize = ExistingfileInfo.Length;
+
+                                        if (existingFileSize > 0 && newFileSize != existingFileSize)
                                         {
-                                            fs.Write(ByteFile);
+                                            var alterFile = item.FileName.Split('.');
+                                            string extention = alterFile.LastOrDefault();
+                                            var alterFileName = alterFile.ToList();
+                                            alterFileName.RemoveAt(alterFileName.Count - 1);
+                                            string fileName = string.Join(".", alterFileName);
+                                            fileName = fileName + "_" + HelperExtension.CreateRandomString(7) + "." + extention;
+                                            FilePath = Path.Combine(FileRoot, fileName);
+                                            using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                            {
+                                                fs.Write(ByteFile);
+                                            }
+                                        }
+                                        else
+                                        {
+                                            using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                            {
+                                                fs.Write(ByteFile);
+                                            }
                                         }
                                     }
                                     else
@@ -3290,88 +3309,88 @@ namespace Web.Services.Concrete
                                         }
                                     }
                                 }
-                                else
-                                {
-                                    using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
-                                    {
-                                        fs.Write(ByteFile);
-                                    }
-                                }
+
                             }
-
-                        }
-                        if (FileRoot != null && FileRoot != "")
-                        {
-                            codeSTEMI.VideoFolderRoot = FileRoot.Replace(this._RootPath, "").Replace("\\", "/");
-                        }
-                    }
-                    if (codeSTEMI.Audios != null && codeSTEMI.Audios.Count > 0)
-                    {
-                        var RootPath = this._RootPath + "/Organizations";
-                        string FileRoot = null;
-                        List<string> Attachments = new();
-
-                        //var outPath = Directory.GetCurrentDirectory();
-
-                        FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeSTEMI.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
-                        FileRoot = Path.Combine(RootPath, FileRoot);
-                        if (!Directory.Exists(FileRoot))
-                        {
-                            Directory.CreateDirectory(FileRoot);
-                        }
-                        FileRoot = Path.Combine(FileRoot, UCLEnums.STEMI.ToString());
-                        if (!Directory.Exists(FileRoot))
-                        {
-                            Directory.CreateDirectory(FileRoot);
-                        }
-                        FileRoot = Path.Combine(FileRoot, STEMI.CodeStemiid.ToString());
-                        if (!Directory.Exists(FileRoot))
-                        {
-                            Directory.CreateDirectory(FileRoot);
-                        }
-                        FileRoot = Path.Combine(FileRoot, "Audios");
-
-                        if (!Directory.Exists(FileRoot))
-                        {
-                            Directory.CreateDirectory(FileRoot);
-                        }
-                        //else
-                        //{
-                        //    DirectoryInfo dir = new DirectoryInfo(FileRoot);
-                        //    foreach (FileInfo fi in dir.GetFiles())
-                        //    {
-                        //        fi.Delete();
-                        //    }
-                        //}
-                        foreach (var item in codeSTEMI.Audios)
-                        {
-                            if (!string.IsNullOrEmpty(item.Base64Str))
+                            if (FileRoot != null && FileRoot != "")
                             {
+                                codeSTEMI.VideoFolderRoot = FileRoot.Replace(this._RootPath, "").Replace("\\", "/");
+                            }
+                        }
+                        if (codeSTEMI.Audios != null && codeSTEMI.Audios.Count > 0)
+                        {
+                            var RootPath = this._RootPath + "/Organizations";
+                            string FileRoot = null;
+                            List<string> Attachments = new();
 
-                                var fileInfo = item.Base64Str.Split("base64,");
-                                string fileExtension = fileInfo[0].GetFileExtenstion();
-                                var ByteFile = Convert.FromBase64String(fileInfo[1]);
-                                string FilePath = Path.Combine(FileRoot, item.FileName);
+                            //var outPath = Directory.GetCurrentDirectory();
 
-                                if (File.Exists(FilePath))
+                            FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeSTEMI.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
+                            FileRoot = Path.Combine(RootPath, FileRoot);
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, UCLEnums.STEMI.ToString());
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, STEMI.CodeStemiid.ToString());
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, "Audios");
+
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            //else
+                            //{
+                            //    DirectoryInfo dir = new DirectoryInfo(FileRoot);
+                            //    foreach (FileInfo fi in dir.GetFiles())
+                            //    {
+                            //        fi.Delete();
+                            //    }
+                            //}
+                            foreach (var item in codeSTEMI.Audios)
+                            {
+                                if (!string.IsNullOrEmpty(item.Base64Str))
                                 {
-                                    long existingFileSize = 0;
-                                    long newFileSize = ByteFile.LongLength;
-                                    FileInfo ExistingfileInfo = new FileInfo(FilePath);
-                                    existingFileSize = ExistingfileInfo.Length;
 
-                                    if (existingFileSize > 0 && newFileSize != existingFileSize)
+                                    var fileInfo = item.Base64Str.Split("base64,");
+                                    string fileExtension = fileInfo[0].GetFileExtenstion();
+                                    var ByteFile = Convert.FromBase64String(fileInfo[1]);
+                                    string FilePath = Path.Combine(FileRoot, item.FileName);
+
+                                    if (File.Exists(FilePath))
                                     {
-                                        var alterFile = item.FileName.Split('.');
-                                        string extention = alterFile.LastOrDefault();
-                                        var alterFileName = alterFile.ToList();
-                                        alterFileName.RemoveAt(alterFileName.Count - 1);
-                                        string fileName = string.Join(".", alterFileName);
-                                        fileName = fileName + "_" + HelperExtension.CreateRandomString(7) + "." + extention;
-                                        FilePath = Path.Combine(FileRoot, fileName);
-                                        using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                        long existingFileSize = 0;
+                                        long newFileSize = ByteFile.LongLength;
+                                        FileInfo ExistingfileInfo = new FileInfo(FilePath);
+                                        existingFileSize = ExistingfileInfo.Length;
+
+                                        if (existingFileSize > 0 && newFileSize != existingFileSize)
                                         {
-                                            fs.Write(ByteFile);
+                                            var alterFile = item.FileName.Split('.');
+                                            string extention = alterFile.LastOrDefault();
+                                            var alterFileName = alterFile.ToList();
+                                            alterFileName.RemoveAt(alterFileName.Count - 1);
+                                            string fileName = string.Join(".", alterFileName);
+                                            fileName = fileName + "_" + HelperExtension.CreateRandomString(7) + "." + extention;
+                                            FilePath = Path.Combine(FileRoot, fileName);
+                                            using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                            {
+                                                fs.Write(ByteFile);
+                                            }
+                                        }
+                                        else
+                                        {
+                                            using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                            {
+                                                fs.Write(ByteFile);
+                                            }
                                         }
                                     }
                                     else
@@ -3382,116 +3401,110 @@ namespace Web.Services.Concrete
                                         }
                                     }
                                 }
-                                else
-                                {
-                                    using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
-                                    {
-                                        fs.Write(ByteFile);
-                                    }
-                                }
+
                             }
-
+                            if (FileRoot != null && FileRoot != "")
+                            {
+                                codeSTEMI.AudioFolderRoot = FileRoot.Replace(this._RootPath, "").Replace("\\", "/");
+                            }
                         }
-                        if (FileRoot != null && FileRoot != "")
+                        if (codeSTEMI.AttachmentsFolderRoot != null)
                         {
-                            codeSTEMI.AudioFolderRoot = FileRoot.Replace(this._RootPath, "").Replace("\\", "/");
+                            STEMI.Attachments = codeSTEMI.AttachmentsFolderRoot;
                         }
-                    }
-                    if (codeSTEMI.AttachmentsFolderRoot != null)
-                    {
-                        STEMI.Attachments = codeSTEMI.AttachmentsFolderRoot;
-                    }
-                    if (codeSTEMI.VideoFolderRoot != null)
-                    {
-                        STEMI.Video = codeSTEMI.VideoFolderRoot;
-                    }
-                    if (codeSTEMI.AudioFolderRoot != null)
-                    {
-                        STEMI.Audio = codeSTEMI.AudioFolderRoot;
-                    }
-
-                    this._codeSTEMIRepo.Insert(STEMI);
-
-                    var codeServiceMappingList = new List<CodesServiceLinesMapping>();
-                    for (int i = 0; i < DefaultServiceLineIds.Count; i++)
-                    {
-                        var codeService = new CodesServiceLinesMapping()
+                        if (codeSTEMI.VideoFolderRoot != null)
                         {
-                            OrganizationIdFk = STEMI.OrganizationIdFk,
-                            CodeIdFk = UCLEnums.STEMI.ToInt(),
-                            DefaultServiceLineIdFk = DefaultServiceLineIds.ElementAt(i),
-                            //ServiceLineId1Fk = ServiceLineTeam1Ids.Count > i ? ServiceLineTeam1Ids.ElementAt(i) : null,
-                            //ServiceLineId2Fk = ServiceLineTeam2Ids.Count > i ? ServiceLineTeam2Ids.ElementAt(i) : null,
-                            ActiveCodeId = STEMI.CodeStemiid,
-                            ActiveCodeName = UCLEnums.STEMI.ToString()
-                        };
-                        codeServiceMappingList.Add(codeService);
-                    }
-                    this._codesServiceLinesMappingRepo.Insert(codeServiceMappingList);
+                            STEMI.Video = codeSTEMI.VideoFolderRoot;
+                        }
+                        if (codeSTEMI.AudioFolderRoot != null)
+                        {
+                            STEMI.Audio = codeSTEMI.AudioFolderRoot;
+                        }
 
-                    var UserChannelSid = (from us in this._userSchedulesRepo.Table
-                                          join u in this._userRepo.Table on us.UserIdFk equals u.UserId
-                                          where DefaultServiceLineIds.Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
-                                          select new { u.UserUniqueId, u.UserId }).ToList();
-                    var loggedUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).FirstOrDefault();
-                    UserChannelSid.Add(loggedUser);
-                    List<ActiveCodesGroupMember> ACodeGroupMembers = new List<ActiveCodesGroupMember>();
-                    if (UserChannelSid != null && UserChannelSid.Count > 0)
-                    {
-                        //string uniqueName = $"CONSULT_{Consult_Counter.Counter_Value.ToString()}";
-                        string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
-                        string friendlyName = STEMI.IsEms.HasValue && STEMI.IsEms.Value ? $"EMS Code {UCLEnums.STEMI.ToString()} {STEMI.CodeStemiid}" : $"Active Code {UCLEnums.STEMI.ToString()} {STEMI.CodeStemiid}";
-                        var conversationChannelAttributes = JsonConvert.SerializeObject(new Dictionary<string, Object>()
+                        this._codeSTEMIRepo.Insert(STEMI);
+
+                        var codeServiceMappingList = new List<CodesServiceLinesMapping>();
+                        for (int i = 0; i < DefaultServiceLineIds.Count; i++)
+                        {
+                            var codeService = new CodesServiceLinesMapping()
+                            {
+                                OrganizationIdFk = STEMI.OrganizationIdFk,
+                                CodeIdFk = UCLEnums.STEMI.ToInt(),
+                                DefaultServiceLineIdFk = DefaultServiceLineIds.ElementAt(i),
+                                //ServiceLineId1Fk = ServiceLineTeam1Ids.Count > i ? ServiceLineTeam1Ids.ElementAt(i) : null,
+                                //ServiceLineId2Fk = ServiceLineTeam2Ids.Count > i ? ServiceLineTeam2Ids.ElementAt(i) : null,
+                                ActiveCodeId = STEMI.CodeStemiid,
+                                ActiveCodeName = UCLEnums.STEMI.ToString()
+                            };
+                            codeServiceMappingList.Add(codeService);
+                        }
+                        this._codesServiceLinesMappingRepo.Insert(codeServiceMappingList);
+
+                        var UserChannelSid = (from us in this._userSchedulesRepo.Table
+                                              join u in this._userRepo.Table on us.UserIdFk equals u.UserId
+                                              where DefaultServiceLineIds.Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
+                                              select new { u.UserUniqueId, u.UserId }).ToList();
+                        var loggedUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).FirstOrDefault();
+                        UserChannelSid.Add(loggedUser);
+                        List<ActiveCodesGroupMember> ACodeGroupMembers = new List<ActiveCodesGroupMember>();
+                        if (UserChannelSid != null && UserChannelSid.Count > 0)
+                        {
+                            //string uniqueName = $"CONSULT_{Consult_Counter.Counter_Value.ToString()}";
+                            string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
+                            string friendlyName = STEMI.IsEms.HasValue && STEMI.IsEms.Value ? $"EMS Code {UCLEnums.STEMI.ToString()} {STEMI.CodeStemiid}" : $"Active Code {UCLEnums.STEMI.ToString()} {STEMI.CodeStemiid}";
+                            var conversationChannelAttributes = JsonConvert.SerializeObject(new Dictionary<string, Object>()
                                     {
                                         {ChannelAttributeEnums.ChannelType.ToString(), ChannelTypeEnums.EMS.ToString()},
                                         {ChannelAttributeEnums.CodeType.ToString(), ChannelTypeEnums.STEMI.ToString()},
                                         {ChannelAttributeEnums.STEMIId.ToString(), STEMI.CodeStemiid}
                                     }, Formatting.Indented);
-                        var channel = _communication.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
+                            var channel = _communication.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
 
-                        UserChannelSid = UserChannelSid.Distinct().ToList();
-                        foreach (var item in UserChannelSid)
-                        {
-                            try
+                            UserChannelSid = UserChannelSid.Distinct().ToList();
+                            foreach (var item in UserChannelSid)
                             {
-                                var codeGroupMember = new ActiveCodesGroupMember()
+                                try
                                 {
-                                    ChannelSid = channel.Sid,
-                                    UserIdFk = item.UserId,
-                                    ActiveCodeIdFk = STEMI.CodeStemiid,
-                                    ActiveCodeName = UCLEnums.STEMI.ToString(),
-                                    IsAcknowledge = false,
-                                    CreatedBy = ApplicationSettings.UserId,
-                                    CreatedDate = DateTime.UtcNow,
-                                    IsDeleted = false
-                                };
-                                ACodeGroupMembers.Add(codeGroupMember);
-                                _communication.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
+                                    var codeGroupMember = new ActiveCodesGroupMember()
+                                    {
+                                        ChannelSid = channel.Sid,
+                                        UserIdFk = item.UserId,
+                                        ActiveCodeIdFk = STEMI.CodeStemiid,
+                                        ActiveCodeName = UCLEnums.STEMI.ToString(),
+                                        IsAcknowledge = false,
+                                        CreatedBy = ApplicationSettings.UserId,
+                                        CreatedDate = DateTime.UtcNow,
+                                        IsDeleted = false
+                                    };
+                                    ACodeGroupMembers.Add(codeGroupMember);
+                                    _communication.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
+                                }
+                                catch (Exception ex)
+                                {
+                                    //ElmahExtensions.RiseError(ex);
+                                }
                             }
-                            catch (Exception ex)
-                            {
-                                //ElmahExtensions.RiseError(ex);
-                            }
+                            var isMembersAdded = AddGroupMembers(ACodeGroupMembers);
+                            var msg = new ConversationMessageVM();
+                            msg.channelSid = channel.Sid;
+                            msg.author = "System";
+                            msg.attributes = "";
+                            msg.body = $"<strong> {(codeSTEMI.IsEms.HasValue && codeSTEMI.IsEms.Value ? "EMS Code" : "Active Code")} {UCLEnums.STEMI.ToString()} </strong></br></br>";
+                            if (codeSTEMI.PatientName != null && codeSTEMI.PatientName != "")
+                                msg.body += $"<strong>Patient Name: </strong> {codeSTEMI.PatientName} </br>";
+                            msg.body += $"<strong>Dob: </strong> {codeSTEMI.Dob:MM-dd-yyyy} </br>";
+                            msg.body += $"<strong>Last Well Known: </strong> {codeSTEMI.LastKnownWell:MM-dd-yyyy hh:mm tt} </br>";
+                            if (codeSTEMI.ChiefComplant != null && codeSTEMI.ChiefComplant != "")
+                                msg.body += $"<strong>Chief Complaint: </strong> {codeSTEMI.ChiefComplant} </br>";
+                            if (codeSTEMI.Hpi != null && codeSTEMI.Hpi != "")
+                                msg.body += $"<strong>Hpi: </strong> {codeSTEMI.Hpi} </br>";
+                            var sendMsg = _communication.sendPushNotification(msg);
                         }
-                        var isMembersAdded = AddGroupMembers(ACodeGroupMembers);
-                        var msg = new ConversationMessageVM();
-                        msg.channelSid = channel.Sid;
-                        msg.author = "System";
-                        msg.attributes = "";
-                        msg.body = $"<strong> {(codeSTEMI.IsEms.HasValue && codeSTEMI.IsEms.Value ? "EMS Code" : "Active Code")} {UCLEnums.STEMI.ToString()} </strong></br></br>";
-                        if (codeSTEMI.PatientName != null && codeSTEMI.PatientName != "")
-                            msg.body += $"<strong>Patient Name: </strong> {codeSTEMI.PatientName} </br>";
-                        msg.body += $"<strong>Dob: </strong> {codeSTEMI.Dob:MM-dd-yyyy} </br>";
-                        msg.body += $"<strong>Last Well Known: </strong> {codeSTEMI.LastKnownWell:MM-dd-yyyy hh:mm tt} </br>";
-                        if (codeSTEMI.ChiefComplant != null && codeSTEMI.ChiefComplant != "")
-                            msg.body += $"<strong>Chief Complaint: </strong> {codeSTEMI.ChiefComplant} </br>";
-                        if (codeSTEMI.Hpi != null && codeSTEMI.Hpi != "")
-                            msg.body += $"<strong>Hpi: </strong> {codeSTEMI.Hpi} </br>";
-                        var sendMsg = _communication.sendPushNotification(msg);
+                        return GetSTEMIDataById(STEMI.CodeStemiid);
                     }
-                    return GetSTEMIDataById(STEMI.CodeStemiid);
+                    return new BaseResponse() { Status = HttpStatusCode.NotAcceptable, Message = "There is no Service Line in this organization related to Code STEMI" }; 
                 }
-                return new BaseResponse() { Status = HttpStatusCode.NotAcceptable, Message = "There is no Service Line in this organization related to Code STEMI" };
+                return new BaseResponse() { Status = HttpStatusCode.NotAcceptable, Message = "Organization is not selected" };
             }
         }
 
@@ -3664,7 +3677,8 @@ namespace Web.Services.Concrete
                         }
                     }
                 }
-                var serviceIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == TrumaData.OrganizationIdFk && x.CodeIdFk == UCLEnums.Trauma.ToInt() && !x.IsDeleted).Select(x => new { x.DefaultServiceLineTeam, x.ServiceLineTeam1, x.ServiceLineTeam2 }).FirstOrDefault();
+                string Type = TrumaDataVM.IsEms.HasValue && TrumaDataVM.IsEms.Value ? "EMS" : "Active Code";
+                var serviceIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == TrumaData.OrganizationIdFk && x.CodeIdFk == UCLEnums.Trauma.ToInt() && x.Type == Type && !x.IsDeleted).Select(x => new { x.DefaultServiceLineTeam, x.ServiceLineTeam1, x.ServiceLineTeam2 }).FirstOrDefault();
                 var serviceLineIds = (from x in this._codesServiceLinesMappingRepo.Table
                                       where x.OrganizationIdFk == TrumaData.OrganizationIdFk && x.CodeIdFk == UCLEnums.Trauma.ToInt()
                                       && x.ActiveCodeId == TrumaData.CodeTraumaId && x.ActiveCodeName == UCLEnums.Trauma.ToString() && (serviceIds.DefaultServiceLineTeam.ToIntList().Contains(x.DefaultServiceLineIdFk)
@@ -4157,84 +4171,94 @@ namespace Web.Services.Concrete
             else
             {
 
-                string IsEMS = codeTruma.IsEms.HasValue && codeTruma.IsEms.Value ? "EMS" : "Active Code";
-                var DefaultServiceLineTeam = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeTruma.OrganizationIdFk && x.CodeIdFk == UCLEnums.Trauma.ToInt() && x.Type == IsEMS && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
-                if (DefaultServiceLineTeam != null && DefaultServiceLineTeam != "")
+                if (codeTruma.OrganizationIdFk > 0)
                 {
-                    var DefaultServiceLineIds = DefaultServiceLineTeam.ToIntList();
-                    //var ServiceLineTeam1Ids = codeTruma.ServiceLineTeam1Ids.ToIntList();
-                    //var ServiceLineTeam2Ids = codeTruma.ServiceLineTeam2Ids.ToIntList();
-
-                    codeTruma.CreatedDate = DateTime.UtcNow;
-                    var Truma = AutoMapperHelper.MapSingleRow<CodeTrumaVM, CodeTrauma>(codeTruma);
-
-
-                    if (codeTruma.Attachment != null && codeTruma.Attachment.Count > 0)
+                    string IsEMS = codeTruma.IsEms.HasValue && codeTruma.IsEms.Value ? "EMS" : "Active Code";
+                    var DefaultServiceLineTeam = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeTruma.OrganizationIdFk && x.CodeIdFk == UCLEnums.Trauma.ToInt() && x.Type == IsEMS && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
+                    if (DefaultServiceLineTeam != null && DefaultServiceLineTeam != "")
                     {
-                        var RootPath = this._RootPath + "/Organizations";
-                        string FileRoot = null;
-                        List<string> Attachments = new();
-                        //var outPath = Directory.GetCurrentDirectory();
+                        var DefaultServiceLineIds = DefaultServiceLineTeam.ToIntList();
+                        //var ServiceLineTeam1Ids = codeTruma.ServiceLineTeam1Ids.ToIntList();
+                        //var ServiceLineTeam2Ids = codeTruma.ServiceLineTeam2Ids.ToIntList();
 
-                        FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeTruma.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
-                        FileRoot = Path.Combine(RootPath, FileRoot);
-                        if (!Directory.Exists(FileRoot))
-                        {
-                            Directory.CreateDirectory(FileRoot);
-                        }
-                        FileRoot = Path.Combine(FileRoot, UCLEnums.Trauma.ToString());
-                        if (!Directory.Exists(FileRoot))
-                        {
-                            Directory.CreateDirectory(FileRoot);
-                        }
-                        FileRoot = Path.Combine(FileRoot, Truma.CodeTraumaId.ToString());
-                        if (!Directory.Exists(FileRoot))
-                        {
-                            Directory.CreateDirectory(FileRoot);
-                        }
-                        FileRoot = Path.Combine(FileRoot, "Attachments");
+                        codeTruma.CreatedDate = DateTime.UtcNow;
+                        var Truma = AutoMapperHelper.MapSingleRow<CodeTrumaVM, CodeTrauma>(codeTruma);
 
-                        if (!Directory.Exists(FileRoot))
+
+                        if (codeTruma.Attachment != null && codeTruma.Attachment.Count > 0)
                         {
-                            Directory.CreateDirectory(FileRoot);
-                        }
-                        //else
-                        //{
-                        //    DirectoryInfo dir = new DirectoryInfo(FileRoot);
-                        //    foreach (FileInfo fi in dir.GetFiles())
-                        //    {
-                        //        fi.Delete();
-                        //    }
-                        //}
-                        foreach (var item in codeTruma.Attachment)
-                        {
-                            if (!string.IsNullOrEmpty(item.Base64Str))
+                            var RootPath = this._RootPath + "/Organizations";
+                            string FileRoot = null;
+                            List<string> Attachments = new();
+                            //var outPath = Directory.GetCurrentDirectory();
+
+                            FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeTruma.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
+                            FileRoot = Path.Combine(RootPath, FileRoot);
+                            if (!Directory.Exists(FileRoot))
                             {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, UCLEnums.Trauma.ToString());
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, Truma.CodeTraumaId.ToString());
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, "Attachments");
 
-                                var fileInfo = item.Base64Str.Split("base64,");
-                                string fileExtension = fileInfo[0].GetFileExtenstion();
-                                var ByteFile = Convert.FromBase64String(fileInfo[1]);
-                                string FilePath = Path.Combine(FileRoot, item.FileName);
-
-                                if (File.Exists(FilePath))
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            //else
+                            //{
+                            //    DirectoryInfo dir = new DirectoryInfo(FileRoot);
+                            //    foreach (FileInfo fi in dir.GetFiles())
+                            //    {
+                            //        fi.Delete();
+                            //    }
+                            //}
+                            foreach (var item in codeTruma.Attachment)
+                            {
+                                if (!string.IsNullOrEmpty(item.Base64Str))
                                 {
-                                    long existingFileSize = 0;
-                                    long newFileSize = ByteFile.LongLength;
-                                    FileInfo ExistingfileInfo = new FileInfo(FilePath);
-                                    existingFileSize = ExistingfileInfo.Length;
 
-                                    if (existingFileSize > 0 && newFileSize != existingFileSize)
+                                    var fileInfo = item.Base64Str.Split("base64,");
+                                    string fileExtension = fileInfo[0].GetFileExtenstion();
+                                    var ByteFile = Convert.FromBase64String(fileInfo[1]);
+                                    string FilePath = Path.Combine(FileRoot, item.FileName);
+
+                                    if (File.Exists(FilePath))
                                     {
-                                        var alterFile = item.FileName.Split('.');
-                                        string extention = alterFile.LastOrDefault();
-                                        var alterFileName = alterFile.ToList();
-                                        alterFileName.RemoveAt(alterFileName.Count - 1);
-                                        string fileName = string.Join(".", alterFileName);
-                                        fileName = fileName + "_" + HelperExtension.CreateRandomString(7) + "." + extention;
-                                        FilePath = Path.Combine(FileRoot, fileName);
-                                        using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                        long existingFileSize = 0;
+                                        long newFileSize = ByteFile.LongLength;
+                                        FileInfo ExistingfileInfo = new FileInfo(FilePath);
+                                        existingFileSize = ExistingfileInfo.Length;
+
+                                        if (existingFileSize > 0 && newFileSize != existingFileSize)
                                         {
-                                            fs.Write(ByteFile);
+                                            var alterFile = item.FileName.Split('.');
+                                            string extention = alterFile.LastOrDefault();
+                                            var alterFileName = alterFile.ToList();
+                                            alterFileName.RemoveAt(alterFileName.Count - 1);
+                                            string fileName = string.Join(".", alterFileName);
+                                            fileName = fileName + "_" + HelperExtension.CreateRandomString(7) + "." + extention;
+                                            FilePath = Path.Combine(FileRoot, fileName);
+                                            using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                            {
+                                                fs.Write(ByteFile);
+                                            }
+                                        }
+                                        else
+                                        {
+                                            using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                            {
+                                                fs.Write(ByteFile);
+                                            }
                                         }
                                     }
                                     else
@@ -4245,87 +4269,87 @@ namespace Web.Services.Concrete
                                         }
                                     }
                                 }
-                                else
-                                {
-                                    using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
-                                    {
-                                        fs.Write(ByteFile);
-                                    }
-                                }
+
                             }
-
-                        }
-                        if (FileRoot != null && FileRoot != "")
-                        {
-                            codeTruma.AttachmentsFolderRoot = FileRoot.Replace(this._RootPath, "").Replace("\\", "/");
-                        }
-                    }
-                    if (codeTruma.Videos != null && codeTruma.Videos.Count > 0)
-                    {
-                        var RootPath = this._RootPath + "/Organizations";
-                        string FileRoot = null;
-                        List<string> Attachments = new();
-                        //var outPath = Directory.GetCurrentDirectory();
-
-                        FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeTruma.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
-                        FileRoot = Path.Combine(RootPath, FileRoot);
-                        if (!Directory.Exists(FileRoot))
-                        {
-                            Directory.CreateDirectory(FileRoot);
-                        }
-                        FileRoot = Path.Combine(FileRoot, UCLEnums.Trauma.ToString());
-                        if (!Directory.Exists(FileRoot))
-                        {
-                            Directory.CreateDirectory(FileRoot);
-                        }
-                        FileRoot = Path.Combine(FileRoot, Truma.CodeTraumaId.ToString());
-                        if (!Directory.Exists(FileRoot))
-                        {
-                            Directory.CreateDirectory(FileRoot);
-                        }
-                        FileRoot = Path.Combine(FileRoot, "Videos");
-
-                        if (!Directory.Exists(FileRoot))
-                        {
-                            Directory.CreateDirectory(FileRoot);
-                        }
-                        //else
-                        //{
-                        //    DirectoryInfo dir = new DirectoryInfo(FileRoot);
-                        //    foreach (FileInfo fi in dir.GetFiles())
-                        //    {
-                        //        fi.Delete();
-                        //    }
-                        //}
-                        foreach (var item in codeTruma.Videos)
-                        {
-                            if (!string.IsNullOrEmpty(item.Base64Str))
+                            if (FileRoot != null && FileRoot != "")
                             {
+                                codeTruma.AttachmentsFolderRoot = FileRoot.Replace(this._RootPath, "").Replace("\\", "/");
+                            }
+                        }
+                        if (codeTruma.Videos != null && codeTruma.Videos.Count > 0)
+                        {
+                            var RootPath = this._RootPath + "/Organizations";
+                            string FileRoot = null;
+                            List<string> Attachments = new();
+                            //var outPath = Directory.GetCurrentDirectory();
 
-                                var fileInfo = item.Base64Str.Split("base64,");
-                                string fileExtension = fileInfo[0].GetFileExtenstion();
-                                var ByteFile = Convert.FromBase64String(fileInfo[1]);
-                                string FilePath = Path.Combine(FileRoot, item.FileName);
+                            FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeTruma.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
+                            FileRoot = Path.Combine(RootPath, FileRoot);
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, UCLEnums.Trauma.ToString());
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, Truma.CodeTraumaId.ToString());
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, "Videos");
 
-                                if (File.Exists(FilePath))
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            //else
+                            //{
+                            //    DirectoryInfo dir = new DirectoryInfo(FileRoot);
+                            //    foreach (FileInfo fi in dir.GetFiles())
+                            //    {
+                            //        fi.Delete();
+                            //    }
+                            //}
+                            foreach (var item in codeTruma.Videos)
+                            {
+                                if (!string.IsNullOrEmpty(item.Base64Str))
                                 {
-                                    long existingFileSize = 0;
-                                    long newFileSize = ByteFile.LongLength;
-                                    FileInfo ExistingfileInfo = new FileInfo(FilePath);
-                                    existingFileSize = ExistingfileInfo.Length;
 
-                                    if (existingFileSize > 0 && newFileSize != existingFileSize)
+                                    var fileInfo = item.Base64Str.Split("base64,");
+                                    string fileExtension = fileInfo[0].GetFileExtenstion();
+                                    var ByteFile = Convert.FromBase64String(fileInfo[1]);
+                                    string FilePath = Path.Combine(FileRoot, item.FileName);
+
+                                    if (File.Exists(FilePath))
                                     {
-                                        var alterFile = item.FileName.Split('.');
-                                        string extention = alterFile.LastOrDefault();
-                                        var alterFileName = alterFile.ToList();
-                                        alterFileName.RemoveAt(alterFileName.Count - 1);
-                                        string fileName = string.Join(".", alterFileName);
-                                        fileName = fileName + "_" + HelperExtension.CreateRandomString(7) + "." + extention;
-                                        FilePath = Path.Combine(FileRoot, fileName);
-                                        using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                        long existingFileSize = 0;
+                                        long newFileSize = ByteFile.LongLength;
+                                        FileInfo ExistingfileInfo = new FileInfo(FilePath);
+                                        existingFileSize = ExistingfileInfo.Length;
+
+                                        if (existingFileSize > 0 && newFileSize != existingFileSize)
                                         {
-                                            fs.Write(ByteFile);
+                                            var alterFile = item.FileName.Split('.');
+                                            string extention = alterFile.LastOrDefault();
+                                            var alterFileName = alterFile.ToList();
+                                            alterFileName.RemoveAt(alterFileName.Count - 1);
+                                            string fileName = string.Join(".", alterFileName);
+                                            fileName = fileName + "_" + HelperExtension.CreateRandomString(7) + "." + extention;
+                                            FilePath = Path.Combine(FileRoot, fileName);
+                                            using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                            {
+                                                fs.Write(ByteFile);
+                                            }
+                                        }
+                                        else
+                                        {
+                                            using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                            {
+                                                fs.Write(ByteFile);
+                                            }
                                         }
                                     }
                                     else
@@ -4336,87 +4360,87 @@ namespace Web.Services.Concrete
                                         }
                                     }
                                 }
-                                else
-                                {
-                                    using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
-                                    {
-                                        fs.Write(ByteFile);
-                                    }
-                                }
+
                             }
-
-                        }
-                        if (FileRoot != null && FileRoot != "")
-                        {
-                            codeTruma.VideoFolderRoot = FileRoot.Replace(this._RootPath, "").Replace("\\", "/");
-                        }
-                    }
-                    if (codeTruma.Audios != null && codeTruma.Audios.Count > 0)
-                    {
-                        var RootPath = this._RootPath + "/Organizations";
-                        string FileRoot = null;
-                        List<string> Attachments = new();
-                        //var outPath = Directory.GetCurrentDirectory();
-
-                        FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeTruma.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
-                        FileRoot = Path.Combine(RootPath, FileRoot);
-                        if (!Directory.Exists(FileRoot))
-                        {
-                            Directory.CreateDirectory(FileRoot);
-                        }
-                        FileRoot = Path.Combine(FileRoot, UCLEnums.Trauma.ToString());
-                        if (!Directory.Exists(FileRoot))
-                        {
-                            Directory.CreateDirectory(FileRoot);
-                        }
-                        FileRoot = Path.Combine(FileRoot, Truma.CodeTraumaId.ToString());
-                        if (!Directory.Exists(FileRoot))
-                        {
-                            Directory.CreateDirectory(FileRoot);
-                        }
-                        FileRoot = Path.Combine(FileRoot, "Audios");
-
-                        if (!Directory.Exists(FileRoot))
-                        {
-                            Directory.CreateDirectory(FileRoot);
-                        }
-                        //else
-                        //{
-                        //    DirectoryInfo dir = new DirectoryInfo(FileRoot);
-                        //    foreach (FileInfo fi in dir.GetFiles())
-                        //    {
-                        //        fi.Delete();
-                        //    }
-                        //}
-                        foreach (var item in codeTruma.Audios)
-                        {
-                            if (!string.IsNullOrEmpty(item.Base64Str))
+                            if (FileRoot != null && FileRoot != "")
                             {
+                                codeTruma.VideoFolderRoot = FileRoot.Replace(this._RootPath, "").Replace("\\", "/");
+                            }
+                        }
+                        if (codeTruma.Audios != null && codeTruma.Audios.Count > 0)
+                        {
+                            var RootPath = this._RootPath + "/Organizations";
+                            string FileRoot = null;
+                            List<string> Attachments = new();
+                            //var outPath = Directory.GetCurrentDirectory();
 
-                                var fileInfo = item.Base64Str.Split("base64,");
-                                string fileExtension = fileInfo[0].GetFileExtenstion();
-                                var ByteFile = Convert.FromBase64String(fileInfo[1]);
-                                string FilePath = Path.Combine(FileRoot, item.FileName);
+                            FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeTruma.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
+                            FileRoot = Path.Combine(RootPath, FileRoot);
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, UCLEnums.Trauma.ToString());
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, Truma.CodeTraumaId.ToString());
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, "Audios");
 
-                                if (File.Exists(FilePath))
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            //else
+                            //{
+                            //    DirectoryInfo dir = new DirectoryInfo(FileRoot);
+                            //    foreach (FileInfo fi in dir.GetFiles())
+                            //    {
+                            //        fi.Delete();
+                            //    }
+                            //}
+                            foreach (var item in codeTruma.Audios)
+                            {
+                                if (!string.IsNullOrEmpty(item.Base64Str))
                                 {
-                                    long existingFileSize = 0;
-                                    long newFileSize = ByteFile.LongLength;
-                                    FileInfo ExistingfileInfo = new FileInfo(FilePath);
-                                    existingFileSize = ExistingfileInfo.Length;
 
-                                    if (existingFileSize > 0 && newFileSize != existingFileSize)
+                                    var fileInfo = item.Base64Str.Split("base64,");
+                                    string fileExtension = fileInfo[0].GetFileExtenstion();
+                                    var ByteFile = Convert.FromBase64String(fileInfo[1]);
+                                    string FilePath = Path.Combine(FileRoot, item.FileName);
+
+                                    if (File.Exists(FilePath))
                                     {
-                                        var alterFile = item.FileName.Split('.');
-                                        string extention = alterFile.LastOrDefault();
-                                        var alterFileName = alterFile.ToList();
-                                        alterFileName.RemoveAt(alterFileName.Count - 1);
-                                        string fileName = string.Join(".", alterFileName);
-                                        fileName = fileName + "_" + HelperExtension.CreateRandomString(7) + "." + extention;
-                                        FilePath = Path.Combine(FileRoot, fileName);
-                                        using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                        long existingFileSize = 0;
+                                        long newFileSize = ByteFile.LongLength;
+                                        FileInfo ExistingfileInfo = new FileInfo(FilePath);
+                                        existingFileSize = ExistingfileInfo.Length;
+
+                                        if (existingFileSize > 0 && newFileSize != existingFileSize)
                                         {
-                                            fs.Write(ByteFile);
+                                            var alterFile = item.FileName.Split('.');
+                                            string extention = alterFile.LastOrDefault();
+                                            var alterFileName = alterFile.ToList();
+                                            alterFileName.RemoveAt(alterFileName.Count - 1);
+                                            string fileName = string.Join(".", alterFileName);
+                                            fileName = fileName + "_" + HelperExtension.CreateRandomString(7) + "." + extention;
+                                            FilePath = Path.Combine(FileRoot, fileName);
+                                            using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                            {
+                                                fs.Write(ByteFile);
+                                            }
+                                        }
+                                        else
+                                        {
+                                            using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                            {
+                                                fs.Write(ByteFile);
+                                            }
                                         }
                                     }
                                     else
@@ -4427,114 +4451,108 @@ namespace Web.Services.Concrete
                                         }
                                     }
                                 }
-                                else
-                                {
-                                    using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
-                                    {
-                                        fs.Write(ByteFile);
-                                    }
-                                }
+
                             }
-
+                            if (FileRoot != null && FileRoot != "")
+                            {
+                                codeTruma.AudioFolderRoot = FileRoot.Replace(this._RootPath, "").Replace("\\", "/");
+                            }
                         }
-                        if (FileRoot != null && FileRoot != "")
+                        if (codeTruma.AttachmentsFolderRoot != null)
                         {
-                            codeTruma.AudioFolderRoot = FileRoot.Replace(this._RootPath, "").Replace("\\", "/");
+                            Truma.Attachments = codeTruma.AttachmentsFolderRoot;
                         }
-                    }
-                    if (codeTruma.AttachmentsFolderRoot != null)
-                    {
-                        Truma.Attachments = codeTruma.AttachmentsFolderRoot;
-                    }
-                    if (codeTruma.VideoFolderRoot != null)
-                    {
-                        Truma.Video = codeTruma.VideoFolderRoot;
-                    }
-                    if (codeTruma.AudioFolderRoot != null)
-                    {
-                        Truma.Audio = codeTruma.AudioFolderRoot;
-                    }
-                    this._codeTrumaRepo.Insert(Truma);
-
-                    var codeServiceMappingList = new List<CodesServiceLinesMapping>();
-                    for (int i = 0; i < DefaultServiceLineIds.Count; i++)
-                    {
-                        var codeService = new CodesServiceLinesMapping()
+                        if (codeTruma.VideoFolderRoot != null)
                         {
-                            OrganizationIdFk = Truma.OrganizationIdFk,
-                            CodeIdFk = UCLEnums.Trauma.ToInt(),
-                            DefaultServiceLineIdFk = DefaultServiceLineIds.ElementAt(i),
-                            //ServiceLineId1Fk = ServiceLineTeam1Ids.Count > i ? ServiceLineTeam1Ids.ElementAt(i) : null,
-                            //ServiceLineId2Fk = ServiceLineTeam2Ids.Count > i ? ServiceLineTeam2Ids.ElementAt(i) : null,
-                            ActiveCodeId = Truma.CodeTraumaId,
-                            ActiveCodeName = UCLEnums.Trauma.ToString()
-                        };
-                        codeServiceMappingList.Add(codeService);
-                    }
-                    this._codesServiceLinesMappingRepo.Insert(codeServiceMappingList);
+                            Truma.Video = codeTruma.VideoFolderRoot;
+                        }
+                        if (codeTruma.AudioFolderRoot != null)
+                        {
+                            Truma.Audio = codeTruma.AudioFolderRoot;
+                        }
+                        this._codeTrumaRepo.Insert(Truma);
 
-                    var UserChannelSid = (from us in this._userSchedulesRepo.Table
-                                          join u in this._userRepo.Table on us.UserIdFk equals u.UserId
-                                          where DefaultServiceLineIds.Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
-                                          select new { u.UserUniqueId, u.UserId }).ToList();
-                    var loggedUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).FirstOrDefault();
-                    UserChannelSid.Add(loggedUser);
-                    List<ActiveCodesGroupMember> ACodeGroupMembers = new();
-                    if (UserChannelSid != null && UserChannelSid.Count > 0)
-                    {
-                        //string uniqueName = $"CONSULT_{Consult_Counter.Counter_Value.ToString()}";
-                        string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
-                        string friendlyName = Truma.IsEms.HasValue && Truma.IsEms.Value ? $"EMS Code {UCLEnums.Trauma.ToString()} {Truma.CodeTraumaId}" : $"Active Code {UCLEnums.Trauma.ToString()} {Truma.CodeTraumaId}";
-                        var conversationChannelAttributes = JsonConvert.SerializeObject(new Dictionary<string, Object>()
+                        var codeServiceMappingList = new List<CodesServiceLinesMapping>();
+                        for (int i = 0; i < DefaultServiceLineIds.Count; i++)
+                        {
+                            var codeService = new CodesServiceLinesMapping()
+                            {
+                                OrganizationIdFk = Truma.OrganizationIdFk,
+                                CodeIdFk = UCLEnums.Trauma.ToInt(),
+                                DefaultServiceLineIdFk = DefaultServiceLineIds.ElementAt(i),
+                                //ServiceLineId1Fk = ServiceLineTeam1Ids.Count > i ? ServiceLineTeam1Ids.ElementAt(i) : null,
+                                //ServiceLineId2Fk = ServiceLineTeam2Ids.Count > i ? ServiceLineTeam2Ids.ElementAt(i) : null,
+                                ActiveCodeId = Truma.CodeTraumaId,
+                                ActiveCodeName = UCLEnums.Trauma.ToString()
+                            };
+                            codeServiceMappingList.Add(codeService);
+                        }
+                        this._codesServiceLinesMappingRepo.Insert(codeServiceMappingList);
+
+                        var UserChannelSid = (from us in this._userSchedulesRepo.Table
+                                              join u in this._userRepo.Table on us.UserIdFk equals u.UserId
+                                              where DefaultServiceLineIds.Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
+                                              select new { u.UserUniqueId, u.UserId }).ToList();
+                        var loggedUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).FirstOrDefault();
+                        UserChannelSid.Add(loggedUser);
+                        List<ActiveCodesGroupMember> ACodeGroupMembers = new();
+                        if (UserChannelSid != null && UserChannelSid.Count > 0)
+                        {
+                            //string uniqueName = $"CONSULT_{Consult_Counter.Counter_Value.ToString()}";
+                            string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
+                            string friendlyName = Truma.IsEms.HasValue && Truma.IsEms.Value ? $"EMS Code {UCLEnums.Trauma.ToString()} {Truma.CodeTraumaId}" : $"Active Code {UCLEnums.Trauma.ToString()} {Truma.CodeTraumaId}";
+                            var conversationChannelAttributes = JsonConvert.SerializeObject(new Dictionary<string, Object>()
                                     {
                                         {ChannelAttributeEnums.ChannelType.ToString(), ChannelTypeEnums.EMS.ToString()},
                                         {ChannelAttributeEnums.CodeType.ToString(), ChannelTypeEnums.Trauma.ToString()},
                                         {ChannelAttributeEnums.TraumaId.ToString(), Truma.CodeTraumaId}
                                     }, Formatting.Indented);
-                        var channel = _communication.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
-                        UserChannelSid = UserChannelSid.Distinct().ToList();
-                        foreach (var item in UserChannelSid)
-                        {
-                            try
+                            var channel = _communication.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
+                            UserChannelSid = UserChannelSid.Distinct().ToList();
+                            foreach (var item in UserChannelSid)
                             {
-                                var codeGroupMember = new ActiveCodesGroupMember()
+                                try
                                 {
-                                    ChannelSid = channel.Sid,
-                                    UserIdFk = item.UserId,
-                                    ActiveCodeIdFk = Truma.CodeTraumaId,
-                                    ActiveCodeName = UCLEnums.Trauma.ToString(),
-                                    IsAcknowledge = false,
-                                    CreatedBy = ApplicationSettings.UserId,
-                                    CreatedDate = DateTime.UtcNow,
-                                    IsDeleted = false
-                                };
-                                ACodeGroupMembers.Add(codeGroupMember);
-                                _communication.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
+                                    var codeGroupMember = new ActiveCodesGroupMember()
+                                    {
+                                        ChannelSid = channel.Sid,
+                                        UserIdFk = item.UserId,
+                                        ActiveCodeIdFk = Truma.CodeTraumaId,
+                                        ActiveCodeName = UCLEnums.Trauma.ToString(),
+                                        IsAcknowledge = false,
+                                        CreatedBy = ApplicationSettings.UserId,
+                                        CreatedDate = DateTime.UtcNow,
+                                        IsDeleted = false
+                                    };
+                                    ACodeGroupMembers.Add(codeGroupMember);
+                                    _communication.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
+                                }
+                                catch (Exception ex)
+                                {
+                                    //ElmahExtensions.RiseError(ex);
+                                }
                             }
-                            catch (Exception ex)
-                            {
-                                //ElmahExtensions.RiseError(ex);
-                            }
+                            var isMembersAdded = AddGroupMembers(ACodeGroupMembers);
+                            var msg = new ConversationMessageVM();
+                            msg.channelSid = channel.Sid;
+                            msg.author = "System";
+                            msg.attributes = "";
+                            msg.body = $"<strong> {(codeTruma.IsEms.HasValue && codeTruma.IsEms.Value ? "EMS Code" : "Active Code")} {UCLEnums.Trauma.ToString()} </strong></br></br>";
+                            if (codeTruma.PatientName != null && codeTruma.PatientName != "")
+                                msg.body += $"<strong>Patient Name: </strong> {codeTruma.PatientName} </br>";
+                            msg.body += $"<strong>Dob: </strong> {codeTruma.Dob:MM-dd-yyyy} </br>";
+                            msg.body += $"<strong>Last Well Known: </strong> {codeTruma.LastKnownWell:MM-dd-yyyy hh:mm tt} </br>";
+                            if (codeTruma.ChiefComplant != null && codeTruma.ChiefComplant != "")
+                                msg.body += $"<strong>Chief Complaint: </strong> {codeTruma.ChiefComplant} </br>";
+                            if (codeTruma.Hpi != null && codeTruma.Hpi != "")
+                                msg.body += $"<strong>Hpi: </strong> {codeTruma.Hpi} </br>";
+                            var sendMsg = _communication.sendPushNotification(msg);
                         }
-                        var isMembersAdded = AddGroupMembers(ACodeGroupMembers);
-                        var msg = new ConversationMessageVM();
-                        msg.channelSid = channel.Sid;
-                        msg.author = "System";
-                        msg.attributes = "";
-                        msg.body = $"<strong> {(codeTruma.IsEms.HasValue && codeTruma.IsEms.Value ? "EMS Code" : "Active Code")} {UCLEnums.Trauma.ToString()} </strong></br></br>";
-                        if (codeTruma.PatientName != null && codeTruma.PatientName != "")
-                            msg.body += $"<strong>Patient Name: </strong> {codeTruma.PatientName} </br>";
-                        msg.body += $"<strong>Dob: </strong> {codeTruma.Dob:MM-dd-yyyy} </br>";
-                        msg.body += $"<strong>Last Well Known: </strong> {codeTruma.LastKnownWell:MM-dd-yyyy hh:mm tt} </br>";
-                        if (codeTruma.ChiefComplant != null && codeTruma.ChiefComplant != "")
-                            msg.body += $"<strong>Chief Complaint: </strong> {codeTruma.ChiefComplant} </br>";
-                        if (codeTruma.Hpi != null && codeTruma.Hpi != "")
-                            msg.body += $"<strong>Hpi: </strong> {codeTruma.Hpi} </br>";
-                        var sendMsg = _communication.sendPushNotification(msg);
+                        return GetTrumaDataById(Truma.CodeTraumaId);
                     }
-                    return GetTrumaDataById(Truma.CodeTraumaId);
+                    return new BaseResponse() { Status = HttpStatusCode.NotAcceptable, Message = "There is no Service Line in this organization related to Code Trauma" }; 
                 }
-                return new BaseResponse() { Status = HttpStatusCode.NotAcceptable, Message = "There is no Service Line in this organization related to Code Trauma" };
+                return new BaseResponse() { Status = HttpStatusCode.NotAcceptable, Message = "Organization is not selected" };
             }
         }
 
@@ -4705,7 +4723,8 @@ namespace Web.Services.Concrete
                         }
                     }
                 }
-                var serviceIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == blueData.OrganizationIdFk && x.CodeIdFk == UCLEnums.Blue.ToInt() && !x.IsDeleted).Select(x => new { x.DefaultServiceLineTeam, x.ServiceLineTeam1, x.ServiceLineTeam2 }).FirstOrDefault();
+                string Type = BlueDataVM.IsEms.HasValue && BlueDataVM.IsEms.Value ? "EMS" : "Active Code";
+                var serviceIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == blueData.OrganizationIdFk && x.CodeIdFk == UCLEnums.Blue.ToInt() && x.Type == Type && !x.IsDeleted).Select(x => new { x.DefaultServiceLineTeam, x.ServiceLineTeam1, x.ServiceLineTeam2 }).FirstOrDefault();
                 var serviceLineIds = (from x in this._codesServiceLinesMappingRepo.Table
                                       where x.OrganizationIdFk == blueData.OrganizationIdFk && x.CodeIdFk == UCLEnums.Blue.ToInt()
                                       && x.ActiveCodeId == blueData.CodeBlueId && x.ActiveCodeName == UCLEnums.Blue.ToString() && (serviceIds.DefaultServiceLineTeam.ToIntList().Contains(x.DefaultServiceLineIdFk)
@@ -5191,83 +5210,93 @@ namespace Web.Services.Concrete
             }
             else
             {
-                string IsEMS = codeBlue.IsEms.HasValue && codeBlue.IsEms.Value ? "EMS" : "Active Code";
-                var DefaultServiceLineTeam = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeBlue.OrganizationIdFk && x.CodeIdFk == UCLEnums.Blue.ToInt() && x.Type == IsEMS && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
-                if (DefaultServiceLineTeam != null && DefaultServiceLineTeam != "")
+                if (codeBlue.OrganizationIdFk > 0)
                 {
-                    var DefaultServiceLineIds = DefaultServiceLineTeam.ToIntList();
-                    //var ServiceLineTeam1Ids = codeBlue.ServiceLineTeam1Ids.ToIntList();
-                    //var ServiceLineTeam2Ids = codeBlue.ServiceLineTeam2Ids.ToIntList();
-
-                    codeBlue.CreatedDate = DateTime.UtcNow;
-                    var blue = AutoMapperHelper.MapSingleRow<CodeBlueVM, CodeBlue>(codeBlue);
-
-                    if (codeBlue.Attachment != null && codeBlue.Attachment.Count > 0)
+                    string IsEMS = codeBlue.IsEms.HasValue && codeBlue.IsEms.Value ? "EMS" : "Active Code";
+                    var DefaultServiceLineTeam = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeBlue.OrganizationIdFk && x.CodeIdFk == UCLEnums.Blue.ToInt() && x.Type == IsEMS && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
+                    if (DefaultServiceLineTeam != null && DefaultServiceLineTeam != "")
                     {
-                        var RootPath = this._RootPath + "/Organizations";
-                        string FileRoot = null;
-                        List<string> Attachments = new();
+                        var DefaultServiceLineIds = DefaultServiceLineTeam.ToIntList();
+                        //var ServiceLineTeam1Ids = codeBlue.ServiceLineTeam1Ids.ToIntList();
+                        //var ServiceLineTeam2Ids = codeBlue.ServiceLineTeam2Ids.ToIntList();
+
+                        codeBlue.CreatedDate = DateTime.UtcNow;
+                        var blue = AutoMapperHelper.MapSingleRow<CodeBlueVM, CodeBlue>(codeBlue);
+
+                        if (codeBlue.Attachment != null && codeBlue.Attachment.Count > 0)
+                        {
+                            var RootPath = this._RootPath + "/Organizations";
+                            string FileRoot = null;
+                            List<string> Attachments = new();
 
 
-                        FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeBlue.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
-                        FileRoot = Path.Combine(RootPath, FileRoot);
-                        if (!Directory.Exists(FileRoot))
-                        {
-                            Directory.CreateDirectory(FileRoot);
-                        }
-                        FileRoot = Path.Combine(FileRoot, UCLEnums.Blue.ToString());
-                        if (!Directory.Exists(FileRoot))
-                        {
-                            Directory.CreateDirectory(FileRoot);
-                        }
-                        FileRoot = Path.Combine(FileRoot, blue.CodeBlueId.ToString());
-                        if (!Directory.Exists(FileRoot))
-                        {
-                            Directory.CreateDirectory(FileRoot);
-                        }
-                        FileRoot = Path.Combine(FileRoot, "Attachments");
-
-                        if (!Directory.Exists(FileRoot))
-                        {
-                            Directory.CreateDirectory(FileRoot);
-                        }
-                        //else
-                        //{
-                        //    DirectoryInfo dir = new DirectoryInfo(FileRoot);
-                        //    foreach (FileInfo fi in dir.GetFiles())
-                        //    {
-                        //        fi.Delete();
-                        //    }
-                        //}
-                        foreach (var item in codeBlue.Attachment)
-                        {
-                            if (!string.IsNullOrEmpty(item.Base64Str))
+                            FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeBlue.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
+                            FileRoot = Path.Combine(RootPath, FileRoot);
+                            if (!Directory.Exists(FileRoot))
                             {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, UCLEnums.Blue.ToString());
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, blue.CodeBlueId.ToString());
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, "Attachments");
 
-                                var fileInfo = item.Base64Str.Split("base64,");
-                                string fileExtension = fileInfo[0].GetFileExtenstion();
-                                var ByteFile = Convert.FromBase64String(fileInfo[1]);
-                                string FilePath = Path.Combine(FileRoot, item.FileName);
-
-                                if (File.Exists(FilePath))
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            //else
+                            //{
+                            //    DirectoryInfo dir = new DirectoryInfo(FileRoot);
+                            //    foreach (FileInfo fi in dir.GetFiles())
+                            //    {
+                            //        fi.Delete();
+                            //    }
+                            //}
+                            foreach (var item in codeBlue.Attachment)
+                            {
+                                if (!string.IsNullOrEmpty(item.Base64Str))
                                 {
-                                    long existingFileSize = 0;
-                                    long newFileSize = ByteFile.LongLength;
-                                    FileInfo ExistingfileInfo = new FileInfo(FilePath);
-                                    existingFileSize = ExistingfileInfo.Length;
 
-                                    if (existingFileSize > 0 && newFileSize != existingFileSize)
+                                    var fileInfo = item.Base64Str.Split("base64,");
+                                    string fileExtension = fileInfo[0].GetFileExtenstion();
+                                    var ByteFile = Convert.FromBase64String(fileInfo[1]);
+                                    string FilePath = Path.Combine(FileRoot, item.FileName);
+
+                                    if (File.Exists(FilePath))
                                     {
-                                        var alterFile = item.FileName.Split('.');
-                                        string extention = alterFile.LastOrDefault();
-                                        var alterFileName = alterFile.ToList();
-                                        alterFileName.RemoveAt(alterFileName.Count - 1);
-                                        string fileName = string.Join(".", alterFileName);
-                                        fileName = fileName + "_" + HelperExtension.CreateRandomString(7) + "." + extention;
-                                        FilePath = Path.Combine(FileRoot, fileName);
-                                        using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                        long existingFileSize = 0;
+                                        long newFileSize = ByteFile.LongLength;
+                                        FileInfo ExistingfileInfo = new FileInfo(FilePath);
+                                        existingFileSize = ExistingfileInfo.Length;
+
+                                        if (existingFileSize > 0 && newFileSize != existingFileSize)
                                         {
-                                            fs.Write(ByteFile);
+                                            var alterFile = item.FileName.Split('.');
+                                            string extention = alterFile.LastOrDefault();
+                                            var alterFileName = alterFile.ToList();
+                                            alterFileName.RemoveAt(alterFileName.Count - 1);
+                                            string fileName = string.Join(".", alterFileName);
+                                            fileName = fileName + "_" + HelperExtension.CreateRandomString(7) + "." + extention;
+                                            FilePath = Path.Combine(FileRoot, fileName);
+                                            using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                            {
+                                                fs.Write(ByteFile);
+                                            }
+                                        }
+                                        else
+                                        {
+                                            using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                            {
+                                                fs.Write(ByteFile);
+                                            }
                                         }
                                     }
                                     else
@@ -5278,88 +5307,88 @@ namespace Web.Services.Concrete
                                         }
                                     }
                                 }
-                                else
-                                {
-                                    using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
-                                    {
-                                        fs.Write(ByteFile);
-                                    }
-                                }
+
+
                             }
-
-
-                        }
-                        if (FileRoot != null && FileRoot != "")
-                        {
-                            codeBlue.AttachmentsFolderRoot = FileRoot.Replace(this._RootPath, "").Replace("\\", "/");
-                        }
-                    }
-                    if (codeBlue.Videos != null && codeBlue.Videos.Count > 0)
-                    {
-                        var RootPath = this._RootPath + "/Organizations";
-                        string FileRoot = null;
-                        List<string> Attachments = new();
-
-
-                        FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeBlue.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
-                        FileRoot = Path.Combine(RootPath, FileRoot);
-                        if (!Directory.Exists(FileRoot))
-                        {
-                            Directory.CreateDirectory(FileRoot);
-                        }
-                        FileRoot = Path.Combine(FileRoot, UCLEnums.Blue.ToString());
-                        if (!Directory.Exists(FileRoot))
-                        {
-                            Directory.CreateDirectory(FileRoot);
-                        }
-                        FileRoot = Path.Combine(FileRoot, blue.CodeBlueId.ToString());
-                        if (!Directory.Exists(FileRoot))
-                        {
-                            Directory.CreateDirectory(FileRoot);
-                        }
-                        FileRoot = Path.Combine(FileRoot, "Videos");
-
-                        if (!Directory.Exists(FileRoot))
-                        {
-                            Directory.CreateDirectory(FileRoot);
-                        }
-                        //else
-                        //{
-                        //    DirectoryInfo dir = new DirectoryInfo(FileRoot);
-                        //    foreach (FileInfo fi in dir.GetFiles())
-                        //    {
-                        //        fi.Delete();
-                        //    }
-                        //}
-                        foreach (var item in codeBlue.Videos)
-                        {
-                            if (!string.IsNullOrEmpty(item.Base64Str))
+                            if (FileRoot != null && FileRoot != "")
                             {
+                                codeBlue.AttachmentsFolderRoot = FileRoot.Replace(this._RootPath, "").Replace("\\", "/");
+                            }
+                        }
+                        if (codeBlue.Videos != null && codeBlue.Videos.Count > 0)
+                        {
+                            var RootPath = this._RootPath + "/Organizations";
+                            string FileRoot = null;
+                            List<string> Attachments = new();
 
-                                var fileInfo = item.Base64Str.Split("base64,");
-                                string fileExtension = fileInfo[0].GetFileExtenstion();
-                                var ByteFile = Convert.FromBase64String(fileInfo[1]);
-                                string FilePath = Path.Combine(FileRoot, item.FileName);
 
-                                if (File.Exists(FilePath))
+                            FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeBlue.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
+                            FileRoot = Path.Combine(RootPath, FileRoot);
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, UCLEnums.Blue.ToString());
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, blue.CodeBlueId.ToString());
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, "Videos");
+
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            //else
+                            //{
+                            //    DirectoryInfo dir = new DirectoryInfo(FileRoot);
+                            //    foreach (FileInfo fi in dir.GetFiles())
+                            //    {
+                            //        fi.Delete();
+                            //    }
+                            //}
+                            foreach (var item in codeBlue.Videos)
+                            {
+                                if (!string.IsNullOrEmpty(item.Base64Str))
                                 {
-                                    long existingFileSize = 0;
-                                    long newFileSize = ByteFile.LongLength;
-                                    FileInfo ExistingfileInfo = new FileInfo(FilePath);
-                                    existingFileSize = ExistingfileInfo.Length;
 
-                                    if (existingFileSize > 0 && newFileSize != existingFileSize)
+                                    var fileInfo = item.Base64Str.Split("base64,");
+                                    string fileExtension = fileInfo[0].GetFileExtenstion();
+                                    var ByteFile = Convert.FromBase64String(fileInfo[1]);
+                                    string FilePath = Path.Combine(FileRoot, item.FileName);
+
+                                    if (File.Exists(FilePath))
                                     {
-                                        var alterFile = item.FileName.Split('.');
-                                        string extention = alterFile.LastOrDefault();
-                                        var alterFileName = alterFile.ToList();
-                                        alterFileName.RemoveAt(alterFileName.Count - 1);
-                                        string fileName = string.Join(".", alterFileName);
-                                        fileName = fileName + "_" + HelperExtension.CreateRandomString(7) + "." + extention;
-                                        FilePath = Path.Combine(FileRoot, fileName);
-                                        using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                        long existingFileSize = 0;
+                                        long newFileSize = ByteFile.LongLength;
+                                        FileInfo ExistingfileInfo = new FileInfo(FilePath);
+                                        existingFileSize = ExistingfileInfo.Length;
+
+                                        if (existingFileSize > 0 && newFileSize != existingFileSize)
                                         {
-                                            fs.Write(ByteFile);
+                                            var alterFile = item.FileName.Split('.');
+                                            string extention = alterFile.LastOrDefault();
+                                            var alterFileName = alterFile.ToList();
+                                            alterFileName.RemoveAt(alterFileName.Count - 1);
+                                            string fileName = string.Join(".", alterFileName);
+                                            fileName = fileName + "_" + HelperExtension.CreateRandomString(7) + "." + extention;
+                                            FilePath = Path.Combine(FileRoot, fileName);
+                                            using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                            {
+                                                fs.Write(ByteFile);
+                                            }
+                                        }
+                                        else
+                                        {
+                                            using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                            {
+                                                fs.Write(ByteFile);
+                                            }
                                         }
                                     }
                                     else
@@ -5370,88 +5399,88 @@ namespace Web.Services.Concrete
                                         }
                                     }
                                 }
-                                else
-                                {
-                                    using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
-                                    {
-                                        fs.Write(ByteFile);
-                                    }
-                                }
+
+
                             }
-
-
-                        }
-                        if (FileRoot != null && FileRoot != "")
-                        {
-                            codeBlue.VideoFolderRoot = FileRoot.Replace(this._RootPath, "").Replace("\\", "/");
-                        }
-                    }
-                    if (codeBlue.Audios != null && codeBlue.Audios.Count > 0)
-                    {
-                        var RootPath = this._RootPath + "/Organizations";
-                        string FileRoot = null;
-                        List<string> Attachments = new();
-
-
-                        FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeBlue.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
-                        FileRoot = Path.Combine(RootPath, FileRoot);
-                        if (!Directory.Exists(FileRoot))
-                        {
-                            Directory.CreateDirectory(FileRoot);
-                        }
-                        FileRoot = Path.Combine(FileRoot, UCLEnums.Blue.ToString());
-                        if (!Directory.Exists(FileRoot))
-                        {
-                            Directory.CreateDirectory(FileRoot);
-                        }
-                        FileRoot = Path.Combine(FileRoot, blue.CodeBlueId.ToString());
-                        if (!Directory.Exists(FileRoot))
-                        {
-                            Directory.CreateDirectory(FileRoot);
-                        }
-                        FileRoot = Path.Combine(FileRoot, "Audios");
-
-                        if (!Directory.Exists(FileRoot))
-                        {
-                            Directory.CreateDirectory(FileRoot);
-                        }
-                        //else
-                        //{
-                        //    DirectoryInfo dir = new DirectoryInfo(FileRoot);
-                        //    foreach (FileInfo fi in dir.GetFiles())
-                        //    {
-                        //        fi.Delete();
-                        //    }
-                        //}
-                        foreach (var item in codeBlue.Audios)
-                        {
-                            if (!string.IsNullOrEmpty(item.Base64Str))
+                            if (FileRoot != null && FileRoot != "")
                             {
+                                codeBlue.VideoFolderRoot = FileRoot.Replace(this._RootPath, "").Replace("\\", "/");
+                            }
+                        }
+                        if (codeBlue.Audios != null && codeBlue.Audios.Count > 0)
+                        {
+                            var RootPath = this._RootPath + "/Organizations";
+                            string FileRoot = null;
+                            List<string> Attachments = new();
 
-                                var fileInfo = item.Base64Str.Split("base64,");
-                                string fileExtension = fileInfo[0].GetFileExtenstion();
-                                var ByteFile = Convert.FromBase64String(fileInfo[1]);
-                                string FilePath = Path.Combine(FileRoot, item.FileName);
 
-                                if (File.Exists(FilePath))
+                            FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeBlue.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
+                            FileRoot = Path.Combine(RootPath, FileRoot);
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, UCLEnums.Blue.ToString());
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, blue.CodeBlueId.ToString());
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            FileRoot = Path.Combine(FileRoot, "Audios");
+
+                            if (!Directory.Exists(FileRoot))
+                            {
+                                Directory.CreateDirectory(FileRoot);
+                            }
+                            //else
+                            //{
+                            //    DirectoryInfo dir = new DirectoryInfo(FileRoot);
+                            //    foreach (FileInfo fi in dir.GetFiles())
+                            //    {
+                            //        fi.Delete();
+                            //    }
+                            //}
+                            foreach (var item in codeBlue.Audios)
+                            {
+                                if (!string.IsNullOrEmpty(item.Base64Str))
                                 {
-                                    long existingFileSize = 0;
-                                    long newFileSize = ByteFile.LongLength;
-                                    FileInfo ExistingfileInfo = new FileInfo(FilePath);
-                                    existingFileSize = ExistingfileInfo.Length;
 
-                                    if (existingFileSize > 0 && newFileSize != existingFileSize)
+                                    var fileInfo = item.Base64Str.Split("base64,");
+                                    string fileExtension = fileInfo[0].GetFileExtenstion();
+                                    var ByteFile = Convert.FromBase64String(fileInfo[1]);
+                                    string FilePath = Path.Combine(FileRoot, item.FileName);
+
+                                    if (File.Exists(FilePath))
                                     {
-                                        var alterFile = item.FileName.Split('.');
-                                        string extention = alterFile.LastOrDefault();
-                                        var alterFileName = alterFile.ToList();
-                                        alterFileName.RemoveAt(alterFileName.Count - 1);
-                                        string fileName = string.Join(".", alterFileName);
-                                        fileName = fileName + "_" + HelperExtension.CreateRandomString(7) + "." + extention;
-                                        FilePath = Path.Combine(FileRoot, fileName);
-                                        using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                        long existingFileSize = 0;
+                                        long newFileSize = ByteFile.LongLength;
+                                        FileInfo ExistingfileInfo = new FileInfo(FilePath);
+                                        existingFileSize = ExistingfileInfo.Length;
+
+                                        if (existingFileSize > 0 && newFileSize != existingFileSize)
                                         {
-                                            fs.Write(ByteFile);
+                                            var alterFile = item.FileName.Split('.');
+                                            string extention = alterFile.LastOrDefault();
+                                            var alterFileName = alterFile.ToList();
+                                            alterFileName.RemoveAt(alterFileName.Count - 1);
+                                            string fileName = string.Join(".", alterFileName);
+                                            fileName = fileName + "_" + HelperExtension.CreateRandomString(7) + "." + extention;
+                                            FilePath = Path.Combine(FileRoot, fileName);
+                                            using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                            {
+                                                fs.Write(ByteFile);
+                                            }
+                                        }
+                                        else
+                                        {
+                                            using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                            {
+                                                fs.Write(ByteFile);
+                                            }
                                         }
                                     }
                                     else
@@ -5462,117 +5491,111 @@ namespace Web.Services.Concrete
                                         }
                                     }
                                 }
-                                else
-                                {
-                                    using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
-                                    {
-                                        fs.Write(ByteFile);
-                                    }
-                                }
+
+
                             }
-
-
+                            if (FileRoot != null && FileRoot != "")
+                            {
+                                codeBlue.AudioFolderRoot = FileRoot.Replace(this._RootPath, "").Replace("\\", "/");
+                            }
                         }
-                        if (FileRoot != null && FileRoot != "")
+
+                        if (codeBlue.AttachmentsFolderRoot != null)
                         {
-                            codeBlue.AudioFolderRoot = FileRoot.Replace(this._RootPath, "").Replace("\\", "/");
+                            blue.Attachments = codeBlue.AttachmentsFolderRoot;
                         }
-                    }
-
-                    if (codeBlue.AttachmentsFolderRoot != null)
-                    {
-                        blue.Attachments = codeBlue.AttachmentsFolderRoot;
-                    }
-                    if (codeBlue.VideoFolderRoot != null)
-                    {
-                        blue.Video = codeBlue.VideoFolderRoot;
-                    }
-                    if (codeBlue.AudioFolderRoot != null)
-                    {
-                        blue.Audio = codeBlue.AudioFolderRoot;
-                    }
-
-                    this._codeBlueRepo.Insert(blue);
-
-                    var codeServiceMappingList = new List<CodesServiceLinesMapping>();
-                    for (int i = 0; i < DefaultServiceLineIds.Count; i++)
-                    {
-                        var codeService = new CodesServiceLinesMapping()
+                        if (codeBlue.VideoFolderRoot != null)
                         {
-                            OrganizationIdFk = blue.OrganizationIdFk,
-                            CodeIdFk = UCLEnums.Blue.ToInt(),
-                            DefaultServiceLineIdFk = DefaultServiceLineIds.ElementAt(i),
-                            //ServiceLineId1Fk = ServiceLineTeam1Ids.Count > i ? ServiceLineTeam1Ids.ElementAt(i) : null,
-                            //ServiceLineId2Fk = ServiceLineTeam2Ids.Count > i ? ServiceLineTeam2Ids.ElementAt(i) : null,
-                            ActiveCodeId = blue.CodeBlueId,
-                            ActiveCodeName = UCLEnums.Blue.ToString()
-                        };
-                        codeServiceMappingList.Add(codeService);
-                    }
-                    this._codesServiceLinesMappingRepo.Insert(codeServiceMappingList);
+                            blue.Video = codeBlue.VideoFolderRoot;
+                        }
+                        if (codeBlue.AudioFolderRoot != null)
+                        {
+                            blue.Audio = codeBlue.AudioFolderRoot;
+                        }
 
-                    var UserChannelSid = (from us in this._userSchedulesRepo.Table
-                                          join u in this._userRepo.Table on us.UserIdFk equals u.UserId
-                                          where DefaultServiceLineIds.Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
-                                          select new { u.UserUniqueId, u.UserId }).ToList();
-                    var loggedUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).FirstOrDefault();
-                    UserChannelSid.Add(loggedUser);
-                    var conversationChannelAttributes = JsonConvert.SerializeObject(new Dictionary<string, Object>()
+                        this._codeBlueRepo.Insert(blue);
+
+                        var codeServiceMappingList = new List<CodesServiceLinesMapping>();
+                        for (int i = 0; i < DefaultServiceLineIds.Count; i++)
+                        {
+                            var codeService = new CodesServiceLinesMapping()
+                            {
+                                OrganizationIdFk = blue.OrganizationIdFk,
+                                CodeIdFk = UCLEnums.Blue.ToInt(),
+                                DefaultServiceLineIdFk = DefaultServiceLineIds.ElementAt(i),
+                                //ServiceLineId1Fk = ServiceLineTeam1Ids.Count > i ? ServiceLineTeam1Ids.ElementAt(i) : null,
+                                //ServiceLineId2Fk = ServiceLineTeam2Ids.Count > i ? ServiceLineTeam2Ids.ElementAt(i) : null,
+                                ActiveCodeId = blue.CodeBlueId,
+                                ActiveCodeName = UCLEnums.Blue.ToString()
+                            };
+                            codeServiceMappingList.Add(codeService);
+                        }
+                        this._codesServiceLinesMappingRepo.Insert(codeServiceMappingList);
+
+                        var UserChannelSid = (from us in this._userSchedulesRepo.Table
+                                              join u in this._userRepo.Table on us.UserIdFk equals u.UserId
+                                              where DefaultServiceLineIds.Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
+                                              select new { u.UserUniqueId, u.UserId }).ToList();
+                        var loggedUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).FirstOrDefault();
+                        UserChannelSid.Add(loggedUser);
+                        var conversationChannelAttributes = JsonConvert.SerializeObject(new Dictionary<string, Object>()
                                     {
                                         {ChannelAttributeEnums.ChannelType.ToString(), ChannelTypeEnums.EMS.ToString()},
                                         {ChannelAttributeEnums.CodeType.ToString(), ChannelTypeEnums.Blue.ToString()},
                                         {ChannelAttributeEnums.BlueId.ToString(), blue.CodeBlueId}
                                     }, Formatting.Indented);
-                    List<ActiveCodesGroupMember> ACodeGroupMembers = new List<ActiveCodesGroupMember>();
-                    if (UserChannelSid != null && UserChannelSid.Count > 0)
-                    {
-                        //string uniqueName = $"CONSULT_{Consult_Counter.Counter_Value.ToString()}";
-                        string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
-                        string friendlyName = blue.IsEms.HasValue && blue.IsEms.Value ? $"EMS Code {UCLEnums.Blue.ToString()} {blue.CodeBlueId}" : $"Active Code {UCLEnums.Blue.ToString()} {blue.CodeBlueId}";
-                        var channel = _communication.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
-                        UserChannelSid = UserChannelSid.Distinct().ToList();
-                        foreach (var item in UserChannelSid)
+                        List<ActiveCodesGroupMember> ACodeGroupMembers = new List<ActiveCodesGroupMember>();
+                        if (UserChannelSid != null && UserChannelSid.Count > 0)
                         {
-                            try
+                            //string uniqueName = $"CONSULT_{Consult_Counter.Counter_Value.ToString()}";
+                            string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
+                            string friendlyName = blue.IsEms.HasValue && blue.IsEms.Value ? $"EMS Code {UCLEnums.Blue.ToString()} {blue.CodeBlueId}" : $"Active Code {UCLEnums.Blue.ToString()} {blue.CodeBlueId}";
+                            var channel = _communication.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
+                            UserChannelSid = UserChannelSid.Distinct().ToList();
+                            foreach (var item in UserChannelSid)
                             {
-                                var codeGroupMember = new ActiveCodesGroupMember()
+                                try
                                 {
-                                    ChannelSid = channel.Sid,
-                                    UserIdFk = item.UserId,
-                                    ActiveCodeIdFk = blue.CodeBlueId,
-                                    ActiveCodeName = UCLEnums.Blue.ToString(),
-                                    IsAcknowledge = false,
-                                    CreatedBy = ApplicationSettings.UserId,
-                                    CreatedDate = DateTime.UtcNow,
-                                    IsDeleted = false
-                                };
-                                ACodeGroupMembers.Add(codeGroupMember);
-                                _communication.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
+                                    var codeGroupMember = new ActiveCodesGroupMember()
+                                    {
+                                        ChannelSid = channel.Sid,
+                                        UserIdFk = item.UserId,
+                                        ActiveCodeIdFk = blue.CodeBlueId,
+                                        ActiveCodeName = UCLEnums.Blue.ToString(),
+                                        IsAcknowledge = false,
+                                        CreatedBy = ApplicationSettings.UserId,
+                                        CreatedDate = DateTime.UtcNow,
+                                        IsDeleted = false
+                                    };
+                                    ACodeGroupMembers.Add(codeGroupMember);
+                                    _communication.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
+                                }
+                                catch (Exception ex)
+                                {
+                                    //ElmahExtensions.RiseError(ex);
+                                }
                             }
-                            catch (Exception ex)
-                            {
-                                //ElmahExtensions.RiseError(ex);
-                            }
+                            var isMembersAdded = AddGroupMembers(ACodeGroupMembers);
+                            var msg = new ConversationMessageVM();
+                            msg.channelSid = channel.Sid;
+                            msg.author = "System";
+                            msg.attributes = "";
+                            msg.body = $"<strong> {(codeBlue.IsEms.HasValue && codeBlue.IsEms.Value ? "EMS Code" : "Active Code")} {UCLEnums.Blue.ToString()} </strong></br></br>";
+                            if (codeBlue.PatientName != null && codeBlue.PatientName != "")
+                                msg.body += $"<strong>Patient Name: </strong> {codeBlue.PatientName} </br>";
+                            msg.body += $"<strong>Dob: </strong> {codeBlue.Dob:MM-dd-yyyy} </br>";
+                            msg.body += $"<strong>Last Well Known: </strong> {codeBlue.LastKnownWell:MM-dd-yyyy hh:mm tt} </br>";
+                            if (codeBlue.ChiefComplant != null && codeBlue.ChiefComplant != "")
+                                msg.body += $"<strong>Chief Complaint: </strong> {codeBlue.ChiefComplant} </br>";
+                            if (codeBlue.Hpi != null && codeBlue.Hpi != "")
+                                msg.body += $"<strong>Hpi: </strong> {codeBlue.Hpi} </br>";
+                            var sendMsg = _communication.sendPushNotification(msg);
                         }
-                        var isMembersAdded = AddGroupMembers(ACodeGroupMembers);
-                        var msg = new ConversationMessageVM();
-                        msg.channelSid = channel.Sid;
-                        msg.author = "System";
-                        msg.attributes = "";
-                        msg.body = $"<strong> {(codeBlue.IsEms.HasValue && codeBlue.IsEms.Value ? "EMS Code" : "Active Code")} {UCLEnums.Blue.ToString()} </strong></br></br>";
-                        if (codeBlue.PatientName != null && codeBlue.PatientName != "")
-                            msg.body += $"<strong>Patient Name: </strong> {codeBlue.PatientName} </br>";
-                        msg.body += $"<strong>Dob: </strong> {codeBlue.Dob:MM-dd-yyyy} </br>";
-                        msg.body += $"<strong>Last Well Known: </strong> {codeBlue.LastKnownWell:MM-dd-yyyy hh:mm tt} </br>";
-                        if (codeBlue.ChiefComplant != null && codeBlue.ChiefComplant != "")
-                            msg.body += $"<strong>Chief Complaint: </strong> {codeBlue.ChiefComplant} </br>";
-                        if (codeBlue.Hpi != null && codeBlue.Hpi != "")
-                            msg.body += $"<strong>Hpi: </strong> {codeBlue.Hpi} </br>";
-                        var sendMsg = _communication.sendPushNotification(msg);
+                        return GetBlueDataById(blue.CodeBlueId);
                     }
-                    return GetBlueDataById(blue.CodeBlueId);
+                    return new BaseResponse() { Status = HttpStatusCode.NotAcceptable, Message = "There is no Service Line in this organization related to Code Blue" }; 
                 }
-                return new BaseResponse() { Status = HttpStatusCode.NotAcceptable, Message = "There is no Service Line in this organization related to Code Trauma" };
+                return new BaseResponse() { Status = HttpStatusCode.NotAcceptable, Message = "Organization is not selected" };
             }
         }
 
