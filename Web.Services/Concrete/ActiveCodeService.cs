@@ -490,8 +490,6 @@ namespace Web.Services.Concrete
         }
 
         #endregion
-
-
         #region Code Stroke
 
         public BaseResponse GetAllStrokeCode(ActiveCodeVM activeCode)
