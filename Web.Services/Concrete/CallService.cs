@@ -314,8 +314,18 @@ namespace Web.Services.Concrete
                     { 
                         // Create parameters    
                         new SqlParameter { ParameterName = "@pEndTime", Value = DateTime.Now },
-                        new SqlParameter { ParameterName = "@pDuration", Value = 1500 },
-                        new SqlParameter { ParameterName = "@pCallStatus", Value = 1500 }
+                        new SqlParameter { ParameterName = "@pDuration", Value = log.Duration },
+                        new SqlParameter { ParameterName = "@pDirection", Value = log.Direction },
+                        new SqlParameter { ParameterName = "@pCallStatus", Value = log.CallStatus },
+                        new SqlParameter { ParameterName = "@pToPhoneNumber", Value = log.ToPhoneNumber },
+                        new SqlParameter { ParameterName = "@pToName", Value = log.ToName },
+                        new SqlParameter { ParameterName = "@pFromPhoneNumber", Value = log.FromPhoneNumber },
+                        new SqlParameter { ParameterName = "@pFromName", Value = log.FromName },
+                        new SqlParameter { ParameterName = "@pCallSid", Value = log.CallSid },
+                        new SqlParameter { ParameterName = "@pParentCallSid", Value = log.ParentCallSid },
+                        new SqlParameter { ParameterName = "@pRecordingname", Value = log.RecordingName },
+                        new SqlParameter { ParameterName = "@pIsRecorded", Value = log.IsRecorded },
+                        new SqlParameter { ParameterName = "@pCreatedDate", Value = DateTime.UtcNow }
                     };
 
                 rowsAffected = this._dbContext.Database.ExecuteSqlRaw(sql, parms.ToArray());
