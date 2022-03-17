@@ -649,8 +649,8 @@ namespace Web.Services.Concrete
                         }
                     }
                 }
-
-                var serviceIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == strokeData.OrganizationIdFk && x.CodeIdFk == UCLEnums.Stroke.ToInt() && !x.IsDeleted).Select(x => new { x.DefaultServiceLineTeam, x.ServiceLineTeam1, x.ServiceLineTeam2 }).FirstOrDefault();
+                string Type = StrokeDataVM.IsEms.HasValue && StrokeDataVM.IsEms.Value ? "EMS" : "Active Code";
+                var serviceIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == strokeData.OrganizationIdFk && x.CodeIdFk == UCLEnums.Stroke.ToInt() && x.Type == Type && !x.IsDeleted).Select(x => new { x.DefaultServiceLineTeam, x.ServiceLineTeam1, x.ServiceLineTeam2 }).FirstOrDefault();
                 var serviceLineIds = (from x in this._codesServiceLinesMappingRepo.Table
                                       where x.OrganizationIdFk == strokeData.OrganizationIdFk && x.CodeIdFk == UCLEnums.Stroke.ToInt()
                                       && x.ActiveCodeId == strokeData.CodeStrokeId && x.ActiveCodeName == UCLEnums.Stroke.ToString() && (serviceIds.DefaultServiceLineTeam.ToIntList().Contains(x.DefaultServiceLineIdFk)
@@ -1662,8 +1662,8 @@ namespace Web.Services.Concrete
                         }
                     }
                 }
-
-                var serviceIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == SepsisData.OrganizationIdFk && x.CodeIdFk == UCLEnums.Sepsis.ToInt() && !x.IsDeleted).Select(x => new { x.DefaultServiceLineTeam, x.ServiceLineTeam1, x.ServiceLineTeam2 }).FirstOrDefault();
+                string Type = SepsisDataVM.IsEms ? "EMS" : "Active Code";
+                var serviceIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == SepsisData.OrganizationIdFk && x.CodeIdFk == UCLEnums.Sepsis.ToInt() && x.Type == Type && !x.IsDeleted).Select(x => new { x.DefaultServiceLineTeam, x.ServiceLineTeam1, x.ServiceLineTeam2 }).FirstOrDefault();
                 var serviceLineIds = (from x in this._codesServiceLinesMappingRepo.Table
                                       where x.OrganizationIdFk == SepsisData.OrganizationIdFk && x.CodeIdFk == UCLEnums.Sepsis.ToInt()
                                       && x.ActiveCodeId == SepsisData.CodeSepsisId && x.ActiveCodeName == UCLEnums.Sepsis.ToString() && (serviceIds.DefaultServiceLineTeam.ToIntList().Contains(x.DefaultServiceLineIdFk)
@@ -2673,7 +2673,8 @@ namespace Web.Services.Concrete
                         }
                     }
                 }
-                var serviceIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == STEMIData.OrganizationIdFk && x.CodeIdFk == UCLEnums.STEMI.ToInt() && !x.IsDeleted).Select(x => new { x.DefaultServiceLineTeam, x.ServiceLineTeam1, x.ServiceLineTeam2 }).FirstOrDefault();
+                string Type = STEMIDataVM.IsEms.HasValue && STEMIDataVM.IsEms.Value ? "EMS" : "Active Code";
+                var serviceIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == STEMIData.OrganizationIdFk && x.CodeIdFk == UCLEnums.STEMI.ToInt() && x.Type == Type && !x.IsDeleted).Select(x => new { x.DefaultServiceLineTeam, x.ServiceLineTeam1, x.ServiceLineTeam2 }).FirstOrDefault();
                 var serviceLineIds = (from x in this._codesServiceLinesMappingRepo.Table
                                       where x.OrganizationIdFk == STEMIData.OrganizationIdFk && x.CodeIdFk == UCLEnums.STEMI.ToInt()
                                       && x.ActiveCodeId == STEMIData.CodeStemiid && x.ActiveCodeName == UCLEnums.STEMI.ToString() && (serviceIds.DefaultServiceLineTeam.ToIntList().Contains(x.DefaultServiceLineIdFk)
@@ -3676,7 +3677,8 @@ namespace Web.Services.Concrete
                         }
                     }
                 }
-                var serviceIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == TrumaData.OrganizationIdFk && x.CodeIdFk == UCLEnums.Trauma.ToInt() && !x.IsDeleted).Select(x => new { x.DefaultServiceLineTeam, x.ServiceLineTeam1, x.ServiceLineTeam2 }).FirstOrDefault();
+                string Type = TrumaDataVM.IsEms.HasValue && TrumaDataVM.IsEms.Value ? "EMS" : "Active Code";
+                var serviceIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == TrumaData.OrganizationIdFk && x.CodeIdFk == UCLEnums.Trauma.ToInt() && x.Type == Type && !x.IsDeleted).Select(x => new { x.DefaultServiceLineTeam, x.ServiceLineTeam1, x.ServiceLineTeam2 }).FirstOrDefault();
                 var serviceLineIds = (from x in this._codesServiceLinesMappingRepo.Table
                                       where x.OrganizationIdFk == TrumaData.OrganizationIdFk && x.CodeIdFk == UCLEnums.Trauma.ToInt()
                                       && x.ActiveCodeId == TrumaData.CodeTraumaId && x.ActiveCodeName == UCLEnums.Trauma.ToString() && (serviceIds.DefaultServiceLineTeam.ToIntList().Contains(x.DefaultServiceLineIdFk)
@@ -4721,7 +4723,8 @@ namespace Web.Services.Concrete
                         }
                     }
                 }
-                var serviceIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == blueData.OrganizationIdFk && x.CodeIdFk == UCLEnums.Blue.ToInt() && !x.IsDeleted).Select(x => new { x.DefaultServiceLineTeam, x.ServiceLineTeam1, x.ServiceLineTeam2 }).FirstOrDefault();
+                string Type = BlueDataVM.IsEms.HasValue && BlueDataVM.IsEms.Value ? "EMS" : "Active Code";
+                var serviceIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == blueData.OrganizationIdFk && x.CodeIdFk == UCLEnums.Blue.ToInt() && x.Type == Type && !x.IsDeleted).Select(x => new { x.DefaultServiceLineTeam, x.ServiceLineTeam1, x.ServiceLineTeam2 }).FirstOrDefault();
                 var serviceLineIds = (from x in this._codesServiceLinesMappingRepo.Table
                                       where x.OrganizationIdFk == blueData.OrganizationIdFk && x.CodeIdFk == UCLEnums.Blue.ToInt()
                                       && x.ActiveCodeId == blueData.CodeBlueId && x.ActiveCodeName == UCLEnums.Blue.ToString() && (serviceIds.DefaultServiceLineTeam.ToIntList().Contains(x.DefaultServiceLineIdFk)
