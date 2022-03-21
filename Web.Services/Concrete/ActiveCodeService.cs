@@ -1552,6 +1552,12 @@ namespace Web.Services.Concrete
                            .WithSqlParam("@IsSuperAdmin", ApplicationSettings.isSuperAdmin)
                            .WithSqlParam("@showAll", activeCode.showAllActiveCodes)
                            .WithSqlParam("@userId", ApplicationSettings.UserId)
+
+                            .WithSqlParam("@page", activeCode.PageNumber)
+                            .WithSqlParam("@size", activeCode.Rows)
+                            .WithSqlParam("@sortOrder", activeCode.SortOrder)
+                            .WithSqlParam("@sortCol", activeCode.SortCol)
+                            .WithSqlParam("@filterVal", activeCode.FilterVal)
                            .ExecuteStoredProc<ActiveOrEMSCodesVM>();
 
             objList.ForEach(x =>
@@ -2592,6 +2598,12 @@ namespace Web.Services.Concrete
                                        .WithSqlParam("@IsSuperAdmin", ApplicationSettings.isSuperAdmin)
                                        .WithSqlParam("@showAll", activeCode.showAllActiveCodes)
                                        .WithSqlParam("@userId", ApplicationSettings.UserId)
+
+                                        .WithSqlParam("@page", activeCode.PageNumber)
+                                        .WithSqlParam("@size", activeCode.Rows)
+                                        .WithSqlParam("@sortOrder", activeCode.SortOrder)
+                                        .WithSqlParam("@sortCol", activeCode.SortCol)
+                                        .WithSqlParam("@filterVal", activeCode.FilterVal)
                                        .ExecuteStoredProc<ActiveOrEMSCodesVM>();
 
             objList.ForEach(x =>
@@ -3630,6 +3642,12 @@ namespace Web.Services.Concrete
                            .WithSqlParam("@IsSuperAdmin", ApplicationSettings.isSuperAdmin)
                            .WithSqlParam("@showAll", activeCode.showAllActiveCodes)
                            .WithSqlParam("@userId", ApplicationSettings.UserId)
+
+                            .WithSqlParam("@page", activeCode.PageNumber)
+                            .WithSqlParam("@size", activeCode.Rows)
+                            .WithSqlParam("@sortOrder", activeCode.SortOrder)
+                            .WithSqlParam("@sortCol", activeCode.SortCol)
+                            .WithSqlParam("@filterVal", activeCode.FilterVal)
                            .ExecuteStoredProc<ActiveOrEMSCodesVM>();
 
             objList.ForEach(x =>
@@ -4712,6 +4730,12 @@ namespace Web.Services.Concrete
                            .WithSqlParam("@IsSuperAdmin", ApplicationSettings.isSuperAdmin)
                            .WithSqlParam("@showAll", activeCode.showAllActiveCodes)
                            .WithSqlParam("@userId", ApplicationSettings.UserId)
+
+                            .WithSqlParam("@page", activeCode.PageNumber)
+                            .WithSqlParam("@size", activeCode.Rows)
+                            .WithSqlParam("@sortOrder", activeCode.SortOrder)
+                            .WithSqlParam("@sortCol", activeCode.SortCol)
+                            .WithSqlParam("@filterVal", activeCode.FilterVal)
                            .ExecuteStoredProc<ActiveOrEMSCodesVM>();
 
             objList.ForEach(x =>
