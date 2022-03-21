@@ -494,11 +494,17 @@ namespace Web.Services.Concrete
 
         public BaseResponse GetAllStrokeCode(ActiveCodeVM activeCode)
         {
-            var objList = this._dbContext.LoadStoredProcedure("md_getAllActiveCodesOrEMS")
+            var objList = this._dbContext.LoadStoredProcedure("md_getAllActiveCodesOrEMS_Dynamic")
                             .WithSqlParam("@codeName", UCLEnums.Stroke.ToString())
                             .WithSqlParam("@IsSuperAdmin", ApplicationSettings.isSuperAdmin)
                             .WithSqlParam("@showAll", activeCode.showAllActiveCodes)
                             .WithSqlParam("@userId", ApplicationSettings.UserId)
+
+                            .WithSqlParam("@page", activeCode.PageNumber)
+                            .WithSqlParam("@size", activeCode.Rows)
+                            .WithSqlParam("@sortOrder", activeCode.SortOrder)
+                            .WithSqlParam("@sortCol", activeCode.SortCol)
+                            .WithSqlParam("@filterVal", activeCode.FilterVal)
                             .ExecuteStoredProc<ActiveOrEMSCodesVM>();
 
             objList.ForEach(x =>
@@ -507,7 +513,12 @@ namespace Web.Services.Concrete
                 x.BloodThinnersTitle.AddRange(_controlListDetailsRepo.Table.Where(b => x.BloodThinners.ToIntList().Contains(b.ControlListDetailId)).Select(b => new { Id = b.ControlListDetailId, b.Title }).ToList());
             });
 
-            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = objList };
+            int totalRecords = 0;
+            if (objList.Count > 0)
+            {
+                totalRecords = objList.Select(x => x.Total_Records).FirstOrDefault();
+            }
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = new { totalRecords, objList } };
 
             //if (ApplicationSettings.isSuperAdmin)
             //{
@@ -3767,7 +3778,7 @@ namespace Web.Services.Concrete
                 }
                 string Type = TrumaDataVM.IsEms.HasValue && TrumaDataVM.IsEms.Value ? "EMS" : "Active Code";
                 var serviceIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == TrumaData.OrganizationIdFk && x.CodeIdFk == UCLEnums.Trauma.ToInt() && x.Type == Type && !x.IsDeleted).Select(x => new { x.DefaultServiceLineTeam, x.ServiceLineTeam1, x.ServiceLineTeam2 }).FirstOrDefault();
-                
+
 
                 var serviceLineIds = (from x in this._codesServiceLinesMappingRepo.Table
                                       where x.OrganizationIdFk == TrumaData.OrganizationIdFk && x.CodeIdFk == UCLEnums.Trauma.ToInt()

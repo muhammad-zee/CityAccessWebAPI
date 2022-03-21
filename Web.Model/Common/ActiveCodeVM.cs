@@ -31,5 +31,13 @@ namespace Web.Model.Common
         public List<ServiceLineVM> ServiceLineTeam2List { get; set; }
 
         public List<ServiceLineVM> serviceLines { get; set; }
+
+
+        public int PageNumber { get; set; }
+        public int Rows { get; set; }
+        public string Filter { get; set; }
+        public string SortOrder { get; set; }
+        public string SortCol { get; set; }
+        public string FilterVal { get; set; }
     }
 }
