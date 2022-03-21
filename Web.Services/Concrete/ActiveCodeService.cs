@@ -5860,6 +5860,7 @@ namespace Web.Services.Concrete
 
                 item.LastKnownWellStr = item.LastKnownWell?.ToString("yyyy-MM-dd hh:mm:ss tt");
                 //item.OrganizationData = orgData;
+                item.DobStr = item.Dob?.ToString("yyyy-MM-dd hh:mm:ss tt");
                 item.CreatedDateStr = item.CreatedDate.ToString("MM-dd-yyyy hh:mm:ss tt");
                 item.GenderTitle = _controlListDetailsRepo.Table.Where(g => g.ControlListDetailId == item.Gender).Select(g => g.Title).FirstOrDefault();
                 item.BloodThinnersTitle.AddRange(_controlListDetailsRepo.Table.Where(b => item.BloodThinners.ToIntList().Contains(b.ControlListDetailId)).Select(b => new { Id = b.ControlListDetailId, b.Title }).ToList());
