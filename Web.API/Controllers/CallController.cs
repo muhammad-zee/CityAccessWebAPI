@@ -1,4 +1,5 @@
 ﻿using ElmahCore;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -14,7 +15,7 @@ using Web.Services.Interfaces;
 
 namespace Web.API.Controllers
 {
-    //[Authorize]
+    [Authorize]
     [RequestHandler]
     public class CallController : TwilioController
     {
@@ -31,7 +32,6 @@ namespace Web.API.Controllers
         }
 
         [HttpGet("Call/Token")]
-
         public BaseResponse Token(string Identity)
         {
             try
@@ -47,6 +47,7 @@ namespace Web.API.Controllers
 
         }
 
+        [AllowAnonymous]
         [HttpPost("Call/EnqueueCall")]
         public TwiMLResult EnqueueCall()
         {
@@ -63,6 +64,7 @@ namespace Web.API.Controllers
 
         }
 
+        [AllowAnonymous]
         [HttpPost("Call/Connect")]
         public TwiMLResult Connect(string phoneNumber, string Twilio_PhoneNumber, string From, string CallSid, string CallStatus)
         {
@@ -78,8 +80,9 @@ namespace Web.API.Controllers
             }
 
         }
-        [HttpGet("Call/Call")]
 
+        [AllowAnonymous]
+        [HttpGet("Call/Call")]
         public CallResource Call()
         {
             try
@@ -95,6 +98,8 @@ namespace Web.API.Controllers
 
         }
 
+
+        [AllowAnonymous]
         [HttpPost("Call/CallbackStatus")]
         public string CallbackStatus()
         {
@@ -110,6 +115,8 @@ namespace Web.API.Controllers
             }
         }
 
+
+        [AllowAnonymous]
         [HttpPost("Call/CallConnected")]
         public TwiMLResult CallConnected()
         {
@@ -125,12 +132,14 @@ namespace Web.API.Controllers
             }
         }
 
+
+        [AllowAnonymous]
         [HttpPost("Call/PromptResponse")]
-        public TwiMLResult PromptResponse(int Digits)
+        public TwiMLResult PromptResponse(int Digits,int ParentNodeId)
         {
             try
             {
-                return this._callService.PromptResponse(Digits);
+                return this._callService.PromptResponse(Digits,ParentNodeId);
             }
             catch (Exception ex)
             {
@@ -139,6 +148,9 @@ namespace Web.API.Controllers
                 return this._callService.ExceptionResponse(ex);
             }
         }
+
+
+        [AllowAnonymous]
         [HttpPost("Call/ReceiveVoicemail")]
         public TwiMLResult ReceiveVoicemail(string RecordingUrl, string RecordingSid)
         {
@@ -154,7 +166,10 @@ namespace Web.API.Controllers
             }
         }
 
-        [HttpPost("Call/saveCallRecord")]
+        #region [Calls Logging]
+
+
+        [HttpPost("CallLog/saveCallRecord")]
         public BaseResponse saveCallLog([FromBody] CallLogVM log)
         {
             try
@@ -170,6 +185,22 @@ namespace Web.API.Controllers
 
         }
 
+        [HttpGet("CallLog/getPreviousCalls")]
+        public BaseResponse getPreviousCalls()
+        {
+            try
+            {
+                return this._callService.getPreviousCalls();
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+
+        }
+        #endregion
 
         #region IVR Settings
 

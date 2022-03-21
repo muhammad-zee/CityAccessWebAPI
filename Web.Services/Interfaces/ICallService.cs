@@ -15,7 +15,7 @@ namespace Web.Services.Interfaces
         CallResource Call();
         string CallbackStatus(IFormCollection Request);
         TwiMLResult CallConnected();
-        TwiMLResult PromptResponse(int Digits);
+        TwiMLResult PromptResponse(int Digits, int ParentNodeId);
         TwiMLResult ExceptionResponse(Exception ex);
         TwiMLResult ReceiveVoicemail(string RecordingUrl, string RecordingSid);
 
@@ -24,6 +24,7 @@ namespace Web.Services.Interfaces
         BaseResponse getIvrTree(int Id);
         BaseResponse getIvrNodes(int Id);
         BaseResponse saveIvrNode(IvrSettingVM model);
+        BaseResponse getPreviousCalls();
         BaseResponse DeleteIVRNode(int Id, int userId);
 
         BaseResponse saveCallLog(CallLogVM log);

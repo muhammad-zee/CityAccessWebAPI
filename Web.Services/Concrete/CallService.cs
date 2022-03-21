@@ -177,7 +177,7 @@ namespace Web.Services.Concrete
             //var StatusCallbackUrl = $"{origin}/Call/CallbackStatus";
             //url = url.Replace(" ", "%20");
             var To = new PhoneNumber("+923327097498");
-            var From = new PhoneNumber("(616) 449-2720");
+            var From = new PhoneNumber("(848) 400-5547");
             ServicePointManager.SecurityProtocol = (SecurityProtocolType)3072; //TLS 1.2                                                                             
             TwilioClient.Init(this.Twilio_AccountSid, this.Twilio_AuthToken);
             var call = CallResource.Create(to: To,
@@ -220,45 +220,64 @@ namespace Web.Services.Concrete
         {
             var response = new VoiceResponse();
             //var GatherResponseUrl = $"https://" + origin + "/AutomatedCall/PatientResponse?PatientID=" + PatientID + "&AppointmentID=" + AppointmentID + "&Price=" + Price;
-            var GatherResponseUrl = $"{origin}/Call/PromptResponse";
+            var IvrResponse = this._dbContext.LoadStoredProcedure("md_getIvrNodesByParentNodeId")
+                .WithSqlParam("@pParentNodeId", 0)
+                .ExecuteStoredProc<IvrSettingVM>().FirstOrDefault();
+            var GatherResponseUrl = $"{origin}/Call/PromptResponse?parentNodeId={IvrResponse.IvrSettingsId}";
+
+
+            //var gather = new Gather(numDigits: 1, timeout: 10, action: new Uri(GatherResponseUrl)).Pause(length: 3)
+            //                              .Say("Press one to  talk to Bilal.", language: "en").Pause(length: 1)
+            //                              .Say("Press two to talk to an Zee.", language: "en").Pause(length: 1)
+            //                              .Say("Press three to send voice mail");
 
             var gather = new Gather(numDigits: 1, timeout: 10, action: new Uri(GatherResponseUrl)).Pause(length: 3)
-                                          .Say("Press one to  talk to Bilal.", language: "en").Pause(length: 1)
-                                          .Say("Press two to talk to an Zee.", language: "en").Pause(length: 1)
-                                          .Say("Press three to send voice mail");
+                                          .Say(IvrResponse.Description, language: "en");
             response.Append(gather);
             response.Say("You did not press any key,\n good bye.!");
             var xmlResponse = response.ToString();
             return TwiML(response);
         }
-        public TwiMLResult PromptResponse(int Digits)
+        public TwiMLResult PromptResponse(int Digits,int ParentNodeId)
         {
+            var IvrSetting = this._dbContext.LoadStoredProcedure("md_getIvrNodesByParentNodeId")
+               .WithSqlParam("@pParentNodeId", ParentNodeId)
+               .ExecuteStoredProc<IvrSettingVM>();
             int QueryDigit = Convert.ToInt32(Digits);
+
+            var ivrNode = IvrSetting.FirstOrDefault(i => i.KeyPress == QueryDigit);
+
             var response = new VoiceResponse();
-            if (QueryDigit == 1)
-            {
-                response.Say("Sorry, Bilal is not available right now");
+            var GatherResponseUrl = $"{origin}/Call/PromptResponse?parentNodeId={ivrNode.IvrSettingsId}";
+            var gather = new Gather(numDigits: 1, timeout: 10, action: new Uri(GatherResponseUrl)).Pause(length: 3)
+                                                   .Say(ivrNode.Description, language: "en");
+            response.Append(gather);
+            response.Say("You did not press any key,\n good bye.!");
 
-            }
-            else if (QueryDigit == 2)
-            {
-                response.Say("sorry to say zee is not here. we will get back to you when zee will be back");
-            }
-            else if (QueryDigit == 3)
-            {
-                var RecordUrl = $"{origin}/Call/ReceiveVoicemail";
+            //if (QueryDigit == 1)
+            //{
+            //    response.Say("Sorry, Bilal is not available right now");
 
-                response
-                    .Say("Please leave a message at the beep.");
-                response.Record(action: new Uri(RecordUrl));
-                response.Say("I did not receive a recording");
-                response.Leave();
+            //}
+            //else if (QueryDigit == 2)
+            //{
+            //    response.Say("sorry to say zee is not here. we will get back to you when zee will be back");
+            //}
+            //else if (QueryDigit == 3)
+            //{
+            //    var RecordUrl = $"{origin}/Call/ReceiveVoicemail";
 
-            }
-            else
-            {
-                response.Say("You Pressed wrong key");
-            }
+            //    response
+            //        .Say("Please leave a message at the beep.");
+            //    response.Record(action: new Uri(RecordUrl));
+            //    response.Say("I did not receive a recording");
+            //    response.Leave();
+
+            //}
+            //else
+            //{
+            //    response.Say("You Pressed wrong key");
+            //}
             return TwiML(response);
         }
         public TwiMLResult ReceiveVoicemail(string RecordingUrl, string RecordingSid)
@@ -284,6 +303,8 @@ namespace Web.Services.Concrete
             response.Say(ex.Message.ToString());
             return TwiML(response);
         }
+
+        #region [Calls Logging]
 
         public BaseResponse saveCallLog(CallLogVM log)
         {
@@ -369,6 +390,22 @@ namespace Web.Services.Concrete
             };
 
         }
+        public BaseResponse getPreviousCalls()
+        {
+
+            var calls = this._dbContext.LoadStoredProcedure("md_getPrevioceCallsByUserUniqueId")
+                .WithSqlParam("@pUserUniqueId", "")
+                .ExecuteStoredProc<CallLogVM>();
+            return new BaseResponse()
+            {
+                Status = HttpStatusCode.OK,
+                Message = "Record Saved",
+                Body = calls
+            };
+
+        }
+        #endregion
+
 
         #region IVR Settings
         public BaseResponse getIvrTree()
