@@ -75,16 +75,27 @@ namespace Web.Services.Concrete
 
         public BaseResponse GetScheduleList(ScheduleVM schedule)
         {
-            var scheduleList = this._dbContext.LoadStoredProcedure("md_getScheduleListByFilterIds")
+            var scheduleList = this._dbContext.LoadStoredProcedure("md_getScheduleListByFilterIds_Dynamic")
                             .WithSqlParam("@orgId", schedule.selectedOrganizationId)
                             .WithSqlParam("@serviceLineIds", schedule.selectedService)
                             .WithSqlParam("@roleIds", schedule.selectedRole)
                             .WithSqlParam("@userIds", schedule.selectedUser)
                             .WithSqlParam("@fromDate", schedule.selectedFromDate.Date.ToUniversalTime().ToString("yyyy-MM-dd"))
                             .WithSqlParam("@toDate", schedule.selectedToDate.ToString("yyyy-MM-dd"))
-                            .ExecuteStoredProc<ScheduleListVM>();
 
-            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Found", Body = scheduleList };
+                            .WithSqlParam("@page", schedule.PageNumber)
+                            .WithSqlParam("@size", schedule.Rows)
+                            .WithSqlParam("@sortOrder", schedule.SortOrder)
+                            .WithSqlParam("@sortCol", schedule.SortCol)
+                            .WithSqlParam("@filterVal", schedule.FilterVal)
+                            .ExecuteStoredProc<ScheduleListVM>();
+            int totalRecords = 0;
+            if (scheduleList.Count > 0) 
+            {
+                totalRecords = scheduleList.Select(x => x.Total_Records).FirstOrDefault();
+            }
+
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Found", Body = new { totalRecords, scheduleList } };
         }
 
         public BaseResponse ImportCSV(ImportCSVFileVM fileVM)

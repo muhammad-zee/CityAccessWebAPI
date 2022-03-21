@@ -79,7 +79,12 @@ namespace Web.Model.Common
         public string selectedUser { get; set; }
         public DateTime selectedFromDate { get; set; }
         public DateTime selectedToDate { get; set; }
-
+        public int PageNumber { get; set; }
+        public int Rows { get; set; }
+        public string Filter { get; set; }
+        public string SortOrder { get; set; }
+        public string SortCol { get; set; }
+        public string FilterVal { get; set; }
 
     }
 }

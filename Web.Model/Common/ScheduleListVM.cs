@@ -15,6 +15,7 @@
         public string EndTime { get; set; }
 
         public string ServiceName { get; set; }
+        public int Total_Records { get; set; }
 
         public string Initials { get; set; }
         public string DepartmentName { get; set; }
