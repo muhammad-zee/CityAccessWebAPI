@@ -246,12 +246,31 @@ namespace Web.Services.Concrete
             int QueryDigit = Convert.ToInt32(Digits);
 
             var ivrNode = IvrSetting.FirstOrDefault(i => i.KeyPress == QueryDigit);
-
             var response = new VoiceResponse();
-            var GatherResponseUrl = $"{origin}/Call/PromptResponse?parentNodeId={ivrNode.IvrSettingsId}";
-            var gather = new Gather(numDigits: 1, timeout: 10, action: new Uri(GatherResponseUrl)).Pause(length: 3)
-                                                   .Say(ivrNode.Description, language: "en");
-            response.Append(gather);
+            if(ivrNode != null) { 
+                if(ivrNode.NodeTypeId == IvrNodeTypeEnums.Gather.ToInt())
+                {
+                    var GatherResponseUrl = $"{origin}/Call/PromptResponse?parentNodeId={ivrNode.IvrSettingsId}";
+                    var gather = new Gather(numDigits: 1, timeout: 10, action: new Uri(GatherResponseUrl)).Pause(length: 3).Say(ivrNode.Description, language: "en");
+                    response.Append(gather);
+                }
+                else if (ivrNode.NodeTypeId == IvrNodeTypeEnums.Voicemail.ToInt())
+                {
+                    var RecordUrl = $"{origin}/Call/ReceiveVoicemail";
+                    response.Say("Please leave a message at the beep.");
+                    response.Record(action: new Uri(RecordUrl));
+                    response.Say("I did not receive a recording");
+                    response.Leave();
+                }
+            }
+            else
+            {
+               var ivrParentNode = this._ivrSettingsRepo.Table.FirstOrDefault(i => i.IvrSettingsId == ParentNodeId && i.IsDeleted != true);
+                var GatherResponseUrl = $"{origin}/Call/PromptResponse?parentNodeId={ivrParentNode.IvrSettingsId}";
+                var gather = new Gather(numDigits: 1, timeout: 10, action: new Uri(GatherResponseUrl)).Pause(length: 3).Say("You Pressed wrong key").Pause(length: 2).Say(ivrParentNode.Description, language: "en");
+                response.Append(gather);
+
+            }
             response.Say("You did not press any key,\n good bye.!");
 
             //if (QueryDigit == 1)
@@ -445,6 +464,7 @@ namespace Web.Services.Concrete
                     label = x.Name,
                     expandedIcon = x.Icon,
                     collapsedIcon = x.Icon,
+                    NodeTypeId = x.NodeTypeId,
                     KeyPress = x.KeyPress,
                     expanded = true
                 }).ToList();
@@ -499,6 +519,7 @@ namespace Web.Services.Concrete
                     ivrNode.IvrparentId = model.IvrparentId;
                     ivrNode.Name = model.Name;
                     ivrNode.Description = model.Description;
+                    ivrNode.NodeTypeId = model.NodeTypeId;
                     ivrNode.KeyPress = model.KeyPress;
                     ivrNode.ModifiedBy = model.ModifiedBy;
                     ivrNode.ModifiedDate = DateTime.UtcNow;
@@ -514,12 +535,11 @@ namespace Web.Services.Concrete
                 ivrNode.IvrparentId = model.IvrparentId == 0 ? null : model.IvrparentId;
                 ivrNode.Name = model.Name;
                 ivrNode.Description = model.Description;
+                ivrNode.NodeTypeId = model.NodeTypeId;
                 ivrNode.KeyPress = model.KeyPress;
                 ivrNode.Icon = model.Icon;
                 ivrNode.CreatedBy = model.CreatedBy;
                 ivrNode.CreatedDate = DateTime.UtcNow;
-                //ivrNode.ModifiedBy = model.ModifiedBy;
-                //ivrNode.ModifiedDate = DateTime.UtcNow;
                 ivrNode.IsDeleted = false;
                 this._ivrSettingsRepo.Insert(ivrNode);
             }
