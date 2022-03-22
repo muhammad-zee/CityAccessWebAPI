@@ -92,16 +92,15 @@ namespace Web.API.Controllers
         #region Users
 
         [Description("Get Users List")]
-        [HttpGet("admin/GetAllUsers")]
-        public async Task<BaseResponse> GetAllUsers(int? OrganizationId, int? UserRoleId)
+        [HttpPost("admin/GetAllUsers")]
+        public async Task<BaseResponse> GetAllUsers([FromBody] RegisterCredentialVM model)
         {
             try
             {
                 BaseResponse response = null;
-                if (OrganizationId != null)
+                if (model.OrganizationId > 0)
                 {
-                    response = _adminService.GetAllUsersByOrganizationId(OrganizationId.Value, UserRoleId.Value);
-
+                    response = _adminService.GetAllUsersByOrganizationId(model);
                 }
                 else
                 {

@@ -66,6 +66,16 @@ namespace Web.Model.Common
 
         public List<UserProfileSchedulesVM> UserProfileSchedules { get; set; }
         public List<UserRoleVM> UserRole { get; set; }
+
+        ///// For Get All Users Pagination
+        public int OrganizationId { get; set; }
+
+        public int PageNumber { get; set; }
+        public int Rows { get; set; }
+        public string Filter { get; set; }
+        public string SortOrder { get; set; }
+        public string SortCol { get; set; }
+        public string FilterVal { get; set; }
     }
 
     public class UserProfileSchedulesVM

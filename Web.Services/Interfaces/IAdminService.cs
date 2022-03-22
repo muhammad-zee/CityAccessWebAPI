@@ -30,7 +30,7 @@ namespace Web.Services.Interfaces
 
         #region Users
         BaseResponse GetAllUsers();
-        BaseResponse GetAllUsersByOrganizationId(int OrganizationId, int UserRoleId);
+        BaseResponse GetAllUsersByOrganizationId(RegisterCredentialVM model);
         BaseResponse GetAllUsersByServiceLineAndRoleId(string OrganizationId, string ServiceLineId, string RoleIds);
         BaseResponse getAllScheduleUsersByServiceAndRoleId(string OrganizationId, string ServiceLineId, string RoleIds);
         BaseResponse GetUserById(int Id);

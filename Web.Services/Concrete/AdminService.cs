@@ -164,12 +164,18 @@ namespace Web.Services.Concrete
             }
             return new BaseResponse { Status = HttpStatusCode.OK, Message = "Users List Returned", Body = users };
         }
-        public BaseResponse GetAllUsersByOrganizationId(int OrganizationId, int UserRoleId)
+        public BaseResponse GetAllUsersByOrganizationId(RegisterCredentialVM model)
         {
             //var result = _user.Table.Where(x => x.IsDeleted == false).ToList();
-            var result = this._dbContext.LoadStoredProcedure("md_getAllUsersByOrganizationId")
-                .WithSqlParam("@pOrganizationId", OrganizationId)
+            var result = this._dbContext.LoadStoredProcedure("md_getAllUsersByOrganizationId_Dynamic")
+                .WithSqlParam("@pOrganizationId", model.OrganizationId)
                 .WithSqlParam("@pIsSuperAdmin", ApplicationSettings.isSuperAdmin)
+
+                .WithSqlParam("@page", model.PageNumber)
+                .WithSqlParam("@size", model.Rows)
+                .WithSqlParam("@sortOrder", model.SortOrder)
+                .WithSqlParam("@sortCol", model.SortCol)
+                .WithSqlParam("@filterVal", model.FilterVal)
                 .ExecuteStoredProc<User>();
 
             var users = AutoMapperHelper.MapList<User, RegisterCredentialVM>(result);
