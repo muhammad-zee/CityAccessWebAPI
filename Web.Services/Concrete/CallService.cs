@@ -477,6 +477,16 @@ namespace Web.Services.Concrete
                 Body = IVRs
             };
         }
+        public BaseResponse GetNodeType(int Id)
+        {
+            var nodeTypes = _controlListDetailsRepo.Table.Where(x => x.IsDeleted != true && x.ControlListIdFk == Id).ToList();
+            return new BaseResponse()
+            {
+                Status = HttpStatusCode.OK,
+                Message = "Data Found",
+                Body = nodeTypes
+            };
+        }
         public BaseResponse saveIvrNode(IvrSettingVM model)
         {
             Ivrsetting ivrNode = null;

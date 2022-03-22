@@ -23,6 +23,7 @@ namespace Web.Services.Interfaces
         BaseResponse getIvrNodes();
         BaseResponse getIvrTree(int Id);
         BaseResponse getIvrNodes(int Id);
+        BaseResponse GetNodeType(int Id);
         BaseResponse saveIvrNode(IvrSettingVM model);
         BaseResponse getPreviousCalls();
         BaseResponse DeleteIVRNode(int Id, int userId);

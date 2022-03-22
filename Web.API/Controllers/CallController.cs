@@ -236,6 +236,22 @@ namespace Web.API.Controllers
 
         }
 
+        [HttpGet("ivr/GetNodeType/{Id}")]
+        public BaseResponse GetNodeType(int Id)
+        {
+            try
+            {
+                return this._callService.GetNodeType(Id);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+
+        }
+
         [HttpPost("ivr/saveIvrNode")]
         public BaseResponse saveIvrNode([FromBody] IvrSettingVM model)
         {
