@@ -1547,7 +1547,7 @@ namespace Web.Services.Concrete
         public BaseResponse GetAllSepsisCode(ActiveCodeVM activeCode)
         {
 
-            var objList = this._dbContext.LoadStoredProcedure("md_getAllActiveCodesOrEMS")
+            var objList = this._dbContext.LoadStoredProcedure("md_getAllActiveCodesOrEMS_Dynamic")
                            .WithSqlParam("@codeName", UCLEnums.Sepsis.ToString())
                            .WithSqlParam("@IsSuperAdmin", ApplicationSettings.isSuperAdmin)
                            .WithSqlParam("@showAll", activeCode.showAllActiveCodes)
@@ -1565,8 +1565,12 @@ namespace Web.Services.Concrete
                 x.BloodThinnersTitle = new List<object>();
                 x.BloodThinnersTitle.AddRange(_controlListDetailsRepo.Table.Where(b => x.BloodThinners.ToIntList().Contains(b.ControlListDetailId)).Select(b => new { Id = b.ControlListDetailId, b.Title }).ToList());
             });
-
-            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = objList };
+            int totalRecords = 0;
+            if (objList.Count > 0)
+            {
+                totalRecords = objList.Select(x => x.Total_Records).FirstOrDefault();
+            }
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = new { totalRecords, objList } };
 
             //var SepsisData = new List<CodeSepsi>();
             //if (ApplicationSettings.isSuperAdmin)
@@ -2593,7 +2597,7 @@ namespace Web.Services.Concrete
 
         public BaseResponse GetAllSTEMICode(ActiveCodeVM activeCode)
         {
-            var objList = this._dbContext.LoadStoredProcedure("md_getAllActiveCodesOrEMS")
+            var objList = this._dbContext.LoadStoredProcedure("md_getAllActiveCodesOrEMS_Dynamic")
                                        .WithSqlParam("@codeName", UCLEnums.STEMI.ToString())
                                        .WithSqlParam("@IsSuperAdmin", ApplicationSettings.isSuperAdmin)
                                        .WithSqlParam("@showAll", activeCode.showAllActiveCodes)
@@ -2611,8 +2615,12 @@ namespace Web.Services.Concrete
                 x.BloodThinnersTitle = new List<object>();
                 x.BloodThinnersTitle.AddRange(_controlListDetailsRepo.Table.Where(b => x.BloodThinners.ToIntList().Contains(b.ControlListDetailId)).Select(b => new { Id = b.ControlListDetailId, b.Title }).ToList());
             });
-
-            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = objList };
+            int totalRecords = 0;
+            if (objList.Count > 0)
+            {
+                totalRecords = objList.Select(x => x.Total_Records).FirstOrDefault();
+            }
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = new { totalRecords, objList } };
 
             //var STEMIData = new List<CodeStemi>();
             //if (ApplicationSettings.isSuperAdmin)
@@ -3637,7 +3645,7 @@ namespace Web.Services.Concrete
 
         public BaseResponse GetAllTrumaCode(ActiveCodeVM activeCode)
         {
-            var objList = this._dbContext.LoadStoredProcedure("md_getAllActiveCodesOrEMS")
+            var objList = this._dbContext.LoadStoredProcedure("md_getAllActiveCodesOrEMS_Dynamic")
                            .WithSqlParam("@codeName", UCLEnums.Trauma.ToString())
                            .WithSqlParam("@IsSuperAdmin", ApplicationSettings.isSuperAdmin)
                            .WithSqlParam("@showAll", activeCode.showAllActiveCodes)
@@ -3655,8 +3663,12 @@ namespace Web.Services.Concrete
                 x.BloodThinnersTitle = new List<object>();
                 x.BloodThinnersTitle.AddRange(_controlListDetailsRepo.Table.Where(b => x.BloodThinners.ToIntList().Contains(b.ControlListDetailId)).Select(b => new { Id = b.ControlListDetailId, b.Title }).ToList());
             });
-
-            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = objList };
+            int totalRecords = 0;
+            if (objList.Count > 0)
+            {
+                totalRecords = objList.Select(x => x.Total_Records).FirstOrDefault();
+            }
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = new { totalRecords, objList } };
 
             //var TrumaData = new List<CodeTrauma>();
             //if (ApplicationSettings.isSuperAdmin)
@@ -4725,7 +4737,7 @@ namespace Web.Services.Concrete
 
         public BaseResponse GetAllBlueCode(ActiveCodeVM activeCode)
         {
-            var objList = this._dbContext.LoadStoredProcedure("md_getAllActiveCodesOrEMS")
+            var objList = this._dbContext.LoadStoredProcedure("md_getAllActiveCodesOrEMS_Dynamic")
                            .WithSqlParam("@codeName", UCLEnums.Blue.ToString())
                            .WithSqlParam("@IsSuperAdmin", ApplicationSettings.isSuperAdmin)
                            .WithSqlParam("@showAll", activeCode.showAllActiveCodes)
@@ -4743,8 +4755,12 @@ namespace Web.Services.Concrete
                 x.BloodThinnersTitle = new List<object>();
                 x.BloodThinnersTitle.AddRange(_controlListDetailsRepo.Table.Where(b => x.BloodThinners.ToIntList().Contains(b.ControlListDetailId)).Select(b => new { Id = b.ControlListDetailId, b.Title }).ToList());
             });
-
-            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = objList };
+            int totalRecords = 0;
+            if (objList.Count > 0)
+            {
+                totalRecords = objList.Select(x => x.Total_Records).FirstOrDefault();
+            }
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = new { totalRecords, objList } };
             //var blueData = new List<CodeBlue>();
             //if (ApplicationSettings.isSuperAdmin)
             //{
