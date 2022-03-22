@@ -69,7 +69,7 @@ namespace Web.Model.Common
 
         ///// For Get All Users Pagination
         public int OrganizationId { get; set; }
-
+        public int Total_Records { get; set; }
         public int PageNumber { get; set; }
         public int Rows { get; set; }
         public string Filter { get; set; }

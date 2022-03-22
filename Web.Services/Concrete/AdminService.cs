@@ -206,9 +206,9 @@ namespace Web.Services.Concrete
                 .WithSqlParam("@sortOrder", model.SortOrder)
                 .WithSqlParam("@sortCol", model.SortCol)
                 .WithSqlParam("@filterVal", model.FilterVal)
-                .ExecuteStoredProc<User>();
+                .ExecuteStoredProc<RegisterCredentialVM>();
 
-            var users = AutoMapperHelper.MapList<User, RegisterCredentialVM>(result);
+            var users = result; //AutoMapperHelper.MapList<User, RegisterCredentialVM>(result);
             //var userRelationIds = this._userRelationRepo.GetList();
             var genders = _controlListDetails.Table.Where(x => x.ControlListIdFk == UCLEnums.Genders.ToInt()).Select(x => new { x.ControlListDetailId, x.Title });
             foreach (var item in users)
@@ -226,7 +226,14 @@ namespace Web.Services.Concrete
                 //item.dptIdsFT = _serviceRepo.Table.Where(x => item.serviceIdsFT.Contains(x.ServiceLineId) && !x.IsDeleted).Select(x => x.DepartmentIdFk).Distinct().ToList();
                 //item.orgIdsFT = _departmentRepo.Table.Where(x => item.dptIdsFT.Contains(x.DepartmentId) && !x.IsDeleted).Select(x => x.OrganizationIdFk).Distinct().ToList();
             }
-            return new BaseResponse { Status = HttpStatusCode.OK, Message = "Users List Returned", Body = users };
+
+            int totalRecord = 0;
+            if (users.Count > 0) 
+            {
+                totalRecord = users.Select(x => x.Total_Records).FirstOrDefault();
+            }
+
+            return new BaseResponse { Status = HttpStatusCode.OK, Message = "Users List Returned", Body = new { totalRecord, users } };
         }
         public BaseResponse GetAllUsersByServiceLineAndRoleId(string OrganizationId, string ServiceLineId, string RoleIds)
         {
