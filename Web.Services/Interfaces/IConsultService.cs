@@ -22,7 +22,7 @@ namespace Web.Services.Interfaces
         BaseResponse GetAllConsults();
         BaseResponse GetConsultGraphDataForOrg(int orgId, int days = 6);
         BaseResponse GetConsultById(int Id);
-        BaseResponse GetConsultsByServiceLineId(ConsultFieldsVM consult);
+        BaseResponse GetConsultsByServiceLineId(ConsultVM consult);
         BaseResponse AddOrUpdateConsult(IDictionary<string, object> keyValues);
         BaseResponse DeleteConsult(int consultId);
         #endregion

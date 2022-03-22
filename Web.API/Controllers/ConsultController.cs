@@ -186,7 +186,7 @@ namespace Web.API.Controllers
 
         [Description("Get Consults By Service Line Id")]
         [HttpPost("consult/GetConsultsByServiceLineId")]
-        public BaseResponse GetConsultsByServiceLineId([FromBody] ConsultFieldsVM consult)
+        public BaseResponse GetConsultsByServiceLineId([FromBody] ConsultVM consult)
         {
             try
             {
