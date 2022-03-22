@@ -12,6 +12,7 @@ namespace Web.Data.Models
         public int? IvrparentId { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
+        public int NodeTypeId { get; set; }
         public int? KeyPress { get; set; }
         public string Icon { get; set; }
         public int CreatedBy { get; set; }
