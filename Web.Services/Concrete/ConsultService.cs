@@ -308,7 +308,7 @@ namespace Web.Services.Concrete
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = consultData };
         }
 
-        public BaseResponse GetConsultsByServiceLineId(ConsultFieldsVM consult)
+        public BaseResponse GetConsultsByServiceLineId(ConsultVM consult)
         {
             var consultData = _dbContext.LoadStoredProcedure("md_getGetConsultsByServiceLineId_Daynamic")
                 .WithSqlParam("@organizationId", consult.OrganizationId)

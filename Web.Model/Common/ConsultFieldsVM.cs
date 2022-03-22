@@ -20,6 +20,7 @@ namespace Web.Model.Common
 
         public int SortOrder { get; set; }
         public bool IsSelected { get; set; }
+
         public bool showAllConsults { get; set; } = false;
         public bool IsFromDashboard { get; set; } = false;
         public string ServiceLineIds { get; set; }
@@ -28,12 +29,6 @@ namespace Web.Model.Common
 
         public int UserId { get; set; }
 
-        public int PageNumber { get; set; }
-        public int Rows { get; set; }
-        public string Filter { get; set; }
-        public string sortOrder { get; set; }
-        public string SortCol { get; set; }
-        public string FilterVal { get; set; }
 
     }
 }

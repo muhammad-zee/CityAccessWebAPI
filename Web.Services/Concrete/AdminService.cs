@@ -169,11 +169,11 @@ namespace Web.Services.Concrete
             //var result = _user.Table.Where(x => x.IsDeleted == false).ToList();
             var result = this._dbContext.LoadStoredProcedure("md_getAllUsersByOrganizationId")
                 .WithSqlParam("@pOrganizationId", OrganizationId)
-                .WithSqlParam("@pUserRoleId", UserRoleId)
+                .WithSqlParam("@pIsSuperAdmin", ApplicationSettings.isSuperAdmin)
                 .ExecuteStoredProc<User>();
 
             var users = AutoMapperHelper.MapList<User, RegisterCredentialVM>(result);
-            var userRelationIds = this._userRelationRepo.GetList();
+            //var userRelationIds = this._userRelationRepo.GetList();
             var genders = _controlListDetails.Table.Where(x => x.ControlListIdFk == UCLEnums.Genders.ToInt()).Select(x => new { x.ControlListDetailId, x.Title });
             foreach (var item in users)
             {
