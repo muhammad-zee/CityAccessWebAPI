@@ -28,5 +28,12 @@ namespace Web.Model.Common
 
         public int UserId { get; set; }
 
+        public int PageNumber { get; set; }
+        public int Rows { get; set; }
+        public string Filter { get; set; }
+        public string sortOrder { get; set; }
+        public string SortCol { get; set; }
+        public string FilterVal { get; set; }
+
     }
 }

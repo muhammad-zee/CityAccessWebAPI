@@ -310,13 +310,19 @@ namespace Web.Services.Concrete
 
         public BaseResponse GetConsultsByServiceLineId(ConsultFieldsVM consult)
         {
-            var consultData = _dbContext.LoadStoredProcedure("md_getGetConsultsByServiceLineId")
+            var consultData = _dbContext.LoadStoredProcedure("md_getGetConsultsByServiceLineId_Daynamic")
                 .WithSqlParam("@organizationId", consult.OrganizationId)
                 .WithSqlParam("@departmentIds", consult.DepartmentIds)
                 .WithSqlParam("@serviceLineIds", consult.ServiceLineIds)
                 .WithSqlParam("@userId", ApplicationSettings.UserId)
                 .WithSqlParam("@showAllConsults", consult.showAllConsults)
                 .WithSqlParam("@isFromDashboard", consult.IsFromDashboard)
+
+                .WithSqlParam("@page", consult.PageNumber)
+                .WithSqlParam("@size", consult.Rows)
+                .WithSqlParam("@sortOrder", consult.sortOrder)
+                .WithSqlParam("@sortCol", consult.SortCol)
+                .WithSqlParam("@filterVal", consult.FilterVal)
                 .ExecuteStoredProc_ToDictionary();
 
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = consultData };
