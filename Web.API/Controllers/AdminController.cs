@@ -251,7 +251,7 @@ namespace Web.API.Controllers
         #region Role
 
         [HttpPost("admin/GetAllRoles")]
-        public BaseResponse GetAllRoles(RoleVM role)
+        public BaseResponse GetAllRoles([FromBody] RoleVM role)
         {
             try
             {
@@ -273,7 +273,6 @@ namespace Web.API.Controllers
         }
 
 
-        // GET: api/<EmployeeController>
         [HttpGet("admin/GetAllRoles")]
         public BaseResponse GetRoles(int? OrganizationID)
         {
