@@ -474,9 +474,9 @@ namespace Web.Services.Concrete
                     ParentKey = x.IvrparentId,
                     data = x.Description,
                     label = x.Name,
-                    expandedIcon = x.Icon,
-                    collapsedIcon = x.Icon,
-                    icon = "pi pi-image",
+                    //expandedIcon = x.Icon,
+                    //collapsedIcon = x.Icon,
+                    icon = x.Icon,
                     NodeTypeId = x.NodeTypeId,
                     KeyPress = x.KeyPress,
                     expanded = true
