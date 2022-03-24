@@ -247,6 +247,24 @@ namespace Web.API.Controllers
         #region Organizations
 
         [Description("Get All Organizations")]
+        [HttpPost("org/GetAllOrganizations")]
+        public BaseResponse GetAllOrganizations([FromBody] PaginationVM vM)
+        {
+            try
+            {
+                var res = _facilityService.GetAllOrganizations(vM);
+                return res;
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+        
+        
+        [Description("Get All Organizations")]
         [HttpGet("org/GetAllOrganizations")]
         public BaseResponse GetAllOrganizations(int RoleId)
         {

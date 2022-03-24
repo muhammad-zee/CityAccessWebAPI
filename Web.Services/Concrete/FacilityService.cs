@@ -366,6 +366,60 @@ namespace Web.Services.Concrete
 
         #region Organization 
 
+        public BaseResponse GetAllOrganizations(PaginationVM vM)
+        {
+            var orgs = this._dbContext.LoadStoredProcedure("md_getAllOrganizationsByRoleId_Dynamic")
+                     .WithSqlParam("@UserId", ApplicationSettings.UserId)
+                     .WithSqlParam("@IsSuperAdmin", ApplicationSettings.isSuperAdmin)
+                     .WithSqlParam("@page", vM.PageNumber)
+                     .WithSqlParam("@size", vM.Rows)
+                     .WithSqlParam("@sortOrder", vM.SortOrder)
+                     .WithSqlParam("@sortCol", vM.SortCol)
+                     .WithSqlParam("@filterVal", vM.FilterVal)
+                     .ExecuteStoredProc<OrganizationVM>();
+
+            var departments = this._departmentRepo.Table.Where(d => d.IsDeleted != true && orgs.Select(x => x.OrganizationId).Contains(d.OrganizationIdFk.Value)).ToList();
+            var dpts = AutoMapperHelper.MapList<Department, DepartmentVM>(departments);
+
+            var dptServices = (from s in this._serviceRepo.Table
+                               where dpts.Select(x => x.DepartmentId).Contains(s.DepartmentIdFk) && s.IsDeleted != true
+                               select new ServiceLineVM()
+                               {
+                                   ServiceLineId = s.ServiceLineId,
+                                   ServiceName = s.ServiceName,
+                                   ServiceType = s.ServiceType,
+                                   CreatedBy = s.CreatedBy,
+                                   CreatedDate = s.CreatedDate,
+                                   ModifiedBy = s.ModifiedBy,
+                                   ModifiedDate = s.ModifiedDate,
+                                   DepartmentIdFk = s.DepartmentIdFk
+                               }).Distinct().ToList();
+
+            foreach (var item in dpts)
+            {
+                item.ServiceLines = dptServices.Where(x => x.DepartmentIdFk == item.DepartmentId).ToList();
+            }
+            orgs.ForEach(x => x.Departments = dpts.Where(d => d.OrganizationIdFk == x.OrganizationId).ToList());
+
+            //var types = _controlListDetailsRepo.Table.Where(x => x.ControlListIdFk == UCLEnums.OrgType.ToInt()).Select(x => new { x.ControlListDetailId, x.Title });
+            //var states = _controlListDetailsRepo.Table.Where(x => x.ControlListIdFk == UCLEnums.States.ToInt()).Select(x => new { x.ControlListDetailId, x.Title });
+            //foreach (var item in orgs)
+            //{
+            //    item.State = states.Where(x => x.ControlListDetailId == item.StateIdFk).Select(x => x.Title).FirstOrDefault();
+            //    item.OrgType = types.Where(x => x.ControlListDetailId == item.OrganizationType).Select(x => x.Title).FirstOrDefault();
+            //    item.Departments = dpts.Where(x => x.OrganizationIdFk == item.OrganizationId).ToList();
+            //}
+
+
+            return new BaseResponse()
+            {
+                Status = HttpStatusCode.OK,
+                Message = orgs.Count() == 0 ? "Organization Not Found" : "Data Found",
+                Body = orgs
+            };
+        }
+
+
         public BaseResponse GetAllOrganizations(int RoleId)
         {
             var organizations = new List<Organization>();
