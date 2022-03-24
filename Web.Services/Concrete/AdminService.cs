@@ -364,6 +364,20 @@ namespace Web.Services.Concrete
         #endregion
 
         #region Roles
+
+        public BaseResponse GetAllRoles(RoleVM role)
+        {
+            var roleList = this._dbContext.LoadStoredProcedure("")
+                            .WithSqlParam("@organizationId", role.OrganizationId)
+                            .WithSqlParam("@page", role.PageNumber)
+                            .WithSqlParam("@size", role.Rows)
+                            .WithSqlParam("@sortOrder", role.SortOrder)
+                            .WithSqlParam("@sortCol", role.SortCol)
+                            .WithSqlParam("@filterVal", role.FilterVal)
+                            .ExecuteStoredProc<RoleVM>();
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = roleList };
+        }
+
         public IQueryable<Role> getRoleList()
         {
             return this._role.GetList().Where(item => !item.IsDeleted);

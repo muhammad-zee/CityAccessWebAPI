@@ -250,6 +250,29 @@ namespace Web.API.Controllers
 
         #region Role
 
+        [HttpPost("admin/GetAllRoles")]
+        public BaseResponse GetAllRoles(RoleVM role)
+        {
+            try
+            {
+                var response = new BaseResponse();
+                response = _adminService.GetAllRoles(role);
+                return response;
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse()
+                {
+                    Status = HttpStatusCode.BadRequest,
+                    Message = ex.ToString(),
+                    Body = null
+                };
+            }
+        }
+
+
         // GET: api/<EmployeeController>
         [HttpGet("admin/GetAllRoles")]
         public BaseResponse GetRoles(int? OrganizationID)

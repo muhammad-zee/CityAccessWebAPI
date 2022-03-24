@@ -44,6 +44,7 @@ namespace Web.Services.Interfaces
         #endregion
 
         #region Roles
+        BaseResponse GetAllRoles(RoleVM role);
         IQueryable<Role> getRoleList();
         IQueryable<Role> getRoleListByOrganizationId(int OrganizationId);
         IQueryable<Role> getScheduleRoleListByOrganizationId(int OrganizationId);
