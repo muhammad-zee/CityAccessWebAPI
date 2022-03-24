@@ -136,7 +136,7 @@ namespace Web.Services.Concrete
             }
             else
             {
-                dial.Number(phoneNumber: new PhoneNumber(phoneNumber), statusCallback: new Uri(CallbackStatusUrl), statusCallbackMethod: Twilio.Http.HttpMethod.Post,statusCallbackEvent: statusCallbackEventList);
+                dial.Number(phoneNumber: new PhoneNumber(phoneNumber), statusCallback: new Uri(CallbackStatusUrl), statusCallbackMethod: Twilio.Http.HttpMethod.Post, statusCallbackEvent: statusCallbackEventList);
             }
             response.Append(dial);
 
@@ -238,7 +238,7 @@ namespace Web.Services.Concrete
             var xmlResponse = response.ToString();
             return TwiML(response);
         }
-        public TwiMLResult PromptResponse(int Digits,int ParentNodeId)
+        public TwiMLResult PromptResponse(int Digits, int ParentNodeId)
         {
             var IvrSetting = this._dbContext.LoadStoredProcedure("md_getIvrNodesByParentNodeId")
                .WithSqlParam("@pParentNodeId", ParentNodeId)
@@ -246,32 +246,43 @@ namespace Web.Services.Concrete
             int QueryDigit = Convert.ToInt32(Digits);
 
             var ivrNode = IvrSetting.FirstOrDefault(i => i.KeyPress == QueryDigit);
+            var ivrParentNode = this._ivrSettingsRepo.Table.FirstOrDefault(i => i.IvrSettingsId == ParentNodeId && i.IsDeleted != true);
+
             var response = new VoiceResponse();
-            if(ivrNode != null) { 
-                if(ivrNode.NodeTypeId == IvrNodeTypeEnums.Gather.ToInt())
+            if (ivrParentNode.NodeTypeId == IvrNodeTypeEnums.Gather.ToInt())
+            {
+                if (ivrNode != null)
                 {
-                    var GatherResponseUrl = $"{origin}/Call/PromptResponse?parentNodeId={ivrNode.IvrSettingsId}";
-                    var gather = new Gather(numDigits: 1, timeout: 10, action: new Uri(GatherResponseUrl)).Pause(length: 3).Say(ivrNode.Description, language: "en");
-                    response.Append(gather);
+                    if (ivrNode.NodeTypeId == IvrNodeTypeEnums.Gather.ToInt())
+                    {
+                        var GatherResponseUrl = $"{origin}/Call/PromptResponse?parentNodeId={ivrNode.IvrSettingsId}";
+                        var gather = new Gather(numDigits: 1, timeout: 10, action: new Uri(GatherResponseUrl)).Pause(length: 3).Say(ivrNode.Description, language: "en");
+                        response.Append(gather);
+                        response.Say("You did not press any key,\n good bye.!");
+                    }
+                    else if (ivrNode.NodeTypeId == IvrNodeTypeEnums.Voicemail.ToInt())
+                    {
+                        var RecordUrl = $"{origin}/Call/ReceiveVoicemail";
+                        response.Say("Please leave a message at the beep.");
+                        response.Record(action: new Uri(RecordUrl));
+                        response.Say("I did not receive a recording");
+                        response.Leave();
+                    }
                 }
-                else if (ivrNode.NodeTypeId == IvrNodeTypeEnums.Voicemail.ToInt())
+                else
                 {
-                    var RecordUrl = $"{origin}/Call/ReceiveVoicemail";
-                    response.Say("Please leave a message at the beep.");
-                    response.Record(action: new Uri(RecordUrl));
-                    response.Say("I did not receive a recording");
-                    response.Leave();
+                    var GatherResponseUrl = $"{origin}/Call/PromptResponse?parentNodeId={ivrParentNode.IvrSettingsId}";
+                    var gather = new Gather(numDigits: 1, timeout: 10, action: new Uri(GatherResponseUrl)).Pause(length: 3).Say("You Pressed wrong key").Pause(length: 2).Say(ivrParentNode.Description, language: "en");
+                    response.Append(gather);
+
+                    response.Say("You did not press any key,\n good bye.!");
                 }
             }
             else
             {
-               var ivrParentNode = this._ivrSettingsRepo.Table.FirstOrDefault(i => i.IvrSettingsId == ParentNodeId && i.IsDeleted != true);
-                var GatherResponseUrl = $"{origin}/Call/PromptResponse?parentNodeId={ivrParentNode.IvrSettingsId}";
-                var gather = new Gather(numDigits: 1, timeout: 10, action: new Uri(GatherResponseUrl)).Pause(length: 3).Say("You Pressed wrong key").Pause(length: 2).Say(ivrParentNode.Description, language: "en");
-                response.Append(gather);
 
             }
-            response.Say("You did not press any key,\n good bye.!");
+
 
             //if (QueryDigit == 1)
             //{
@@ -427,30 +438,31 @@ namespace Web.Services.Concrete
 
 
         #region IVR Settings
-        public BaseResponse getIvrTree()
-        {
-            var IvrSetting = this._ivrSettingsRepo.Table.Where(i => !i.IsDeleted).ToList();
-            if (IvrSetting.Count() > 0)
-            {
-                var treeItems = IvrSetting.Select(x => new IvrTreeVM()
-                {
-                    key = x.IvrSettingsId.ToString(),
-                    ParentKey = x.IvrparentId,
-                    data = x.Description,
-                    label = x.Name,
-                    expandedIcon = x.Icon,
-                    collapsedIcon = x.Icon,
-                    KeyPress = x.KeyPress,
-                    expanded = true
-                }).ToList();
-                var treeViewItems = treeItems.BuildIvrTree();
-                return new BaseResponse { Status = HttpStatusCode.OK, Message = "IVR Returned", Body = treeViewItems };
-            }
-            else
-            {
-                return new BaseResponse { Status = HttpStatusCode.NotFound, Message = "IVR Not Found" };
-            }
-        }
+        //public BaseResponse getIvrTree()
+        //{
+        //    var IvrSetting = this._ivrSettingsRepo.Table.Where(i => i.IsDeleted!= true).ToList();
+        //    if (IvrSetting.Count() > 0)
+        //    {
+        //        var treeItems = IvrSetting.Select(x => new IvrTreeVM()
+        //        {
+        //            key = x.IvrSettingsId.ToString(),
+        //            ParentKey = x.IvrparentId,
+        //            data = x.Description,
+        //            label = x.Name,
+        //            expandedIcon = x.Icon,
+        //            collapsedIcon = x.Icon,
+        //            icon = "pi pi-image",
+        //            KeyPress = x.KeyPress,
+        //            expanded = true
+        //        }).ToList();
+        //        var treeViewItems = treeItems.BuildIvrTree();
+        //        return new BaseResponse { Status = HttpStatusCode.OK, Message = "IVR Returned", Body = treeViewItems };
+        //    }
+        //    else
+        //    {
+        //        return new BaseResponse { Status = HttpStatusCode.NotFound, Message = "IVR Not Found" };
+        //    }
+        //}
         public BaseResponse getIvrTree(int Id)
         {
             var IvrSetting = this._ivrSettingsRepo.Table.Where(i => !i.IsDeleted && i.IvrIdFk == Id).ToList();
@@ -464,6 +476,7 @@ namespace Web.Services.Concrete
                     label = x.Name,
                     expandedIcon = x.Icon,
                     collapsedIcon = x.Icon,
+                    icon = "pi pi-image",
                     NodeTypeId = x.NodeTypeId,
                     KeyPress = x.KeyPress,
                     expanded = true
@@ -557,14 +570,10 @@ namespace Web.Services.Concrete
             if (IVRNode != null)
             {
                 IVRNode.IsDeleted = true;
-                IVRNode.ModifiedBy = userId;
+                IVRNode.ModifiedBy = ApplicationSettings.UserId;
                 IVRNode.ModifiedDate = DateTime.UtcNow;
-                _ivrSettingsRepo.Update(IVRNode);
-
-                var childNodes = _ivrSettingsRepo.Table.Where(x => x.IvrparentId == Id && x.IsDeleted != true).ToList();
-                childNodes.ForEach(x => { x.IsDeleted = true; x.ModifiedBy = userId; x.ModifiedDate = DateTime.UtcNow; });
-
-                _ivrSettingsRepo.Update(childNodes);
+                this._ivrSettingsRepo.Update(IVRNode);
+                this.deleteNodeChildren(Id);
 
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Successfully Deleted" };
             }
@@ -573,6 +582,25 @@ namespace Web.Services.Concrete
                 return new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "Record Not Found" };
             }
 
+        }
+
+        public void deleteNodeChildren(int Id)
+        {
+            if (this._ivrSettingsRepo.Table.Count(x => x.IvrparentId == Id && x.IsDeleted != true) > 0)
+            {
+
+                var childNodes = this._ivrSettingsRepo.Table.Where(x => x.IvrparentId == Id && x.IsDeleted != true).ToList();
+                foreach (var node in childNodes)
+                {
+                    node.IsDeleted = true;
+                    node.ModifiedBy = ApplicationSettings.UserId;
+                    node.ModifiedDate = DateTime.UtcNow;
+
+                    deleteNodeChildren(node.IvrSettingsId);
+                }
+                //childNodes.ForEach(x => { x.IsDeleted = true; x.ModifiedBy = ApplicationSettings.UserId; x.ModifiedDate = DateTime.UtcNow; });
+                this._ivrSettingsRepo.Update(childNodes);
+            }
         }
 
         #endregion

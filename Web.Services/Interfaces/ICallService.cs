@@ -19,7 +19,7 @@ namespace Web.Services.Interfaces
         TwiMLResult ExceptionResponse(Exception ex);
         TwiMLResult ReceiveVoicemail(string RecordingUrl, string RecordingSid);
 
-        BaseResponse getIvrTree();
+        //BaseResponse getIvrTree();
         BaseResponse getIvrNodes();
         BaseResponse getIvrTree(int Id);
         BaseResponse getIvrNodes(int Id);

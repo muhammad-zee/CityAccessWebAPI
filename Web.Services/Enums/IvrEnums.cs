@@ -13,6 +13,6 @@ namespace Web.Services.Enums
         Enqueue = 1127,
         AfterHour = 1128,
         ClinicalHour = 1129,
-            Say= 1130
+        Say = 1130
     }
 }
