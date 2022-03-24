@@ -367,7 +367,7 @@ namespace Web.Services.Concrete
 
         public BaseResponse GetAllRoles(RoleVM role)
         {
-            var roleList = this._dbContext.LoadStoredProcedure("")
+            var roleList = this._dbContext.LoadStoredProcedure("md_getAllRoles")
                             .WithSqlParam("@organizationId", role.OrganizationId)
                             .WithSqlParam("@page", role.PageNumber)
                             .WithSqlParam("@size", role.Rows)
