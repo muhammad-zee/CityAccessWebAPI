@@ -273,7 +273,7 @@ namespace Web.API.Controllers
         {
             try
             {
-                return this._callService.DeleteIVRNode(Id, userId);
+                return this._callService.DeleteIVRNode(Id);
             }
             catch (Exception ex)
             {
@@ -325,7 +325,7 @@ namespace Web.API.Controllers
         {
             try
             {
-                return this._callService.DeleteIVR(Id, userId);
+                return this._callService.DeleteIVR(Id);
             }
             catch (Exception ex)
             {

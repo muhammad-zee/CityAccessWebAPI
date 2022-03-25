@@ -220,19 +220,30 @@ namespace Web.Services.Concrete
         {
             var response = new VoiceResponse();
             //var GatherResponseUrl = $"https://" + origin + "/AutomatedCall/PatientResponse?PatientID=" + PatientID + "&AppointmentID=" + AppointmentID + "&Price=" + Price;
-            var IvrResponse = this._dbContext.LoadStoredProcedure("md_getIvrNodesByParentNodeId")
+            var rootNode = this._dbContext.LoadStoredProcedure("md_getIvrNodesByParentNodeId")
                 .WithSqlParam("@pParentNodeId", 0)
                 .ExecuteStoredProc<IvrSettingVM>().FirstOrDefault();
-            var GatherResponseUrl = $"{origin}/Call/PromptResponse?parentNodeId={IvrResponse.IvrSettingsId}";
+            response.Say(rootNode.Description);
 
+            var childNodes = this._dbContext.LoadStoredProcedure("md_getIvrNodesByParentNodeId")
+                .WithSqlParam("@pParentNodeId", rootNode.IvrSettingsId)
+                .ExecuteStoredProc<IvrSettingVM>().ToList();
+            IvrSettingVM childNode = null;
+            response.Say(rootNode.Description);
 
-            //var gather = new Gather(numDigits: 1, timeout: 10, action: new Uri(GatherResponseUrl)).Pause(length: 3)
-            //                              .Say("Press one to  talk to Bilal.", language: "en").Pause(length: 1)
-            //                              .Say("Press two to talk to an Zee.", language: "en").Pause(length: 1)
-            //                              .Say("Press three to send voice mail");
-
+            if (DateTime.Now > DateTime.Now.AddHours(2))
+            {
+                //afterhours
+                childNode = childNodes.FirstOrDefault(n => n.NodeTypeId == IvrNodeTypeEnums.AfterHour.ToInt());
+            }
+            else
+            {
+                //clinical hours
+                childNode = childNodes.FirstOrDefault(n => n.NodeTypeId == IvrNodeTypeEnums.ClinicalHour.ToInt());
+            }
+                var GatherResponseUrl = $"{origin}/Call/PromptResponse?parentNodeId={childNode.IvrSettingsId}";
             var gather = new Gather(numDigits: 1, timeout: 10, action: new Uri(GatherResponseUrl)).Pause(length: 3)
-                                          .Say(IvrResponse.Description, language: "en");
+                                          .Say(childNode.Description, language: "en");
             response.Append(gather);
             response.Say("You did not press any key,\n good bye.!");
             var xmlResponse = response.ToString();
@@ -564,7 +575,7 @@ namespace Web.Services.Concrete
             };
         }
 
-        public BaseResponse DeleteIVRNode(int Id, int userId)
+        public BaseResponse DeleteIVRNode(int Id)
         {
             var IVRNode = _ivrSettingsRepo.Table.Where(x => x.IvrSettingsId == Id && x.IsDeleted != true).FirstOrDefault();
             if (IVRNode != null)
@@ -583,7 +594,62 @@ namespace Web.Services.Concrete
             }
 
         }
+        public int addIvrParentNodes(int IvrId)
+        {
+            Ivrsetting ivrNodeCallLanded = new();
+            ivrNodeCallLanded.IvrIdFk = IvrId;
+            ivrNodeCallLanded.IvrparentId = null;
+            ivrNodeCallLanded.Name = "Call Landed";
+            ivrNodeCallLanded.Description = "Welcome";
+            ivrNodeCallLanded.NodeTypeId = IvrNodeTypeEnums.Say.ToInt();
+            ivrNodeCallLanded.KeyPress = null;
+            ivrNodeCallLanded.Icon = "pi pi-sitemap";
+            ivrNodeCallLanded.CreatedBy = ApplicationSettings.UserId;
+            ivrNodeCallLanded.CreatedDate = DateTime.UtcNow;
+            ivrNodeCallLanded.IsDeleted = false;
+            this._ivrSettingsRepo.Insert(ivrNodeCallLanded);
 
+
+            Ivrsetting ivrNodeClinicalHour = new();
+            ivrNodeClinicalHour.IvrIdFk = IvrId;
+            ivrNodeClinicalHour.IvrparentId = ivrNodeCallLanded.IvrSettingsId;
+            ivrNodeClinicalHour.Name = "Clinical Hours";
+            ivrNodeClinicalHour.Description = "You are Calling in Clinical hours";
+            ivrNodeClinicalHour.NodeTypeId = IvrNodeTypeEnums.ClinicalHour.ToInt();
+            ivrNodeClinicalHour.KeyPress = null;
+            ivrNodeClinicalHour.Icon = "pi pi-clock";
+            ivrNodeClinicalHour.CreatedBy = ApplicationSettings.UserId;
+            ivrNodeClinicalHour.CreatedDate = DateTime.UtcNow;
+            ivrNodeClinicalHour.IsDeleted = false;
+
+
+            Ivrsetting ivrNodeAfterHour = new();
+            ivrNodeAfterHour.IvrIdFk = IvrId;
+            ivrNodeAfterHour.IvrparentId = ivrNodeCallLanded.IvrSettingsId;
+            ivrNodeAfterHour.Name = "After Hours";
+            ivrNodeAfterHour.Description = "You are Calling after Clinical hours";
+            ivrNodeAfterHour.NodeTypeId = IvrNodeTypeEnums.AfterHour.ToInt();
+            ivrNodeAfterHour.KeyPress = null;
+            ivrNodeAfterHour.Icon = "pi pi-clock";
+            ivrNodeAfterHour.CreatedBy = ApplicationSettings.UserId;
+            ivrNodeAfterHour.CreatedDate = DateTime.UtcNow;
+            ivrNodeAfterHour.IsDeleted = false;
+
+            List<Ivrsetting> childNodeList = new();
+            childNodeList.Add(ivrNodeAfterHour);
+            childNodeList.Add(ivrNodeClinicalHour);
+
+            this._ivrSettingsRepo.Insert(childNodeList);
+            if (ivrNodeCallLanded.IvrSettingsId > 0 && ivrNodeClinicalHour.IvrSettingsId > 0 && ivrNodeAfterHour.IvrSettingsId > 0)
+            {
+
+                return 1;
+            }
+            else
+            {
+                return 0;
+            }
+        }
         public void deleteNodeChildren(int Id)
         {
             if (this._ivrSettingsRepo.Table.Count(x => x.IvrparentId == Id && x.IsDeleted != true) > 0)
@@ -649,6 +715,9 @@ namespace Web.Services.Concrete
                 ivr.CreatedDate = DateTime.UtcNow;
                 ivr.IsDeleted = false;
                 this._IVRRepo.Insert(ivr);
+
+
+                var saveRootNodes=this.addIvrParentNodes(ivr.IvrId);
             }
             return new BaseResponse()
             {
@@ -658,18 +727,18 @@ namespace Web.Services.Concrete
             };
         }
 
-        public BaseResponse DeleteIVR(int Id, int userId)
+        public BaseResponse DeleteIVR(int Id)
         {
             var IVRNode = this._IVRRepo.Table.Where(x => x.IvrId == Id && x.IsDeleted != true).FirstOrDefault();
             if (IVRNode != null)
             {
                 IVRNode.IsDeleted = true;
-                IVRNode.ModifiedBy = userId;
+                IVRNode.ModifiedBy = ApplicationSettings.UserId;
                 IVRNode.ModifiedDate = DateTime.UtcNow;
                 this._IVRRepo.Update(IVRNode);
 
                 var childNodes = _ivrSettingsRepo.Table.Where(x => x.IvrIdFk == Id && x.IsDeleted != true).ToList();
-                childNodes.ForEach(x => { x.IsDeleted = true; x.ModifiedBy = userId; x.ModifiedDate = DateTime.UtcNow; });
+                childNodes.ForEach(x => { x.IsDeleted = true; x.ModifiedBy = ApplicationSettings.UserId; x.ModifiedDate = DateTime.UtcNow; });
 
                 _ivrSettingsRepo.Update(childNodes);
 

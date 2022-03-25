@@ -26,7 +26,7 @@ namespace Web.Services.Interfaces
         BaseResponse GetNodeType(int Id);
         BaseResponse saveIvrNode(IvrSettingVM model);
         BaseResponse getPreviousCalls();
-        BaseResponse DeleteIVRNode(int Id, int userId);
+        BaseResponse DeleteIVRNode(int Id);
 
         BaseResponse saveCallLog(CallLogVM log);
 
@@ -35,7 +35,7 @@ namespace Web.Services.Interfaces
 
         BaseResponse getAllIvrs();
         BaseResponse saveIVR(IVRVM model);
-        BaseResponse DeleteIVR(int Id, int userId);
+        BaseResponse DeleteIVR(int Id);
 
         #endregion
 
