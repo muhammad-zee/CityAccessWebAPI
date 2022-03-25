@@ -45,6 +45,7 @@ namespace Web.Services.Extensions
         public static DateTime ToUniversalTimeZone(this DateTime dateTime, string currentTimeZone = "Eastern Standard Time")
         {
             TimeZoneInfo easternZone = TimeZoneInfo.FindSystemTimeZoneById(currentTimeZone);
+            //dateTime = TimeZoneInfo.Local.IsDaylightSavingTime(dateTime) ? dateTime.AddHours(1) : dateTime;
             return TimeZoneInfo.ConvertTimeToUtc(dateTime, easternZone);
         }
         public static DateTime ToEST(this DateTime dateTime)

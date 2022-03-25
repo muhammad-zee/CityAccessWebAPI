@@ -391,7 +391,7 @@ namespace Web.Services.Helper
                                 foreach (var col in colMapping)
                                 {
                                     try
-                                    {                                                                                                                  //string colName = colMapping[prop.Name.ToLower()].ColumnName;
+                                    {   //string colName = colMapping[prop.Name.ToLower()].ColumnName;
                                         var val = row[col.Key.ToLower()];
                                         if (val.ToString() != "")
                                             objRow.Add(col.Key.ToCamelCase(), val);

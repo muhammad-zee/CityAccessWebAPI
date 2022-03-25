@@ -425,7 +425,7 @@ namespace Web.Services.Concrete
 
             var calls = this._dbContext.LoadStoredProcedure("md_getPrevioceCallsByUserUniqueId")
                 .WithSqlParam("@pUserUniqueId", "")
-                .ExecuteStoredProc<CallLogVM>();
+                .ExecuteStoredProc_ToDictionary();
             return new BaseResponse()
             {
                 Status = HttpStatusCode.OK,
