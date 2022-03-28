@@ -522,6 +522,31 @@ namespace Web.Services.Concrete
                 };
             }
         }
+        public BaseResponse GetOrganizationTypeByOrgId(int orgId)
+        {
+            var organizationTypeId = this._organizationRepo.Table.Where(x => x.OrganizationId == orgId && x.IsDeleted == false).Select(x=>x.OrganizationType).FirstOrDefault();
+            IQueryable<OrganizationTypeVM> responseList =null;
+            responseList = _controlListDetailsRepo.Table.Where(x => x.ControlListIdFk == UCLEnums.OrgType.ToInt()).Select(x => new OrganizationTypeVM { OrganizationTypeId= x.ControlListDetailId,OrganizationTypeName= x.Title });
+            if(organizationTypeId.Value == 83)
+            {
+                responseList = _controlListDetailsRepo.Table
+                    .Where(x => x.ControlListIdFk == UCLEnums.OrgType.ToInt() && x.IsDeleted != true && x.ControlListDetailId != 83)
+                    .Select(x => new OrganizationTypeVM { OrganizationTypeId = x.ControlListDetailId, OrganizationTypeName = x.Title });
+            }
+            else
+            {
+                responseList = _controlListDetailsRepo.Table
+                   .Where(x => x.ControlListIdFk == UCLEnums.OrgType.ToInt() && x.IsDeleted != true && x.ControlListDetailId == organizationTypeId)
+                   .Select(x => new OrganizationTypeVM { OrganizationTypeId = x.ControlListDetailId, OrganizationTypeName = x.Title });
+            }
+
+            return new BaseResponse()
+            {
+                Status = HttpStatusCode.OK,
+                Message = "Data Found",
+                Body = responseList
+            };
+        }
 
         public BaseResponse AddOrUpdateOrganization(OrganizationVM organization)
         {

@@ -723,7 +723,6 @@ namespace Web.Services.Concrete
             {
                 Status = HttpStatusCode.OK,
                 Message = "Node Saved",
-                Body = ivr
             };
         }
 

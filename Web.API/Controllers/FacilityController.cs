@@ -349,6 +349,23 @@ namespace Web.API.Controllers
             }
         }
 
+        [AllowAnonymous]
+        [Description("Get Organization Type By Id")]
+        [HttpGet("org/GetOrganizationTypeByOrgId/{orgId}")]
+        public BaseResponse GetOrganizationTypeByOrgId(int orgId)
+        {
+            try
+            {
+                var res = _facilityService.GetOrganizationTypeByOrgId(orgId);
+                return res;
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
         #endregion
 
         #region Clinical Hours

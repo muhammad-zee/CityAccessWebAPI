@@ -30,6 +30,7 @@ namespace Web.Services.Interfaces
         BaseResponse GetAllOrganizations(int RoleId);
         BaseResponse GetOrganizationById(int Id);
         BaseResponse GetOrgAssociationTree(string Ids);
+        BaseResponse GetOrganizationTypeByOrgId(int orgId);
         BaseResponse AddOrUpdateOrganization(OrganizationVM organization);
         BaseResponse DeleteOrganization(int Id, int userId);
         #endregion
