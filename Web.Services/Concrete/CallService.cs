@@ -240,8 +240,7 @@ namespace Web.Services.Concrete
                 childNode = childNodes.FirstOrDefault(n => n.NodeTypeId == IvrNodeTypeEnums.ClinicalHour.ToInt());
             }
                 var GatherResponseUrl = $"{origin}/Call/PromptResponse?parentNodeId={childNode.IvrSettingsId}";
-            var gather = new Gather(numDigits: 1, timeout: 10, action: new Uri(GatherResponseUrl)).Pause(length: 3)
-                                          .Say(childNode.Description, language: "en");
+            var gather = new Gather(numDigits: 1, timeout: 10, action: new Uri(GatherResponseUrl)).Say(childNode.Description, language: "en");
             response.Append(gather);
             response.Say("You did not press any key,\n good bye.!");
             var xmlResponse = response.ToString();
@@ -254,69 +253,59 @@ namespace Web.Services.Concrete
                .ExecuteStoredProc<IvrSettingVM>();
             int QueryDigit = Convert.ToInt32(Digits);
 
-            var ivrNode = IvrSetting.FirstOrDefault(i => i.KeyPress == QueryDigit);
+            IvrSettingVM ivrNode = null;
             var ivrParentNode = this._ivrSettingsRepo.Table.FirstOrDefault(i => i.IvrSettingsId == ParentNodeId && i.IsDeleted != true);
 
             var response = new VoiceResponse();
             if (ivrParentNode.NodeTypeId == IvrNodeTypeEnums.Gather.ToInt()||ivrParentNode.NodeTypeId == IvrNodeTypeEnums.AfterHour.ToInt()||ivrParentNode.NodeTypeId == IvrNodeTypeEnums.ClinicalHour.ToInt())
             {
-                if (ivrNode != null)
-                {
-                    if (ivrNode.NodeTypeId == IvrNodeTypeEnums.Gather.ToInt())
-                    {
-                        var GatherResponseUrl = $"{origin}/Call/PromptResponse?parentNodeId={ivrNode.IvrSettingsId}";
-                        var gather = new Gather(numDigits: 1, timeout: 10, action: new Uri(GatherResponseUrl)).Pause(length: 3).Say(ivrNode.Description, language: "en");
-                        response.Append(gather);
-                        response.Say("You did not press any key,\n good bye.!");
-                    }
-                    else if (ivrNode.NodeTypeId == IvrNodeTypeEnums.Voicemail.ToInt())
-                    {
-                        var RecordUrl = $"{origin}/Call/ReceiveVoicemail";
-                        response.Say(ivrNode.Description).Pause(2).Say("press # key after recording message"); ;
-                        response.Record(action: new Uri(RecordUrl),finishOnKey:"#");
-                        response.Say("I did not receive a recording");
-                        response.Leave();
-                    }
-                }
-                else
-                {
-                    var GatherResponseUrl = $"{origin}/Call/PromptResponse?parentNodeId={ivrParentNode.IvrSettingsId}";
-                    var gather = new Gather(numDigits: 1, timeout: 10, action: new Uri(GatherResponseUrl)).Pause(length: 3).Say("You Pressed wrong key").Pause(length: 2).Say(ivrParentNode.Description, language: "en");
-                    response.Append(gather);
+                ivrNode = IvrSetting.FirstOrDefault(i => i.KeyPress == QueryDigit);
+              
+            }
+            else if(ivrParentNode.NodeTypeId == IvrNodeTypeEnums.Say.ToInt())
+            {
+                ivrNode = IvrSetting.FirstOrDefault();
+            }
 
+            if (ivrNode != null)
+            {
+                if (ivrNode.NodeTypeId == IvrNodeTypeEnums.Gather.ToInt())
+                {
+                    var GatherResponseUrl = $"{origin}/Call/PromptResponse?parentNodeId={ivrNode.IvrSettingsId}";
+                    var gather = new Gather(numDigits: 1, timeout: 10, action: new Uri(GatherResponseUrl)).Pause(length: 3).Say(ivrNode.Description, language: "en");
+                    response.Append(gather);
                     response.Say("You did not press any key,\n good bye.!");
+                }
+                else if (ivrNode.NodeTypeId == IvrNodeTypeEnums.Voicemail.ToInt())
+                {
+                    var RecordUrl = $"{origin}/Call/ReceiveVoicemail";
+                    response.Say(ivrNode.Description).Pause(2).Say("press # key after recording message");
+                    response.Record(action: new Uri(RecordUrl), finishOnKey: "#");
+                    response.Say("I did not receive a recording");
+                    response.Leave();
+                }
+                else if (ivrNode.NodeTypeId == IvrNodeTypeEnums.Say.ToInt())
+                {
+                    var RedirectUrl = $"{origin}/Call/PromptResponse?parentNodeId={ivrNode.IvrSettingsId}";
+                    response.Say(ivrNode.Description);
+                    response.Redirect(url: new Uri(RedirectUrl));
+                }
+                else if(ivrNode.NodeTypeId == IvrNodeTypeEnums.Enqueue.ToInt())
+                {
+                    var enqueueCallUrl = $"{origin}/Call/EnqueueCall?parentNodeId={ivrNode.IvrSettingsId}";
+                    response.Say(ivrNode.Description);
+                    response.Redirect(url: new Uri(enqueueCallUrl));
                 }
             }
             else
             {
+                var GatherResponseUrl = $"{origin}/Call/PromptResponse?parentNodeId={ivrParentNode.IvrSettingsId}";
+                var gather = new Gather(numDigits: 1, timeout: 10, action: new Uri(GatherResponseUrl)).Pause(length: 3).Say("You Pressed wrong key").Pause(length: 2).Say(ivrParentNode.Description, language: "en");
+                response.Append(gather);
 
+                response.Say("You did not press any key,\n good bye.!");
             }
 
-
-            //if (QueryDigit == 1)
-            //{
-            //    response.Say("Sorry, Bilal is not available right now");
-
-            //}
-            //else if (QueryDigit == 2)
-            //{
-            //    response.Say("sorry to say zee is not here. we will get back to you when zee will be back");
-            //}
-            //else if (QueryDigit == 3)
-            //{
-            //    var RecordUrl = $"{origin}/Call/ReceiveVoicemail";
-
-            //    response
-            //        .Say("Please leave a message at the beep.");
-            //    response.Record(action: new Uri(RecordUrl));
-            //    response.Say("I did not receive a recording");
-            //    response.Leave();
-
-            //}
-            //else
-            //{
-            //    response.Say("You Pressed wrong key");
-            //}
             return TwiML(response);
         }
         public TwiMLResult ReceiveVoicemail(string RecordingUrl, string RecordingSid)
