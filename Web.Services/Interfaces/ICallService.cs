@@ -34,6 +34,7 @@ namespace Web.Services.Interfaces
         #region IVR
 
         BaseResponse getAllIvrs();
+        BaseResponse getAllIvrsByOrgId(int orgId);
         BaseResponse saveIVR(IVRVM model);
         BaseResponse DeleteIVR(int Id);
 

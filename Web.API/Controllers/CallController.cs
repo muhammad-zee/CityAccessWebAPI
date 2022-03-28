@@ -303,6 +303,21 @@ namespace Web.API.Controllers
             }
 
         }
+        [HttpGet("ivr/getAllIvrsByOrgId/{orgId}")]
+        public BaseResponse getAllIvrsByOrgId(int orgId)
+        {
+            try
+            {
+                return this._callService.getAllIvrsByOrgId(orgId);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+
+        }
 
         [HttpPost("ivr/saveIvr")]
         public BaseResponse saveIVR([FromBody] IVRVM model)
