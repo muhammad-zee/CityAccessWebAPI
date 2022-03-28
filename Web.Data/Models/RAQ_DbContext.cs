@@ -425,6 +425,8 @@ namespace Web.Data.Models
 
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");
 
+                entity.Property(e => e.IsEms).HasColumnName("IsEMS");
+
                 entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
 
                 entity.Property(e => e.ModuleImage)
@@ -956,6 +958,8 @@ namespace Web.Data.Models
                     .IsFixedLength(true);
 
                 entity.Property(e => e.IsActive).HasDefaultValueSql("((1))");
+
+                entity.Property(e => e.IsEms).HasColumnName("IsEMS");
 
                 entity.Property(e => e.LastName)
                     .HasMaxLength(256)

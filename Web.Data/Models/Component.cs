@@ -29,6 +29,7 @@ namespace Web.Data.Models
         public int? SortOrder { get; set; }
         public string ModuleImage { get; set; }
         public bool IsAction { get; set; }
+        public bool IsEms { get; set; }
 
         public virtual ICollection<ComponentAccess> ComponentAccesses { get; set; }
         public virtual ICollection<UserAccess> UserAccesses { get; set; }
