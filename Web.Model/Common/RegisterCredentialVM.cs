@@ -76,6 +76,8 @@ namespace Web.Model.Common
         public string SortOrder { get; set; }
         public string SortCol { get; set; }
         public string FilterVal { get; set; }
+
+        public bool IsEMS { get; set; } = false;
     }
 
     public class UserProfileSchedulesVM
