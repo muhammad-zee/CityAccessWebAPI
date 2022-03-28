@@ -709,6 +709,7 @@ namespace Web.Services.Concrete
                 if (ivr != null)
                 {
                     ivr.OrganizationTypeIdFk = model.OrganizationTypeIdFk;
+                    ivr.OrganizationIdFk = model.OrganizationIdFk;
                     ivr.Name = model.Name;
                     ivr.Description = model.Description;
                     ivr.ModifiedBy = model.ModifiedBy;
@@ -722,6 +723,7 @@ namespace Web.Services.Concrete
             {
                 ivr = new InteractiveVoiceResponse();
                 ivr.OrganizationTypeIdFk = model.OrganizationTypeIdFk;
+                ivr.OrganizationIdFk = model.OrganizationIdFk;
                 ivr.Name = model.Name;
                 ivr.Description = model.Description;
                 ivr.CreatedBy = model.CreatedBy;
