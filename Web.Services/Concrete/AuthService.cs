@@ -24,6 +24,7 @@ namespace Web.Services.Concrete
 {
     public class AuthService : IJwtAuthService
     {
+        private RAQ_DbContext _dbContext;
         private readonly GenericRepository<User> _userRepo;
         private readonly GenericRepository<UserRole> _userRoleRepo;
         private readonly IRepository<UsersRelation> _userRelationRepo;
@@ -37,6 +38,7 @@ namespace Web.Services.Concrete
         private string _encryptionKey = "";
         private IHostingEnvironment _environment;
         public AuthService(IConfiguration config,
+            RAQ_DbContext dbContext,
             IHostingEnvironment environment,
             IRepository<User> userRepo,
             IRepository<UserRole> userRoleRepo,
@@ -57,6 +59,7 @@ namespace Web.Services.Concrete
             this._adminService = adminService;
             this._encryptionKey = this._config["Encryption:key"].ToString();
             this._RootPath = this._config["FilePath:Path"].ToString();
+            this._dbContext = dbContext;
         }
 
 
@@ -336,13 +339,30 @@ namespace Web.Services.Concrete
                             IsEms = register.IsEMS
                         };
                         _userRepo.Insert(obj);
-                        var roleIds = register.RoleIds.ToIntList();
-                        List<UserRole> userRoleList = new List<UserRole>();
-                        foreach (var item in roleIds)
+                        if (register.IsEMS)
                         {
-                            userRoleList.Add(new UserRole() { UserIdFk = obj.UserId, RoleIdFk = item });
+                            try
+                            {
+                                var codes = this._dbContext.LoadStoredProcedure("md_addEMSUserRole")
+                  .WithSqlParam("@UserId", obj.UserId)
+                  .ExecuteStoredProc<string>();
+                            }
+                            catch (Exception ex)
+                            {
+                            }
+
                         }
-                        _userRoleRepo.Insert(userRoleList);
+                        else
+                        {
+                            var roleIds = register.RoleIds.ToIntList();
+                            List<UserRole> userRoleList = new List<UserRole>();
+                            foreach (var item in roleIds)
+                            {
+                                userRoleList.Add(new UserRole() { UserIdFk = obj.UserId, RoleIdFk = item });
+                            }
+                            _userRoleRepo.Insert(userRoleList);
+                        }
+
                         if (!string.IsNullOrEmpty(register.UserImage))
                         {
                             var RootPath = this._RootPath; //this._environment.WebRootPath;
