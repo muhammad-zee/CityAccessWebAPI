@@ -227,6 +227,8 @@ namespace Web.Services.Concrete
                 user.IsActive = register.IsActive;
                 user.ModifiedBy = register.ModifiedBy;
                 user.ModifiedDate = DateTime.UtcNow;
+                user.IsEms = register.IsEMS;
+
                 if (!string.IsNullOrEmpty(register.UserImage))
                 {
                     //var outPath = Directory.GetCurrentDirectory();
@@ -330,7 +332,8 @@ namespace Web.Services.Concrete
                             UserChannelSid = notificationChannel.Sid,
                             ConversationUserSid = conversationUser.Sid,
                             IsDeleted = false,
-                            IsRequirePasswordReset = true
+                            IsRequirePasswordReset = true,
+                            IsEms = register.IsEMS
                         };
                         _userRepo.Insert(obj);
                         var roleIds = register.RoleIds.ToIntList();
