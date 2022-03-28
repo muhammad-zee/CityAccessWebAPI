@@ -547,6 +547,7 @@ namespace Web.Services.Concrete
                     ivrNode.KeyPress = model.KeyPress;
                     ivrNode.ModifiedBy = model.ModifiedBy;
                     ivrNode.ModifiedDate = DateTime.UtcNow;
+                    ivrNode.Icon = model.Icon;
                     ivrNode.IsDeleted = false;
                     this._ivrSettingsRepo.Update(ivrNode);
                 }
