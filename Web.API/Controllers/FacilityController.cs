@@ -349,7 +349,6 @@ namespace Web.API.Controllers
             }
         }
 
-        [AllowAnonymous]
         [Description("Get Organization Type By Id")]
         [HttpGet("org/GetOrganizationTypeByOrgId/{orgId}")]
         public BaseResponse GetOrganizationTypeByOrgId(int orgId)

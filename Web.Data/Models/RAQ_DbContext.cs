@@ -735,7 +735,9 @@ namespace Web.Data.Models
 
                 entity.Property(e => e.Description).IsRequired();
 
-                entity.Property(e => e.Icon).HasMaxLength(20);
+                entity.Property(e => e.Icon)
+                    .IsRequired()
+                    .HasMaxLength(50);
 
                 entity.Property(e => e.IvrparentId).HasColumnName("IVRParentId");
 
