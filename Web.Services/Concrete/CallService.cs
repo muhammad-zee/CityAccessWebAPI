@@ -229,6 +229,7 @@ namespace Web.Services.Concrete
                 .WithSqlParam("@pParentNodeId", rootNode.IvrSettingsId)
                 .ExecuteStoredProc<IvrSettingVM>().ToList();
             IvrSettingVM childNode = null;
+            //TimeSpan startTime = Convert(DateTime);
             if (DateTime.Now > DateTime.Now.AddHours(2))
             {
                 //afterhours
@@ -421,7 +422,7 @@ namespace Web.Services.Concrete
         public BaseResponse getPreviousCalls()
         {
 
-            var calls = this._dbContext.LoadStoredProcedure("md_getPrevioceCallsByUserUniqueId")
+            var calls = this._dbContext.LoadStoredProcedure("md_getPreviousCallsByUserUniqueId")
                 .WithSqlParam("@pUserUniqueId", "")
                 .ExecuteStoredProc_ToDictionary();
             return new BaseResponse()
