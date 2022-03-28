@@ -177,7 +177,7 @@ namespace Web.Services.Concrete
             //var StatusCallbackUrl = $"{origin}/Call/CallbackStatus";
             //url = url.Replace(" ", "%20");
             var To = new PhoneNumber("+923327097498");
-            var From = new PhoneNumber("(848) 400-5547");
+            var From = new PhoneNumber("+17273867112");
             ServicePointManager.SecurityProtocol = (SecurityProtocolType)3072; //TLS 1.2                                                                             
             TwilioClient.Init(this.Twilio_AccountSid, this.Twilio_AuthToken);
             var call = CallResource.Create(to: To,
@@ -229,8 +229,6 @@ namespace Web.Services.Concrete
                 .WithSqlParam("@pParentNodeId", rootNode.IvrSettingsId)
                 .ExecuteStoredProc<IvrSettingVM>().ToList();
             IvrSettingVM childNode = null;
-            response.Say(rootNode.Description);
-
             if (DateTime.Now > DateTime.Now.AddHours(2))
             {
                 //afterhours
@@ -260,7 +258,7 @@ namespace Web.Services.Concrete
             var ivrParentNode = this._ivrSettingsRepo.Table.FirstOrDefault(i => i.IvrSettingsId == ParentNodeId && i.IsDeleted != true);
 
             var response = new VoiceResponse();
-            if (ivrParentNode.NodeTypeId == IvrNodeTypeEnums.Gather.ToInt())
+            if (ivrParentNode.NodeTypeId == IvrNodeTypeEnums.Gather.ToInt()||ivrParentNode.NodeTypeId == IvrNodeTypeEnums.AfterHour.ToInt()||ivrParentNode.NodeTypeId == IvrNodeTypeEnums.ClinicalHour.ToInt())
             {
                 if (ivrNode != null)
                 {
@@ -274,8 +272,8 @@ namespace Web.Services.Concrete
                     else if (ivrNode.NodeTypeId == IvrNodeTypeEnums.Voicemail.ToInt())
                     {
                         var RecordUrl = $"{origin}/Call/ReceiveVoicemail";
-                        response.Say("Please leave a message at the beep.");
-                        response.Record(action: new Uri(RecordUrl));
+                        response.Say(ivrNode.Description).Pause(2).Say("press # key after recording message"); ;
+                        response.Record(action: new Uri(RecordUrl),finishOnKey:"#");
                         response.Say("I did not receive a recording");
                         response.Leave();
                     }
