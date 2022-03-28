@@ -302,7 +302,7 @@ namespace Web.Services.Helper
 
                     da.Fill(ds);
 
-                    if (ds.Tables[0].Rows.Count > 0)
+                    if (ds != null && ds.Tables[0].Rows.Count > 0)
                     {
                         return ds.MapToList<T>();
                     }
