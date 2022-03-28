@@ -217,10 +217,20 @@ namespace Web.Services.Concrete
             return "ok";
         }
         public TwiMLResult CallConnected()
-        {
+        { 
+                 string OfficeOpenTime = "9:00 AM";
+         string OfficeCloseTime = "6:00 PM";
+
+            var dsTime = Convert.ToDateTime(OfficeOpenTime).TimeOfDay;
+            var dcTime = Convert.ToDateTime(OfficeCloseTime).TimeOfDay;
+            var callTime = DateTime.Now.TimeOfDay;
+            var afterOpenTime = TimeSpan.Compare(callTime, dsTime);
+            var beforeCloseTime = TimeSpan.Compare(dcTime, callTime);
+
+
             var response = new VoiceResponse();
             //var GatherResponseUrl = $"https://" + origin + "/AutomatedCall/PatientResponse?PatientID=" + PatientID + "&AppointmentID=" + AppointmentID + "&Price=" + Price;
-            var rootNode = this._dbContext.LoadStoredProcedure("md_getIvrNodesByParentNodeId")
+            var rootNode = this._dbContext.LoadStoredProcedure("md_getIvrNodesByParentNodeId")                       
                 .WithSqlParam("@pParentNodeId", 0)
                 .ExecuteStoredProc<IvrSettingVM>().FirstOrDefault();
             response.Say(rootNode.Description);
@@ -230,7 +240,7 @@ namespace Web.Services.Concrete
                 .ExecuteStoredProc<IvrSettingVM>().ToList();
             IvrSettingVM childNode = null;
             //TimeSpan startTime = Convert(DateTime);
-            if (DateTime.Now > DateTime.Now.AddHours(2))
+            if ( afterOpenTime < 0 || beforeCloseTime < 0)
             {
                 //afterhours
                 childNode = childNodes.FirstOrDefault(n => n.NodeTypeId == IvrNodeTypeEnums.AfterHour.ToInt());
