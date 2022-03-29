@@ -43,6 +43,7 @@ namespace Web.API.Controllers
             }
         }
 
+        [AllowAnonymous]
         [HttpPost("Conversation/sendPushNotification")]
         public BaseResponse sendPushNotification([FromBody] ConversationMessageVM msg)
         {

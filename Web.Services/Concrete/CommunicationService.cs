@@ -55,6 +55,8 @@ namespace Web.Services.Concrete
         private IRepository<Department> _dptRepo;
         private IRepository<Organization> _orgRepo;
 
+        private string _encryptionKey = "";
+        
         public CommunicationService(IConfiguration config,
             RAQ_DbContext dbContext,
             IRepository<User> userRepo,
@@ -93,6 +95,7 @@ namespace Web.Services.Concrete
             this._dptRepo = dptRepo;
             this._orgRepo = orgRepo;
 
+            this._encryptionKey = this._config["Encryption:key"].ToString();
         }
 
         #region [SMS sending]
@@ -255,7 +258,7 @@ namespace Web.Services.Concrete
                 TwilioClient.Init(this.Twilio_AccountSid, this.Twilio_AuthToken);
                 var Notify = Twilio.Rest.Conversations.V1.Service.Conversation.MessageResource.Create(
                                            author: msg.author,
-                                           body: msg.body,
+                                           body: Encryption.encryptData(msg.body,this._encryptionKey),
                                            attributes: msg.attributes,
                                            pathChatServiceSid: Twilio_ChatServiceSid,
                                            pathConversationSid: msg.channelSid
