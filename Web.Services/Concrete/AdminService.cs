@@ -253,7 +253,23 @@ namespace Web.Services.Concrete
 
             return new BaseResponse { Status = HttpStatusCode.OK, Message = "Users List Returned", Body = users };
         }
-
+        public BaseResponse GetAllEMSUsers() 
+        {
+            if (ApplicationSettings.isSuperAdmin) 
+            {
+                var usersEMS = this._dbContext.LoadStoredProcedure("md_GetAllEMSUsers")
+                                .ExecuteStoredProc<RegisterCredentialVM>();
+                var genders = _controlListDetails.Table.Where(x => x.ControlListIdFk == UCLEnums.Genders.ToInt()).Select(x => new { x.ControlListDetailId, x.Title });
+                foreach (var item in usersEMS)
+                {
+                    item.UserRole = getRoleListByUserId(item.UserId).ToList();
+                    item.GenderId = Convert.ToInt32(item.Gender);
+                    item.Gender = genders.Where(x => x.ControlListDetailId == item.GenderId).Select(x => x.Title).FirstOrDefault();
+                }
+                return new BaseResponse { Status = HttpStatusCode.OK, Message = "EMS Users List Returned", Body = usersEMS };
+            }
+            return new BaseResponse { Status = HttpStatusCode.NotFound, Message = "Current user is not a super admin" };
+        }
         public BaseResponse GetUserById(int Id)
         {
             var USER = _user.Table.Where(x => x.UserId == Id && x.IsDeleted == false).FirstOrDefault();

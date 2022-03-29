@@ -183,6 +183,22 @@ namespace Web.API.Controllers
             }
         }
 
+        [Description("Get EMS Users List")]
+        [HttpGet("admin/GetAllEMSUsers")]
+        public BaseResponse GetAllEMSUsers() 
+        {
+            try
+            {
+                return _adminService.GetAllEMSUsers();
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
         [Description("Get User By Id")]
         [HttpGet("admin/GetUserById/{Id}")]
         public async Task<BaseResponse> GetUserById(int Id)
