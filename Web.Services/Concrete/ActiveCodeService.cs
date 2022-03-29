@@ -499,7 +499,7 @@ namespace Web.Services.Concrete
                             .WithSqlParam("@IsSuperAdmin", ApplicationSettings.isSuperAdmin)
                             .WithSqlParam("@showAll", activeCode.showAllActiveCodes)
                             .WithSqlParam("@userId", ApplicationSettings.UserId)
-
+                            .WithSqlParam("@organizationId", activeCode.OrganizationIdFk)
                             .WithSqlParam("@page", activeCode.PageNumber)
                             .WithSqlParam("@size", activeCode.Rows)
                             .WithSqlParam("@sortOrder", activeCode.SortOrder)
@@ -1554,7 +1554,7 @@ namespace Web.Services.Concrete
                            .WithSqlParam("@IsSuperAdmin", ApplicationSettings.isSuperAdmin)
                            .WithSqlParam("@showAll", activeCode.showAllActiveCodes)
                            .WithSqlParam("@userId", ApplicationSettings.UserId)
-
+                           .WithSqlParam("@organizationId", activeCode.OrganizationIdFk)
                             .WithSqlParam("@page", activeCode.PageNumber)
                             .WithSqlParam("@size", activeCode.Rows)
                             .WithSqlParam("@sortOrder", activeCode.SortOrder)
@@ -2604,7 +2604,7 @@ namespace Web.Services.Concrete
                                        .WithSqlParam("@IsSuperAdmin", ApplicationSettings.isSuperAdmin)
                                        .WithSqlParam("@showAll", activeCode.showAllActiveCodes)
                                        .WithSqlParam("@userId", ApplicationSettings.UserId)
-
+                                       .WithSqlParam("@organizationId", activeCode.OrganizationIdFk)
                                         .WithSqlParam("@page", activeCode.PageNumber)
                                         .WithSqlParam("@size", activeCode.Rows)
                                         .WithSqlParam("@sortOrder", activeCode.SortOrder)
@@ -3654,7 +3654,7 @@ namespace Web.Services.Concrete
                            .WithSqlParam("@IsSuperAdmin", ApplicationSettings.isSuperAdmin)
                            .WithSqlParam("@showAll", activeCode.showAllActiveCodes)
                            .WithSqlParam("@userId", ApplicationSettings.UserId)
-
+                           .WithSqlParam("@organizationId", activeCode.OrganizationIdFk)
                             .WithSqlParam("@page", activeCode.PageNumber)
                             .WithSqlParam("@size", activeCode.Rows)
                             .WithSqlParam("@sortOrder", activeCode.SortOrder)
@@ -4746,7 +4746,7 @@ namespace Web.Services.Concrete
                            .WithSqlParam("@IsSuperAdmin", ApplicationSettings.isSuperAdmin)
                            .WithSqlParam("@showAll", activeCode.showAllActiveCodes)
                            .WithSqlParam("@userId", ApplicationSettings.UserId)
-
+                           .WithSqlParam("@organizationId", activeCode.OrganizationIdFk)
                             .WithSqlParam("@page", activeCode.PageNumber)
                             .WithSqlParam("@size", activeCode.Rows)
                             .WithSqlParam("@sortOrder", activeCode.SortOrder)
