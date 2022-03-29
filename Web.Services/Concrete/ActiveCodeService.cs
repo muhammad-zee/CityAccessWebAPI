@@ -678,7 +678,9 @@ namespace Web.Services.Concrete
                 //StrokeDataVM.DefaultServiceLineId = serviceIds.DefaultServiceLineId;
                 //StrokeDataVM.DefaultServiceLine = this._serviceLineRepo.Table.Where(x => x.ServiceLineId == serviceIds.DefaultServiceLineId && !x.IsDeleted).Select(x => new ServiceLineVM() { ServiceLineId = x.ServiceLineId, ServiceName = x.ServiceName }).FirstOrDefault();
                 //StrokeDataVM.SelectedServiceLineIds = string.Join(",", serviceLineIds);
+                if (StrokeDataVM.IsEms.HasValue && StrokeDataVM.IsEms.Value)
                 StrokeDataVM.OrganizationData = GetHosplitalAddressObject(StrokeDataVM.OrganizationIdFk);
+
                 StrokeDataVM.LastKnownWellStr = StrokeDataVM.LastKnownWell?.ToString("yyyy-MM-dd hh:mm:ss tt");
                 StrokeDataVM.DobStr = StrokeDataVM.Dob?.ToString("yyyy-MM-dd hh:mm:ss tt");
                 StrokeDataVM.GenderTitle = _controlListDetailsRepo.Table.Where(g => g.ControlListDetailId == StrokeDataVM.Gender).Select(g => g.Title).FirstOrDefault();
@@ -1732,8 +1734,8 @@ namespace Web.Services.Concrete
                 //SepsisDataVM.ServiceLineTeam1 = this._serviceLineRepo.Table.Where(x => serviceIds.ServiceLineTeam1.ToIntList().Distinct().Contains(x.ServiceLineId) && !x.IsDeleted).Select(x => new ServiceLineVM() { ServiceLineId = x.ServiceLineId, ServiceName = x.ServiceName, IsSelected = serviceLineIds.Select(x => x.ServiceLineId1Fk).Contains(x.ServiceLineId) }).ToList();
                 //SepsisDataVM.ServiceLineTeam2 = this._serviceLineRepo.Table.Where(x => serviceIds.ServiceLineTeam2.ToIntList().Distinct().Contains(x.ServiceLineId) && !x.IsDeleted).Select(x => new ServiceLineVM() { ServiceLineId = x.ServiceLineId, ServiceName = x.ServiceName, IsSelected = serviceLineIds.Select(x => x.ServiceLineId2Fk).Contains(x.ServiceLineId) }).ToList();
 
-
-                SepsisDataVM.OrganizationData = GetHosplitalAddressObject(SepsisDataVM.OrganizationIdFk);
+                if (SepsisDataVM.IsEms)
+                    SepsisDataVM.OrganizationData = GetHosplitalAddressObject(SepsisDataVM.OrganizationIdFk);
                 SepsisDataVM.LastKnownWellStr = SepsisDataVM.LastKnownWell.ToString("yyyy-MM-dd hh:mm:ss tt");
                 SepsisDataVM.DobStr = SepsisDataVM.Dob.ToString("yyyy-MM-dd hh:mm:ss tt");
                 SepsisDataVM.GenderTitle = _controlListDetailsRepo.Table.Where(g => g.ControlListDetailId == SepsisDataVM.Gender).Select(g => g.Title).FirstOrDefault();
@@ -2787,7 +2789,9 @@ namespace Web.Services.Concrete
 
                 STEMIDataVM.LastKnownWellStr = STEMIDataVM.LastKnownWell?.ToString("yyyy-MM-dd hh:mm:ss tt");
                 STEMIDataVM.DobStr = STEMIDataVM.Dob?.ToString("yyyy-MM-dd hh:mm:ss tt");
-                STEMIDataVM.OrganizationData = GetHosplitalAddressObject(STEMIDataVM.OrganizationIdFk);
+                if (STEMIDataVM.IsEms.HasValue && STEMIDataVM.IsEms.Value)
+                    STEMIDataVM.OrganizationData = GetHosplitalAddressObject(STEMIDataVM.OrganizationIdFk);
+
                 STEMIDataVM.GenderTitle = _controlListDetailsRepo.Table.Where(g => g.ControlListDetailId == STEMIDataVM.Gender).Select(g => g.Title).FirstOrDefault();
                 STEMIDataVM.BloodThinnersTitle.AddRange(_controlListDetailsRepo.Table.Where(b => STEMIDataVM.BloodThinners.ToIntList().Contains(b.ControlListDetailId)).Select(b => new { Id = b.ControlListDetailId, b.Title }).ToList());
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Found", Body = STEMIDataVM };
@@ -3832,8 +3836,8 @@ namespace Web.Services.Concrete
                 //TrumaDataVM.ServiceLineTeam1 = this._serviceLineRepo.Table.Where(x => serviceIds.ServiceLineTeam1.ToIntList().Distinct().Contains(x.ServiceLineId) && !x.IsDeleted).Select(x => new ServiceLineVM() { ServiceLineId = x.ServiceLineId, ServiceName = x.ServiceName, IsSelected = serviceLineIds.Select(x => x.ServiceLineId1Fk).Contains(x.ServiceLineId) }).ToList();
                 //TrumaDataVM.ServiceLineTeam2 = this._serviceLineRepo.Table.Where(x => serviceIds.ServiceLineTeam2.ToIntList().Distinct().Contains(x.ServiceLineId) && !x.IsDeleted).Select(x => new ServiceLineVM() { ServiceLineId = x.ServiceLineId, ServiceName = x.ServiceName, IsSelected = serviceLineIds.Select(x => x.ServiceLineId2Fk).Contains(x.ServiceLineId) }).ToList();
 
-
-                TrumaDataVM.OrganizationData = GetHosplitalAddressObject(TrumaDataVM.OrganizationIdFk);
+                if (TrumaDataVM.IsEms.HasValue && TrumaDataVM.IsEms.Value)
+                    TrumaDataVM.OrganizationData = GetHosplitalAddressObject(TrumaDataVM.OrganizationIdFk);
                 TrumaDataVM.LastKnownWellStr = TrumaDataVM.LastKnownWell?.ToString("yyyy-MM-dd hh:mm:ss tt");
                 TrumaDataVM.DobStr = TrumaDataVM.Dob?.ToString("yyyy-MM-dd hh:mm:ss tt");
                 TrumaDataVM.GenderTitle = _controlListDetailsRepo.Table.Where(g => g.ControlListDetailId == TrumaDataVM.Gender).Select(g => g.Title).FirstOrDefault();
@@ -4921,8 +4925,8 @@ namespace Web.Services.Concrete
                 //BlueDataVM.ServiceLineTeam1 = this._serviceLineRepo.Table.Where(x => serviceIds.ServiceLineTeam1.ToIntList().Distinct().Contains(x.ServiceLineId) && !x.IsDeleted).Select(x => new ServiceLineVM() { ServiceLineId = x.ServiceLineId, ServiceName = x.ServiceName, IsSelected = serviceLineIds.Select(x => x.ServiceLineId1Fk).Contains(x.ServiceLineId) }).ToList();
                 //BlueDataVM.ServiceLineTeam2 = this._serviceLineRepo.Table.Where(x => serviceIds.ServiceLineTeam2.ToIntList().Distinct().Contains(x.ServiceLineId) && !x.IsDeleted).Select(x => new ServiceLineVM() { ServiceLineId = x.ServiceLineId, ServiceName = x.ServiceName, IsSelected = serviceLineIds.Select(x => x.ServiceLineId2Fk).Contains(x.ServiceLineId) }).ToList();
 
-
-                BlueDataVM.OrganizationData = GetHosplitalAddressObject(BlueDataVM.OrganizationIdFk);
+                if (BlueDataVM.IsEms.HasValue && BlueDataVM.IsEms.Value)
+                    BlueDataVM.OrganizationData = GetHosplitalAddressObject(BlueDataVM.OrganizationIdFk);
                 BlueDataVM.LastKnownWellStr = BlueDataVM.LastKnownWell?.ToString("yyyy-MM-dd hh:mm:ss tt");
                 BlueDataVM.DobStr = BlueDataVM.Dob?.ToString("yyyy-MM-dd hh:mm:ss tt");
                 BlueDataVM.GenderTitle = _controlListDetailsRepo.Table.Where(g => g.ControlListDetailId == BlueDataVM.Gender).Select(g => g.Title).FirstOrDefault();
