@@ -28,6 +28,8 @@ namespace Web.Services.Interfaces
         BaseResponse getPreviousCalls();
         BaseResponse DeleteIVRNode(int Id);
 
+        BaseResponse copyIvrSettings(int copyFromIvrId, int copyToIvrId);
+
         BaseResponse saveCallLog(CallLogVM log);
 
 

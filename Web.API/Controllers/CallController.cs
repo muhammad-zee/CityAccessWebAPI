@@ -283,6 +283,22 @@ namespace Web.API.Controllers
             }
 
         }
+        [AllowAnonymous]
+        [HttpGet("ivr/copyIvrSettings/{copyFromIvrId}/{copytoIvrId}")]
+        public BaseResponse copyIvrSettings(int copyFromIvrId, int copyToIvrId)
+        {
+            try
+            {
+                return this._callService.copyIvrSettings(copyFromIvrId, copyToIvrId);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+
+        }
 
         #endregion
 

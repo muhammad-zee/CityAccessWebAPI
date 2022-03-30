@@ -668,6 +668,35 @@ namespace Web.Services.Concrete
             }
         }
 
+        public BaseResponse copyIvrSettings(int copyFromIvrId,int copyToIvrId)
+        {
+            BaseResponse response = new();
+            int rowsAffected;
+            string sql = "EXEC md_CopyIvrSettings " +
+                "@pCopyFromIvrId, " +
+                "@pCopyToIvrId, " +
+                "@pCreatedBy ";
+
+            List<SqlParameter> parms = new List<SqlParameter>
+            {
+                new SqlParameter { ParameterName = "@pCopyFromIvrId", Value = copyFromIvrId },
+                new SqlParameter { ParameterName = "@pCopyToIvrId", Value = copytoIvrId },
+                new SqlParameter { ParameterName = "@pCreatedBy",Value=1016 }
+            };
+
+            rowsAffected = this._dbContext.Database.ExecuteSqlRaw(sql, parms.ToArray());
+            if (rowsAffected > 0)
+            {
+                response.Status = HttpStatusCode.OK;
+                response.Message = "IVR Settings Copied Successfully!"; 
+            }
+            else
+            {
+                response.Status = HttpStatusCode.BadRequest;
+                response.Message = "Ivr Settings Not Copied";
+            }
+            return response;
+        }
         #endregion
 
 
