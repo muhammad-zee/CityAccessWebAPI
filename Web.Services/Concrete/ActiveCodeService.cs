@@ -658,7 +658,7 @@ namespace Web.Services.Concrete
                         }
                     }
                 }
-                string Type = StrokeDataVM.IsEms.HasValue && StrokeDataVM.IsEms.Value ? "EMS" : "Active Code";
+                string Type = StrokeDataVM.IsEms.HasValue && StrokeDataVM.IsEms.Value ? "EMS Code" : "Inhouse Code";
                 var serviceIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == strokeData.OrganizationIdFk && x.CodeIdFk == UCLEnums.Stroke.ToInt() && x.Type == Type && !x.IsDeleted).Select(x => new { x.DefaultServiceLineTeam, x.ServiceLineTeam1, x.ServiceLineTeam2 }).FirstOrDefault();
                 var serviceLineIds = (from x in this._codesServiceLinesMappingRepo.Table
                                       where x.OrganizationIdFk == strokeData.OrganizationIdFk && x.CodeIdFk == UCLEnums.Stroke.ToInt()
@@ -1119,7 +1119,7 @@ namespace Web.Services.Concrete
                         OrgId = row.OrganizationIdFk,
                         UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).Distinct().ToList(),
                         From = AuthorEnums.Stroke.ToString(),
-                        Msg = (codeStroke.IsEms.HasValue && codeStroke.IsEms.Value ? "EMS" : "Active") + " Code Stroke From is Changed",
+                        Msg = (codeStroke.IsEms.HasValue && codeStroke.IsEms.Value ? "EMS" : "Inhouse") + " Code Stroke From is Changed",
                         RouteLink = "/Home/Activate%20Code/code-strok-form",
                         RouteLinkEMS = "/Home/EMS/activateCode"
                     };
@@ -1134,7 +1134,7 @@ namespace Web.Services.Concrete
             {
                 if (codeStroke.OrganizationIdFk > 0)
                 {
-                    string IsEMS = codeStroke.IsEms.HasValue && codeStroke.IsEms.Value ? "EMS" : "Active Code";
+                    string IsEMS = codeStroke.IsEms.HasValue && codeStroke.IsEms.Value ? "EMS Code" : "Inhouse Code";
                     var DefaultServiceLineTeam = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeStroke.OrganizationIdFk && x.CodeIdFk == UCLEnums.Stroke.ToInt() && x.Type == IsEMS && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
                     if (DefaultServiceLineTeam != null && DefaultServiceLineTeam != "")
                     {
@@ -1484,7 +1484,7 @@ namespace Web.Services.Concrete
                         if (UserChannelSid != null && UserChannelSid.Count > 0)
                         {
                             string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
-                            string friendlyName = stroke.IsEms.HasValue && stroke.IsEms.Value ? $"EMS Code {UCLEnums.Stroke.ToString()} {stroke.CodeStrokeId}" : $"Active Code {UCLEnums.Stroke.ToString()} {stroke.CodeStrokeId}";
+                            string friendlyName = stroke.IsEms.HasValue && stroke.IsEms.Value ? $"EMS Code {UCLEnums.Stroke.ToString()} {stroke.CodeStrokeId}" : $"Inhouse Code {UCLEnums.Stroke.ToString()} {stroke.CodeStrokeId}";
                             var channel = _communication.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
                             UserChannelSid = UserChannelSid.Distinct().ToList();
                             foreach (var item in UserChannelSid)
@@ -1515,7 +1515,7 @@ namespace Web.Services.Concrete
                             msg.channelSid = channel.Sid;
                             msg.author = "System";
                             msg.attributes = "";
-                            msg.body = $"<strong> {(codeStroke.IsEms.HasValue && codeStroke.IsEms.Value ? "EMS Code" : "Active Code")} {UCLEnums.Stroke.ToString()} </strong></br></br>";
+                            msg.body = $"<strong> {(codeStroke.IsEms.HasValue && codeStroke.IsEms.Value ? "EMS Code" : "Inhouse Code")} {UCLEnums.Stroke.ToString()} </strong></br></br>";
                             if (codeStroke.PatientName != null && codeStroke.PatientName != "")
                                 msg.body += $"<strong>Patient Name: </strong> {codeStroke.PatientName} </br>";
                             msg.body += $"<strong>Dob: </strong> {codeStroke.Dob:MM-dd-yyyy} </br>";
@@ -1714,7 +1714,7 @@ namespace Web.Services.Concrete
                         }
                     }
                 }
-                string Type = SepsisDataVM.IsEms ? "EMS" : "Active Code";
+                string Type = SepsisDataVM.IsEms ? "EMS Code" : "Inhouse Code";
                 var serviceIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == SepsisData.OrganizationIdFk && x.CodeIdFk == UCLEnums.Sepsis.ToInt() && x.Type == Type && !x.IsDeleted).Select(x => new { x.DefaultServiceLineTeam, x.ServiceLineTeam1, x.ServiceLineTeam2 }).FirstOrDefault();
                 var serviceLineIds = (from x in this._codesServiceLinesMappingRepo.Table
                                       where x.OrganizationIdFk == SepsisData.OrganizationIdFk && x.CodeIdFk == UCLEnums.Sepsis.ToInt()
@@ -2174,7 +2174,7 @@ namespace Web.Services.Concrete
                         OrgId = row.OrganizationIdFk,
                         UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).ToList(),
                         From = AuthorEnums.Sepsis.ToString(),
-                        Msg = (codeSepsis.IsEms ? "EMS" : "Active") + " Code Sepsis From is Changed",
+                        Msg = (codeSepsis.IsEms ? "EMS" : "Inhouse") + " Code Sepsis From is Changed",
                         RouteLink = "/Home/Activate%20Code/code-sepsis-form",
                         RouteLinkEMS = "/Home/EMS/activateCode"
                     };
@@ -2190,7 +2190,7 @@ namespace Web.Services.Concrete
 
                 if (codeSepsis.OrganizationIdFk > 0)
                 {
-                    string IsEMS = codeSepsis.IsEms ? "EMS" : "Active Code";
+                    string IsEMS = codeSepsis.IsEms ? "EMS Code" : "Inhouse Code";
                     var DefaultServiceLineTeam = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeSepsis.OrganizationIdFk && x.CodeIdFk == UCLEnums.Sepsis.ToInt() && x.Type == IsEMS && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
                     if (DefaultServiceLineTeam != null && DefaultServiceLineTeam != "")
                     {
@@ -2529,7 +2529,7 @@ namespace Web.Services.Concrete
                         {
                             //string uniqueName = $"CONSULT_{Consult_Counter.Counter_Value.ToString()}";
                             string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
-                            string friendlyName = Sepsis.IsEms ? $"EMS Code {UCLEnums.Sepsis.ToString()} {Sepsis.CodeSepsisId}" : $"Active Code {UCLEnums.Sepsis.ToString()} {Sepsis.CodeSepsisId}";
+                            string friendlyName = Sepsis.IsEms ? $"EMS Code {UCLEnums.Sepsis.ToString()} {Sepsis.CodeSepsisId}" : $"Inhouse Code {UCLEnums.Sepsis.ToString()} {Sepsis.CodeSepsisId}";
                             var conversationChannelAttributes = JsonConvert.SerializeObject(new Dictionary<string, Object>()
                                     {
                                         {ChannelAttributeEnums.ChannelType.ToString(), ChannelTypeEnums.EMS.ToString()},
@@ -2567,7 +2567,7 @@ namespace Web.Services.Concrete
                             msg.channelSid = channel.Sid;
                             msg.author = "System";
                             msg.attributes = "";
-                            msg.body = $"<strong> {(codeSepsis.IsEms ? "EMS Code" : "Active Code")} {UCLEnums.Sepsis.ToString()} </strong></br></br>";
+                            msg.body = $"<strong> {(codeSepsis.IsEms ? "EMS Code" : "Inhouse Code")} {UCLEnums.Sepsis.ToString()} </strong></br></br>";
                             if (codeSepsis.PatientName != null && codeSepsis.PatientName != "")
                                 msg.body += $"<strong>Patient Name: </strong> {codeSepsis.PatientName} </br>";
                             msg.body += $"<strong>Dob: </strong> {codeSepsis.Dob:MM-dd-yyyy} </br>";
@@ -2768,7 +2768,7 @@ namespace Web.Services.Concrete
                         }
                     }
                 }
-                string Type = STEMIDataVM.IsEms.HasValue && STEMIDataVM.IsEms.Value ? "EMS" : "Active Code";
+                string Type = STEMIDataVM.IsEms.HasValue && STEMIDataVM.IsEms.Value ? "EMS Code" : "Inhouse Code";
                 var serviceIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == STEMIData.OrganizationIdFk && x.CodeIdFk == UCLEnums.STEMI.ToInt() && x.Type == Type && !x.IsDeleted).Select(x => new { x.DefaultServiceLineTeam, x.ServiceLineTeam1, x.ServiceLineTeam2 }).FirstOrDefault();
 
                 var serviceLineIds = (from x in this._codesServiceLinesMappingRepo.Table
@@ -3229,7 +3229,7 @@ namespace Web.Services.Concrete
                         OrgId = row.OrganizationIdFk,
                         UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).ToList(),
                         From = AuthorEnums.STEMI.ToString(),
-                        Msg = (codeSTEMI.IsEms.HasValue && codeSTEMI.IsEms.Value ? "EMS" : "Active") + " Code STEMI From is Changed",
+                        Msg = (codeSTEMI.IsEms.HasValue && codeSTEMI.IsEms.Value ? "EMS" : "Inhouse") + " Code STEMI From is Changed",
                         RouteLink = "/Home/Activate%20Code/code-STEMI-form",
                         RouteLinkEMS = "/Home/EMS/activateCode"
                     };
@@ -3244,7 +3244,7 @@ namespace Web.Services.Concrete
             {
                 if (codeSTEMI.OrganizationIdFk > 0)
                 {
-                    string IsEMS = codeSTEMI.IsEms.HasValue && codeSTEMI.IsEms.Value ? "EMS" : "Active Code";
+                    string IsEMS = codeSTEMI.IsEms.HasValue && codeSTEMI.IsEms.Value ? "EMS Code" : "Inhouse Code";
                     var DefaultServiceLineTeam = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeSTEMI.OrganizationIdFk && x.CodeIdFk == UCLEnums.STEMI.ToInt() && x.Type == IsEMS && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
                     if (DefaultServiceLineTeam != null && DefaultServiceLineTeam != "")
                     {
@@ -3585,7 +3585,7 @@ namespace Web.Services.Concrete
                         {
                             //string uniqueName = $"CONSULT_{Consult_Counter.Counter_Value.ToString()}";
                             string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
-                            string friendlyName = STEMI.IsEms.HasValue && STEMI.IsEms.Value ? $"EMS Code {UCLEnums.STEMI.ToString()} {STEMI.CodeStemiid}" : $"Active Code {UCLEnums.STEMI.ToString()} {STEMI.CodeStemiid}";
+                            string friendlyName = STEMI.IsEms.HasValue && STEMI.IsEms.Value ? $"EMS Code {UCLEnums.STEMI.ToString()} {STEMI.CodeStemiid}" : $"Inhouse Code {UCLEnums.STEMI.ToString()} {STEMI.CodeStemiid}";
                             var conversationChannelAttributes = JsonConvert.SerializeObject(new Dictionary<string, Object>()
                                     {
                                         {ChannelAttributeEnums.ChannelType.ToString(), ChannelTypeEnums.EMS.ToString()},
@@ -3623,7 +3623,7 @@ namespace Web.Services.Concrete
                             msg.channelSid = channel.Sid;
                             msg.author = "System";
                             msg.attributes = "";
-                            msg.body = $"<strong> {(codeSTEMI.IsEms.HasValue && codeSTEMI.IsEms.Value ? "EMS Code" : "Active Code")} {UCLEnums.STEMI.ToString()} </strong></br></br>";
+                            msg.body = $"<strong> {(codeSTEMI.IsEms.HasValue && codeSTEMI.IsEms.Value ? "EMS Code" : "Inhouse Code")} {UCLEnums.STEMI.ToString()} </strong></br></br>";
                             if (codeSTEMI.PatientName != null && codeSTEMI.PatientName != "")
                                 msg.body += $"<strong>Patient Name: </strong> {codeSTEMI.PatientName} </br>";
                             msg.body += $"<strong>Dob: </strong> {codeSTEMI.Dob:MM-dd-yyyy} </br>";
@@ -3821,7 +3821,7 @@ namespace Web.Services.Concrete
                         }
                     }
                 }
-                string Type = TrumaDataVM.IsEms.HasValue && TrumaDataVM.IsEms.Value ? "EMS" : "Active Code";
+                string Type = TrumaDataVM.IsEms.HasValue && TrumaDataVM.IsEms.Value ? "EMS Code" : "Inhouse Code";
                 var serviceIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == TrumaData.OrganizationIdFk && x.CodeIdFk == UCLEnums.Trauma.ToInt() && x.Type == Type && !x.IsDeleted).Select(x => new { x.DefaultServiceLineTeam, x.ServiceLineTeam1, x.ServiceLineTeam2 }).FirstOrDefault();
 
 
@@ -4282,7 +4282,7 @@ namespace Web.Services.Concrete
                         OrgId = row.OrganizationIdFk,
                         UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).ToList(),
                         From = AuthorEnums.Trauma.ToString(),
-                        Msg = (codeTruma.IsEms.HasValue && codeTruma.IsEms.Value ? "EMS" : "Active") + " Code Trauma From is Changed",
+                        Msg = (codeTruma.IsEms.HasValue && codeTruma.IsEms.Value ? "EMS" : "Inhouse") + " Code Trauma From is Changed",
                         RouteLink = "/Home/Activate%20Code/code-trauma-form",
                         RouteLinkEMS = "/Home/EMS/activateCode"
                     };
@@ -4343,7 +4343,7 @@ namespace Web.Services.Concrete
 
                 if (codeTruma.OrganizationIdFk > 0)
                 {
-                    string IsEMS = codeTruma.IsEms.HasValue && codeTruma.IsEms.Value ? "EMS" : "Active Code";
+                    string IsEMS = codeTruma.IsEms.HasValue && codeTruma.IsEms.Value ? "EMS Code" : "Inhouse Code";
                     var DefaultServiceLineTeam = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeTruma.OrganizationIdFk && x.CodeIdFk == UCLEnums.Trauma.ToInt() && x.Type == IsEMS && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
                     if (DefaultServiceLineTeam != null && DefaultServiceLineTeam != "")
                     {
@@ -4682,7 +4682,7 @@ namespace Web.Services.Concrete
                         {
                             //string uniqueName = $"CONSULT_{Consult_Counter.Counter_Value.ToString()}";
                             string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
-                            string friendlyName = Truma.IsEms.HasValue && Truma.IsEms.Value ? $"EMS Code {UCLEnums.Trauma.ToString()} {Truma.CodeTraumaId}" : $"Active Code {UCLEnums.Trauma.ToString()} {Truma.CodeTraumaId}";
+                            string friendlyName = Truma.IsEms.HasValue && Truma.IsEms.Value ? $"EMS Code {UCLEnums.Trauma.ToString()} {Truma.CodeTraumaId}" : $"Inhouse Code {UCLEnums.Trauma.ToString()} {Truma.CodeTraumaId}";
                             var conversationChannelAttributes = JsonConvert.SerializeObject(new Dictionary<string, Object>()
                                     {
                                         {ChannelAttributeEnums.ChannelType.ToString(), ChannelTypeEnums.EMS.ToString()},
@@ -4719,7 +4719,7 @@ namespace Web.Services.Concrete
                             msg.channelSid = channel.Sid;
                             msg.author = "System";
                             msg.attributes = "";
-                            msg.body = $"<strong> {(codeTruma.IsEms.HasValue && codeTruma.IsEms.Value ? "EMS Code" : "Active Code")} {UCLEnums.Trauma.ToString()} </strong></br></br>";
+                            msg.body = $"<strong> {(codeTruma.IsEms.HasValue && codeTruma.IsEms.Value ? "EMS Code" : "Inhouse Code")} {UCLEnums.Trauma.ToString()} </strong></br></br>";
                             if (codeTruma.PatientName != null && codeTruma.PatientName != "")
                                 msg.body += $"<strong>Patient Name: </strong> {codeTruma.PatientName} </br>";
                             msg.body += $"<strong>Dob: </strong> {codeTruma.Dob:MM-dd-yyyy} </br>";
@@ -4915,7 +4915,7 @@ namespace Web.Services.Concrete
                         }
                     }
                 }
-                string Type = BlueDataVM.IsEms.HasValue && BlueDataVM.IsEms.Value ? "EMS" : "Active Code";
+                string Type = BlueDataVM.IsEms.HasValue && BlueDataVM.IsEms.Value ? "EMS Code" : "Inhouse Code";
                 var serviceIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == blueData.OrganizationIdFk && x.CodeIdFk == UCLEnums.Blue.ToInt() && x.Type == Type && !x.IsDeleted).Select(x => new { x.DefaultServiceLineTeam, x.ServiceLineTeam1, x.ServiceLineTeam2 }).FirstOrDefault();
 
                 var serviceLineIds = (from x in this._codesServiceLinesMappingRepo.Table
@@ -5371,7 +5371,7 @@ namespace Web.Services.Concrete
                         OrgId = row.OrganizationIdFk,
                         UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).ToList(),
                         From = AuthorEnums.Blue.ToString(),
-                        Msg = (codeBlue.IsEms.HasValue && codeBlue.IsEms.Value ? "EMS" : "Active") + " Code Blue From is Changed",
+                        Msg = (codeBlue.IsEms.HasValue && codeBlue.IsEms.Value ? "EMS" : "Inhouse") + " Code Blue From is Changed",
                         RouteLink = "/Home/Activate%20Code/code-blue-form",
                         RouteLinkEMS = "/Home/EMS/activateCode"
                     };
@@ -5429,7 +5429,7 @@ namespace Web.Services.Concrete
             {
                 if (codeBlue.OrganizationIdFk > 0)
                 {
-                    string IsEMS = codeBlue.IsEms.HasValue && codeBlue.IsEms.Value ? "EMS" : "Active Code";
+                    string IsEMS = codeBlue.IsEms.HasValue && codeBlue.IsEms.Value ? "EMS Code" : "Inhouse Code";
                     var DefaultServiceLineTeam = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeBlue.OrganizationIdFk && x.CodeIdFk == UCLEnums.Blue.ToInt() && x.Type == IsEMS && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
                     if (DefaultServiceLineTeam != null && DefaultServiceLineTeam != "")
                     {
@@ -5779,7 +5779,7 @@ namespace Web.Services.Concrete
                         {
                             //string uniqueName = $"CONSULT_{Consult_Counter.Counter_Value.ToString()}";
                             string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
-                            string friendlyName = blue.IsEms.HasValue && blue.IsEms.Value ? $"EMS Code {UCLEnums.Blue.ToString()} {blue.CodeBlueId}" : $"Active Code {UCLEnums.Blue.ToString()} {blue.CodeBlueId}";
+                            string friendlyName = blue.IsEms.HasValue && blue.IsEms.Value ? $"EMS Code {UCLEnums.Blue.ToString()} {blue.CodeBlueId}" : $"Inhouse Code {UCLEnums.Blue.ToString()} {blue.CodeBlueId}";
                             var channel = _communication.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
                             UserChannelSid = UserChannelSid.Distinct().ToList();
                             foreach (var item in UserChannelSid)
@@ -5810,7 +5810,7 @@ namespace Web.Services.Concrete
                             msg.channelSid = channel.Sid;
                             msg.author = "System";
                             msg.attributes = "";
-                            msg.body = $"<strong> {(codeBlue.IsEms.HasValue && codeBlue.IsEms.Value ? "EMS Code" : "Active Code")} {UCLEnums.Blue.ToString()} </strong></br></br>";
+                            msg.body = $"<strong> {(codeBlue.IsEms.HasValue && codeBlue.IsEms.Value ? "EMS Code" : "Inhouse Code")} {UCLEnums.Blue.ToString()} </strong></br></br>";
                             if (codeBlue.PatientName != null && codeBlue.PatientName != "")
                                 msg.body += $"<strong>Patient Name: </strong> {codeBlue.PatientName} </br>";
                             msg.body += $"<strong>Dob: </strong> {codeBlue.Dob:MM-dd-yyyy} </br>";
