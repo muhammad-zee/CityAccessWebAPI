@@ -15,9 +15,5 @@ namespace Web.Model.Common
 
         public int ServiceLineIdFk { get; set; }
         public int OrganizationIdFk { get; set; }
-        public int OrganizationTypeIdFk { get; set; }
-
-        public string OrganizationType { get; set; }
-
     }
 }

@@ -129,7 +129,7 @@ namespace Web.Services.Concrete
                 Number.EventEnum.Answered,
                 Number.EventEnum.Completed
             }.ToList();
-            var dial = new Dial(callerId: (phoneNumber.Contains("client")?From:Twilio_PhoneNumber/*, record: Dial.RecordEnum.RecordFromAnswer*/);
+            var dial = new Dial(callerId: phoneNumber.Contains("client")?From:Twilio_PhoneNumber/*, record: Dial.RecordEnum.RecordFromAnswer*/);
             if (phoneNumber.Contains("client"))
             {
                 dial.Client(phoneNumber.Replace("client:", ""));
@@ -678,7 +678,7 @@ namespace Web.Services.Concrete
             var IVRs = _IVRRepo.Table.Where(x => x.IsDeleted != true).ToList();
             var types = _controlListDetailsRepo.Table.Where(x => x.ControlListIdFk == UCLEnums.OrgType.ToInt()).Select(x => new { x.ControlListDetailId, x.Title });
             var IVRVMs = AutoMapperHelper.MapList<InteractiveVoiceResponse, IVRVM>(IVRs);
-            IVRVMs.ForEach(x => x.OrganizationType = types.Where(t => t.ControlListDetailId == x.OrganizationTypeIdFk).Select(ty => ty.Title).FirstOrDefault());
+            //IVRVMs.ForEach(x => x.OrganizationType = types.Where(t => t.ControlListDetailId == x.OrganizationTypeIdFk).Select(ty => ty.Title).FirstOrDefault());
             return new BaseResponse()
             {
                 Status = HttpStatusCode.OK,
@@ -691,7 +691,7 @@ namespace Web.Services.Concrete
             var IVRs = _IVRRepo.Table.Where(x => x.IsDeleted != true && x.OrganizationIdFk == orgId).ToList();
             var types = _controlListDetailsRepo.Table.Where(x => x.ControlListIdFk == UCLEnums.OrgType.ToInt()).Select(x => new { x.ControlListDetailId, x.Title });
             var IVRVMs = AutoMapperHelper.MapList<InteractiveVoiceResponse, IVRVM>(IVRs);
-            IVRVMs.ForEach(x => x.OrganizationType = types.Where(t => t.ControlListDetailId == x.OrganizationTypeIdFk).Select(ty => ty.Title).FirstOrDefault());
+            //IVRVMs.ForEach(x => x.OrganizationType = types.Where(t => t.ControlListDetailId == x.OrganizationTypeIdFk).Select(ty => ty.Title).FirstOrDefault());
             return new BaseResponse()
             {
                 Status = HttpStatusCode.OK,
@@ -707,7 +707,6 @@ namespace Web.Services.Concrete
                 ivr = this._IVRRepo.Table.Where(i => i.IvrId == model.IvrId && !i.IsDeleted).FirstOrDefault();
                 if (ivr != null)
                 {
-                    ivr.OrganizationTypeIdFk = model.OrganizationTypeIdFk;
                     ivr.OrganizationIdFk = model.OrganizationIdFk;
                     ivr.ServicelineIdFk = model.ServiceLineIdFk;
                     ivr.Name = model.Name;
@@ -722,7 +721,6 @@ namespace Web.Services.Concrete
             else
             {
                 ivr = new InteractiveVoiceResponse();
-                ivr.OrganizationTypeIdFk = model.OrganizationTypeIdFk;
                 ivr.OrganizationIdFk = model.OrganizationIdFk;
                 ivr.ServicelineIdFk = model.ServiceLineIdFk;
                 ivr.Name = model.Name;
