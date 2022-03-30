@@ -333,7 +333,7 @@ namespace Web.Services.Concrete
                 });
                 datasets.Add(new
                 {
-                    label = "Active Codes",
+                    label = "Inhouse Codes",
                     backgroundColor = "#CEEBEE",
                     borderColor = "#CEEBEE",
                     data = activeCodes
