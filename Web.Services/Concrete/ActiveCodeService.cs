@@ -350,7 +350,7 @@ namespace Web.Services.Concrete
                                                 },
                                                 new
                                                 {
-                                                  label= "Active Codes",
+                                                  label= "Inhouse Codes",
                                                   backgroundColor= "#CEEBEE",
                                                   data= ActiveCodes.Select(c=>c.ActiveCodes).ToList()
                                                 }
