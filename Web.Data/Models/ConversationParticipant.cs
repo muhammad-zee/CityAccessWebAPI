@@ -18,7 +18,7 @@ namespace Web.Data.Models
         public int? ModifiedBy { get; set; }
         public DateTime? ModifiedDate { get; set; }
         public bool IsDeleted { get; set; }
-
+        public bool IsInGroup { get; set; }
         public virtual ConversationChannel ConversationChannelIdFkNavigation { get; set; }
         public virtual User UserIdFkNavigation { get; set; }
     }

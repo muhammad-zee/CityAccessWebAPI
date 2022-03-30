@@ -421,6 +421,8 @@ namespace Web.Services.Concrete
                                         {ChannelAttributeEnums.ConsultId.ToString(), Consult_Counter.Counter_Value}
                                     }, Formatting.Indented);
 
+                        var superAdmins = this._usersRepo.Table.Where(x => x.IsInGroup && !x.IsDeleted).Select(x => new RegisterCredentialVM() { UserUniqueId = x.UserUniqueId, UserId = x.UserId }).ToList();
+                        users.AddRange(superAdmins);
                         var loggedUser = (from u in this._usersRepo.Table
                                           where u.UserId == ApplicationSettings.UserId
                                           select new RegisterCredentialVM

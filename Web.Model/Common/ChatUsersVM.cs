@@ -16,7 +16,7 @@ namespace Web.Model.Common
         public string ConversationUserSid { get; set; }
         public string UserUniqueId { get; set; }
         public string OnCallServiceLines { get; set; }
-
+        public bool IsInGroup { get; set; }
         public List<UserRoleVM> UserRoles { get; set; }
         public List<ServiceLineVM> ServiceLines { get; set; }
         public List<DepartmentVM> Departments { get; set; }

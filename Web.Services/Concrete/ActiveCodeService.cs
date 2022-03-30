@@ -679,7 +679,7 @@ namespace Web.Services.Concrete
                 //StrokeDataVM.DefaultServiceLine = this._serviceLineRepo.Table.Where(x => x.ServiceLineId == serviceIds.DefaultServiceLineId && !x.IsDeleted).Select(x => new ServiceLineVM() { ServiceLineId = x.ServiceLineId, ServiceName = x.ServiceName }).FirstOrDefault();
                 //StrokeDataVM.SelectedServiceLineIds = string.Join(",", serviceLineIds);
                 if (StrokeDataVM.IsEms.HasValue && StrokeDataVM.IsEms.Value)
-                StrokeDataVM.OrganizationData = GetHosplitalAddressObject(StrokeDataVM.OrganizationIdFk);
+                    StrokeDataVM.OrganizationData = GetHosplitalAddressObject(StrokeDataVM.OrganizationIdFk);
 
                 StrokeDataVM.LastKnownWellStr = StrokeDataVM.LastKnownWell?.ToString("yyyy-MM-dd hh:mm:ss tt");
                 StrokeDataVM.DobStr = StrokeDataVM.Dob?.ToString("yyyy-MM-dd hh:mm:ss tt");
@@ -1061,7 +1061,8 @@ namespace Web.Services.Concrete
                                           join u in this._userRepo.Table on us.UserIdFk equals u.UserId
                                           where (DefaultServiceLineIds.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam1Ids.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam2Ids.Contains(us.ServiceLineIdFk.Value)) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
                                           select new { u.UserUniqueId, u.UserId }).Distinct().ToList();
-
+                    var superAdmins = this._userRepo.Table.Where(x => x.IsInGroup && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).ToList();
+                    UserChannelSid.AddRange(superAdmins);
                     var loggedInUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).FirstOrDefault();
                     UserChannelSid.Add(loggedInUser);
 
@@ -1468,6 +1469,9 @@ namespace Web.Services.Concrete
                                               join u in this._userRepo.Table on us.UserIdFk equals u.UserId
                                               where DefaultServiceLineIds.Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
                                               select new { u.UserUniqueId, u.UserId }).Distinct().ToList();
+
+                        var superAdmins = this._userRepo.Table.Where(x => x.IsInGroup && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).ToList();
+                        UserChannelSid.AddRange(superAdmins);
                         var loggedUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).FirstOrDefault();
                         UserChannelSid.Add(loggedUser);
                         var conversationChannelAttributes = JsonConvert.SerializeObject(new Dictionary<string, Object>()
@@ -2069,8 +2073,6 @@ namespace Web.Services.Concrete
                     row.Audio = codeSepsis.AudioFolderRoot;
                 }
 
-
-
                 this._codeSepsisRepo.Update(row);
 
                 //var serviceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == row.OrganizationIdFk && x.CodeIdFk == UCLEnums.Sepsis.ToInt() && !x.IsDeleted).Select(x => x.ServiceLineIds).FirstOrDefault();
@@ -2119,6 +2121,8 @@ namespace Web.Services.Concrete
                                           join u in this._userRepo.Table on us.UserIdFk equals u.UserId
                                           where (DefaultServiceLineIds.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam1Ids.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam2Ids.Contains(us.ServiceLineIdFk.Value)) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
                                           select new { u.UserUniqueId, u.UserId }).Distinct().ToList();
+                    var superAdmins = this._userRepo.Table.Where(x => x.IsInGroup && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).ToList();
+                    UserChannelSid.AddRange(superAdmins);
                     var loggedInUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).FirstOrDefault();
                     UserChannelSid.Add(loggedInUser);
 
@@ -2516,6 +2520,8 @@ namespace Web.Services.Concrete
                                               join u in this._userRepo.Table on us.UserIdFk equals u.UserId
                                               where DefaultServiceLineIds.Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
                                               select new { u.UserUniqueId, u.UserId }).ToList();
+                        var superAdmins = this._userRepo.Table.Where(x => x.IsInGroup && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).ToList();
+                        UserChannelSid.AddRange(superAdmins);
                         var loggedUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).FirstOrDefault();
                         UserChannelSid.Add(loggedUser);
                         List<ActiveCodesGroupMember> ACodeGroupMembers = new List<ActiveCodesGroupMember>();
@@ -3170,6 +3176,8 @@ namespace Web.Services.Concrete
                                           join u in this._userRepo.Table on us.UserIdFk equals u.UserId
                                           where (DefaultServiceLineIds.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam1Ids.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam2Ids.Contains(us.ServiceLineIdFk.Value)) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
                                           select new { u.UserUniqueId, u.UserId }).Distinct().ToList();
+                    var superAdmins = this._userRepo.Table.Where(x => x.IsInGroup && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).ToList();
+                    UserChannelSid.AddRange(superAdmins);
                     var loggedInUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).FirstOrDefault();
                     UserChannelSid.Add(loggedInUser);
 
@@ -3567,6 +3575,9 @@ namespace Web.Services.Concrete
                                               join u in this._userRepo.Table on us.UserIdFk equals u.UserId
                                               where DefaultServiceLineIds.Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
                                               select new { u.UserUniqueId, u.UserId }).ToList();
+
+                        var superAdmins = this._userRepo.Table.Where(x => x.IsInGroup && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).ToList();
+                        UserChannelSid.AddRange(superAdmins);
                         var loggedUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).FirstOrDefault();
                         UserChannelSid.Add(loggedUser);
                         List<ActiveCodesGroupMember> ACodeGroupMembers = new List<ActiveCodesGroupMember>();
@@ -4218,6 +4229,8 @@ namespace Web.Services.Concrete
                                           join u in this._userRepo.Table on us.UserIdFk equals u.UserId
                                           where (DefaultServiceLineIds.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam1Ids.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam2Ids.Contains(us.ServiceLineIdFk.Value)) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
                                           select new { u.UserUniqueId, u.UserId }).Distinct().ToList();
+                    var superAdmins = this._userRepo.Table.Where(x => x.IsInGroup && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).ToList();
+                    UserChannelSid.AddRange(superAdmins);
                     var loggedInUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).FirstOrDefault();
                     UserChannelSid.Add(loggedInUser);
 
@@ -4660,6 +4673,8 @@ namespace Web.Services.Concrete
                                               join u in this._userRepo.Table on us.UserIdFk equals u.UserId
                                               where DefaultServiceLineIds.Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
                                               select new { u.UserUniqueId, u.UserId }).ToList();
+                        var superAdmins = this._userRepo.Table.Where(x => x.IsInGroup && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).ToList();
+                        UserChannelSid.AddRange(superAdmins);
                         var loggedUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).FirstOrDefault();
                         UserChannelSid.Add(loggedUser);
                         List<ActiveCodesGroupMember> ACodeGroupMembers = new();
@@ -5302,6 +5317,8 @@ namespace Web.Services.Concrete
                                           join u in this._userRepo.Table on us.UserIdFk equals u.UserId
                                           where (DefaultServiceLineIds.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam1Ids.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam2Ids.Contains(us.ServiceLineIdFk.Value)) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
                                           select new { u.UserUniqueId, u.UserId }).Distinct().ToList();
+                    var superAdmins = this._userRepo.Table.Where(x => x.IsInGroup && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).ToList();
+                    UserChannelSid.AddRange(superAdmins);
                     var loggedInUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).FirstOrDefault();
                     UserChannelSid.Add(loggedInUser);
 
@@ -5747,6 +5764,8 @@ namespace Web.Services.Concrete
                                               join u in this._userRepo.Table on us.UserIdFk equals u.UserId
                                               where DefaultServiceLineIds.Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
                                               select new { u.UserUniqueId, u.UserId }).ToList();
+                        var superAdmins = this._userRepo.Table.Where(x => x.IsInGroup && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).ToList();
+                        UserChannelSid.AddRange(superAdmins);
                         var loggedUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).FirstOrDefault();
                         UserChannelSid.Add(loggedUser);
                         var conversationChannelAttributes = JsonConvert.SerializeObject(new Dictionary<string, Object>()
