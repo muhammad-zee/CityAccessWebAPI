@@ -266,11 +266,11 @@ namespace Web.API.Controllers
         
         [Description("Get All Organizations")]
         [HttpGet("org/GetAllOrganizations")]
-        public BaseResponse GetAllOrganizations(int RoleId)
+        public BaseResponse GetAllOrganizations()
         {
             try
             {
-                var res = _facilityService.GetAllOrganizations(RoleId);
+                var res = _facilityService.GetAllOrganizations();
                 return res;
             }
             catch (Exception ex)
@@ -351,11 +351,11 @@ namespace Web.API.Controllers
 
         [Description("Delete Organization")]
         [HttpGet("org/DeleteOrganization")]
-        public BaseResponse DeleteOrganization(int Id, int userId)
+        public BaseResponse DeleteOrganization(int OrganizationId)
         {
             try
             {
-                var res = _facilityService.DeleteOrganization(Id, userId);
+                var res = _facilityService.DeleteOrganization(OrganizationId);
                 return res;
             }
             catch (Exception ex)

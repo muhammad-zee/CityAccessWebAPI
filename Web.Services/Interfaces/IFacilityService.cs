@@ -29,12 +29,12 @@ namespace Web.Services.Interfaces
 
         BaseResponse GetOrganizationsForOutpatientIvr();
         BaseResponse GetAllOrganizations(PaginationVM vM);
-        BaseResponse GetAllOrganizations(int RoleId);
+        BaseResponse GetAllOrganizations();
         BaseResponse GetOrganizationById(int Id);
         BaseResponse GetOrgAssociationTree(string Ids);
         BaseResponse GetOrganizationTypeByOrgId(int orgId);
         BaseResponse AddOrUpdateOrganization(OrganizationVM organization);
-        BaseResponse DeleteOrganization(int Id, int userId);
+        BaseResponse DeleteOrganization(int OrganizationId);
         #endregion
 
         #region Clinical Hours
