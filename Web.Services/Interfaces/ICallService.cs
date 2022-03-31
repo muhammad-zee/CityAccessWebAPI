@@ -14,7 +14,7 @@ namespace Web.Services.Interfaces
         TwiMLResult Connect(string phoneNumber, string Twilio_PhoneNumber, string From, string CallSid, string CallStatus);
         CallResource Call();
         string CallbackStatus(IFormCollection Request);
-        TwiMLResult CallConnected();
+        TwiMLResult CallConnected(string To,string From);
         TwiMLResult PromptResponse(int Digits, int ParentNodeId);
         TwiMLResult ExceptionResponse(Exception ex);
         TwiMLResult ReceiveVoicemail(string RecordingUrl, string RecordingSid);

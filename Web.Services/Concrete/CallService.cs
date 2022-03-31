@@ -216,7 +216,7 @@ namespace Web.Services.Concrete
             this.saveCallLog(callRec);
             return "ok";
         }
-        public TwiMLResult CallConnected()
+        public TwiMLResult CallConnected(string To, string From)
         { 
                  string OfficeOpenTime = "9:00 AM";
          string OfficeCloseTime = "6:00 PM";
@@ -227,33 +227,43 @@ namespace Web.Services.Concrete
             var afterOpenTime = TimeSpan.Compare(callTime, dsTime);
             var beforeCloseTime = TimeSpan.Compare(dcTime, callTime);
 
+            var serviceLineId = this._IVRRepo.Table.Where(i => i.IsDeleted!= true && (i.LandlineNumber == To || i.VirtualNumber == To || i.LandlineNumber == From || i.VirtualNumber == From)).Select(i=>i.ServicelineIdFk).FirstOrDefault();
 
             var response = new VoiceResponse();
             //var GatherResponseUrl = $"https://" + origin + "/AutomatedCall/PatientResponse?PatientID=" + PatientID + "&AppointmentID=" + AppointmentID + "&Price=" + Price;
             var rootNode = this._dbContext.LoadStoredProcedure("md_getIvrNodesByParentNodeId")                       
                 .WithSqlParam("@pParentNodeId", 0)
+                .WithSqlParam("@pServiceLineId",serviceLineId)
                 .ExecuteStoredProc<IvrSettingVM>().FirstOrDefault();
-            response.Say(rootNode.Description);
-
-            var childNodes = this._dbContext.LoadStoredProcedure("md_getIvrNodesByParentNodeId")
-                .WithSqlParam("@pParentNodeId", rootNode.IvrSettingsId)
-                .ExecuteStoredProc<IvrSettingVM>().ToList();
-            IvrSettingVM childNode = null;
-            //TimeSpan startTime = Convert(DateTime);
-            if ( afterOpenTime < 0 || beforeCloseTime < 0)
+            if(rootNode != null)
             {
-                //afterhours
-                childNode = childNodes.FirstOrDefault(n => n.NodeTypeId == IvrNodeTypeEnums.AfterHour.ToInt());
+                response.Say(rootNode.Description);
+
+                var childNodes = this._dbContext.LoadStoredProcedure("md_getIvrNodesByParentNodeId")
+                    .WithSqlParam("@pParentNodeId", rootNode.IvrSettingsId)
+                    .ExecuteStoredProc<IvrSettingVM>().ToList();
+                IvrSettingVM childNode = null;
+                //TimeSpan startTime = Convert(DateTime);
+                if (afterOpenTime < 0 || beforeCloseTime < 0)
+                {
+                    //afterhours
+                    childNode = childNodes.FirstOrDefault(n => n.NodeTypeId == IvrNodeTypeEnums.AfterHour.ToInt());
+                }
+                else
+                {
+                    //clinical hours
+                    childNode = childNodes.FirstOrDefault(n => n.NodeTypeId == IvrNodeTypeEnums.ClinicalHour.ToInt());
+                }
+                var GatherResponseUrl = $"{origin}/Call/PromptResponse?parentNodeId={childNode.IvrSettingsId}&serviceLineId={serviceLineId}";
+                var gather = new Gather(numDigits: 1, timeout: 10, action: new Uri(GatherResponseUrl)).Say(childNode.Description, language: "en");
+                response.Append(gather);
+                response.Say("You did not press any key,\n good bye.!");
             }
             else
             {
-                //clinical hours
-                childNode = childNodes.FirstOrDefault(n => n.NodeTypeId == IvrNodeTypeEnums.ClinicalHour.ToInt());
+                response.Say("there is no I V R saved against number that you are calling ");
             }
-                var GatherResponseUrl = $"{origin}/Call/PromptResponse?parentNodeId={childNode.IvrSettingsId}";
-            var gather = new Gather(numDigits: 1, timeout: 10, action: new Uri(GatherResponseUrl)).Say(childNode.Description, language: "en");
-            response.Append(gather);
-            response.Say("You did not press any key,\n good bye.!");
+            
             var xmlResponse = response.ToString();
             return TwiML(response);
         }

@@ -118,11 +118,11 @@ namespace Web.API.Controllers
 
         [AllowAnonymous]
         [HttpPost("Call/CallConnected")]
-        public TwiMLResult CallConnected()
+        public TwiMLResult CallConnected(string To, string From)
         {
             try
             {
-                return this._callService.CallConnected();
+                return this._callService.CallConnected(To, From);
             }
             catch (Exception ex)
             {
