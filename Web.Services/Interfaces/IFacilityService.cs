@@ -26,6 +26,8 @@ namespace Web.Services.Interfaces
         #endregion
 
         #region Organization
+
+        BaseResponse GetOrganizationsForOutpatientIvr();
         BaseResponse GetAllOrganizations(PaginationVM vM);
         BaseResponse GetAllOrganizations(int RoleId);
         BaseResponse GetOrganizationById(int Id);
