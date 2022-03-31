@@ -161,11 +161,15 @@ namespace Web.Services.Concrete
             this.saveCallLog(call);
             return TwiML(response);
         }
-        public TwiMLResult EnqueueCall()
+        public TwiMLResult EnqueueCall(int serviceLineId)
         {
+            var users = _dbContext.LoadStoredProcedure("md_getAllUsersByServiceLineId")
+                        .WithSqlParam("@serviceLineId", serviceLineId)
+                        .ExecuteStoredProc<UserListVm>().ToList();
+
             var response = new VoiceResponse();
             var dial = new Dial();
-            dial.Client("X72ZHE3KSEB49TR");
+            dial.Client(users.FirstOrDefault().UserUniqueId);
             response.Append(dial);
             return TwiML(response);
         }
@@ -219,7 +223,7 @@ namespace Web.Services.Concrete
         public TwiMLResult CallConnected(string To, string From)
         { 
                  string OfficeOpenTime = "9:00 AM";
-         string OfficeCloseTime = "6:00 PM";
+         string OfficeCloseTime = "7:00 PM";
 
             var dsTime = Convert.ToDateTime(OfficeOpenTime).TimeOfDay;
             var dcTime = Convert.ToDateTime(OfficeCloseTime).TimeOfDay;
@@ -267,10 +271,11 @@ namespace Web.Services.Concrete
             var xmlResponse = response.ToString();
             return TwiML(response);
         }
-        public TwiMLResult PromptResponse(int Digits, int ParentNodeId)
+        public TwiMLResult PromptResponse(int Digits, int ParentNodeId,int serviceLineId)
         {
             var IvrSetting = this._dbContext.LoadStoredProcedure("md_getIvrNodesByParentNodeId")
                .WithSqlParam("@pParentNodeId", ParentNodeId)
+               .WithSqlParam("@pServiceLineId", serviceLineId)
                .ExecuteStoredProc<IvrSettingVM>();
             int QueryDigit = Convert.ToInt32(Digits);
 
@@ -292,7 +297,7 @@ namespace Web.Services.Concrete
             {
                 if (ivrNode.NodeTypeId == IvrNodeTypeEnums.Gather.ToInt())
                 {
-                    var GatherResponseUrl = $"{origin}/Call/PromptResponse?parentNodeId={ivrNode.IvrSettingsId}";
+                    var GatherResponseUrl = $"{origin}/Call/PromptResponse?parentNodeId={ivrNode.IvrSettingsId}&serviceLineId={serviceLineId}";
                     var gather = new Gather(numDigits: 1, timeout: 10, action: new Uri(GatherResponseUrl)).Pause(length: 3).Say(ivrNode.Description, language: "en");
                     response.Append(gather);
                     response.Say("You did not press any key,\n good bye.!");
@@ -307,20 +312,20 @@ namespace Web.Services.Concrete
                 }
                 else if (ivrNode.NodeTypeId == IvrNodeTypeEnums.Say.ToInt())
                 {
-                    var RedirectUrl = $"{origin}/Call/PromptResponse?parentNodeId={ivrNode.IvrSettingsId}";
+                    var RedirectUrl = $"{origin}/Call/PromptResponse?parentNodeId={ivrNode.IvrSettingsId}&serviceLineId={serviceLineId}";
                     response.Say(ivrNode.Description);
                     response.Redirect(url: new Uri(RedirectUrl));
                 }
                 else if(ivrNode.NodeTypeId == IvrNodeTypeEnums.Enqueue.ToInt())
                 {
-                    var enqueueCallUrl = $"{origin}/Call/EnqueueCall?parentNodeId={ivrNode.IvrSettingsId}";
+                    var enqueueCallUrl = $"{origin}/Call/EnqueueCall?parentNodeId={ivrNode.IvrSettingsId}&serviceLineId={serviceLineId}";
                     response.Say(ivrNode.Description);
                     response.Redirect(url: new Uri(enqueueCallUrl));
                 }
             }
             else
             {
-                var GatherResponseUrl = $"{origin}/Call/PromptResponse?parentNodeId={ivrParentNode.IvrSettingsId}";
+                var GatherResponseUrl = $"{origin}/Call/PromptResponse?parentNodeId={ivrParentNode.IvrSettingsId}&serviceLineId={serviceLineId}";
                 var gather = new Gather(numDigits: 1, timeout: 10, action: new Uri(GatherResponseUrl)).Pause(length: 3).Say("You Pressed wrong key").Pause(length: 2).Say(ivrParentNode.Description, language: "en");
                 response.Append(gather);
 

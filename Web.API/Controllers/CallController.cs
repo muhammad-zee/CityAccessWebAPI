@@ -49,11 +49,11 @@ namespace Web.API.Controllers
 
         [AllowAnonymous]
         [HttpPost("Call/EnqueueCall")]
-        public TwiMLResult EnqueueCall()
+        public TwiMLResult EnqueueCall(int serviceLineId)
         {
             try
             {
-                return this._callService.EnqueueCall();
+                return this._callService.EnqueueCall(serviceLineId);
             }
             catch (Exception ex)
             {
@@ -135,11 +135,11 @@ namespace Web.API.Controllers
 
         [AllowAnonymous]
         [HttpPost("Call/PromptResponse")]
-        public TwiMLResult PromptResponse(int Digits,int ParentNodeId)
+        public TwiMLResult PromptResponse(int Digits,int ParentNodeId, int serviceLineId)
         {
             try
             {
-                return this._callService.PromptResponse(Digits,ParentNodeId);
+                return this._callService.PromptResponse(Digits,ParentNodeId,serviceLineId);
             }
             catch (Exception ex)
             {
