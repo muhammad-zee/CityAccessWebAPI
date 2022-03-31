@@ -281,6 +281,23 @@ namespace Web.API.Controllers
             }
         }
 
+        [Description("Get All Organizations For Outpatient")]
+        [HttpGet("org/GetAllOrganizationsForOutpatient")]
+        public BaseResponse GetOrganizationsForOutPatient()
+        {
+            try
+            {
+                var res = _facilityService.GetOrganizationsForOutpatientIvr();
+                return res;
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
         [Description("Get Organization  By Id")]
         [HttpGet("org/GetOrganizationById/{Id}")]
         public BaseResponse GetOrganizationById(int Id)
