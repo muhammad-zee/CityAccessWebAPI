@@ -680,7 +680,7 @@ namespace Web.Services.Concrete
             List<SqlParameter> parms = new List<SqlParameter>
             {
                 new SqlParameter { ParameterName = "@pCopyFromIvrId", Value = copyFromIvrId },
-                new SqlParameter { ParameterName = "@pCopyToIvrId", Value = copytoIvrId },
+                new SqlParameter { ParameterName = "@pCopyToIvrId", Value = copyToIvrId },
                 new SqlParameter { ParameterName = "@pCreatedBy",Value=1016 }
             };
 
