@@ -681,7 +681,7 @@ namespace Web.Services.Concrete
             {
                 new SqlParameter { ParameterName = "@pCopyFromIvrId", Value = copyFromIvrId },
                 new SqlParameter { ParameterName = "@pCopyToIvrId", Value = copyToIvrId },
-                new SqlParameter { ParameterName = "@pCreatedBy",Value=1016 }
+                new SqlParameter { ParameterName = "@pCreatedBy",Value=ApplicationSettings.UserId }
             };
 
             rowsAffected = this._dbContext.Database.ExecuteSqlRaw(sql, parms.ToArray());
@@ -740,6 +740,8 @@ namespace Web.Services.Concrete
                     ivr.ServicelineIdFk = model.ServiceLineIdFk;
                     ivr.Name = model.Name;
                     ivr.Description = model.Description;
+                    ivr.VirtualNumber = model.VirtualNumber;
+                    ivr.LandlineNumber = model.LandlineNumber;
                     ivr.ModifiedBy = model.ModifiedBy;
                     ivr.ModifiedDate = DateTime.UtcNow;
                     ivr.IsDeleted = false;
@@ -752,6 +754,8 @@ namespace Web.Services.Concrete
                 ivr = new InteractiveVoiceResponse();
                 ivr.OrganizationIdFk = model.OrganizationIdFk;
                 ivr.ServicelineIdFk = model.ServiceLineIdFk;
+                ivr.VirtualNumber = model.VirtualNumber;
+                ivr.LandlineNumber = model.LandlineNumber;
                 ivr.Name = model.Name;
                 ivr.Description = model.Description;
                 ivr.CreatedBy = model.CreatedBy;

@@ -420,7 +420,7 @@ namespace Web.Services.Concrete
         }
 
 
-        public BaseResponse GetAllOrganizations(int RoleId)
+        public BaseResponse GetAllOrganizations()
         {
             var organizations = new List<Organization>();
             if (ApplicationSettings.isSuperAdmin)
@@ -591,13 +591,13 @@ namespace Web.Services.Concrete
             return response;
         }
 
-        public BaseResponse DeleteOrganization(int Id, int userId)
+        public BaseResponse DeleteOrganization(int OrganizationId)
         {
-            var org = _organizationRepo.Table.Where(x => x.OrganizationId == Id).FirstOrDefault();
+            var org = _organizationRepo.Table.Where(x => x.OrganizationId == OrganizationId).FirstOrDefault();
             if (org != null)
             {
                 org.IsDeleted = true;
-                org.ModifiedBy = userId;
+                org.ModifiedBy = ApplicationSettings.UserId;
                 org.ModifiedDate = DateTime.UtcNow;
                 _organizationRepo.Update(org);
 
