@@ -164,7 +164,7 @@ namespace Web.Services.Concrete
         public TwiMLResult EnqueueCall(int serviceLineId)
         {
             var users = _dbContext.LoadStoredProcedure("md_getAllUsersByServiceLineId")
-                        .WithSqlParam("@serviceLineId", serviceLineId)
+                        .WithSqlParam("@pServiceLineId", serviceLineId)
                         .ExecuteStoredProc<UserListVm>().ToList();
 
             var response = new VoiceResponse();
