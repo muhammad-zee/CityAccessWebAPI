@@ -683,7 +683,7 @@ namespace Web.Services.Concrete
             }
         }
 
-        public BaseResponse copyIvrSettings(int copyFromIvrId,int copyToIvrId)
+        public BaseResponse copyIvrSettings(int copyFromServiceLineId,int copyToServicelineId)
         {
             BaseResponse response = new();
             int rowsAffected;
@@ -694,8 +694,8 @@ namespace Web.Services.Concrete
 
             List<SqlParameter> parms = new List<SqlParameter>
             {
-                new SqlParameter { ParameterName = "@pCopyFromIvrId", Value = copyFromIvrId },
-                new SqlParameter { ParameterName = "@pCopyToIvrId", Value = copyToIvrId },
+                new SqlParameter { ParameterName = "@pCopyFromIvrId", Value = copyFromServiceLineId },
+                new SqlParameter { ParameterName = "@pCopyToIvrId", Value = copyToServicelineId },
                 new SqlParameter { ParameterName = "@pCreatedBy",Value=ApplicationSettings.UserId }
             };
 
