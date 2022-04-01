@@ -282,12 +282,12 @@ namespace Web.API.Controllers
         }
 
         [Description("Get All Organizations For Outpatient")]
-        [HttpGet("org/GetAllOrganizationsForOutpatient")]
-        public BaseResponse GetOrganizationsForOutPatient()
+        [HttpGet("org/GetAllOutpatientOrganization")]
+        public BaseResponse GetOutPatientOrganization()
         {
             try
             {
-                var res = _facilityService.GetOrganizationsForOutpatientIvr();
+                var res = _facilityService.GetOutpatientOrganizationsIvr();
                 return res;
             }
             catch (Exception ex)

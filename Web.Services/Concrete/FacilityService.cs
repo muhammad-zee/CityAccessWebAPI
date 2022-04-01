@@ -419,7 +419,7 @@ namespace Web.Services.Concrete
             };
         }
 
-        public BaseResponse GetOrganizationsForOutpatientIvr()
+        public BaseResponse GetOutpatientOrganizationsIvr()
         {
             var organization = new List<Organization>();
             if (ApplicationSettings.isSuperAdmin) {

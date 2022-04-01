@@ -27,7 +27,7 @@ namespace Web.Services.Interfaces
 
         #region Organization
 
-        BaseResponse GetOrganizationsForOutpatientIvr();
+        BaseResponse GetOutpatientOrganizationsIvr();
         BaseResponse GetAllOrganizations(PaginationVM vM);
         BaseResponse GetAllOrganizations();
         BaseResponse GetOrganizationById(int Id);
