@@ -23,6 +23,7 @@ namespace Web.Services.Concrete
         private ICommunicationService _communicationService;
         private IRepository<User> _usersRepo;
         private IRepository<Organization> _orgRepo;
+        private IRepository<Department> _dptRepo;
         private IRepository<ControlListDetail> _controlListDetailsRepo;
         private IRepository<ConsultField> _consultFieldRepo;
         private IRepository<OrganizationConsultField> _orgConsultRepo;
@@ -35,6 +36,7 @@ namespace Web.Services.Concrete
             IConfiguration config,
             IRepository<User> userRepo,
             IRepository<Organization> orgRepo,
+            IRepository<Department> dptRepo,
             IRepository<ControlListDetail> controlListDetailsRepo,
             IRepository<ConsultField> consultFieldRepo,
             IRepository<OrganizationConsultField> orgConsultRepo,
@@ -46,6 +48,7 @@ namespace Web.Services.Concrete
             this._communicationService = communicationService;
             this._usersRepo = userRepo;
             this._orgRepo = orgRepo;
+            this._dptRepo = dptRepo;
             this._serviceLineRepo = serviceLineRepo;
             this._controlListDetailsRepo = controlListDetailsRepo;
             this._consultFieldRepo = consultFieldRepo;
@@ -495,6 +498,20 @@ namespace Web.Services.Concrete
                                     msg.body += keyValues.ContainsKey("MedicalRecordNumber") ? $"<strong>Medical Record Number:</strong> {keyValues["MedicalRecordNumber"].ToString()} </br>" : "";
                                     msg.body += keyValues.ContainsKey("CallbackNumber") ? $"<strong>Callback Number:</strong> {keyValues["CallbackNumber"].ToString()} </br>" : "";
                                     _communicationService.sendPushNotification(msg);
+
+                                    var orgByServiceId = _dptRepo.Table.Where(x => !x.IsDeleted && x.DepartmentId == _serviceLineRepo.Table.Where(x => !x.IsDeleted && x.ServiceLineId == serviceLineId).Select(x => x.DepartmentIdFk).FirstOrDefault()).Select(x => x.OrganizationIdFk).FirstOrDefault();
+                                    var notification = new PushNotificationVM()
+                                    {
+                                        Id = keyValues["CallbackNumber"].ToInt(),
+                                        OrgId = orgByServiceId.Value,
+                                        UserChannelSid = users.Select(x => x.UserUniqueId).ToList(),
+                                        From = "Consult",
+                                        Msg = "New Consult is Created",
+                                        RouteLink1 = "/Home/Dashboard",
+                                        RouteLink2 = "/Home/Consult"
+                                    };
+
+                                    _communicationService.pushNotification(notification);
                                 }
                             }
                         }
@@ -557,6 +574,19 @@ namespace Web.Services.Concrete
                             msg.channelSid = channel.Sid;
 
                             var sendMsg = _communicationService.sendPushNotification(msg);
+                            var orgByServiceId = _dptRepo.Table.Where(x => !x.IsDeleted && x.DepartmentId == _serviceLineRepo.Table.Where(x => !x.IsDeleted && x.ServiceLineId == serviceLineId).Select(x => x.DepartmentIdFk).FirstOrDefault()).Select(x => x.OrganizationIdFk).FirstOrDefault();
+                            var notification = new PushNotificationVM()
+                            {
+                                Id = keyValues["CallbackNumber"].ToInt(),
+                                OrgId = orgByServiceId.Value,
+                                UserChannelSid = users.Select(x => x.UserUniqueId).ToList(),
+                                From = "Consult",
+                                Msg = "New Consult is Created",
+                                RouteLink1 = "/Home/Dashboard",
+                                RouteLink2 = "/Home/Consult"
+                            };
+
+                            _communicationService.pushNotification(notification);
                         }
                     }
 

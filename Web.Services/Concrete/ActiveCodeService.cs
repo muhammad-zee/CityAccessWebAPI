@@ -385,8 +385,8 @@ namespace Web.Services.Concrete
                     UserChannelSid = UserChannelSid,
                     From = AuthorEnums.Stroke.ToString(),
                     Msg = (rootPath.IsEms.HasValue && rootPath.IsEms.Value ? "EMS" : "Active") + " Code Stroke Form is Changed",
-                    RouteLink = "/Home/Activate%20Code/code-strok-form",
-                    RouteLinkEMS = "/Home/EMS/activateCode"
+                    RouteLink1 = "/Home/Activate%20Code/code-strok-form",
+                    RouteLink2 = "/Home/EMS/activateCode"
                 };
 
                 _communication.pushNotification(notification);
@@ -409,8 +409,8 @@ namespace Web.Services.Concrete
                     UserChannelSid = UserChannelSid,
                     From = AuthorEnums.Sepsis.ToString(),
                     Msg = (rootPath.IsEms.HasValue && rootPath.IsEms.Value ? "EMS" : "Active") + " Code Sepsis Form is Changed",
-                    RouteLink = "/Home/Activate%20Code/code-sepsis-form",
-                    RouteLinkEMS = "/Home/EMS/activateCode"
+                    RouteLink1 = "/Home/Activate%20Code/code-sepsis-form",
+                    RouteLink2 = "/Home/EMS/activateCode"
                 };
 
                 _communication.pushNotification(notification);
@@ -432,8 +432,8 @@ namespace Web.Services.Concrete
                     UserChannelSid = UserChannelSid,
                     From = AuthorEnums.STEMI.ToString(),
                     Msg = (rootPath.IsEms.HasValue && rootPath.IsEms.Value ? "EMS" : "Active") + " Code STEMI Form is Changed",
-                    RouteLink = "/Home/Activate%20Code/code-stemi-form",
-                    RouteLinkEMS = "/Home/EMS/activateCode"
+                    RouteLink1 = "/Home/Activate%20Code/code-stemi-form",
+                    RouteLink2 = "/Home/EMS/activateCode"
                 };
 
                 _communication.pushNotification(notification);
@@ -455,8 +455,8 @@ namespace Web.Services.Concrete
                     UserChannelSid = UserChannelSid,
                     From = AuthorEnums.Trauma.ToString(),
                     Msg = (rootPath.IsEms.HasValue && rootPath.IsEms.Value ? "EMS" : "Active") + " Code Trauma Form is Changed",
-                    RouteLink = "/Home/Activate%20Code/code-trauma-form",
-                    RouteLinkEMS = "/Home/EMS/activateCode"
+                    RouteLink1 = "/Home/Activate%20Code/code-trauma-form",
+                    RouteLink2 = "/Home/EMS/activateCode"
                 };
 
                 _communication.pushNotification(notification);
@@ -478,8 +478,8 @@ namespace Web.Services.Concrete
                     UserChannelSid = UserChannelSid,
                     From = AuthorEnums.Blue.ToString(),
                     Msg = (rootPath.IsEms.HasValue && rootPath.IsEms.Value ? "EMS" : "Active") + " Code Blue Form is Changed",
-                    RouteLink = "/Home/Activate%20Code/code-blue-form",
-                    RouteLinkEMS = "/Home/EMS/activateCode"
+                    RouteLink1 = "/Home/Activate%20Code/code-blue-form",
+                    RouteLink2 = "/Home/EMS/activateCode"
                 };
 
                 _communication.pushNotification(notification);
@@ -1120,8 +1120,8 @@ namespace Web.Services.Concrete
                         UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).Distinct().ToList(),
                         From = AuthorEnums.Stroke.ToString(),
                         Msg = (codeStroke.IsEms.HasValue && codeStroke.IsEms.Value ? "EMS" : "Inhouse") + " Code Stroke From is Changed",
-                        RouteLink = "/Home/Activate%20Code/code-strok-form",
-                        RouteLinkEMS = "/Home/EMS/activateCode"
+                        RouteLink1 = "/Home/Activate%20Code/code-strok-form",
+                        RouteLink2 = "/Home/EMS/activateCode",
                     };
 
                     _communication.pushNotification(notification);
@@ -1525,6 +1525,24 @@ namespace Web.Services.Concrete
                             if (codeStroke.Hpi != null && codeStroke.Hpi != "")
                                 msg.body += $"<strong>Hpi: </strong> {codeStroke.Hpi} </br>";
                             var sendMsg = _communication.sendPushNotification(msg);
+
+                            var showAllAccessUsers = this._dbContext.LoadStoredProcedure("md_getUsersOfComponentAccess")
+                                                .WithSqlParam("@componentName", "Show All EMS,Show All Active Codes,Show Graphs,Show EMS,Show Active Codes")
+                                                .ExecuteStoredProc<RegisterCredentialVM>().Select(x => new { x.UserUniqueId, x.UserId }).Distinct().ToList();
+                            UserChannelSid.AddRange(showAllAccessUsers);
+                            var notification = new PushNotificationVM()
+                            {
+                                Id = codeStroke.CodeStrokeId,
+                                OrgId = codeStroke.OrganizationIdFk,
+                                UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).Distinct().ToList(),
+                                From = AuthorEnums.Stroke.ToString(),
+                                Msg = (codeStroke.IsEms.HasValue && codeStroke.IsEms.Value ? "EMS" : "Inhouse") + " Code Stroke is update",
+                                RouteLink3 = "/Home/EMS",
+                                RouteLink4 = "/Home/Dashboard",
+                                RouteLink5 = "/Home/Inhouse%20Codes"
+                            };
+
+                            _communication.pushNotification(notification);
                         }
                         return GetStrokeDataById(stroke.CodeStrokeId);
                     }
@@ -2175,8 +2193,8 @@ namespace Web.Services.Concrete
                         UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).ToList(),
                         From = AuthorEnums.Sepsis.ToString(),
                         Msg = (codeSepsis.IsEms ? "EMS" : "Inhouse") + " Code Sepsis From is Changed",
-                        RouteLink = "/Home/Activate%20Code/code-sepsis-form",
-                        RouteLinkEMS = "/Home/EMS/activateCode"
+                        RouteLink1 = "/Home/Activate%20Code/code-sepsis-form",
+                        RouteLink2 = "/Home/EMS/activateCode"
                     };
 
                     _communication.pushNotification(notification);
@@ -2578,6 +2596,24 @@ namespace Web.Services.Concrete
                                 msg.body += $"<strong>Hpi: </strong> {codeSepsis.Hpi} </br>";
 
                             var sendMsg = _communication.sendPushNotification(msg);
+
+                            var showAllAccessUsers = this._dbContext.LoadStoredProcedure("md_getUsersOfComponentAccess")
+                                               .WithSqlParam("@componentName", "Show All EMS,Show All Active Codes,Show Graphs,Show EMS,Show Active Codes")
+                                               .ExecuteStoredProc<RegisterCredentialVM>().Select(x => new { x.UserUniqueId, x.UserId }).Distinct().ToList();
+                            UserChannelSid.AddRange(showAllAccessUsers);
+                            var notification = new PushNotificationVM()
+                            {
+                                Id = codeSepsis.CodeSepsisId,
+                                OrgId = codeSepsis.OrganizationIdFk,
+                                UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).Distinct().ToList(),
+                                From = AuthorEnums.Sepsis.ToString(),
+                                Msg = (codeSepsis.IsEms ? "EMS" : "Inhouse") + " Code Sepsis is update",
+                                RouteLink3 = "/Home/EMS",
+                                RouteLink4 = "/Home/Dashboard",
+                                RouteLink5 = "/Home/Inhouse%20Codes"
+                            };
+
+                            _communication.pushNotification(notification);
                         }
                         return GetSepsisDataById(Sepsis.CodeSepsisId);
                     }
@@ -3230,8 +3266,8 @@ namespace Web.Services.Concrete
                         UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).ToList(),
                         From = AuthorEnums.STEMI.ToString(),
                         Msg = (codeSTEMI.IsEms.HasValue && codeSTEMI.IsEms.Value ? "EMS" : "Inhouse") + " Code STEMI From is Changed",
-                        RouteLink = "/Home/Activate%20Code/code-STEMI-form",
-                        RouteLinkEMS = "/Home/EMS/activateCode"
+                        RouteLink1 = "/Home/Activate%20Code/code-STEMI-form",
+                        RouteLink2 = "/Home/EMS/activateCode"
                     };
 
                     _communication.pushNotification(notification);
@@ -3633,6 +3669,24 @@ namespace Web.Services.Concrete
                             if (codeSTEMI.Hpi != null && codeSTEMI.Hpi != "")
                                 msg.body += $"<strong>Hpi: </strong> {codeSTEMI.Hpi} </br>";
                             var sendMsg = _communication.sendPushNotification(msg);
+
+                            var showAllAccessUsers = this._dbContext.LoadStoredProcedure("md_getUsersOfComponentAccess")
+                                               .WithSqlParam("@componentName", "Show All EMS,Show All Active Codes,Show Graphs,Show EMS,Show Active Codes")
+                                               .ExecuteStoredProc<RegisterCredentialVM>().Select(x => new { x.UserUniqueId, x.UserId }).Distinct().ToList();
+                            UserChannelSid.AddRange(showAllAccessUsers);
+                            var notification = new PushNotificationVM()
+                            {
+                                Id = codeSTEMI.CodeStemiid,
+                                OrgId = codeSTEMI.OrganizationIdFk,
+                                UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).Distinct().ToList(),
+                                From = AuthorEnums.STEMI.ToString(),
+                                Msg = (codeSTEMI.IsEms.HasValue && codeSTEMI.IsEms.Value ? "EMS" : "Inhouse") + " Code Stemi is update",
+                                RouteLink3 = "/Home/EMS",
+                                RouteLink4 = "/Home/Dashboard",
+                                RouteLink5 = "/Home/Inhouse%20Codes"
+                            };
+
+                            _communication.pushNotification(notification);
                         }
                         return GetSTEMIDataById(STEMI.CodeStemiid);
                     }
@@ -4283,8 +4337,8 @@ namespace Web.Services.Concrete
                         UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).ToList(),
                         From = AuthorEnums.Trauma.ToString(),
                         Msg = (codeTruma.IsEms.HasValue && codeTruma.IsEms.Value ? "EMS" : "Inhouse") + " Code Trauma From is Changed",
-                        RouteLink = "/Home/Activate%20Code/code-trauma-form",
-                        RouteLinkEMS = "/Home/EMS/activateCode"
+                        RouteLink1 = "/Home/Activate%20Code/code-trauma-form",
+                        RouteLink2 = "/Home/EMS/activateCode"
                     };
 
                     _communication.pushNotification(notification);
@@ -4729,6 +4783,24 @@ namespace Web.Services.Concrete
                             if (codeTruma.Hpi != null && codeTruma.Hpi != "")
                                 msg.body += $"<strong>Hpi: </strong> {codeTruma.Hpi} </br>";
                             var sendMsg = _communication.sendPushNotification(msg);
+
+                            var showAllAccessUsers = this._dbContext.LoadStoredProcedure("md_getUsersOfComponentAccess")
+                                               .WithSqlParam("@componentName", "Show All EMS,Show All Active Codes,Show Graphs,Show EMS,Show Active Codes")
+                                               .ExecuteStoredProc<RegisterCredentialVM>().Select(x => new { x.UserUniqueId, x.UserId }).Distinct().ToList();
+                            UserChannelSid.AddRange(showAllAccessUsers);
+                            var notification = new PushNotificationVM()
+                            {
+                                Id = codeTruma.CodeTraumaId,
+                                OrgId = codeTruma.OrganizationIdFk,
+                                UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).Distinct().ToList(),
+                                From = AuthorEnums.Trauma.ToString(),
+                                Msg = (codeTruma.IsEms.HasValue && codeTruma.IsEms.Value ? "EMS" : "Inhouse") + " Code Trauma is update",
+                                RouteLink3 = "/Home/EMS",
+                                RouteLink4 = "/Home/Dashboard",
+                                RouteLink5 = "/Home/Inhouse%20Codes"
+                            };
+
+                            _communication.pushNotification(notification);
                         }
                         return GetTrumaDataById(Truma.CodeTraumaId);
                     }
@@ -5372,8 +5444,8 @@ namespace Web.Services.Concrete
                         UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).ToList(),
                         From = AuthorEnums.Blue.ToString(),
                         Msg = (codeBlue.IsEms.HasValue && codeBlue.IsEms.Value ? "EMS" : "Inhouse") + " Code Blue From is Changed",
-                        RouteLink = "/Home/Activate%20Code/code-blue-form",
-                        RouteLinkEMS = "/Home/EMS/activateCode"
+                        RouteLink1 = "/Home/Activate%20Code/code-blue-form",
+                        RouteLink2 = "/Home/EMS/activateCode"
                     };
 
                     _communication.pushNotification(notification);
@@ -5820,6 +5892,24 @@ namespace Web.Services.Concrete
                             if (codeBlue.Hpi != null && codeBlue.Hpi != "")
                                 msg.body += $"<strong>Hpi: </strong> {codeBlue.Hpi} </br>";
                             var sendMsg = _communication.sendPushNotification(msg);
+
+                            var showAllAccessUsers = this._dbContext.LoadStoredProcedure("md_getUsersOfComponentAccess")
+                                               .WithSqlParam("@componentName", "Show All EMS,Show All Active Codes,Show Graphs,Show EMS,Show Active Codes")
+                                               .ExecuteStoredProc<RegisterCredentialVM>().Select(x => new { x.UserUniqueId, x.UserId }).Distinct().ToList();
+                            UserChannelSid.AddRange(showAllAccessUsers);
+                            var notification = new PushNotificationVM()
+                            {
+                                Id = codeBlue.CodeBlueId,
+                                OrgId = codeBlue.OrganizationIdFk,
+                                UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).Distinct().ToList(),
+                                From = AuthorEnums.Blue.ToString(),
+                                Msg = (codeBlue.IsEms.HasValue && codeBlue.IsEms.Value ? "EMS" : "Inhouse") + " Code Blue is update",
+                                RouteLink3 = "/Home/EMS",
+                                RouteLink4 = "/Home/Dashboard",
+                                RouteLink5 = "/Home/Inhouse%20Codes"
+                            };
+
+                            _communication.pushNotification(notification);
                         }
                         return GetBlueDataById(blue.CodeBlueId);
                     }

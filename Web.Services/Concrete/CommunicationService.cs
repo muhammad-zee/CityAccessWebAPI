@@ -772,8 +772,11 @@ namespace Web.Services.Concrete
                                     {
                                         { "id", model.Id},
                                         { "orgId", model.OrgId},
-                                        { "routerLink", model.RouteLink},
-                                        { "routerLinkEMS", model.RouteLinkEMS }
+                                        { "routerLink1", model.RouteLink1},
+                                        { "routerLink2", model.RouteLink2 },
+                                        { "routerLink3", model.RouteLink3 },
+                                        { "routerLink4", model.RouteLink4 },
+                                        { "routerLink5", model.RouteLink5 },
                                     }, Formatting.Indented);
             foreach (var item in model.UserChannelSid)
             {

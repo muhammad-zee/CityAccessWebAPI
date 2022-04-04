@@ -395,6 +395,21 @@ namespace Web.Services.Concrete
                             Message = "Created",
                             Body = obj.UserId,
                         };
+
+
+                        //var notification = new PushNotificationVM()
+                        //{
+                        //    Id = row.CodeStrokeId,
+                        //    OrgId = row.OrganizationIdFk,
+                        //    UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).Distinct().ToList(),
+                        //    From = AuthorEnums.Stroke.ToString(),
+                        //    Msg = (codeStroke.IsEms.HasValue && codeStroke.IsEms.Value ? "EMS" : "Inhouse") + " Code Stroke From is Changed",
+                        //    RouteLink1 = "/Home/Activate%20Code/code-strok-form",
+                        //    RouteLink2 = "/Home/EMS/activateCode",
+                        //};
+
+                        //_communication.pushNotification(notification);
+
                     }
                     else
                     {
