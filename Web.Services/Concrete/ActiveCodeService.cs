@@ -5983,44 +5983,50 @@ namespace Web.Services.Concrete
             var googleApiResult = this._httpClient.GetAsync("https://maps.googleapis.com/maps/api/geocode/json?latlng=" + latlng + "&key=" + this._GoogleApiKey).Result;
 
             dynamic results = googleApiResult["results"];
-            var address = results[0]["address_components"];
-            var StateName = "";
-            for (int i = 0; i < address.Count; i++)
+            if (results.Count > 0)
             {
-                var addressType = address[i].types;
-                for (int j = 0; j < addressType.Count; j++)
+                var address = results[0]["address_components"];
+                var StateName = "";
+                for (int i = 0; i < address.Count; i++)
                 {
-                    if (addressType[j] == "administrative_area_level_1")
+                    var addressType = address[i].types;
+                    for (int j = 0; j < addressType.Count; j++)
                     {
-                        StateName = address[i].long_name;
+                        if (addressType[j] == "administrative_area_level_1")
+                        {
+                            StateName = address[i].long_name;
+                        }
                     }
                 }
-            }
-
-            if (StateName != "")
-            {
-                var stateId = this._controlListDetailsRepo.Table.Where(x => x.Description.Contains(StateName) && !x.IsDeleted).Select(x => new { Id = x.ControlListDetailId, x.Title }).FirstOrDefault();
-                if (stateId != null)
+                if (StateName != "")
                 {
-                    var orgsAddress = this._orgRepo.Table.Where(x => x.ActiveCodes.Contains(codeId.ToString()) && x.StateIdFk == stateId.Id && !x.IsDeleted).ToList();
-
-                    List<object> objList = new List<object>();
-
-                    foreach (var item in orgsAddress)
+                    var stateId = this._controlListDetailsRepo.Table.Where(x => x.Description.Contains(StateName) && !x.IsDeleted).Select(x => new { Id = x.ControlListDetailId, x.Title }).FirstOrDefault();
+                    if (stateId != null)
                     {
-                        string add = $"{item.PrimaryAddress} {item.City}, {stateId.Title} {item.Zip}";
-                        string url = "https://maps.googleapis.com/maps/api/geocode/json?address=" + add.Replace(" ", "%20") + "&key=" + this._GoogleApiKey;
-                        var googleApiLatLng = this._httpClient.GetAsync(url).Result;
+                        var orgsAddress = this._orgRepo.Table.Where(x => x.ActiveCodes.Contains(codeId.ToString()) && x.StateIdFk == stateId.Id && !x.IsDeleted).ToList();
 
-                        dynamic Apiresults = googleApiLatLng["results"];
-                        var formatted_address = Convert.ToString(Apiresults[0]["formatted_address"]);
-                        var geometry = Apiresults[0]["geometry"];
-                        var location = geometry["location"];
-                        var longLat = new List<double> { Convert.ToDouble(location.lat), Convert.ToDouble(location.lng) };
+                        List<object> objList = new List<object>();
 
-                        objList.Add(new { OrganizationId = item.OrganizationId, Address = formatted_address, lat = longLat[0], lng = longLat[1], title = item.OrganizationName });
+                        foreach (var item in orgsAddress)
+                        {
+                            string add = $"{item.PrimaryAddress} {item.City}, {stateId.Title} {item.Zip}";
+                            string url = "https://maps.googleapis.com/maps/api/geocode/json?address=" + add.Replace(" ", "%20") + "&key=" + this._GoogleApiKey;
+                            var googleApiLatLng = this._httpClient.GetAsync(url).Result;
+
+                            dynamic Apiresults = googleApiLatLng["results"];
+                            var formatted_address = Convert.ToString(Apiresults[0]["formatted_address"]);
+                            var geometry = Apiresults[0]["geometry"];
+                            var location = geometry["location"];
+                            var longLat = new List<double> { Convert.ToDouble(location.lat), Convert.ToDouble(location.lng) };
+
+                            objList.Add(new { OrganizationId = item.OrganizationId, Address = formatted_address, lat = longLat[0], lng = longLat[1], title = item.OrganizationName });
+                        }
+                        return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Addresses Returned", Body = objList };
                     }
-                    return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Addresses Returned", Body = objList };
+                    else
+                    {
+                        return new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "State Not Found" };
+                    }
                 }
                 else
                 {
@@ -6031,6 +6037,7 @@ namespace Web.Services.Concrete
             {
                 return new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "State Not Found" };
             }
+
         }
 
         #endregion
