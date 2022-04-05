@@ -20,6 +20,7 @@ namespace Web.Data.Models
         public virtual DbSet<ActiveCode> ActiveCodes { get; set; }
         public virtual DbSet<ActiveCodesGroupMember> ActiveCodesGroupMembers { get; set; }
         public virtual DbSet<CallLog> CallLogs { get; set; }
+        public virtual DbSet<ChatSetting> ChatSettings { get; set; }
         public virtual DbSet<ClinicalHoliday> ClinicalHolidays { get; set; }
         public virtual DbSet<ClinicalHour> ClinicalHours { get; set; }
         public virtual DbSet<CodeBlue> CodeBlues { get; set; }
@@ -62,7 +63,7 @@ namespace Web.Data.Models
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseSqlServer("Data Source=192.168.0.20;Initial Catalog=RouteAndQueue;User Id=sa;Password=4292;");
+                optionsBuilder.UseSqlServer("Data Source=192.168.0.44;Initial Catalog=RouteAndQueue;User Id=sa;Password=4292;");
             }
         }
 
@@ -131,6 +132,25 @@ namespace Web.Data.Models
                 entity.Property(e => e.ToName).HasMaxLength(50);
 
                 entity.Property(e => e.ToPhoneNumber).HasMaxLength(50);
+            });
+
+            modelBuilder.Entity<ChatSetting>(entity =>
+            {
+                entity.Property(e => e.CallSound).HasMaxLength(200);
+
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.MessageSound).HasMaxLength(200);
+
+                entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.Wallpaper).HasMaxLength(200);
+
+                entity.HasOne(d => d.UserIdFkNavigation)
+                    .WithMany(p => p.ChatSettings)
+                    .HasForeignKey(d => d.UserIdFk)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_ChatSettings_Users");
             });
 
             modelBuilder.Entity<ClinicalHoliday>(entity =>

@@ -1528,6 +1528,7 @@ namespace Web.Services.Concrete
 
                             var showAllAccessUsers = this._dbContext.LoadStoredProcedure("md_getUsersOfComponentAccess")
                                                 .WithSqlParam("@componentName", "Show All EMS,Show All Active Codes,Show Graphs,Show EMS,Show Active Codes")
+                                                .WithSqlParam("@orgId", codeStroke.OrganizationIdFk)
                                                 .ExecuteStoredProc<RegisterCredentialVM>().Select(x => new { x.UserUniqueId, x.UserId }).Distinct().ToList();
                             UserChannelSid.AddRange(showAllAccessUsers);
                             var notification = new PushNotificationVM()
@@ -2599,6 +2600,7 @@ namespace Web.Services.Concrete
 
                             var showAllAccessUsers = this._dbContext.LoadStoredProcedure("md_getUsersOfComponentAccess")
                                                .WithSqlParam("@componentName", "Show All EMS,Show All Active Codes,Show Graphs,Show EMS,Show Active Codes")
+                                               .WithSqlParam("@orgId", codeSepsis.OrganizationIdFk)
                                                .ExecuteStoredProc<RegisterCredentialVM>().Select(x => new { x.UserUniqueId, x.UserId }).Distinct().ToList();
                             UserChannelSid.AddRange(showAllAccessUsers);
                             var notification = new PushNotificationVM()
@@ -3672,6 +3674,7 @@ namespace Web.Services.Concrete
 
                             var showAllAccessUsers = this._dbContext.LoadStoredProcedure("md_getUsersOfComponentAccess")
                                                .WithSqlParam("@componentName", "Show All EMS,Show All Active Codes,Show Graphs,Show EMS,Show Active Codes")
+                                               .WithSqlParam("@orgId", codeSTEMI.OrganizationIdFk)
                                                .ExecuteStoredProc<RegisterCredentialVM>().Select(x => new { x.UserUniqueId, x.UserId }).Distinct().ToList();
                             UserChannelSid.AddRange(showAllAccessUsers);
                             var notification = new PushNotificationVM()
@@ -4786,6 +4789,7 @@ namespace Web.Services.Concrete
 
                             var showAllAccessUsers = this._dbContext.LoadStoredProcedure("md_getUsersOfComponentAccess")
                                                .WithSqlParam("@componentName", "Show All EMS,Show All Active Codes,Show Graphs,Show EMS,Show Active Codes")
+                                               .WithSqlParam("@orgId", codeTruma.OrganizationIdFk)
                                                .ExecuteStoredProc<RegisterCredentialVM>().Select(x => new { x.UserUniqueId, x.UserId }).Distinct().ToList();
                             UserChannelSid.AddRange(showAllAccessUsers);
                             var notification = new PushNotificationVM()
@@ -5895,6 +5899,7 @@ namespace Web.Services.Concrete
 
                             var showAllAccessUsers = this._dbContext.LoadStoredProcedure("md_getUsersOfComponentAccess")
                                                .WithSqlParam("@componentName", "Show All EMS,Show All Active Codes,Show Graphs,Show EMS,Show Active Codes")
+                                               .WithSqlParam("@orgId", codeBlue.OrganizationIdFk)
                                                .ExecuteStoredProc<RegisterCredentialVM>().Select(x => new { x.UserUniqueId, x.UserId }).Distinct().ToList();
                             UserChannelSid.AddRange(showAllAccessUsers);
                             var notification = new PushNotificationVM()

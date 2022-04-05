@@ -500,11 +500,16 @@ namespace Web.Services.Concrete
                                     _communicationService.sendPushNotification(msg);
 
                                     var orgByServiceId = _dptRepo.Table.Where(x => !x.IsDeleted && x.DepartmentId == _serviceLineRepo.Table.Where(x => !x.IsDeleted && x.ServiceLineId == serviceLineId).Select(x => x.DepartmentIdFk).FirstOrDefault()).Select(x => x.OrganizationIdFk).FirstOrDefault();
+                                    var showAllAccessUsers = this._dbContext.LoadStoredProcedure("md_getUsersOfComponentAccess")
+                                                                                   .WithSqlParam("@componentName", "Show Consults,Show All Consults,Show Graphs")
+                                                                                   .WithSqlParam("@orgId", orgByServiceId.Value)
+                                                                                   .ExecuteStoredProc<RegisterCredentialVM>(); //.Select(x => new { x.UserUniqueId, x.UserId }).Distinct().ToList();
+                                    users.AddRange(showAllAccessUsers);
                                     var notification = new PushNotificationVM()
                                     {
-                                        Id = keyValues["CallbackNumber"].ToInt(),
+                                        Id = keyValues["CallbackNumber"].ToString().ToInt(),
                                         OrgId = orgByServiceId.Value,
-                                        UserChannelSid = users.Select(x => x.UserUniqueId).ToList(),
+                                        UserChannelSid = users.Select(x => x.UserUniqueId).Distinct().ToList(),
                                         From = "Consult",
                                         Msg = "New Consult is Created",
                                         RouteLink1 = "/Home/Dashboard",
@@ -574,12 +579,18 @@ namespace Web.Services.Concrete
                             msg.channelSid = channel.Sid;
 
                             var sendMsg = _communicationService.sendPushNotification(msg);
+                            
                             var orgByServiceId = _dptRepo.Table.Where(x => !x.IsDeleted && x.DepartmentId == _serviceLineRepo.Table.Where(x => !x.IsDeleted && x.ServiceLineId == serviceLineId).Select(x => x.DepartmentIdFk).FirstOrDefault()).Select(x => x.OrganizationIdFk).FirstOrDefault();
+                            var showAllAccessUsers = this._dbContext.LoadStoredProcedure("md_getUsersOfComponentAccess")
+                                               .WithSqlParam("@componentName", "Show Consults,Show All Consults,Show Graphs")
+                                               .WithSqlParam("@orgId", orgByServiceId.Value)
+                                               .ExecuteStoredProc<RegisterCredentialVM>(); //.Select(x => new { x.UserUniqueId, x.UserId }).Distinct().ToList();
+                            users.AddRange(showAllAccessUsers);
                             var notification = new PushNotificationVM()
                             {
-                                Id = keyValues["CallbackNumber"].ToInt(),
+                                Id = keyValues["CallbackNumber"].ToString().ToInt(),
                                 OrgId = orgByServiceId.Value,
-                                UserChannelSid = users.Select(x => x.UserUniqueId).ToList(),
+                                UserChannelSid = users.Select(x => x.UserUniqueId).Distinct().ToList(),
                                 From = "Consult",
                                 Msg = "New Consult is Created",
                                 RouteLink1 = "/Home/Dashboard",

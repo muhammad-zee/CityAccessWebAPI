@@ -344,8 +344,8 @@ namespace Web.Services.Concrete
                             try
                             {
                                 var codes = this._dbContext.LoadStoredProcedure("md_addEMSUserRole")
-                  .WithSqlParam("@UserId", obj.UserId)
-                  .ExecuteStoredProc<string>();
+                                                  .WithSqlParam("@UserId", obj.UserId)
+                                                  .ExecuteStoredProc<string>();
                             }
                             catch (Exception ex)
                             {
@@ -396,7 +396,10 @@ namespace Web.Services.Concrete
                             Body = obj.UserId,
                         };
 
-
+                        //var showAllAccessUsers = this._dbContext.LoadStoredProcedure("md_getUsersOfComponentAccess")
+                        //                       .WithSqlParam("@componentName", "Users")
+                        //                       .ExecuteStoredProc<RegisterCredentialVM>(); //.Select(x => new { x.UserUniqueId, x.UserId }).Distinct().ToList();
+                       
                         //var notification = new PushNotificationVM()
                         //{
                         //    Id = row.CodeStrokeId,
@@ -405,7 +408,6 @@ namespace Web.Services.Concrete
                         //    From = AuthorEnums.Stroke.ToString(),
                         //    Msg = (codeStroke.IsEms.HasValue && codeStroke.IsEms.Value ? "EMS" : "Inhouse") + " Code Stroke From is Changed",
                         //    RouteLink1 = "/Home/Activate%20Code/code-strok-form",
-                        //    RouteLink2 = "/Home/EMS/activateCode",
                         //};
 
                         //_communication.pushNotification(notification);
@@ -511,6 +513,22 @@ namespace Web.Services.Concrete
             if (favTeam.Count > 0)
             {
                 _userFavouriteTeamRepo.Insert(favTeam);
+                //var showAllAccessUsers = this._dbContext.LoadStoredProcedure("md_getUsersOfComponentAccess")
+                //                       .WithSqlParam("@componentName", "Favourite Teams")
+                //                       .WithSqlParam("@orgId", FavTeam.OrganizationId)
+                //                       .ExecuteStoredProc<RegisterCredentialVM>();
+                //var notification = new PushNotificationVM()
+                //{
+                //    Id = FavTeam.UserId,
+                //    OrgId = FavTeam.OrganizationId,
+                //    UserChannelSid = showAllAccessUsers.Select(x => x.UserUniqueId).Distinct().ToList(),
+                //    From = "Users",
+                //    Msg = "A new users is added",
+                //    RouteLink2 = "/Home/Dashboard",
+                //};
+
+                //_communicationService.pushNotification(notification);
+
                 return new BaseResponse()
                 {
                     Status = HttpStatusCode.OK,

@@ -9,6 +9,7 @@ namespace Web.Data.Models
     {
         public User()
         {
+            ChatSettings = new HashSet<ChatSetting>();
             ConversationParticipants = new HashSet<ConversationParticipant>();
             FavouriteTeams = new HashSet<FavouriteTeam>();
             UserAccesses = new HashSet<UserAccess>();
@@ -54,6 +55,7 @@ namespace Web.Data.Models
         public bool IsEms { get; set; }
         public bool IsInGroup { get; set; }
 
+        public virtual ICollection<ChatSetting> ChatSettings { get; set; }
         public virtual ICollection<ConversationParticipant> ConversationParticipants { get; set; }
         public virtual ICollection<FavouriteTeam> FavouriteTeams { get; set; }
         public virtual ICollection<UserAccess> UserAccesses { get; set; }
