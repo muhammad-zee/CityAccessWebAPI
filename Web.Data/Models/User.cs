@@ -54,6 +54,7 @@ namespace Web.Data.Models
         public string ConversationUserSid { get; set; }
         public bool IsEms { get; set; }
         public bool IsInGroup { get; set; }
+        public bool IsDiscoveredByOtherOrganization { get; set; }
 
         public virtual ICollection<ChatSetting> ChatSettings { get; set; }
         public virtual ICollection<ConversationParticipant> ConversationParticipants { get; set; }

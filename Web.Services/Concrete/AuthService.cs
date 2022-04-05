@@ -231,6 +231,7 @@ namespace Web.Services.Concrete
                 user.ModifiedBy = register.ModifiedBy;
                 user.ModifiedDate = DateTime.UtcNow;
                 user.IsEms = register.IsEMS;
+                user.IsDiscoveredByOtherOrganization = register.IsDiscoveredByOtherOrganization;
 
                 if (!string.IsNullOrEmpty(register.UserImage))
                 {
@@ -336,8 +337,9 @@ namespace Web.Services.Concrete
                             ConversationUserSid = conversationUser.Sid,
                             IsDeleted = false,
                             IsRequirePasswordReset = true,
-                            IsEms = register.IsEMS
-                        };
+                            IsEms = register.IsEMS,
+                            user.IsDiscoveredByOtherOrganization = register.IsDiscoveredByOtherOrganization;
+                    };
                         _userRepo.Insert(obj);
                         if (register.IsEMS)
                         {
