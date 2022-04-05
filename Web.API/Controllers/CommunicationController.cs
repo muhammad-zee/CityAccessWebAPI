@@ -343,5 +343,23 @@ namespace Web.API.Controllers
             }
         }
         #endregion
+
+        #region Chat Setting
+
+        [HttpGet("ChatSetting/GetTones/{Id}")]
+        public BaseResponse GetTones(int Id)
+        {
+            try
+            {
+                return this._communicaitonService.GetTone(Id);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+        #endregion
     }
 }
