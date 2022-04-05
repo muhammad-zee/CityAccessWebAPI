@@ -5,6 +5,7 @@ using SendGrid;
 using SendGrid.Helpers.Mail;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -44,7 +45,7 @@ namespace Web.Services.Concrete
         private IRepository<UserRole> _userRole;
 
 
-
+        private string _RootPath;
         private IConfiguration _config;
         private RAQ_DbContext _dbContext;
         private readonly IRepository<User> _userRepo;
@@ -54,9 +55,12 @@ namespace Web.Services.Concrete
         private IRepository<ServiceLine> _serviceLineRepo;
         private IRepository<Department> _dptRepo;
         private IRepository<Organization> _orgRepo;
+        private IRepository<ControlList> _uclRepo;
+        private IRepository<ControlListDetail> _uclDetailRepo;
+
 
         private string _encryptionKey = "";
-        
+
         public CommunicationService(IConfiguration config,
             RAQ_DbContext dbContext,
             IRepository<User> userRepo,
@@ -67,7 +71,9 @@ namespace Web.Services.Concrete
             IRepository<UsersRelation> userRelationRepo,
             IRepository<ServiceLine> serviceLineRepo,
             IRepository<Department> dptRepo,
-            IRepository<Organization> orgRepo
+            IRepository<Organization> orgRepo,
+            IRepository<ControlList> uclRepo,
+            IRepository<ControlListDetail> uclDetailRepo
             )
         {
 
@@ -82,7 +88,7 @@ namespace Web.Services.Concrete
             this.Twilio_ChatPushCredentialSid = this._config["Twilio:PushCredentialSid"].ToString();
             this.Twilio_ChatApiKey = this._config["Twilio:ChatApiKey"].ToString();
             this.Twilio_ChatApiKeySecret = this._config["Twilio:ChatApiKeySecret"].ToString();
-
+            this._RootPath = this._config["FilePath:Path"].ToString();
             this._userRepo = userRepo;
             this._conversationChannelsRepo = conversationChannelsRepo;
             this._conversationParticipantsRepo = conversationParticipantsRepo;
@@ -94,6 +100,8 @@ namespace Web.Services.Concrete
             this._serviceLineRepo = serviceLineRepo;
             this._dptRepo = dptRepo;
             this._orgRepo = orgRepo;
+            this._uclRepo = uclRepo;
+            this._uclDetailRepo = uclDetailRepo;
 
             this._encryptionKey = this._config["Encryption:key"].ToString();
         }
@@ -817,6 +825,47 @@ namespace Web.Services.Concrete
             });
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Event Sent" };
         }
+        #endregion
+
+
+        #region Chat Settings
+
+        public BaseResponse GetTone(int Id) 
+        {
+
+            var UCLDetails = (from ucl in _uclRepo.Table
+                              join ucld in _uclDetailRepo.Table on ucl.ControlListId equals ucld.ControlListIdFk
+                              where ucl.ControlListId == Id && ucl.IsDeleted == false && ucld.IsDeleted == false
+                              && ucl.ControlListIsActive == true && ucld.IsActive == true
+                              select new
+                              {
+                                  ParentId = ucl.ControlListId,
+                                  ParetntTitle = ucl.ControlListTitle,
+                                  Id = ucld.ControlListDetailId,
+                                  Title = ucld.Title,
+                                  Description = ucld.Description,
+                                  ImageHtml = ucld.ImageHtml
+                              }).ToList();
+
+            var returnObj = new Dictionary<string, object>();
+            foreach (var item in UCLDetails)
+            {
+                var paths = new List<object>();
+                string path = this._RootPath + item.ImageHtml; 
+                if (Directory.Exists(path))
+                {
+                    DirectoryInfo AttachFiles = new DirectoryInfo(path);
+                    foreach (var itemfile in AttachFiles.GetFiles())
+                    {
+                        paths.Add(new { path = path+'/'+itemfile.Name, name= itemfile.Name.Split(".")[0]});
+                    }
+
+                    returnObj.Add(item.Title.Replace(" ",""), paths);
+                }
+            }
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = returnObj };
+        }
+
         #endregion
     }
 

@@ -293,8 +293,8 @@ namespace Web.Services.Concrete
 
                 foreach (var u in param.added)
                 {
-                    u.startTime = DateTime.Parse(u.startTimeStr).ToUniversalTimeZone();
-                    u.endTime = DateTime.Parse(u.endTimeStr).ToUniversalTimeZone();
+                    u.startTime = DateTime.Parse(u.startTimeStr).ToUniversalTime();
+                    u.endTime = DateTime.Parse(u.endTimeStr).ToUniversalTime();
                 }
 
                 if (this._scheduleRepo.Table.Any(x => x.UserIdFk == param.selectedUserId.ToInt() && x.ServiceLineIdFk == param.added.ElementAt(0).serviceLineId.ToInt() && x.RoleIdFk == param.added.ElementAt(0).roleId.ToInt() && !x.IsDeleted
@@ -332,8 +332,8 @@ namespace Web.Services.Concrete
                 {
                     foreach (var u in param.changed)
                     {
-                        u.startTime = DateTime.Parse(u.startTimeStr).ToUniversalTimeZone();
-                        u.endTime = DateTime.Parse(u.endTimeStr).ToUniversalTimeZone();
+                        u.startTime = DateTime.Parse(u.startTimeStr).ToUniversalTime();
+                        u.endTime = DateTime.Parse(u.endTimeStr).ToUniversalTime();
                     }
 
                     schedule.ScheduleDate = changedSchedule.startTime;

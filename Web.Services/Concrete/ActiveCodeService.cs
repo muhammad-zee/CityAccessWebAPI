@@ -1528,12 +1528,13 @@ namespace Web.Services.Concrete
 
                             var showAllAccessUsers = this._dbContext.LoadStoredProcedure("md_getUsersOfComponentAccess")
                                                 .WithSqlParam("@componentName", "Show All EMS,Show All Active Codes,Show Graphs,Show EMS,Show Active Codes")
+                                                .WithSqlParam("@orgId", stroke.OrganizationIdFk)
                                                 .ExecuteStoredProc<RegisterCredentialVM>().Select(x => new { x.UserUniqueId, x.UserId }).Distinct().ToList();
                             UserChannelSid.AddRange(showAllAccessUsers);
                             var notification = new PushNotificationVM()
                             {
-                                Id = codeStroke.CodeStrokeId,
-                                OrgId = codeStroke.OrganizationIdFk,
+                                Id = stroke.CodeStrokeId,
+                                OrgId = stroke.OrganizationIdFk,
                                 UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).Distinct().ToList(),
                                 From = AuthorEnums.Stroke.ToString(),
                                 Msg = (codeStroke.IsEms.HasValue && codeStroke.IsEms.Value ? "EMS" : "Inhouse") + " Code Stroke is update",
@@ -2599,12 +2600,13 @@ namespace Web.Services.Concrete
 
                             var showAllAccessUsers = this._dbContext.LoadStoredProcedure("md_getUsersOfComponentAccess")
                                                .WithSqlParam("@componentName", "Show All EMS,Show All Active Codes,Show Graphs,Show EMS,Show Active Codes")
+                                               .WithSqlParam("@orgId", Sepsis.OrganizationIdFk)
                                                .ExecuteStoredProc<RegisterCredentialVM>().Select(x => new { x.UserUniqueId, x.UserId }).Distinct().ToList();
                             UserChannelSid.AddRange(showAllAccessUsers);
                             var notification = new PushNotificationVM()
                             {
-                                Id = codeSepsis.CodeSepsisId,
-                                OrgId = codeSepsis.OrganizationIdFk,
+                                Id = Sepsis.CodeSepsisId,
+                                OrgId = Sepsis.OrganizationIdFk,
                                 UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).Distinct().ToList(),
                                 From = AuthorEnums.Sepsis.ToString(),
                                 Msg = (codeSepsis.IsEms ? "EMS" : "Inhouse") + " Code Sepsis is update",
@@ -3672,12 +3674,13 @@ namespace Web.Services.Concrete
 
                             var showAllAccessUsers = this._dbContext.LoadStoredProcedure("md_getUsersOfComponentAccess")
                                                .WithSqlParam("@componentName", "Show All EMS,Show All Active Codes,Show Graphs,Show EMS,Show Active Codes")
+                                               .WithSqlParam("@orgId", STEMI.OrganizationIdFk)
                                                .ExecuteStoredProc<RegisterCredentialVM>().Select(x => new { x.UserUniqueId, x.UserId }).Distinct().ToList();
                             UserChannelSid.AddRange(showAllAccessUsers);
                             var notification = new PushNotificationVM()
                             {
-                                Id = codeSTEMI.CodeStemiid,
-                                OrgId = codeSTEMI.OrganizationIdFk,
+                                Id = STEMI.CodeStemiid,
+                                OrgId = STEMI.OrganizationIdFk,
                                 UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).Distinct().ToList(),
                                 From = AuthorEnums.STEMI.ToString(),
                                 Msg = (codeSTEMI.IsEms.HasValue && codeSTEMI.IsEms.Value ? "EMS" : "Inhouse") + " Code Stemi is update",
@@ -4786,12 +4789,13 @@ namespace Web.Services.Concrete
 
                             var showAllAccessUsers = this._dbContext.LoadStoredProcedure("md_getUsersOfComponentAccess")
                                                .WithSqlParam("@componentName", "Show All EMS,Show All Active Codes,Show Graphs,Show EMS,Show Active Codes")
+                                               .WithSqlParam("@orgId", Truma.OrganizationIdFk)
                                                .ExecuteStoredProc<RegisterCredentialVM>().Select(x => new { x.UserUniqueId, x.UserId }).Distinct().ToList();
                             UserChannelSid.AddRange(showAllAccessUsers);
                             var notification = new PushNotificationVM()
                             {
-                                Id = codeTruma.CodeTraumaId,
-                                OrgId = codeTruma.OrganizationIdFk,
+                                Id = Truma.CodeTraumaId,
+                                OrgId = Truma.OrganizationIdFk,
                                 UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).Distinct().ToList(),
                                 From = AuthorEnums.Trauma.ToString(),
                                 Msg = (codeTruma.IsEms.HasValue && codeTruma.IsEms.Value ? "EMS" : "Inhouse") + " Code Trauma is update",
@@ -5895,12 +5899,13 @@ namespace Web.Services.Concrete
 
                             var showAllAccessUsers = this._dbContext.LoadStoredProcedure("md_getUsersOfComponentAccess")
                                                .WithSqlParam("@componentName", "Show All EMS,Show All Active Codes,Show Graphs,Show EMS,Show Active Codes")
+                                               .WithSqlParam("@orgId", blue.OrganizationIdFk)
                                                .ExecuteStoredProc<RegisterCredentialVM>().Select(x => new { x.UserUniqueId, x.UserId }).Distinct().ToList();
                             UserChannelSid.AddRange(showAllAccessUsers);
                             var notification = new PushNotificationVM()
                             {
-                                Id = codeBlue.CodeBlueId,
-                                OrgId = codeBlue.OrganizationIdFk,
+                                Id = blue.CodeBlueId,
+                                OrgId = blue.OrganizationIdFk,
                                 UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).Distinct().ToList(),
                                 From = AuthorEnums.Blue.ToString(),
                                 Msg = (codeBlue.IsEms.HasValue && codeBlue.IsEms.Value ? "EMS" : "Inhouse") + " Code Blue is update",

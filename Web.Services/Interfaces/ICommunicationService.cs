@@ -43,5 +43,10 @@ namespace Web.Services.Interfaces
 
         bool SendSms(string ToPhoneNumber, string SmsBody);
         bool SendEmail(string To, string Subject, string HtmlContent, byte[] ImageContent);
+
+        #region Chat Settings
+        BaseResponse GetTone(int Id);
+
+        #endregion
     }
 }
