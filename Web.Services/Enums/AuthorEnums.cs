@@ -3,6 +3,7 @@
     public enum AuthorEnums
     {
         VideoCall,
+        Call,
         Stroke,
         STEMI,
         Sepsis,

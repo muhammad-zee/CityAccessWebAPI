@@ -23,6 +23,8 @@ using Web.Services.Extensions;
 using Web.Services.Helper;
 using Web.Services.Interfaces;
 using static Twilio.Rest.Api.V2010.Account.CallResource;
+using Client = Twilio.TwiML.Voice.Client;
+using Newtonsoft.Json;
 
 namespace Web.Services.Concrete
 {
@@ -34,6 +36,10 @@ namespace Web.Services.Concrete
         private readonly IRepository<InteractiveVoiceResponse> _IVRRepo;
         private readonly IRepository<ControlListDetail> _controlListDetailsRepo;
         private readonly IRepository<CallLog> _callLogRepo;
+        private readonly IRepository<User> _userRepo;
+
+
+
         IConfiguration _config;
         private readonly UnitOfWork unitorWork;
         private string origin = "";
@@ -50,7 +56,8 @@ namespace Web.Services.Concrete
             IRepository<Ivrsetting> ivrSettings,
             IRepository<InteractiveVoiceResponse> IVR,
             IRepository<ControlListDetail> controlListDetails,
-            IRepository<CallLog> callLog)
+            IRepository<CallLog> callLog,
+            IRepository<User> userRepo)
         {
 
             this._dbContext = dbContext;
@@ -60,6 +67,7 @@ namespace Web.Services.Concrete
             this._IVRRepo = IVR;
             this._controlListDetailsRepo = controlListDetails;
             this._callLogRepo = callLog;
+            this._userRepo = userRepo;
             this.origin = this._config["Twilio:CallbackDomain"].ToString();
 
             //Twilio Credentials
@@ -129,10 +137,17 @@ namespace Web.Services.Concrete
                 Number.EventEnum.Answered,
                 Number.EventEnum.Completed
             }.ToList();
+
+            var statusCallbackEventList1 = new[]{
+                //Number.EventEnum.Initiated,
+                //Number.EventEnum.Ringing,
+                Client.EventEnum.Answered,
+                Client.EventEnum.Completed
+            }.ToList();
             var dial = new Dial(callerId: phoneNumber.Contains("client")?From:Twilio_PhoneNumber/*, record: Dial.RecordEnum.RecordFromAnswer*/);
             if (phoneNumber.Contains("client"))
             {
-                dial.Client(phoneNumber.Replace("client:", ""));
+                dial.Client(phoneNumber.Replace("client:", ""), statusCallback: new Uri(CallbackStatusUrl), statusCallbackMethod: Twilio.Http.HttpMethod.Post, statusCallbackEvent: statusCallbackEventList1);
             }
             else
             {
@@ -193,28 +208,47 @@ namespace Web.Services.Concrete
             return call;
         }
 
-        public string CallbackStatus(IFormCollection Reruest)
+        public string CallbackStatus(IFormCollection Request)
         {
-            var Callsid = Reruest["CallSid"].ToString();
-            var CallStatus = Reruest["CallStatus"].ToString();
-            var Direction = Reruest["Direction"].ToString();
+            var Callsid = Request["CallSid"].ToString();
+            var CallStatus = Request["CallStatus"].ToString();
+            var Direction = Request["Direction"].ToString();
+
+            if ( CallStatus == "in-progress")
+            {
+                string from = Request["From"].ToString();
+                string channelSid = this._userRepo.Table.FirstOrDefault(u => u.UserUniqueId == from.Replace("client:", "")).UserChannelSid;
+                var attributes = JsonConvert.SerializeObject(new Dictionary<string, Object>()
+                                    {
+                                        { "callSid", Request["ParentCallSid"].ToString()},
+                                        { "eventType", CallEventEnums.Accepted.ToString()},
+                                        { "type", "CallEvent"}
+                                    });
+                var push = this._communicationService.sendPushNotification(new ConversationMessageVM
+                {
+                    author = AuthorEnums.Call.ToString(),
+                    body = CallEventEnums.Accepted.ToString(),
+                    attributes = attributes,
+                    channelSid = channelSid
+                });
+            }
 
             CallLogVM callRec = new();
             if (Direction == "inbound")
             {
-                callRec.CallSid = Reruest["CallSid"].ToString();
+                callRec.CallSid = Request["CallSid"].ToString();
 
             }
             else if (Direction == "outbound-dial")
             {
-                callRec.CallSid = Reruest["ParentCallSid"].ToString();
+                callRec.CallSid = Request["ParentCallSid"].ToString();
             }
 
             callRec = this._dbContext.LoadStoredProcedure("md_getCallByCallSid")
                .WithSqlParam("@pCallSid", callRec.CallSid)
                .ExecuteStoredProc<CallLogVM>().FirstOrDefault();
 
-            callRec.Duration = Reruest["CallDuration"].ToString();
+            callRec.Duration = Request["CallDuration"].ToString();
             callRec.CallStatus = CallStatus;
             callRec.EndTime = DateTime.UtcNow;
             this.saveCallLog(callRec);
@@ -355,7 +389,7 @@ namespace Web.Services.Concrete
         {
             VoiceResponse response = new VoiceResponse();
             response.Say(ex.Message.ToString());
-            return TwiML(response);
+            return TwiML(response); 
         }
 
         #region [Calls Logging]
@@ -688,14 +722,14 @@ namespace Web.Services.Concrete
             BaseResponse response = new();
             int rowsAffected;
             string sql = "EXEC md_CopyIvrSettings " +
-                "@pCopyFromIvrId, " +
-                "@pCopyToIvrId, " +
+                "@pCopyFromServiceLineId, " +
+                "@pCopyToServiceLineId, " +
                 "@pCreatedBy ";
 
             List<SqlParameter> parms = new List<SqlParameter>
             {
-                new SqlParameter { ParameterName = "@pCopyFromIvrId", Value = copyFromServiceLineId },
-                new SqlParameter { ParameterName = "@pCopyToIvrId", Value = copyToServicelineId },
+                new SqlParameter { ParameterName = "@pCopyFromServiceLineId", Value = copyFromServiceLineId },
+                new SqlParameter { ParameterName = "@pCopyToServiceLineId", Value = copyToServicelineId },
                 new SqlParameter { ParameterName = "@pCreatedBy",Value=ApplicationSettings.UserId }
             };
 
