@@ -782,10 +782,8 @@ namespace Web.Services.Concrete
                     DateTime? StartDateTime = Convert.ToDateTime(startDateTimeStr);
                     DateTime? EndDateTime = Convert.ToDateTime(endDateTimeStr);
 
-
-
-                    cHour.StartTime = StartDateTime.Value.ToUniversalTimeZone();
-                    cHour.EndTime = EndDateTime.Value.ToUniversalTimeZone();
+                    cHour.StartTime = StartDateTime.Value.ToUniversalTime();
+                    cHour.EndTime = EndDateTime.Value.ToUniversalTime();
                     cHour.ModifiedBy = clinicalHours.modifiedBy;
                     cHour.ModifiedDate = DateTime.UtcNow;
                     cHour.IsDeleted = false;
@@ -821,12 +819,12 @@ namespace Web.Services.Concrete
                         chour = new ClinicalHour();
                         chour.ServicelineIdFk = service.ToInt();
                         chour.WeekDayIdFk = item.ToInt();
-                        chour.StartTime = StartDateTime.Value.ToUniversalTimeZone();
-                        chour.EndTime = EndDateTime.Value.ToUniversalTimeZone();
+                        chour.StartTime = StartDateTime.Value.ToUniversalTime();
+                        chour.EndTime = EndDateTime.Value.ToUniversalTime();
                         chour.CreatedBy = clinicalHours.createdBy;
                         chour.CreatedDate = DateTime.UtcNow;
-                        chour.StartDate = StartDateTime.Value.ToUniversalTimeZone();
-                        chour.EndDate = EndDateTime.Value.ToUniversalTimeZone();
+                        chour.StartDate = StartDateTime.Value.ToUniversalTime();
+                        chour.EndDate = EndDateTime.Value.ToUniversalTime();
                         chour.StartBreak = null;
                         chour.EndBreak = null;
                         chour.IsDeleted = false;
@@ -996,8 +994,8 @@ namespace Web.Services.Concrete
                     var date = DateTime.Parse(clinicalHoliday.SelectedDateStr.ElementAt(0));
 
                     holiday.ServicelineIdFk = clinicalHoliday.ServicelineIdFk;
-                    holiday.StartDate = date.ToUniversalTimeZone().Date;
-                    holiday.EndDate = date.ToUniversalTimeZone().Date;
+                    holiday.StartDate = date.ToUniversalTime().Date;
+                    holiday.EndDate = date.ToUniversalTime().Date;
                     holiday.Description = clinicalHoliday.Description;
                     holiday.ModifiedBy = clinicalHoliday.ModifiedBy;
                     holiday.ModifiedDate = DateTime.UtcNow;
@@ -1022,8 +1020,8 @@ namespace Web.Services.Concrete
                     var date = DateTime.Parse(item);
 
                     holiday.ServicelineIdFk = clinicalHoliday.ServicelineIdFk;
-                    holiday.StartDate = date.ToUniversalTimeZone();
-                    holiday.EndDate = date.ToUniversalTimeZone();
+                    holiday.StartDate = date.ToUniversalTime();
+                    holiday.EndDate = date.ToUniversalTime();
                     holiday.Description = clinicalHoliday.Description;
                     holiday.CreatedBy = clinicalHoliday.CreatedBy;
                     holiday.CreatedDate = DateTime.UtcNow;

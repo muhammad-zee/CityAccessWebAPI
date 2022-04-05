@@ -164,9 +164,9 @@ namespace Web.Services.Concrete
 
                                     var obj = new UsersSchedule()
                                     {
-                                        ScheduleDate = StartDateTime.Date.ToUniversalTimeZone(),
-                                        ScheduleDateStart = StartDateTime.ToUniversalTimeZone(),
-                                        ScheduleDateEnd = EndDateTime.ToUniversalTimeZone(),
+                                        ScheduleDate = StartDateTime.Date.ToUniversalTime(),
+                                        ScheduleDateStart = StartDateTime.ToUniversalTime(),
+                                        ScheduleDateEnd = EndDateTime.ToUniversalTime(),
                                         UserIdFk = user.UserIdFk,
                                         RoleIdFk = user.RoleIdFk,
                                         ServiceLineIdFk = fileVM.ServiceLineId,
@@ -415,9 +415,9 @@ namespace Web.Services.Concrete
                             endDateTime.Value.AddDays(1);
                         }
 
-                        row.ScheduleDate = startDateTime.Value.ToUniversalTimeZone();
-                        row.ScheduleDateStart = startDateTime.Value.ToUniversalTimeZone();
-                        row.ScheduleDateEnd = endDateTime.Value.ToUniversalTimeZone();
+                        row.ScheduleDate = startDateTime.Value.ToUniversalTime();
+                        row.ScheduleDateStart = startDateTime.Value.ToUniversalTime();
+                        row.ScheduleDateEnd = endDateTime.Value.ToUniversalTime();
                         row.ModifiedBy = schedule.ModifiedBy;
                         row.ModifiedDate = DateTime.UtcNow;
                         row.IsDeleted = false;
@@ -443,7 +443,7 @@ namespace Web.Services.Concrete
                 var roleIds = schedule.RoleIdFk.ToIntList();
                 int count = 0;
                 var weekDays = schedule.WeekDays.Split(",");
-                if (schedule.DateRangeId == 2)
+                if (schedule.DateRangeId == 2)  // For Daily
                 {
 
                     DateTime loopFirstDate = schedule.FromDate;
@@ -487,9 +487,9 @@ namespace Web.Services.Concrete
                                     {
                                         var userSchedule = new UsersSchedule()
                                         {
-                                            ScheduleDate = StartDateTime.Value.ToUniversalTimeZone(),
-                                            ScheduleDateStart = StartDateTime.Value.ToUniversalTimeZone(),
-                                            ScheduleDateEnd = EndDateTime.Value.ToUniversalTimeZone(),
+                                            ScheduleDate = StartDateTime.Value.ToUniversalTime(),
+                                            ScheduleDateStart = StartDateTime.Value.ToUniversalTime(),
+                                            ScheduleDateEnd = EndDateTime.Value.ToUniversalTime(),
                                             ServiceLineIdFk = schedule.ServiceLineIdFk,
                                             UserIdFk = user,
                                             RoleIdFk = role,
@@ -510,7 +510,7 @@ namespace Web.Services.Concrete
                         }
                     }
                 }
-                else if (schedule.DateRangeId == 3)
+                else if (schedule.DateRangeId == 3) // For Weekly
                 {
                     //DateTime startOfWeek = DateTime.Today.AddDays(-1 * (int)(DateTime.Today.DayOfWeek)).AddDays(1);
                     var loopFirstDate = schedule.FromDate;
@@ -560,9 +560,9 @@ namespace Web.Services.Concrete
                                         {
                                             var userSchedule = new UsersSchedule()
                                             {
-                                                ScheduleDate = StartDateTime.Value.ToUniversalTimeZone(),
-                                                ScheduleDateStart = StartDateTime.Value.ToUniversalTimeZone(),
-                                                ScheduleDateEnd = EndDateTime.Value.ToUniversalTimeZone(),
+                                                ScheduleDate = StartDateTime.Value.ToUniversalTime(),
+                                                ScheduleDateStart = StartDateTime.Value.ToUniversalTime(),
+                                                ScheduleDateEnd = EndDateTime.Value.ToUniversalTime(),
                                                 ServiceLineIdFk = schedule.ServiceLineIdFk,
                                                 UserIdFk = user,
                                                 RoleIdFk = role,
@@ -585,7 +585,7 @@ namespace Web.Services.Concrete
                     }
 
                 }
-                else if (schedule.DateRangeId == 4)
+                else if (schedule.DateRangeId == 4) //For Monthly
                 {
                     if (schedule.SelectiveDates.Count > 0)
                     {
@@ -616,9 +616,9 @@ namespace Web.Services.Concrete
                                     {
                                         var userSchedule = new UsersSchedule()
                                         {
-                                            ScheduleDate = StartDateTime.Value.ToUniversalTimeZone(),
-                                            ScheduleDateStart = StartDateTime.Value.ToUniversalTimeZone(),
-                                            ScheduleDateEnd = EndDateTime.Value.ToUniversalTimeZone(),
+                                            ScheduleDate = StartDateTime.Value.ToUniversalTime(),
+                                            ScheduleDateStart = StartDateTime.Value.ToUniversalTime(),
+                                            ScheduleDateEnd = EndDateTime.Value.ToUniversalTime(),
                                             ServiceLineIdFk = schedule.ServiceLineIdFk,
                                             UserIdFk = user,
                                             RoleIdFk = role,
@@ -669,9 +669,9 @@ namespace Web.Services.Concrete
                                         {
                                             var userSchedule = new UsersSchedule()
                                             {
-                                                ScheduleDate = StartDateTime.Value.ToUniversalTimeZone(),
-                                                ScheduleDateStart = StartDateTime.Value.ToUniversalTimeZone(),
-                                                ScheduleDateEnd = EndDateTime.Value.ToUniversalTimeZone(),
+                                                ScheduleDate = StartDateTime.Value.ToUniversalTime(),
+                                                ScheduleDateStart = StartDateTime.Value.ToUniversalTime(),
+                                                ScheduleDateEnd = EndDateTime.Value.ToUniversalTime(),
                                                 ServiceLineIdFk = schedule.ServiceLineIdFk,
                                                 UserIdFk = user,
                                                 RoleIdFk = role,
@@ -694,7 +694,7 @@ namespace Web.Services.Concrete
 
                     }
                 }
-                else if (schedule.DateRangeId == 5)
+                else if (schedule.DateRangeId == 5) //For Yearly
                 {
                     //int year = DateTime.Now.Year;
                     DateTime startDate = schedule.FromDate; //new DateTime(year, 1, 1);
@@ -727,9 +727,9 @@ namespace Web.Services.Concrete
                                     {
                                         var userSchedule = new UsersSchedule()
                                         {
-                                            ScheduleDate = StartDateTime.Value.ToUniversalTimeZone(),
-                                            ScheduleDateStart = StartDateTime.Value.ToUniversalTimeZone(),
-                                            ScheduleDateEnd = EndDateTime.Value.ToUniversalTimeZone(),
+                                            ScheduleDate = StartDateTime.Value.ToUniversalTime(),
+                                            ScheduleDateStart = StartDateTime.Value.ToUniversalTime(),
+                                            ScheduleDateEnd = EndDateTime.Value.ToUniversalTime(),
                                             ServiceLineIdFk = schedule.ServiceLineIdFk,
                                             UserIdFk = user,
                                             RoleIdFk = role,
@@ -752,7 +752,7 @@ namespace Web.Services.Concrete
                 }
                 else
                 {
-
+                    // For Never Repeate
                     DateTime startDate = schedule.FromDate;
 
                     string startDateTimeStr = startDate.ToString("MM-dd-yyyy") + " " + schedule.StartTime.ToString("hh:mm:ss tt");
@@ -779,9 +779,9 @@ namespace Web.Services.Concrete
                             {
                                 var userSchedule = new UsersSchedule()
                                 {
-                                    ScheduleDate = StartDateTime.Value.ToUniversalTimeZone(),
-                                    ScheduleDateStart = StartDateTime.Value.ToUniversalTimeZone(),
-                                    ScheduleDateEnd = EndDateTime.Value.ToUniversalTimeZone(),
+                                    ScheduleDate = StartDateTime.Value.ToUniversalTime(),
+                                    ScheduleDateStart = StartDateTime.Value.ToUniversalTime(),
+                                    ScheduleDateEnd = EndDateTime.Value.ToUniversalTime(),
                                     ServiceLineIdFk = schedule.ServiceLineIdFk,
                                     UserIdFk = user,
                                     RoleIdFk = role,
