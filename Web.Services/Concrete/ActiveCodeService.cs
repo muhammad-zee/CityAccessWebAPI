@@ -3265,7 +3265,7 @@ namespace Web.Services.Concrete
                     {
                         Id = row.CodeStemiid,
                         OrgId = row.OrganizationIdFk,
-                        UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).ToList(),
+                        UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).Distinct().ToList(),
                         From = AuthorEnums.STEMI.ToString(),
                         Msg = (codeSTEMI.IsEms.HasValue && codeSTEMI.IsEms.Value ? "EMS" : "Inhouse") + " Code STEMI From is Changed",
                         RouteLink1 = "/Home/Inhouse%20Codes/code-STEMI-form",
@@ -4337,7 +4337,7 @@ namespace Web.Services.Concrete
                     {
                         Id = row.CodeTraumaId,
                         OrgId = row.OrganizationIdFk,
-                        UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).ToList(),
+                        UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).Distinct().ToList(),
                         From = AuthorEnums.Trauma.ToString(),
                         Msg = (codeTruma.IsEms.HasValue && codeTruma.IsEms.Value ? "EMS" : "Inhouse") + " Code Trauma From is Changed",
                         RouteLink1 = "/Home/Inhouse%20Codes/code-trauma-form",
@@ -5445,7 +5445,7 @@ namespace Web.Services.Concrete
                     {
                         Id = row.CodeBlueId,
                         OrgId = row.OrganizationIdFk,
-                        UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).ToList(),
+                        UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).Distinct().ToList(),
                         From = AuthorEnums.Blue.ToString(),
                         Msg = (codeBlue.IsEms.HasValue && codeBlue.IsEms.Value ? "EMS" : "Inhouse") + " Code Blue From is Changed",
                         RouteLink1 = "/Home/Activate%20Code/code-blue-form",
