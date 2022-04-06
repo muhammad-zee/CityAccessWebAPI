@@ -13,6 +13,7 @@ namespace Web.Data.Models
         public string CallSound { get; set; }
         public string MessageSound { get; set; }
         public string Wallpaper { get; set; }
+        public int? FontSize { get; set; }
         public DateTime CreatedDate { get; set; }
         public int CreatedBy { get; set; }
         public int? ModifiedBy { get; set; }
