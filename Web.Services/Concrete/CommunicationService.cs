@@ -887,6 +887,7 @@ namespace Web.Services.Concrete
                     Wallpaper = channel.Wallpaper,
                     CreatedDate = DateTime.UtcNow,
                     CreatedBy = ApplicationSettings.UserId,
+                    FontSize =  channel.FontSize,
                     IsDeleted = false,
                 };
                 if (!string.IsNullOrEmpty(channel.WallpaperObj.Base64Str))

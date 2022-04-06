@@ -13,6 +13,7 @@ namespace Web.Model.Common
         public bool IsMute { get; set; }
         public string CallSound { get; set; }
         public string MessageSound { get; set; }
+        public int? FontSize { get; set; }
         public string Wallpaper { get; set; }
         public DateTime CreatedDate { get; set; }
         public int CreatedBy { get; set; }
