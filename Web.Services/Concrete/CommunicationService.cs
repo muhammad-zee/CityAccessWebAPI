@@ -860,7 +860,7 @@ namespace Web.Services.Concrete
                     DirectoryInfo AttachFiles = new DirectoryInfo(path);
                     foreach (var itemfile in AttachFiles.GetFiles())
                     {
-                        paths.Add(new { path = path + '/' + itemfile.Name, name = itemfile.Name.Split(".")[0] });
+                        paths.Add(new { path = path.Replace(this._RootPath, "") + '/' + itemfile.Name, name = itemfile.Name.Split(".")[0] });
                     }
 
                     returnObj.Add(item.Title.Replace(" ", ""), paths);
