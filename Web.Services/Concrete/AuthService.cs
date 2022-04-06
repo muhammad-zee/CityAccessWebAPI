@@ -338,8 +338,8 @@ namespace Web.Services.Concrete
                             IsDeleted = false,
                             IsRequirePasswordReset = true,
                             IsEms = register.IsEMS,
-                            user.IsDiscoveredByOtherOrganization = register.IsDiscoveredByOtherOrganization;
-                    };
+                            IsDiscoveredByOtherOrganization = register.IsDiscoveredByOtherOrganization
+                        };
                         _userRepo.Insert(obj);
                         if (register.IsEMS)
                         {

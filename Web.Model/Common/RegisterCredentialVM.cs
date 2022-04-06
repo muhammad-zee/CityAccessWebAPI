@@ -78,7 +78,7 @@ namespace Web.Model.Common
         public string FilterVal { get; set; }
 
         public bool IsEMS { get; set; } = false;
-        public bool IsDiscoveredByOtherOrganization { get; set; } ;
+        public bool IsDiscoveredByOtherOrganization { get; set; }
     }
 
     public class UserProfileSchedulesVM
