@@ -1059,7 +1059,7 @@ namespace Web.Services.Concrete
 
                     var UserChannelSid = (from us in this._userSchedulesRepo.Table
                                           join u in this._userRepo.Table on us.UserIdFk equals u.UserId
-                                          where (DefaultServiceLineIds.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam1Ids.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam2Ids.Contains(us.ServiceLineIdFk.Value)) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
+                                          where (DefaultServiceLineIds.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam1Ids.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam2Ids.Contains(us.ServiceLineIdFk.Value)) && !us.IsDeleted && !u.IsDeleted
                                           select new { u.UserUniqueId, u.UserId }).Distinct().ToList();
                     var superAdmins = this._userRepo.Table.Where(x => x.IsInGroup && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).ToList();
                     UserChannelSid.AddRange(superAdmins);
@@ -1120,7 +1120,7 @@ namespace Web.Services.Concrete
                         UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).Distinct().ToList(),
                         From = AuthorEnums.Stroke.ToString(),
                         Msg = (codeStroke.IsEms.HasValue && codeStroke.IsEms.Value ? "EMS" : "Inhouse") + " Code Stroke From is Changed",
-                        RouteLink1 = "/Home/Activate%20Code/code-strok-form",
+                        RouteLink1 = "/Home/Inhouse%20Codes/code-strok-form",
                         RouteLink2 = "/Home/EMS/activateCode",
                     };
 
@@ -2138,7 +2138,7 @@ namespace Web.Services.Concrete
 
                     var UserChannelSid = (from us in this._userSchedulesRepo.Table
                                           join u in this._userRepo.Table on us.UserIdFk equals u.UserId
-                                          where (DefaultServiceLineIds.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam1Ids.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam2Ids.Contains(us.ServiceLineIdFk.Value)) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
+                                          where (DefaultServiceLineIds.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam1Ids.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam2Ids.Contains(us.ServiceLineIdFk.Value)) && !us.IsDeleted && !u.IsDeleted
                                           select new { u.UserUniqueId, u.UserId }).Distinct().ToList();
                     var superAdmins = this._userRepo.Table.Where(x => x.IsInGroup && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).ToList();
                     UserChannelSid.AddRange(superAdmins);
@@ -2191,10 +2191,10 @@ namespace Web.Services.Concrete
                     {
                         Id = row.CodeSepsisId,
                         OrgId = row.OrganizationIdFk,
-                        UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).ToList(),
+                        UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).Distinct().ToList(),
                         From = AuthorEnums.Sepsis.ToString(),
                         Msg = (codeSepsis.IsEms ? "EMS" : "Inhouse") + " Code Sepsis From is Changed",
-                        RouteLink1 = "/Home/Activate%20Code/code-sepsis-form",
+                        RouteLink1 = "/Home/Inhouse%20Codes/code-sepsis-form",
                         RouteLink2 = "/Home/EMS/activateCode"
                     };
 
@@ -3212,7 +3212,7 @@ namespace Web.Services.Concrete
 
                     var UserChannelSid = (from us in this._userSchedulesRepo.Table
                                           join u in this._userRepo.Table on us.UserIdFk equals u.UserId
-                                          where (DefaultServiceLineIds.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam1Ids.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam2Ids.Contains(us.ServiceLineIdFk.Value)) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
+                                          where (DefaultServiceLineIds.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam1Ids.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam2Ids.Contains(us.ServiceLineIdFk.Value)) && !us.IsDeleted && !u.IsDeleted
                                           select new { u.UserUniqueId, u.UserId }).Distinct().ToList();
                     var superAdmins = this._userRepo.Table.Where(x => x.IsInGroup && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).ToList();
                     UserChannelSid.AddRange(superAdmins);
@@ -3268,7 +3268,7 @@ namespace Web.Services.Concrete
                         UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).ToList(),
                         From = AuthorEnums.STEMI.ToString(),
                         Msg = (codeSTEMI.IsEms.HasValue && codeSTEMI.IsEms.Value ? "EMS" : "Inhouse") + " Code STEMI From is Changed",
-                        RouteLink1 = "/Home/Activate%20Code/code-STEMI-form",
+                        RouteLink1 = "/Home/Inhouse%20Codes/code-STEMI-form",
                         RouteLink2 = "/Home/EMS/activateCode"
                     };
 
@@ -4284,7 +4284,7 @@ namespace Web.Services.Concrete
 
                     var UserChannelSid = (from us in this._userSchedulesRepo.Table
                                           join u in this._userRepo.Table on us.UserIdFk equals u.UserId
-                                          where (DefaultServiceLineIds.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam1Ids.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam2Ids.Contains(us.ServiceLineIdFk.Value)) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
+                                          where (DefaultServiceLineIds.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam1Ids.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam2Ids.Contains(us.ServiceLineIdFk.Value)) && !us.IsDeleted && !u.IsDeleted
                                           select new { u.UserUniqueId, u.UserId }).Distinct().ToList();
                     var superAdmins = this._userRepo.Table.Where(x => x.IsInGroup && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).ToList();
                     UserChannelSid.AddRange(superAdmins);
@@ -4340,7 +4340,7 @@ namespace Web.Services.Concrete
                         UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).ToList(),
                         From = AuthorEnums.Trauma.ToString(),
                         Msg = (codeTruma.IsEms.HasValue && codeTruma.IsEms.Value ? "EMS" : "Inhouse") + " Code Trauma From is Changed",
-                        RouteLink1 = "/Home/Activate%20Code/code-trauma-form",
+                        RouteLink1 = "/Home/Inhouse%20Codes/code-trauma-form",
                         RouteLink2 = "/Home/EMS/activateCode"
                     };
 

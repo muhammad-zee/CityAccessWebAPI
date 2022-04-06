@@ -381,7 +381,7 @@ namespace Web.Services.Concrete
                                 fs.Write(register.UserImageByte);
                             }
                             var newAddedUser = _userRepo.Table.Where(x => x.UserId == obj.UserId).FirstOrDefault();
-                            newAddedUser.UserImage = targetPath.Replace(RootPath, "").Replace("\\", "/"); ;
+                            newAddedUser.UserImage = targetPath.Replace(RootPath, "").Replace("\\", "/");
                             _userRepo.Update(newAddedUser);
                         }
 
