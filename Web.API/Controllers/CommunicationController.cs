@@ -360,6 +360,21 @@ namespace Web.API.Controllers
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
         }
+
+        [HttpGet("ChatSetting/GetChatSetting/{Id}")]
+        public BaseResponse GetChatSetting(int Id)
+        {
+            try
+            {
+                return this._communicaitonService.GetChatSetting(Id);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
         #endregion
 
 

@@ -316,8 +316,8 @@ namespace Web.Services.Concrete
             {
                 channel.IsGroup = true;
             }
-            var channelNotExists = this._conversationChannelsRepo.Table.Count(ch => ch.ChannelSid == channel.ChannelSid && ch.IsDeleted != true) == 0;
-            if (channelNotExists)
+            var channelSetting = this._conversationChannelsRepo.Table.Count(ch => ch.ChannelSid == channel.ChannelSid && ch.IsDeleted != true) == 0;
+            if (channelSetting)
             {
                 var newChannel = new ConversationChannel
                 {
@@ -869,32 +869,37 @@ namespace Web.Services.Concrete
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = returnObj };
         }
 
+        public BaseResponse GetChatSetting(int Id)
+        {
+            var chatData = this._chatSettingRepo.Table.Where(x => x.UserIdFk == ApplicationSettings.UserId);
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Chat data", Body = chatData };
+        }
         #endregion
 
         public BaseResponse addChatSettings(AddChatSettingVM channel)
         {
-            var channelNotExists = this._chatSettingRepo.Table.Count(ch => ch.ChatSettingId == channel.ChatSettingId && ch.IsDeleted != true) == 0;
+            var channelSetting = this._chatSettingRepo.Table.FirstOrDefault(ch => ch.UserIdFk == channel.UserIdFk && ch.IsDeleted != true);
             BaseResponse response = new BaseResponse();
-            if (channelNotExists)
+            if (channelSetting == null)
             {
                 var newChannel = new ChatSetting
                 {
                     //ChatSettingId = channel.ChatSettingId,
-                    UserIdFk = ApplicationSettings.UserId,
+                    UserIdFk = channel.UserIdFk,
                     IsMute = channel.IsMute,
                     CallSound = channel.CallSound.Replace(this._RootPath, ""),
                     MessageSound = channel.MessageSound.Replace(this._RootPath, ""),
                     Wallpaper = channel.Wallpaper,
                     CreatedDate = DateTime.UtcNow,
                     CreatedBy = ApplicationSettings.UserId,
-                    FontSize =  channel.FontSize,
+                    FontSize = channel.FontSize,
                     IsDeleted = false,
                 };
                 if (!string.IsNullOrEmpty(channel.WallpaperObj.Base64Str))
                 {
                     var GetUserInfo = _userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && x.IsDeleted == false).Select(x => new { x.UserId, x.FirstName, x.LastName }).FirstOrDefault();
                     //var outPath = Directory.GetCurrentDirectory();
-                    var RootPath = this._RootPath; 
+                    var RootPath = this._RootPath;
                     string FilePath = "Wallpapers";
                     var targetPath = Path.Combine(RootPath, FilePath);
 
@@ -915,10 +920,39 @@ namespace Web.Services.Concrete
             }
             else
             {
-                response.Status = HttpStatusCode.OK;
-                response.Message = "Channel Already Exists";
+                //ChatSettingId = channel.ChatSettingId,
+                channelSetting.UserIdFk = channel.UserIdFk;
+                channelSetting.IsMute = channel.IsMute;
+                channelSetting.CallSound = channel.CallSound.Replace(this._RootPath, "");
+                channelSetting.MessageSound = channel.MessageSound.Replace(this._RootPath, "");
+                channelSetting.Wallpaper = channel.Wallpaper;
+                channelSetting.CreatedDate = DateTime.UtcNow;
+                channelSetting.CreatedBy = ApplicationSettings.UserId;
+                channelSetting.FontSize = channel.FontSize;
+                channelSetting.IsDeleted = false;
+                if (!string.IsNullOrEmpty(channel.WallpaperObj.Base64Str))
+                {
+                    var GetUserInfo = _userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && x.IsDeleted == false).Select(x => new { x.UserId, x.FirstName, x.LastName }).FirstOrDefault();
+                    //var outPath = Directory.GetCurrentDirectory();
+                    var RootPath = this._RootPath;
+                    string FilePath = "Wallpapers";
+                    var targetPath = Path.Combine(RootPath, FilePath);
+
+                    if (!Directory.Exists(targetPath))
+                    {
+                        Directory.CreateDirectory(targetPath);
+                    }
+                    var UserImageByte = Convert.FromBase64String(channel.WallpaperObj.Base64Str.Split("base64,")[1]);
+                    targetPath += "/" + $"{GetUserInfo.FirstName}-{GetUserInfo.LastName}_{GetUserInfo.UserId}.png";
+                    using (FileStream fs = new FileStream(targetPath, FileMode.Create, FileAccess.Write))
+                    {
+                        fs.Write(UserImageByte);
+                    }
+                    channelSetting.Wallpaper = targetPath.Replace(RootPath, "").Replace("\\", "/");
+                }
+                this._chatSettingRepo.Update(channelSetting);
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Chat Setting Updated Successfully", Body = channelSetting };
             }
-            return response;
         }
     }
 }
