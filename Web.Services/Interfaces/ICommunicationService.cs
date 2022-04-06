@@ -48,5 +48,7 @@ namespace Web.Services.Interfaces
         BaseResponse GetTone(int Id);
 
         #endregion
+
+        public BaseResponse addChatSettings(AddChatSettingVM channel);
     }
 }
