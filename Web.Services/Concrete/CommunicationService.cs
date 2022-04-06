@@ -50,6 +50,7 @@ namespace Web.Services.Concrete
         private RAQ_DbContext _dbContext;
         private readonly IRepository<User> _userRepo;
         private readonly IRepository<ConversationChannel> _conversationChannelsRepo;
+        private readonly IRepository<ChatSetting> _chatSettingRepo;
         private readonly IRepository<ConversationParticipant> _conversationParticipantsRepo;
         private IRepository<UsersRelation> _userRelationRepo;
         private IRepository<ServiceLine> _serviceLineRepo;
@@ -65,6 +66,7 @@ namespace Web.Services.Concrete
             RAQ_DbContext dbContext,
             IRepository<User> userRepo,
             IRepository<ConversationChannel> conversationChannelsRepo,
+            IRepository<ChatSetting> chatSettingRepo,
             IRepository<ConversationParticipant> conversationParticipantsRepo,
             IRepository<Role> role,
             IRepository<UserRole> userRole,
@@ -92,6 +94,7 @@ namespace Web.Services.Concrete
             this._userRepo = userRepo;
             this._conversationChannelsRepo = conversationChannelsRepo;
             this._conversationParticipantsRepo = conversationParticipantsRepo;
+            this._chatSettingRepo = chatSettingRepo;
 
 
             this._role = role;
@@ -266,7 +269,7 @@ namespace Web.Services.Concrete
                 TwilioClient.Init(this.Twilio_AccountSid, this.Twilio_AuthToken);
                 var Notify = Twilio.Rest.Conversations.V1.Service.Conversation.MessageResource.Create(
                                            author: msg.author,
-                                           body: Encryption.encryptData(msg.body,this._encryptionKey),
+                                           body: Encryption.encryptData(msg.body, this._encryptionKey),
                                            attributes: msg.attributes,
                                            pathChatServiceSid: Twilio_ChatServiceSid,
                                            pathConversationSid: msg.channelSid
@@ -830,7 +833,7 @@ namespace Web.Services.Concrete
 
         #region Chat Settings
 
-        public BaseResponse GetTone(int Id) 
+        public BaseResponse GetTone(int Id)
         {
 
             var UCLDetails = (from ucl in _uclRepo.Table
@@ -851,24 +854,70 @@ namespace Web.Services.Concrete
             foreach (var item in UCLDetails)
             {
                 var paths = new List<object>();
-                string path = this._RootPath + item.ImageHtml; 
+                string path = this._RootPath + item.ImageHtml;
                 if (Directory.Exists(path))
                 {
                     DirectoryInfo AttachFiles = new DirectoryInfo(path);
                     foreach (var itemfile in AttachFiles.GetFiles())
                     {
-                        paths.Add(new { path = path+'/'+itemfile.Name, name= itemfile.Name.Split(".")[0]});
+                        paths.Add(new { path = path + '/' + itemfile.Name, name = itemfile.Name.Split(".")[0] });
                     }
 
-                    returnObj.Add(item.Title.Replace(" ",""), paths);
+                    returnObj.Add(item.Title.Replace(" ", ""), paths);
                 }
             }
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = returnObj };
         }
 
         #endregion
+
+        public BaseResponse addChatSettings(AddChatSettingVM channel)
+        {
+            var channelNotExists = this._chatSettingRepo.Table.Count(ch => ch.ChatSettingId == channel.ChatSettingId && ch.IsDeleted != true) == 0;
+            BaseResponse response = new BaseResponse();
+            if (channelNotExists)
+            {
+                var newChannel = new ChatSetting
+                {
+                    //ChatSettingId = channel.ChatSettingId,
+                    UserIdFk = ApplicationSettings.UserId,
+                    IsMute = channel.IsMute,
+                    CallSound = channel.CallSound.Replace(this._RootPath, ""),
+                    MessageSound = channel.MessageSound.Replace(this._RootPath, ""),
+                    Wallpaper = channel.Wallpaper,
+                    CreatedDate = DateTime.UtcNow,
+                    CreatedBy = ApplicationSettings.UserId,
+                    IsDeleted = false,
+                };
+                if (!string.IsNullOrEmpty(channel.WallpaperObj.Base64Str))
+                {
+                    var GetUserInfo = _userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && x.IsDeleted == false).Select(x => new { x.UserId, x.FirstName, x.LastName }).FirstOrDefault();
+                    //var outPath = Directory.GetCurrentDirectory();
+                    var RootPath = this._RootPath; 
+                    string FilePath = "Wallpapers";
+                    var targetPath = Path.Combine(RootPath, FilePath);
+
+                    if (!Directory.Exists(targetPath))
+                    {
+                        Directory.CreateDirectory(targetPath);
+                    }
+                    var UserImageByte = Convert.FromBase64String(channel.WallpaperObj.Base64Str.Split("base64,")[1]);
+                    targetPath += "/" + $"{GetUserInfo.FirstName}-{GetUserInfo.LastName}_{GetUserInfo.UserId}.png";
+                    using (FileStream fs = new FileStream(targetPath, FileMode.Create, FileAccess.Write))
+                    {
+                        fs.Write(UserImageByte);
+                    }
+                    newChannel.Wallpaper = targetPath.Replace(RootPath, "").Replace("\\", "/");
+                }
+                this._chatSettingRepo.Insert(newChannel);
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Chat Setting Saved Successfully", Body = newChannel };
+            }
+            else
+            {
+                response.Status = HttpStatusCode.OK;
+                response.Message = "Channel Already Exists";
+            }
+            return response;
+        }
     }
-
-
-
 }

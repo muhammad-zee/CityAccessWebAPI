@@ -361,5 +361,25 @@ namespace Web.API.Controllers
             }
         }
         #endregion
+
+
+        #region Chat setting
+        [HttpPost("ChatSetting/addChatSettings")]
+        public BaseResponse addChatSettings([FromBody] AddChatSettingVM channel)
+        {
+            try
+            {
+                return this._communicaitonService.addChatSettings(channel);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+        #endregion chat Setting
     }
+
+
 }
