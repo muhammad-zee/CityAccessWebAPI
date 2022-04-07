@@ -871,7 +871,7 @@ namespace Web.Services.Concrete
 
         public BaseResponse GetChatSetting(int UserId)
         {
-            var chatData = this._chatSettingRepo.Table.Where(x => x.UserIdFk == ApplicationSettings.UserId);
+            var chatData = this._chatSettingRepo.Table.FirstOrDefault(x => x.UserIdFk == ApplicationSettings.UserId && x.IsDeleted != true);
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Chat data", Body = chatData };
         }
         #endregion
