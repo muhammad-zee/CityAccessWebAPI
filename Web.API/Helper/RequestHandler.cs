@@ -8,6 +8,10 @@ namespace Web.API.Helper
 {
     public class RequestHandler : ActionFilterAttribute
     {
+        /// <summary>
+        /// Get User Info on Every Request from request token
+        /// </summary>
+        /// <param name="context"></param>
         public override void OnActionExecuting(ActionExecutingContext context)
         {
             var user = context.HttpContext.User;
@@ -21,8 +25,9 @@ namespace Web.API.Helper
             ApplicationSettings.RoleIds = user.Claims.Where(x => x.Type == "RoleIds").Select(x => x.Value).FirstOrDefault();
             ApplicationSettings.isSuperAdmin = isSuperAdmin == "True" ? true : false;
             ApplicationSettings.TimeZone = timeZone.ToString();
-
+            
             base.OnActionExecuting(context);
         }
+
     }
 }
