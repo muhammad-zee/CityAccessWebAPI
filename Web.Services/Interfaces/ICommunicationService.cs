@@ -46,7 +46,7 @@ namespace Web.Services.Interfaces
 
         #region Chat Settings
         BaseResponse GetTone(int Id);
-        BaseResponse GetChatSetting(int Id);
+        BaseResponse GetChatSetting(int UserId);
         #endregion
 
         public BaseResponse addChatSettings(AddChatSettingVM channel);

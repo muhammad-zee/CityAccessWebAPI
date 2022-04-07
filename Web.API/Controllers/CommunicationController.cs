@@ -361,12 +361,12 @@ namespace Web.API.Controllers
             }
         }
 
-        [HttpGet("ChatSetting/GetChatSetting/{Id}")]
-        public BaseResponse GetChatSetting(int Id)
+        [HttpGet("ChatSetting/GetChatSetting/{UserId}")]
+        public BaseResponse GetChatSetting(int UserId)
         {
             try
             {
-                return this._communicaitonService.GetChatSetting(Id);
+                return this._communicaitonService.GetChatSetting(UserId);
             }
             catch (Exception ex)
             {
@@ -375,10 +375,7 @@ namespace Web.API.Controllers
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
         }
-        #endregion
 
-
-        #region Chat setting
         [HttpPost("ChatSetting/addChatSettings")]
         public BaseResponse addChatSettings([FromBody] AddChatSettingVM channel)
         {

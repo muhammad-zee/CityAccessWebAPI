@@ -869,7 +869,7 @@ namespace Web.Services.Concrete
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = returnObj };
         }
 
-        public BaseResponse GetChatSetting(int Id)
+        public BaseResponse GetChatSetting(int UserId)
         {
             var chatData = this._chatSettingRepo.Table.Where(x => x.UserIdFk == ApplicationSettings.UserId);
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Chat data", Body = chatData };

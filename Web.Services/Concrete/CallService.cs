@@ -195,8 +195,8 @@ namespace Web.Services.Concrete
             //var CallConnectedUrl = $"{origin}/Call/CallConnected";
             //var StatusCallbackUrl = $"{origin}/Call/CallbackStatus";
             //url = url.Replace(" ", "%20");
-            var To = new PhoneNumber("+923327097498");
-            //var To = new PhoneNumber("+923248754754");
+            //var To = new PhoneNumber("+923327097498");
+            var To = new PhoneNumber("+923248754754");
             var From = new PhoneNumber("+17273867112");
             ServicePointManager.SecurityProtocol = (SecurityProtocolType)3072; //TLS 1.2                                                                             
             TwilioClient.Init(this.Twilio_AccountSid, this.Twilio_AuthToken);
