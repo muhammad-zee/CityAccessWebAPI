@@ -895,7 +895,7 @@ namespace Web.Services.Concrete
                     FontSize = channel.FontSize,
                     IsDeleted = false,
                 };
-                if (!string.IsNullOrEmpty(channel.WallpaperObj.Base64Str))
+                if (channel.WallpaperObj != null && !string.IsNullOrEmpty(channel.WallpaperObj.Base64Str))
                 {
                     var GetUserInfo = _userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && x.IsDeleted == false).Select(x => new { x.UserId, x.FirstName, x.LastName }).FirstOrDefault();
                     //var outPath = Directory.GetCurrentDirectory();
@@ -930,7 +930,7 @@ namespace Web.Services.Concrete
                 channelSetting.CreatedBy = ApplicationSettings.UserId;
                 channelSetting.FontSize = channel.FontSize;
                 channelSetting.IsDeleted = false;
-                if (!string.IsNullOrEmpty(channel.WallpaperObj.Base64Str))
+                if (channel.WallpaperObj != null&& !string.IsNullOrEmpty(channel.WallpaperObj.Base64Str))
                 {
                     var GetUserInfo = _userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && x.IsDeleted == false).Select(x => new { x.UserId, x.FirstName, x.LastName }).FirstOrDefault();
                     //var outPath = Directory.GetCurrentDirectory();
