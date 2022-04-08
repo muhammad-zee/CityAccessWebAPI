@@ -11,6 +11,12 @@ namespace Web.Model.Common
         public string OrganizationEmail { get; set; }
         public int TwoFactorCodeExpiry { get; set; }
         public int VerifyCodeForFutureDays { get; set; }
+        public int? PasswordLength { get; set; }
+        public bool RequiredLowerCase { get; set; }
+        public bool RequiredUpperCase { get; set; }
+        public bool RequiredNumeric { get; set; }
+        public bool RequiredNonAlphaNumeric { get; set; }
+        public int? EnablePasswordAge { get; set; }
         public int CreatedBy { get; set; }
         public DateTime CreatedDate { get; set; }
         public int? ModifiedBy { get; set; }

@@ -33,10 +33,17 @@ namespace Web.Services.Concrete
             {
                 SettingId = x.SettingId,
                 OrganizationIdFk = x.OrganizationIdFk,
-                OrganizationEmail = x.OrganizationEmail,
                 TwoFactorCodeExpiry = x.TwoFactorAuthenticationExpiryMinutes,
                 TwoFactorEnabled = x.TwoFactorEnable,
                 VerifyCodeForFutureDays = x.VerifyForFutureDays,
+
+                PasswordLength = x.PasswordLength,
+                RequiredLowerCase = x.RequiredLowerCase,
+                RequiredNonAlphaNumeric = x.RequiredNonAlphaNumeric,
+                RequiredNumeric = x.RequiredNumeric,
+                RequiredUpperCase = x.RequiredUpperCase,
+                EnablePasswordAge = x.EnablePasswordAge,
+
                 TokenExpiryTime = x.TokenExpiryTime,
                 IsDeleted = x.IsDeleted
             }).FirstOrDefault();
@@ -60,7 +67,18 @@ namespace Web.Services.Concrete
                 setting.TwoFactorAuthenticationExpiryMinutes = settings.TwoFactorCodeExpiry;
                 setting.VerifyForFutureDays = settings.VerifyCodeForFutureDays;
                 setting.TokenExpiryTime = settings.TokenExpiryTime;
-                setting.OrganizationEmail = settings.OrganizationEmail;
+
+                ////// Password Validations ///////////
+
+                setting.PasswordLength = settings.PasswordLength;
+                setting.RequiredLowerCase = settings.RequiredLowerCase;
+                setting.RequiredNonAlphaNumeric = settings.RequiredNonAlphaNumeric;
+                setting.RequiredNumeric = settings.RequiredNumeric;
+                setting.RequiredUpperCase = settings.RequiredUpperCase;
+                setting.EnablePasswordAge = settings.EnablePasswordAge;
+
+                //////////////////////////////////////
+
                 setting.ModifiedBy = settings.ModifiedBy;
                 setting.ModifiedDate = DateTime.UtcNow;
                 setting.IsDeleted = false;
@@ -75,7 +93,18 @@ namespace Web.Services.Concrete
                     TwoFactorAuthenticationExpiryMinutes = settings.TwoFactorCodeExpiry,
                     VerifyForFutureDays = settings.VerifyCodeForFutureDays,
                     TokenExpiryTime = settings.TokenExpiryTime,
-                    OrganizationEmail = settings.OrganizationEmail,
+
+                    ////// Password Validations ///////////
+
+                    PasswordLength = settings.PasswordLength,
+                    RequiredLowerCase = settings.RequiredLowerCase,
+                    RequiredNonAlphaNumeric = settings.RequiredNonAlphaNumeric,
+                    RequiredNumeric = settings.RequiredNumeric,
+                    RequiredUpperCase = settings.RequiredUpperCase,
+                    EnablePasswordAge = settings.EnablePasswordAge,
+
+                    //////////////////////////////////////
+                    
                     CreatedBy = settings.CreatedBy,
                     CreatedDate = DateTime.UtcNow
                 };

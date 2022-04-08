@@ -17,6 +17,7 @@ namespace Web.Data.Models
         public int OrganizationId { get; set; }
         public string OrganizationName { get; set; }
         public int? OrganizationType { get; set; }
+        public string OrganizationEmail { get; set; }
         public int? TimeZoneIdFk { get; set; }
         public string PrimaryAddress { get; set; }
         public string PrimaryAddress2 { get; set; }
