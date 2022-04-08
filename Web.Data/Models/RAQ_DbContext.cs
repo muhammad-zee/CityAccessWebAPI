@@ -812,6 +812,11 @@ namespace Web.Data.Models
 
                 entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
 
+                entity.Property(e => e.OrganizationEmail)
+                    .IsRequired()
+                    .HasMaxLength(100)
+                    .HasDefaultValueSql("('')");
+
                 entity.Property(e => e.OrganizationName)
                     .IsRequired()
                     .HasMaxLength(500);
@@ -894,10 +899,6 @@ namespace Web.Data.Models
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");
 
                 entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
-
-                entity.Property(e => e.OrganizationEmail)
-                    .IsRequired()
-                    .HasMaxLength(50);
 
                 entity.HasOne(d => d.OrganizationIdFkNavigation)
                     .WithOne(p => p.Setting)

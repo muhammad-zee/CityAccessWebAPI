@@ -617,6 +617,7 @@ namespace Web.Services.Concrete
                     org.FaxNo = organization.FaxNo;
                     org.Zip = organization.Zip;
                     org.OrganizationType = organization.OrganizationType;
+                    org.OrganizationEmail = organization.OrganizationEmail;
                     org.PrimaryAddress = organization.PrimaryAddress;
                     org.PrimaryAddress2 = organization.PrimaryAddress2;
                     org.StateIdFk = organization.StateIdFk;
