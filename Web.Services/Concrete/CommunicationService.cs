@@ -552,7 +552,45 @@ namespace Web.Services.Concrete
 
             //var chatusers = this._userrepo.table.where(u => u.isdeleted != true && u.isactive == true && !string.isnullorempty(u.userchannelsid));
             var chatUsers = this._dbContext.LoadStoredProcedure("md_getAllConversationUsers")
-             .WithSqlParam("@proleid", ApplicationSettings.RoleIds)
+             .WithSqlParam("@pRoleid", ApplicationSettings.RoleIds)
+             .ExecuteStoredProc<ChatUsersVM>();
+            foreach (var user in chatUsers)
+            {
+                user.UserRoles = (from ur in this._userRole.Table
+                                  join r in this._role.Table on ur.RoleIdFk equals r.RoleId
+                                  where ur.UserIdFk == user.UserId && !r.IsDeleted
+                                  select new UserRoleVM
+                                  {
+                                      RoleId = ur.RoleIdFk,
+                                      RoleName = r.RoleName,
+                                      OrganizationIdFk = r.OrganizationIdFk
+                                  }).ToList();
+
+                user.ServiceLines = (from sl in this._serviceLineRepo.Table
+                                     join ur in this._userRelationRepo.Table
+                                     on sl.ServiceLineId equals ur.ServiceLineIdFk
+                                     where sl.IsDeleted != true && ur.UserIdFk == user.UserId
+                                     select new ServiceLineVM
+                                     {
+                                         ServiceLineId = sl.ServiceLineId,
+                                         ServiceName = sl.ServiceName,
+                                         DepartmentIdFk = sl.DepartmentIdFk,
+                                     }).ToList();
+                user.Departments = this._dptRepo.Table.Where(x => !x.IsDeleted && user.ServiceLines.Select(y => y.DepartmentIdFk).Contains(x.DepartmentId)).Select(x => new DepartmentVM() { DepartmentId = x.DepartmentId, DepartmentName = x.DepartmentName, OrganizationIdFk = x.OrganizationIdFk }).ToList();
+                user.Organizations = user.Departments.Count > 0 ? this._orgRepo.Table.Where(x => !x.IsDeleted && user.Departments.Select(y => y.OrganizationIdFk).Contains(x.OrganizationId)).Select(x => new OrganizationVM() { OrganizationId = x.OrganizationId, OrganizationName = x.OrganizationName }).ToList() : this._orgRepo.Table.Where(x => !x.IsDeleted && user.UserRoles.Select(y => y.OrganizationIdFk).Contains(x.OrganizationId)).Select(x => new OrganizationVM() { OrganizationId = x.OrganizationId, OrganizationName = x.OrganizationName }).ToList();
+            }
+
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Chat users found", Body = chatUsers };
+        }
+
+
+        public BaseResponse getAllConversationUsersByOrgId(int orgid)
+        {
+
+            //var chatusers = this._userrepo.table.where(u => u.isdeleted != true && u.isactive == true && !string.isnullorempty(u.userchannelsid));
+            var chatUsers = this._dbContext.LoadStoredProcedure("md_getAllUsersByOrganizationIdforchat")
+             .WithSqlParam("@pOrganizationId", orgid)
+             .WithSqlParam("@pIsSuperAdmin", ApplicationSettings.isSuperAdmin)
              .ExecuteStoredProc<ChatUsersVM>();
             foreach (var user in chatUsers)
             {

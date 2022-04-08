@@ -23,6 +23,8 @@ namespace Web.Services.Interfaces
         BaseResponse updateConversationGroup(string FriendlyName, string ChannelSid);
         BaseResponse updateConversationUserSid(string UserSid);
         BaseResponse getAllConversationUsers();
+
+        public BaseResponse getAllConversationUsersByOrgId(int orgid);
         BaseResponse getConversationUsersStatus(string UserSid);
         BaseResponse GetCurrentConversationParticipants(string channelSid);
         bool conversationUserIsOnline(string UserSid);
