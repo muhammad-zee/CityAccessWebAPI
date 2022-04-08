@@ -29,6 +29,7 @@ namespace Web.Services.Concrete
         private readonly GenericRepository<UserRole> _userRoleRepo;
         private readonly IRepository<UsersRelation> _userRelationRepo;
         private readonly IRepository<FavouriteTeam> _userFavouriteTeamRepo;
+        private readonly IRepository<Setting> _settingRepo;
         private IRepository<ControlListDetail> _controlListDetails;
         private readonly ICommunicationService _communicationService;
         private readonly IAdminService _adminService;
@@ -44,6 +45,7 @@ namespace Web.Services.Concrete
             IRepository<UserRole> userRoleRepo,
             IRepository<UsersRelation> userRelationRepo,
             IRepository<FavouriteTeam> userFavouriteTeamRepo,
+            IRepository<Setting> settingRepo,
             IRepository<ControlListDetail> controlListDetails,
             ICommunicationService communicationService,
             IAdminService adminService)
@@ -54,6 +56,7 @@ namespace Web.Services.Concrete
             this._userRoleRepo = (GenericRepository<UserRole>)userRoleRepo;
             this._userRelationRepo = userRelationRepo;
             this._userFavouriteTeamRepo = userFavouriteTeamRepo;
+            this._settingRepo = settingRepo;
             this._controlListDetails = controlListDetails;
             this._communicationService = communicationService;
             this._adminService = adminService;
@@ -153,6 +156,13 @@ namespace Web.Services.Concrete
             if (user.TwoFactorEnabled && user.IsTwoFactRememberChecked && DateTime.UtcNow <= user.TwoFactorExpiryDate)
             {
                 user.TwoFactorEnabled = false;
+            }
+            if (!user.IsRequirePasswordReset) 
+            {
+                if (user.PasswordExpiryDate.HasValue) 
+                {
+                    user.IsRequirePasswordReset = DateTime.UtcNow.Date > user.PasswordExpiryDate.Value.Date;
+                }
             }
             return new
             {
@@ -550,13 +560,22 @@ namespace Web.Services.Concrete
 
         public BaseResponse ChangePassword(ChangePasswordVM changePassword)
         {
+            var user = _userRepo.Table.Where(x => !x.IsDeleted && x.UserId == changePassword.UserId).FirstOrDefault();
+            var OrgSettings = this._settingRepo.Table.Where(x => x.OrganizationIdFk == changePassword.OrganizationId).FirstOrDefault();
+            DateTime? passwordExpiryDate = null;
+            if (OrgSettings.EnablePasswordAge.HasValue) 
+            {
+                passwordExpiryDate = DateTime.UtcNow.AddDays(OrgSettings.EnablePasswordAge.Value);
+            }
             if (changePassword.isFromProfile)
             {
-                var user = _userRepo.Table.Where(x => !x.IsDeleted && x.UserId == changePassword.UserId).FirstOrDefault();
                 var userOldPass = Encryption.decryptData(user.Password, this._encryptionKey);
                 var oldPass = Encryption.decryptData(changePassword.OldPassword, this._encryptionKey);
                 if (userOldPass == oldPass)
                 {
+                    user.TwoFactorEnabled = OrgSettings.TwoFactorEnable;
+                    user.TwoFactorExpiryDate = OrgSettings.TwoFactorAuthenticationExpiryMinutes > 0 ? DateTime.UtcNow.AddMinutes(OrgSettings.TwoFactorAuthenticationExpiryMinutes) : user.TwoFactorExpiryDate;
+                    user.PasswordExpiryDate = passwordExpiryDate;
                     user.Password = changePassword.NewPassword;
                     user.ModifiedBy = ApplicationSettings.UserId;
                     user.ModifiedDate = DateTime.UtcNow;
@@ -570,7 +589,9 @@ namespace Web.Services.Concrete
             }
             else
             {
-                var user = _userRepo.Table.Where(x => !x.IsDeleted && x.UserId == changePassword.UserId).FirstOrDefault();
+                user.TwoFactorEnabled = OrgSettings.TwoFactorEnable;
+                user.TwoFactorExpiryDate = OrgSettings.TwoFactorAuthenticationExpiryMinutes > 0 ? DateTime.UtcNow.AddMinutes(OrgSettings.TwoFactorAuthenticationExpiryMinutes) : user.TwoFactorExpiryDate;
+                user.PasswordExpiryDate = passwordExpiryDate;
                 user.Password = changePassword.NewPassword;
                 user.ModifiedBy = ApplicationSettings.UserId;
                 user.ModifiedDate = DateTime.UtcNow;
