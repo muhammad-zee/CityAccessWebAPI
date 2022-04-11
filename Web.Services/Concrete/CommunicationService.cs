@@ -951,7 +951,7 @@ namespace Web.Services.Concrete
                         Directory.CreateDirectory(targetPath);
                     }
                     var UserImageByte = Convert.FromBase64String(channel.WallpaperObj.Base64Str.Split("base64,")[1]);
-                    targetPath += "/" + $"{GetUserInfo.FirstName}-{GetUserInfo.LastName}_{GetUserInfo.UserId}.png";
+                    targetPath += "/" + $"{GetUserInfo.FirstName}-{GetUserInfo.LastName}_{GetUserInfo.UserId}_{DateTime.UtcNow.ToString("yyyyMMddHHmmssffff")}.png";
                     using (FileStream fs = new FileStream(targetPath, FileMode.Create, FileAccess.Write))
                     {
                         fs.Write(UserImageByte);
@@ -962,7 +962,7 @@ namespace Web.Services.Concrete
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Chat Setting Saved Successfully", Body = newChannel };
             }
             else
-            {
+                {
                 //ChatSettingId = channel.ChatSettingId,
                 channelSetting.UserIdFk = channel.UserIdFk;
                 channelSetting.IsMute = channel.IsMute;
@@ -984,6 +984,16 @@ namespace Web.Services.Concrete
                     if (!Directory.Exists(targetPath))
                     {
                         Directory.CreateDirectory(targetPath);
+                    }
+                    else
+                    {
+                        var allFiles = new DirectoryInfo(targetPath).GetFiles();
+                        var existingWallpaper = allFiles.Where(i => i.FullName.Contains($"{GetUserInfo.FirstName}-{GetUserInfo.LastName}_{GetUserInfo.UserId}"));
+                        foreach(var file in existingWallpaper)
+                        {
+                            file.Delete();
+                        }
+
                     }
                     var UserImageByte = Convert.FromBase64String(channel.WallpaperObj.Base64Str.Split("base64,")[1]);
                     targetPath += "/" + $"{GetUserInfo.FirstName}-{GetUserInfo.LastName}_{GetUserInfo.UserId}_{DateTime.UtcNow.ToString("yyyyMMddHHmmssffff")}.png";
