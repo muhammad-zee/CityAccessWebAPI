@@ -65,9 +65,9 @@ namespace Web.Services.Concrete
             {
                 var setting = this._settingRepo.Table.Where(x => x.SettingId == settings.SettingId && !x.IsDeleted).FirstOrDefault();
                 setting.TwoFactorEnable = settings.TwoFactorEnabled;
-                setting.TwoFactorAuthenticationExpiryMinutes = settings.TwoFactorCodeExpiry;
-                setting.VerifyForFutureDays = settings.VerifyCodeForFutureDays;
-                setting.TokenExpiryTime = settings.TokenExpiryTime;
+                setting.TwoFactorAuthenticationExpiryMinutes = settings.TwoFactorCodeExpiry.HasValue && settings.TwoFactorCodeExpiry.Value > 0 ? settings.TwoFactorCodeExpiry.Value : _config["TwoFactorAuthentication:TwoFactorAuthenticationExpiryMinutes"].ToInt();
+                setting.VerifyForFutureDays = settings.VerifyCodeForFutureDays.HasValue && settings.VerifyCodeForFutureDays.Value > 0 ? settings.VerifyCodeForFutureDays.Value : _config["TwoFactorAuthentication:VerifyForFutureDays"].ToInt();
+                setting.TokenExpiryTime = settings.TokenExpiryTime.Value;
 
                 ////// Password Validations ///////////
 
@@ -89,11 +89,11 @@ namespace Web.Services.Concrete
             {
                 var setting = new Setting()
                 {
-                    OrganizationIdFk = settings.OrganizationIdFk,
+                    OrganizationIdFk = settings.OrganizationIdFk.Value,
                     TwoFactorEnable = settings.TwoFactorEnabled,
-                    TwoFactorAuthenticationExpiryMinutes = settings.TwoFactorCodeExpiry,
-                    VerifyForFutureDays = settings.VerifyCodeForFutureDays,
-                    TokenExpiryTime = settings.TokenExpiryTime,
+                    TwoFactorAuthenticationExpiryMinutes = settings.TwoFactorCodeExpiry.Value,
+                    VerifyForFutureDays = settings.VerifyCodeForFutureDays.Value,
+                    TokenExpiryTime = settings.TokenExpiryTime.Value,
 
                     ////// Password Validations ///////////
 
@@ -106,7 +106,7 @@ namespace Web.Services.Concrete
 
                     //////////////////////////////////////
 
-                    CreatedBy = settings.CreatedBy,
+                    CreatedBy = settings.CreatedBy.Value,
                     CreatedDate = DateTime.UtcNow
                 };
                 this._settingRepo.Insert(setting);

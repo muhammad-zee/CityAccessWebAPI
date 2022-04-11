@@ -156,8 +156,8 @@ namespace Web.Services.Concrete
             {
                 user.TwoFactorEnabled = settings.TwoFactorEnabled;
                 user.IsTwoFactRememberChecked = settings.VerifyCodeForFutureDays > 0;
-                user.TwoFactorExpiryDate = settings.TwoFactorCodeExpiry > 0 ? DateTime.UtcNow.AddDays(settings.TwoFactorCodeExpiry) : user.TwoFactorExpiryDate;
-                tokenExpiryTime = settings.TokenExpiryTime > 0 ? DateTime.UtcNow.AddDays(settings.TokenExpiryTime) : tokenExpiryTime;
+                user.TwoFactorExpiryDate = settings.TwoFactorCodeExpiry > 0 ? DateTime.UtcNow.AddDays(settings.TwoFactorCodeExpiry.Value) : user.TwoFactorExpiryDate;
+                tokenExpiryTime = settings.TokenExpiryTime > 0 ? DateTime.UtcNow.AddDays(settings.TokenExpiryTime.Value) : tokenExpiryTime;
             }
             ///////////////////////////////////////////////////////////////////////////////////////////////////
 
