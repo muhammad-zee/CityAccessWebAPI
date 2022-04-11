@@ -981,7 +981,7 @@ namespace Web.Services.Concrete
                         Directory.CreateDirectory(targetPath);
                     }
                     var UserImageByte = Convert.FromBase64String(channel.WallpaperObj.Base64Str.Split("base64,")[1]);
-                    targetPath += "/" + $"{GetUserInfo.FirstName}-{GetUserInfo.LastName}_{GetUserInfo.UserId}.png";
+                    targetPath += "/" + $"{GetUserInfo.FirstName}-{GetUserInfo.LastName}_{GetUserInfo.UserId}_{DateTime.UtcNow.ToString("yyyyMMddHHmmssffff")}.png";
                     using (FileStream fs = new FileStream(targetPath, FileMode.Create, FileAccess.Write))
                     {
                         fs.Write(UserImageByte);
