@@ -146,13 +146,22 @@ namespace Web.Services.Concrete
 
             };
             var tokenExpiryTime = DateTime.UtcNow.AddMinutes(_config["Jwt:JwtExpiryTime"].ToInt());
-            var token = new JwtSecurityToken(_config["Jwt:ValidIssuer"],
-              _config["Jwt:ValidIssuer"],
-              claims,
-              expires: tokenExpiryTime,
-              signingCredentials: credentials);
+           
 
-            //checking Verified for future or not 
+            /////////////////  Set user Two Factor Settings According to Organization Setting /////////////////
+            var settings = this._dbContext.LoadStoredProcedure("md_getSettingsByUserId")
+                                .WithSqlParam("@userId", user.UserId)
+                                .ExecuteStoredProc<SettingsVM>().FirstOrDefault();
+            if (settings != null)
+            {
+                user.TwoFactorEnabled = settings.TwoFactorEnabled;
+                user.IsTwoFactRememberChecked = settings.VerifyCodeForFutureDays > 0;
+                user.TwoFactorExpiryDate = settings.TwoFactorCodeExpiry > 0 ? DateTime.UtcNow.AddDays(settings.TwoFactorCodeExpiry) : user.TwoFactorExpiryDate;
+                tokenExpiryTime = settings.TokenExpiryTime > 0 ? DateTime.UtcNow.AddDays(settings.TokenExpiryTime) : tokenExpiryTime;
+            }
+            ///////////////////////////////////////////////////////////////////////////////////////////////////
+
+            ////////////////////// Checking Verified for future or not ////////////////////////////////////////
             if (user.TwoFactorEnabled && user.IsTwoFactRememberChecked && DateTime.UtcNow <= user.TwoFactorExpiryDate)
             {
                 user.TwoFactorEnabled = false;
@@ -164,6 +173,13 @@ namespace Web.Services.Concrete
                     user.IsRequirePasswordReset = DateTime.UtcNow.Date > user.PasswordExpiryDate.Value.Date;
                 }
             }
+            /////////////////////////////////////////////////////////////////////////////////////////////////
+
+            var token = new JwtSecurityToken(_config["Jwt:ValidIssuer"],
+             _config["Jwt:ValidIssuer"],
+             claims,
+             expires: tokenExpiryTime,
+             signingCredentials: credentials);
             return new
             {
                 token = new JwtSecurityTokenHandler().WriteToken(token),

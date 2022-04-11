@@ -7,6 +7,7 @@ using Web.Data.Models;
 using Web.DLL.Generic_Repository;
 using Web.Model;
 using Web.Model.Common;
+using Web.Services.Extensions;
 using Web.Services.Interfaces;
 
 namespace Web.Services.Concrete
@@ -70,12 +71,12 @@ namespace Web.Services.Concrete
 
                 ////// Password Validations ///////////
 
-                setting.PasswordLength = settings.PasswordLength;
+                setting.PasswordLength = settings.PasswordLength.HasValue ? settings.PasswordLength : _config["PasswordSettings:PassLength"].ToInt();
                 setting.RequiredLowerCase = settings.RequiredLowerCase;
                 setting.RequiredNonAlphaNumeric = settings.RequiredNonAlphaNumeric;
                 setting.RequiredNumeric = settings.RequiredNumeric;
                 setting.RequiredUpperCase = settings.RequiredUpperCase;
-                setting.EnablePasswordAge = settings.EnablePasswordAge;
+                setting.EnablePasswordAge = settings.EnablePasswordAge.HasValue ? settings.EnablePasswordAge : _config["PasswordSettings:PassExpiryDays"].ToInt();
 
                 //////////////////////////////////////
 
@@ -96,15 +97,15 @@ namespace Web.Services.Concrete
 
                     ////// Password Validations ///////////
 
-                    PasswordLength = settings.PasswordLength,
+                    PasswordLength = settings.PasswordLength.HasValue ? settings.PasswordLength : _config["PasswordSettings:PassLength"].ToInt(),
                     RequiredLowerCase = settings.RequiredLowerCase,
                     RequiredNonAlphaNumeric = settings.RequiredNonAlphaNumeric,
                     RequiredNumeric = settings.RequiredNumeric,
                     RequiredUpperCase = settings.RequiredUpperCase,
-                    EnablePasswordAge = settings.EnablePasswordAge,
+                    EnablePasswordAge = settings.EnablePasswordAge.HasValue ? settings.EnablePasswordAge : _config["PasswordSettings:PassExpiryDays"].ToInt(),
 
                     //////////////////////////////////////
-                    
+
                     CreatedBy = settings.CreatedBy,
                     CreatedDate = DateTime.UtcNow
                 };
