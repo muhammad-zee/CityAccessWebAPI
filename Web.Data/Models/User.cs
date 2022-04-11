@@ -47,6 +47,7 @@ namespace Web.Data.Models
         public DateTime? CodeExpiryTime { get; set; }
         public bool IsTwoFactRememberChecked { get; set; }
         public DateTime? TwoFactorExpiryDate { get; set; }
+        public DateTime? PasswordExpiryDate { get; set; }
         public bool IsRequirePasswordReset { get; set; }
         public bool? IsActive { get; set; }
         public string UserChannelSid { get; set; }

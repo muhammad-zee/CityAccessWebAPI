@@ -14,6 +14,7 @@
 
     public class ChangePasswordVM
     {
+        public int OrganizationId { get; set; }
         public int UserId { get; set; }
         public string OldPassword { get; set; }
         public string NewPassword { get; set; }

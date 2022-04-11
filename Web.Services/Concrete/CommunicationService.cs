@@ -599,8 +599,13 @@ namespace Web.Services.Concrete
                                   where ur.UserIdFk == user.UserId && !r.IsDeleted
                                   select new UserRoleVM
                                   {
+
+                                      
+
+
+
                                       RoleId = ur.RoleIdFk,
-                                      RoleName = r.RoleName,
+                                      RoleName = r.IsSuperAdmin==true?"MD-Support":r.RoleName,
                                       OrganizationIdFk = r.OrganizationIdFk
                                   }).ToList();
 

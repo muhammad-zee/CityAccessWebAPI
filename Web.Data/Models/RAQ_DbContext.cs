@@ -1002,6 +1002,8 @@ namespace Web.Data.Models
 
                 entity.Property(e => e.OfficePhoneNumber).HasMaxLength(15);
 
+                entity.Property(e => e.PasswordExpiryDate).HasColumnType("datetime");
+
                 entity.Property(e => e.PersonalMobileNumber).HasMaxLength(15);
 
                 entity.Property(e => e.PrimaryEmail).HasMaxLength(256);
