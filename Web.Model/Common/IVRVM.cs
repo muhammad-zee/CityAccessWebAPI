@@ -9,10 +9,7 @@ namespace Web.Model.Common
         public string Description { get; set; }
         public int OrganizationIdFk { get; set; }
         public int ServiceLineIdFk { get; set; }
-
-       
         public string VirtualNumber { get; set; }
-        public string LandlineNumber { get; set; }
         public int CreatedBy { get; set; }
         public DateTime CreatedDate { get; set; }
         public int? ModifiedBy { get; set; }

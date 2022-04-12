@@ -737,15 +737,15 @@ namespace Web.Data.Models
                     .IsRequired()
                     .HasMaxLength(100);
 
-                entity.Property(e => e.LandlineNumber).HasMaxLength(50);
-
                 entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
 
                 entity.Property(e => e.Name)
                     .IsRequired()
                     .HasMaxLength(50);
 
-                entity.Property(e => e.VirtualNumber).HasMaxLength(50);
+                entity.Property(e => e.VirtualNumber)
+                    .IsRequired()
+                    .HasMaxLength(50);
             });
 
             modelBuilder.Entity<Ivrsetting>(entity =>
