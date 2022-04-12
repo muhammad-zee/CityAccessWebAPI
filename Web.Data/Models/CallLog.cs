@@ -21,6 +21,7 @@ namespace Web.Data.Models
         public string ParentCallSid { get; set; }
         public string RecordingName { get; set; }
         public bool IsRecorded { get; set; }
+        public bool IsAppToAppCall { get; set; }
         public DateTime? CreatedDate { get; set; }
     }
 }
