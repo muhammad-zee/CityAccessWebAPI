@@ -1,0 +1,55 @@
+ public showHeaderBar: Boolean = true;
+  public ownerCollections: Record<string, any>[] = [
+    { OwnerText: 'Select', OwnerId: 0, Color: '' },
+    { OwnerText: 'Muhammad Masud', OwnerId: 1, Color: '#ea7a57' },
+    { OwnerText: 'Muhammad Bilal', OwnerId: 2, Color: '#df5286' },
+  ];
+
+  public resourceDataSource: Record<string, any>[] = this.ownerCollections;
+  public allowMultiple = false;
+  public readonly = false;
+  public title= "Physician";
+
+  public selectedDate: Date = new Date(2021, 11, 21);
+  public currentView: View = 'Month';
+
+  private dataManager: DataManager = new DataManager({
+    url: this.configuration.api_url + '/Schedule/LoadSchedule',
+    crudUrl: this.configuration.api_url + '/Schedule/UpdateSchedule',
+    adaptor: new UrlAdaptor
+  });
+
+
+private dataQuery: Query = new Query().from("Events").addParams('readOnly', 'true');
+  public eventSettings: EventSettingsModel = {
+    dataSource: this.dataManager,
+    query: this.dataQuery,
+    fields: {
+      id: 'id',
+      subject: { name: 'subject' , validation: { required: true } },
+      isAllDay: { name: 'isAllDay' },
+      startTime: { name: 'startTime' },
+      endTime: { name: 'endTime' }
+    }
+  };
+
+
+
+<div class="m-3">
+    <h1>Schedule</h1>
+    <ejs-schedule width='100%' height='850px' [selectedDate]="selectedDate" [currentView]='currentView'
+        [showHeaderBar]='showHeaderBar' [readonly]="readonly" [eventSettings]="eventSettings">
+        <e-resources>
+            <e-resource field='ownerId' [title]='title' [dataSource]='resourceDataSource'
+                [allowMultiple]='allowMultiple' name='Owners' textField='OwnerText' idField='OwnerId'
+                colorField='Color'>
+            </e-resource>
+        </e-resources>
+        <e-views>
+            <e-view option="Day"></e-view>
+            <e-view option="Week"></e-view>
+            <e-view option="WorkWeek"></e-view>
+            <e-view option="Month"></e-view>
+        </e-views>
+    </ejs-schedule>
+</div>
