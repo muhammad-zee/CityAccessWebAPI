@@ -266,7 +266,7 @@ namespace Web.Services.Concrete
             var afterOpenTime = TimeSpan.Compare(callTime, dsTime);
             var beforeCloseTime = TimeSpan.Compare(dcTime, callTime);
 
-            var serviceLineId = this._IVRRepo.Table.Where(i => i.IsDeleted!= true && ( i.VirtualNumber == To || i.VirtualNumber == From)).Select(i=>i.ServicelineIdFk).FirstOrDefault();
+            var serviceLineId = this._IVRRepo.Table.Where(i => i.IsDeleted!= true && ( i.LandlineNumber == To || i.LandlineNumber == From)).Select(i=>i.ServicelineIdFk).FirstOrDefault();
 
             var response = new VoiceResponse();
             //var GatherResponseUrl = $"https://" + origin + "/AutomatedCall/PatientResponse?PatientID=" + PatientID + "&AppointmentID=" + AppointmentID + "&Price=" + Price;
@@ -790,7 +790,7 @@ namespace Web.Services.Concrete
                     ivr.ServicelineIdFk = model.ServiceLineIdFk;
                     ivr.Name = model.Name;
                     ivr.Description = model.Description;
-                    ivr.VirtualNumber = model.VirtualNumber;
+                    ivr.LandlineNumber = model.LandlineNumber;
                     ivr.ModifiedBy = model.ModifiedBy;
                     ivr.ModifiedDate = DateTime.UtcNow;
                     ivr.IsDeleted = false;
@@ -803,7 +803,7 @@ namespace Web.Services.Concrete
                 ivr = new InteractiveVoiceResponse();
                 ivr.OrganizationIdFk = model.OrganizationIdFk;
                 ivr.ServicelineIdFk = model.ServiceLineIdFk;
-                ivr.VirtualNumber = model.VirtualNumber;
+                ivr.LandlineNumber = model.LandlineNumber;
                 ivr.Name = model.Name;
                 ivr.Description = model.Description;
                 ivr.CreatedBy = model.CreatedBy;

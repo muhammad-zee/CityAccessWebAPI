@@ -17,7 +17,7 @@ namespace Web.Data.Models
         public string Description { get; set; }
         public int OrganizationIdFk { get; set; }
         public int ServicelineIdFk { get; set; }
-        public string VirtualNumber { get; set; }
+        public string LandlineNumber { get; set; }
         public int CreatedBy { get; set; }
         public DateTime CreatedDate { get; set; }
         public int? ModifiedBy { get; set; }

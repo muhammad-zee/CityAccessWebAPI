@@ -737,13 +737,13 @@ namespace Web.Data.Models
                     .IsRequired()
                     .HasMaxLength(100);
 
-                entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
-
-                entity.Property(e => e.Name)
+                entity.Property(e => e.LandlineNumber)
                     .IsRequired()
                     .HasMaxLength(50);
 
-                entity.Property(e => e.VirtualNumber)
+                entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.Name)
                     .IsRequired()
                     .HasMaxLength(50);
             });
