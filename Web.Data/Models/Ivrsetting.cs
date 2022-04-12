@@ -14,6 +14,7 @@ namespace Web.Data.Models
         public string Description { get; set; }
         public int NodeTypeId { get; set; }
         public int? KeyPress { get; set; }
+        public int? EnqueueToRoleIdFk { get; set; }
         public string Icon { get; set; }
         public int CreatedBy { get; set; }
         public DateTime CreatedDate { get; set; }

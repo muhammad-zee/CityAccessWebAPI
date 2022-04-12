@@ -537,7 +537,9 @@ namespace Web.Services.Concrete
                     //collapsedIcon = x.Icon,
                     icon = x.Icon,
                     NodeTypeId = x.NodeTypeId,
+                    EnqueueToRoleIdFk = x.EnqueueToRoleIdFk,
                     KeyPress = x.KeyPress,
+                    
                     expanded = true
                 }).ToList();
                 var treeViewItems = treeItems.BuildIvrTree();
@@ -593,6 +595,7 @@ namespace Web.Services.Concrete
                     ivrNode.Description = model.Description;
                     ivrNode.NodeTypeId = model.NodeTypeId;
                     ivrNode.KeyPress = model.KeyPress;
+                    ivrNode.EnqueueToRoleIdFk = model.EnqueueToRoleIdFk;
                     ivrNode.ModifiedBy = model.ModifiedBy;
                     ivrNode.ModifiedDate = DateTime.UtcNow;
                     ivrNode.Icon = model.Icon;
@@ -610,6 +613,7 @@ namespace Web.Services.Concrete
                 ivrNode.Description = model.Description;
                 ivrNode.NodeTypeId = model.NodeTypeId;
                 ivrNode.KeyPress = model.KeyPress;
+                ivrNode.EnqueueToRoleIdFk = model.EnqueueToRoleIdFk;
                 ivrNode.Icon = model.Icon;
                 ivrNode.CreatedBy = model.CreatedBy;
                 ivrNode.CreatedDate = DateTime.UtcNow;

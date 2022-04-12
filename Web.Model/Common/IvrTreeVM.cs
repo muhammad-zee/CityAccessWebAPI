@@ -13,6 +13,7 @@ namespace Web.Model.Common
         public int? ParentKey { get; set; }
         public int? KeyPress { get; set; }
         public int? NodeTypeId { get; set; }
+        public int? EnqueueToRoleIdFk { get; set; }
         public bool expanded { get; set; }
         public IList<IvrTreeVM> children { get; set; }
     }

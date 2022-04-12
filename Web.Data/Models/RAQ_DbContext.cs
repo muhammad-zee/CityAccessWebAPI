@@ -761,6 +761,8 @@ namespace Web.Data.Models
 
                 entity.Property(e => e.Description).IsRequired();
 
+                entity.Property(e => e.EnqueueToRoleIdFk).HasColumnName("EnqueueToRoleIdFK");
+
                 entity.Property(e => e.Icon)
                     .IsRequired()
                     .HasMaxLength(50);
