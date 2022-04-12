@@ -437,8 +437,14 @@ namespace Web.Services.Concrete
             return roleList;
         }
 
-
-        public List<UserRoleVM> getRoleListByUserId(int UserId)
+        public BaseResponse GetAllRolesByServiceLineId(int ServiceLineId)
+        {
+            var roleList = this._dbContext.LoadStoredProcedure("md_getRolesByServiceLineId")
+                            .WithSqlParam("@pServiceLineId", ServiceLineId)
+                            .ExecuteStoredProc<RoleVM>();
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = roleList };
+    }
+    public List<UserRoleVM> getRoleListByUserId(int UserId)
         {
             var userRoles = (from ur in this._userRole.Table
                              join r in this._role.Table on ur.RoleIdFk equals r.RoleId

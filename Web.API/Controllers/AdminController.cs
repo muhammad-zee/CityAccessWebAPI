@@ -332,6 +332,23 @@ namespace Web.API.Controllers
             }
 
         }
+        [HttpGet("admin/GetAllRolesByServiceLineId/{serviceLineId}")]
+        public BaseResponse GetAllRolesByServiceLineId(int serviceLineId)
+        {
+            try
+            {
+                BaseResponse roleObj = _adminService.GetAllRolesByServiceLineId(serviceLineId);
+                return roleObj;
+
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+
+        }
 
         [HttpGet("admin/getRoleListByOrganizationIds/{Ids}")]
         public BaseResponse GetRoleListByOrganizationIds(string Ids)

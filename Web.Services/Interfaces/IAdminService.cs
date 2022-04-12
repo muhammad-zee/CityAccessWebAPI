@@ -50,6 +50,7 @@ namespace Web.Services.Interfaces
         IQueryable<Role> getRoleListByOrganizationId(int OrganizationId);
         IQueryable<Role> getScheduleRoleListByOrganizationId(int OrganizationId);
         IQueryable<Role> getRoleListByOrganizationIds(string OrganizationIds);
+        BaseResponse GetAllRolesByServiceLineId(int ServiceLineId);
         List<UserRoleVM> getRoleListByUserId(int UserId);
         string SaveRole(List<RoleVM> role);
         BaseResponse GetRoleById(int roleId);
