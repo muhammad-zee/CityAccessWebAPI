@@ -496,7 +496,7 @@ namespace Web.Services.Concrete
                                         msg.body += $"<strong>Dob:</strong> {dob:MM-dd-yyyy} </br>";
                                     }
                                     msg.body += keyValues.ContainsKey("MedicalRecordNumber") ? $"<strong>Medical Record Number:</strong> {keyValues["MedicalRecordNumber"].ToString()} </br>" : "";
-                                    msg.body += keyValues.ContainsKey("CallbackNumber") ? $"<strong>Callback Number:</strong> {keyValues["CallbackNumber"].ToString()} </br>" : "";
+                                    msg.body += keyValues.ContainsKey("CallbackNumber") && keyValues["CallbackNumber"].ToString() != "(___) ___-____" ? $"<strong>Callback Number:</strong> {keyValues["CallbackNumber"].ToString()} </br>" : "";
                                     _communicationService.sendPushNotification(msg);
 
                                     var orgByServiceId = _dptRepo.Table.Where(x => !x.IsDeleted && x.DepartmentId == _serviceLineRepo.Table.Where(x => !x.IsDeleted && x.ServiceLineId == serviceLineId).Select(x => x.DepartmentIdFk).FirstOrDefault()).Select(x => x.OrganizationIdFk).FirstOrDefault();
@@ -575,7 +575,7 @@ namespace Web.Services.Concrete
                                 msg.body += $"<strong>Dob:</strong> {dob:MM-dd-yyyy} </br>";
                             }
                             msg.body += keyValues.ContainsKey("MedicalRecordNumber") ? $"<strong>Medical Record Number:</strong> {keyValues["MedicalRecordNumber"].ToString()} </br>" : "";
-                            msg.body += keyValues.ContainsKey("CallbackNumber") ? $"<strong>Callback Number:</strong> {keyValues["CallbackNumber"].ToString()} </br>" : "";
+                            msg.body += keyValues.ContainsKey("CallbackNumber") && keyValues["CallbackNumber"].ToString() != "(___) ___-____" ? $"<strong>Callback Number:</strong> {keyValues["CallbackNumber"].ToString()} </br>" : "";
                             msg.channelSid = channel.Sid;
 
                             var sendMsg = _communicationService.sendPushNotification(msg);

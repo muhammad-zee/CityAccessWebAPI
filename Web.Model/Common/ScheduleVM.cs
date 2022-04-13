@@ -40,7 +40,7 @@ namespace Web.Model.Common
 
         public string roleId { get; set; }
         public string subject { get; set; }
-
+        public string Description { get; set; }
         public string selectedUserId { get; set; }
         public string RoleName { get; set; }
         public string ServiceName { get; set; }

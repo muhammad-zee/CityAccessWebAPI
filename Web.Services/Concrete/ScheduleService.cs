@@ -314,6 +314,7 @@ namespace Web.Services.Concrete
                                     UserIdFk = param.selectedUserId.ToInt(),
                                     RoleIdFk = u.roleId.ToInt(),
                                     ServiceLineIdFk = u.serviceLineId.ToInt(),
+                                    Description = u.subject,
                                     CreatedBy = param.CreatedBy,
                                     CreatedDate = DateTime.UtcNow,
                                     IsDeleted = false
@@ -339,7 +340,7 @@ namespace Web.Services.Concrete
                     schedule.ScheduleDate = changedSchedule.startTime;
                     schedule.ScheduleDateStart = changedSchedule.startTime;
                     schedule.ScheduleDateEnd = changedSchedule.endTime;
-
+                    schedule.Description = changedSchedule.subject;
                     schedule.UserIdFk = Convert.ToInt32(changedSchedule.userId);
                     schedule.RoleIdFk = changedSchedule.roleId.ToInt();
 

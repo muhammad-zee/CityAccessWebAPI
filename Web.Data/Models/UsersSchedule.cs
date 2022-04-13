@@ -20,6 +20,7 @@ namespace Web.Data.Models
         public int? ModifiedBy { get; set; }
         public DateTime? ModifiedDate { get; set; }
         public bool IsDeleted { get; set; }
+        public string Description { get; set; }
 
         public virtual Role RoleIdFkNavigation { get; set; }
         public virtual ServiceLine ServiceLineIdFkNavigation { get; set; }
