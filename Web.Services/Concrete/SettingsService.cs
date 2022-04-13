@@ -91,8 +91,8 @@ namespace Web.Services.Concrete
                 {
                     OrganizationIdFk = settings.OrganizationIdFk.Value,
                     TwoFactorEnable = settings.TwoFactorEnabled,
-                    TwoFactorAuthenticationExpiryMinutes = settings.TwoFactorCodeExpiry.Value,
-                    VerifyForFutureDays = settings.VerifyCodeForFutureDays.Value,
+                    TwoFactorAuthenticationExpiryMinutes = settings.TwoFactorCodeExpiry.HasValue && settings.TwoFactorCodeExpiry.Value > 0 ? settings.TwoFactorCodeExpiry.Value : _config["TwoFactorAuthentication:TwoFactorAuthenticationExpiryMinutes"].ToInt(),
+                    VerifyForFutureDays = settings.VerifyCodeForFutureDays.HasValue && settings.VerifyCodeForFutureDays.Value > 0 ? settings.VerifyCodeForFutureDays.Value : _config["TwoFactorAuthentication:VerifyForFutureDays"].ToInt(),
                     TokenExpiryTime = settings.TokenExpiryTime.Value,
 
                     ////// Password Validations ///////////
