@@ -49,11 +49,11 @@ namespace Web.API.Controllers
 
         [AllowAnonymous]
         [HttpPost("Call/EnqueueCall")]
-        public TwiMLResult EnqueueCall(int serviceLineId)
+        public TwiMLResult EnqueueCall(int parentNodeId,int serviceLineId,string CallSid)
         {
             try
             {
-                return this._callService.EnqueueCall(serviceLineId);
+                return this._callService.EnqueueCall(parentNodeId,serviceLineId, CallSid);
             }
             catch (Exception ex)
             {
@@ -99,22 +99,7 @@ namespace Web.API.Controllers
         }
 
 
-        [AllowAnonymous]
-        [HttpPost("Call/CallbackStatus")]
-        public string CallbackStatus()
-        {
-            try
-            {
-                return this._callService.CallbackStatus(HttpContext.Request.Form);
-            }
-            catch (Exception ex)
-            {
-                ElmahExtensions.RiseError(ex);
-                _logger.LogExceptions(ex);
-                return ex.Message;
-            }
-        }
-
+   
 
         [AllowAnonymous]
         [HttpPost("Call/CallConnected")]
@@ -166,6 +151,55 @@ namespace Web.API.Controllers
             }
         }
 
+        #region [Call Status Events]
+
+        [AllowAnonymous]
+        [HttpPost("Call/CallbackStatus")]
+        public string CallbackStatus()
+        {
+            try
+            {
+                return this._callService.CallbackStatus(HttpContext.Request.Form);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return ex.Message;
+            }
+        }
+        [AllowAnonymous]
+        [HttpPost("Call/InboundCallbackStatus")]
+        public string InboundCallbackStatus(int parentNodeId, int serviceLineId)
+        {
+            try
+            {
+                return this._callService.InboundCallbackStatus(HttpContext.Request.Form,parentNodeId, serviceLineId);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return ex.Message;
+            }
+        }
+        [AllowAnonymous]
+        [HttpPost("Call/ConferenceParticipantCallbackStatus")]
+        public string ConferenceParticipantCallbackStatus(int roleId, int serviceLineId,string conferenceSid)
+        {
+            try
+            {
+                return this._callService.ConferenceParticipantCallbackStatus(HttpContext.Request.Form, roleId, serviceLineId, conferenceSid);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return ex.Message;
+            }
+        }
+
+        #endregion
         #region [Calls Logging]
 
 

@@ -25,6 +25,7 @@ using Web.Services.Interfaces;
 using static Twilio.Rest.Api.V2010.Account.CallResource;
 using Client = Twilio.TwiML.Voice.Client;
 using Newtonsoft.Json;
+using Twilio.Rest.Api.V2010.Account.Conference;
 
 namespace Web.Services.Concrete
 {
@@ -144,7 +145,7 @@ namespace Web.Services.Concrete
                 Client.EventEnum.Answered,
                 Client.EventEnum.Completed
             }.ToList();
-            var dial = new Dial(callerId: phoneNumber.Contains("client")?From:Twilio_PhoneNumber/*, record: Dial.RecordEnum.RecordFromAnswer*/);
+            var dial = new Dial(callerId: phoneNumber.Contains("client") ? From : Twilio_PhoneNumber/*, record: Dial.RecordEnum.RecordFromAnswer*/);
             if (phoneNumber.Contains("client"))
             {
                 dial.Client(phoneNumber.Replace("client:", ""), statusCallback: new Uri(CallbackStatusUrl), statusCallbackMethod: Twilio.Http.HttpMethod.Post, statusCallbackEvent: statusCallbackEventList1);
@@ -176,16 +177,43 @@ namespace Web.Services.Concrete
             this.saveCallLog(call);
             return TwiML(response);
         }
-        public TwiMLResult EnqueueCall(int serviceLineId)
+        public TwiMLResult EnqueueCall(int parentNodeId, int serviceLineId, string CallSid)
         {
+            var enqueueNode = this._ivrSettingsRepo.Table.FirstOrDefault(i => i.IvrSettingsId == parentNodeId);
+
             var users = _dbContext.LoadStoredProcedure("md_getAllUsersByServiceLineId")
                         .WithSqlParam("@pServiceLineId", serviceLineId)
+                        .WithSqlParam("@pRoleId", enqueueNode.EnqueueToRoleIdFk)
                         .ExecuteStoredProc<UserListVm>().ToList();
 
             var response = new VoiceResponse();
-            var dial = new Dial();
-            dial.Client(users.FirstOrDefault().UserUniqueId);
-            response.Append(dial);
+            if (users.Count() > 0)
+            {
+                var conferenceStatusCallbackEvent = new[] {
+                     Conference.EventEnum.Start,
+                     Conference.EventEnum.End,
+                     Conference.EventEnum.Join,
+                     Conference.EventEnum.Leave,
+                    // Conference.EventEnum.Mute,
+                    // Conference.EventEnum.Hold
+                }.ToList();
+                var StatusCallbackUrl = $"{origin}/Call/InboundCallbackStatus?parentNodeId={enqueueNode.IvrSettingsId}&serviceLineId={serviceLineId}";
+                var dial = new Dial();
+                dial.Conference(name: CallSid,
+                    endConferenceOnExit: true,
+                    startConferenceOnEnter: true,
+                    statusCallback: new Uri(StatusCallbackUrl),
+                    statusCallbackEvent: conferenceStatusCallbackEvent,
+                    statusCallbackMethod: Twilio.Http.HttpMethod.Post);
+
+                //dial.Client(users.FirstOrDefault().UserUniqueId);
+                response.Append(dial);
+
+            }
+            else
+            {
+                response.Say("Sorry our staff is busy right no, please callback later");
+            }
             return TwiML(response);
         }
         public CallResource Call()
@@ -197,7 +225,7 @@ namespace Web.Services.Concrete
             //url = url.Replace(" ", "%20");
             //var To = new PhoneNumber("+923327097498");
             var To = new PhoneNumber("+923327097498");
-            var From = new PhoneNumber("+17273867112");
+            var From = new PhoneNumber("+12562516861");
             ServicePointManager.SecurityProtocol = (SecurityProtocolType)3072; //TLS 1.2                                                                             
             TwilioClient.Init(this.Twilio_AccountSid, this.Twilio_AuthToken);
             var call = CallResource.Create(to: To,
@@ -209,13 +237,180 @@ namespace Web.Services.Concrete
             return call;
         }
 
+    
+        public TwiMLResult CallConnected(string To, string From)
+        {
+            string OfficeOpenTime = "9:00 AM";
+            string OfficeCloseTime = "7:00 PM";
+
+            var dsTime = Convert.ToDateTime(OfficeOpenTime).TimeOfDay;
+            var dcTime = Convert.ToDateTime(OfficeCloseTime).TimeOfDay;
+            var callTime = DateTime.Now.TimeOfDay;
+            var afterOpenTime = TimeSpan.Compare(callTime, dsTime);
+            var beforeCloseTime = TimeSpan.Compare(dcTime, callTime);
+
+            var serviceLineId = this._IVRRepo.Table.Where(i => i.IsDeleted != true && (i.LandlineNumber == To || i.LandlineNumber == From)).Select(i => i.ServicelineIdFk).FirstOrDefault();
+
+            var response = new VoiceResponse();
+            //var GatherResponseUrl = $"https://" + origin + "/AutomatedCall/PatientResponse?PatientID=" + PatientID + "&AppointmentID=" + AppointmentID + "&Price=" + Price;
+            var rootNode = this._dbContext.LoadStoredProcedure("md_getIvrNodesByParentNodeId")
+                .WithSqlParam("@pParentNodeId", 0)
+                .WithSqlParam("@pServiceLineId", serviceLineId)
+                .ExecuteStoredProc<IvrSettingVM>().FirstOrDefault();
+            if (rootNode != null)
+            {
+                response.Say(rootNode.Description);
+
+                var childNodes = this._dbContext.LoadStoredProcedure("md_getIvrNodesByParentNodeId")
+                    .WithSqlParam("@pParentNodeId", rootNode.IvrSettingsId)
+                    .ExecuteStoredProc<IvrSettingVM>().ToList();
+                IvrSettingVM childNode = null;
+                //TimeSpan startTime = Convert(DateTime);
+                if (afterOpenTime < 0 || beforeCloseTime < 0)
+                {
+                    //afterhours
+                    childNode = childNodes.FirstOrDefault(n => n.NodeTypeId == IvrNodeTypeEnums.AfterHour.ToInt());
+                }
+                else
+                {
+                    //clinical hours
+                    childNode = childNodes.FirstOrDefault(n => n.NodeTypeId == IvrNodeTypeEnums.ClinicalHour.ToInt());
+                }
+                var GatherResponseUrl = $"{origin}/Call/PromptResponse?parentNodeId={childNode.IvrSettingsId}&serviceLineId={serviceLineId}";
+                var gather = new Gather(numDigits: 1, timeout: 10, action: new Uri(GatherResponseUrl)).Say(childNode.Description, language: "en");
+                response.Append(gather);
+                response.Say("You did not press any key,\n good bye.!");
+            }
+            else
+            {
+                response.Say("there is no I V R saved against number that you are calling ");
+            }
+
+            var xmlResponse = response.ToString();
+            return TwiML(response);
+        }
+        public TwiMLResult PromptResponse(int Digits, int ParentNodeId, int serviceLineId)
+        {
+            var IvrSetting = this._dbContext.LoadStoredProcedure("md_getIvrNodesByParentNodeId")
+               .WithSqlParam("@pParentNodeId", ParentNodeId)
+               .WithSqlParam("@pServiceLineId", serviceLineId)
+               .ExecuteStoredProc<IvrSettingVM>();
+            int QueryDigit = Convert.ToInt32(Digits);
+
+            IvrSettingVM ivrNode = null;
+            var ivrParentNode = this._ivrSettingsRepo.Table.FirstOrDefault(i => i.IvrSettingsId == ParentNodeId && i.IsDeleted != true);
+
+            var response = new VoiceResponse();
+            if (ivrParentNode.NodeTypeId == IvrNodeTypeEnums.Gather.ToInt() || ivrParentNode.NodeTypeId == IvrNodeTypeEnums.AfterHour.ToInt() || ivrParentNode.NodeTypeId == IvrNodeTypeEnums.ClinicalHour.ToInt())
+            {
+                ivrNode = IvrSetting.FirstOrDefault(i => i.KeyPress == QueryDigit);
+
+            }
+            else if (ivrParentNode.NodeTypeId == IvrNodeTypeEnums.Say.ToInt())
+            {
+                ivrNode = IvrSetting.FirstOrDefault();
+            }
+
+            if (ivrNode != null)
+            {
+                if (ivrNode.NodeTypeId == IvrNodeTypeEnums.Gather.ToInt())
+                {
+                    var GatherResponseUrl = $"{origin}/Call/PromptResponse?parentNodeId={ivrNode.IvrSettingsId}&serviceLineId={serviceLineId}";
+                    var gather = new Gather(numDigits: 1, timeout: 10, action: new Uri(GatherResponseUrl)).Pause(length: 3).Say(ivrNode.Description, language: "en");
+                    response.Append(gather);
+                    response.Say("You did not press any key,\n good bye.!");
+                }
+                else if (ivrNode.NodeTypeId == IvrNodeTypeEnums.Voicemail.ToInt())
+                {
+                    var RecordUrl = $"{origin}/Call/ReceiveVoicemail";
+                    response.Say(ivrNode.Description).Pause(2).Say("press # key after recording message");
+                    response.Record(action: new Uri(RecordUrl), finishOnKey: "#");
+                    response.Say("I did not receive a recording");
+                    response.Leave();
+                }
+                else if (ivrNode.NodeTypeId == IvrNodeTypeEnums.Say.ToInt())
+                {
+                    var RedirectUrl = $"{origin}/Call/PromptResponse?parentNodeId={ivrNode.IvrSettingsId}&serviceLineId={serviceLineId}";
+                    response.Say(ivrNode.Description);
+                    response.Redirect(url: new Uri(RedirectUrl));
+                }
+                else if (ivrNode.NodeTypeId == IvrNodeTypeEnums.Enqueue.ToInt())
+                {
+                    var enqueueCallUrl = $"{origin}/Call/EnqueueCall?parentNodeId={ivrNode.IvrSettingsId}&serviceLineId={serviceLineId}";
+                    response.Say(ivrNode.Description);
+                    response.Redirect(url: new Uri(enqueueCallUrl));
+                }
+            }
+            else
+            {
+                var GatherResponseUrl = $"{origin}/Call/PromptResponse?parentNodeId={ivrParentNode.IvrSettingsId}&serviceLineId={serviceLineId}";
+                var gather = new Gather(numDigits: 1, timeout: 10, action: new Uri(GatherResponseUrl)).Pause(length: 3).Say("You Pressed wrong key").Pause(length: 2).Say(ivrParentNode.Description, language: "en");
+                response.Append(gather);
+
+                response.Say("You did not press any key,\n good bye.!");
+            }
+
+            return TwiML(response);
+        }
+        public TwiMLResult ReceiveVoicemail(string RecordingUrl, string RecordingSid)
+        {
+
+            VoiceResponse response = new VoiceResponse();
+            response.Say("Thankyou , Your Voicemail is received.");
+            return TwiML(response);
+        }
+
+        public TwiMLResult ForwardCallToAgent(string CallSid, string From)
+        {
+            var response = new VoiceResponse();
+            var dial = new Dial();
+            dial.Number("+16784263023");
+            response.Append(dial);
+            string responseXML = response.ToString();
+            return TwiML(response);
+        }
+        public TwiMLResult ExceptionResponse(Exception ex)
+        {
+            VoiceResponse response = new VoiceResponse();
+            response.Say(ex.Message.ToString());
+            return TwiML(response);
+        }
+
+        public ParticipantResource addParticipant(UserListVm User,string ConferenceSid,int RoleId,int ServiceLineId)
+        {
+            ServicePointManager.SecurityProtocol = (SecurityProtocolType)3072; //TLS 1.2                                                                             
+            TwilioClient.Init(this.Twilio_AccountSid, this.Twilio_AuthToken);
+            var statusCallbackEvent = new List<string> {
+                "initiated",
+                "ringing",
+                "answered",
+                "completed"
+            };
+            var StatusCallbackUrl  = $"{origin}/Call/ConferenceParticipantCallbackStatus?roleId={RoleId}&serviceLineId={ServiceLineId}&conferenceSid={ConferenceSid}";
+            var participant= ParticipantResource.Create(
+            label: User.FullName,
+            earlyMedia: true,
+            beep: "onEnter",
+            statusCallback: new Uri(StatusCallbackUrl),
+            statusCallbackEvent: statusCallbackEvent,
+            record: true,
+            from: new Twilio.Types.PhoneNumber("+12562516861"),
+            to: new Twilio.Types.PhoneNumber($"client:{User.UserUniqueId}"),
+            pathConferenceSid: ConferenceSid
+        );
+            return participant;
+        }
+
+
+        #region [Call Status Events]
+
         public string CallbackStatus(IFormCollection Request)
         {
             var Callsid = Request["CallSid"].ToString();
             var CallStatus = Request["CallStatus"].ToString();
             var Direction = Request["Direction"].ToString();
 
-            if ( CallStatus == "in-progress")
+            if (CallStatus == "in-progress")
             {
                 string from = Request["From"].ToString();
                 string channelSid = this._userRepo.Table.FirstOrDefault(u => u.UserUniqueId == from.Replace("client:", "")).UserChannelSid;
@@ -255,143 +450,55 @@ namespace Web.Services.Concrete
             this.saveCallLog(callRec);
             return "ok";
         }
-        public TwiMLResult CallConnected(string To, string From)
-        { 
-                 string OfficeOpenTime = "9:00 AM";
-         string OfficeCloseTime = "7:00 PM";
-
-            var dsTime = Convert.ToDateTime(OfficeOpenTime).TimeOfDay;
-            var dcTime = Convert.ToDateTime(OfficeCloseTime).TimeOfDay;
-            var callTime = DateTime.Now.TimeOfDay;
-            var afterOpenTime = TimeSpan.Compare(callTime, dsTime);
-            var beforeCloseTime = TimeSpan.Compare(dcTime, callTime);
-
-            var serviceLineId = this._IVRRepo.Table.Where(i => i.IsDeleted!= true && ( i.LandlineNumber == To || i.LandlineNumber == From)).Select(i=>i.ServicelineIdFk).FirstOrDefault();
-
-            var response = new VoiceResponse();
-            //var GatherResponseUrl = $"https://" + origin + "/AutomatedCall/PatientResponse?PatientID=" + PatientID + "&AppointmentID=" + AppointmentID + "&Price=" + Price;
-            var rootNode = this._dbContext.LoadStoredProcedure("md_getIvrNodesByParentNodeId")                       
-                .WithSqlParam("@pParentNodeId", 0)
-                .WithSqlParam("@pServiceLineId",serviceLineId)
-                .ExecuteStoredProc<IvrSettingVM>().FirstOrDefault();
-            if(rootNode != null)
-            {
-                response.Say(rootNode.Description);
-
-                var childNodes = this._dbContext.LoadStoredProcedure("md_getIvrNodesByParentNodeId")
-                    .WithSqlParam("@pParentNodeId", rootNode.IvrSettingsId)
-                    .ExecuteStoredProc<IvrSettingVM>().ToList();
-                IvrSettingVM childNode = null;
-                //TimeSpan startTime = Convert(DateTime);
-                if (afterOpenTime < 0 || beforeCloseTime < 0)
-                {
-                    //afterhours
-                    childNode = childNodes.FirstOrDefault(n => n.NodeTypeId == IvrNodeTypeEnums.AfterHour.ToInt());
-                }
-                else
-                {
-                    //clinical hours
-                    childNode = childNodes.FirstOrDefault(n => n.NodeTypeId == IvrNodeTypeEnums.ClinicalHour.ToInt());
-                }
-                var GatherResponseUrl = $"{origin}/Call/PromptResponse?parentNodeId={childNode.IvrSettingsId}&serviceLineId={serviceLineId}";
-                var gather = new Gather(numDigits: 1, timeout: 10, action: new Uri(GatherResponseUrl)).Say(childNode.Description, language: "en");
-                response.Append(gather);
-                response.Say("You did not press any key,\n good bye.!");
-            }
-            else
-            {
-                response.Say("there is no I V R saved against number that you are calling ");
-            }
-            
-            var xmlResponse = response.ToString();
-            return TwiML(response);
-        }
-        public TwiMLResult PromptResponse(int Digits, int ParentNodeId,int serviceLineId)
+        public string InboundCallbackStatus(IFormCollection Request, int parentNodeId, int serviceLineId)
         {
-            var IvrSetting = this._dbContext.LoadStoredProcedure("md_getIvrNodesByParentNodeId")
-               .WithSqlParam("@pParentNodeId", ParentNodeId)
-               .WithSqlParam("@pServiceLineId", serviceLineId)
-               .ExecuteStoredProc<IvrSettingVM>();
-            int QueryDigit = Convert.ToInt32(Digits);
-
-            IvrSettingVM ivrNode = null;
-            var ivrParentNode = this._ivrSettingsRepo.Table.FirstOrDefault(i => i.IvrSettingsId == ParentNodeId && i.IsDeleted != true);
-
-            var response = new VoiceResponse();
-            if (ivrParentNode.NodeTypeId == IvrNodeTypeEnums.Gather.ToInt()||ivrParentNode.NodeTypeId == IvrNodeTypeEnums.AfterHour.ToInt()||ivrParentNode.NodeTypeId == IvrNodeTypeEnums.ClinicalHour.ToInt())
+            var Callsid = Request["FriendlyName"].ToString();
+            var StatusCallbackEvent = Request["StatusCallbackEvent"].ToString();
+            var ConferenceSid = Request["ConferenceSid"].ToString();
+            var SequenceNumber = Request["SequenceNumber"].ToString();
+          
+            if (StatusCallbackEvent == "participant-join" && SequenceNumber == "1")
             {
-                ivrNode = IvrSetting.FirstOrDefault(i => i.KeyPress == QueryDigit);
-              
-            }
-            else if(ivrParentNode.NodeTypeId == IvrNodeTypeEnums.Say.ToInt())
-            {
-                ivrNode = IvrSetting.FirstOrDefault();
-            }
+                var enqueueNode = this._ivrSettingsRepo.Table.FirstOrDefault(i => i.IvrSettingsId == parentNodeId);
 
-            if (ivrNode != null)
-            {
-                if (ivrNode.NodeTypeId == IvrNodeTypeEnums.Gather.ToInt())
+                var users = _dbContext.LoadStoredProcedure("md_getAllUsersByServiceLineId")
+                            .WithSqlParam("@pServiceLineId", serviceLineId)
+                            .WithSqlParam("@pRoleId", enqueueNode.EnqueueToRoleIdFk)
+                            .ExecuteStoredProc<UserListVm>().ToList();
+                if(users.Count()>0)
                 {
-                    var GatherResponseUrl = $"{origin}/Call/PromptResponse?parentNodeId={ivrNode.IvrSettingsId}&serviceLineId={serviceLineId}";
-                    var gather = new Gather(numDigits: 1, timeout: 10, action: new Uri(GatherResponseUrl)).Pause(length: 3).Say(ivrNode.Description, language: "en");
-                    response.Append(gather);
-                    response.Say("You did not press any key,\n good bye.!");
+                    var participant = this.addParticipant(users.ElementAt(0), ConferenceSid, enqueueNode.EnqueueToRoleIdFk.Value, serviceLineId);
                 }
-                else if (ivrNode.NodeTypeId == IvrNodeTypeEnums.Voicemail.ToInt())
-                {
-                    var RecordUrl = $"{origin}/Call/ReceiveVoicemail";
-                    response.Say(ivrNode.Description).Pause(2).Say("press # key after recording message");
-                    response.Record(action: new Uri(RecordUrl), finishOnKey: "#");
-                    response.Say("I did not receive a recording");
-                    response.Leave();
-                }
-                else if (ivrNode.NodeTypeId == IvrNodeTypeEnums.Say.ToInt())
-                {
-                    var RedirectUrl = $"{origin}/Call/PromptResponse?parentNodeId={ivrNode.IvrSettingsId}&serviceLineId={serviceLineId}";
-                    response.Say(ivrNode.Description);
-                    response.Redirect(url: new Uri(RedirectUrl));
-                }
-                else if(ivrNode.NodeTypeId == IvrNodeTypeEnums.Enqueue.ToInt())
-                {
-                    var enqueueCallUrl = $"{origin}/Call/EnqueueCall?parentNodeId={ivrNode.IvrSettingsId}&serviceLineId={serviceLineId}";
-                    response.Say(ivrNode.Description);
-                    response.Redirect(url: new Uri(enqueueCallUrl));
-                }
-            }
-            else
-            {
-                var GatherResponseUrl = $"{origin}/Call/PromptResponse?parentNodeId={ivrParentNode.IvrSettingsId}&serviceLineId={serviceLineId}";
-                var gather = new Gather(numDigits: 1, timeout: 10, action: new Uri(GatherResponseUrl)).Pause(length: 3).Say("You Pressed wrong key").Pause(length: 2).Say(ivrParentNode.Description, language: "en");
-                response.Append(gather);
 
-                response.Say("You did not press any key,\n good bye.!");
             }
+            else if (StatusCallbackEvent == "participant-leave" && SequenceNumber == "1") { }
+            else if (StatusCallbackEvent == "conference-end" && SequenceNumber == "1") { }
 
-            return TwiML(response);
+            return "ok";
         }
-        public TwiMLResult ReceiveVoicemail(string RecordingUrl, string RecordingSid)
+        public string ConferenceParticipantCallbackStatus(IFormCollection Request, int roleId, int serviceLineId,string conferenceSid)
         {
+            var To = Request["To"].ToString();
+            var UserUniqueId = To.Replace("client:","");
+            var Callsid = Request["CallSid"].ToString();
+            var StatusCallbackEvent = Request["CallStatus"].ToString();
+            if (StatusCallbackEvent == "no-answer")
+            {
 
-            VoiceResponse response = new VoiceResponse();
-            response.Say("Thankyou , Your Voicemail is received.");
-            return TwiML(response);
-        }
+                var users = _dbContext.LoadStoredProcedure("md_getAllUsersByServiceLineId")
+                            .WithSqlParam("@pServiceLineId", serviceLineId)
+                            .WithSqlParam("@pRoleId", roleId)
+                            .ExecuteStoredProc<UserListVm>().ToList();
+                if (users.Count() > 0)
+                {
+                    var participant = this.addParticipant(users.Where(u=>u.UserUniqueId!= UserUniqueId).FirstOrDefault(), conferenceSid, roleId, serviceLineId);
+                }
 
-        public TwiMLResult ForwardCallToAgent(string CallSid, string From)
-        {
-            var response = new VoiceResponse();
-            var dial = new Dial();
-            dial.Number("+16784263023");
-            response.Append(dial);
-            string responseXML = response.ToString();
-            return TwiML(response);
+            }
+
+            return "ok";
         }
-        public TwiMLResult ExceptionResponse(Exception ex)
-        {
-            VoiceResponse response = new VoiceResponse();
-            response.Say(ex.Message.ToString());
-            return TwiML(response); 
-        }
+        #endregion
 
         #region [Calls Logging]
 
@@ -539,7 +646,7 @@ namespace Web.Services.Concrete
                     NodeTypeId = x.NodeTypeId,
                     EnqueueToRoleIdFk = x.EnqueueToRoleIdFk,
                     KeyPress = x.KeyPress,
-                    
+
                     expanded = true
                 }).ToList();
                 var treeViewItems = treeItems.BuildIvrTree();
@@ -722,7 +829,7 @@ namespace Web.Services.Concrete
             }
         }
 
-        public BaseResponse copyIvrSettings(int copyFromServiceLineId,int copyToServicelineId)
+        public BaseResponse copyIvrSettings(int copyFromServiceLineId, int copyToServicelineId)
         {
             BaseResponse response = new();
             int rowsAffected;
@@ -742,7 +849,7 @@ namespace Web.Services.Concrete
             if (rowsAffected > 0)
             {
                 response.Status = HttpStatusCode.OK;
-                response.Message = "IVR Settings Copied Successfully!"; 
+                response.Message = "IVR Settings Copied Successfully!";
             }
             else
             {
@@ -816,7 +923,7 @@ namespace Web.Services.Concrete
                 this._IVRRepo.Insert(ivr);
 
 
-                var saveRootNodes=this.addIvrParentNodes(ivr.IvrId);
+                var saveRootNodes = this.addIvrParentNodes(ivr.IvrId);
             }
             return new BaseResponse()
             {

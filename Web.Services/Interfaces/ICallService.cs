@@ -10,15 +10,17 @@ namespace Web.Services.Interfaces
     public interface ICallService
     {
         BaseResponse GenerateToken(string Identity);
-        TwiMLResult EnqueueCall(int serviceLineId);
+        TwiMLResult EnqueueCall(int parentNodeId,int serviceLineId,string CallSid);
         TwiMLResult Connect(string phoneNumber, string Twilio_PhoneNumber, string From, string CallSid, string CallStatus);
         CallResource Call();
-        string CallbackStatus(IFormCollection Request);
         TwiMLResult CallConnected(string To,string From);
         TwiMLResult PromptResponse(int Digits, int ParentNodeId, int serviceLineId);
         TwiMLResult ExceptionResponse(Exception ex);
         TwiMLResult ReceiveVoicemail(string RecordingUrl, string RecordingSid);
 
+        string CallbackStatus(IFormCollection Request);
+        string InboundCallbackStatus(IFormCollection Request, int parentNodeId, int serviceLineId);
+        string ConferenceParticipantCallbackStatus(IFormCollection Request, int roleId, int serviceLineId,string conferenceSid);
         //BaseResponse getIvrTree();
         BaseResponse getIvrNodes();
         BaseResponse getIvrTree(int Id);
