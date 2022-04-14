@@ -43,5 +43,10 @@ namespace Web.Services.Interfaces
 
         #endregion
 
+        #region Enqueue
+
+        BaseResponse saveQueues(QueuesVM queue);
+        #endregion
+
     }
 }

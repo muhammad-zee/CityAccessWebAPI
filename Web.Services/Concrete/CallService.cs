@@ -962,6 +962,56 @@ namespace Web.Services.Concrete
         }
 
         #endregion
+
+
+        #region Enqueues
+
+        public BaseResponse saveQueues(QueuesVM queue)
+        {
+
+            var record = queue;
+
+            if (!string.IsNullOrEmpty(queue.Callsid))
+            {
+                
+                int rowsAffected;
+                string sql = "EXEC md_InsertUpdateQueues " +
+                    "@pToPhoneNumber, " +
+                    "@pFromPhoneNumber, " +
+                    "@pQueueAcceptedBy, " +
+                    "@pQueueStatus, " +
+                    "@pConfrenceSid, " +
+                    "@pCallSid, " +
+                    "@pParentCallsid, " +
+                    "@pModifiedDate, " +
+                    "@pCreatedDate, "  ;
+
+                List<SqlParameter> parms = new List<SqlParameter>
+                    { 
+                        // Create parameters    
+                        new SqlParameter { ParameterName = "@pToPhoneNumber", Value = queue.ToPhoneNumber },
+                        new SqlParameter { ParameterName = "@pFromPhoneNumber", Value = queue.FromPhoneNumber },
+                        new SqlParameter { ParameterName = "@pQueueAcceptedBy", Value = queue.QueueAcceptedBy },
+                        new SqlParameter { ParameterName = "@pQueueStatus", Value = queue.QueueStatus },
+                        new SqlParameter { ParameterName = "@pConfrenceSid", Value = queue.ConfrenceSid },
+                        new SqlParameter { ParameterName = "@pCallSid", Value = queue.Callsid },
+                        new SqlParameter { ParameterName = "@pParentCallsid", Value = queue.ParentCallsid },
+                        new SqlParameter { ParameterName = "@pModifiedDate", Value = queue.ModifiedDate },
+                        new SqlParameter { ParameterName = "@pCreatedDate", Value = DateTime.UtcNow},
+
+                };
+
+                rowsAffected = this._dbContext.Database.ExecuteSqlRaw(sql, parms.ToArray());
+            }
+            return new BaseResponse()
+            {
+                Status = HttpStatusCode.OK,
+                Message = "Record Saved",
+                Body = record
+            };
+        }
+
+        #endregion
     }
 
 }
