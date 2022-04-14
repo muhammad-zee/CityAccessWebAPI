@@ -17,7 +17,6 @@ namespace Web.Services.Interfaces
         TwiMLResult PromptResponse(int Digits, int ParentNodeId, int serviceLineId);
         TwiMLResult ExceptionResponse(Exception ex);
         TwiMLResult ReceiveVoicemail(string RecordingUrl, string RecordingSid);
-
         string CallbackStatus(IFormCollection Request);
         string InboundCallbackStatus(IFormCollection Request, int parentNodeId, int serviceLineId);
         string ConferenceParticipantCallbackStatus(IFormCollection Request, int roleId, int serviceLineId, string conferenceSid);
@@ -43,7 +42,6 @@ namespace Web.Services.Interfaces
         BaseResponse DeleteIVR(int Id);
 
         #endregion
-
 
     }
 }

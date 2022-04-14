@@ -388,8 +388,10 @@ namespace Web.Services.Concrete
             var StatusCallbackUrl = $"{origin}/Call/ConferenceParticipantCallbackStatus?roleId={RoleId}&serviceLineId={ServiceLineId}&conferenceSid={ConferenceSid}";
             var participant = ParticipantResource.Create(
             label: User.FullName,
-            earlyMedia: true,
+            //earlyMedia: true,
             beep: "onEnter",
+            startConferenceOnEnter:true,
+            endConferenceOnExit:true,
             statusCallback: new Uri(StatusCallbackUrl),
             statusCallbackEvent: statusCallbackEvent,
             record: true,
@@ -481,16 +483,20 @@ namespace Web.Services.Concrete
             var UserUniqueId = To.Replace("client:", "");
             var Callsid = Request["CallSid"].ToString();
             var StatusCallbackEvent = Request["CallStatus"].ToString();
-            if (StatusCallbackEvent == "no-answer")
+            if (StatusCallbackEvent == "no-answer"||StatusCallbackEvent == "busy")
             {
-
                 var users = _dbContext.LoadStoredProcedure("md_getAllUsersByServiceLineId")
                             .WithSqlParam("@pServiceLineId", serviceLineId)
                             .WithSqlParam("@pRoleId", roleId)
                             .ExecuteStoredProc<UserListVm>().ToList();
                 if (users.Count() > 0)
                 {
-                    var participant = this.addParticipant(users.Where(u => u.UserUniqueId != UserUniqueId).FirstOrDefault(), conferenceSid, roleId, serviceLineId);
+                    //bool agentFound = false;
+                    //foreach (var u in users)
+                    //{
+                    //            var isOnline = this._communicationService.conversationUserIsOnline(u.ConversationUserSid);
+                    //}
+                    var participant = this.addParticipant(users.Where(u=>u.UserUniqueId!= UserUniqueId).FirstOrDefault(), conferenceSid, roleId, serviceLineId);
                 }
 
             }
@@ -957,4 +963,5 @@ namespace Web.Services.Concrete
 
         #endregion
     }
+
 }
