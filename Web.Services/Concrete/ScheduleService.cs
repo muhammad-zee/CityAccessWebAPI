@@ -90,7 +90,7 @@ namespace Web.Services.Concrete
                             .WithSqlParam("@filterVal", schedule.FilterVal)
                             .ExecuteStoredProc<ScheduleListVM>();
             int totalRecords = 0;
-            if (scheduleList.Count > 0) 
+            if (scheduleList.Count > 0)
             {
                 totalRecords = scheduleList.Select(x => x.Total_Records).FirstOrDefault();
             }
@@ -402,7 +402,7 @@ namespace Web.Services.Concrete
                 var row = _scheduleRepo.Table.Where(x => !x.IsDeleted && x.UsersScheduleId == schedule.ScheduleId).FirstOrDefault();
                 if (row != null)
                 {
-                    
+
                     if (!_scheduleRepo.Table.Any(x => x.ScheduleDate.Value.Date == schedule.FromDate.Date && x.ServiceLineIdFk == row.ServiceLineIdFk && x.RoleIdFk == row.RoleIdFk && x.UserIdFk == row.UserIdFk && !x.IsDeleted && schedule.ScheduleId != x.UsersScheduleId))
                     {
                         string startDateTimeStr = schedule.FromDate.ToString("MM-dd-yyyy") + " " + schedule.StartTime.ToString("hh:mm:ss tt");

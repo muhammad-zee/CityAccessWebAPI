@@ -147,7 +147,7 @@ namespace Web.Services.Concrete
 
             };
             var tokenExpiryTime = DateTime.UtcNow.AddMinutes(_config["Jwt:JwtExpiryTime"].ToInt());
-           
+
 
             /////////////////  Set user Two Factor Settings According to Organization Setting /////////////////
             var settings = this._dbContext.LoadStoredProcedure("md_getSettingsByUserId")
@@ -167,9 +167,9 @@ namespace Web.Services.Concrete
             {
                 user.TwoFactorEnabled = false;
             }
-            if (!user.IsRequirePasswordReset) 
+            if (!user.IsRequirePasswordReset)
             {
-                if (user.PasswordExpiryDate.HasValue) 
+                if (user.PasswordExpiryDate.HasValue)
                 {
                     user.IsRequirePasswordReset = DateTime.UtcNow.Date > user.PasswordExpiryDate.Value.Date;
                 }
@@ -430,7 +430,7 @@ namespace Web.Services.Concrete
                         //var showAllAccessUsers = this._dbContext.LoadStoredProcedure("md_getUsersOfComponentAccess")
                         //                       .WithSqlParam("@componentName", "Users")
                         //                       .ExecuteStoredProc<RegisterCredentialVM>(); //.Select(x => new { x.UserUniqueId, x.UserId }).Distinct().ToList();
-                       
+
                         //var notification = new PushNotificationVM()
                         //{
                         //    Id = row.CodeStrokeId,
@@ -586,7 +586,7 @@ namespace Web.Services.Concrete
                                 .WithSqlParam("@orgId", changePassword.OrganizationId)
                                 .ExecuteStoredProc<Setting>().FirstOrDefault();
             var user = _userRepo.Table.Where(x => !x.IsDeleted && x.UserId == changePassword.UserId).FirstOrDefault();
-            
+
             if (OrgSettings != null && OrgSettings.EnablePasswordAge.HasValue)
             {
                 passwordExpiryDate = DateTime.UtcNow.AddDays(OrgSettings.EnablePasswordAge.Value);

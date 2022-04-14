@@ -7,6 +7,11 @@ namespace Web.Data.Models
 {
     public partial class CodeStroke
     {
+        public CodeStroke()
+        {
+            CodeStrokeGroupMembers = new HashSet<CodeStrokeGroupMember>();
+        }
+
         public int CodeStrokeId { get; set; }
         public string PatientName { get; set; }
         public int OrganizationIdFk { get; set; }
@@ -33,5 +38,7 @@ namespace Web.Data.Models
         public TimeSpan? ActualTime { get; set; }
         public string Distance { get; set; }
         public string StartingPoint { get; set; }
+
+        public virtual ICollection<CodeStrokeGroupMember> CodeStrokeGroupMembers { get; set; }
     }
 }

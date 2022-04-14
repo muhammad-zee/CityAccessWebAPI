@@ -228,7 +228,7 @@ namespace Web.Services.Concrete
             }
 
             int totalRecord = 0;
-            if (users.Count > 0) 
+            if (users.Count > 0)
             {
                 totalRecord = users.Select(x => x.Total_Records).FirstOrDefault();
             }
@@ -253,9 +253,9 @@ namespace Web.Services.Concrete
 
             return new BaseResponse { Status = HttpStatusCode.OK, Message = "Users List Returned", Body = users };
         }
-        public BaseResponse GetAllEMSUsers() 
+        public BaseResponse GetAllEMSUsers()
         {
-            if (ApplicationSettings.isSuperAdmin) 
+            if (ApplicationSettings.isSuperAdmin)
             {
                 var usersEMS = this._dbContext.LoadStoredProcedure("md_GetAllEMSUsers")
                                 .ExecuteStoredProc<RegisterCredentialVM>();
@@ -443,8 +443,8 @@ namespace Web.Services.Concrete
                             .WithSqlParam("@pServiceLineId", ServiceLineId)
                             .ExecuteStoredProc<RoleVM>();
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = roleList };
-    }
-    public List<UserRoleVM> getRoleListByUserId(int UserId)
+        }
+        public List<UserRoleVM> getRoleListByUserId(int UserId)
         {
             var userRoles = (from ur in this._userRole.Table
                              join r in this._role.Table on ur.RoleIdFk equals r.RoleId

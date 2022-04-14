@@ -7,6 +7,11 @@ namespace Web.Data.Models
 {
     public partial class CodeBlue
     {
+        public CodeBlue()
+        {
+            CodeBlueGroupMembers = new HashSet<CodeBlueGroupMember>();
+        }
+
         public int CodeBlueId { get; set; }
         public string PatientName { get; set; }
         public int OrganizationIdFk { get; set; }
@@ -33,5 +38,7 @@ namespace Web.Data.Models
         public TimeSpan? ActualTime { get; set; }
         public string Distance { get; set; }
         public string StartingPoint { get; set; }
+
+        public virtual ICollection<CodeBlueGroupMember> CodeBlueGroupMembers { get; set; }
     }
 }

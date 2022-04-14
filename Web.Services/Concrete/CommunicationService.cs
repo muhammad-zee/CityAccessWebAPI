@@ -600,12 +600,12 @@ namespace Web.Services.Concrete
                                   select new UserRoleVM
                                   {
 
-                                      
+
 
 
 
                                       RoleId = ur.RoleIdFk,
-                                      RoleName = r.IsSuperAdmin==true?"MD-Support":r.RoleName,
+                                      RoleName = r.IsSuperAdmin == true ? "MD-Support" : r.RoleName,
                                       OrganizationIdFk = r.OrganizationIdFk
                                   }).ToList();
 
@@ -962,7 +962,7 @@ namespace Web.Services.Concrete
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Chat Setting Saved Successfully", Body = newChannel };
             }
             else
-                {
+            {
                 //ChatSettingId = channel.ChatSettingId,
                 channelSetting.UserIdFk = channel.UserIdFk;
                 channelSetting.IsMute = channel.IsMute;
@@ -973,7 +973,7 @@ namespace Web.Services.Concrete
                 channelSetting.CreatedBy = ApplicationSettings.UserId;
                 channelSetting.FontSize = channel.FontSize;
                 channelSetting.IsDeleted = false;
-                if (channel.WallpaperObj != null&& !string.IsNullOrEmpty(channel.WallpaperObj.Base64Str))
+                if (channel.WallpaperObj != null && !string.IsNullOrEmpty(channel.WallpaperObj.Base64Str))
                 {
                     var GetUserInfo = _userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && x.IsDeleted == false).Select(x => new { x.UserId, x.FirstName, x.LastName }).FirstOrDefault();
                     //var outPath = Directory.GetCurrentDirectory();
@@ -989,7 +989,7 @@ namespace Web.Services.Concrete
                     {
                         var allFiles = new DirectoryInfo(targetPath).GetFiles();
                         var existingWallpaper = allFiles.Where(i => i.FullName.Contains($"{GetUserInfo.FirstName}-{GetUserInfo.LastName}_{GetUserInfo.UserId}"));
-                        foreach(var file in existingWallpaper)
+                        foreach (var file in existingWallpaper)
                         {
                             file.Delete();
                         }

@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Web.Model.Common
 {
@@ -24,7 +20,7 @@ namespace Web.Model.Common
 
     }
 
-    public class WallpaperFileVM 
+    public class WallpaperFileVM
     {
         public string FileName { get; set; }
         public string Base64Str { get; set; }

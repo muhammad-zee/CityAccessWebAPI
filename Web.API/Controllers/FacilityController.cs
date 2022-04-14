@@ -262,8 +262,8 @@ namespace Web.API.Controllers
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
         }
-        
-        
+
+
         [Description("Get All Organizations")]
         [HttpGet("org/GetAllOrganizations")]
         public BaseResponse GetAllOrganizations()

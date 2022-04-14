@@ -442,7 +442,7 @@ namespace Web.Services.Helper
 
         public static string GetUserName(this int userId)
         {
-            using (var dbContext = new RAQ_DbContext()) 
+            using (var dbContext = new RAQ_DbContext())
             {
                 var userName = dbContext.Users.Where(x => x.UserId == userId && !x.IsDeleted).Select(x => x.FirstName + " " + x.LastName).AsQueryable().FirstOrDefault();
                 return userName;

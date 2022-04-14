@@ -7,6 +7,11 @@ namespace Web.Data.Models
 {
     public partial class CodeStemi
     {
+        public CodeStemi()
+        {
+            CodeStemigroupMembers = new HashSet<CodeStemigroupMember>();
+        }
+
         public int CodeStemiid { get; set; }
         public string PatientName { get; set; }
         public DateTime? Dob { get; set; }
@@ -33,5 +38,7 @@ namespace Web.Data.Models
         public TimeSpan? ActualTime { get; set; }
         public string Distance { get; set; }
         public string StartingPoint { get; set; }
+
+        public virtual ICollection<CodeStemigroupMember> CodeStemigroupMembers { get; set; }
     }
 }

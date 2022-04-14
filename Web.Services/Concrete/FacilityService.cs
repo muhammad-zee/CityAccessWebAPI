@@ -422,7 +422,8 @@ namespace Web.Services.Concrete
         public BaseResponse GetOutpatientOrganizationsIvr()
         {
             var organization = new List<Organization>();
-            if (ApplicationSettings.isSuperAdmin) {
+            if (ApplicationSettings.isSuperAdmin)
+            {
                 organization = _organizationRepo.Table.Where(x => x.IsDeleted == false).ToList();
             }
             else
@@ -430,7 +431,7 @@ namespace Web.Services.Concrete
                 organization = this._dbContext.LoadStoredProcedure("md_getAllOutpatientOrganizations")
                     .WithSqlParam("@UserId", ApplicationSettings.UserId)
                     .ExecuteStoredProc<Organization>().ToList();
-               
+
             }
 
             var orgs = AutoMapperHelper.MapList<Organization, OrganizationVM>(organization);
@@ -468,7 +469,8 @@ namespace Web.Services.Concrete
 
 
 
-            return new BaseResponse {
+            return new BaseResponse
+            {
                 Status = HttpStatusCode.OK,
                 Message = orgs.Count() == 0 ? "Organization Not Found" : "Data Found",
                 Body = orgs
@@ -579,10 +581,10 @@ namespace Web.Services.Concrete
         }
         public BaseResponse GetOrganizationTypeByOrgId(int orgId)
         {
-            var organizationTypeId = this._organizationRepo.Table.Where(x => x.OrganizationId == orgId && x.IsDeleted == false).Select(x=>x.OrganizationType).FirstOrDefault();
-            IQueryable<OrganizationTypeVM> responseList =null;
-            responseList = _controlListDetailsRepo.Table.Where(x => x.ControlListIdFk == UCLEnums.OrgType.ToInt()).Select(x => new OrganizationTypeVM { OrganizationTypeId= x.ControlListDetailId,OrganizationTypeName= x.Title });
-            if(organizationTypeId.Value == 83)
+            var organizationTypeId = this._organizationRepo.Table.Where(x => x.OrganizationId == orgId && x.IsDeleted == false).Select(x => x.OrganizationType).FirstOrDefault();
+            IQueryable<OrganizationTypeVM> responseList = null;
+            responseList = _controlListDetailsRepo.Table.Where(x => x.ControlListIdFk == UCLEnums.OrgType.ToInt()).Select(x => new OrganizationTypeVM { OrganizationTypeId = x.ControlListDetailId, OrganizationTypeName = x.Title });
+            if (organizationTypeId.Value == 83)
             {
                 responseList = _controlListDetailsRepo.Table
                     .Where(x => x.ControlListIdFk == UCLEnums.OrgType.ToInt() && x.IsDeleted != true && x.ControlListDetailId != 83)

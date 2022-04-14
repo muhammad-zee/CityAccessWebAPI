@@ -49,11 +49,11 @@ namespace Web.API.Controllers
 
         [AllowAnonymous]
         [HttpPost("Call/EnqueueCall")]
-        public TwiMLResult EnqueueCall(int parentNodeId,int serviceLineId,string CallSid)
+        public TwiMLResult EnqueueCall(int parentNodeId, int serviceLineId, string CallSid)
         {
             try
             {
-                return this._callService.EnqueueCall(parentNodeId,serviceLineId, CallSid);
+                return this._callService.EnqueueCall(parentNodeId, serviceLineId, CallSid);
             }
             catch (Exception ex)
             {
@@ -70,7 +70,7 @@ namespace Web.API.Controllers
         {
             try
             {
-                return this._callService.Connect(phoneNumber, Twilio_PhoneNumber,From,CallSid,CallStatus);
+                return this._callService.Connect(phoneNumber, Twilio_PhoneNumber, From, CallSid, CallStatus);
             }
             catch (Exception ex)
             {
@@ -99,7 +99,7 @@ namespace Web.API.Controllers
         }
 
 
-   
+
 
         [AllowAnonymous]
         [HttpPost("Call/CallConnected")]
@@ -120,11 +120,11 @@ namespace Web.API.Controllers
 
         [AllowAnonymous]
         [HttpPost("Call/PromptResponse")]
-        public TwiMLResult PromptResponse(int Digits,int ParentNodeId, int serviceLineId)
+        public TwiMLResult PromptResponse(int Digits, int ParentNodeId, int serviceLineId)
         {
             try
             {
-                return this._callService.PromptResponse(Digits,ParentNodeId,serviceLineId);
+                return this._callService.PromptResponse(Digits, ParentNodeId, serviceLineId);
             }
             catch (Exception ex)
             {
@@ -174,7 +174,7 @@ namespace Web.API.Controllers
         {
             try
             {
-                return this._callService.InboundCallbackStatus(HttpContext.Request.Form,parentNodeId, serviceLineId);
+                return this._callService.InboundCallbackStatus(HttpContext.Request.Form, parentNodeId, serviceLineId);
             }
             catch (Exception ex)
             {
@@ -185,7 +185,7 @@ namespace Web.API.Controllers
         }
         [AllowAnonymous]
         [HttpPost("Call/ConferenceParticipantCallbackStatus")]
-        public string ConferenceParticipantCallbackStatus(int roleId, int serviceLineId,string conferenceSid)
+        public string ConferenceParticipantCallbackStatus(int roleId, int serviceLineId, string conferenceSid)
         {
             try
             {

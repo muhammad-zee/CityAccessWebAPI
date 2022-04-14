@@ -7,6 +7,11 @@ namespace Web.Data.Models
 {
     public partial class CodeTrauma
     {
+        public CodeTrauma()
+        {
+            CodeTraumaGroupMembers = new HashSet<CodeTraumaGroupMember>();
+        }
+
         public int CodeTraumaId { get; set; }
         public string PatientName { get; set; }
         public DateTime? Dob { get; set; }
@@ -33,5 +38,7 @@ namespace Web.Data.Models
         public TimeSpan? ActualTime { get; set; }
         public string Distance { get; set; }
         public string StartingPoint { get; set; }
+
+        public virtual ICollection<CodeTraumaGroupMember> CodeTraumaGroupMembers { get; set; }
     }
 }

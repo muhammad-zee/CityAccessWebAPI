@@ -28,5 +28,5 @@ namespace Web.Model.Common
         public string FilterVal { get; set; }
     }
 
-   
+
 }

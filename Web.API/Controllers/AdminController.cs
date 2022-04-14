@@ -185,7 +185,7 @@ namespace Web.API.Controllers
 
         [Description("Get EMS Users List")]
         [HttpGet("admin/GetAllEMSUsers")]
-        public BaseResponse GetAllEMSUsers() 
+        public BaseResponse GetAllEMSUsers()
         {
             try
             {

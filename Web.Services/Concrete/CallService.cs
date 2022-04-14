@@ -1,15 +1,17 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using Microsoft.Data.SqlClient;
 using System.Linq;
 using System.Net;
 using Twilio;
 using Twilio.AspNet.Core;
 using Twilio.Jwt.AccessToken;
 using Twilio.Rest.Api.V2010.Account;
+using Twilio.Rest.Api.V2010.Account.Conference;
 using Twilio.TwiML;
 using Twilio.TwiML.Voice;
 using Twilio.Types;
@@ -22,10 +24,7 @@ using Web.Services.Enums;
 using Web.Services.Extensions;
 using Web.Services.Helper;
 using Web.Services.Interfaces;
-using static Twilio.Rest.Api.V2010.Account.CallResource;
 using Client = Twilio.TwiML.Voice.Client;
-using Newtonsoft.Json;
-using Twilio.Rest.Api.V2010.Account.Conference;
 
 namespace Web.Services.Concrete
 {
@@ -237,7 +236,7 @@ namespace Web.Services.Concrete
             return call;
         }
 
-    
+
         public TwiMLResult CallConnected(string To, string From)
         {
             string OfficeOpenTime = "9:00 AM";
@@ -376,7 +375,7 @@ namespace Web.Services.Concrete
             return TwiML(response);
         }
 
-        public ParticipantResource addParticipant(UserListVm User,string ConferenceSid,int RoleId,int ServiceLineId)
+        public ParticipantResource addParticipant(UserListVm User, string ConferenceSid, int RoleId, int ServiceLineId)
         {
             ServicePointManager.SecurityProtocol = (SecurityProtocolType)3072; //TLS 1.2                                                                             
             TwilioClient.Init(this.Twilio_AccountSid, this.Twilio_AuthToken);
@@ -386,8 +385,8 @@ namespace Web.Services.Concrete
                 "answered",
                 "completed"
             };
-            var StatusCallbackUrl  = $"{origin}/Call/ConferenceParticipantCallbackStatus?roleId={RoleId}&serviceLineId={ServiceLineId}&conferenceSid={ConferenceSid}";
-            var participant= ParticipantResource.Create(
+            var StatusCallbackUrl = $"{origin}/Call/ConferenceParticipantCallbackStatus?roleId={RoleId}&serviceLineId={ServiceLineId}&conferenceSid={ConferenceSid}";
+            var participant = ParticipantResource.Create(
             label: User.FullName,
             earlyMedia: true,
             beep: "onEnter",
@@ -456,7 +455,7 @@ namespace Web.Services.Concrete
             var StatusCallbackEvent = Request["StatusCallbackEvent"].ToString();
             var ConferenceSid = Request["ConferenceSid"].ToString();
             var SequenceNumber = Request["SequenceNumber"].ToString();
-          
+
             if (StatusCallbackEvent == "participant-join" && SequenceNumber == "1")
             {
                 var enqueueNode = this._ivrSettingsRepo.Table.FirstOrDefault(i => i.IvrSettingsId == parentNodeId);
@@ -465,7 +464,7 @@ namespace Web.Services.Concrete
                             .WithSqlParam("@pServiceLineId", serviceLineId)
                             .WithSqlParam("@pRoleId", enqueueNode.EnqueueToRoleIdFk)
                             .ExecuteStoredProc<UserListVm>().ToList();
-                if(users.Count()>0)
+                if (users.Count() > 0)
                 {
                     var participant = this.addParticipant(users.ElementAt(0), ConferenceSid, enqueueNode.EnqueueToRoleIdFk.Value, serviceLineId);
                 }
@@ -476,10 +475,10 @@ namespace Web.Services.Concrete
 
             return "ok";
         }
-        public string ConferenceParticipantCallbackStatus(IFormCollection Request, int roleId, int serviceLineId,string conferenceSid)
+        public string ConferenceParticipantCallbackStatus(IFormCollection Request, int roleId, int serviceLineId, string conferenceSid)
         {
             var To = Request["To"].ToString();
-            var UserUniqueId = To.Replace("client:","");
+            var UserUniqueId = To.Replace("client:", "");
             var Callsid = Request["CallSid"].ToString();
             var StatusCallbackEvent = Request["CallStatus"].ToString();
             if (StatusCallbackEvent == "no-answer")
@@ -491,7 +490,7 @@ namespace Web.Services.Concrete
                             .ExecuteStoredProc<UserListVm>().ToList();
                 if (users.Count() > 0)
                 {
-                    var participant = this.addParticipant(users.Where(u=>u.UserUniqueId!= UserUniqueId).FirstOrDefault(), conferenceSid, roleId, serviceLineId);
+                    var participant = this.addParticipant(users.Where(u => u.UserUniqueId != UserUniqueId).FirstOrDefault(), conferenceSid, roleId, serviceLineId);
                 }
 
             }

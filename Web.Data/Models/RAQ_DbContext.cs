@@ -1,6 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
+﻿using Microsoft.EntityFrameworkCore;
 
 #nullable disable
 
@@ -18,16 +16,20 @@ namespace Web.Data.Models
         }
 
         public virtual DbSet<ActiveCode> ActiveCodes { get; set; }
-        public virtual DbSet<ActiveCodesGroupMember> ActiveCodesGroupMembers { get; set; }
         public virtual DbSet<CallLog> CallLogs { get; set; }
         public virtual DbSet<ChatSetting> ChatSettings { get; set; }
         public virtual DbSet<ClinicalHoliday> ClinicalHolidays { get; set; }
         public virtual DbSet<ClinicalHour> ClinicalHours { get; set; }
         public virtual DbSet<CodeBlue> CodeBlues { get; set; }
+        public virtual DbSet<CodeBlueGroupMember> CodeBlueGroupMembers { get; set; }
         public virtual DbSet<CodeSepsi> CodeSepses { get; set; }
+        public virtual DbSet<CodeSepsisGroupMember> CodeSepsisGroupMembers { get; set; }
         public virtual DbSet<CodeStemi> CodeStemis { get; set; }
+        public virtual DbSet<CodeStemigroupMember> CodeStemigroupMembers { get; set; }
         public virtual DbSet<CodeStroke> CodeStrokes { get; set; }
+        public virtual DbSet<CodeStrokeGroupMember> CodeStrokeGroupMembers { get; set; }
         public virtual DbSet<CodeTrauma> CodeTraumas { get; set; }
+        public virtual DbSet<CodeTraumaGroupMember> CodeTraumaGroupMembers { get; set; }
         public virtual DbSet<CodesServiceLinesMapping> CodesServiceLinesMappings { get; set; }
         public virtual DbSet<Component> Components { get; set; }
         public virtual DbSet<ComponentAccess> ComponentAccesses { get; set; }
@@ -86,19 +88,6 @@ namespace Web.Data.Models
                     .HasForeignKey(d => d.OrganizationIdFk)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_ActiveCodes_Organizations");
-            });
-
-            modelBuilder.Entity<ActiveCodesGroupMember>(entity =>
-            {
-                entity.Property(e => e.ActiveCodeName)
-                    .IsRequired()
-                    .HasMaxLength(20);
-
-                entity.Property(e => e.ChannelSid).HasMaxLength(200);
-
-                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
-
-                entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
             });
 
             modelBuilder.Entity<CallLog>(entity =>
@@ -246,6 +235,21 @@ namespace Web.Data.Models
                 entity.Property(e => e.Video).HasMaxLength(500);
             });
 
+            modelBuilder.Entity<CodeBlueGroupMember>(entity =>
+            {
+                entity.Property(e => e.ChannelSid).HasMaxLength(200);
+
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+
+                entity.HasOne(d => d.BlueCodeIdFkNavigation)
+                    .WithMany(p => p.CodeBlueGroupMembers)
+                    .HasForeignKey(d => d.BlueCodeIdFk)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_CodeBlueGroupMembers_CodeBlues");
+            });
+
             modelBuilder.Entity<CodeSepsi>(entity =>
             {
                 entity.HasKey(e => e.CodeSepsisId);
@@ -291,6 +295,21 @@ namespace Web.Data.Models
                 entity.Property(e => e.StartingPoint).HasMaxLength(50);
 
                 entity.Property(e => e.Video).HasMaxLength(500);
+            });
+
+            modelBuilder.Entity<CodeSepsisGroupMember>(entity =>
+            {
+                entity.Property(e => e.ChannelSid).HasMaxLength(200);
+
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+
+                entity.HasOne(d => d.SepsisCodeIdFkNavigation)
+                    .WithMany(p => p.CodeSepsisGroupMembers)
+                    .HasForeignKey(d => d.SepsisCodeIdFk)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_CodeSepsisGroupMembers_CodeSepsis");
             });
 
             modelBuilder.Entity<CodeStemi>(entity =>
@@ -340,6 +359,27 @@ namespace Web.Data.Models
                 entity.Property(e => e.Video).HasMaxLength(500);
             });
 
+            modelBuilder.Entity<CodeStemigroupMember>(entity =>
+            {
+                entity.ToTable("CodeSTEMIGroupMembers");
+
+                entity.Property(e => e.CodeStemigroupMemberId).HasColumnName("CodeSTEMIGroupMemberId");
+
+                entity.Property(e => e.ChannelSid).HasMaxLength(200);
+
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.StemicodeIdFk).HasColumnName("STEMICodeIdFk");
+
+                entity.HasOne(d => d.StemicodeIdFkNavigation)
+                    .WithMany(p => p.CodeStemigroupMembers)
+                    .HasForeignKey(d => d.StemicodeIdFk)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_CodeSTEMIGroupMembers_CodeSTEMIs");
+            });
+
             modelBuilder.Entity<CodeStroke>(entity =>
             {
                 entity.Property(e => e.Attachments).HasMaxLength(500);
@@ -383,6 +423,21 @@ namespace Web.Data.Models
                 entity.Property(e => e.Video).HasMaxLength(500);
             });
 
+            modelBuilder.Entity<CodeStrokeGroupMember>(entity =>
+            {
+                entity.Property(e => e.ChannelSid).HasMaxLength(200);
+
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+
+                entity.HasOne(d => d.StrokeCodeIdFkNavigation)
+                    .WithMany(p => p.CodeStrokeGroupMembers)
+                    .HasForeignKey(d => d.StrokeCodeIdFk)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_CodeStrokeGroupMembers_CodeStrokes");
+            });
+
             modelBuilder.Entity<CodeTrauma>(entity =>
             {
                 entity.Property(e => e.Attachments).HasMaxLength(500);
@@ -424,6 +479,21 @@ namespace Web.Data.Models
                 entity.Property(e => e.StartingPoint).HasMaxLength(50);
 
                 entity.Property(e => e.Video).HasMaxLength(500);
+            });
+
+            modelBuilder.Entity<CodeTraumaGroupMember>(entity =>
+            {
+                entity.Property(e => e.ChannelSid).HasMaxLength(200);
+
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+
+                entity.HasOne(d => d.TraumaCodeIdFkNavigation)
+                    .WithMany(p => p.CodeTraumaGroupMembers)
+                    .HasForeignKey(d => d.TraumaCodeIdFk)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_CodeTraumaGroupMembers_CodeTraumas");
             });
 
             modelBuilder.Entity<CodesServiceLinesMapping>(entity =>

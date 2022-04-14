@@ -32,23 +32,23 @@ namespace Web.Services.Concrete
         public BaseResponse GetSettingsByOrgId(int OrgId)
         {
             var settings = this._settingRepo.Table.Where(x => x.OrganizationIdFk == OrgId && !x.IsDeleted).Select(x => new SettingsVM()
-                {
-                    SettingId = x.SettingId,
-                    OrganizationIdFk = x.OrganizationIdFk,
-                    TwoFactorCodeExpiry = x.TwoFactorAuthenticationExpiryMinutes,
-                    TwoFactorEnabled = x.TwoFactorEnable,
-                    VerifyCodeForFutureDays = x.VerifyForFutureDays,
+            {
+                SettingId = x.SettingId,
+                OrganizationIdFk = x.OrganizationIdFk,
+                TwoFactorCodeExpiry = x.TwoFactorAuthenticationExpiryMinutes,
+                TwoFactorEnabled = x.TwoFactorEnable,
+                VerifyCodeForFutureDays = x.VerifyForFutureDays,
 
-                    PasswordLength = x.PasswordLength,
-                    RequiredLowerCase = x.RequiredLowerCase,
-                    RequiredNonAlphaNumeric = x.RequiredNonAlphaNumeric,
-                    RequiredNumeric = x.RequiredNumeric,
-                    RequiredUpperCase = x.RequiredUpperCase,
-                    EnablePasswordAge = x.EnablePasswordAge,
+                PasswordLength = x.PasswordLength,
+                RequiredLowerCase = x.RequiredLowerCase,
+                RequiredNonAlphaNumeric = x.RequiredNonAlphaNumeric,
+                RequiredNumeric = x.RequiredNumeric,
+                RequiredUpperCase = x.RequiredUpperCase,
+                EnablePasswordAge = x.EnablePasswordAge,
 
-                    TokenExpiryTime = x.TokenExpiryTime,
-                    IsDeleted = x.IsDeleted
-                }).FirstOrDefault();
+                TokenExpiryTime = x.TokenExpiryTime,
+                IsDeleted = x.IsDeleted
+            }).FirstOrDefault();
             if (settings != null)
             {
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Found", Body = settings };

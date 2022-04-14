@@ -1,5 +1,4 @@
-﻿using ElmahCore;
-using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System;
@@ -36,7 +35,11 @@ namespace Web.Services.Concrete
         private IRepository<CodeStemi> _codeSTEMIRepo;
         private IRepository<CodeTrauma> _codeTrumaRepo;
         private IRepository<CodeBlue> _codeBlueRepo;
-        private IRepository<ActiveCodesGroupMember> _activeCodesGroupMembersRepo;
+        private IRepository<CodeStrokeGroupMember> _StrokeCodeGroupMembersRepo;
+        private IRepository<CodeStemigroupMember> _STEMICodeGroupMembersRepo;
+        private IRepository<CodeSepsisGroupMember> _SepsisCodeGroupMembersRepo;
+        private IRepository<CodeTraumaGroupMember> _TraumaCodeGroupMembersRepo;
+        private IRepository<CodeBlueGroupMember> _BlueCodeGroupMembersRepo;
         private IRepository<CodesServiceLinesMapping> _codesServiceLinesMappingRepo;
         IConfiguration _config;
         private string _RootPath;
@@ -57,7 +60,11 @@ namespace Web.Services.Concrete
             IRepository<CodeStemi> codeSTEMIRepo,
             IRepository<CodeTrauma> codeTrumaRepo,
             IRepository<CodeBlue> codeBlueRepo,
-            IRepository<ActiveCodesGroupMember> activeCodesGroupMembersRepo,
+            IRepository<CodeStrokeGroupMember> StrokeCodeGroupMembersRepo,
+            IRepository<CodeStemigroupMember> STEMICodeGroupMembersRepo,
+            IRepository<CodeSepsisGroupMember> SepsisCodeGroupMembersRepo,
+            IRepository<CodeTraumaGroupMember> TraumaCodeGroupMembersRepo,
+            IRepository<CodeBlueGroupMember> BlueCodeGroupMembersRepo,
             IRepository<CodesServiceLinesMapping> codesServiceLinesMappingRepo)
         {
             this._config = config;
@@ -76,7 +83,13 @@ namespace Web.Services.Concrete
             this._codeSTEMIRepo = codeSTEMIRepo;
             this._codeTrumaRepo = codeTrumaRepo;
             this._codeBlueRepo = codeBlueRepo;
-            this._activeCodesGroupMembersRepo = activeCodesGroupMembersRepo;
+
+            this._StrokeCodeGroupMembersRepo = StrokeCodeGroupMembersRepo;
+            this._STEMICodeGroupMembersRepo = STEMICodeGroupMembersRepo;
+            this._SepsisCodeGroupMembersRepo = SepsisCodeGroupMembersRepo;
+            this._TraumaCodeGroupMembersRepo = TraumaCodeGroupMembersRepo;
+            this._BlueCodeGroupMembersRepo = BlueCodeGroupMembersRepo;
+
             this._codesServiceLinesMappingRepo = codesServiceLinesMappingRepo;
             this._RootPath = this._config["FilePath:Path"].ToString();
             this._GoogleApiKey = this._config["GoogleApi:Key"].ToString();
@@ -374,8 +387,8 @@ namespace Web.Services.Concrete
                 File.Delete(path);
 
                 var UserChannelSid = (from u in this._userRepo.Table
-                                      join gm in this._activeCodesGroupMembersRepo.Table on u.UserId equals gm.UserIdFk
-                                      where gm.ActiveCodeIdFk == files.Id && gm.ActiveCodeName == UCLEnums.Stroke.ToString() && !u.IsDeleted
+                                      join gm in this._StrokeCodeGroupMembersRepo.Table on u.UserId equals gm.UserIdFk
+                                      where gm.StrokeCodeIdFk == files.Id && !u.IsDeleted
                                       select u.UserChannelSid).Distinct().ToList();
 
                 var notification = new PushNotificationVM()
@@ -398,8 +411,8 @@ namespace Web.Services.Concrete
                 File.Delete(path);
 
                 var UserChannelSid = (from u in this._userRepo.Table
-                                      join gm in this._activeCodesGroupMembersRepo.Table on u.UserId equals gm.UserIdFk
-                                      where gm.ActiveCodeIdFk == files.Id && gm.ActiveCodeName == UCLEnums.Sepsis.ToString() && !u.IsDeleted
+                                      join gm in this._SepsisCodeGroupMembersRepo.Table on u.UserId equals gm.UserIdFk
+                                      where gm.SepsisCodeIdFk == files.Id && !u.IsDeleted
                                       select u.UserChannelSid).Distinct().ToList();
 
                 var notification = new PushNotificationVM()
@@ -421,8 +434,8 @@ namespace Web.Services.Concrete
                 string path = _environment.WebRootFileProvider.GetFileInfo(rootPath + '/' + files.FileName)?.PhysicalPath;
                 File.Delete(path);
                 var UserChannelSid = (from u in this._userRepo.Table
-                                      join gm in this._activeCodesGroupMembersRepo.Table on u.UserId equals gm.UserIdFk
-                                      where gm.ActiveCodeIdFk == files.Id && gm.ActiveCodeName == UCLEnums.STEMI.ToString() && !u.IsDeleted
+                                      join gm in this._STEMICodeGroupMembersRepo.Table on u.UserId equals gm.UserIdFk
+                                      where gm.StemicodeIdFk == files.Id && !u.IsDeleted
                                       select u.UserChannelSid).Distinct().ToList();
 
                 var notification = new PushNotificationVM()
@@ -444,8 +457,8 @@ namespace Web.Services.Concrete
                 string path = _environment.WebRootFileProvider.GetFileInfo(rootPath + '/' + files.FileName)?.PhysicalPath;
                 File.Delete(path);
                 var UserChannelSid = (from u in this._userRepo.Table
-                                      join gm in this._activeCodesGroupMembersRepo.Table on u.UserId equals gm.UserIdFk
-                                      where gm.ActiveCodeIdFk == files.Id && gm.ActiveCodeName == UCLEnums.Trauma.ToString() && !u.IsDeleted
+                                      join gm in this._TraumaCodeGroupMembersRepo.Table on u.UserId equals gm.UserIdFk
+                                      where gm.TraumaCodeIdFk == files.Id && !u.IsDeleted
                                       select u.UserChannelSid).Distinct().ToList();
 
                 var notification = new PushNotificationVM()
@@ -467,8 +480,8 @@ namespace Web.Services.Concrete
                 string path = _environment.WebRootFileProvider.GetFileInfo(rootPath + '/' + files.FileName)?.PhysicalPath;
                 File.Delete(path);
                 var UserChannelSid = (from u in this._userRepo.Table
-                                      join gm in this._activeCodesGroupMembersRepo.Table on u.UserId equals gm.UserIdFk
-                                      where gm.ActiveCodeIdFk == files.Id && gm.ActiveCodeName == UCLEnums.Blue.ToString() && !u.IsDeleted
+                                      join gm in this._BlueCodeGroupMembersRepo.Table on u.UserId equals gm.UserIdFk
+                                      where gm.BlueCodeIdFk == files.Id && !u.IsDeleted
                                       select u.UserChannelSid).Distinct().ToList();
 
                 var notification = new PushNotificationVM()
@@ -1010,7 +1023,6 @@ namespace Web.Services.Concrete
 
                 this._codeStrokeRepo.Update(row);
 
-                //this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == row.OrganizationIdFk && x.CodeIdFk == UCLEnums.Stroke.ToInt() && !x.IsDeleted).Select(x => x.ServiceLineIds).FirstOrDefault();
                 if (codeStroke.DefaultServiceLineIds != null && codeStroke.DefaultServiceLineIds != "")
                 {
                     var DefaultServiceLineIds = codeStroke.DefaultServiceLineIds.ToIntList();
@@ -1018,31 +1030,9 @@ namespace Web.Services.Concrete
                     var ServiceLineTeam2Ids = codeStroke.ServiceLineTeam2Ids.ToIntList();
 
                     var codeServiceMapping = this._codesServiceLinesMappingRepo.Table.Where(x => x.OrganizationIdFk == row.OrganizationIdFk && x.CodeIdFk == UCLEnums.Stroke.ToInt() && x.ActiveCodeId == row.CodeStrokeId).ToList();
-                    //var rowsToDelete = codeServiceMapping.Where(x => !DefaultServiceLineIds.Contains(x.DefaultServiceLineIdFk)).ToList();
                     if (codeServiceMapping.Count > 0)
                         this._codesServiceLinesMappingRepo.DeleteRange(codeServiceMapping);
 
-
-                    //serviceLineIds.RemoveAll(x => codeServiceMapping.Select(s => s.ServiceLineIdFk).Contains(x));
-                    //var codeServiceMappingList = new List<CodesServiceLinesMapping>();
-                    //for (int i = 0; i < DefaultServiceLineIds.Count; i++)
-                    //{
-                    //    var codeService = new CodesServiceLinesMapping()
-                    //    {
-                    //        OrganizationIdFk = row.OrganizationIdFk,
-                    //        CodeIdFk = UCLEnums.Stroke.ToInt(),
-                    //        DefaultServiceLineIdFk = codeStroke.DefaultServiceLineIds,
-                    //        ServiceLineId1Fk = codeStroke.ServiceLineTeam1Ids,
-                    //        ServiceLineId2Fk = codeStroke.ServiceLineTeam2Ids,
-                    //        ActiveCodeId = row.CodeStrokeId,
-                    //        ActiveCodeName = UCLEnums.Stroke.ToString()
-                    //    };
-                    //    codeServiceMappingList.Add(codeService);
-                    //}
-                    ////for (var item in DefaultServiceLineIds)
-                    ////{
-
-                    ////}
                     var codeService = new CodesServiceLinesMapping()
                     {
                         OrganizationIdFk = row.OrganizationIdFk,
@@ -1055,11 +1045,11 @@ namespace Web.Services.Concrete
                     };
                     this._codesServiceLinesMappingRepo.Insert(codeService);
 
-                    var channel = this._activeCodesGroupMembersRepo.Table.Where(x => x.ActiveCodeName == UCLEnums.Stroke.ToString() && x.ActiveCodeIdFk == row.CodeStrokeId && !x.IsDeleted).ToList();
+                    var channel = this._StrokeCodeGroupMembersRepo.Table.Where(x => x.StrokeCodeIdFk == row.CodeStrokeId && !x.IsDeleted).ToList();
 
                     var UserChannelSid = (from us in this._userSchedulesRepo.Table
                                           join u in this._userRepo.Table on us.UserIdFk equals u.UserId
-                                          where (DefaultServiceLineIds.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam1Ids.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam2Ids.Contains(us.ServiceLineIdFk.Value)) && !us.IsDeleted && !u.IsDeleted
+                                          where (DefaultServiceLineIds.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam1Ids.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam2Ids.Contains(us.ServiceLineIdFk.Value)) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
                                           select new { u.UserUniqueId, u.UserId }).Distinct().ToList();
                     var superAdmins = this._userRepo.Table.Where(x => x.IsInGroup && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).ToList();
                     UserChannelSid.AddRange(superAdmins);
@@ -1070,19 +1060,19 @@ namespace Web.Services.Concrete
                     {
                         var channelSid = channel.Select(x => x.ChannelSid).FirstOrDefault();
 
-                        this._activeCodesGroupMembersRepo.DeleteRange(channel);
+                        this._StrokeCodeGroupMembersRepo.DeleteRange(channel);
                         bool isDeleted = _communication.DeleteUserToConversationChannel(channelSid);
-                        List<ActiveCodesGroupMember> ACodeGroupMembers = new List<ActiveCodesGroupMember>();
+                        List<CodeStrokeGroupMember> ACodeGroupMembers = new List<CodeStrokeGroupMember>();
                         foreach (var item in UserChannelSid.Distinct())
                         {
                             try
                             {
-                                var codeGroupMember = new ActiveCodesGroupMember()
+                                var codeGroupMember = new CodeStrokeGroupMember()
                                 {
                                     ChannelSid = channelSid,
                                     UserIdFk = item.UserId,
-                                    ActiveCodeIdFk = row.CodeStrokeId,
-                                    ActiveCodeName = UCLEnums.Stroke.ToString(),
+                                    StrokeCodeIdFk = row.CodeStrokeId,
+                                    //ActiveCodeName = UCLEnums.Stroke.ToString(),
                                     IsAcknowledge = false,
                                     CreatedBy = ApplicationSettings.UserId,
                                     CreatedDate = DateTime.UtcNow,
@@ -1096,22 +1086,10 @@ namespace Web.Services.Concrete
                                 //ElmahExtensions.RiseError(ex);
                             }
                         }
-                        var isMembersAdded = AddGroupMembers(ACodeGroupMembers);
+                        this._StrokeCodeGroupMembersRepo.Insert(ACodeGroupMembers);
+
                     }
-                    //var UserChannelSid = (from us in this._userSchedulesRepo.Table
-                    //                      join u in this._userRepo.Table on us.UserIdFk equals u.UserId
-                    //                      where codeStroke.SelectedServiceLineIds.ToIntList().Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.Now && us.ScheduleDateEnd >= DateTime.Now && !us.IsDeleted && !u.IsDeleted
-                    //                      select u.UserChannelSid).ToList();
 
-                    //UserChannelSid = (from u in this._userRepo.Table
-                    //                      join gm in this._activeCodesGroupMembersRepo.Table on u.UserId equals gm.UserIdFk
-                    //                      where gm.ActiveCodeIdFk == codeStroke.CodeStrokeId && gm.ActiveCodeName == UCLEnums.Stroke.ToString() && !u.IsDeleted
-                    //                      select u.UserChannelSid).Distinct().ToList();
-
-                    //var loggedInUserChannelId = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => x.UserChannelSid).FirstOrDefault();
-
-                    //UserChannelSid.Add(loggedInUserChannelId);
-                    //UserChannelSid = UserChannelSid.Distinct().ToList();
 
                     var notification = new PushNotificationVM()
                     {
@@ -1437,29 +1415,11 @@ namespace Web.Services.Concrete
 
                         this._codeStrokeRepo.Insert(stroke);
 
-                        //var codeServiceMappingList = new List<CodesServiceLinesMapping>();
-                        //for (int i = 0; i < DefaultServiceLineIds.Count; i++)
-                        //{
-                        //    var codeService = new CodesServiceLinesMapping()
-                        //    {
-                        //        OrganizationIdFk = stroke.OrganizationIdFk,
-                        //        CodeIdFk = UCLEnums.Stroke.ToInt(),
-                        //        DefaultServiceLineIdFk = DefaultServiceLineTeam,//DefaultServiceLineIds.ElementAt(i),
-                        //        //ServiceLineId1Fk = ServiceLineTeam1Ids.Count > i ? ServiceLineTeam1Ids.ElementAt(i) : null,
-                        //        //ServiceLineId2Fk = ServiceLineTeam2Ids.Count > i ? ServiceLineTeam2Ids.ElementAt(i) : null,
-                        //        ActiveCodeId = stroke.CodeStrokeId,
-                        //        ActiveCodeName = UCLEnums.Stroke.ToString()
-                        //    };
-                        //    codeServiceMappingList.Add(codeService);
-                        //}
-
                         var codeService = new CodesServiceLinesMapping()
                         {
                             OrganizationIdFk = stroke.OrganizationIdFk,
                             CodeIdFk = UCLEnums.Stroke.ToInt(),
-                            DefaultServiceLineIdFk = DefaultServiceLineTeam,//DefaultServiceLineIds.ElementAt(i),
-                            //ServiceLineId1Fk = ServiceLineTeam1Ids.Count > i ? ServiceLineTeam1Ids.ElementAt(i) : null,
-                            //ServiceLineId2Fk = ServiceLineTeam2Ids.Count > i ? ServiceLineTeam2Ids.ElementAt(i) : null,
+                            DefaultServiceLineIdFk = DefaultServiceLineTeam,
                             ActiveCodeId = stroke.CodeStrokeId,
                             ActiveCodeName = UCLEnums.Stroke.ToString()
                         };
@@ -1480,7 +1440,7 @@ namespace Web.Services.Concrete
                                         {ChannelAttributeEnums.CodeType.ToString(), ChannelTypeEnums.Stroke.ToString()},
                                         {ChannelAttributeEnums.StrokeId.ToString(), stroke.CodeStrokeId}
                                     }, Formatting.Indented);
-                        List<ActiveCodesGroupMember> ACodeGroupMembers = new List<ActiveCodesGroupMember>();
+                        List<CodeStrokeGroupMember> ACodeGroupMembers = new List<CodeStrokeGroupMember>();
                         if (UserChannelSid != null && UserChannelSid.Count > 0)
                         {
                             string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
@@ -1491,12 +1451,12 @@ namespace Web.Services.Concrete
                             {
                                 try
                                 {
-                                    var codeGroupMember = new ActiveCodesGroupMember()
+                                    var codeGroupMember = new CodeStrokeGroupMember()
                                     {
                                         ChannelSid = channel.Sid,
                                         UserIdFk = item.UserId,
-                                        ActiveCodeIdFk = stroke.CodeStrokeId,
-                                        ActiveCodeName = UCLEnums.Stroke.ToString(),
+                                        StrokeCodeIdFk = stroke.CodeStrokeId,
+                                        //ActiveCodeName = UCLEnums.Stroke.ToString(),
                                         IsAcknowledge = false,
                                         CreatedBy = ApplicationSettings.UserId,
                                         CreatedDate = DateTime.UtcNow,
@@ -1507,10 +1467,10 @@ namespace Web.Services.Concrete
                                 }
                                 catch (Exception ex)
                                 {
-                                    //ElmahExtensions.RiseError(ex);
+
                                 }
                             }
-                            var isMembersAdded = AddGroupMembers(ACodeGroupMembers);
+                            this._StrokeCodeGroupMembersRepo.Insert(ACodeGroupMembers);
                             var msg = new ConversationMessageVM();
                             msg.channelSid = channel.Sid;
                             msg.author = "System";
@@ -2094,7 +2054,6 @@ namespace Web.Services.Concrete
 
                 this._codeSepsisRepo.Update(row);
 
-                //var serviceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == row.OrganizationIdFk && x.CodeIdFk == UCLEnums.Sepsis.ToInt() && !x.IsDeleted).Select(x => x.ServiceLineIds).FirstOrDefault();
                 if (codeSepsis.DefaultServiceLineIds != null && codeSepsis.DefaultServiceLineIds != "")
                 {
                     var DefaultServiceLineIds = codeSepsis.DefaultServiceLineIds.ToIntList();
@@ -2102,43 +2061,27 @@ namespace Web.Services.Concrete
                     var ServiceLineTeam2Ids = codeSepsis.ServiceLineTeam2Ids.ToIntList();
 
                     var codeServiceMapping = this._codesServiceLinesMappingRepo.Table.Where(x => x.OrganizationIdFk == row.OrganizationIdFk && x.CodeIdFk == UCLEnums.Sepsis.ToInt() && x.ActiveCodeId == row.CodeSepsisId).ToList();
-                    //var rowsToDelete = codeServiceMapping.Where(x => !serviceLineIds.Contains(x.ServiceLineIdFk)).ToList();
+
                     if (codeServiceMapping.Count > 0)
                         this._codesServiceLinesMappingRepo.DeleteRange(codeServiceMapping);
 
-                    //serviceLineIds.RemoveAll(x => codeServiceMapping.Select(s => s.ServiceLineIdFk).Contains(x));
-                    //var codeServiceMappingList = new List<CodesServiceLinesMapping>();
-                    //for (int i = 0; i < DefaultServiceLineIds.Count; i++)
-                    //{
-                    //    var codeService = new CodesServiceLinesMapping()
-                    //    {
-                    //        OrganizationIdFk = row.OrganizationIdFk,
-                    //        CodeIdFk = UCLEnums.Sepsis.ToInt(),
-                    //        DefaultServiceLineIdFk = codeSepsis.DefaultServiceLineIds, //DefaultServiceLineIds.ElementAt(i),
-                    //        ServiceLineId1Fk = codeSepsis.ServiceLineTeam1Ids, //ServiceLineTeam1Ids.Count > i ? ServiceLineTeam1Ids.ElementAt(i) : null,
-                    //        ServiceLineId2Fk = codeSepsis.ServiceLineTeam2Ids, //ServiceLineTeam2Ids.Count > i ? ServiceLineTeam2Ids.ElementAt(i) : null,
-                    //        ActiveCodeId = row.CodeSepsisId,
-                    //        ActiveCodeName = UCLEnums.Sepsis.ToString()
-                    //    };
-                    //    codeServiceMappingList.Add(codeService);
-                    //}
                     var codeService = new CodesServiceLinesMapping()
                     {
                         OrganizationIdFk = row.OrganizationIdFk,
                         CodeIdFk = UCLEnums.Sepsis.ToInt(),
-                        DefaultServiceLineIdFk = codeSepsis.DefaultServiceLineIds, //DefaultServiceLineIds.ElementAt(i),
-                        ServiceLineId1Fk = codeSepsis.ServiceLineTeam1Ids, //ServiceLineTeam1Ids.Count > i ? ServiceLineTeam1Ids.ElementAt(i) : null,
-                        ServiceLineId2Fk = codeSepsis.ServiceLineTeam2Ids, //ServiceLineTeam2Ids.Count > i ? ServiceLineTeam2Ids.ElementAt(i) : null,
+                        DefaultServiceLineIdFk = codeSepsis.DefaultServiceLineIds,
+                        ServiceLineId1Fk = codeSepsis.ServiceLineTeam1Ids,
+                        ServiceLineId2Fk = codeSepsis.ServiceLineTeam2Ids,
                         ActiveCodeId = row.CodeSepsisId,
                         ActiveCodeName = UCLEnums.Sepsis.ToString()
                     };
                     this._codesServiceLinesMappingRepo.Insert(codeService);
 
-                    var channel = this._activeCodesGroupMembersRepo.Table.Where(x => x.ActiveCodeName == UCLEnums.Sepsis.ToString() && x.ActiveCodeIdFk == row.CodeSepsisId && !x.IsDeleted).ToList();
+                    var channel = this._SepsisCodeGroupMembersRepo.Table.Where(x => x.SepsisCodeIdFk == row.CodeSepsisId && !x.IsDeleted).ToList();
 
                     var UserChannelSid = (from us in this._userSchedulesRepo.Table
                                           join u in this._userRepo.Table on us.UserIdFk equals u.UserId
-                                          where (DefaultServiceLineIds.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam1Ids.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam2Ids.Contains(us.ServiceLineIdFk.Value)) && !us.IsDeleted && !u.IsDeleted
+                                          where (DefaultServiceLineIds.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam1Ids.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam2Ids.Contains(us.ServiceLineIdFk.Value)) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
                                           select new { u.UserUniqueId, u.UserId }).Distinct().ToList();
                     var superAdmins = this._userRepo.Table.Where(x => x.IsInGroup && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).ToList();
                     UserChannelSid.AddRange(superAdmins);
@@ -2149,19 +2092,19 @@ namespace Web.Services.Concrete
                     {
                         var channelSid = channel.Select(x => x.ChannelSid).FirstOrDefault();
 
-                        this._activeCodesGroupMembersRepo.DeleteRange(channel);
+                        this._SepsisCodeGroupMembersRepo.DeleteRange(channel);
                         bool isDeleted = _communication.DeleteUserToConversationChannel(channelSid);
-                        List<ActiveCodesGroupMember> ACodeGroupMembers = new List<ActiveCodesGroupMember>();
+                        List<CodeSepsisGroupMember> ACodeGroupMembers = new List<CodeSepsisGroupMember>();
                         foreach (var item in UserChannelSid.Distinct())
                         {
                             try
                             {
-                                var codeGroupMember = new ActiveCodesGroupMember()
+                                var codeGroupMember = new CodeSepsisGroupMember()
                                 {
                                     ChannelSid = channelSid,
                                     UserIdFk = item.UserId,
-                                    ActiveCodeIdFk = row.CodeSepsisId,
-                                    ActiveCodeName = UCLEnums.Sepsis.ToString(),
+                                    SepsisCodeIdFk = row.CodeSepsisId,
+                                    //ActiveCodeName = UCLEnums.Sepsis.ToString(),
                                     IsAcknowledge = false,
                                     CreatedBy = ApplicationSettings.UserId,
                                     CreatedDate = DateTime.UtcNow,
@@ -2172,20 +2115,11 @@ namespace Web.Services.Concrete
                             }
                             catch (Exception ex)
                             {
-                                //ElmahExtensions.RiseError(ex);
+
                             }
                         }
-                        var isMembersAdded = AddGroupMembers(ACodeGroupMembers);
+                        this._SepsisCodeGroupMembersRepo.Insert(ACodeGroupMembers);
                     }
-                    //var UserChannelSid = (from us in this._userSchedulesRepo.Table
-                    //                      join u in this._userRepo.Table on us.UserIdFk equals u.UserId
-                    //                      where serviceLineIds.Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
-                    //                      select u.UserChannelSid).ToList();
-
-                    //var UserChannelSid = (from u in this._userRepo.Table
-                    //                      join gm in this._activeCodesGroupMembersRepo.Table on u.UserId equals gm.UserIdFk
-                    //                      where gm.ActiveCodeIdFk == codeSepsis.CodeSepsisId && gm.ActiveCodeName == UCLEnums.Sepsis.ToString() && !u.IsDeleted
-                    //                      select u.UserChannelSid).Distinct().ToList();
 
                     var notification = new PushNotificationVM()
                     {
@@ -2508,28 +2442,11 @@ namespace Web.Services.Concrete
                         }
                         this._codeSepsisRepo.Insert(Sepsis);
 
-                        //var codeServiceMappingList = new List<CodesServiceLinesMapping>();
-                        //for (int i = 0; i < DefaultServiceLineIds.Count; i++)
-                        //{
-                        //    var codeService = new CodesServiceLinesMapping()
-                        //    {
-                        //        OrganizationIdFk = Sepsis.OrganizationIdFk,
-                        //        CodeIdFk = UCLEnums.Sepsis.ToInt(),
-                        //        DefaultServiceLineIdFk = DefaultServiceLineTeam, //DefaultServiceLineIds.ElementAt(i),
-                        //        //ServiceLineId1Fk = ServiceLineTeam1Ids.Count > i ? ServiceLineTeam1Ids.ElementAt(i) : null,
-                        //        //ServiceLineId2Fk = ServiceLineTeam2Ids.Count > i ? ServiceLineTeam2Ids.ElementAt(i) : null,
-                        //        ActiveCodeId = Sepsis.CodeSepsisId,
-                        //        ActiveCodeName = UCLEnums.Sepsis.ToString()
-                        //    };
-                        //    codeServiceMappingList.Add(codeService);
-                        //}
                         var codeService = new CodesServiceLinesMapping()
                         {
                             OrganizationIdFk = Sepsis.OrganizationIdFk,
                             CodeIdFk = UCLEnums.Sepsis.ToInt(),
-                            DefaultServiceLineIdFk = DefaultServiceLineTeam, //DefaultServiceLineIds.ElementAt(i),
-                                                                             //ServiceLineId1Fk = ServiceLineTeam1Ids.Count > i ? ServiceLineTeam1Ids.ElementAt(i) : null,
-                                                                             //ServiceLineId2Fk = ServiceLineTeam2Ids.Count > i ? ServiceLineTeam2Ids.ElementAt(i) : null,
+                            DefaultServiceLineIdFk = DefaultServiceLineTeam,
                             ActiveCodeId = Sepsis.CodeSepsisId,
                             ActiveCodeName = UCLEnums.Sepsis.ToString()
                         };
@@ -2543,10 +2460,9 @@ namespace Web.Services.Concrete
                         UserChannelSid.AddRange(superAdmins);
                         var loggedUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).FirstOrDefault();
                         UserChannelSid.Add(loggedUser);
-                        List<ActiveCodesGroupMember> ACodeGroupMembers = new List<ActiveCodesGroupMember>();
+                        List<CodeSepsisGroupMember> ACodeGroupMembers = new List<CodeSepsisGroupMember>();
                         if (UserChannelSid != null && UserChannelSid.Count > 0)
                         {
-                            //string uniqueName = $"CONSULT_{Consult_Counter.Counter_Value.ToString()}";
                             string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
                             string friendlyName = Sepsis.IsEms ? $"EMS Code {UCLEnums.Sepsis.ToString()} {Sepsis.CodeSepsisId}" : $"Inhouse Code {UCLEnums.Sepsis.ToString()} {Sepsis.CodeSepsisId}";
                             var conversationChannelAttributes = JsonConvert.SerializeObject(new Dictionary<string, Object>()
@@ -2561,12 +2477,12 @@ namespace Web.Services.Concrete
                             {
                                 try
                                 {
-                                    var codeGroupMember = new ActiveCodesGroupMember()
+                                    var codeGroupMember = new CodeSepsisGroupMember()
                                     {
                                         ChannelSid = channel.Sid,
                                         UserIdFk = item.UserId,
-                                        ActiveCodeIdFk = Sepsis.CodeSepsisId,
-                                        ActiveCodeName = UCLEnums.Sepsis.ToString(),
+                                        SepsisCodeIdFk = Sepsis.CodeSepsisId,
+                                        //ActiveCodeName = UCLEnums.Sepsis.ToString(),
                                         IsAcknowledge = false,
                                         CreatedBy = ApplicationSettings.UserId,
                                         CreatedDate = DateTime.UtcNow,
@@ -2580,7 +2496,7 @@ namespace Web.Services.Concrete
                                     //ElmahExtensions.RiseError(ex);
                                 }
                             }
-                            var isMembersAdded = AddGroupMembers(ACodeGroupMembers);
+                            this._SepsisCodeGroupMembersRepo.Insert(ACodeGroupMembers);
 
                             var msg = new ConversationMessageVM();
                             msg.channelSid = channel.Sid;
@@ -3168,7 +3084,7 @@ namespace Web.Services.Concrete
 
                 this._codeSTEMIRepo.Update(row);
 
-                //var serviceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == row.OrganizationIdFk && x.CodeIdFk == UCLEnums.STEMI.ToInt() && !x.IsDeleted).Select(x => x.ServiceLineIds).FirstOrDefault();
+
                 if (codeSTEMI.DefaultServiceLineIds != null && codeSTEMI.DefaultServiceLineIds != "")
                 {
                     var DefaultServiceLineIds = codeSTEMI.DefaultServiceLineIds.ToIntList();
@@ -3176,43 +3092,27 @@ namespace Web.Services.Concrete
                     var ServiceLineTeam2Ids = codeSTEMI.ServiceLineTeam2Ids.ToIntList();
 
                     var codeServiceMapping = this._codesServiceLinesMappingRepo.Table.Where(x => x.OrganizationIdFk == row.OrganizationIdFk && x.CodeIdFk == UCLEnums.STEMI.ToInt() && x.ActiveCodeId == row.CodeStemiid).ToList();
-                    //var rowsToDelete = codeServiceMapping.Where(x => !serviceLineIds.Contains(x.ServiceLineIdFk)).ToList();
+
                     if (codeServiceMapping.Count > 0)
                         this._codesServiceLinesMappingRepo.DeleteRange(codeServiceMapping);
 
-                    //serviceLineIds.RemoveAll(x => codeServiceMapping.Select(s => s.ServiceLineIdFk).Contains(x));
-                    //var codeServiceMappingList = new List<CodesServiceLinesMapping>();
-                    //for (int i = 0; i < DefaultServiceLineIds.Count; i++)
-                    //{
-                    //    var codeService = new CodesServiceLinesMapping()
-                    //    {
-                    //        OrganizationIdFk = row.OrganizationIdFk,
-                    //        CodeIdFk = UCLEnums.STEMI.ToInt(),
-                    //        DefaultServiceLineIdFk = codeSTEMI.DefaultServiceLineIds, // DefaultServiceLineIds.ElementAt(i),
-                    //        ServiceLineId1Fk = codeSTEMI.ServiceLineTeam1Ids, // ServiceLineTeam1Ids.Count > i ? ServiceLineTeam1Ids.ElementAt(i) : null,
-                    //        ServiceLineId2Fk = codeSTEMI.ServiceLineTeam2Ids, // ServiceLineTeam2Ids.Count > i ? ServiceLineTeam2Ids.ElementAt(i) : null,
-                    //        ActiveCodeId = row.CodeStemiid,
-                    //        ActiveCodeName = UCLEnums.STEMI.ToString()
-                    //    };
-                    //    codeServiceMappingList.Add(codeService);
-                    //}
                     var codeService = new CodesServiceLinesMapping()
                     {
                         OrganizationIdFk = row.OrganizationIdFk,
                         CodeIdFk = UCLEnums.STEMI.ToInt(),
-                        DefaultServiceLineIdFk = codeSTEMI.DefaultServiceLineIds, // DefaultServiceLineIds.ElementAt(i),
-                        ServiceLineId1Fk = codeSTEMI.ServiceLineTeam1Ids, // ServiceLineTeam1Ids.Count > i ? ServiceLineTeam1Ids.ElementAt(i) : null,
-                        ServiceLineId2Fk = codeSTEMI.ServiceLineTeam2Ids, // ServiceLineTeam2Ids.Count > i ? ServiceLineTeam2Ids.ElementAt(i) : null,
+                        DefaultServiceLineIdFk = codeSTEMI.DefaultServiceLineIds,
+                        ServiceLineId1Fk = codeSTEMI.ServiceLineTeam1Ids,
+                        ServiceLineId2Fk = codeSTEMI.ServiceLineTeam2Ids,
                         ActiveCodeId = row.CodeStemiid,
                         ActiveCodeName = UCLEnums.STEMI.ToString()
                     };
                     this._codesServiceLinesMappingRepo.Insert(codeService);
 
-                    var channel = this._activeCodesGroupMembersRepo.Table.Where(x => x.ActiveCodeName == UCLEnums.STEMI.ToString() && x.ActiveCodeIdFk == row.CodeStemiid && !x.IsDeleted).ToList();
+                    var channel = this._STEMICodeGroupMembersRepo.Table.Where(x => x.StemicodeIdFk == row.CodeStemiid && !x.IsDeleted).ToList();
 
                     var UserChannelSid = (from us in this._userSchedulesRepo.Table
                                           join u in this._userRepo.Table on us.UserIdFk equals u.UserId
-                                          where (DefaultServiceLineIds.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam1Ids.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam2Ids.Contains(us.ServiceLineIdFk.Value)) && !us.IsDeleted && !u.IsDeleted
+                                          where (DefaultServiceLineIds.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam1Ids.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam2Ids.Contains(us.ServiceLineIdFk.Value)) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
                                           select new { u.UserUniqueId, u.UserId }).Distinct().ToList();
                     var superAdmins = this._userRepo.Table.Where(x => x.IsInGroup && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).ToList();
                     UserChannelSid.AddRange(superAdmins);
@@ -3223,19 +3123,19 @@ namespace Web.Services.Concrete
                     {
                         var channelSid = channel.Select(x => x.ChannelSid).FirstOrDefault();
 
-                        this._activeCodesGroupMembersRepo.DeleteRange(channel);
+                        this._STEMICodeGroupMembersRepo.DeleteRange(channel);
                         bool isDeleted = _communication.DeleteUserToConversationChannel(channelSid);
-                        List<ActiveCodesGroupMember> ACodeGroupMembers = new List<ActiveCodesGroupMember>();
+                        List<CodeStemigroupMember> ACodeGroupMembers = new List<CodeStemigroupMember>();
                         foreach (var item in UserChannelSid.Distinct())
                         {
                             try
                             {
-                                var codeGroupMember = new ActiveCodesGroupMember()
+                                var codeGroupMember = new CodeStemigroupMember()
                                 {
                                     ChannelSid = channelSid,
                                     UserIdFk = item.UserId,
-                                    ActiveCodeIdFk = row.CodeStemiid,
-                                    ActiveCodeName = UCLEnums.STEMI.ToString(),
+                                    StemicodeIdFk = row.CodeStemiid,
+                                    //ActiveCodeName = UCLEnums.STEMI.ToString(),
                                     IsAcknowledge = false,
                                     CreatedBy = ApplicationSettings.UserId,
                                     CreatedDate = DateTime.UtcNow,
@@ -3249,18 +3149,8 @@ namespace Web.Services.Concrete
                                 //ElmahExtensions.RiseError(ex);
                             }
                         }
-                        var isMembersAdded = AddGroupMembers(ACodeGroupMembers);
+                        this._STEMICodeGroupMembersRepo.Insert(ACodeGroupMembers);
                     }
-                    //var UserChannelSid = (from us in this._userSchedulesRepo.Table
-                    //                      join u in this._userRepo.Table on us.UserIdFk equals u.UserId
-                    //                      where serviceLineIds.Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
-                    //                      select u.UserChannelSid).ToList();
-
-                    //var UserChannelSid = (from u in this._userRepo.Table
-                    //                      join gm in this._activeCodesGroupMembersRepo.Table on u.UserId equals gm.UserIdFk
-                    //                      where gm.ActiveCodeIdFk == codeSTEMI.CodeStemiid && gm.ActiveCodeName == UCLEnums.STEMI.ToString() && !u.IsDeleted
-                    //                      select u.UserChannelSid).Distinct().ToList();
-
                     var notification = new PushNotificationVM()
                     {
                         Id = row.CodeStemiid,
@@ -3287,8 +3177,7 @@ namespace Web.Services.Concrete
                     if (DefaultServiceLineTeam != null && DefaultServiceLineTeam != "")
                     {
                         var DefaultServiceLineIds = DefaultServiceLineTeam.ToIntList();
-                        //var ServiceLineTeam1Ids = codeSTEMI.ServiceLineTeam1Ids.ToIntList();
-                        //var ServiceLineTeam2Ids = codeSTEMI.ServiceLineTeam2Ids.ToIntList();
+
 
                         codeSTEMI.CreatedDate = DateTime.UtcNow;
                         var STEMI = AutoMapperHelper.MapSingleRow<CodeSTEMIVM, CodeStemi>(codeSTEMI);
@@ -3582,28 +3471,11 @@ namespace Web.Services.Concrete
 
                         this._codeSTEMIRepo.Insert(STEMI);
 
-                        //var codeServiceMappingList = new List<CodesServiceLinesMapping>();
-                        //for (int i = 0; i < DefaultServiceLineIds.Count; i++)
-                        //{
-                        //    var codeService = new CodesServiceLinesMapping()
-                        //    {
-                        //        OrganizationIdFk = STEMI.OrganizationIdFk,
-                        //        CodeIdFk = UCLEnums.STEMI.ToInt(),
-                        //        DefaultServiceLineIdFk = DefaultServiceLineTeam, //DefaultServiceLineIds.ElementAt(i),
-                        //        //ServiceLineId1Fk = ServiceLineTeam1Ids.Count > i ? ServiceLineTeam1Ids.ElementAt(i) : null,
-                        //        //ServiceLineId2Fk = ServiceLineTeam2Ids.Count > i ? ServiceLineTeam2Ids.ElementAt(i) : null,
-                        //        ActiveCodeId = STEMI.CodeStemiid,
-                        //        ActiveCodeName = UCLEnums.STEMI.ToString()
-                        //    };
-                        //    codeServiceMappingList.Add(codeService);
-                        //}
                         var codeService = new CodesServiceLinesMapping()
                         {
                             OrganizationIdFk = STEMI.OrganizationIdFk,
                             CodeIdFk = UCLEnums.STEMI.ToInt(),
-                            DefaultServiceLineIdFk = DefaultServiceLineTeam, //DefaultServiceLineIds.ElementAt(i),
-                                                                             //ServiceLineId1Fk = ServiceLineTeam1Ids.Count > i ? ServiceLineTeam1Ids.ElementAt(i) : null,
-                                                                             //ServiceLineId2Fk = ServiceLineTeam2Ids.Count > i ? ServiceLineTeam2Ids.ElementAt(i) : null,
+                            DefaultServiceLineIdFk = DefaultServiceLineTeam,
                             ActiveCodeId = STEMI.CodeStemiid,
                             ActiveCodeName = UCLEnums.STEMI.ToString()
                         };
@@ -3618,7 +3490,7 @@ namespace Web.Services.Concrete
                         UserChannelSid.AddRange(superAdmins);
                         var loggedUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).FirstOrDefault();
                         UserChannelSid.Add(loggedUser);
-                        List<ActiveCodesGroupMember> ACodeGroupMembers = new List<ActiveCodesGroupMember>();
+                        List<CodeStemigroupMember> ACodeGroupMembers = new List<CodeStemigroupMember>();
                         if (UserChannelSid != null && UserChannelSid.Count > 0)
                         {
                             //string uniqueName = $"CONSULT_{Consult_Counter.Counter_Value.ToString()}";
@@ -3637,12 +3509,12 @@ namespace Web.Services.Concrete
                             {
                                 try
                                 {
-                                    var codeGroupMember = new ActiveCodesGroupMember()
+                                    var codeGroupMember = new CodeStemigroupMember()
                                     {
                                         ChannelSid = channel.Sid,
                                         UserIdFk = item.UserId,
-                                        ActiveCodeIdFk = STEMI.CodeStemiid,
-                                        ActiveCodeName = UCLEnums.STEMI.ToString(),
+                                        StemicodeIdFk = STEMI.CodeStemiid,
+                                        //  ActiveCodeName = UCLEnums.STEMI.ToString(),
                                         IsAcknowledge = false,
                                         CreatedBy = ApplicationSettings.UserId,
                                         CreatedDate = DateTime.UtcNow,
@@ -3656,7 +3528,8 @@ namespace Web.Services.Concrete
                                     //ElmahExtensions.RiseError(ex);
                                 }
                             }
-                            var isMembersAdded = AddGroupMembers(ACodeGroupMembers);
+                            this._STEMICodeGroupMembersRepo.Insert(ACodeGroupMembers);
+
                             var msg = new ConversationMessageVM();
                             msg.channelSid = channel.Sid;
                             msg.author = "System";
@@ -4240,7 +4113,6 @@ namespace Web.Services.Concrete
 
                 this._codeTrumaRepo.Update(row);
 
-                //var serviceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == row.OrganizationIdFk && x.CodeIdFk == UCLEnums.Trauma.ToInt() && !x.IsDeleted).Select(x => x.ServiceLineIds).FirstOrDefault();
                 if (codeTruma.DefaultServiceLineIds != null && codeTruma.DefaultServiceLineIds != "")
                 {
                     var DefaultServiceLineIds = codeTruma.DefaultServiceLineIds.ToIntList();
@@ -4248,43 +4120,25 @@ namespace Web.Services.Concrete
                     var ServiceLineTeam2Ids = codeTruma.ServiceLineTeam2Ids.ToIntList();
 
                     var codeServiceMapping = this._codesServiceLinesMappingRepo.Table.Where(x => x.OrganizationIdFk == row.OrganizationIdFk && x.CodeIdFk == UCLEnums.Trauma.ToInt() && x.ActiveCodeId == row.CodeTraumaId).ToList();
-                    //var rowsToDelete = codeServiceMapping.Where(x => !serviceLineIds.Contains(x.ServiceLineIdFk)).ToList();
                     if (codeServiceMapping.Count > 0)
                         this._codesServiceLinesMappingRepo.DeleteRange(codeServiceMapping);
-
-                    //serviceLineIds.RemoveAll(x => codeServiceMapping.Select(s => s.ServiceLineIdFk).Contains(x));
-                    //var codeServiceMappingList = new List<CodesServiceLinesMapping>();
-                    //for (int i = 0; i < DefaultServiceLineIds.Count; i++)
-                    //{
-                    //    var codeService = new CodesServiceLinesMapping()
-                    //    {
-                    //        OrganizationIdFk = row.OrganizationIdFk,
-                    //        CodeIdFk = UCLEnums.Trauma.ToInt(),
-                    //        DefaultServiceLineIdFk = codeTruma.DefaultServiceLineIds, //DefaultServiceLineIds.ElementAt(i),
-                    //        ServiceLineId1Fk = codeTruma.ServiceLineTeam1Ids, // ServiceLineTeam1Ids.Count > i ? ServiceLineTeam1Ids.ElementAt(i) : null,
-                    //        ServiceLineId2Fk = codeTruma.ServiceLineTeam2Ids, //ServiceLineTeam2Ids.Count > i ? ServiceLineTeam2Ids.ElementAt(i) : null,
-                    //        ActiveCodeId = row.CodeTraumaId,
-                    //        ActiveCodeName = UCLEnums.Trauma.ToString()
-                    //    };
-                    //    codeServiceMappingList.Add(codeService);
-                    //}
                     var codeService = new CodesServiceLinesMapping()
                     {
                         OrganizationIdFk = row.OrganizationIdFk,
                         CodeIdFk = UCLEnums.Trauma.ToInt(),
-                        DefaultServiceLineIdFk = codeTruma.DefaultServiceLineIds, //DefaultServiceLineIds.ElementAt(i),
-                        ServiceLineId1Fk = codeTruma.ServiceLineTeam1Ids, // ServiceLineTeam1Ids.Count > i ? ServiceLineTeam1Ids.ElementAt(i) : null,
-                        ServiceLineId2Fk = codeTruma.ServiceLineTeam2Ids, //ServiceLineTeam2Ids.Count > i ? ServiceLineTeam2Ids.ElementAt(i) : null,
+                        DefaultServiceLineIdFk = codeTruma.DefaultServiceLineIds,
+                        ServiceLineId1Fk = codeTruma.ServiceLineTeam1Ids,
+                        ServiceLineId2Fk = codeTruma.ServiceLineTeam2Ids,
                         ActiveCodeId = row.CodeTraumaId,
                         ActiveCodeName = UCLEnums.Trauma.ToString()
                     };
                     this._codesServiceLinesMappingRepo.Insert(codeService);
 
-                    var channel = this._activeCodesGroupMembersRepo.Table.Where(x => x.ActiveCodeName == UCLEnums.Trauma.ToString() && x.ActiveCodeIdFk == row.CodeTraumaId && !x.IsDeleted).ToList();
+                    var channel = this._TraumaCodeGroupMembersRepo.Table.Where(x => x.TraumaCodeIdFk == row.CodeTraumaId && !x.IsDeleted).ToList();
 
                     var UserChannelSid = (from us in this._userSchedulesRepo.Table
                                           join u in this._userRepo.Table on us.UserIdFk equals u.UserId
-                                          where (DefaultServiceLineIds.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam1Ids.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam2Ids.Contains(us.ServiceLineIdFk.Value)) && !us.IsDeleted && !u.IsDeleted
+                                          where (DefaultServiceLineIds.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam1Ids.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam2Ids.Contains(us.ServiceLineIdFk.Value)) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
                                           select new { u.UserUniqueId, u.UserId }).Distinct().ToList();
                     var superAdmins = this._userRepo.Table.Where(x => x.IsInGroup && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).ToList();
                     UserChannelSid.AddRange(superAdmins);
@@ -4295,19 +4149,19 @@ namespace Web.Services.Concrete
                     {
                         var channelSid = channel.Select(x => x.ChannelSid).FirstOrDefault();
 
-                        this._activeCodesGroupMembersRepo.DeleteRange(channel);
+                        this._TraumaCodeGroupMembersRepo.DeleteRange(channel);
                         bool isDeleted = _communication.DeleteUserToConversationChannel(channelSid);
-                        List<ActiveCodesGroupMember> ACodeGroupMembers = new List<ActiveCodesGroupMember>();
+                        List<CodeTraumaGroupMember> ACodeGroupMembers = new List<CodeTraumaGroupMember>();
                         foreach (var item in UserChannelSid.Distinct())
                         {
                             try
                             {
-                                var codeGroupMember = new ActiveCodesGroupMember()
+                                var codeGroupMember = new CodeTraumaGroupMember()
                                 {
                                     ChannelSid = channelSid,
                                     UserIdFk = item.UserId,
-                                    ActiveCodeIdFk = row.CodeTraumaId,
-                                    ActiveCodeName = UCLEnums.Trauma.ToString(),
+                                    TraumaCodeIdFk = row.CodeTraumaId,
+                                    //ActiveCodeName = UCLEnums.Trauma.ToString(),
                                     IsAcknowledge = false,
                                     CreatedBy = ApplicationSettings.UserId,
                                     CreatedDate = DateTime.UtcNow,
@@ -4321,17 +4175,8 @@ namespace Web.Services.Concrete
                                 //ElmahExtensions.RiseError(ex);
                             }
                         }
-                        var isMembersAdded = AddGroupMembers(ACodeGroupMembers);
+                        this._TraumaCodeGroupMembersRepo.Insert(ACodeGroupMembers);
                     }
-                    //var UserChannelSid = (from us in this._userSchedulesRepo.Table
-                    //                      join u in this._userRepo.Table on us.UserIdFk equals u.UserId
-                    //                      where serviceLineIds.Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
-                    //                      select u.UserChannelSid).ToList();
-
-                    //var UserChannelSid = (from u in this._userRepo.Table
-                    //                      join gm in this._activeCodesGroupMembersRepo.Table on u.UserId equals gm.UserIdFk
-                    //                      where gm.ActiveCodeIdFk == codeTruma.CodeTraumaId && gm.ActiveCodeName == UCLEnums.Trauma.ToString() && !u.IsDeleted
-                    //                      select u.UserChannelSid).Distinct().ToList();
 
                     var notification = new PushNotificationVM()
                     {
@@ -4348,51 +4193,6 @@ namespace Web.Services.Concrete
 
                 }
 
-                //codeTruma.AttachmentsPath = new List<string>();
-                //codeTruma.AudiosPath = new List<string>();
-                //codeTruma.VideosPath = new List<string>();
-
-                //if (!string.IsNullOrEmpty(codeTruma.AttachmentsFolderRoot) && !string.IsNullOrWhiteSpace(codeTruma.AttachmentsFolderRoot))
-                //{
-                //    string path = this._RootPath + codeTruma.AttachmentsFolderRoot; //_environment.WebRootFileProvider.GetFileInfo(codeTruma.AttachmentsFolderRoot)?.PhysicalPath;
-                //    if (Directory.Exists(path))
-                //    {
-                //        DirectoryInfo AttachFiles = new DirectoryInfo(path);
-                //        foreach (var item in AttachFiles.GetFiles())
-                //        {
-                //            codeTruma.AttachmentsPath.Add(codeTruma.AttachmentsFolderRoot + "/" + item.Name);
-                //        }
-                //    }
-                //}
-
-                //if (!string.IsNullOrEmpty(codeTruma.AudioFolderRoot) && !string.IsNullOrWhiteSpace(codeTruma.AudioFolderRoot))
-                //{
-                //    string path = this._RootPath + codeTruma.AudioFolderRoot; //_environment.WebRootFileProvider.GetFileInfo(codeTruma.AudioFolderRoot)?.PhysicalPath;
-                //    if (Directory.Exists(path))
-                //    {
-                //        DirectoryInfo AudioFiles = new DirectoryInfo(path);
-                //        foreach (var item in AudioFiles.GetFiles())
-                //        {
-                //            codeTruma.AudiosPath.Add(codeTruma.AudioFolderRoot + "/" + item.Name);
-                //        }
-                //    }
-                //}
-
-                //if (!string.IsNullOrEmpty(codeTruma.VideoFolderRoot) && !string.IsNullOrWhiteSpace(codeTruma.VideoFolderRoot))
-                //{
-                //    var path = this._RootPath + codeTruma.VideoFolderRoot;  //_environment.WebRootFileProvider.GetFileInfo(codeTruma.VideoFolderRoot)?.PhysicalPath;
-                //    if (Directory.Exists(path))
-                //    {
-                //        DirectoryInfo VideoFiles = new DirectoryInfo(path);
-                //        foreach (var item in VideoFiles.GetFiles())
-                //        {
-                //            codeTruma.VideosPath.Add(codeTruma.VideoFolderRoot + "/" + item.Name);
-                //        }
-                //    }
-                //}
-
-
-
                 return GetTrumaDataById(row.CodeTraumaId);
             }
             else
@@ -4405,12 +4205,9 @@ namespace Web.Services.Concrete
                     if (DefaultServiceLineTeam != null && DefaultServiceLineTeam != "")
                     {
                         var DefaultServiceLineIds = DefaultServiceLineTeam.ToIntList();
-                        //var ServiceLineTeam1Ids = codeTruma.ServiceLineTeam1Ids.ToIntList();
-                        //var ServiceLineTeam2Ids = codeTruma.ServiceLineTeam2Ids.ToIntList();
 
                         codeTruma.CreatedDate = DateTime.UtcNow;
                         var Truma = AutoMapperHelper.MapSingleRow<CodeTrumaVM, CodeTrauma>(codeTruma);
-
 
                         if (codeTruma.Attachment != null && codeTruma.Attachment.Count > 0)
                         {
@@ -4699,28 +4496,11 @@ namespace Web.Services.Concrete
                         }
                         this._codeTrumaRepo.Insert(Truma);
 
-                        //var codeServiceMappingList = new List<CodesServiceLinesMapping>();
-                        //for (int i = 0; i < DefaultServiceLineIds.Count; i++)
-                        //{
-                        //    var codeService = new CodesServiceLinesMapping()
-                        //    {
-                        //        OrganizationIdFk = Truma.OrganizationIdFk,
-                        //        CodeIdFk = UCLEnums.Trauma.ToInt(),
-                        //        DefaultServiceLineIdFk = DefaultServiceLineTeam, //DefaultServiceLineIds.ElementAt(i),
-                        //        //ServiceLineId1Fk = ServiceLineTeam1Ids.Count > i ? ServiceLineTeam1Ids.ElementAt(i) : null,
-                        //        //ServiceLineId2Fk = ServiceLineTeam2Ids.Count > i ? ServiceLineTeam2Ids.ElementAt(i) : null,
-                        //        ActiveCodeId = Truma.CodeTraumaId,
-                        //        ActiveCodeName = UCLEnums.Trauma.ToString()
-                        //    };
-                        //    codeServiceMappingList.Add(codeService);
-                        //}
                         var codeService = new CodesServiceLinesMapping()
                         {
                             OrganizationIdFk = Truma.OrganizationIdFk,
                             CodeIdFk = UCLEnums.Trauma.ToInt(),
-                            DefaultServiceLineIdFk = DefaultServiceLineTeam, //DefaultServiceLineIds.ElementAt(i),
-                                                                             //ServiceLineId1Fk = ServiceLineTeam1Ids.Count > i ? ServiceLineTeam1Ids.ElementAt(i) : null,
-                                                                             //ServiceLineId2Fk = ServiceLineTeam2Ids.Count > i ? ServiceLineTeam2Ids.ElementAt(i) : null,
+                            DefaultServiceLineIdFk = DefaultServiceLineTeam,
                             ActiveCodeId = Truma.CodeTraumaId,
                             ActiveCodeName = UCLEnums.Trauma.ToString()
                         };
@@ -4734,10 +4514,9 @@ namespace Web.Services.Concrete
                         UserChannelSid.AddRange(superAdmins);
                         var loggedUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).FirstOrDefault();
                         UserChannelSid.Add(loggedUser);
-                        List<ActiveCodesGroupMember> ACodeGroupMembers = new();
+                        List<CodeTraumaGroupMember> ACodeGroupMembers = new();
                         if (UserChannelSid != null && UserChannelSid.Count > 0)
                         {
-                            //string uniqueName = $"CONSULT_{Consult_Counter.Counter_Value.ToString()}";
                             string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
                             string friendlyName = Truma.IsEms.HasValue && Truma.IsEms.Value ? $"EMS Code {UCLEnums.Trauma.ToString()} {Truma.CodeTraumaId}" : $"Inhouse Code {UCLEnums.Trauma.ToString()} {Truma.CodeTraumaId}";
                             var conversationChannelAttributes = JsonConvert.SerializeObject(new Dictionary<string, Object>()
@@ -4752,12 +4531,12 @@ namespace Web.Services.Concrete
                             {
                                 try
                                 {
-                                    var codeGroupMember = new ActiveCodesGroupMember()
+                                    var codeGroupMember = new CodeTraumaGroupMember()
                                     {
                                         ChannelSid = channel.Sid,
                                         UserIdFk = item.UserId,
-                                        ActiveCodeIdFk = Truma.CodeTraumaId,
-                                        ActiveCodeName = UCLEnums.Trauma.ToString(),
+                                        TraumaCodeIdFk = Truma.CodeTraumaId,
+                                        //ActiveCodeName = UCLEnums.Trauma.ToString(),
                                         IsAcknowledge = false,
                                         CreatedBy = ApplicationSettings.UserId,
                                         CreatedDate = DateTime.UtcNow,
@@ -4771,7 +4550,8 @@ namespace Web.Services.Concrete
                                     //ElmahExtensions.RiseError(ex);
                                 }
                             }
-                            var isMembersAdded = AddGroupMembers(ACodeGroupMembers);
+                            this._TraumaCodeGroupMembersRepo.Insert(ACodeGroupMembers);
+
                             var msg = new ConversationMessageVM();
                             msg.channelSid = channel.Sid;
                             msg.author = "System";
@@ -5346,48 +5126,27 @@ namespace Web.Services.Concrete
                 }
 
                 this._codeBlueRepo.Update(row);
-
-
-                //var serviceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == row.OrganizationIdFk && x.CodeIdFk == UCLEnums.Blue.ToInt() && !x.IsDeleted).Select(x => x.ServiceLineIds).FirstOrDefault();
                 if (codeBlue.DefaultServiceLineIds != null && codeBlue.DefaultServiceLineIds != "")
                 {
                     var DefaultServiceLineIds = codeBlue.DefaultServiceLineIds.ToIntList();
                     var ServiceLineTeam1Ids = codeBlue.ServiceLineTeam1Ids.ToIntList();
                     var ServiceLineTeam2Ids = codeBlue.ServiceLineTeam2Ids.ToIntList();
                     var codeServiceMapping = this._codesServiceLinesMappingRepo.Table.Where(x => x.OrganizationIdFk == row.OrganizationIdFk && x.CodeIdFk == UCLEnums.Blue.ToInt() && x.ActiveCodeId == row.CodeBlueId).ToList();
-                    // var rowsToDelete = codeServiceMapping.Where(x => !serviceLineIds.Contains(x.ServiceLineIdFk)).ToList();
                     if (codeServiceMapping.Count > 0)
                         this._codesServiceLinesMappingRepo.DeleteRange(codeServiceMapping);
-
-                    //serviceLineIds.RemoveAll(x => codeServiceMapping.Select(s => s.ServiceLineIdFk).Contains(x));
-                    //var codeServiceMappingList = new List<CodesServiceLinesMapping>();
-                    //for (int i = 0; i < DefaultServiceLineIds.Count; i++)
-                    //{
-                    //    var codeService = new CodesServiceLinesMapping()
-                    //    {
-                    //        OrganizationIdFk = row.OrganizationIdFk,
-                    //        CodeIdFk = UCLEnums.Blue.ToInt(),
-                    //        DefaultServiceLineIdFk = codeBlue.DefaultServiceLineIds, // DefaultServiceLineIds.ElementAt(i),
-                    //        ServiceLineId1Fk = codeBlue.ServiceLineTeam1Ids, //ServiceLineTeam1Ids.Count > i ? ServiceLineTeam1Ids.ElementAt(i) : null,
-                    //        ServiceLineId2Fk = codeBlue.ServiceLineTeam2Ids, //ServiceLineTeam2Ids.Count > i ? ServiceLineTeam2Ids.ElementAt(i) : null,
-                    //        ActiveCodeId = row.CodeBlueId,
-                    //        ActiveCodeName = UCLEnums.Blue.ToString()
-                    //    };
-                    //    codeServiceMappingList.Add(codeService);
-                    //}
                     var codeService = new CodesServiceLinesMapping()
                     {
                         OrganizationIdFk = row.OrganizationIdFk,
                         CodeIdFk = UCLEnums.Blue.ToInt(),
-                        DefaultServiceLineIdFk = codeBlue.DefaultServiceLineIds, // DefaultServiceLineIds.ElementAt(i),
-                        ServiceLineId1Fk = codeBlue.ServiceLineTeam1Ids, //ServiceLineTeam1Ids.Count > i ? ServiceLineTeam1Ids.ElementAt(i) : null,
-                        ServiceLineId2Fk = codeBlue.ServiceLineTeam2Ids, //ServiceLineTeam2Ids.Count > i ? ServiceLineTeam2Ids.ElementAt(i) : null,
+                        DefaultServiceLineIdFk = codeBlue.DefaultServiceLineIds,
+                        ServiceLineId1Fk = codeBlue.ServiceLineTeam1Ids,
+                        ServiceLineId2Fk = codeBlue.ServiceLineTeam2Ids,
                         ActiveCodeId = row.CodeBlueId,
                         ActiveCodeName = UCLEnums.Blue.ToString()
                     };
                     this._codesServiceLinesMappingRepo.Insert(codeService);
 
-                    var channel = this._activeCodesGroupMembersRepo.Table.Where(x => x.ActiveCodeName == UCLEnums.Blue.ToString() && x.ActiveCodeIdFk == row.CodeBlueId && !x.IsDeleted).ToList();
+                    var channel = this._BlueCodeGroupMembersRepo.Table.Where(x => x.BlueCodeIdFk == row.CodeBlueId && !x.IsDeleted).ToList();
 
                     var UserChannelSid = (from us in this._userSchedulesRepo.Table
                                           join u in this._userRepo.Table on us.UserIdFk equals u.UserId
@@ -5402,19 +5161,19 @@ namespace Web.Services.Concrete
                     {
                         var channelSid = channel.Select(x => x.ChannelSid).FirstOrDefault();
 
-                        this._activeCodesGroupMembersRepo.DeleteRange(channel);
+                        this._BlueCodeGroupMembersRepo.DeleteRange(channel);
                         bool isDeleted = _communication.DeleteUserToConversationChannel(channelSid);
-                        List<ActiveCodesGroupMember> ACodeGroupMembers = new List<ActiveCodesGroupMember>();
+                        List<CodeBlueGroupMember> ACodeGroupMembers = new List<CodeBlueGroupMember>();
                         foreach (var item in UserChannelSid.Distinct())
                         {
                             try
                             {
-                                var codeGroupMember = new ActiveCodesGroupMember()
+                                var codeGroupMember = new CodeBlueGroupMember()
                                 {
                                     ChannelSid = channelSid,
                                     UserIdFk = item.UserId,
-                                    ActiveCodeIdFk = row.CodeBlueId,
-                                    ActiveCodeName = UCLEnums.Blue.ToString(),
+                                    BlueCodeIdFk = row.CodeBlueId,
+                                    //ActiveCodeName = UCLEnums.Blue.ToString(),
                                     IsAcknowledge = false,
                                     CreatedBy = ApplicationSettings.UserId,
                                     CreatedDate = DateTime.UtcNow,
@@ -5428,18 +5187,8 @@ namespace Web.Services.Concrete
                                 //ElmahExtensions.RiseError(ex);
                             }
                         }
-                        var isMembersAdded = AddGroupMembers(ACodeGroupMembers);
+                        this._BlueCodeGroupMembersRepo.Insert(ACodeGroupMembers);
                     }
-
-                    //var UserChannelSid = (from us in this._userSchedulesRepo.Table
-                    //                      join u in this._userRepo.Table on us.UserIdFk equals u.UserId
-                    //                      where serviceLineIds.Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.Now && us.ScheduleDateEnd >= DateTime.Now && !us.IsDeleted && !u.IsDeleted
-                    //                      select u.UserChannelSid).ToList();
-
-                    //var UserChannelSid = (from u in this._userRepo.Table
-                    //                      join gm in this._activeCodesGroupMembersRepo.Table on u.UserId equals gm.UserIdFk
-                    //                      where gm.ActiveCodeIdFk == codeBlue.CodeBlueId && gm.ActiveCodeName == UCLEnums.Blue.ToString() && !u.IsDeleted
-                    //                      select u.UserChannelSid).Distinct().ToList();
 
                     var notification = new PushNotificationVM()
                     {
@@ -5456,49 +5205,6 @@ namespace Web.Services.Concrete
 
                 }
 
-                //codeStroke.AttachmentsPath = new List<string>();
-                //codeStroke.AudiosPath = new List<string>();
-                //codeStroke.VideosPath = new List<string>();
-
-                //if (!string.IsNullOrEmpty(codeStroke.AttachmentsFolderRoot) && !string.IsNullOrWhiteSpace(codeStroke.AttachmentsFolderRoot))
-                //{
-                //    string path = this._RootPath + codeStroke.AttachmentsFolderRoot; //_environment.WebRootFileProvider.GetFileInfo(codeStroke.AttachmentsFolderRoot)?.PhysicalPath;
-                //    if (Directory.Exists(path))
-                //    {
-                //        DirectoryInfo AttachFiles = new DirectoryInfo(path);
-                //        foreach (var item in AttachFiles.GetFiles())
-                //        {
-                //            codeStroke.AttachmentsPath.Add(codeStroke.AttachmentsFolderRoot + "/" + item.Name);
-                //        }
-                //    }
-                //}
-
-                //if (!string.IsNullOrEmpty(codeStroke.AudioFolderRoot) && !string.IsNullOrWhiteSpace(codeStroke.AudioFolderRoot))
-                //{
-                //    string path = this._RootPath + codeStroke.AudioFolderRoot;  //_environment.WebRootFileProvider.GetFileInfo(codeStroke.AudioFolderRoot)?.PhysicalPath;
-                //    if (Directory.Exists(path))
-                //    {
-                //        DirectoryInfo AudioFiles = new DirectoryInfo(path);
-                //        foreach (var item in AudioFiles.GetFiles())
-                //        {
-                //            codeStroke.AudiosPath.Add(codeStroke.AudioFolderRoot + "/" + item.Name);
-                //        }
-                //    }
-                //}
-
-                //if (!string.IsNullOrEmpty(codeStroke.VideoFolderRoot) && !string.IsNullOrWhiteSpace(codeStroke.VideoFolderRoot))
-                //{
-                //    var path = this._RootPath + codeStroke.VideoFolderRoot;  //_environment.WebRootFileProvider.GetFileInfo(codeStroke.VideoFolderRoot)?.PhysicalPath;
-                //    if (Directory.Exists(path))
-                //    {
-                //        DirectoryInfo VideoFiles = new DirectoryInfo(path);
-                //        foreach (var item in VideoFiles.GetFiles())
-                //        {
-                //            codeStroke.VideosPath.Add(codeStroke.VideoFolderRoot + "/" + item.Name);
-                //        }
-                //    }
-                //}
-
                 return GetBlueDataById(row.CodeBlueId);
             }
             else
@@ -5510,8 +5216,6 @@ namespace Web.Services.Concrete
                     if (DefaultServiceLineTeam != null && DefaultServiceLineTeam != "")
                     {
                         var DefaultServiceLineIds = DefaultServiceLineTeam.ToIntList();
-                        //var ServiceLineTeam1Ids = codeBlue.ServiceLineTeam1Ids.ToIntList();
-                        //var ServiceLineTeam2Ids = codeBlue.ServiceLineTeam2Ids.ToIntList();
 
                         codeBlue.CreatedDate = DateTime.UtcNow;
                         var blue = AutoMapperHelper.MapSingleRow<CodeBlueVM, CodeBlue>(codeBlue);
@@ -5808,29 +5512,11 @@ namespace Web.Services.Concrete
 
                         this._codeBlueRepo.Insert(blue);
 
-                        //var codeServiceMappingList = new List<CodesServiceLinesMapping>();
-                        //for (int i = 0; i < DefaultServiceLineIds.Count; i++)
-                        //{
-                        //    var codeService = new CodesServiceLinesMapping()
-                        //    {
-                        //        OrganizationIdFk = blue.OrganizationIdFk,
-                        //        CodeIdFk = UCLEnums.Blue.ToInt(),
-                        //        DefaultServiceLineIdFk = DefaultServiceLineTeam,// DefaultServiceLineIds.ElementAt(i),
-                        //        //ServiceLineId1Fk = ServiceLineTeam1Ids.Count > i ? ServiceLineTeam1Ids.ElementAt(i) : null,
-                        //        //ServiceLineId2Fk = ServiceLineTeam2Ids.Count > i ? ServiceLineTeam2Ids.ElementAt(i) : null,
-                        //        ActiveCodeId = blue.CodeBlueId,
-                        //        ActiveCodeName = UCLEnums.Blue.ToString()
-                        //    };
-                        //    codeServiceMappingList.Add(codeService);
-                        //}
-
                         var codeService = new CodesServiceLinesMapping()
                         {
                             OrganizationIdFk = blue.OrganizationIdFk,
                             CodeIdFk = UCLEnums.Blue.ToInt(),
-                            DefaultServiceLineIdFk = DefaultServiceLineTeam,// DefaultServiceLineIds.ElementAt(i),
-                                                                            //ServiceLineId1Fk = ServiceLineTeam1Ids.Count > i ? ServiceLineTeam1Ids.ElementAt(i) : null,
-                                                                            //ServiceLineId2Fk = ServiceLineTeam2Ids.Count > i ? ServiceLineTeam2Ids.ElementAt(i) : null,
+                            DefaultServiceLineIdFk = DefaultServiceLineTeam,
                             ActiveCodeId = blue.CodeBlueId,
                             ActiveCodeName = UCLEnums.Blue.ToString()
                         };
@@ -5850,10 +5536,9 @@ namespace Web.Services.Concrete
                                         {ChannelAttributeEnums.CodeType.ToString(), ChannelTypeEnums.Blue.ToString()},
                                         {ChannelAttributeEnums.BlueId.ToString(), blue.CodeBlueId}
                                     }, Formatting.Indented);
-                        List<ActiveCodesGroupMember> ACodeGroupMembers = new List<ActiveCodesGroupMember>();
+                        List<CodeBlueGroupMember> ACodeGroupMembers = new List<CodeBlueGroupMember>();
                         if (UserChannelSid != null && UserChannelSid.Count > 0)
                         {
-                            //string uniqueName = $"CONSULT_{Consult_Counter.Counter_Value.ToString()}";
                             string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
                             string friendlyName = blue.IsEms.HasValue && blue.IsEms.Value ? $"EMS Code {UCLEnums.Blue.ToString()} {blue.CodeBlueId}" : $"Inhouse Code {UCLEnums.Blue.ToString()} {blue.CodeBlueId}";
                             var channel = _communication.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
@@ -5862,12 +5547,12 @@ namespace Web.Services.Concrete
                             {
                                 try
                                 {
-                                    var codeGroupMember = new ActiveCodesGroupMember()
+                                    var codeGroupMember = new CodeBlueGroupMember()
                                     {
                                         ChannelSid = channel.Sid,
                                         UserIdFk = item.UserId,
-                                        ActiveCodeIdFk = blue.CodeBlueId,
-                                        ActiveCodeName = UCLEnums.Blue.ToString(),
+                                        BlueCodeIdFk = blue.CodeBlueId,
+                                        // ActiveCodeName = UCLEnums.Blue.ToString(),
                                         IsAcknowledge = false,
                                         CreatedBy = ApplicationSettings.UserId,
                                         CreatedDate = DateTime.UtcNow,
@@ -5881,7 +5566,7 @@ namespace Web.Services.Concrete
                                     //ElmahExtensions.RiseError(ex);
                                 }
                             }
-                            var isMembersAdded = AddGroupMembers(ACodeGroupMembers);
+                            this._BlueCodeGroupMembersRepo.Insert(ACodeGroupMembers);
                             var msg = new ConversationMessageVM();
                             msg.channelSid = channel.Sid;
                             msg.author = "System";
@@ -5937,19 +5622,6 @@ namespace Web.Services.Concrete
 
         #endregion
 
-
-        public BaseResponse AddGroupMembers(List<ActiveCodesGroupMember> activeCodesGroup)
-        {
-            if (activeCodesGroup.Count > 0)
-            {
-                this._activeCodesGroupMembersRepo.Insert(activeCodesGroup);
-                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Inserted" };
-            }
-            else
-            {
-                return new BaseResponse() { Status = HttpStatusCode.NotModified, Message = "No Data Inserted" };
-            }
-        }
 
         #region EMS
 
