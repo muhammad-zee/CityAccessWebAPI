@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 #nullable disable
 
@@ -48,6 +50,7 @@ namespace Web.Data.Models
         public virtual DbSet<MdrouteCounter> MdrouteCounters { get; set; }
         public virtual DbSet<Organization> Organizations { get; set; }
         public virtual DbSet<OrganizationConsultField> OrganizationConsultFields { get; set; }
+        public virtual DbSet<Queue> Queues { get; set; }
         public virtual DbSet<Role> Roles { get; set; }
         public virtual DbSet<ServiceLine> ServiceLines { get; set; }
         public virtual DbSet<Setting> Settings { get; set; }
@@ -925,6 +928,29 @@ namespace Web.Data.Models
                     .HasForeignKey(d => d.OrganizationIdFk)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_OrganizationConsultFields_Organizations");
+            });
+
+            modelBuilder.Entity<Queue>(entity =>
+            {
+                entity.HasNoKey();
+
+                entity.Property(e => e.Callsid).HasMaxLength(50);
+
+                entity.Property(e => e.ConfrenceSid).HasMaxLength(50);
+
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.FromPhoneNumber).HasMaxLength(30);
+
+                entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.ParentCallsid).HasMaxLength(50);
+
+                entity.Property(e => e.QueueId).ValueGeneratedOnAdd();
+
+                entity.Property(e => e.QueueStatus).HasMaxLength(20);
+
+                entity.Property(e => e.ToPhoneNumber).HasMaxLength(30);
             });
 
             modelBuilder.Entity<Role>(entity =>
