@@ -45,6 +45,23 @@ namespace Web.API.Controllers
             }
         }
 
+        //new
+        [Description("Get Settings By Org Id (Change Password)")]
+        [HttpPost("settings/GetSettingsChangePasswordByOrgId")]
+        public BaseResponse GetSettingsChangePasswordByOrgId([FromBody] SettingsVM settings)
+        {
+            try
+            {
+                return _settingService.GetSettingsChangePasswordByOrgId(settings);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
         [Description("Add or Update Org Settings")]
         [HttpPost("settings/AddOrUpdateOrgSettings")]
         public BaseResponse AddOrUpdateOrgSettings([FromBody] SettingsVM settings)

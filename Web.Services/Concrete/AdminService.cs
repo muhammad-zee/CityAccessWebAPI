@@ -455,7 +455,8 @@ namespace Web.Services.Concrete
                                  //UserId = ur.UserIdFK,
                                  RoleId = ur.RoleIdFk,
                                  RoleName = r.RoleName,
-                                 OrganizationIdFk = r.OrganizationIdFk
+                                 OrganizationIdFk = r.OrganizationIdFk,
+                                 IsSuperAdmin = r.IsSuperAdmin
                              }).ToList();
             foreach (var item in userRoles)
             {

@@ -7,5 +7,6 @@
         public static string UserName { get; set; }
         public static string TimeZone { get; set; }
         public static bool isSuperAdmin { get; set; }
+        public static bool isEMS { get; set; }
     }
 }

@@ -141,7 +141,8 @@ namespace Web.Services.Concrete
                     new Claim(JwtRegisteredClaimNames.Sub, user.PrimaryEmail),
                     new Claim("UserId",user.UserId.ToString()),
                     new Claim("RoleIds",string.Join(",",UserRole.Select(x => x.RoleId).ToList())),
-                    new Claim("isSuperAdmin",UserRole.Any(x =>x.RoleId == 2).ToString()),
+                    new Claim("isEMS", (UserRole.Where(x => x.RoleName == "EMS").Count() > 0).ToString()),
+                    new Claim("isSuperAdmin",UserRole.Any(x =>x.IsSuperAdmin).ToString()),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
 
             };
@@ -191,6 +192,8 @@ namespace Web.Services.Concrete
                 Username = user.UserName,
                 PrimaryEmail = user.PrimaryEmail,
                 UserRole = UserRole,
+                IsSuperAdmin = UserRole.Any(x => x.IsSuperAdmin),
+                IsEMS = (UserRole.Where(x => x.RoleName == "EMS").Count() > 0),
                 IsRequirePasswordReset = user.IsRequirePasswordReset,
                 NotificationChannelSid = user.UserChannelSid,
                 conversationUserSid = user.ConversationUserSid,
@@ -576,10 +579,15 @@ namespace Web.Services.Concrete
 
         public BaseResponse ChangePassword(ChangePasswordVM changePassword)
         {
-            var user = _userRepo.Table.Where(x => !x.IsDeleted && x.UserId == changePassword.UserId).FirstOrDefault();
-            var OrgSettings = this._settingRepo.Table.Where(x => x.OrganizationIdFk == changePassword.OrganizationId).FirstOrDefault();
             DateTime? passwordExpiryDate = null;
-            if (OrgSettings.EnablePasswordAge.HasValue) 
+            var OrgSettings = this._dbContext.LoadStoredProcedure("md_getOrganizationSettings")
+                                .WithSqlParam("@IsSuperAdmin", ApplicationSettings.isSuperAdmin)
+                                .WithSqlParam("@IsEMS", ApplicationSettings.isEMS)
+                                .WithSqlParam("@orgId", changePassword.OrganizationId)
+                                .ExecuteStoredProc<Setting>().FirstOrDefault();
+            var user = _userRepo.Table.Where(x => !x.IsDeleted && x.UserId == changePassword.UserId).FirstOrDefault();
+            
+            if (OrgSettings != null && OrgSettings.EnablePasswordAge.HasValue)
             {
                 passwordExpiryDate = DateTime.UtcNow.AddDays(OrgSettings.EnablePasswordAge.Value);
             }

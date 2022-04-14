@@ -7,5 +7,6 @@ namespace Web.Services.Interfaces
     {
         BaseResponse GetSettingsByOrgId(int OrgId);
         BaseResponse AddOrUpdateOrgSettings(SettingsVM settings);
+        BaseResponse GetSettingsChangePasswordByOrgId(SettingsVM settings);
     }
 }

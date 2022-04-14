@@ -8,6 +8,7 @@
         public string RoleName { get; set; }
         public int? OrganizationIdFk { get; set; }
         public string OrganizationName { get; set; }
+        public bool IsSuperAdmin { get; set; }
 
     }
 }

@@ -8,6 +8,7 @@ using Web.DLL.Generic_Repository;
 using Web.Model;
 using Web.Model.Common;
 using Web.Services.Extensions;
+using Web.Services.Helper;
 using Web.Services.Interfaces;
 
 namespace Web.Services.Concrete
@@ -31,23 +32,23 @@ namespace Web.Services.Concrete
         public BaseResponse GetSettingsByOrgId(int OrgId)
         {
             var settings = this._settingRepo.Table.Where(x => x.OrganizationIdFk == OrgId && !x.IsDeleted).Select(x => new SettingsVM()
-            {
-                SettingId = x.SettingId,
-                OrganizationIdFk = x.OrganizationIdFk,
-                TwoFactorCodeExpiry = x.TwoFactorAuthenticationExpiryMinutes,
-                TwoFactorEnabled = x.TwoFactorEnable,
-                VerifyCodeForFutureDays = x.VerifyForFutureDays,
+                {
+                    SettingId = x.SettingId,
+                    OrganizationIdFk = x.OrganizationIdFk,
+                    TwoFactorCodeExpiry = x.TwoFactorAuthenticationExpiryMinutes,
+                    TwoFactorEnabled = x.TwoFactorEnable,
+                    VerifyCodeForFutureDays = x.VerifyForFutureDays,
 
-                PasswordLength = x.PasswordLength,
-                RequiredLowerCase = x.RequiredLowerCase,
-                RequiredNonAlphaNumeric = x.RequiredNonAlphaNumeric,
-                RequiredNumeric = x.RequiredNumeric,
-                RequiredUpperCase = x.RequiredUpperCase,
-                EnablePasswordAge = x.EnablePasswordAge,
+                    PasswordLength = x.PasswordLength,
+                    RequiredLowerCase = x.RequiredLowerCase,
+                    RequiredNonAlphaNumeric = x.RequiredNonAlphaNumeric,
+                    RequiredNumeric = x.RequiredNumeric,
+                    RequiredUpperCase = x.RequiredUpperCase,
+                    EnablePasswordAge = x.EnablePasswordAge,
 
-                TokenExpiryTime = x.TokenExpiryTime,
-                IsDeleted = x.IsDeleted
-            }).FirstOrDefault();
+                    TokenExpiryTime = x.TokenExpiryTime,
+                    IsDeleted = x.IsDeleted
+                }).FirstOrDefault();
             if (settings != null)
             {
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Found", Body = settings };
@@ -57,6 +58,23 @@ namespace Web.Services.Concrete
                 return new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "Data Not Found" };
             }
 
+        }
+
+        public BaseResponse GetSettingsChangePasswordByOrgId(SettingsVM settings)
+        {
+            var passwordSettings = this._dbContext.LoadStoredProcedure("md_getOrganizationSettings")
+                                .WithSqlParam("@IsSuperAdmin", settings.UserIsSuperAdmin)
+                                .WithSqlParam("@IsEMS", settings.UserIsEMS)
+                                .WithSqlParam("@orgId", settings.OrganizationId)
+                                .ExecuteStoredProc<Setting>().FirstOrDefault();
+            if (passwordSettings != null)
+            {
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Found", Body = passwordSettings };
+            }
+            else
+            {
+                return new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "Data Not Found" };
+            }
         }
 
         public BaseResponse AddOrUpdateOrgSettings(SettingsVM settings)

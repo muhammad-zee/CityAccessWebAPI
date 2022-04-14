@@ -4,7 +4,7 @@ namespace Web.Model.Common
 {
     public class SettingsVM
     {
-        public int SettingId { get; set; } = 0;
+        public int SettingId { get; set; } = 0; 
         public int? OrganizationIdFk { get; set; } = 0;
         public bool TwoFactorEnabled { get; set; }
         public int? TokenExpiryTime { get; set; } = 0;
@@ -22,6 +22,9 @@ namespace Web.Model.Common
         public int? ModifiedBy { get; set; }
         public DateTime? ModifiedDate { get; set; }
         public bool IsDeleted { get; set; }
+        public bool UserIsSuperAdmin { get; set; }
+        public bool UserIsEMS { get; set; }
+        public int OrganizationId { get; set; } = 0;
 
     }
 }
