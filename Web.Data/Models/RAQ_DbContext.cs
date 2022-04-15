@@ -568,6 +568,9 @@ namespace Web.Data.Models
 
             modelBuilder.Entity<Consult>(entity =>
             {
+                entity.HasIndex(e => e.ConsultNumber, "U_ConsultNumber")
+                    .IsUnique();
+
                 entity.Property(e => e.CallbackNumber).HasMaxLength(15);
 
                 entity.Property(e => e.ConsultType).HasMaxLength(50);
@@ -595,9 +598,20 @@ namespace Web.Data.Models
 
             modelBuilder.Entity<ConsultAcknowledgment>(entity =>
             {
+                entity.Property(e => e.ChannelSid)
+                    .IsRequired()
+                    .HasMaxLength(50);
+
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");
 
                 entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+
+                entity.HasOne(d => d.ConsultIdFkNavigation)
+                    .WithMany(p => p.ConsultAcknowledgments)
+                    .HasPrincipalKey(p => p.ConsultNumber)
+                    .HasForeignKey(d => d.ConsultIdFk)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_ConsultAcknowledgments_Consults");
             });
 
             modelBuilder.Entity<ConsultField>(entity =>

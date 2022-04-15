@@ -7,6 +7,11 @@ namespace Web.Data.Models
 {
     public partial class Consult
     {
+        public Consult()
+        {
+            ConsultAcknowledgments = new HashSet<ConsultAcknowledgment>();
+        }
+
         public long ConsultId { get; set; }
         public long ConsultNumber { get; set; }
         public int ServiceLineIdFk { get; set; }
@@ -27,5 +32,6 @@ namespace Web.Data.Models
         public bool? IsDeleted { get; set; }
 
         public virtual ServiceLine ServiceLineIdFkNavigation { get; set; }
+        public virtual ICollection<ConsultAcknowledgment> ConsultAcknowledgments { get; set; }
     }
 }

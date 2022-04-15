@@ -1,4 +1,5 @@
 ﻿using ElmahCore;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
@@ -450,6 +451,7 @@ namespace Web.Services.Concrete
                                     List<ConsultAcknowledgment> consultAcknowledgmentList = new();
                                     users = users.Distinct().ToList();
                                     var distinctUsers = users.Select(x => new { x.UserUniqueId, x.UserId }).Distinct().ToList();
+                                    
                                     foreach (var item in distinctUsers)
                                     {
                                         try
@@ -457,6 +459,7 @@ namespace Web.Services.Concrete
                                             this._communicationService.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
                                             var acknowledgeConsult = new ConsultAcknowledgment
                                             {
+                                                ChannelSid = channel.Sid,
                                                 IsAcknowledge = false,
                                                 ConsultIdFk = Consult_Counter.Counter_Value,
                                                 UserIdFk = item.UserId,
@@ -538,6 +541,7 @@ namespace Web.Services.Concrete
                                     this._communicationService.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
                                     var acknowledgeConsult = new ConsultAcknowledgment
                                     {
+                                        ChannelSid = channel.Sid,
                                         IsAcknowledge = false,
                                         ConsultIdFk = Consult_Counter.Counter_Value,
                                         UserIdFk = item.UserId,
@@ -647,7 +651,12 @@ namespace Web.Services.Concrete
 
         public BaseResponse DeleteConsult(int consultId)
         {
-            var isDeleted = this._dbContext.Database.ExecuteSqlRaw($"Update Consults SET IsDeleted = 1, ModifiedBy = '{ApplicationSettings.UserId}', ModifiedDate = '{DateTime.UtcNow.ToString("yyyy-MM-dd hh:mm:ss")}' WHERE ConsultId = '{consultId}'");
+            var sql = "EXEC md_DeleteConsultAndGroup @userId, @consultId";
+            var parameters = new List<SqlParameter>() { new SqlParameter { ParameterName = "@userId", Value = ApplicationSettings.UserId },
+                                                        new SqlParameter { ParameterName = "@consultId", Value = consultId } 
+                                                      };
+
+            var isDeleted = this._dbContext.Database.ExecuteSqlRaw(sql, parameters);
             if (isDeleted > 0)
             {
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Consult Deleted" };

@@ -676,21 +676,18 @@ namespace Web.Services.Concrete
                 var serviceLineIds = (from x in this._codesServiceLinesMappingRepo.Table
                                       where x.OrganizationIdFk == strokeData.OrganizationIdFk && x.CodeIdFk == UCLEnums.Stroke.ToInt()
                                       && x.ActiveCodeId == strokeData.CodeStrokeId && x.ActiveCodeName == UCLEnums.Stroke.ToString()
-                                      //&& (serviceIds.DefaultServiceLineTeam.ToIntList().Where(s => x.DefaultServiceLineIdFk.ToIntList().Contains(s))
-                                      //|| serviceIds.ServiceLineTeam1.ToIntList().Where(s => x.ServiceLineId1Fk.ToIntList().Contains(s))
-                                      //|| serviceIds.ServiceLineTeam2.ToIntList().Where(s => x.ServiceLineId2Fk.ToIntList().Contains(s)))
-                                      //select new { x.DefaultServiceLineIdFk, x.ServiceLineId1Fk, x.ServiceLineId2Fk }).Distinct().ToList();
                                       select new { x.DefaultServiceLineIdFk, x.ServiceLineId1Fk, x.ServiceLineId2Fk }).FirstOrDefault();
-                var defaultIds = serviceIds.DefaultServiceLineTeam.ToIntList().Where(x => serviceLineIds.DefaultServiceLineIdFk.ToIntList().Contains(x)).Distinct().ToList();
-                var team1 = serviceIds.ServiceLineTeam1.ToIntList().Where(x => serviceLineIds.ServiceLineId1Fk.ToIntList().Contains(x)).Distinct().ToList();
-                var team2 = serviceIds.ServiceLineTeam2.ToIntList().Where(x => serviceLineIds.ServiceLineId2Fk.ToIntList().Contains(x)).Distinct().ToList();
-                StrokeDataVM.DefaultServiceLineTeam = this._serviceLineRepo.Table.Where(x => serviceIds.DefaultServiceLineTeam.ToIntList().Distinct().Contains(x.ServiceLineId) && !x.IsDeleted).Select(x => new ServiceLineVM() { ServiceLineId = x.ServiceLineId, ServiceName = x.ServiceName, IsSelected = defaultIds.Contains(x.ServiceLineId) }).ToList();
-                StrokeDataVM.ServiceLineTeam1 = this._serviceLineRepo.Table.Where(x => serviceIds.ServiceLineTeam1.ToIntList().Distinct().Contains(x.ServiceLineId) && !x.IsDeleted).Select(x => new ServiceLineVM() { ServiceLineId = x.ServiceLineId, ServiceName = x.ServiceName, IsSelected = team1.Contains(x.ServiceLineId) }).ToList();
-                StrokeDataVM.ServiceLineTeam2 = this._serviceLineRepo.Table.Where(x => serviceIds.ServiceLineTeam2.ToIntList().Distinct().Contains(x.ServiceLineId) && !x.IsDeleted).Select(x => new ServiceLineVM() { ServiceLineId = x.ServiceLineId, ServiceName = x.ServiceName, IsSelected = team2.Contains(x.ServiceLineId) }).ToList();
 
-                //StrokeDataVM.DefaultServiceLineId = serviceIds.DefaultServiceLineId;
-                //StrokeDataVM.DefaultServiceLine = this._serviceLineRepo.Table.Where(x => x.ServiceLineId == serviceIds.DefaultServiceLineId && !x.IsDeleted).Select(x => new ServiceLineVM() { ServiceLineId = x.ServiceLineId, ServiceName = x.ServiceName }).FirstOrDefault();
-                //StrokeDataVM.SelectedServiceLineIds = string.Join(",", serviceLineIds);
+                if (serviceIds != null && serviceLineIds != null)
+                {
+                    var defaultIds = serviceIds.DefaultServiceLineTeam.ToIntList().Where(x => serviceLineIds.DefaultServiceLineIdFk.ToIntList().Contains(x)).Distinct().ToList();
+                    var team1 = serviceIds.ServiceLineTeam1.ToIntList().Where(x => serviceLineIds.ServiceLineId1Fk.ToIntList().Contains(x)).Distinct().ToList();
+                    var team2 = serviceIds.ServiceLineTeam2.ToIntList().Where(x => serviceLineIds.ServiceLineId2Fk.ToIntList().Contains(x)).Distinct().ToList();
+                    StrokeDataVM.DefaultServiceLineTeam = this._serviceLineRepo.Table.Where(x => serviceIds.DefaultServiceLineTeam.ToIntList().Distinct().Contains(x.ServiceLineId) && !x.IsDeleted).Select(x => new ServiceLineVM() { ServiceLineId = x.ServiceLineId, ServiceName = x.ServiceName, IsSelected = defaultIds.Contains(x.ServiceLineId) }).ToList();
+                    StrokeDataVM.ServiceLineTeam1 = this._serviceLineRepo.Table.Where(x => serviceIds.ServiceLineTeam1.ToIntList().Distinct().Contains(x.ServiceLineId) && !x.IsDeleted).Select(x => new ServiceLineVM() { ServiceLineId = x.ServiceLineId, ServiceName = x.ServiceName, IsSelected = team1.Contains(x.ServiceLineId) }).ToList();
+                    StrokeDataVM.ServiceLineTeam2 = this._serviceLineRepo.Table.Where(x => serviceIds.ServiceLineTeam2.ToIntList().Distinct().Contains(x.ServiceLineId) && !x.IsDeleted).Select(x => new ServiceLineVM() { ServiceLineId = x.ServiceLineId, ServiceName = x.ServiceName, IsSelected = team2.Contains(x.ServiceLineId) }).ToList();
+                }
+
                 if (StrokeDataVM.IsEms.HasValue && StrokeDataVM.IsEms.Value)
                     StrokeDataVM.OrganizationData = GetHosplitalAddressObject(StrokeDataVM.OrganizationIdFk);
 
@@ -1022,6 +1019,12 @@ namespace Web.Services.Concrete
                 }
 
                 this._codeStrokeRepo.Update(row);
+
+                if (codeStroke.DefaultServiceLineIds == null || codeStroke.DefaultServiceLineIds == "") 
+                {
+                    string IsEMS = row.IsEms.HasValue && row.IsEms.Value ? "EMS Code" : "Inhouse Code";
+                    codeStroke.DefaultServiceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeStroke.OrganizationIdFk && x.CodeIdFk == UCLEnums.Stroke.ToInt() && x.Type == IsEMS && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
+                }
 
                 if (codeStroke.DefaultServiceLineIds != null && codeStroke.DefaultServiceLineIds != "")
                 {
@@ -1699,23 +1702,14 @@ namespace Web.Services.Concrete
                                       where x.OrganizationIdFk == SepsisData.OrganizationIdFk && x.CodeIdFk == UCLEnums.Sepsis.ToInt()
                                       && x.ActiveCodeId == SepsisData.CodeSepsisId && x.ActiveCodeName == UCLEnums.Sepsis.ToString()
                                       select new { x.DefaultServiceLineIdFk, x.ServiceLineId1Fk, x.ServiceLineId2Fk }).FirstOrDefault();
-                var defaultIds = serviceIds.DefaultServiceLineTeam.ToIntList().Where(x => serviceLineIds.DefaultServiceLineIdFk.ToIntList().Contains(x)).Distinct().ToList();
-                var team1 = serviceIds.ServiceLineTeam1.ToIntList().Where(x => serviceLineIds.ServiceLineId1Fk.ToIntList().Contains(x)).Distinct().ToList();
-                var team2 = serviceIds.ServiceLineTeam2.ToIntList().Where(x => serviceLineIds.ServiceLineId2Fk.ToIntList().Contains(x)).Distinct().ToList();
-                SepsisDataVM.DefaultServiceLineTeam = this._serviceLineRepo.Table.Where(x => serviceIds.DefaultServiceLineTeam.ToIntList().Distinct().Contains(x.ServiceLineId) && !x.IsDeleted).Select(x => new ServiceLineVM() { ServiceLineId = x.ServiceLineId, ServiceName = x.ServiceName, IsSelected = defaultIds.Contains(x.ServiceLineId) }).ToList();
-                SepsisDataVM.ServiceLineTeam1 = this._serviceLineRepo.Table.Where(x => serviceIds.ServiceLineTeam1.ToIntList().Distinct().Contains(x.ServiceLineId) && !x.IsDeleted).Select(x => new ServiceLineVM() { ServiceLineId = x.ServiceLineId, ServiceName = x.ServiceName, IsSelected = team1.Contains(x.ServiceLineId) }).ToList();
-                SepsisDataVM.ServiceLineTeam2 = this._serviceLineRepo.Table.Where(x => serviceIds.ServiceLineTeam2.ToIntList().Distinct().Contains(x.ServiceLineId) && !x.IsDeleted).Select(x => new ServiceLineVM() { ServiceLineId = x.ServiceLineId, ServiceName = x.ServiceName, IsSelected = team2.Contains(x.ServiceLineId) }).ToList();
-
-
-                //var serviceLineIds = (from x in this._codesServiceLinesMappingRepo.Table
-                //                      where x.OrganizationIdFk == SepsisData.OrganizationIdFk && x.CodeIdFk == UCLEnums.Sepsis.ToInt()
-                //                      && x.ActiveCodeId == SepsisData.CodeSepsisId && x.ActiveCodeName == UCLEnums.Sepsis.ToString() && (serviceIds.DefaultServiceLineTeam.ToIntList().Contains(x.DefaultServiceLineIdFk)
-                //                      || serviceIds.ServiceLineTeam1.ToIntList().Contains(x.ServiceLineId1Fk != null ? x.ServiceLineId1Fk.Value : 0)
-                //                      || serviceIds.ServiceLineTeam2.ToIntList().Contains(x.ServiceLineId2Fk != null ? x.ServiceLineId2Fk.Value : 0))
-                //                      select new { x.DefaultServiceLineIdFk, x.ServiceLineId1Fk, x.ServiceLineId2Fk }).Distinct().ToList();
-                //SepsisDataVM.DefaultServiceLineTeam = this._serviceLineRepo.Table.Where(x => serviceIds.DefaultServiceLineTeam.ToIntList().Distinct().Contains(x.ServiceLineId) && !x.IsDeleted).Select(x => new ServiceLineVM() { ServiceLineId = x.ServiceLineId, ServiceName = x.ServiceName, IsSelected = serviceLineIds.Select(x => x.DefaultServiceLineIdFk).Contains(x.ServiceLineId) }).ToList();
-                //SepsisDataVM.ServiceLineTeam1 = this._serviceLineRepo.Table.Where(x => serviceIds.ServiceLineTeam1.ToIntList().Distinct().Contains(x.ServiceLineId) && !x.IsDeleted).Select(x => new ServiceLineVM() { ServiceLineId = x.ServiceLineId, ServiceName = x.ServiceName, IsSelected = serviceLineIds.Select(x => x.ServiceLineId1Fk).Contains(x.ServiceLineId) }).ToList();
-                //SepsisDataVM.ServiceLineTeam2 = this._serviceLineRepo.Table.Where(x => serviceIds.ServiceLineTeam2.ToIntList().Distinct().Contains(x.ServiceLineId) && !x.IsDeleted).Select(x => new ServiceLineVM() { ServiceLineId = x.ServiceLineId, ServiceName = x.ServiceName, IsSelected = serviceLineIds.Select(x => x.ServiceLineId2Fk).Contains(x.ServiceLineId) }).ToList();
+                if (serviceIds != null && serviceLineIds != null) {
+                    var defaultIds = serviceIds.DefaultServiceLineTeam.ToIntList().Where(x => serviceLineIds.DefaultServiceLineIdFk.ToIntList().Contains(x)).Distinct().ToList();
+                    var team1 = serviceIds.ServiceLineTeam1.ToIntList().Where(x => serviceLineIds.ServiceLineId1Fk.ToIntList().Contains(x)).Distinct().ToList();
+                    var team2 = serviceIds.ServiceLineTeam2.ToIntList().Where(x => serviceLineIds.ServiceLineId2Fk.ToIntList().Contains(x)).Distinct().ToList();
+                    SepsisDataVM.DefaultServiceLineTeam = this._serviceLineRepo.Table.Where(x => serviceIds.DefaultServiceLineTeam.ToIntList().Distinct().Contains(x.ServiceLineId) && !x.IsDeleted).Select(x => new ServiceLineVM() { ServiceLineId = x.ServiceLineId, ServiceName = x.ServiceName, IsSelected = defaultIds.Contains(x.ServiceLineId) }).ToList();
+                    SepsisDataVM.ServiceLineTeam1 = this._serviceLineRepo.Table.Where(x => serviceIds.ServiceLineTeam1.ToIntList().Distinct().Contains(x.ServiceLineId) && !x.IsDeleted).Select(x => new ServiceLineVM() { ServiceLineId = x.ServiceLineId, ServiceName = x.ServiceName, IsSelected = team1.Contains(x.ServiceLineId) }).ToList();
+                    SepsisDataVM.ServiceLineTeam2 = this._serviceLineRepo.Table.Where(x => serviceIds.ServiceLineTeam2.ToIntList().Distinct().Contains(x.ServiceLineId) && !x.IsDeleted).Select(x => new ServiceLineVM() { ServiceLineId = x.ServiceLineId, ServiceName = x.ServiceName, IsSelected = team2.Contains(x.ServiceLineId) }).ToList();
+                }
 
                 if (SepsisDataVM.IsEms)
                     SepsisDataVM.OrganizationData = GetHosplitalAddressObject(SepsisDataVM.OrganizationIdFk);
@@ -2053,6 +2047,12 @@ namespace Web.Services.Concrete
                 }
 
                 this._codeSepsisRepo.Update(row);
+
+                if (codeSepsis.DefaultServiceLineIds == null || codeSepsis.DefaultServiceLineIds == "")
+                {
+                    string IsEMS = row.IsEms ? "EMS Code" : "Inhouse Code";
+                    codeSepsis.DefaultServiceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeSepsis.OrganizationIdFk && x.CodeIdFk == UCLEnums.Sepsis.ToInt() && x.Type == IsEMS && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
+                }
 
                 if (codeSepsis.DefaultServiceLineIds != null && codeSepsis.DefaultServiceLineIds != "")
                 {
@@ -2729,23 +2729,16 @@ namespace Web.Services.Concrete
                                       where x.OrganizationIdFk == STEMIData.OrganizationIdFk && x.CodeIdFk == UCLEnums.STEMI.ToInt()
                                       && x.ActiveCodeId == STEMIData.CodeStemiid && x.ActiveCodeName == UCLEnums.STEMI.ToString()
                                       select new { x.DefaultServiceLineIdFk, x.ServiceLineId1Fk, x.ServiceLineId2Fk }).FirstOrDefault();
-                var defaultIds = serviceIds.DefaultServiceLineTeam.ToIntList().Where(x => serviceLineIds.DefaultServiceLineIdFk.ToIntList().Contains(x)).Distinct().ToList();
-                var team1 = serviceIds.ServiceLineTeam1.ToIntList().Where(x => serviceLineIds.ServiceLineId1Fk.ToIntList().Contains(x)).Distinct().ToList();
-                var team2 = serviceIds.ServiceLineTeam2.ToIntList().Where(x => serviceLineIds.ServiceLineId2Fk.ToIntList().Contains(x)).Distinct().ToList();
-                STEMIDataVM.DefaultServiceLineTeam = this._serviceLineRepo.Table.Where(x => serviceIds.DefaultServiceLineTeam.ToIntList().Distinct().Contains(x.ServiceLineId) && !x.IsDeleted).Select(x => new ServiceLineVM() { ServiceLineId = x.ServiceLineId, ServiceName = x.ServiceName, IsSelected = defaultIds.Contains(x.ServiceLineId) }).ToList();
-                STEMIDataVM.ServiceLineTeam1 = this._serviceLineRepo.Table.Where(x => serviceIds.ServiceLineTeam1.ToIntList().Distinct().Contains(x.ServiceLineId) && !x.IsDeleted).Select(x => new ServiceLineVM() { ServiceLineId = x.ServiceLineId, ServiceName = x.ServiceName, IsSelected = team1.Contains(x.ServiceLineId) }).ToList();
-                STEMIDataVM.ServiceLineTeam2 = this._serviceLineRepo.Table.Where(x => serviceIds.ServiceLineTeam2.ToIntList().Distinct().Contains(x.ServiceLineId) && !x.IsDeleted).Select(x => new ServiceLineVM() { ServiceLineId = x.ServiceLineId, ServiceName = x.ServiceName, IsSelected = team2.Contains(x.ServiceLineId) }).ToList();
 
-
-                //var serviceLineIds = (from x in this._codesServiceLinesMappingRepo.Table
-                //                      where x.OrganizationIdFk == STEMIData.OrganizationIdFk && x.CodeIdFk == UCLEnums.STEMI.ToInt()
-                //                      && x.ActiveCodeId == STEMIData.CodeStemiid && x.ActiveCodeName == UCLEnums.STEMI.ToString() && (serviceIds.DefaultServiceLineTeam.ToIntList().Contains(x.DefaultServiceLineIdFk)
-                //                      || serviceIds.ServiceLineTeam1.ToIntList().Contains(x.ServiceLineId1Fk != null ? x.ServiceLineId1Fk.Value : 0)
-                //                      || serviceIds.ServiceLineTeam2.ToIntList().Contains(x.ServiceLineId2Fk != null ? x.ServiceLineId2Fk.Value : 0))
-                //                      select new { x.DefaultServiceLineIdFk, x.ServiceLineId1Fk, x.ServiceLineId2Fk }).Distinct().ToList();
-                //STEMIDataVM.DefaultServiceLineTeam = this._serviceLineRepo.Table.Where(x => serviceIds.DefaultServiceLineTeam.ToIntList().Distinct().Contains(x.ServiceLineId) && !x.IsDeleted).Select(x => new ServiceLineVM() { ServiceLineId = x.ServiceLineId, ServiceName = x.ServiceName, IsSelected = serviceLineIds.Select(x => x.DefaultServiceLineIdFk).Contains(x.ServiceLineId) }).ToList();
-                //STEMIDataVM.ServiceLineTeam1 = this._serviceLineRepo.Table.Where(x => serviceIds.ServiceLineTeam1.ToIntList().Distinct().Contains(x.ServiceLineId) && !x.IsDeleted).Select(x => new ServiceLineVM() { ServiceLineId = x.ServiceLineId, ServiceName = x.ServiceName, IsSelected = serviceLineIds.Select(x => x.ServiceLineId1Fk).Contains(x.ServiceLineId) }).ToList();
-                //STEMIDataVM.ServiceLineTeam2 = this._serviceLineRepo.Table.Where(x => serviceIds.ServiceLineTeam2.ToIntList().Distinct().Contains(x.ServiceLineId) && !x.IsDeleted).Select(x => new ServiceLineVM() { ServiceLineId = x.ServiceLineId, ServiceName = x.ServiceName, IsSelected = serviceLineIds.Select(x => x.ServiceLineId2Fk).Contains(x.ServiceLineId) }).ToList();
+                if (serviceIds != null && serviceLineIds != null)
+                {
+                    var defaultIds = serviceIds.DefaultServiceLineTeam.ToIntList().Where(x => serviceLineIds.DefaultServiceLineIdFk.ToIntList().Contains(x)).Distinct().ToList();
+                    var team1 = serviceIds.ServiceLineTeam1.ToIntList().Where(x => serviceLineIds.ServiceLineId1Fk.ToIntList().Contains(x)).Distinct().ToList();
+                    var team2 = serviceIds.ServiceLineTeam2.ToIntList().Where(x => serviceLineIds.ServiceLineId2Fk.ToIntList().Contains(x)).Distinct().ToList();
+                    STEMIDataVM.DefaultServiceLineTeam = this._serviceLineRepo.Table.Where(x => serviceIds.DefaultServiceLineTeam.ToIntList().Distinct().Contains(x.ServiceLineId) && !x.IsDeleted).Select(x => new ServiceLineVM() { ServiceLineId = x.ServiceLineId, ServiceName = x.ServiceName, IsSelected = defaultIds.Contains(x.ServiceLineId) }).ToList();
+                    STEMIDataVM.ServiceLineTeam1 = this._serviceLineRepo.Table.Where(x => serviceIds.ServiceLineTeam1.ToIntList().Distinct().Contains(x.ServiceLineId) && !x.IsDeleted).Select(x => new ServiceLineVM() { ServiceLineId = x.ServiceLineId, ServiceName = x.ServiceName, IsSelected = team1.Contains(x.ServiceLineId) }).ToList();
+                    STEMIDataVM.ServiceLineTeam2 = this._serviceLineRepo.Table.Where(x => serviceIds.ServiceLineTeam2.ToIntList().Distinct().Contains(x.ServiceLineId) && !x.IsDeleted).Select(x => new ServiceLineVM() { ServiceLineId = x.ServiceLineId, ServiceName = x.ServiceName, IsSelected = team2.Contains(x.ServiceLineId) }).ToList();
+                }
 
                 STEMIDataVM.LastKnownWellStr = STEMIDataVM.LastKnownWell?.ToString("yyyy-MM-dd hh:mm:ss tt");
                 STEMIDataVM.DobStr = STEMIDataVM.Dob?.ToString("yyyy-MM-dd hh:mm:ss tt");
@@ -3084,6 +3077,11 @@ namespace Web.Services.Concrete
 
                 this._codeSTEMIRepo.Update(row);
 
+                if (codeSTEMI.DefaultServiceLineIds == null || codeSTEMI.DefaultServiceLineIds == "")
+                {
+                    string IsEMS = row.IsEms.HasValue && row.IsEms.Value ? "EMS Code" : "Inhouse Code";
+                    codeSTEMI.DefaultServiceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeSTEMI.OrganizationIdFk && x.CodeIdFk == UCLEnums.STEMI.ToInt() && x.Type == IsEMS && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
+                }
 
                 if (codeSTEMI.DefaultServiceLineIds != null && codeSTEMI.DefaultServiceLineIds != "")
                 {
@@ -3759,23 +3757,16 @@ namespace Web.Services.Concrete
                                       where x.OrganizationIdFk == TrumaData.OrganizationIdFk && x.CodeIdFk == UCLEnums.Trauma.ToInt()
                                       && x.ActiveCodeId == TrumaData.CodeTraumaId && x.ActiveCodeName == UCLEnums.Trauma.ToString()
                                       select new { x.DefaultServiceLineIdFk, x.ServiceLineId1Fk, x.ServiceLineId2Fk }).FirstOrDefault();
-                var defaultIds = serviceIds.DefaultServiceLineTeam.ToIntList().Where(x => serviceLineIds.DefaultServiceLineIdFk.ToIntList().Contains(x)).Distinct().ToList();
-                var team1 = serviceIds.ServiceLineTeam1.ToIntList().Where(x => serviceLineIds.ServiceLineId1Fk.ToIntList().Contains(x)).Distinct().ToList();
-                var team2 = serviceIds.ServiceLineTeam2.ToIntList().Where(x => serviceLineIds.ServiceLineId2Fk.ToIntList().Contains(x)).Distinct().ToList();
-                TrumaDataVM.DefaultServiceLineTeam = this._serviceLineRepo.Table.Where(x => serviceIds.DefaultServiceLineTeam.ToIntList().Distinct().Contains(x.ServiceLineId) && !x.IsDeleted).Select(x => new ServiceLineVM() { ServiceLineId = x.ServiceLineId, ServiceName = x.ServiceName, IsSelected = defaultIds.Contains(x.ServiceLineId) }).ToList();
-                TrumaDataVM.ServiceLineTeam1 = this._serviceLineRepo.Table.Where(x => serviceIds.ServiceLineTeam1.ToIntList().Distinct().Contains(x.ServiceLineId) && !x.IsDeleted).Select(x => new ServiceLineVM() { ServiceLineId = x.ServiceLineId, ServiceName = x.ServiceName, IsSelected = team1.Contains(x.ServiceLineId) }).ToList();
-                TrumaDataVM.ServiceLineTeam2 = this._serviceLineRepo.Table.Where(x => serviceIds.ServiceLineTeam2.ToIntList().Distinct().Contains(x.ServiceLineId) && !x.IsDeleted).Select(x => new ServiceLineVM() { ServiceLineId = x.ServiceLineId, ServiceName = x.ServiceName, IsSelected = team2.Contains(x.ServiceLineId) }).ToList();
 
-
-                //var serviceLineIds = (from x in this._codesServiceLinesMappingRepo.Table
-                //                      where x.OrganizationIdFk == TrumaData.OrganizationIdFk && x.CodeIdFk == UCLEnums.Trauma.ToInt()
-                //                      && x.ActiveCodeId == TrumaData.CodeTraumaId && x.ActiveCodeName == UCLEnums.Trauma.ToString() && (serviceIds.DefaultServiceLineTeam.ToIntList().Contains(x.DefaultServiceLineIdFk)
-                //                      || serviceIds.ServiceLineTeam1.ToIntList().Contains(x.ServiceLineId1Fk != null ? x.ServiceLineId1Fk.Value : 0)
-                //                      || serviceIds.ServiceLineTeam2.ToIntList().Contains(x.ServiceLineId2Fk != null ? x.ServiceLineId2Fk.Value : 0))
-                //                      select new { x.DefaultServiceLineIdFk, x.ServiceLineId1Fk, x.ServiceLineId2Fk }).Distinct().ToList();
-                //TrumaDataVM.DefaultServiceLineTeam = this._serviceLineRepo.Table.Where(x => serviceIds.DefaultServiceLineTeam.ToIntList().Distinct().Contains(x.ServiceLineId) && !x.IsDeleted).Select(x => new ServiceLineVM() { ServiceLineId = x.ServiceLineId, ServiceName = x.ServiceName, IsSelected = serviceLineIds.Select(x => x.DefaultServiceLineIdFk).Contains(x.ServiceLineId) }).ToList();
-                //TrumaDataVM.ServiceLineTeam1 = this._serviceLineRepo.Table.Where(x => serviceIds.ServiceLineTeam1.ToIntList().Distinct().Contains(x.ServiceLineId) && !x.IsDeleted).Select(x => new ServiceLineVM() { ServiceLineId = x.ServiceLineId, ServiceName = x.ServiceName, IsSelected = serviceLineIds.Select(x => x.ServiceLineId1Fk).Contains(x.ServiceLineId) }).ToList();
-                //TrumaDataVM.ServiceLineTeam2 = this._serviceLineRepo.Table.Where(x => serviceIds.ServiceLineTeam2.ToIntList().Distinct().Contains(x.ServiceLineId) && !x.IsDeleted).Select(x => new ServiceLineVM() { ServiceLineId = x.ServiceLineId, ServiceName = x.ServiceName, IsSelected = serviceLineIds.Select(x => x.ServiceLineId2Fk).Contains(x.ServiceLineId) }).ToList();
+                if (serviceIds != null && serviceLineIds != null) 
+                {
+                    var defaultIds = serviceIds.DefaultServiceLineTeam.ToIntList().Where(x => serviceLineIds.DefaultServiceLineIdFk.ToIntList().Contains(x)).Distinct().ToList();
+                    var team1 = serviceIds.ServiceLineTeam1.ToIntList().Where(x => serviceLineIds.ServiceLineId1Fk.ToIntList().Contains(x)).Distinct().ToList();
+                    var team2 = serviceIds.ServiceLineTeam2.ToIntList().Where(x => serviceLineIds.ServiceLineId2Fk.ToIntList().Contains(x)).Distinct().ToList();
+                    TrumaDataVM.DefaultServiceLineTeam = this._serviceLineRepo.Table.Where(x => serviceIds.DefaultServiceLineTeam.ToIntList().Distinct().Contains(x.ServiceLineId) && !x.IsDeleted).Select(x => new ServiceLineVM() { ServiceLineId = x.ServiceLineId, ServiceName = x.ServiceName, IsSelected = defaultIds.Contains(x.ServiceLineId) }).ToList();
+                    TrumaDataVM.ServiceLineTeam1 = this._serviceLineRepo.Table.Where(x => serviceIds.ServiceLineTeam1.ToIntList().Distinct().Contains(x.ServiceLineId) && !x.IsDeleted).Select(x => new ServiceLineVM() { ServiceLineId = x.ServiceLineId, ServiceName = x.ServiceName, IsSelected = team1.Contains(x.ServiceLineId) }).ToList();
+                    TrumaDataVM.ServiceLineTeam2 = this._serviceLineRepo.Table.Where(x => serviceIds.ServiceLineTeam2.ToIntList().Distinct().Contains(x.ServiceLineId) && !x.IsDeleted).Select(x => new ServiceLineVM() { ServiceLineId = x.ServiceLineId, ServiceName = x.ServiceName, IsSelected = team2.Contains(x.ServiceLineId) }).ToList();
+                }
 
                 if (TrumaDataVM.IsEms.HasValue && TrumaDataVM.IsEms.Value)
                     TrumaDataVM.OrganizationData = GetHosplitalAddressObject(TrumaDataVM.OrganizationIdFk);
@@ -4112,6 +4103,12 @@ namespace Web.Services.Concrete
                 }
 
                 this._codeTrumaRepo.Update(row);
+
+                if (codeTruma.DefaultServiceLineIds == null || codeTruma.DefaultServiceLineIds == "")
+                {
+                    string IsEMS = row.IsEms.HasValue && row.IsEms.Value ? "EMS Code" : "Inhouse Code";
+                    codeTruma.DefaultServiceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeTruma.OrganizationIdFk && x.CodeIdFk == UCLEnums.Trauma.ToInt() && x.Type == IsEMS && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
+                }
 
                 if (codeTruma.DefaultServiceLineIds != null && codeTruma.DefaultServiceLineIds != "")
                 {
@@ -4778,23 +4775,14 @@ namespace Web.Services.Concrete
                                       where x.OrganizationIdFk == blueData.OrganizationIdFk && x.CodeIdFk == UCLEnums.Blue.ToInt()
                                       && x.ActiveCodeId == blueData.CodeBlueId && x.ActiveCodeName == UCLEnums.Blue.ToString()
                                       select new { x.DefaultServiceLineIdFk, x.ServiceLineId1Fk, x.ServiceLineId2Fk }).FirstOrDefault();
-                var defaultIds = serviceIds.DefaultServiceLineTeam.ToIntList().Where(x => serviceLineIds.DefaultServiceLineIdFk.ToIntList().Contains(x)).Distinct().ToList();
-                var team1 = serviceIds.ServiceLineTeam1.ToIntList().Where(x => serviceLineIds.ServiceLineId1Fk.ToIntList().Contains(x)).Distinct().ToList();
-                var team2 = serviceIds.ServiceLineTeam2.ToIntList().Where(x => serviceLineIds.ServiceLineId2Fk.ToIntList().Contains(x)).Distinct().ToList();
-                BlueDataVM.DefaultServiceLineTeam = this._serviceLineRepo.Table.Where(x => serviceIds.DefaultServiceLineTeam.ToIntList().Distinct().Contains(x.ServiceLineId) && !x.IsDeleted).Select(x => new ServiceLineVM() { ServiceLineId = x.ServiceLineId, ServiceName = x.ServiceName, IsSelected = defaultIds.Contains(x.ServiceLineId) }).ToList();
-                BlueDataVM.ServiceLineTeam1 = this._serviceLineRepo.Table.Where(x => serviceIds.ServiceLineTeam1.ToIntList().Distinct().Contains(x.ServiceLineId) && !x.IsDeleted).Select(x => new ServiceLineVM() { ServiceLineId = x.ServiceLineId, ServiceName = x.ServiceName, IsSelected = team1.Contains(x.ServiceLineId) }).ToList();
-                BlueDataVM.ServiceLineTeam2 = this._serviceLineRepo.Table.Where(x => serviceIds.ServiceLineTeam2.ToIntList().Distinct().Contains(x.ServiceLineId) && !x.IsDeleted).Select(x => new ServiceLineVM() { ServiceLineId = x.ServiceLineId, ServiceName = x.ServiceName, IsSelected = team2.Contains(x.ServiceLineId) }).ToList();
-
-
-                //var serviceLineIds = (from x in this._codesServiceLinesMappingRepo.Table
-                //                      where x.OrganizationIdFk == blueData.OrganizationIdFk && x.CodeIdFk == UCLEnums.Blue.ToInt()
-                //                      && x.ActiveCodeId == blueData.CodeBlueId && x.ActiveCodeName == UCLEnums.Blue.ToString() && (serviceIds.DefaultServiceLineTeam.ToIntList().Contains(x.DefaultServiceLineIdFk)
-                //                      || serviceIds.ServiceLineTeam1.ToIntList().Contains(x.ServiceLineId1Fk != null ? x.ServiceLineId1Fk.Value : 0)
-                //                      || serviceIds.ServiceLineTeam2.ToIntList().Contains(x.ServiceLineId2Fk != null ? x.ServiceLineId2Fk.Value : 0))
-                //                      select new { x.DefaultServiceLineIdFk, x.ServiceLineId1Fk, x.ServiceLineId2Fk }).Distinct().ToList();
-                //BlueDataVM.DefaultServiceLineTeam = this._serviceLineRepo.Table.Where(x => serviceIds.DefaultServiceLineTeam.ToIntList().Distinct().Contains(x.ServiceLineId) && !x.IsDeleted).Select(x => new ServiceLineVM() { ServiceLineId = x.ServiceLineId, ServiceName = x.ServiceName, IsSelected = serviceLineIds.Select(x => x.DefaultServiceLineIdFk).Contains(x.ServiceLineId) }).ToList();
-                //BlueDataVM.ServiceLineTeam1 = this._serviceLineRepo.Table.Where(x => serviceIds.ServiceLineTeam1.ToIntList().Distinct().Contains(x.ServiceLineId) && !x.IsDeleted).Select(x => new ServiceLineVM() { ServiceLineId = x.ServiceLineId, ServiceName = x.ServiceName, IsSelected = serviceLineIds.Select(x => x.ServiceLineId1Fk).Contains(x.ServiceLineId) }).ToList();
-                //BlueDataVM.ServiceLineTeam2 = this._serviceLineRepo.Table.Where(x => serviceIds.ServiceLineTeam2.ToIntList().Distinct().Contains(x.ServiceLineId) && !x.IsDeleted).Select(x => new ServiceLineVM() { ServiceLineId = x.ServiceLineId, ServiceName = x.ServiceName, IsSelected = serviceLineIds.Select(x => x.ServiceLineId2Fk).Contains(x.ServiceLineId) }).ToList();
+                if (serviceIds != null && serviceLineIds != null) {
+                    var defaultIds = serviceIds.DefaultServiceLineTeam.ToIntList().Where(x => serviceLineIds.DefaultServiceLineIdFk.ToIntList().Contains(x)).Distinct().ToList();
+                    var team1 = serviceIds.ServiceLineTeam1.ToIntList().Where(x => serviceLineIds.ServiceLineId1Fk.ToIntList().Contains(x)).Distinct().ToList();
+                    var team2 = serviceIds.ServiceLineTeam2.ToIntList().Where(x => serviceLineIds.ServiceLineId2Fk.ToIntList().Contains(x)).Distinct().ToList();
+                    BlueDataVM.DefaultServiceLineTeam = this._serviceLineRepo.Table.Where(x => serviceIds.DefaultServiceLineTeam.ToIntList().Distinct().Contains(x.ServiceLineId) && !x.IsDeleted).Select(x => new ServiceLineVM() { ServiceLineId = x.ServiceLineId, ServiceName = x.ServiceName, IsSelected = defaultIds.Contains(x.ServiceLineId) }).ToList();
+                    BlueDataVM.ServiceLineTeam1 = this._serviceLineRepo.Table.Where(x => serviceIds.ServiceLineTeam1.ToIntList().Distinct().Contains(x.ServiceLineId) && !x.IsDeleted).Select(x => new ServiceLineVM() { ServiceLineId = x.ServiceLineId, ServiceName = x.ServiceName, IsSelected = team1.Contains(x.ServiceLineId) }).ToList();
+                    BlueDataVM.ServiceLineTeam2 = this._serviceLineRepo.Table.Where(x => serviceIds.ServiceLineTeam2.ToIntList().Distinct().Contains(x.ServiceLineId) && !x.IsDeleted).Select(x => new ServiceLineVM() { ServiceLineId = x.ServiceLineId, ServiceName = x.ServiceName, IsSelected = team2.Contains(x.ServiceLineId) }).ToList();
+                }
 
                 if (BlueDataVM.IsEms.HasValue && BlueDataVM.IsEms.Value)
                     BlueDataVM.OrganizationData = GetHosplitalAddressObject(BlueDataVM.OrganizationIdFk);
@@ -5126,6 +5114,13 @@ namespace Web.Services.Concrete
                 }
 
                 this._codeBlueRepo.Update(row);
+
+                if (codeBlue.DefaultServiceLineIds == null || codeBlue.DefaultServiceLineIds == "")
+                {
+                    string IsEMS = row.IsEms.HasValue && row.IsEms.Value ? "EMS Code" : "Inhouse Code";
+                    codeBlue.DefaultServiceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeBlue.OrganizationIdFk && x.CodeIdFk == UCLEnums.Blue.ToInt() && x.Type == IsEMS && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
+                }
+
                 if (codeBlue.DefaultServiceLineIds != null && codeBlue.DefaultServiceLineIds != "")
                 {
                     var DefaultServiceLineIds = codeBlue.DefaultServiceLineIds.ToIntList();
