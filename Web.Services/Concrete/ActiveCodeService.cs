@@ -625,7 +625,7 @@ namespace Web.Services.Concrete
 
         public BaseResponse GetStrokeDataById(int strokeId)
         {
-            var strokeData = this._codeStrokeRepo.Table.Where(x => x.CodeStrokeId == strokeId && !x.IsDeleted).FirstOrDefault();
+            var strokeData = this._codeStrokeRepo.Table.Where(x => x.CodeStrokeId == strokeId).FirstOrDefault();
             if (strokeData != null)
             {
                 var StrokeDataVM = AutoMapperHelper.MapSingleRow<CodeStroke, CodeStrokeVM>(strokeData);
@@ -1110,6 +1110,24 @@ namespace Web.Services.Concrete
 
                     _communication.pushNotification(notification);
 
+                }
+                else {
+
+                    var userIds = this._StrokeCodeGroupMembersRepo.Table.Where(x => x.StrokeCodeIdFk == row.CodeStrokeId).Select(x => x.UserIdFk).ToList();
+                    var userUniqueIds = this._userRepo.Table.Where(x => userIds.Contains(x.UserId)).Select(x => x.UserUniqueId).Distinct().ToList();
+
+                    var notification = new PushNotificationVM()
+                    {
+                        Id = row.CodeStrokeId,
+                        OrgId = row.OrganizationIdFk,
+                        UserChannelSid = userUniqueIds,
+                        From = AuthorEnums.Stroke.ToString(),
+                        Msg = (codeStroke.IsEms.HasValue && codeStroke.IsEms.Value ? "EMS" : "Inhouse") + " Code Stroke From is Changed",
+                        RouteLink1 = "/Home/Inhouse%20Codes/code-strok-form",
+                        RouteLink2 = "/Home/EMS/activateCode",
+                    };
+
+                    _communication.pushNotification(notification);
                 }
 
                 return GetStrokeDataById(row.CodeStrokeId);
@@ -1662,7 +1680,7 @@ namespace Web.Services.Concrete
 
         public BaseResponse GetSepsisDataById(int SepsisId)
         {
-            var SepsisData = this._codeSepsisRepo.Table.Where(x => x.CodeSepsisId == SepsisId && !x.IsDeleted).FirstOrDefault();
+            var SepsisData = this._codeSepsisRepo.Table.Where(x => x.CodeSepsisId == SepsisId).FirstOrDefault();
             if (SepsisData != null)
             {
                 var SepsisDataVM = AutoMapperHelper.MapSingleRow<CodeSepsi, CodeSepsisVM>(SepsisData);
@@ -2149,7 +2167,23 @@ namespace Web.Services.Concrete
                     _communication.pushNotification(notification);
 
                 }
+                else {
+                    var userIds = this._SepsisCodeGroupMembersRepo.Table.Where(x => x.SepsisCodeIdFk == row.CodeSepsisId).Select(x => x.UserIdFk).ToList();
+                    var userUniqueIds = this._userRepo.Table.Where(x => userIds.Contains(x.UserId)).Select(x => x.UserUniqueId).Distinct().ToList();
 
+                    var notification = new PushNotificationVM()
+                    {
+                        Id = row.CodeSepsisId,
+                        OrgId = row.OrganizationIdFk,
+                        UserChannelSid = userUniqueIds,
+                        From = AuthorEnums.Sepsis.ToString(),
+                        Msg = (codeSepsis.IsEms ? "EMS" : "Inhouse") + " Code Sepsis From is Changed",
+                        RouteLink1 = "/Home/Inhouse%20Codes/code-sepsis-form",
+                        RouteLink2 = "/Home/EMS/activateCode"
+                    };
+
+                    _communication.pushNotification(notification);
+                }
                 return GetSepsisDataById(row.CodeSepsisId);
             }
             else
@@ -2698,7 +2732,7 @@ namespace Web.Services.Concrete
 
         public BaseResponse GetSTEMIDataById(int STEMIId)
         {
-            var STEMIData = this._codeSTEMIRepo.Table.Where(x => x.CodeStemiid == STEMIId && !x.IsDeleted).FirstOrDefault();
+            var STEMIData = this._codeSTEMIRepo.Table.Where(x => x.CodeStemiid == STEMIId).FirstOrDefault();
             if (STEMIData != null)
             {
                 var STEMIDataVM = AutoMapperHelper.MapSingleRow<CodeStemi, CodeSTEMIVM>(STEMIData);
@@ -3187,7 +3221,23 @@ namespace Web.Services.Concrete
                     _communication.pushNotification(notification);
 
                 }
+                else {
+                    var userIds = this._STEMICodeGroupMembersRepo.Table.Where(x => x.StemicodeIdFk == row.CodeStemiid).Select(x => x.UserIdFk).ToList();
+                    var userUniqueIds = this._userRepo.Table.Where(x => userIds.Contains(x.UserId)).Select(x => x.UserUniqueId).Distinct().ToList();
 
+                    var notification = new PushNotificationVM()
+                    {
+                        Id = row.CodeStemiid,
+                        OrgId = row.OrganizationIdFk,
+                        UserChannelSid = userUniqueIds,
+                        From = AuthorEnums.STEMI.ToString(),
+                        Msg = (codeSTEMI.IsEms.HasValue && codeSTEMI.IsEms.Value ? "EMS" : "Inhouse") + " Code STEMI From is Changed",
+                        RouteLink1 = "/Home/Inhouse%20Codes/code-STEMI-form",
+                        RouteLink2 = "/Home/EMS/activateCode"
+                    };
+
+                    _communication.pushNotification(notification);
+                }
                 return GetSTEMIDataById(row.CodeStemiid);
             }
             else
@@ -3736,7 +3786,7 @@ namespace Web.Services.Concrete
 
         public BaseResponse GetTrumaDataById(int TrumaId)
         {
-            var TrumaData = this._codeTrumaRepo.Table.Where(x => x.CodeTraumaId == TrumaId && !x.IsDeleted).FirstOrDefault();
+            var TrumaData = this._codeTrumaRepo.Table.Where(x => x.CodeTraumaId == TrumaId).FirstOrDefault();
             if (TrumaData != null)
             {
                 var TrumaDataVM = AutoMapperHelper.MapSingleRow<CodeTrauma, CodeTrumaVM>(TrumaData);
@@ -4223,7 +4273,26 @@ namespace Web.Services.Concrete
                     _communication.pushNotification(notification);
 
                 }
+                else {
 
+                    var userIds = this._TraumaCodeGroupMembersRepo.Table.Where(x => x.TraumaCodeIdFk == row.CodeTraumaId).Select(x => x.UserIdFk).ToList();
+                    var userUniqueIds = this._userRepo.Table.Where(x => userIds.Contains(x.UserId)).Select(x => x.UserUniqueId).Distinct().ToList();
+
+
+                    var notification = new PushNotificationVM()
+                    {
+                        Id = row.CodeTraumaId,
+                        OrgId = row.OrganizationIdFk,
+                        UserChannelSid = userUniqueIds,
+                        From = AuthorEnums.Trauma.ToString(),
+                        Msg = (codeTruma.IsEms.HasValue && codeTruma.IsEms.Value ? "EMS" : "Inhouse") + " Code Trauma From is Changed",
+                        RouteLink1 = "/Home/Inhouse%20Codes/code-trauma-form",
+                        RouteLink2 = "/Home/EMS/activateCode"
+                    };
+
+                    _communication.pushNotification(notification);
+
+                }
                 return GetTrumaDataById(row.CodeTraumaId);
             }
             else
@@ -4764,7 +4833,7 @@ namespace Web.Services.Concrete
 
         public BaseResponse GetBlueDataById(int blueId)
         {
-            var blueData = this._codeBlueRepo.Table.Where(x => x.CodeBlueId == blueId && !x.IsDeleted).FirstOrDefault();
+            var blueData = this._codeBlueRepo.Table.Where(x => x.CodeBlueId == blueId).FirstOrDefault();
             if (blueData != null)
             {
                 var BlueDataVM = AutoMapperHelper.MapSingleRow<CodeBlue, CodeBlueVM>(blueData);
@@ -5244,7 +5313,24 @@ namespace Web.Services.Concrete
                     _communication.pushNotification(notification);
 
                 }
+                else {
+                    var userIds = this._BlueCodeGroupMembersRepo.Table.Where(x => x.BlueCodeIdFk == row.CodeBlueId).Select(x => x.UserIdFk).ToList();
+                    var userUniqueIds = this._userRepo.Table.Where(x => userIds.Contains(x.UserId)).Select(x => x.UserUniqueId).Distinct().ToList();
 
+                    var notification = new PushNotificationVM()
+                    {
+                        Id = row.CodeBlueId,
+                        OrgId = row.OrganizationIdFk,
+                        UserChannelSid = userUniqueIds,
+                        From = AuthorEnums.Blue.ToString(),
+                        Msg = (codeBlue.IsEms.HasValue && codeBlue.IsEms.Value ? "EMS" : "Inhouse") + " Code Blue From is Changed",
+                        RouteLink1 = "/Home/Activate%20Code/code-blue-form",
+                        RouteLink2 = "/Home/EMS/activateCode"
+                    };
+
+                    _communication.pushNotification(notification);
+
+                }
                 return GetBlueDataById(row.CodeBlueId);
             }
             else
