@@ -419,17 +419,17 @@ namespace Web.Services.Concrete
                     var dbChannel = this._conversationChannelsRepo.Table.FirstOrDefault(c => c.ChannelSid == ch.Sid && c.IsDeleted != true);
                     if (dbChannel != null)
                     {
-                        dbChannel.IsDeleted = true;
-                        this._conversationChannelsRepo.Update(dbChannel);
+                        //dbChannel.IsDeleted = true;
                         var channelParticipants = this._conversationParticipantsRepo.Table.Where(p => p.ConversationChannelIdFk == dbChannel.ConversationChannelId);
-                        foreach (var p in channelParticipants)
-                        {
-                            p.IsDeleted = true;
-                        }
-                        this._conversationParticipantsRepo.Update(channelParticipants);
+                        //foreach (var p in channelParticipants)
+                        //{
+                        //    p.IsDeleted = true;
+                        //}
+                        this._conversationParticipantsRepo.DeleteRange(channelParticipants);
+                        this._conversationChannelsRepo.Delete(dbChannel);
                     }
                 }
-                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Channels Found" };
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Channels deleted" };
             }
             else
             {
@@ -447,7 +447,7 @@ namespace Web.Services.Concrete
                 dbChannel.ModifiedBy = UserId;
                 dbChannel.ModifiedDate = DateTime.UtcNow;
 
-                this._conversationChannelsRepo.Update(dbChannel);
+                //this._conversationChannelsRepo.Update(dbChannel);
                 var channelParticipants = this._conversationParticipantsRepo.Table.Where(p => p.ConversationChannelIdFk == dbChannel.ConversationChannelId && p.IsDeleted != true);
                 foreach (var p in channelParticipants)
                 {
@@ -455,7 +455,9 @@ namespace Web.Services.Concrete
                     p.ModifiedBy = UserId;
                     p.ModifiedDate = DateTime.UtcNow;
                 }
-                this._conversationParticipantsRepo.Update(channelParticipants);
+                //this._conversationParticipantsRepo.Update(channelParticipants);
+                this._conversationParticipantsRepo.DeleteRange(channelParticipants);
+                this._conversationChannelsRepo.Delete(dbChannel);
             }
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Conversation Deleted" };
         }
