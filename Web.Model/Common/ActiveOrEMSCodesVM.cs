@@ -38,6 +38,7 @@ namespace Web.Model.Common
         public TimeSpan? ActualTime { get; set; }
         public string Distance { get; set; }
         public string StartingPoint { get; set; }
+        public bool Status { get; set; }
         public List<FilesVM> Audios { get; set; }
         public List<FilesVM> Videos { get; set; }
         public List<FilesVM> Attachment { get; set; }
