@@ -652,7 +652,7 @@ namespace Web.Services.Concrete
 
         public BaseResponse DeleteConsult(int consultId, bool status)
         {
-            var sql = "EXEC md_DeleteConsultAndGroup @userId, @consultId";
+            var sql = "EXEC md_DeleteConsultAndGroup @status, @userId, @consultId";
             var parameters = new List<SqlParameter>() { new SqlParameter { ParameterName = "@status", Value = status },
                                                         new SqlParameter { ParameterName = "@userId", Value = ApplicationSettings.UserId },
                                                         new SqlParameter { ParameterName = "@consultId", Value = consultId } 
