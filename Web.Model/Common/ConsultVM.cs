@@ -9,7 +9,7 @@
         public int OrganizationId { get; set; }
 
         public int UserId { get; set; }
-
+        public bool Status { get; set; }
         public int PageNumber { get; set; }
         public int Rows { get; set; }
         public string Filter { get; set; }

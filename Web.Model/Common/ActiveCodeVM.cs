@@ -25,6 +25,7 @@ namespace Web.Model.Common
         public bool IsEMS { get; set; }
         public bool showAllActiveCodes { get; set; }
         public bool fromDashboard { get; set; }
+        public bool Status { get; set; }
 
         public List<ServiceLineVM> DefaultServiceLineTeamList { get; set; }
         public List<ServiceLineVM> ServiceLineTeam1List { get; set; }

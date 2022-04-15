@@ -508,6 +508,7 @@ namespace Web.Services.Concrete
         public BaseResponse GetAllStrokeCode(ActiveCodeVM activeCode)
         {
             var objList = this._dbContext.LoadStoredProcedure("md_getAllActiveCodesOrEMS_Dynamic")
+                            .WithSqlParam("@status", activeCode.Status)
                             .WithSqlParam("@codeName", UCLEnums.Stroke.ToString())
                             .WithSqlParam("@IsSuperAdmin", ApplicationSettings.isSuperAdmin)
                             .WithSqlParam("@showAll", activeCode.showAllActiveCodes)
@@ -1020,7 +1021,7 @@ namespace Web.Services.Concrete
 
                 this._codeStrokeRepo.Update(row);
 
-                if (codeStroke.DefaultServiceLineIds == null || codeStroke.DefaultServiceLineIds == "") 
+                if (codeStroke.DefaultServiceLineIds == null || codeStroke.DefaultServiceLineIds == "")
                 {
                     string IsEMS = row.IsEms.HasValue && row.IsEms.Value ? "EMS Code" : "Inhouse Code";
                     codeStroke.DefaultServiceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeStroke.OrganizationIdFk && x.CodeIdFk == UCLEnums.Stroke.ToInt() && x.Type == IsEMS && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
@@ -1536,11 +1537,12 @@ namespace Web.Services.Concrete
         {
 
             var objList = this._dbContext.LoadStoredProcedure("md_getAllActiveCodesOrEMS_Dynamic")
-                           .WithSqlParam("@codeName", UCLEnums.Sepsis.ToString())
-                           .WithSqlParam("@IsSuperAdmin", ApplicationSettings.isSuperAdmin)
-                           .WithSqlParam("@showAll", activeCode.showAllActiveCodes)
-                           .WithSqlParam("@userId", ApplicationSettings.UserId)
-                           .WithSqlParam("@organizationId", activeCode.OrganizationIdFk)
+                            .WithSqlParam("@status", activeCode.Status)
+                            .WithSqlParam("@codeName", UCLEnums.Sepsis.ToString())
+                            .WithSqlParam("@IsSuperAdmin", ApplicationSettings.isSuperAdmin)
+                            .WithSqlParam("@showAll", activeCode.showAllActiveCodes)
+                            .WithSqlParam("@userId", ApplicationSettings.UserId)
+                            .WithSqlParam("@organizationId", activeCode.OrganizationIdFk)
                             .WithSqlParam("@page", activeCode.PageNumber)
                             .WithSqlParam("@size", activeCode.Rows)
                             .WithSqlParam("@sortOrder", activeCode.SortOrder)
@@ -1702,7 +1704,8 @@ namespace Web.Services.Concrete
                                       where x.OrganizationIdFk == SepsisData.OrganizationIdFk && x.CodeIdFk == UCLEnums.Sepsis.ToInt()
                                       && x.ActiveCodeId == SepsisData.CodeSepsisId && x.ActiveCodeName == UCLEnums.Sepsis.ToString()
                                       select new { x.DefaultServiceLineIdFk, x.ServiceLineId1Fk, x.ServiceLineId2Fk }).FirstOrDefault();
-                if (serviceIds != null && serviceLineIds != null) {
+                if (serviceIds != null && serviceLineIds != null)
+                {
                     var defaultIds = serviceIds.DefaultServiceLineTeam.ToIntList().Where(x => serviceLineIds.DefaultServiceLineIdFk.ToIntList().Contains(x)).Distinct().ToList();
                     var team1 = serviceIds.ServiceLineTeam1.ToIntList().Where(x => serviceLineIds.ServiceLineId1Fk.ToIntList().Contains(x)).Distinct().ToList();
                     var team2 = serviceIds.ServiceLineTeam2.ToIntList().Where(x => serviceLineIds.ServiceLineId2Fk.ToIntList().Contains(x)).Distinct().ToList();
@@ -2560,11 +2563,12 @@ namespace Web.Services.Concrete
         public BaseResponse GetAllSTEMICode(ActiveCodeVM activeCode)
         {
             var objList = this._dbContext.LoadStoredProcedure("md_getAllActiveCodesOrEMS_Dynamic")
-                                       .WithSqlParam("@codeName", UCLEnums.STEMI.ToString())
-                                       .WithSqlParam("@IsSuperAdmin", ApplicationSettings.isSuperAdmin)
-                                       .WithSqlParam("@showAll", activeCode.showAllActiveCodes)
-                                       .WithSqlParam("@userId", ApplicationSettings.UserId)
-                                       .WithSqlParam("@organizationId", activeCode.OrganizationIdFk)
+                                        .WithSqlParam("@status", activeCode.Status)
+                                        .WithSqlParam("@codeName", UCLEnums.STEMI.ToString())
+                                        .WithSqlParam("@IsSuperAdmin", ApplicationSettings.isSuperAdmin)
+                                        .WithSqlParam("@showAll", activeCode.showAllActiveCodes)
+                                        .WithSqlParam("@userId", ApplicationSettings.UserId)
+                                        .WithSqlParam("@organizationId", activeCode.OrganizationIdFk)
                                         .WithSqlParam("@page", activeCode.PageNumber)
                                         .WithSqlParam("@size", activeCode.Rows)
                                         .WithSqlParam("@sortOrder", activeCode.SortOrder)
@@ -3589,11 +3593,12 @@ namespace Web.Services.Concrete
         public BaseResponse GetAllTrumaCode(ActiveCodeVM activeCode)
         {
             var objList = this._dbContext.LoadStoredProcedure("md_getAllActiveCodesOrEMS_Dynamic")
-                           .WithSqlParam("@codeName", UCLEnums.Trauma.ToString())
-                           .WithSqlParam("@IsSuperAdmin", ApplicationSettings.isSuperAdmin)
-                           .WithSqlParam("@showAll", activeCode.showAllActiveCodes)
-                           .WithSqlParam("@userId", ApplicationSettings.UserId)
-                           .WithSqlParam("@organizationId", activeCode.OrganizationIdFk)
+                            .WithSqlParam("@status", activeCode.Status)
+                            .WithSqlParam("@codeName", UCLEnums.Trauma.ToString())
+                            .WithSqlParam("@IsSuperAdmin", ApplicationSettings.isSuperAdmin)
+                            .WithSqlParam("@showAll", activeCode.showAllActiveCodes)
+                            .WithSqlParam("@userId", ApplicationSettings.UserId)
+                            .WithSqlParam("@organizationId", activeCode.OrganizationIdFk)
                             .WithSqlParam("@page", activeCode.PageNumber)
                             .WithSqlParam("@size", activeCode.Rows)
                             .WithSqlParam("@sortOrder", activeCode.SortOrder)
@@ -3758,7 +3763,7 @@ namespace Web.Services.Concrete
                                       && x.ActiveCodeId == TrumaData.CodeTraumaId && x.ActiveCodeName == UCLEnums.Trauma.ToString()
                                       select new { x.DefaultServiceLineIdFk, x.ServiceLineId1Fk, x.ServiceLineId2Fk }).FirstOrDefault();
 
-                if (serviceIds != null && serviceLineIds != null) 
+                if (serviceIds != null && serviceLineIds != null)
                 {
                     var defaultIds = serviceIds.DefaultServiceLineTeam.ToIntList().Where(x => serviceLineIds.DefaultServiceLineIdFk.ToIntList().Contains(x)).Distinct().ToList();
                     var team1 = serviceIds.ServiceLineTeam1.ToIntList().Where(x => serviceLineIds.ServiceLineId1Fk.ToIntList().Contains(x)).Distinct().ToList();
@@ -4610,11 +4615,12 @@ namespace Web.Services.Concrete
         public BaseResponse GetAllBlueCode(ActiveCodeVM activeCode)
         {
             var objList = this._dbContext.LoadStoredProcedure("md_getAllActiveCodesOrEMS_Dynamic")
-                           .WithSqlParam("@codeName", UCLEnums.Blue.ToString())
-                           .WithSqlParam("@IsSuperAdmin", ApplicationSettings.isSuperAdmin)
-                           .WithSqlParam("@showAll", activeCode.showAllActiveCodes)
-                           .WithSqlParam("@userId", ApplicationSettings.UserId)
-                           .WithSqlParam("@organizationId", activeCode.OrganizationIdFk)
+                            .WithSqlParam("@status", activeCode.Status)
+                            .WithSqlParam("@codeName", UCLEnums.Blue.ToString())
+                            .WithSqlParam("@IsSuperAdmin", ApplicationSettings.isSuperAdmin)
+                            .WithSqlParam("@showAll", activeCode.showAllActiveCodes)
+                            .WithSqlParam("@userId", ApplicationSettings.UserId)
+                            .WithSqlParam("@organizationId", activeCode.OrganizationIdFk)
                             .WithSqlParam("@page", activeCode.PageNumber)
                             .WithSqlParam("@size", activeCode.Rows)
                             .WithSqlParam("@sortOrder", activeCode.SortOrder)
@@ -4775,7 +4781,8 @@ namespace Web.Services.Concrete
                                       where x.OrganizationIdFk == blueData.OrganizationIdFk && x.CodeIdFk == UCLEnums.Blue.ToInt()
                                       && x.ActiveCodeId == blueData.CodeBlueId && x.ActiveCodeName == UCLEnums.Blue.ToString()
                                       select new { x.DefaultServiceLineIdFk, x.ServiceLineId1Fk, x.ServiceLineId2Fk }).FirstOrDefault();
-                if (serviceIds != null && serviceLineIds != null) {
+                if (serviceIds != null && serviceLineIds != null)
+                {
                     var defaultIds = serviceIds.DefaultServiceLineTeam.ToIntList().Where(x => serviceLineIds.DefaultServiceLineIdFk.ToIntList().Contains(x)).Distinct().ToList();
                     var team1 = serviceIds.ServiceLineTeam1.ToIntList().Where(x => serviceLineIds.ServiceLineId1Fk.ToIntList().Contains(x)).Distinct().ToList();
                     var team2 = serviceIds.ServiceLineTeam2.ToIntList().Where(x => serviceLineIds.ServiceLineId2Fk.ToIntList().Contains(x)).Distinct().ToList();
