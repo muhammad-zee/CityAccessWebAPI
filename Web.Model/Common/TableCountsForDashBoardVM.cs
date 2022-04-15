@@ -6,6 +6,7 @@
         public int Orgnaizations { get; set; }
         public int Departments { get; set; }
         public int Services { get; set; }
+        public int Roles { get; set; }
 
     }
 }
