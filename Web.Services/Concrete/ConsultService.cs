@@ -650,10 +650,11 @@ namespace Web.Services.Concrete
             return new BaseResponse() { Status = HttpStatusCode.NotModified, Message = "Consult Id Column is not exist" };
         }
 
-        public BaseResponse DeleteConsult(int consultId)
+        public BaseResponse DeleteConsult(int consultId, bool status)
         {
             var sql = "EXEC md_DeleteConsultAndGroup @userId, @consultId";
-            var parameters = new List<SqlParameter>() { new SqlParameter { ParameterName = "@userId", Value = ApplicationSettings.UserId },
+            var parameters = new List<SqlParameter>() { new SqlParameter { ParameterName = "@status", Value = status },
+                                                        new SqlParameter { ParameterName = "@userId", Value = ApplicationSettings.UserId },
                                                         new SqlParameter { ParameterName = "@consultId", Value = consultId } 
                                                       };
 

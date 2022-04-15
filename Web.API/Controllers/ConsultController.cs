@@ -218,12 +218,12 @@ namespace Web.API.Controllers
         }
 
         [Description("Delete Consult")]
-        [HttpGet("consult/DeleteConsult/{consultId}")]
-        public BaseResponse DeleteConsult(int consultId)
+        [HttpGet("consult/DeleteConsult/{consultId}/{status}")]
+        public BaseResponse DeleteConsult(int consultId, bool status)
         {
             try
             {
-                return _consultService.DeleteConsult(consultId);
+                return _consultService.DeleteConsult(consultId, status);
             }
             catch (Exception ex)
             {

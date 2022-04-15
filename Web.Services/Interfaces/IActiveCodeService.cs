@@ -22,7 +22,7 @@ namespace Web.Services.Interfaces
         BaseResponse GetAllStrokeCode(ActiveCodeVM activeCode);
         BaseResponse GetStrokeDataById(int strokeId);
         BaseResponse AddOrUpdateStrokeData(CodeStrokeVM codeStroke);
-        BaseResponse DeleteStroke(int strokeId);
+        BaseResponse DeleteStroke(int strokeId, bool status);
         #endregion
 
 
@@ -30,21 +30,21 @@ namespace Web.Services.Interfaces
         BaseResponse GetAllSepsisCode(ActiveCodeVM activeCode);
         BaseResponse GetSepsisDataById(int SepsisId);
         BaseResponse AddOrUpdateSepsisData(CodeSepsisVM codeSepsis);
-        BaseResponse DeleteSepsis(int SepsisId);
+        BaseResponse DeleteSepsis(int SepsisId, bool status);
         #endregion
 
         #region Code STEMI
         BaseResponse GetAllSTEMICode(ActiveCodeVM activeCode);
         BaseResponse GetSTEMIDataById(int STEMIId);
         BaseResponse AddOrUpdateSTEMIData(CodeSTEMIVM codeSTEMI);
-        BaseResponse DeleteSTEMI(int STEMIId);
+        BaseResponse DeleteSTEMI(int STEMIId, bool status);
         #endregion
 
         #region Code Truma
         BaseResponse GetAllTrumaCode(ActiveCodeVM activeCode);
         BaseResponse GetTrumaDataById(int TrumaId);
         BaseResponse AddOrUpdateTrumaData(CodeTrumaVM codeTruma);
-        BaseResponse DeleteTruma(int TrumaId);
+        BaseResponse DeleteTruma(int TrumaId, bool status);
         #endregion
 
         #region Code Blue
@@ -52,7 +52,7 @@ namespace Web.Services.Interfaces
         BaseResponse GetAllBlueCode(ActiveCodeVM activeCode);
         BaseResponse GetBlueDataById(int blueId);
         BaseResponse AddOrUpdateBlueData(CodeBlueVM codeBlue);
-        BaseResponse DeleteBlue(int blueId);
+        BaseResponse DeleteBlue(int blueId, bool status);
 
 
         #endregion

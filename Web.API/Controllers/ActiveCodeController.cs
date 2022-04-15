@@ -184,12 +184,12 @@ namespace Web.API.Controllers
 
 
         [Description("Delete Stroke Data By Id")]
-        [HttpGet("stroke/DeleteStrokeDataById/{strokeId}")]
-        public BaseResponse DeleteStrokeDataById(int strokeId)
+        [HttpGet("stroke/DeleteStrokeDataById/{strokeId}/{status}")]
+        public BaseResponse DeleteStrokeDataById(int strokeId, bool status)
         {
             try
             {
-                return _activeCodesService.DeleteStroke(strokeId);
+                return _activeCodesService.DeleteStroke(strokeId, status);
             }
             catch (Exception ex)
             {
@@ -256,12 +256,12 @@ namespace Web.API.Controllers
 
 
         [Description("Delete Sepsis Data By Id")]
-        [HttpGet("Sepsis/DeleteSepsisDataById/{SepsisId}")]
-        public BaseResponse DeleteSepsisDataById(int SepsisId)
+        [HttpGet("Sepsis/DeleteSepsisDataById/{SepsisId}/{status}")]
+        public BaseResponse DeleteSepsisDataById(int SepsisId, bool status)
         {
             try
             {
-                return _activeCodesService.DeleteSepsis(SepsisId);
+                return _activeCodesService.DeleteSepsis(SepsisId, status);
             }
             catch (Exception ex)
             {
@@ -327,12 +327,12 @@ namespace Web.API.Controllers
 
 
         [Description("Delete STEMI Data By Id")]
-        [HttpGet("STEMI/DeleteSTEMIDataById/{STEMIId}")]
-        public BaseResponse DeleteSTEMIDataById(int STEMIId)
+        [HttpGet("STEMI/DeleteSTEMIDataById/{STEMIId}/{status}")]
+        public BaseResponse DeleteSTEMIDataById(int STEMIId, bool status)
         {
             try
             {
-                return _activeCodesService.DeleteSTEMI(STEMIId);
+                return _activeCodesService.DeleteSTEMI(STEMIId, status);
             }
             catch (Exception ex)
             {
@@ -397,12 +397,12 @@ namespace Web.API.Controllers
 
 
         [Description("Delete Truma Data By Id")]
-        [HttpGet("Truma/DeleteTrumaDataById/{TrumaId}")]
-        public BaseResponse DeleteTrumaDataById(int TrumaId)
+        [HttpGet("Truma/DeleteTrumaDataById/{TrumaId}/{status}")]
+        public BaseResponse DeleteTrumaDataById(int TrumaId, bool status)
         {
             try
             {
-                return _activeCodesService.DeleteTruma(TrumaId);
+                return _activeCodesService.DeleteTruma(TrumaId, status);
             }
             catch (Exception ex)
             {
@@ -468,12 +468,12 @@ namespace Web.API.Controllers
 
 
         [Description("Delete Blue Data By Id")]
-        [HttpGet("blue/DeleteBlueDataById/{blueId}")]
-        public BaseResponse DeleteBlueDataById(int blueId)
+        [HttpGet("blue/DeleteBlueDataById/{blueId}/{status}")]
+        public BaseResponse DeleteBlueDataById(int blueId, bool status)
         {
             try
             {
-                return _activeCodesService.DeleteBlue(blueId);
+                return _activeCodesService.DeleteBlue(blueId, status);
             }
             catch (Exception ex)
             {

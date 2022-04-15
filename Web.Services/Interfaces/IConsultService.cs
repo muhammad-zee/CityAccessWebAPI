@@ -24,7 +24,7 @@ namespace Web.Services.Interfaces
         BaseResponse GetConsultById(int Id);
         BaseResponse GetConsultsByServiceLineId(ConsultVM consult);
         BaseResponse AddOrUpdateConsult(IDictionary<string, object> keyValues);
-        BaseResponse DeleteConsult(int consultId);
+        BaseResponse DeleteConsult(int consultId, bool status);
         #endregion
 
         #region Consult Acknowledgments
