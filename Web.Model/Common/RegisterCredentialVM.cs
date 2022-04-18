@@ -56,6 +56,8 @@ namespace Web.Model.Common
         public bool IsAfterHours { get; set; }
         public string UserUniqueId { get; set; }
 
+        public bool status { get; set; }
+
         public List<ServiceLineVM> UserServices { get; set; }
         public List<DepartmentVM> Departments { get; set; }
         public List<OrganizationVM> Organizations { get; set; }
