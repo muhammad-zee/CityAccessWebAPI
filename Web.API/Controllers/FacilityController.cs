@@ -145,7 +145,6 @@ namespace Web.API.Controllers
 
         #endregion
 
-
         #region Departments
 
         [Description("Get All Departments")]
@@ -242,7 +241,6 @@ namespace Web.API.Controllers
             }
         }
         #endregion
-
 
         #region Organizations
 

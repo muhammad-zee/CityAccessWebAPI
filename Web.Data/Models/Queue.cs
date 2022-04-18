@@ -17,5 +17,7 @@ namespace Web.Data.Models
         public int? QueueAcceptedBy { get; set; }
         public DateTime? CreatedDate { get; set; }
         public DateTime? ModifiedDate { get; set; }
+        public int ServiceLineIdFk { get; set; }
+        public int RoleIdFk { get; set; }
     }
 }
