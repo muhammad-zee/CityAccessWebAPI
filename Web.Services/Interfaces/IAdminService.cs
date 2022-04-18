@@ -34,7 +34,7 @@ namespace Web.Services.Interfaces
         BaseResponse GetAllUsersByOrganizationId(RegisterCredentialVM model);
         BaseResponse GetAllUsersByServiceLineAndRoleId(string OrganizationId, string ServiceLineId, string RoleIds);
         BaseResponse getAllScheduleUsersByServiceAndRoleId(string OrganizationId, string ServiceLineId, string RoleIds);
-        BaseResponse GetAllEMSUsers();
+        BaseResponse GetAllEMSUsers(bool status);
         BaseResponse GetUserById(int Id);
         BaseResponse DeleteUser(int Id);
 

@@ -169,6 +169,7 @@ namespace Web.Services.Concrete
         {
             //var result = _user.Table.Where(x => x.IsDeleted == false).ToList();
             var result = this._dbContext.LoadStoredProcedure("md_getAllUsersByOrganizationId")
+               
                 .WithSqlParam("@pOrganizationId", OrganizationId)
                 .WithSqlParam("@pIsSuperAdmin", ApplicationSettings.isSuperAdmin)
                 .ExecuteStoredProc<User>();
@@ -254,11 +255,12 @@ namespace Web.Services.Concrete
 
             return new BaseResponse { Status = HttpStatusCode.OK, Message = "Users List Returned", Body = users };
         }
-        public BaseResponse GetAllEMSUsers()
+        public BaseResponse GetAllEMSUsers(bool status)
         {
             if (ApplicationSettings.isSuperAdmin)
             {
                 var usersEMS = this._dbContext.LoadStoredProcedure("md_GetAllEMSUsers")
+                    .WithSqlParam("@pstatus", status)
                                 .ExecuteStoredProc<RegisterCredentialVM>();
                 var genders = _controlListDetails.Table.Where(x => x.ControlListIdFk == UCLEnums.Genders.ToInt()).Select(x => new { x.ControlListDetailId, x.Title });
                 foreach (var item in usersEMS)

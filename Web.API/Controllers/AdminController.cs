@@ -185,11 +185,11 @@ namespace Web.API.Controllers
 
         [Description("Get EMS Users List")]
         [HttpGet("admin/GetAllEMSUsers")]
-        public BaseResponse GetAllEMSUsers()
+        public BaseResponse GetAllEMSUsers(bool status)
         {
             try
             {
-                return _adminService.GetAllEMSUsers();
+                return _adminService.GetAllEMSUsers(status);
             }
             catch (Exception ex)
             {
