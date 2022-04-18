@@ -99,10 +99,11 @@ namespace Web.Services.Concrete
 
         #region Active Code
 
-        public BaseResponse GetActivatedCodesByOrgId(int orgId)
+        public BaseResponse GetActivatedCodesByOrgId(int orgId,bool status)
         {
             var codes = this._dbContext.LoadStoredProcedure("md_getActivatedCodesForOrg")
                 .WithSqlParam("@pOrgId", orgId)
+                .WithSqlParam("@pstatus",status)
                 .ExecuteStoredProc<ActiveCodeVM>();
             foreach (var item in codes)
             {
@@ -207,12 +208,12 @@ namespace Web.Services.Concrete
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Saved" };
         }
 
-        public BaseResponse DetachActiveCodes(int activeCodeId)
+        public BaseResponse DetachActiveCodes(int activeCodeId,bool status)
         {
-            var row = this._activeCodeRepo.Table.Where(x => x.ActiveCodeId == activeCodeId && !x.IsDeleted).FirstOrDefault();
+            var row = this._activeCodeRepo.Table.Where(x => x.ActiveCodeId == activeCodeId).FirstOrDefault();
             row.ModifiedBy = ApplicationSettings.UserId;
             row.ModifiedDate = DateTime.UtcNow;
-            row.IsDeleted = true;
+            row.IsDeleted = status;
             this._activeCodeRepo.Update(row);
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Deleted" };
         }

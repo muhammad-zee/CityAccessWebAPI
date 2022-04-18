@@ -32,12 +32,12 @@ namespace Web.API.Controllers
 
 
         [Description("Get Activated Codes By Org Id")]
-        [HttpGet("activecode/GetActivatedCodesByOrgId/{orgId}")]
-        public BaseResponse GetActivatedCodesByOrgId(int orgId)
+        [HttpGet("activecode/GetActivatedCodesByOrgId/{orgId}/{status}")]
+        public BaseResponse GetActivatedCodesByOrgId(int orgId,bool status)
         {
             try
             {
-                return _activeCodesService.GetActivatedCodesByOrgId(orgId);
+                return _activeCodesService.GetActivatedCodesByOrgId(orgId, status);
             }
             catch (Exception ex)
             {
@@ -64,12 +64,12 @@ namespace Web.API.Controllers
         }
 
         [Description("Add Or Update Stroke")]
-        [HttpGet("activecode/DetachActiveCodes/{activeCodeId}")]
-        public BaseResponse DetachActiveCodes(int activeCodeId)
+        [HttpGet("activecode/DetachActiveCodes/{activeCodeId}/{status}")]
+        public BaseResponse DetachActiveCodes(int activeCodeId,bool status)
         {
             try
             {
-                return _activeCodesService.DetachActiveCodes(activeCodeId);
+                return _activeCodesService.DetachActiveCodes(activeCodeId,status);
             }
             catch (Exception ex)
             {
