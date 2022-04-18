@@ -8,33 +8,33 @@ namespace Web.Services.Interfaces
     {
         #region Service Lines
         BaseResponse GetAllServiceLines();
-        BaseResponse GetAllServiceLinesByDepartmentId(int DepartmentId);
+        BaseResponse GetAllServiceLinesByDepartmentId(int DepartmentId,bool status);
         BaseResponse GetServiceLineById(int Id);
         BaseResponse getServicesByDepartmentIds(string departmentIds);
         BaseResponse GetServicesByOrganizationId(int OrganizationId);
         BaseResponse AddOrUpdateServiceLine(List<ServiceLineVM> serviceLines);
-        BaseResponse DeleteServiceLine(int serviceLineId, int userId);
+        BaseResponse DeleteServiceLine(int serviceLineId, int userId, bool status);
         #endregion
 
         #region Department
         BaseResponse GetAllDepartments();
-        BaseResponse GetAllDepartmentsByOrganizationId(int OrganizationId);
+        BaseResponse GetAllDepartmentsByOrganizationId(int OrganizationId,bool status);
         BaseResponse GetDepartmentById(int Id);
         BaseResponse GetDepartmentsByIds(string Ids);
         BaseResponse AddOrUpdateDepartment(List<DepartmentVM> departments);
-        BaseResponse DeleteDepartment(int departmentId, int userId);
+        BaseResponse DeleteDepartment(int departmentId, int userId,bool status);
         #endregion
 
         #region Organization
 
         BaseResponse GetOutpatientOrganizationsIvr();
         BaseResponse GetAllOrganizations(PaginationVM vM);
-        BaseResponse GetAllOrganizations();
+        BaseResponse GetAllOrganizations(bool status);
         BaseResponse GetOrganizationById(int Id);
         BaseResponse GetOrgAssociationTree(string Ids);
         BaseResponse GetOrganizationTypeByOrgId(int orgId);
         BaseResponse AddOrUpdateOrganization(OrganizationVM organization);
-        BaseResponse DeleteOrganization(int OrganizationId);
+        BaseResponse DeleteOrganization(int OrganizationId,bool status);
         #endregion
 
         #region Clinical Hours
