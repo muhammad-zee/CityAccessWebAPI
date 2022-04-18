@@ -63,9 +63,9 @@ namespace Web.Services.Concrete
                 Body = services
             };
         }
-        public BaseResponse GetAllServiceLinesByDepartmentId(int DepartmentId)
+        public BaseResponse GetAllServiceLinesByDepartmentId(int DepartmentId,bool status)
         {
-            var services = _serviceRepo.Table.Where(x => x.IsDeleted == false && x.DepartmentIdFk == DepartmentId).ToList();
+            var services = _serviceRepo.Table.Where(x => x.IsDeleted == status && x.DepartmentIdFk == DepartmentId).ToList();
             if (services.Count() > 0)
             {
                 return new BaseResponse()
@@ -182,12 +182,12 @@ namespace Web.Services.Concrete
             return response;
         }
 
-        public BaseResponse DeleteServiceLine(int serviceLineId, int userId)
+        public BaseResponse DeleteServiceLine(int serviceLineId, int userId,bool status)
         {
             var service = _serviceRepo.Table.Where(x => x.ServiceLineId == serviceLineId).FirstOrDefault();
             if (service != null)
             {
-                service.IsDeleted = true;
+                service.IsDeleted = status;
                 service.ModifiedBy = userId;
                 service.ModifiedDate = DateTime.UtcNow;
                 _serviceRepo.Update(service);
@@ -235,9 +235,9 @@ namespace Web.Services.Concrete
             };
         }
 
-        public BaseResponse GetAllDepartmentsByOrganizationId(int OrganizationId)
+        public BaseResponse GetAllDepartmentsByOrganizationId(int OrganizationId,bool status)
         {
-            var departments = this._departmentRepo.Table.Where(od => od.OrganizationIdFk == OrganizationId && od.IsDeleted != true).ToList();
+            var departments = this._departmentRepo.Table.Where(od => od.OrganizationIdFk == OrganizationId && od.IsDeleted == status).ToList();
             var dpts = AutoMapperHelper.MapList<Department, DepartmentVM>(departments);
             var dptServices = (from s in this._serviceRepo.Table
                                where dpts.Select(x => x.DepartmentId).Contains(s.DepartmentIdFk) && s.IsDeleted != true
@@ -344,13 +344,13 @@ namespace Web.Services.Concrete
             return response;
         }
 
-        public BaseResponse DeleteDepartment(int departmentId, int userId)
+        public BaseResponse DeleteDepartment(int departmentId, int userId,bool status)
         {
-            var dpt = _departmentRepo.Table.Where(x => x.DepartmentId == departmentId && x.IsDeleted != true).FirstOrDefault();
+            var dpt = _departmentRepo.Table.Where(x => x.DepartmentId == departmentId).FirstOrDefault();
             //var deptOrgRelation = this._organizationDepartmentRepo.Table.FirstOrDefault(r => r.DepartmentIdFk == departmentId && r.OrganizationIdFk == organizationId);
             if (dpt != null)
             {
-                dpt.IsDeleted = true;
+                dpt.IsDeleted = status;
                 dpt.ModifiedBy = userId;
                 dpt.ModifiedDate = DateTime.UtcNow;
                 _departmentRepo.Update(dpt);
@@ -477,12 +477,12 @@ namespace Web.Services.Concrete
             };
         }
 
-        public BaseResponse GetAllOrganizations()
-        {
+        public BaseResponse GetAllOrganizations(bool status)
+        { 
             var organizations = new List<Organization>();
             if (ApplicationSettings.isSuperAdmin)
             {
-                organizations = _organizationRepo.Table.Where(x => x.IsDeleted == false).ToList();
+                organizations = _organizationRepo.Table.Where(x => x.IsDeleted == status).ToList();
             }
             else
             {
@@ -649,12 +649,13 @@ namespace Web.Services.Concrete
             return response;
         }
 
-        public BaseResponse DeleteOrganization(int OrganizationId)
+        public BaseResponse DeleteOrganization(int OrganizationId,bool status)
         {
             var org = _organizationRepo.Table.Where(x => x.OrganizationId == OrganizationId).FirstOrDefault();
             if (org != null)
             {
-                org.IsDeleted = true;
+                //org.IsDeleted = true;
+                org.IsActive = false;
                 org.ModifiedBy = ApplicationSettings.UserId;
                 org.ModifiedDate = DateTime.UtcNow;
                 _organizationRepo.Update(org);
