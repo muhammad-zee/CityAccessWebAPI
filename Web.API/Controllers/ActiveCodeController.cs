@@ -380,7 +380,7 @@ namespace Web.API.Controllers
         {
             try
             {
-                return _activeCodesService.ActiceOrInActiveSTEMI(STEMIId, status);
+                return _activeCodesService.ActiveOrInActiveSTEMI(STEMIId, status);
             }
             catch (Exception ex)
             {

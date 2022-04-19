@@ -3714,7 +3714,7 @@ namespace Web.Services.Concrete
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Deleted" };
         }
 
-        public BaseResponse ActiceOrInActiveSTEMI(int STEMIId, bool status)
+        public BaseResponse ActiveOrInActiveSTEMI(int STEMIId, bool status)
         {
             //var row = this._codeSTEMIRepo.Table.Where(x => x.CodeStemiid == STEMIId && !x.IsDeleted).FirstOrDefault();
             //row.IsDeleted = true;
