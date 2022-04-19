@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 #nullable disable
 
@@ -148,9 +150,17 @@ namespace Web.Data.Models
             {
                 entity.HasKey(e => e.ReservationId);
 
+                entity.Property(e => e.CallSid)
+                    .IsRequired()
+                    .HasMaxLength(50);
+
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");
 
                 entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.ReservationAssignedTo)
+                    .IsRequired()
+                    .HasMaxLength(50);
 
                 entity.HasOne(d => d.QueueIdFkNavigation)
                     .WithMany(p => p.CallReservations)

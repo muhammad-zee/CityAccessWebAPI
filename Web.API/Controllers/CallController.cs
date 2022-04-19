@@ -185,11 +185,11 @@ namespace Web.API.Controllers
         }
         [AllowAnonymous]
         [HttpPost("Call/ConferenceParticipantCallbackStatus")]
-        public string ConferenceParticipantCallbackStatus(int roleId, int serviceLineId, string conferenceSid)
+        public string ConferenceParticipantCallbackStatus(int roleId, int serviceLineId, string conferenceSid,int queueId)
         {
             try
             {
-                return this._callService.ConferenceParticipantCallbackStatus(HttpContext.Request.Form, roleId, serviceLineId, conferenceSid);
+                return this._callService.ConferenceParticipantCallbackStatus(HttpContext.Request.Form, roleId, serviceLineId, conferenceSid,queueId);
             }
             catch (Exception ex)
             {
@@ -427,7 +427,7 @@ namespace Web.API.Controllers
         {
             try
             {
-                return this._callService.saveQueues(queue);
+                return this._callService.saveQueue(queue);
             }
             catch (Exception ex)
             {

@@ -375,7 +375,7 @@ namespace Web.Services.Concrete
             return TwiML(response);
         }
 
-        public ParticipantResource addParticipant(UserListVm User, string ConferenceSid, int RoleId, int ServiceLineId)
+        public ParticipantResource addParticipant(UserListVm User, string ConferenceSid, int RoleId, int ServiceLineId, int QueueId)
         {
             ServicePointManager.SecurityProtocol = (SecurityProtocolType)3072; //TLS 1.2                                                                             
             TwilioClient.Init(this.Twilio_AccountSid, this.Twilio_AuthToken);
@@ -385,7 +385,7 @@ namespace Web.Services.Concrete
                 "answered",
                 "completed"
             };
-            var StatusCallbackUrl = $"{origin}/Call/ConferenceParticipantCallbackStatus?roleId={RoleId}&serviceLineId={ServiceLineId}&conferenceSid={ConferenceSid}";
+            var StatusCallbackUrl = $"{origin}/Call/ConferenceParticipantCallbackStatus?roleId={RoleId}&serviceLineId={ServiceLineId}&conferenceSid={ConferenceSid}&queueId={QueueId}";
             var participant = ParticipantResource.Create(
             label: User.FullName,
             //earlyMedia: true,
@@ -399,9 +399,9 @@ namespace Web.Services.Concrete
             to: new Twilio.Types.PhoneNumber($"client:{User.UserUniqueId}"),
             pathConferenceSid: ConferenceSid
         );
+
             return participant;
         }
-
 
         #region [Call Status Events]
 
@@ -472,12 +472,11 @@ namespace Web.Services.Concrete
                     ParentCallsid = Callsid,
                     ConfrenceSid = ConferenceSid,
                     ServiceLineIdFk = serviceLineId,
-                    QueueAcceptedBy = 0,
                     RoleIdFk = enqueueNode.EnqueueToRoleIdFk.Value,
                     QueueStatus = QueueStatusEnums.Pending.ToInt(),
 
                 };
-                var saveQueue = this.saveQueues(queue);
+                var saveQueue = this.saveQueue(queue);
 
             }
             else if (StatusCallbackEvent == "participant-leave" && SequenceNumber == "1") { }
@@ -485,18 +484,34 @@ namespace Web.Services.Concrete
 
             return "ok";
         }
-        public string ConferenceParticipantCallbackStatus(IFormCollection Request, int roleId, int serviceLineId, string conferenceSid)
+        public string ConferenceParticipantCallbackStatus(IFormCollection Request, int roleId, int serviceLineId, string conferenceSid, int queueId)
         {
             var To = Request["To"].ToString();
             var UserUniqueId = To.Replace("client:", "");
-            var Callsid = Request["CallSid"].ToString();
+            var CallSid = Request["CallSid"].ToString();
             var StatusCallbackEvent = Request["CallStatus"].ToString();
-            if (StatusCallbackEvent == "no-answer" || StatusCallbackEvent == "busy")
+
+            if (StatusCallbackEvent == "initiated")
+            {
+                var reservation = new ReservationsVM
+                {
+                    QueueIdFk = queueId,
+                    ReservationStatus = ReservationStatusEnums.Ringing.ToInt(),
+                    CallSid = CallSid,
+                    ReservationAssignedTo = UserUniqueId
+                };
+                var saveReservation = this.saveReservation(reservation);
+
+            }
+            else if (StatusCallbackEvent == "no-answer" || StatusCallbackEvent == "busy")
             {
                 var users = _dbContext.LoadStoredProcedure("md_getAllUsersByServiceLineId")
                             .WithSqlParam("@pServiceLineId", serviceLineId)
                             .WithSqlParam("@pRoleId", roleId)
                             .ExecuteStoredProc<UserListVm>().ToList();
+
+                var assigntoUser = users.Where(u => u.UserUniqueId != UserUniqueId).FirstOrDefault();
+
                 if (users.Count() > 0)
                 {
                     //bool agentFound = false;
@@ -504,9 +519,53 @@ namespace Web.Services.Concrete
                     //{
                     //            var isOnline = this._communicationService.conversationUserIsOnline(u.ConversationUserSid);
                     //}
-                    var participant = this.addParticipant(users.Where(u => u.UserUniqueId != UserUniqueId).FirstOrDefault(), conferenceSid, roleId, serviceLineId);
+                    var participant = this.addParticipant(assigntoUser, conferenceSid, roleId, serviceLineId, queueId);
+                    var reservation = new ReservationsVM
+                    {
+                        QueueIdFk = queueId,
+                        ReservationStatus = ReservationStatusEnums.Ringing.ToInt(),
+                        CallSid = participant.CallSid,
+                        ReservationAssignedTo = assigntoUser.UserUniqueId
+                    };
+                    var saveReservation = this.saveReservation(reservation);
                 }
 
+            }
+
+            int reservationStatus = 0;
+            int queueStatus = 0;
+            if (StatusCallbackEvent == "canceled")
+            {
+                queueStatus = QueueStatusEnums.Cancelled.ToInt();
+                reservationStatus = ReservationStatusEnums.Cancelled.ToInt();
+
+            }
+            else if (StatusCallbackEvent == "in-progress")
+            {
+                //queueStatus = QueueStatusEnums.Completed.ToInt();
+                reservationStatus = ReservationStatusEnums.Connected.ToInt();
+            }
+            else if (StatusCallbackEvent == "completed")
+            {
+                queueStatus = QueueStatusEnums.Completed.ToInt();
+                reservationStatus = ReservationStatusEnums.Completed.ToInt();
+            }
+            else if (StatusCallbackEvent == "no-answer")
+            {
+                queueStatus = QueueStatusEnums.Cancelled.ToInt();
+                reservationStatus = ReservationStatusEnums.NoAnswer.ToInt();
+            }
+            else if (StatusCallbackEvent == "busy")
+            {
+                queueStatus = QueueStatusEnums.Cancelled.ToInt();
+                reservationStatus = ReservationStatusEnums.Busy.ToInt();
+            }
+
+            if (StatusCallbackEvent == "canceled" || StatusCallbackEvent == "completed" || StatusCallbackEvent == "in-progress"
+                || StatusCallbackEvent == "no-answer" || StatusCallbackEvent == "busy")
+            {
+                var saveQueue = this.UpdateQueueStatus(queueStatus, conferenceSid);
+                var saveReservation = this.UpdateReservationStatus(reservationStatus, CallSid);
             }
 
             return "ok";
@@ -998,7 +1057,7 @@ namespace Web.Services.Concrete
 
         #region Queues
 
-        public BaseResponse saveQueues(QueuesVM queue)
+        public BaseResponse saveQueue(QueuesVM queue)
         {
 
             var record = queue;
@@ -1007,7 +1066,6 @@ namespace Web.Services.Concrete
             string sql = "EXEC md_InsertUpdateQueues " +
                 "@pToPhoneNumber, " +
                 "@pFromPhoneNumber, " +
-                "@pQueueAcceptedBy, " +
                 "@pQueueStatus, " +
                 "@pRoleIdFk, " +
                 "@pServiceLineIdFk, " +
@@ -1020,7 +1078,6 @@ namespace Web.Services.Concrete
                         // Create parameters    
                         new SqlParameter { ParameterName = "@pToPhoneNumber", Value = queue.ToPhoneNumber },
                         new SqlParameter { ParameterName = "@pFromPhoneNumber", Value = queue.FromPhoneNumber },
-                        new SqlParameter { ParameterName = "@pQueueAcceptedBy", Value = queue.QueueAcceptedBy },
                         new SqlParameter { ParameterName = "@pQueueStatus", Value = queue.QueueStatus },
                         new SqlParameter { ParameterName = "@pRoleIdFk", Value = queue.RoleIdFk },
                         new SqlParameter { ParameterName = "@pServiceLineIdFk", Value = queue.ServiceLineIdFk },
@@ -1052,14 +1109,16 @@ namespace Web.Services.Concrete
                           .ExecuteStoredProc<UserListVm>().ToList();
                 if (users.Count() > 0)
                 {
+                    var assigntoUser = users.ElementAt(0);
                     var updateQueue = this.UpdateQueueStatus(QueueStatusEnums.Reserved.ToInt(), q.ConferenceSid);
-                    var participant = this.addParticipant(users.ElementAt(0), q.ConferenceSid, q.RoleIdFk, q.ServiceLineIdFk);
+                    var participant = this.addParticipant(assigntoUser, q.ConferenceSid, q.RoleIdFk, q.ServiceLineIdFk, q.QueueId);
+
+
                 }
             }
 
             return new BaseResponse { Status = HttpStatusCode.OK, Message = "Triggered...!!" };
         }
-
         public BaseResponse UpdateQueueStatus(int QueueStatus, string ConferenceSid)
         {
 
@@ -1072,10 +1131,63 @@ namespace Web.Services.Concrete
             QueuesVM queue = new();
             queue.QueueStatus = QueueStatus;
             queue.ConfrenceSid = ConferenceSid;
-            return this.saveQueues(queue);
+            return this.saveQueue(queue);
 
         }
 
+        #endregion
+
+
+        #region Reservations
+
+        public BaseResponse saveReservation(ReservationsVM reservation)
+        {
+            var record = reservation;
+
+            int rowsAffected;
+            string sql = "EXEC md_InsertUpdateReservation " +
+                        "@pQueueIdFk, " +
+                        "@pReservationStatus, " +
+                        "@pCallSid, " +
+                        "@pReservationAssignedTo";
+
+
+            List<SqlParameter> parms = new List<SqlParameter>
+                { 
+                        // Create parameters    
+                        new SqlParameter { ParameterName = "@pQueueIdFk", Value = reservation.QueueIdFk },
+                        new SqlParameter { ParameterName = "@pReservationStatus", Value = reservation.ReservationStatus },
+                        new SqlParameter { ParameterName = "@pCallSid", Value = reservation.CallSid },
+                        new SqlParameter { ParameterName = "@pReservationAssignedTo", Value = reservation.ReservationAssignedTo }
+
+                };
+
+            rowsAffected = this._dbContext.Database.ExecuteSqlRaw(sql, parms.ToArray());
+
+            return new BaseResponse()
+            {
+                Status = HttpStatusCode.OK,
+                Message = "Record Saved",
+                Body = record
+            };
+
+
+        }
+        public BaseResponse UpdateReservationStatus(int REservationStatus, string CallSid)
+        {
+
+
+            //int rowsAffected = 0;
+            //string sql = $"EXEC md_InsertUpdateQueues " +
+            //    $"@pQueueStatus = {QueueStatus}, " +
+            //    $"@pConferenceSid = '{ConferenceSid}'";
+            //rowsAffected = this._dbContext.Database.ExecuteSqlRaw(sql);
+            ReservationsVM reservation = new();
+            reservation.ReservationStatus = REservationStatus;
+            reservation.CallSid = CallSid;
+            return this.saveReservation(reservation);
+
+        }
         #endregion
     }
 

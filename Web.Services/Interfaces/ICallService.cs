@@ -19,7 +19,7 @@ namespace Web.Services.Interfaces
         TwiMLResult ReceiveVoicemail(string RecordingUrl, string RecordingSid);
         string CallbackStatus(IFormCollection Request);
         string InboundCallbackStatus(IFormCollection Request, int parentNodeId, int serviceLineId);
-        string ConferenceParticipantCallbackStatus(IFormCollection Request, int roleId, int serviceLineId, string conferenceSid);
+        string ConferenceParticipantCallbackStatus(IFormCollection Request, int roleId, int serviceLineId, string conferenceSid, int queueId);
         //BaseResponse getIvrTree();
         BaseResponse getIvrNodes();
         BaseResponse getIvrTree(int Id);
@@ -44,10 +44,15 @@ namespace Web.Services.Interfaces
 
         #endregion
 
-        #region Enqueue
+        #region Queues
 
-        BaseResponse saveQueues(QueuesVM queue);
+        BaseResponse saveQueue(QueuesVM queue);
         BaseResponse DequeueCalls();
+        #endregion
+
+        #region Reservations
+
+        BaseResponse saveReservation(ReservationsVM reservation);
         #endregion
 
     }

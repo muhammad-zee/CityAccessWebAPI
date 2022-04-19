@@ -21,7 +21,6 @@ namespace Web.Data.Models
         public string ParentCallSid { get; set; }
         public string ConferenceSid { get; set; }
         public int QueueStatus { get; set; }
-        public int? QueueAcceptedBy { get; set; }
         public DateTime? CreatedDate { get; set; }
         public DateTime? ModifiedDate { get; set; }
 

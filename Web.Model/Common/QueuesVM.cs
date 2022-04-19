@@ -11,7 +11,5 @@
         public string ParentCallsid { get; set; } = "";
         public string ConfrenceSid { get; set; } = "";
         public int QueueStatus { get; set; } = 0;
-        public int? QueueAcceptedBy { get; set; } = 0;
-
     }
 }
