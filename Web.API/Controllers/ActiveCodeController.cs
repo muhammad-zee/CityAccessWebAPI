@@ -461,7 +461,7 @@ namespace Web.API.Controllers
         }
 
         [Description("Active/InActive Truma Data By Id")]
-        [HttpGet("Truma/DeleteTrumaDataById/{TrumaId}/{status}")]
+        [HttpGet("Truma/ActiveOrInActiveTrumaDataById/{TrumaId}/{status}")]
         public BaseResponse ActiveOrInActiveTrumaDataById(int TrumaId, bool status)
         {
             try
