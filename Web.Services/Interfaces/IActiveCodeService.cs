@@ -43,7 +43,7 @@ namespace Web.Services.Interfaces
         BaseResponse AddOrUpdateSTEMIData(CodeSTEMIVM codeSTEMI);
         BaseResponse DeleteSTEMI(int STEMIId, bool status);
 
-        BaseResponse ActiceOrInActiveSTEMI(int STEMIId, bool status);
+        BaseResponse ActiveOrInActiveSTEMI(int STEMIId, bool status);
         #endregion
 
         #region Code Truma
