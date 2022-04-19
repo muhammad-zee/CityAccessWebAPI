@@ -389,6 +389,7 @@ namespace Web.Services.Concrete
             var roleList = this._dbContext.LoadStoredProcedure("md_getAllRoles")
                             .WithSqlParam("@organizationId", role.OrganizationId)
                             .WithSqlParam("@page", role.PageNumber)
+                            .WithSqlParam("@status",role.status)
                             .WithSqlParam("@size", role.Rows)
                             .WithSqlParam("@sortOrder", role.SortOrder)
                             .WithSqlParam("@sortCol", role.SortCol)

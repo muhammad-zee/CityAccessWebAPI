@@ -876,9 +876,9 @@ namespace Web.Services.Concrete
 
         #region IVR
 
-        public BaseResponse getAllIvrs()
+        public BaseResponse getAllIvrs(bool status)
         {
-            var IVRs = _IVRRepo.Table.Where(x => x.IsDeleted != true).ToList();
+            var IVRs = _IVRRepo.Table.Where(x => x.IsDeleted != true && x.IsActive==status ).ToList();
             var types = _controlListDetailsRepo.Table.Where(x => x.ControlListIdFk == UCLEnums.OrgType.ToInt()).Select(x => new { x.ControlListDetailId, x.Title });
             var IVRVMs = AutoMapperHelper.MapList<InteractiveVoiceResponse, IVRVM>(IVRs);
             //IVRVMs.ForEach(x => x.OrganizationType = types.Where(t => t.ControlListDetailId == x.OrganizationTypeIdFk).Select(ty => ty.Title).FirstOrDefault());
@@ -961,6 +961,30 @@ namespace Web.Services.Concrete
                 _ivrSettingsRepo.Update(childNodes);
 
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Successfully Deleted" };
+            }
+            else
+            {
+                return new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "Record Not Found" };
+            }
+
+        }
+
+        public BaseResponse ActiveOrInActiveIVR(int Id,bool status)
+        {
+            var IVRNode = this._IVRRepo.Table.Where(x => x.IvrId == Id && x.IsDeleted != true).FirstOrDefault();
+            if (IVRNode != null)
+            {
+                IVRNode.IsActive = status;
+                IVRNode.ModifiedBy = ApplicationSettings.UserId;
+                IVRNode.ModifiedDate = DateTime.UtcNow;
+                this._IVRRepo.Update(IVRNode);
+
+                var childNodes = _ivrSettingsRepo.Table.Where(x => x.IvrIdFk == Id && x.IsDeleted != true).ToList();
+                childNodes.ForEach(x => { x.IsDeleted = true; x.ModifiedBy = ApplicationSettings.UserId; x.ModifiedDate = DateTime.UtcNow; });
+
+                _ivrSettingsRepo.Update(childNodes);
+
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = (status? "Activated" : "InActive") + "Successfully" };
             }
             else
             {

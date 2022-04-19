@@ -338,12 +338,12 @@ namespace Web.API.Controllers
 
         #region IVR
 
-        [HttpGet("ivr/getAllIvrs")]
-        public BaseResponse getAllIvrs()
+        [HttpGet("ivr/getAllIvrs/{status}")]
+        public BaseResponse getAllIvrs(bool status=true)
         {
             try
             {
-                return this._callService.getAllIvrs();
+                return this._callService.getAllIvrs(status);
             }
             catch (Exception ex)
             {
@@ -391,6 +391,22 @@ namespace Web.API.Controllers
             try
             {
                 return this._callService.DeleteIVR(Id);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+
+        }
+
+        [HttpGet("ivr/Active/InActiveIVR/{Id}/{status}")]
+        public BaseResponse ActiveOrInActiveIVR(int Id,bool status)
+        {
+            try
+            {
+                return this._callService.ActiveOrInActiveIVR(Id,status);
             }
             catch (Exception ex)
             {
