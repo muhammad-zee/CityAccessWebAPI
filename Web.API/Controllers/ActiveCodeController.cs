@@ -199,6 +199,22 @@ namespace Web.API.Controllers
             }
         }
 
+        [Description("Active/InActive Stroke Data By Id")]
+        [HttpGet("stroke/ActiveOrInActiveStrokeDataById/{strokeId}/{status}")]
+        public BaseResponse ActiveOrInActiveStrokeDataById(int strokeId, bool status)
+        {
+            try
+            {
+                return _activeCodesService.ActiveOrInActiveStroke(strokeId, status);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
         #endregion
 
 
@@ -262,6 +278,22 @@ namespace Web.API.Controllers
             try
             {
                 return _activeCodesService.DeleteSepsis(SepsisId, status);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
+        [Description("Active?InActive Sepsis Data By Id")]
+        [HttpGet("Sepsis/ActiveOrInActiveSepsisDataById/{SepsisId}/{status}")]
+        public BaseResponse ActiveOrInActiveSepsisDataById(int SepsisId, bool status)
+        {
+            try
+            {
+                return _activeCodesService.ActiveOrInActiveSepsis(SepsisId, status);
             }
             catch (Exception ex)
             {
@@ -342,6 +374,22 @@ namespace Web.API.Controllers
             }
         }
 
+        [Description("Active/InActive STEMI Data By Id")]
+        [HttpGet("STEMI/ActiveOrInActiveSTEMIDataById/{STEMIId}/{status}")]
+        public BaseResponse ActiveOrInActiveSTEMIDataById(int STEMIId, bool status)
+        {
+            try
+            {
+                return _activeCodesService.ActiceOrInActiveSTEMI(STEMIId, status);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
         #endregion
 
 
@@ -403,6 +451,22 @@ namespace Web.API.Controllers
             try
             {
                 return _activeCodesService.DeleteTruma(TrumaId, status);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
+        [Description("Active/InActive Truma Data By Id")]
+        [HttpGet("Truma/DeleteTrumaDataById/{TrumaId}/{status}")]
+        public BaseResponse ActiveOrInActiveTrumaDataById(int TrumaId, bool status)
+        {
+            try
+            {
+                return _activeCodesService.ActiveOrInActiveTruma(TrumaId, status);
             }
             catch (Exception ex)
             {
@@ -474,6 +538,22 @@ namespace Web.API.Controllers
             try
             {
                 return _activeCodesService.DeleteBlue(blueId, status);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
+        [Description("Active/InActive Blue Data By Id")]
+        [HttpGet("blue/ActiveOrInActiveBlueDataById/{blueId}/{status}")]
+        public BaseResponse ActiveInActiveBlueDataById(int blueId, bool status)
+        {
+            try
+            {
+                return _activeCodesService.ActiveOrInActiveBlue(blueId, status);
             }
             catch (Exception ex)
             {

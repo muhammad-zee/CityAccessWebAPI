@@ -373,7 +373,27 @@ namespace Web.Services.Concrete
                 dpt.ModifiedDate = DateTime.UtcNow;
                 _departmentRepo.Update(dpt);
                 //this._organizationDepartmentRepo.Delete(deptOrgRelation);
-                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Deleted Successfully" };
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = (status ? "Active" : "Inactive") + "Successfully" };
+            }
+            else
+            {
+                return new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "Data Not Found" };
+            }
+        }
+
+
+        public BaseResponse ActiveOrInActiveDepartment(int departmentId, int userId, bool status)
+        {
+            var dpt = _departmentRepo.Table.Where(x => x.DepartmentId == departmentId).FirstOrDefault();
+            //var deptOrgRelation = this._organizationDepartmentRepo.Table.FirstOrDefault(r => r.DepartmentIdFk == departmentId && r.OrganizationIdFk == organizationId);
+            if (dpt != null)
+            {
+                dpt.IsActive = status;
+                dpt.ModifiedBy = userId;
+                dpt.ModifiedDate = DateTime.UtcNow;
+                _departmentRepo.Update(dpt);
+                //this._organizationDepartmentRepo.Delete(deptOrgRelation);
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = (status ? "Active" : "Inactive") + "Successfully" };
             }
             else
             {
@@ -500,7 +520,7 @@ namespace Web.Services.Concrete
             var organizations = new List<Organization>();
             if (ApplicationSettings.isSuperAdmin)
             {
-                organizations = _organizationRepo.Table.Where(x => x.IsDeleted == status).ToList();
+                organizations = _organizationRepo.Table.Where(x => x.IsActive == status && !x.IsDeleted).ToList();
             }
             else
             {
@@ -673,7 +693,7 @@ namespace Web.Services.Concrete
             if (org != null)
             {
                 //org.IsDeleted = true;
-                org.IsActive = false;
+                org.IsActive = status;
                 org.ModifiedBy = ApplicationSettings.UserId;
                 org.ModifiedDate = DateTime.UtcNow;
                 _organizationRepo.Update(org);

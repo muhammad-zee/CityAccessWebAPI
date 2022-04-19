@@ -24,6 +24,8 @@ namespace Web.Services.Interfaces
         BaseResponse GetDepartmentsByIds(string Ids);
         BaseResponse AddOrUpdateDepartment(List<DepartmentVM> departments);
         BaseResponse DeleteDepartment(int departmentId, int userId, bool status);
+
+        BaseResponse ActiveOrInActiveDepartment(int departmentId, int userId, bool status);
         #endregion
 
         #region Organization

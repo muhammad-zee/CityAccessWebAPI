@@ -266,6 +266,23 @@ namespace Web.API.Controllers
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
         }
+
+        [Description("Active?InActive Department")]
+        [HttpGet("dpt/DeleteDepartment/{departmentId}/{userId}/{status}")]
+        public BaseResponse ActiveOrInActiveDepartment(int departmentId, int userId, bool status)
+        {
+            try
+            {
+                var res = _facilityService.ActiveOrInActiveDepartment(departmentId, userId, status);
+                return res;
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
         #endregion
 
         #region Organizations

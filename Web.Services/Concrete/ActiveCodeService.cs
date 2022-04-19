@@ -1561,6 +1561,26 @@ namespace Web.Services.Concrete
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Deleted" };
         }
 
+        public BaseResponse ActiveOrInActiveStroke(int strokeId, bool status)
+        {
+            //var row = this._codeStrokeRepo.Table.Where(x => x.CodeStrokeId == strokeId && !x.IsDeleted).FirstOrDefault();
+            //row.IsDeleted = true;
+            //row.ModifiedBy = ApplicationSettings.UserId;
+            //row.ModifiedDate = DateTime.UtcNow;
+            //this._codeStrokeRepo.Update(row);
+
+            var sql = "EXEC md_ActiveOrInActiveInHouseCodesOrEMSDynamic @Status, @CodeName, @CodeId, @UserId";
+            var parameters = new List<SqlParameter>() { new SqlParameter { ParameterName = "@Status", Value = status },
+                                                        new SqlParameter { ParameterName = "@CodeName", Value = UCLEnums.Stroke.ToString() },
+                                                        new SqlParameter { ParameterName = "@CodeId", Value = strokeId },
+                                                        new SqlParameter { ParameterName = "@UserId", Value = ApplicationSettings.UserId }
+                                                      };
+
+            var isDeleted = this._dbContext.Database.ExecuteSqlRaw(sql, parameters);
+
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Deleted" };
+        }
+
         #endregion
 
         #region Code Sepsis
@@ -2604,6 +2624,26 @@ namespace Web.Services.Concrete
             //this._codeSepsisRepo.Update(row);
 
             var sql = "EXEC md_ActiveOrInActiveInHouseCodesOrEMS @Status, @CodeName, @CodeId, @UserId";
+            var parameters = new List<SqlParameter>() { new SqlParameter { ParameterName = "@Status", Value = status },
+                                                        new SqlParameter { ParameterName = "@CodeName", Value = UCLEnums.Sepsis.ToString() },
+                                                        new SqlParameter { ParameterName = "@CodeId", Value = SepsisId },
+                                                        new SqlParameter { ParameterName = "@UserId", Value = ApplicationSettings.UserId }
+                                                      };
+
+            var isDeleted = this._dbContext.Database.ExecuteSqlRaw(sql, parameters);
+
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Deleted" };
+        }
+
+        public BaseResponse ActiveOrInActiveSepsis(int SepsisId, bool status)
+        {
+            //var row = this._codeSepsisRepo.Table.Where(x => x.CodeSepsisId == SepsisId && !x.IsDeleted).FirstOrDefault();
+            //row.IsDeleted = true;
+            //row.ModifiedBy = ApplicationSettings.UserId;
+            //row.ModifiedDate = DateTime.UtcNow;
+            //this._codeSepsisRepo.Update(row);
+
+            var sql = "EXEC md_ActiveOrInActiveInHouseCodesOrEMSDynamic @Status, @CodeName, @CodeId, @UserId";
             var parameters = new List<SqlParameter>() { new SqlParameter { ParameterName = "@Status", Value = status },
                                                         new SqlParameter { ParameterName = "@CodeName", Value = UCLEnums.Sepsis.ToString() },
                                                         new SqlParameter { ParameterName = "@CodeId", Value = SepsisId },
@@ -3674,6 +3714,27 @@ namespace Web.Services.Concrete
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Deleted" };
         }
 
+        public BaseResponse ActiceOrInActiveSTEMI(int STEMIId, bool status)
+        {
+            //var row = this._codeSTEMIRepo.Table.Where(x => x.CodeStemiid == STEMIId && !x.IsDeleted).FirstOrDefault();
+            //row.IsDeleted = true;
+            //row.ModifiedBy = ApplicationSettings.UserId;
+            //row.ModifiedDate = DateTime.UtcNow;
+            //this._codeSTEMIRepo.Update(row);
+
+            var sql = "EXEC md_ActiveOrInActiveInHouseCodesOrEMSDynamic @Status, @CodeName, @CodeId, @UserId";
+            var parameters = new List<SqlParameter>() { new SqlParameter { ParameterName = "@Status", Value = status },
+                                                        new SqlParameter { ParameterName = "@CodeName", Value = UCLEnums.STEMI.ToString() },
+                                                        new SqlParameter { ParameterName = "@CodeId", Value = STEMIId },
+                                                        new SqlParameter { ParameterName = "@UserId", Value = ApplicationSettings.UserId }
+                                                      };
+
+            var isDeleted = this._dbContext.Database.ExecuteSqlRaw(sql, parameters);
+
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Deleted" };
+        }
+
+
 
         #endregion
 
@@ -4728,6 +4789,26 @@ namespace Web.Services.Concrete
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Deleted" };
         }
 
+        public BaseResponse ActiveOrInActiveTruma(int TrumaId, bool status)
+        {
+            //var row = this._codeTrumaRepo.Table.Where(x => x.CodeTraumaId == TrumaId && !x.IsDeleted).FirstOrDefault();
+            //row.IsDeleted = true;
+            //row.ModifiedBy = ApplicationSettings.UserId;
+            //row.ModifiedDate = DateTime.UtcNow;
+            //this._codeTrumaRepo.Update(row);
+
+            var sql = "EXEC md_ActiveOrInActiveInHouseCodesOrEMSDynamic @Status, @CodeName, @CodeId, @UserId";
+            var parameters = new List<SqlParameter>() { new SqlParameter { ParameterName = "@Status", Value = status },
+                                                        new SqlParameter { ParameterName = "@CodeName", Value = UCLEnums.Trauma.ToString() },
+                                                        new SqlParameter { ParameterName = "@CodeId", Value = TrumaId },
+                                                        new SqlParameter { ParameterName = "@UserId", Value = ApplicationSettings.UserId }
+                                                      };
+
+            var isDeleted = this._dbContext.Database.ExecuteSqlRaw(sql, parameters);
+
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Deleted" };
+        }
+
 
         #endregion
 
@@ -5764,6 +5845,26 @@ namespace Web.Services.Concrete
             //this._codeBlueRepo.Update(row);
 
             var sql = "EXEC md_ActiveOrInActiveInHouseCodesOrEMS @Status, @CodeName, @CodeId, @UserId";
+            var parameters = new List<SqlParameter>() { new SqlParameter { ParameterName = "@Status", Value = status },
+                                                        new SqlParameter { ParameterName = "@CodeName", Value = UCLEnums.Blue.ToString() },
+                                                        new SqlParameter { ParameterName = "@CodeId", Value = blueId },
+                                                        new SqlParameter { ParameterName = "@UserId", Value = ApplicationSettings.UserId }
+                                                      };
+
+            var isDeleted = this._dbContext.Database.ExecuteSqlRaw(sql, parameters);
+
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Deleted" };
+        }
+
+        public BaseResponse ActiveOrInActiveBlue(int blueId, bool status)
+        {
+            //var row = this._codeBlueRepo.Table.Where(x => x.CodeBlueId == blueId && !x.IsDeleted).FirstOrDefault();
+            //row.IsDeleted = true;
+            //row.ModifiedBy = ApplicationSettings.UserId;
+            //row.ModifiedDate = DateTime.UtcNow;
+            //this._codeBlueRepo.Update(row);
+
+            var sql = "EXEC md_ActiveOrInActiveInHouseCodesOrEMSDynamic @Status, @CodeName, @CodeId, @UserId";
             var parameters = new List<SqlParameter>() { new SqlParameter { ParameterName = "@Status", Value = status },
                                                         new SqlParameter { ParameterName = "@CodeName", Value = UCLEnums.Blue.ToString() },
                                                         new SqlParameter { ParameterName = "@CodeId", Value = blueId },
