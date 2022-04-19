@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 #nullable disable
 
@@ -6,6 +7,11 @@ namespace Web.Data.Models
 {
     public partial class CallQueue
     {
+        public CallQueue()
+        {
+            CallReservations = new HashSet<CallReservation>();
+        }
+
         public int QueueId { get; set; }
         public string FromPhoneNumber { get; set; }
         public string ToPhoneNumber { get; set; }
@@ -18,5 +24,7 @@ namespace Web.Data.Models
         public int? QueueAcceptedBy { get; set; }
         public DateTime? CreatedDate { get; set; }
         public DateTime? ModifiedDate { get; set; }
+
+        public virtual ICollection<CallReservation> CallReservations { get; set; }
     }
 }

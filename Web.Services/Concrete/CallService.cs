@@ -458,18 +458,26 @@ namespace Web.Services.Concrete
             var ConferenceSid = Request["ConferenceSid"].ToString();
             var SequenceNumber = Request["SequenceNumber"].ToString();
 
+           
             if (StatusCallbackEvent == "participant-join" && SequenceNumber == "1")
             {
+               
                 var enqueueNode = this._ivrSettingsRepo.Table.FirstOrDefault(i => i.IvrSettingsId == parentNodeId);
 
-                var users = _dbContext.LoadStoredProcedure("md_getAllUsersByServiceLineId")
-                            .WithSqlParam("@pServiceLineId", serviceLineId)
-                            .WithSqlParam("@pRoleId", enqueueNode.EnqueueToRoleIdFk)
-                            .ExecuteStoredProc<UserListVm>().ToList();
-                if (users.Count() > 0)
+                QueuesVM queue = new QueuesVM
                 {
-                    var participant = this.addParticipant(users.ElementAt(0), ConferenceSid, enqueueNode.EnqueueToRoleIdFk.Value, serviceLineId);
-                }
+                    FromPhoneNumber = Request["From"].ToString(),
+                    ToPhoneNumber = Request["To"].ToString(),
+                    Callsid = Callsid,
+                    ParentCallsid = Callsid,
+                    ConfrenceSid = ConferenceSid,
+                    ServiceLineIdFk = serviceLineId,
+                    QueueAcceptedBy = 0,
+                    RoleIdFk = enqueueNode.EnqueueToRoleIdFk.Value,
+                    QueueStatus = QueueStatusEnums.Pending.ToInt(),
+
+                };
+                var saveQueue = this.saveQueues(queue);              
 
             }
             else if (StatusCallbackEvent == "participant-leave" && SequenceNumber == "1") { }
@@ -964,27 +972,24 @@ namespace Web.Services.Concrete
         #endregion
 
 
-        #region Enqueues
+        #region Queues
 
         public BaseResponse saveQueues(QueuesVM queue)
         {
 
             var record = queue;
-
-            if (!string.IsNullOrEmpty(queue.Callsid))
-            {
-
+                
                 int rowsAffected;
                 string sql = "EXEC md_InsertUpdateQueues " +
                     "@pToPhoneNumber, " +
                     "@pFromPhoneNumber, " +
                     "@pQueueAcceptedBy, " +
                     "@pQueueStatus, " +
+                    "@pRoleIdFk, " +
+                    "@pServiceLineIdFk, " +
                     "@pConfrenceSid, " +
                     "@pCallSid, " +
-                    "@pParentCallsid, " +
-                    "@pModifiedDate, " +
-                    "@pCreatedDate, ";
+                    "@pParentCallsid " ;
 
                 List<SqlParameter> parms = new List<SqlParameter>
                     { 
@@ -993,22 +998,58 @@ namespace Web.Services.Concrete
                         new SqlParameter { ParameterName = "@pFromPhoneNumber", Value = queue.FromPhoneNumber },
                         new SqlParameter { ParameterName = "@pQueueAcceptedBy", Value = queue.QueueAcceptedBy },
                         new SqlParameter { ParameterName = "@pQueueStatus", Value = queue.QueueStatus },
+                        new SqlParameter { ParameterName = "@pRoleIdFk", Value = queue.RoleIdFk },
+                        new SqlParameter { ParameterName = "@pServiceLineIdFk", Value = queue.ServiceLineIdFk },
                         new SqlParameter { ParameterName = "@pConfrenceSid", Value = queue.ConfrenceSid },
                         new SqlParameter { ParameterName = "@pCallSid", Value = queue.Callsid },
-                        new SqlParameter { ParameterName = "@pParentCallsid", Value = queue.ParentCallsid },
-                        new SqlParameter { ParameterName = "@pModifiedDate", Value = queue.ModifiedDate },
-                        new SqlParameter { ParameterName = "@pCreatedDate", Value = DateTime.UtcNow},
+                        new SqlParameter { ParameterName = "@pParentCallsid", Value = queue.ParentCallsid }
 
                 };
 
                 rowsAffected = this._dbContext.Database.ExecuteSqlRaw(sql, parms.ToArray());
-            }
+
             return new BaseResponse()
             {
                 Status = HttpStatusCode.OK,
                 Message = "Record Saved",
                 Body = record
             };
+        }
+        public BaseResponse DequeueCalls()
+        {
+
+            var queues = _dbContext.LoadStoredProcedure("md_getAllUPendingQueues").ExecuteStoredProc<CallQueue>().ToList();
+
+            foreach(var q in queues)
+            {
+                var users = _dbContext.LoadStoredProcedure("md_getAllUsersByServiceLineId")
+                          .WithSqlParam("@pServiceLineId", q.ServiceLineIdFk)
+                          .WithSqlParam("@pRoleId", q.RoleIdFk)
+                          .ExecuteStoredProc<UserListVm>().ToList();
+                if (users.Count() > 0)
+                {
+                    var updateQueue = this.UpdateQueueStatus(QueueStatusEnums.Reserved.ToInt(), q.ConferenceSid);
+                    var participant = this.addParticipant(users.ElementAt(0), q.ConferenceSid, q.RoleIdFk, q.ServiceLineIdFk);
+                }
+            }
+           
+            return new BaseResponse { Status = HttpStatusCode.OK, Message = "Triggered...!!" };
+        }
+
+        public BaseResponse UpdateQueueStatus(int QueueStatus,string ConferenceSid)
+        {
+
+            
+            //int rowsAffected = 0;
+                //string sql = $"EXEC md_InsertUpdateQueues " +
+                //    $"@pQueueStatus = {QueueStatus}, " +
+                //    $"@pConferenceSid = '{ConferenceSid}'";
+                //rowsAffected = this._dbContext.Database.ExecuteSqlRaw(sql);
+                QueuesVM queue = new();
+                queue.QueueStatus = QueueStatus;
+                queue.ConfrenceSid = ConferenceSid;
+                return this.saveQueues(queue);
+          
         }
 
         #endregion
