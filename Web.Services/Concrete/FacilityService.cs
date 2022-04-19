@@ -237,10 +237,10 @@ namespace Web.Services.Concrete
 
         public BaseResponse GetAllDepartmentsByOrganizationId(int OrganizationId, bool status)
         {
-            var departments = this._departmentRepo.Table.Where(od => od.OrganizationIdFk == OrganizationId && od.IsDeleted == status).ToList();
+            var departments = this._departmentRepo.Table.Where(od => od.OrganizationIdFk == OrganizationId && od.IsActive == status && od.IsDeleted == false).ToList();
             var dpts = AutoMapperHelper.MapList<Department, DepartmentVM>(departments);
             var dptServices = (from s in this._serviceRepo.Table
-                               where dpts.Select(x => x.DepartmentId).Contains(s.DepartmentIdFk) && s.IsDeleted != true
+                               where dpts.Select(x => x.DepartmentId).Contains(s.DepartmentIdFk) && s.IsDeleted == false && s.IsActive == true
                                select new ServiceLineVM()
                                {
                                    ServiceLineId = s.ServiceLineId,
