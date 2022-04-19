@@ -1,6 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
+﻿using Microsoft.EntityFrameworkCore;
 
 #nullable disable
 
@@ -19,6 +17,7 @@ namespace Web.Data.Models
 
         public virtual DbSet<ActiveCode> ActiveCodes { get; set; }
         public virtual DbSet<CallLog> CallLogs { get; set; }
+        public virtual DbSet<CallQueue> CallQueues { get; set; }
         public virtual DbSet<ChatSetting> ChatSettings { get; set; }
         public virtual DbSet<ClinicalHoliday> ClinicalHolidays { get; set; }
         public virtual DbSet<ClinicalHour> ClinicalHours { get; set; }
@@ -50,7 +49,6 @@ namespace Web.Data.Models
         public virtual DbSet<MdrouteCounter> MdrouteCounters { get; set; }
         public virtual DbSet<Organization> Organizations { get; set; }
         public virtual DbSet<OrganizationConsultField> OrganizationConsultFields { get; set; }
-        public virtual DbSet<Queue> Queues { get; set; }
         public virtual DbSet<Role> Roles { get; set; }
         public virtual DbSet<ServiceLine> ServiceLines { get; set; }
         public virtual DbSet<Setting> Settings { get; set; }
@@ -124,6 +122,27 @@ namespace Web.Data.Models
                 entity.Property(e => e.ToName).HasMaxLength(50);
 
                 entity.Property(e => e.ToPhoneNumber).HasMaxLength(50);
+            });
+
+            modelBuilder.Entity<CallQueue>(entity =>
+            {
+                entity.HasNoKey();
+
+                entity.Property(e => e.CallSid).HasMaxLength(50);
+
+                entity.Property(e => e.ConferenceSid).HasMaxLength(50);
+
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.FromPhoneNumber).HasMaxLength(30);
+
+                entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.ParentCallSid).HasMaxLength(50);
+
+                entity.Property(e => e.QueueId).ValueGeneratedOnAdd();
+
+                entity.Property(e => e.ToPhoneNumber).HasMaxLength(30);
             });
 
             modelBuilder.Entity<ChatSetting>(entity =>
@@ -203,6 +222,8 @@ namespace Web.Data.Models
 
                 entity.Property(e => e.BloodThinners).HasMaxLength(100);
 
+                entity.Property(e => e.ChannelSid).HasMaxLength(50);
+
                 entity.Property(e => e.ChiefComplant).HasMaxLength(200);
 
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");
@@ -225,6 +246,10 @@ namespace Web.Data.Models
                     .HasMaxLength(500)
                     .HasColumnName("HPI");
 
+                entity.Property(e => e.IsActive)
+                    .IsRequired()
+                    .HasDefaultValueSql("((1))");
+
                 entity.Property(e => e.IsEms).HasColumnName("IsEMS");
 
                 entity.Property(e => e.LastKnownWell).HasColumnType("datetime");
@@ -240,8 +265,6 @@ namespace Web.Data.Models
 
             modelBuilder.Entity<CodeBlueGroupMember>(entity =>
             {
-                entity.Property(e => e.ChannelSid).HasMaxLength(200);
-
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");
 
                 entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
@@ -265,6 +288,8 @@ namespace Web.Data.Models
 
                 entity.Property(e => e.BloodThinners).HasMaxLength(100);
 
+                entity.Property(e => e.ChannelSid).HasMaxLength(50);
+
                 entity.Property(e => e.ChiefComplant).HasMaxLength(200);
 
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");
@@ -287,6 +312,10 @@ namespace Web.Data.Models
                     .HasMaxLength(500)
                     .HasColumnName("HPI");
 
+                entity.Property(e => e.IsActive)
+                    .IsRequired()
+                    .HasDefaultValueSql("((1))");
+
                 entity.Property(e => e.IsEms).HasColumnName("IsEMS");
 
                 entity.Property(e => e.LastKnownWell).HasColumnType("datetime");
@@ -302,8 +331,6 @@ namespace Web.Data.Models
 
             modelBuilder.Entity<CodeSepsisGroupMember>(entity =>
             {
-                entity.Property(e => e.ChannelSid).HasMaxLength(200);
-
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");
 
                 entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
@@ -327,6 +354,8 @@ namespace Web.Data.Models
 
                 entity.Property(e => e.BloodThinners).HasMaxLength(100);
 
+                entity.Property(e => e.ChannelSid).HasMaxLength(50);
+
                 entity.Property(e => e.ChiefComplant).HasMaxLength(200);
 
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");
@@ -349,6 +378,10 @@ namespace Web.Data.Models
                     .HasMaxLength(500)
                     .HasColumnName("HPI");
 
+                entity.Property(e => e.IsActive)
+                    .IsRequired()
+                    .HasDefaultValueSql("((1))");
+
                 entity.Property(e => e.IsEms).HasColumnName("IsEMS");
 
                 entity.Property(e => e.LastKnownWell).HasColumnType("datetime");
@@ -367,8 +400,6 @@ namespace Web.Data.Models
                 entity.ToTable("CodeSTEMIGroupMembers");
 
                 entity.Property(e => e.CodeStemigroupMemberId).HasColumnName("CodeSTEMIGroupMemberId");
-
-                entity.Property(e => e.ChannelSid).HasMaxLength(200);
 
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");
 
@@ -391,6 +422,8 @@ namespace Web.Data.Models
 
                 entity.Property(e => e.BloodThinners).HasMaxLength(100);
 
+                entity.Property(e => e.ChannelSid).HasMaxLength(50);
+
                 entity.Property(e => e.ChiefComplant).HasMaxLength(200);
 
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");
@@ -413,6 +446,10 @@ namespace Web.Data.Models
                     .HasMaxLength(500)
                     .HasColumnName("HPI");
 
+                entity.Property(e => e.IsActive)
+                    .IsRequired()
+                    .HasDefaultValueSql("((1))");
+
                 entity.Property(e => e.IsEms).HasColumnName("IsEMS");
 
                 entity.Property(e => e.LastKnownWell).HasColumnType("datetime");
@@ -428,8 +465,6 @@ namespace Web.Data.Models
 
             modelBuilder.Entity<CodeStrokeGroupMember>(entity =>
             {
-                entity.Property(e => e.ChannelSid).HasMaxLength(200);
-
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");
 
                 entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
@@ -449,6 +484,8 @@ namespace Web.Data.Models
 
                 entity.Property(e => e.BloodThinners).HasMaxLength(100);
 
+                entity.Property(e => e.ChannelSid).HasMaxLength(50);
+
                 entity.Property(e => e.ChiefComplant).HasMaxLength(200);
 
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");
@@ -471,6 +508,10 @@ namespace Web.Data.Models
                     .HasMaxLength(500)
                     .HasColumnName("HPI");
 
+                entity.Property(e => e.IsActive)
+                    .IsRequired()
+                    .HasDefaultValueSql("((1))");
+
                 entity.Property(e => e.IsEms).HasColumnName("IsEMS");
 
                 entity.Property(e => e.LastKnownWell).HasColumnType("datetime");
@@ -486,8 +527,6 @@ namespace Web.Data.Models
 
             modelBuilder.Entity<CodeTraumaGroupMember>(entity =>
             {
-                entity.Property(e => e.ChannelSid).HasMaxLength(200);
-
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");
 
                 entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
@@ -573,11 +612,17 @@ namespace Web.Data.Models
 
                 entity.Property(e => e.CallbackNumber).HasMaxLength(15);
 
+                entity.Property(e => e.ChannelSid).HasMaxLength(50);
+
                 entity.Property(e => e.ConsultType).HasMaxLength(50);
 
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");
 
                 entity.Property(e => e.DateOfBirth).HasColumnType("datetime");
+
+                entity.Property(e => e.IsActive)
+                    .IsRequired()
+                    .HasDefaultValueSql("((1))");
 
                 entity.Property(e => e.Location).HasMaxLength(500);
 
@@ -598,10 +643,6 @@ namespace Web.Data.Models
 
             modelBuilder.Entity<ConsultAcknowledgment>(entity =>
             {
-                entity.Property(e => e.ChannelSid)
-                    .IsRequired()
-                    .HasMaxLength(50);
-
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");
 
                 entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
@@ -736,6 +777,10 @@ namespace Web.Data.Models
 
                 entity.Property(e => e.DepartmentName).HasMaxLength(500);
 
+                entity.Property(e => e.IsActive)
+                    .IsRequired()
+                    .HasDefaultValueSql("((1))");
+
                 entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
 
                 entity.HasOne(d => d.OrganizationIdFkNavigation)
@@ -823,6 +868,10 @@ namespace Web.Data.Models
                 entity.Property(e => e.Description)
                     .IsRequired()
                     .HasMaxLength(100);
+
+                entity.Property(e => e.IsActive)
+                    .IsRequired()
+                    .HasDefaultValueSql("((1))");
 
                 entity.Property(e => e.LandlineNumber)
                     .IsRequired()
@@ -944,29 +993,6 @@ namespace Web.Data.Models
                     .HasConstraintName("FK_OrganizationConsultFields_Organizations");
             });
 
-            modelBuilder.Entity<Queue>(entity =>
-            {
-                entity.HasNoKey();
-
-                entity.Property(e => e.Callsid).HasMaxLength(50);
-
-                entity.Property(e => e.ConfrenceSid).HasMaxLength(50);
-
-                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
-
-                entity.Property(e => e.FromPhoneNumber).HasMaxLength(30);
-
-                entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
-
-                entity.Property(e => e.ParentCallsid).HasMaxLength(50);
-
-                entity.Property(e => e.QueueId).ValueGeneratedOnAdd();
-
-                entity.Property(e => e.QueueStatus).HasMaxLength(20);
-
-                entity.Property(e => e.ToPhoneNumber).HasMaxLength(30);
-            });
-
             modelBuilder.Entity<Role>(entity =>
             {
                 entity.Property(e => e.CreatedDate)
@@ -989,6 +1015,10 @@ namespace Web.Data.Models
                 entity.ToTable("ServiceLine");
 
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.IsActive)
+                    .IsRequired()
+                    .HasDefaultValueSql("((1))");
 
                 entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
 

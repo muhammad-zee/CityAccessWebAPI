@@ -1,5 +1,4 @@
-﻿using ElmahCore;
-using Microsoft.Data.SqlClient;
+﻿using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
@@ -449,10 +448,23 @@ namespace Web.Services.Concrete
                                     string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
                                     string friendlyName = $"{consultType} {ServiceName} Consult {Consult_Counter.Counter_Value}";
                                     var channel = _communicationService.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
+
+                                    //////////////// Update Consult For ChannelSid ////////////////////////////
+
+                                    string ConsultId = keyValues["ConsultId"].ToString();
+                                    string qry = $"UPDATE [dbo].[Consults] SET [ChannelSid] = '{channel.Sid}'";
+
+                                    qry += $" WHERE ConsultNumber = '{Consult_Counter.Counter_Value}'";
+
+                                    int rowUpdate = this._dbContext.Database.ExecuteSqlRaw(qry);
+
+                                    ///////////////////////////////////////////////////////////////////////////
+
+
                                     List<ConsultAcknowledgment> consultAcknowledgmentList = new();
                                     users = users.Distinct().ToList();
                                     var distinctUsers = users.Select(x => new { x.UserUniqueId, x.UserId }).Distinct().ToList();
-                                    
+
                                     foreach (var item in distinctUsers)
                                     {
                                         try
@@ -460,7 +472,6 @@ namespace Web.Services.Concrete
                                             this._communicationService.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
                                             var acknowledgeConsult = new ConsultAcknowledgment
                                             {
-                                                ChannelSid = channel.Sid,
                                                 IsAcknowledge = false,
                                                 ConsultIdFk = Consult_Counter.Counter_Value,
                                                 UserIdFk = item.UserId,
@@ -471,7 +482,7 @@ namespace Web.Services.Concrete
                                         }
                                         catch (Exception ex)
                                         {
-                                            ElmahExtensions.RiseError(ex);
+
                                         }
                                     }
                                     this._consultAcknowledgmentRepo.Insert(consultAcknowledgmentList);
@@ -533,6 +544,18 @@ namespace Web.Services.Concrete
                             string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
                             string friendlyName = $"{consultType} {ServiceName} Consult {Consult_Counter.Counter_Value}";
                             var channel = _communicationService.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
+
+                            //////////////// Update Consult For ChannelSid ////////////////////////////
+
+                            string ConsultId = keyValues["ConsultId"].ToString();
+                            string qry = $"UPDATE [dbo].[Consults] SET [ChannelSid] = '{channel.Sid}'";
+
+                            qry += $" WHERE ConsultNumber = '{Consult_Counter.Counter_Value}'";
+
+                            int rowUpdate = this._dbContext.Database.ExecuteSqlRaw(qry);
+
+                            ///////////////////////////////////////////////////////////////////////////
+
                             List<ConsultAcknowledgment> consultAcknowledgmentList = new();
                             var distinctUsers = users.Select(x => new { x.UserUniqueId, x.UserId }).Distinct().ToList();
                             foreach (var item in distinctUsers)
@@ -542,7 +565,6 @@ namespace Web.Services.Concrete
                                     this._communicationService.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
                                     var acknowledgeConsult = new ConsultAcknowledgment
                                     {
-                                        ChannelSid = channel.Sid,
                                         IsAcknowledge = false,
                                         ConsultIdFk = Consult_Counter.Counter_Value,
                                         UserIdFk = item.UserId,
@@ -553,7 +575,7 @@ namespace Web.Services.Concrete
                                 }
                                 catch (Exception ex)
                                 {
-                                    ElmahExtensions.RiseError(ex);
+
                                 }
                             }
                             this._consultAcknowledgmentRepo.Insert(consultAcknowledgmentList);
@@ -650,12 +672,31 @@ namespace Web.Services.Concrete
             return new BaseResponse() { Status = HttpStatusCode.NotModified, Message = "Consult Id Column is not exist" };
         }
 
+        public BaseResponse ActiveOrInActiveConsult(int consultId, bool status)
+        {
+            var sql = "EXEC md_ActiveOrInActiveConsult @status, @userId, @consultId";
+            var parameters = new List<SqlParameter>() { new SqlParameter { ParameterName = "@status", Value = status },
+                                                        new SqlParameter { ParameterName = "@userId", Value = ApplicationSettings.UserId },
+                                                        new SqlParameter { ParameterName = "@consultId", Value = consultId }
+                                                      };
+
+            var rowsEffected = this._dbContext.Database.ExecuteSqlRaw(sql, parameters);
+            if (rowsEffected > 0)
+            {
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Consult Deleted" };
+            }
+            else
+            {
+                return new BaseResponse() { Status = HttpStatusCode.NotModified, Message = "No Recored deleted" };
+            }
+        }
+
         public BaseResponse DeleteConsult(int consultId, bool status)
         {
             var sql = "EXEC md_DeleteConsultAndGroup @status, @userId, @consultId";
             var parameters = new List<SqlParameter>() { new SqlParameter { ParameterName = "@status", Value = status },
                                                         new SqlParameter { ParameterName = "@userId", Value = ApplicationSettings.UserId },
-                                                        new SqlParameter { ParameterName = "@consultId", Value = consultId } 
+                                                        new SqlParameter { ParameterName = "@consultId", Value = consultId }
                                                       };
 
             var isDeleted = this._dbContext.Database.ExecuteSqlRaw(sql, parameters);

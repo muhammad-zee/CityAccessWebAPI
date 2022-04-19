@@ -7,9 +7,9 @@ namespace Web.Services.Interfaces
     public interface IActiveCodeService
     {
         #region Active Codes
-        BaseResponse GetActivatedCodesByOrgId(int orgId,bool status);
+        BaseResponse GetActivatedCodesByOrgId(int orgId, bool status);
         BaseResponse MapActiveCodes(List<ActiveCodeVM> activeCodes);
-        BaseResponse DetachActiveCodes(int activeCodeId,bool status);
+        BaseResponse DetachActiveCodes(int activeCodeId, bool status);
         BaseResponse GetAllActiveCodes(int orgId);
         BaseResponse GetEMSandActiveCodesForDashboard(int OrgId, int days = 6);
         #endregion

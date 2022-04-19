@@ -33,7 +33,7 @@ namespace Web.API.Controllers
 
         [Description("Get Activated Codes By Org Id")]
         [HttpGet("activecode/GetActivatedCodesByOrgId/{orgId}/{status}")]
-        public BaseResponse GetActivatedCodesByOrgId(int orgId,bool status)
+        public BaseResponse GetActivatedCodesByOrgId(int orgId, bool status)
         {
             try
             {
@@ -65,11 +65,11 @@ namespace Web.API.Controllers
 
         [Description("Add Or Update Stroke")]
         [HttpGet("activecode/DetachActiveCodes/{activeCodeId}/{status}")]
-        public BaseResponse DetachActiveCodes(int activeCodeId,bool status)
+        public BaseResponse DetachActiveCodes(int activeCodeId, bool status)
         {
             try
             {
-                return _activeCodesService.DetachActiveCodes(activeCodeId,status);
+                return _activeCodesService.DetachActiveCodes(activeCodeId, status);
             }
             catch (Exception ex)
             {

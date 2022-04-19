@@ -390,8 +390,8 @@ namespace Web.Services.Concrete
             label: User.FullName,
             //earlyMedia: true,
             beep: "onEnter",
-            startConferenceOnEnter:true,
-            endConferenceOnExit:true,
+            startConferenceOnEnter: true,
+            endConferenceOnExit: true,
             statusCallback: new Uri(StatusCallbackUrl),
             statusCallbackEvent: statusCallbackEvent,
             record: true,
@@ -483,7 +483,7 @@ namespace Web.Services.Concrete
             var UserUniqueId = To.Replace("client:", "");
             var Callsid = Request["CallSid"].ToString();
             var StatusCallbackEvent = Request["CallStatus"].ToString();
-            if (StatusCallbackEvent == "no-answer"||StatusCallbackEvent == "busy")
+            if (StatusCallbackEvent == "no-answer" || StatusCallbackEvent == "busy")
             {
                 var users = _dbContext.LoadStoredProcedure("md_getAllUsersByServiceLineId")
                             .WithSqlParam("@pServiceLineId", serviceLineId)
@@ -496,7 +496,7 @@ namespace Web.Services.Concrete
                     //{
                     //            var isOnline = this._communicationService.conversationUserIsOnline(u.ConversationUserSid);
                     //}
-                    var participant = this.addParticipant(users.Where(u=>u.UserUniqueId!= UserUniqueId).FirstOrDefault(), conferenceSid, roleId, serviceLineId);
+                    var participant = this.addParticipant(users.Where(u => u.UserUniqueId != UserUniqueId).FirstOrDefault(), conferenceSid, roleId, serviceLineId);
                 }
 
             }
@@ -973,7 +973,7 @@ namespace Web.Services.Concrete
 
             if (!string.IsNullOrEmpty(queue.Callsid))
             {
-                
+
                 int rowsAffected;
                 string sql = "EXEC md_InsertUpdateQueues " +
                     "@pToPhoneNumber, " +
@@ -984,7 +984,7 @@ namespace Web.Services.Concrete
                     "@pCallSid, " +
                     "@pParentCallsid, " +
                     "@pModifiedDate, " +
-                    "@pCreatedDate, "  ;
+                    "@pCreatedDate, ";
 
                 List<SqlParameter> parms = new List<SqlParameter>
                     { 

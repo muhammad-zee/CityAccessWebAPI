@@ -217,6 +217,22 @@ namespace Web.API.Controllers
             }
         }
 
+        [Description("Active Or InActive Consult Consult")]
+        [HttpGet("consult/ActiveOrInActiveConsult/{consultId}/{status}")]
+        public BaseResponse ActiveOrInActiveConsult(int consultId, bool status)
+        {
+            try
+            {
+                return _consultService.ActiveOrInActiveConsult(consultId, status);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
         [Description("Delete Consult")]
         [HttpGet("consult/DeleteConsult/{consultId}/{status}")]
         public BaseResponse DeleteConsult(int consultId, bool status)
