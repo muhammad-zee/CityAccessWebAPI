@@ -65,7 +65,7 @@ namespace Web.Services.Concrete
         }
         public BaseResponse GetAllServiceLinesByDepartmentId(int DepartmentId, bool status)
         {
-            var services = _serviceRepo.Table.Where(x => x.IsDeleted == status && x.DepartmentIdFk == DepartmentId).ToList();
+            var services = _serviceRepo.Table.Where(x => x.IsActive == status && x.DepartmentIdFk == DepartmentId && !x.IsDeleted).ToList();
             if (services.Count() > 0)
             {
                 return new BaseResponse()
@@ -180,6 +180,24 @@ namespace Web.Services.Concrete
                 }
             }
             return response;
+        }
+
+        public BaseResponse ActiveOrInactiveServiceLine(int serviceLineId, int userId, bool status)
+        {
+            var service = _serviceRepo.Table.Where(x => x.ServiceLineId == serviceLineId).FirstOrDefault();
+            if (service != null)
+            {
+                service.IsActive = status;
+                service.ModifiedBy = userId;
+                service.ModifiedDate = DateTime.UtcNow;
+                _serviceRepo.Update(service);
+
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = (status ? "Activate" : "InAvtivate") + " Successfully" };
+            }
+            else
+            {
+                return new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "Data Not Found" };
+            }
         }
 
         public BaseResponse DeleteServiceLine(int serviceLineId, int userId, bool status)

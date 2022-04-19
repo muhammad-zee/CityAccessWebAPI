@@ -18,6 +18,7 @@ namespace Web.Data.Models
         public virtual DbSet<ActiveCode> ActiveCodes { get; set; }
         public virtual DbSet<CallLog> CallLogs { get; set; }
         public virtual DbSet<CallQueue> CallQueues { get; set; }
+        public virtual DbSet<CallReservation> CallReservations { get; set; }
         public virtual DbSet<ChatSetting> ChatSettings { get; set; }
         public virtual DbSet<ClinicalHoliday> ClinicalHolidays { get; set; }
         public virtual DbSet<ClinicalHour> ClinicalHours { get; set; }
@@ -145,6 +146,17 @@ namespace Web.Data.Models
                 entity.Property(e => e.ToPhoneNumber).HasMaxLength(30);
             });
 
+            modelBuilder.Entity<CallReservation>(entity =>
+            {
+                entity.HasNoKey();
+
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.ReservationId).ValueGeneratedOnAdd();
+            });
+
             modelBuilder.Entity<ChatSetting>(entity =>
             {
                 entity.Property(e => e.CallSound).HasMaxLength(200);
@@ -176,6 +188,10 @@ namespace Web.Data.Models
 
                 entity.Property(e => e.EndDate).HasColumnType("datetime");
 
+                entity.Property(e => e.IsActive)
+                    .IsRequired()
+                    .HasDefaultValueSql("((1))");
+
                 entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
 
                 entity.Property(e => e.StartDate).HasColumnType("datetime");
@@ -198,6 +214,10 @@ namespace Web.Data.Models
                 entity.Property(e => e.EndDate).HasColumnType("datetime");
 
                 entity.Property(e => e.EndTime).HasColumnType("datetime");
+
+                entity.Property(e => e.IsActive)
+                    .IsRequired()
+                    .HasDefaultValueSql("((1))");
 
                 entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
 
@@ -998,6 +1018,10 @@ namespace Web.Data.Models
                 entity.Property(e => e.CreatedDate)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.IsActive)
+                    .IsRequired()
+                    .HasDefaultValueSql("((1))");
 
                 entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
 

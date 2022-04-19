@@ -24,6 +24,7 @@ namespace Web.Data.Models
         public DateTime CreatedDate { get; set; }
         public int? ModifiedBy { get; set; }
         public DateTime? ModifiedDate { get; set; }
+        public bool? IsActive { get; set; }
         public bool IsDeleted { get; set; }
         public bool IsScheduleRequired { get; set; }
         public bool IsSuperAdmin { get; set; }

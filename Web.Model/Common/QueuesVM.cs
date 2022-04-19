@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Web.Model.Common
+﻿namespace Web.Model.Common
 {
     public class QueuesVM
     {

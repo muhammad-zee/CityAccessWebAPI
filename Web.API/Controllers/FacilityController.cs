@@ -131,6 +131,24 @@ namespace Web.API.Controllers
         }
 
         [Description("Delete Service Line")]
+        [HttpGet("service/ActiveOrInactiveServiceLine/{serviceLineId}/{userId}/{status}")]
+        public BaseResponse ActiveOrInactiveServiceLine(int serviceLineId, int userId, bool status)
+        {
+            try
+            {
+                var res = _facilityService.ActiveOrInactiveServiceLine(serviceLineId, userId, status);
+                return res;
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
+
+        [Description("Delete Service Line")]
         [HttpGet("service/DeleteServiceLine/{serviceLineId}/{userId}/{status}")]
         public BaseResponse DeleteServiceLine(int serviceLineId, int userId, bool status)
         {
