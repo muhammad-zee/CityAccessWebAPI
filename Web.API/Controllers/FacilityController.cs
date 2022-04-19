@@ -412,6 +412,23 @@ namespace Web.API.Controllers
             }
         }
 
+        [Description("Active/InActive Organization")]
+        [HttpGet("org/ActiveOrInActiveOrganization")]
+        public BaseResponse ActiveOrInActiveOrganization(int OrganizationId, bool status)
+        {
+            try
+            {
+                var res = _facilityService.ActiveOrInActiveOrganization(OrganizationId, status);
+                return res;
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
         [Description("Get Organization Type By Id")]
         [HttpGet("org/GetOrganizationTypeByOrgId/{orgId}")]
         public BaseResponse GetOrganizationTypeByOrgId(int orgId)
@@ -468,11 +485,11 @@ namespace Web.API.Controllers
 
         [Description("Get Clinical Hours By Service Line Id")]
         [HttpGet("ClinicalHour/GetClinicalHourByServiceLineId/{orgId}/{serviceLineId}")]
-        public BaseResponse GetClinicalHourByServiceLineId(int orgId, int serviceLineId)
+        public BaseResponse GetClinicalHourByServiceLineId(int orgId, int serviceLineId,bool status=true)
         {
             try
             {
-                var res = _facilityService.GetClinicalHourByServiceLineId(orgId, serviceLineId);
+                var res = _facilityService.GetClinicalHourByServiceLineId(orgId, serviceLineId,status);
 
                 return res;
             }
@@ -509,6 +526,23 @@ namespace Web.API.Controllers
             try
             {
                 var res = _facilityService.DeleteClinicalHour(Id, userId);
+                return res;
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
+        [Description("Active/InActive Clinical Hour")]
+        [HttpGet("ClinicalHour/ActiveOrInActiveClinicalHour")]
+        public BaseResponse ActiveInActiveClinicalHour(int Id, int userId,bool status)
+        {
+            try
+            {
+                var res = _facilityService.ActiveOrInActiveClinicalHour(Id, userId,status);
                 return res;
             }
             catch (Exception ex)

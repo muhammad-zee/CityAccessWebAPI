@@ -705,6 +705,25 @@ namespace Web.Services.Concrete
                 return new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "Data Not Found" };
             }
         }
+
+        public BaseResponse ActiveOrInActiveOrganization(int OrganizationId, bool status)
+        {
+            var org = _organizationRepo.Table.Where(x => x.OrganizationId == OrganizationId).FirstOrDefault();
+            if (org != null)
+            {
+                //org.IsDeleted = true;
+                org.IsActive = status;
+                org.ModifiedBy = ApplicationSettings.UserId;
+                org.ModifiedDate = DateTime.UtcNow;
+                _organizationRepo.Update(org);
+
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Deleted Successfully" };
+            }
+            else
+            {
+                return new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "Data Not Found" };
+            }
+        }
         #endregion
 
 
@@ -747,7 +766,7 @@ namespace Web.Services.Concrete
 
         }
 
-        public BaseResponse GetClinicalHourByServiceLineId(int orgId, int serviceLineId)
+        public BaseResponse GetClinicalHourByServiceLineId(int orgId, int serviceLineId,bool status)
         {
             var cHours = (from ch in this._clinicalHourRepo.Table
                           join w in this._controlListDetailsRepo.Table on ch.WeekDayIdFk equals w.ControlListDetailId
@@ -761,6 +780,12 @@ namespace Web.Services.Concrete
                           && d.IsDeleted != true
                           && sl.IsDeleted != true
                           && ch.IsDeleted != true
+                          && ch.IsActive==status
+                          && sl.IsActive==status
+                          && d.IsActive==status
+                          && w.IsActive==status
+                          && org.IsActive==status
+
                           select new clinicalHours()
                           {
                               id = ch.ClinicalHourId,
@@ -983,6 +1008,24 @@ namespace Web.Services.Concrete
             if (cHour != null)
             {
                 cHour.IsDeleted = true;
+                cHour.ModifiedBy = userId;
+                cHour.ModifiedDate = DateTime.UtcNow;
+                this._clinicalHourRepo.Update(cHour);
+
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Deleted Successfully" };
+            }
+            else
+            {
+                return new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "Data Not Found" };
+            }
+        }
+
+        public BaseResponse ActiveOrInActiveClinicalHour(int Id, int userId,bool status)
+        {
+            var cHour = this._clinicalHourRepo.Table.Where(x => x.ClinicalHourId == Id).FirstOrDefault();
+            if (cHour != null)
+            {
+                cHour.IsActive = status;
                 cHour.ModifiedBy = userId;
                 cHour.ModifiedDate = DateTime.UtcNow;
                 this._clinicalHourRepo.Update(cHour);

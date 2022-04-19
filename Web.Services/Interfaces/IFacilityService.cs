@@ -38,15 +38,19 @@ namespace Web.Services.Interfaces
         BaseResponse GetOrganizationTypeByOrgId(int orgId);
         BaseResponse AddOrUpdateOrganization(OrganizationVM organization);
         BaseResponse DeleteOrganization(int OrganizationId, bool status);
+
+        BaseResponse ActiveOrInActiveOrganization(int OrganizationId, bool status);
         #endregion
 
         #region Clinical Hours
 
         BaseResponse GetAllClinicalHours();
         BaseResponse GetClinicalHourById(int Id);
-        BaseResponse GetClinicalHourByServiceLineId(int orgId, int serviceLineId);
+        BaseResponse GetClinicalHourByServiceLineId(int orgId, int serviceLineId,bool status);
         BaseResponse AddOrUpdateClinicalHour(OrganizationSchedule clinicalHours);
         BaseResponse DeleteClinicalHour(int Id, int userId);
+
+        BaseResponse ActiveOrInActiveClinicalHour(int Id, int userId, bool status);
 
         #endregion
 
