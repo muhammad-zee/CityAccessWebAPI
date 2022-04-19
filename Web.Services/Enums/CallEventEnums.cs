@@ -12,4 +12,12 @@
         Inbound
     }
 
+    public enum QueueStatusEnums
+    {
+        Pending=0,
+        Reserved=1,
+        Completed=2,
+        Cancelled=3
+    } 
+
 }

@@ -422,6 +422,23 @@ namespace Web.API.Controllers
 
         }
 
+        [AllowAnonymous]
+        [HttpPost("Queue/DequeueCalls")]
+        public BaseResponse DequeueCalls()
+        {
+            try
+            {
+                return this._callService.DequeueCalls();
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+
+        }
+
         #endregion
 
     }
