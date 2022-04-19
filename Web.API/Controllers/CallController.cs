@@ -338,7 +338,7 @@ namespace Web.API.Controllers
 
         #region IVR
 
-        [HttpGet("ivr/getAllIvrs/{status}")]
+        [HttpGet("ivr/getAllIvrs")]
         public BaseResponse getAllIvrs()
         {
             try
