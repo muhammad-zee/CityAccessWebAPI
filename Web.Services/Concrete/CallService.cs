@@ -876,9 +876,9 @@ namespace Web.Services.Concrete
 
         #region IVR
 
-        public BaseResponse getAllIvrs(bool status)
+        public BaseResponse getAllIvrs()
         {
-            var IVRs = _IVRRepo.Table.Where(x => x.IsDeleted != true && x.IsActive==status ).ToList();
+            var IVRs = _IVRRepo.Table.Where(x => x.IsDeleted != true).ToList();
             var types = _controlListDetailsRepo.Table.Where(x => x.ControlListIdFk == UCLEnums.OrgType.ToInt()).Select(x => new { x.ControlListDetailId, x.Title });
             var IVRVMs = AutoMapperHelper.MapList<InteractiveVoiceResponse, IVRVM>(IVRs);
             //IVRVMs.ForEach(x => x.OrganizationType = types.Where(t => t.ControlListDetailId == x.OrganizationTypeIdFk).Select(ty => ty.Title).FirstOrDefault());
@@ -889,9 +889,9 @@ namespace Web.Services.Concrete
                 Body = IVRVMs
             };
         }
-        public BaseResponse getAllIvrsByOrgId(int orgId)
+        public BaseResponse getAllIvrsByOrgId(int orgId,bool status)
         {
-            var IVRs = _IVRRepo.Table.Where(x => x.IsDeleted != true && x.OrganizationIdFk == orgId).ToList();
+            var IVRs = _IVRRepo.Table.Where(x => x.IsDeleted != true && x.OrganizationIdFk == orgId && x.IsActive==status).ToList();
             var types = _controlListDetailsRepo.Table.Where(x => x.ControlListIdFk == UCLEnums.OrgType.ToInt()).Select(x => new { x.ControlListDetailId, x.Title });
             var IVRVMs = AutoMapperHelper.MapList<InteractiveVoiceResponse, IVRVM>(IVRs);
             //IVRVMs.ForEach(x => x.OrganizationType = types.Where(t => t.ControlListDetailId == x.OrganizationTypeIdFk).Select(ty => ty.Title).FirstOrDefault());

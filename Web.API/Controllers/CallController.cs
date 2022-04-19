@@ -339,11 +339,11 @@ namespace Web.API.Controllers
         #region IVR
 
         [HttpGet("ivr/getAllIvrs/{status}")]
-        public BaseResponse getAllIvrs(bool status=true)
+        public BaseResponse getAllIvrs()
         {
             try
             {
-                return this._callService.getAllIvrs(status);
+                return this._callService.getAllIvrs();
             }
             catch (Exception ex)
             {
@@ -354,11 +354,11 @@ namespace Web.API.Controllers
 
         }
         [HttpGet("ivr/getAllIvrsByOrgId/{orgId}")]
-        public BaseResponse getAllIvrsByOrgId(int orgId)
+        public BaseResponse getAllIvrsByOrgId(int orgId,bool status=true)
         {
             try
             {
-                return this._callService.getAllIvrsByOrgId(orgId);
+                return this._callService.getAllIvrsByOrgId(orgId,status);
             }
             catch (Exception ex)
             {
