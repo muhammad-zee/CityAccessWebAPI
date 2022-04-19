@@ -34,18 +34,14 @@ namespace Web.API.Controllers
 
         [Description("Get All Service Lines")]
         [HttpGet("service/GetAllServiceLines/{departmentId}/{status}")]
-        public BaseResponse GetAllServiceLines(int? departmentId, bool? status)
+        public BaseResponse GetAllServiceLines(int? departmentId, bool status = true)
         {
-            if (status == null)
-            {
-                status = true;
-            }
             try
             {
                 BaseResponse res = null;
                 if (departmentId != null)
                 {
-                    res = this._facilityService.GetAllServiceLinesByDepartmentId(Convert.ToInt32(departmentId), status.Value);
+                    res = this._facilityService.GetAllServiceLinesByDepartmentId(Convert.ToInt32(departmentId), status);
                 }
                 else
                 {
@@ -132,7 +128,7 @@ namespace Web.API.Controllers
 
         [Description("Delete Service Line")]
         [HttpGet("service/ActiveOrInactiveServiceLine/{serviceLineId}/{userId}/{status}")]
-        public BaseResponse ActiveOrInactiveServiceLine(int serviceLineId, int userId, bool status)
+        public BaseResponse ActiveOrInactiveServiceLine(int serviceLineId, int userId, bool status = true)
         {
             try
             {
@@ -171,18 +167,14 @@ namespace Web.API.Controllers
 
         [Description("Get All Departments")]
         [HttpGet("dpt/GetAllDepartments")]
-        public BaseResponse GetAllDepartments(int? OrganizationId, bool? status = true)
+        public BaseResponse GetAllDepartments(int? OrganizationId, bool status = true)
         {
             try
             {
-                if (status == null)
-                {
-                    status = true;
-                }
                 BaseResponse res = null;
                 if (OrganizationId != null)
                 {
-                    res = this._facilityService.GetAllDepartmentsByOrganizationId(OrganizationId.Value, status.Value);
+                    res = this._facilityService.GetAllDepartmentsByOrganizationId(OrganizationId.Value, status);
                 }
                 else
                 {
@@ -269,7 +261,7 @@ namespace Web.API.Controllers
 
         [Description("Active/InActive Department")]
         [HttpGet("dpt/ActiveOrInActiveDepartment/{departmentId}/{userId}/{status}")]
-        public BaseResponse ActiveOrInActiveDepartment(int departmentId, int userId, bool status)
+        public BaseResponse ActiveOrInActiveDepartment(int departmentId, int userId, bool status = true)
         {
             try
             {
@@ -307,16 +299,11 @@ namespace Web.API.Controllers
 
         [Description("Get All Organizations")]
         [HttpGet("org/GetAllOrganizations")]
-        public BaseResponse GetAllOrganizations(bool? status = true)
+        public BaseResponse GetAllOrganizations(bool status = true)
         {
-
-            if (status == null)
-            {
-                status = true;
-            }
             try
             {
-                var res = _facilityService.GetAllOrganizations(status.Value);
+                var res = _facilityService.GetAllOrganizations(status);
                 return res;
             }
             catch (Exception ex)
