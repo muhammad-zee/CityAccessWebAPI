@@ -47,7 +47,7 @@ namespace Web.Services.Interfaces
         #region Roles
         BaseResponse GetAllRoles(RoleVM role);
         IQueryable<Role> getRoleList();
-        IQueryable<Role> getRoleListByOrganizationId(int OrganizationId);
+        IQueryable<Role> getRoleListByOrganizationId(int OrganizationId,bool status);
         IQueryable<Role> getScheduleRoleListByOrganizationId(int OrganizationId);
         IQueryable<Role> getRoleListByOrganizationIds(string OrganizationIds);
         BaseResponse GetAllRolesByServiceLineId(int ServiceLineId);
@@ -55,6 +55,8 @@ namespace Web.Services.Interfaces
         string SaveRole(List<RoleVM> role);
         BaseResponse GetRoleById(int roleId);
         BaseResponse DeleteRole(int Id);
+
+        BaseResponse ActiveInActiveRole(int Id,bool status);
 
         #endregion
 

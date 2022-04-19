@@ -290,14 +290,14 @@ namespace Web.API.Controllers
 
 
         [HttpGet("admin/GetAllRoles")]
-        public BaseResponse GetRoles(int? OrganizationID)
+        public BaseResponse GetRoles(int? OrganizationID,bool status =true)
         {
             try
             {
                 IQueryable roleObj = null;
                 if (OrganizationID != null)
                 {
-                    roleObj = _adminService.getRoleListByOrganizationId(OrganizationID.Value);
+                    roleObj = _adminService.getRoleListByOrganizationId(OrganizationID.Value,status);
                 }
                 else
                 {
@@ -433,6 +433,23 @@ namespace Web.API.Controllers
             try
             {
                 var response = _adminService.DeleteRole(Id);
+                return response;
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
+        [Description("Active/InActive Role")]
+        [HttpGet("admin/ActiveOrInActiveRole/{Id}/{status}")]
+        public async Task<BaseResponse> ActiveorInActiveRole(int Id,bool status)
+        {
+            try
+            {
+                var response = _adminService.ActiveInActiveRole(Id,status);
                 return response;
             }
             catch (Exception ex)

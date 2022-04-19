@@ -401,9 +401,9 @@ namespace Web.Services.Concrete
         {
             return this._role.GetList().Where(item => !item.IsDeleted);
         }
-        public IQueryable<Role> getRoleListByOrganizationId(int OrganizationId)
+        public IQueryable<Role> getRoleListByOrganizationId(int OrganizationId,bool status)
         {
-            var rolesList = this._role.Table.Where(item => item.OrganizationIdFk == OrganizationId && !item.IsDeleted && !item.IsSuperAdmin);
+            var rolesList = this._role.Table.Where(item => item.OrganizationIdFk == OrganizationId && !item.IsDeleted &&item.IsActive==status && !item.IsSuperAdmin );
             //if (ApplicationSettings.isSuperAdmin)
             //{
             //    var superAdminRole = this._role.GetList().Where(item => item.RoleId == userRoleId);
@@ -529,6 +529,21 @@ namespace Web.Services.Concrete
                 Role.IsDeleted = true;
                 _role.Update(Role);
                 return new BaseResponse { Status = HttpStatusCode.OK, Message = "Role Deleted" };
+            }
+            else
+            {
+                return new BaseResponse { Status = HttpStatusCode.NotFound, Message = "Role Not Found" };
+            }
+        }
+
+        public BaseResponse ActiveInActiveRole(int Id,bool status)
+        {
+            var Role = _role.Table.Where(x => x.RoleId == Id && x.IsDeleted == false).FirstOrDefault();
+            if (Role != null)
+            {
+                Role.IsActive = status;
+                _role.Update(Role);
+                return new BaseResponse { Status = HttpStatusCode.OK, Message = "Role" };
             }
             else
             {
