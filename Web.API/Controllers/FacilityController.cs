@@ -171,14 +171,14 @@ namespace Web.API.Controllers
 
         [Description("Get All Departments")]
         [HttpGet("dpt/GetAllDepartments")]
-        public BaseResponse GetAllDepartments(int? OrganizationId, bool? status)
+        public BaseResponse GetAllDepartments(int? OrganizationId, bool? status = true)
         {
-            if (status == null)
-            {
-                status = true;
-            }
             try
             {
+                if (status == null)
+                {
+                    status = true;
+                }
                 BaseResponse res = null;
                 if (OrganizationId != null)
                 {
