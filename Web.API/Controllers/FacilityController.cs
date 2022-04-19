@@ -307,7 +307,7 @@ namespace Web.API.Controllers
 
         [Description("Get All Organizations")]
         [HttpGet("org/GetAllOrganizations")]
-        public BaseResponse GetAllOrganizations(bool? status = false)
+        public BaseResponse GetAllOrganizations(bool? status = true)
         {
 
             if (status == null)
