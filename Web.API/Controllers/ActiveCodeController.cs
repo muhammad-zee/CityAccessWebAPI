@@ -287,7 +287,7 @@ namespace Web.API.Controllers
             }
         }
 
-        [Description("Active?InActive Sepsis Data By Id")]
+        [Description("Active Or InActive Sepsis Data By Id")]
         [HttpGet("Sepsis/ActiveOrInActiveSepsisDataById/{SepsisId}/{status}")]
         public BaseResponse ActiveOrInActiveSepsisDataById(int SepsisId, bool status)
         {
@@ -374,7 +374,7 @@ namespace Web.API.Controllers
             }
         }
 
-        [Description("Active/InActive STEMI Data By Id")]
+        [Description("Active Or InActive STEMI Data By Id")]
         [HttpGet("STEMI/ActiveOrInActiveSTEMIDataById/{STEMIId}/{status}")]
         public BaseResponse ActiveOrInActiveSTEMIDataById(int STEMIId, bool status)
         {
@@ -547,7 +547,7 @@ namespace Web.API.Controllers
             }
         }
 
-        [Description("Active/InActive Blue Data By Id")]
+        [Description("Active Or InActive Blue Data By Id")]
         [HttpGet("blue/ActiveOrInActiveBlueDataById/{blueId}/{status}")]
         public BaseResponse ActiveInActiveBlueDataById(int blueId, bool status)
         {
