@@ -169,7 +169,7 @@ namespace Web.Services.Concrete
         {
             //var result = _user.Table.Where(x => x.IsDeleted == false).ToList();
             var result = this._dbContext.LoadStoredProcedure("md_getAllUsersByOrganizationId")
-               
+
                 .WithSqlParam("@pOrganizationId", OrganizationId)
                 .WithSqlParam("@pIsSuperAdmin", ApplicationSettings.isSuperAdmin)
                 .ExecuteStoredProc<User>();
@@ -201,7 +201,7 @@ namespace Web.Services.Concrete
             var result = this._dbContext.LoadStoredProcedure("md_getAllUsersByOrganizationId_Dynamic")
                 .WithSqlParam("@pOrganizationId", model.OrganizationId)
                 .WithSqlParam("@pIsSuperAdmin", ApplicationSettings.isSuperAdmin)
-                .WithSqlParam("@pstatus",model.status)
+                .WithSqlParam("@pstatus", model.status)
 
                 .WithSqlParam("@page", model.PageNumber)
                 .WithSqlParam("@size", model.Rows)

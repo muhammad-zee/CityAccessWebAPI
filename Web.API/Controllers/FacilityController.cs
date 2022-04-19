@@ -34,9 +34,9 @@ namespace Web.API.Controllers
 
         [Description("Get All Service Lines")]
         [HttpGet("service/GetAllServiceLines/{departmentId}/{status}")]
-        public BaseResponse GetAllServiceLines(int? departmentId,bool? status)
+        public BaseResponse GetAllServiceLines(int? departmentId, bool? status)
         {
-            if(status == null)
+            if (status == null)
             {
                 status = true;
             }
@@ -45,7 +45,7 @@ namespace Web.API.Controllers
                 BaseResponse res = null;
                 if (departmentId != null)
                 {
-                    res = this._facilityService.GetAllServiceLinesByDepartmentId(Convert.ToInt32(departmentId),status.Value);
+                    res = this._facilityService.GetAllServiceLinesByDepartmentId(Convert.ToInt32(departmentId), status.Value);
                 }
                 else
                 {
@@ -132,11 +132,11 @@ namespace Web.API.Controllers
 
         [Description("Delete Service Line")]
         [HttpGet("service/DeleteServiceLine/{serviceLineId}/{userId}/{status}")]
-        public BaseResponse DeleteServiceLine(int serviceLineId, int userId,bool status)
+        public BaseResponse DeleteServiceLine(int serviceLineId, int userId, bool status)
         {
             try
             {
-                var res = _facilityService.DeleteServiceLine(serviceLineId, userId,status);
+                var res = _facilityService.DeleteServiceLine(serviceLineId, userId, status);
                 return res;
             }
             catch (Exception ex)
@@ -153,9 +153,9 @@ namespace Web.API.Controllers
 
         [Description("Get All Departments")]
         [HttpGet("dpt/GetAllDepartments")]
-        public BaseResponse GetAllDepartments(int? OrganizationId,bool? status)
-        { 
-            if(status == null)
+        public BaseResponse GetAllDepartments(int? OrganizationId, bool? status)
+        {
+            if (status == null)
             {
                 status = true;
             }
@@ -164,7 +164,7 @@ namespace Web.API.Controllers
                 BaseResponse res = null;
                 if (OrganizationId != null)
                 {
-                    res = this._facilityService.GetAllDepartmentsByOrganizationId(OrganizationId.Value,status.Value);
+                    res = this._facilityService.GetAllDepartmentsByOrganizationId(OrganizationId.Value, status.Value);
                 }
                 else
                 {
@@ -234,11 +234,11 @@ namespace Web.API.Controllers
 
         [Description("Delete Department")]
         [HttpGet("dpt/DeleteDepartment/{departmentId}/{userId}/{status}")]
-        public BaseResponse DeleteDepartment(int departmentId, int userId,bool status)
+        public BaseResponse DeleteDepartment(int departmentId, int userId, bool status)
         {
             try
             {
-                var res = _facilityService.DeleteDepartment(departmentId, userId,status);
+                var res = _facilityService.DeleteDepartment(departmentId, userId, status);
                 return res;
             }
             catch (Exception ex)
@@ -274,12 +274,12 @@ namespace Web.API.Controllers
         [HttpGet("org/GetAllOrganizations")]
         public BaseResponse GetAllOrganizations(bool? status = false)
         {
-            
-                if (status == null)
-                {
-                    status = true;
-                }
-                try
+
+            if (status == null)
+            {
+                status = true;
+            }
+            try
             {
                 var res = _facilityService.GetAllOrganizations(status.Value);
                 return res;
@@ -362,11 +362,11 @@ namespace Web.API.Controllers
 
         [Description("Delete Organization")]
         [HttpGet("org/DeleteOrganization")]
-        public BaseResponse DeleteOrganization(int OrganizationId,bool status)
+        public BaseResponse DeleteOrganization(int OrganizationId, bool status)
         {
             try
             {
-                var res = _facilityService.DeleteOrganization(OrganizationId,status);
+                var res = _facilityService.DeleteOrganization(OrganizationId, status);
                 return res;
             }
             catch (Exception ex)

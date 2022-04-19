@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 #nullable disable
 
@@ -10,7 +9,6 @@ namespace Web.Data.Models
         public int ConsultAcknowledgmentId { get; set; }
         public long ConsultIdFk { get; set; }
         public int UserIdFk { get; set; }
-        public string ChannelSid { get; set; }
         public bool IsAcknowledge { get; set; }
         public int CreatedBy { get; set; }
         public DateTime CreatedDate { get; set; }

@@ -29,6 +29,7 @@ namespace Web.Data.Models
         public bool IsDeleted { get; set; }
         public bool? IsEms { get; set; }
         public bool? IsCompleted { get; set; }
+        public bool? IsActive { get; set; }
         public string FamilyContactName { get; set; }
         public string Audio { get; set; }
         public string Video { get; set; }
@@ -38,6 +39,7 @@ namespace Web.Data.Models
         public TimeSpan? ActualTime { get; set; }
         public string Distance { get; set; }
         public string StartingPoint { get; set; }
+        public string ChannelSid { get; set; }
 
         public virtual ICollection<CodeStrokeGroupMember> CodeStrokeGroupMembers { get; set; }
     }

@@ -63,7 +63,7 @@ namespace Web.Services.Concrete
                 Body = services
             };
         }
-        public BaseResponse GetAllServiceLinesByDepartmentId(int DepartmentId,bool status)
+        public BaseResponse GetAllServiceLinesByDepartmentId(int DepartmentId, bool status)
         {
             var services = _serviceRepo.Table.Where(x => x.IsDeleted == status && x.DepartmentIdFk == DepartmentId).ToList();
             if (services.Count() > 0)
@@ -182,7 +182,7 @@ namespace Web.Services.Concrete
             return response;
         }
 
-        public BaseResponse DeleteServiceLine(int serviceLineId, int userId,bool status)
+        public BaseResponse DeleteServiceLine(int serviceLineId, int userId, bool status)
         {
             var service = _serviceRepo.Table.Where(x => x.ServiceLineId == serviceLineId).FirstOrDefault();
             if (service != null)
@@ -235,7 +235,7 @@ namespace Web.Services.Concrete
             };
         }
 
-        public BaseResponse GetAllDepartmentsByOrganizationId(int OrganizationId,bool status)
+        public BaseResponse GetAllDepartmentsByOrganizationId(int OrganizationId, bool status)
         {
             var departments = this._departmentRepo.Table.Where(od => od.OrganizationIdFk == OrganizationId && od.IsDeleted == status).ToList();
             var dpts = AutoMapperHelper.MapList<Department, DepartmentVM>(departments);
@@ -344,7 +344,7 @@ namespace Web.Services.Concrete
             return response;
         }
 
-        public BaseResponse DeleteDepartment(int departmentId, int userId,bool status)
+        public BaseResponse DeleteDepartment(int departmentId, int userId, bool status)
         {
             var dpt = _departmentRepo.Table.Where(x => x.DepartmentId == departmentId).FirstOrDefault();
             //var deptOrgRelation = this._organizationDepartmentRepo.Table.FirstOrDefault(r => r.DepartmentIdFk == departmentId && r.OrganizationIdFk == organizationId);
@@ -478,7 +478,7 @@ namespace Web.Services.Concrete
         }
 
         public BaseResponse GetAllOrganizations(bool status)
-        { 
+        {
             var organizations = new List<Organization>();
             if (ApplicationSettings.isSuperAdmin)
             {
@@ -649,7 +649,7 @@ namespace Web.Services.Concrete
             return response;
         }
 
-        public BaseResponse DeleteOrganization(int OrganizationId,bool status)
+        public BaseResponse DeleteOrganization(int OrganizationId, bool status)
         {
             var org = _organizationRepo.Table.Where(x => x.OrganizationId == OrganizationId).FirstOrDefault();
             if (org != null)

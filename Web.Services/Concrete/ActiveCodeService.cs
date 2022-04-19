@@ -99,11 +99,11 @@ namespace Web.Services.Concrete
 
         #region Active Code
 
-        public BaseResponse GetActivatedCodesByOrgId(int orgId,bool status)
+        public BaseResponse GetActivatedCodesByOrgId(int orgId, bool status)
         {
             var codes = this._dbContext.LoadStoredProcedure("md_getActivatedCodesForOrg")
                 .WithSqlParam("@pOrgId", orgId)
-                .WithSqlParam("@pstatus",status)
+                .WithSqlParam("@pstatus", status)
                 .ExecuteStoredProc<ActiveCodeVM>();
             foreach (var item in codes)
             {
@@ -208,7 +208,7 @@ namespace Web.Services.Concrete
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Saved" };
         }
 
-        public BaseResponse DetachActiveCodes(int activeCodeId,bool status)
+        public BaseResponse DetachActiveCodes(int activeCodeId, bool status)
         {
             var row = this._activeCodeRepo.Table.Where(x => x.ActiveCodeId == activeCodeId).FirstOrDefault();
             row.ModifiedBy = ApplicationSettings.UserId;
@@ -1052,7 +1052,7 @@ namespace Web.Services.Concrete
                     };
                     this._codesServiceLinesMappingRepo.Insert(codeService);
 
-                    var channel = this._StrokeCodeGroupMembersRepo.Table.Where(x => x.StrokeCodeIdFk == row.CodeStrokeId && !x.IsDeleted).ToList();
+                    //var channel = this._StrokeCodeGroupMembersRepo.Table.Where(x => x.StrokeCodeIdFk == row.CodeStrokeId && !x.IsDeleted).ToList();
 
                     var UserChannelSid = (from us in this._userSchedulesRepo.Table
                                           join u in this._userRepo.Table on us.UserIdFk equals u.UserId
@@ -1063,11 +1063,13 @@ namespace Web.Services.Concrete
                     var loggedInUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).FirstOrDefault();
                     UserChannelSid.Add(loggedInUser);
 
-                    if (channel != null && channel.Count > 0)
+                    if (row.ChannelSid != null && row.ChannelSid != "")
                     {
-                        var channelSid = channel.Select(x => x.ChannelSid).FirstOrDefault();
+                        var channelSid = row.ChannelSid; //channel.Select(x => x.ChannelSid).FirstOrDefault();
 
-                        this._StrokeCodeGroupMembersRepo.DeleteRange(channel);
+                        var groupMembers = this._StrokeCodeGroupMembersRepo.Table.Where(x => x.StrokeCodeIdFk == row.CodeStrokeId).ToList();
+                        this._StrokeCodeGroupMembersRepo.DeleteRange(groupMembers);
+                        //this._StrokeCodeGroupMembersRepo.DeleteRange(channel);
                         bool isDeleted = _communication.DeleteUserToConversationChannel(channelSid);
                         List<CodeStrokeGroupMember> ACodeGroupMembers = new List<CodeStrokeGroupMember>();
                         foreach (var item in UserChannelSid.Distinct())
@@ -1076,7 +1078,6 @@ namespace Web.Services.Concrete
                             {
                                 var codeGroupMember = new CodeStrokeGroupMember()
                                 {
-                                    ChannelSid = channelSid,
                                     UserIdFk = item.UserId,
                                     StrokeCodeIdFk = row.CodeStrokeId,
                                     //ActiveCodeName = UCLEnums.Stroke.ToString(),
@@ -1112,7 +1113,8 @@ namespace Web.Services.Concrete
                     _communication.pushNotification(notification);
 
                 }
-                else {
+                else
+                {
 
                     var userIds = this._StrokeCodeGroupMembersRepo.Table.Where(x => x.StrokeCodeIdFk == row.CodeStrokeId).Select(x => x.UserIdFk).ToList();
                     var userUniqueIds = this._userRepo.Table.Where(x => userIds.Contains(x.UserId)).Select(x => x.UserUniqueId).Distinct().ToList();
@@ -1471,6 +1473,8 @@ namespace Web.Services.Concrete
                             string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
                             string friendlyName = stroke.IsEms.HasValue && stroke.IsEms.Value ? $"EMS Code {UCLEnums.Stroke.ToString()} {stroke.CodeStrokeId}" : $"Inhouse Code {UCLEnums.Stroke.ToString()} {stroke.CodeStrokeId}";
                             var channel = _communication.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
+                            stroke.ChannelSid = channel.Sid;
+                            this._codeStrokeRepo.Update(stroke);
                             UserChannelSid = UserChannelSid.Distinct().ToList();
                             foreach (var item in UserChannelSid)
                             {
@@ -1478,7 +1482,6 @@ namespace Web.Services.Concrete
                                 {
                                     var codeGroupMember = new CodeStrokeGroupMember()
                                     {
-                                        ChannelSid = channel.Sid,
                                         UserIdFk = item.UserId,
                                         StrokeCodeIdFk = stroke.CodeStrokeId,
                                         //ActiveCodeName = UCLEnums.Stroke.ToString(),
@@ -2110,7 +2113,7 @@ namespace Web.Services.Concrete
                     };
                     this._codesServiceLinesMappingRepo.Insert(codeService);
 
-                    var channel = this._SepsisCodeGroupMembersRepo.Table.Where(x => x.SepsisCodeIdFk == row.CodeSepsisId && !x.IsDeleted).ToList();
+                    //var channel = this._SepsisCodeGroupMembersRepo.Table.Where(x => x.SepsisCodeIdFk == row.CodeSepsisId && !x.IsDeleted).ToList();
 
                     var UserChannelSid = (from us in this._userSchedulesRepo.Table
                                           join u in this._userRepo.Table on us.UserIdFk equals u.UserId
@@ -2121,11 +2124,12 @@ namespace Web.Services.Concrete
                     var loggedInUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).FirstOrDefault();
                     UserChannelSid.Add(loggedInUser);
 
-                    if (channel != null && channel.Count > 0)
+                    if (row.ChannelSid != null && row.ChannelSid != "")
                     {
-                        var channelSid = channel.Select(x => x.ChannelSid).FirstOrDefault();
-
-                        this._SepsisCodeGroupMembersRepo.DeleteRange(channel);
+                        var channelSid = row.ChannelSid; //channel.Select(x => x.ChannelSid).FirstOrDefault();
+                        var groupMembers = this._SepsisCodeGroupMembersRepo.Table.Where(x => x.SepsisCodeIdFk == row.CodeSepsisId).ToList();
+                        this._SepsisCodeGroupMembersRepo.DeleteRange(groupMembers);
+                        //this._SepsisCodeGroupMembersRepo.DeleteRange(channel);
                         bool isDeleted = _communication.DeleteUserToConversationChannel(channelSid);
                         List<CodeSepsisGroupMember> ACodeGroupMembers = new List<CodeSepsisGroupMember>();
                         foreach (var item in UserChannelSid.Distinct())
@@ -2134,7 +2138,6 @@ namespace Web.Services.Concrete
                             {
                                 var codeGroupMember = new CodeSepsisGroupMember()
                                 {
-                                    ChannelSid = channelSid,
                                     UserIdFk = item.UserId,
                                     SepsisCodeIdFk = row.CodeSepsisId,
                                     //ActiveCodeName = UCLEnums.Sepsis.ToString(),
@@ -2168,7 +2171,8 @@ namespace Web.Services.Concrete
                     _communication.pushNotification(notification);
 
                 }
-                else {
+                else
+                {
                     var userIds = this._SepsisCodeGroupMembersRepo.Table.Where(x => x.SepsisCodeIdFk == row.CodeSepsisId).Select(x => x.UserIdFk).ToList();
                     var userUniqueIds = this._userRepo.Table.Where(x => userIds.Contains(x.UserId)).Select(x => x.UserUniqueId).Distinct().ToList();
 
@@ -2521,6 +2525,8 @@ namespace Web.Services.Concrete
                                         {ChannelAttributeEnums.SepsisId.ToString(), Sepsis.CodeSepsisId}
                                     }, Formatting.Indented);
                             var channel = _communication.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
+                            Sepsis.ChannelSid = channel.Sid;
+                            this._codeSepsisRepo.Update(Sepsis);
                             UserChannelSid = UserChannelSid.Distinct().ToList();
                             foreach (var item in UserChannelSid)
                             {
@@ -2528,7 +2534,6 @@ namespace Web.Services.Concrete
                                 {
                                     var codeGroupMember = new CodeSepsisGroupMember()
                                     {
-                                        ChannelSid = channel.Sid,
                                         UserIdFk = item.UserId,
                                         SepsisCodeIdFk = Sepsis.CodeSepsisId,
                                         //ActiveCodeName = UCLEnums.Sepsis.ToString(),
@@ -3165,7 +3170,7 @@ namespace Web.Services.Concrete
                     };
                     this._codesServiceLinesMappingRepo.Insert(codeService);
 
-                    var channel = this._STEMICodeGroupMembersRepo.Table.Where(x => x.StemicodeIdFk == row.CodeStemiid && !x.IsDeleted).ToList();
+                    //var channel = this._STEMICodeGroupMembersRepo.Table.Where(x => x.StemicodeIdFk == row.CodeStemiid && !x.IsDeleted).ToList();
 
                     var UserChannelSid = (from us in this._userSchedulesRepo.Table
                                           join u in this._userRepo.Table on us.UserIdFk equals u.UserId
@@ -3176,11 +3181,13 @@ namespace Web.Services.Concrete
                     var loggedInUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).FirstOrDefault();
                     UserChannelSid.Add(loggedInUser);
 
-                    if (channel != null && channel.Count > 0)
+                    if (row.ChannelSid != null && row.ChannelSid != "")
                     {
-                        var channelSid = channel.Select(x => x.ChannelSid).FirstOrDefault();
+                        var channelSid = row.ChannelSid; //channel.Select(x => x.ChannelSid).FirstOrDefault();
 
-                        this._STEMICodeGroupMembersRepo.DeleteRange(channel);
+                        var groupMembers = this._STEMICodeGroupMembersRepo.Table.Where(x => x.StemicodeIdFk == row.CodeStemiid).ToList();
+                        this._STEMICodeGroupMembersRepo.DeleteRange(groupMembers);
+                        //this._STEMICodeGroupMembersRepo.DeleteRange(channel);
                         bool isDeleted = _communication.DeleteUserToConversationChannel(channelSid);
                         List<CodeStemigroupMember> ACodeGroupMembers = new List<CodeStemigroupMember>();
                         foreach (var item in UserChannelSid.Distinct())
@@ -3189,7 +3196,7 @@ namespace Web.Services.Concrete
                             {
                                 var codeGroupMember = new CodeStemigroupMember()
                                 {
-                                    ChannelSid = channelSid,
+                                    //ChannelSid = channelSid,
                                     UserIdFk = item.UserId,
                                     StemicodeIdFk = row.CodeStemiid,
                                     //ActiveCodeName = UCLEnums.STEMI.ToString(),
@@ -3222,7 +3229,8 @@ namespace Web.Services.Concrete
                     _communication.pushNotification(notification);
 
                 }
-                else {
+                else
+                {
                     var userIds = this._STEMICodeGroupMembersRepo.Table.Where(x => x.StemicodeIdFk == row.CodeStemiid).Select(x => x.UserIdFk).ToList();
                     var userUniqueIds = this._userRepo.Table.Where(x => userIds.Contains(x.UserId)).Select(x => x.UserUniqueId).Distinct().ToList();
 
@@ -3576,7 +3584,8 @@ namespace Web.Services.Concrete
                                         {ChannelAttributeEnums.STEMIId.ToString(), STEMI.CodeStemiid}
                                     }, Formatting.Indented);
                             var channel = _communication.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
-
+                            STEMI.ChannelSid = channel.Sid;
+                            this._codeSTEMIRepo.Update(STEMI);
                             UserChannelSid = UserChannelSid.Distinct().ToList();
                             foreach (var item in UserChannelSid)
                             {
@@ -3584,7 +3593,7 @@ namespace Web.Services.Concrete
                                 {
                                     var codeGroupMember = new CodeStemigroupMember()
                                     {
-                                        ChannelSid = channel.Sid,
+                                        //ChannelSid = channel.Sid,
                                         UserIdFk = item.UserId,
                                         StemicodeIdFk = STEMI.CodeStemiid,
                                         //  ActiveCodeName = UCLEnums.STEMI.ToString(),
@@ -4216,7 +4225,7 @@ namespace Web.Services.Concrete
                     };
                     this._codesServiceLinesMappingRepo.Insert(codeService);
 
-                    var channel = this._TraumaCodeGroupMembersRepo.Table.Where(x => x.TraumaCodeIdFk == row.CodeTraumaId && !x.IsDeleted).ToList();
+                    //var channel = this._TraumaCodeGroupMembersRepo.Table.Where(x => x.TraumaCodeIdFk == row.CodeTraumaId && !x.IsDeleted).ToList();
 
                     var UserChannelSid = (from us in this._userSchedulesRepo.Table
                                           join u in this._userRepo.Table on us.UserIdFk equals u.UserId
@@ -4227,11 +4236,12 @@ namespace Web.Services.Concrete
                     var loggedInUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).FirstOrDefault();
                     UserChannelSid.Add(loggedInUser);
 
-                    if (channel != null && channel.Count > 0)
+                    if (row.ChannelSid != null && row.ChannelSid != "")
                     {
-                        var channelSid = channel.Select(x => x.ChannelSid).FirstOrDefault();
-
-                        this._TraumaCodeGroupMembersRepo.DeleteRange(channel);
+                        var channelSid = row.ChannelSid; //channel.Select(x => x.ChannelSid).FirstOrDefault();
+                        var groupMembers = this._TraumaCodeGroupMembersRepo.Table.Where(x => x.TraumaCodeIdFk == row.CodeTraumaId).ToList();
+                        this._TraumaCodeGroupMembersRepo.DeleteRange(groupMembers);
+                        //this._TraumaCodeGroupMembersRepo.DeleteRange(channel);
                         bool isDeleted = _communication.DeleteUserToConversationChannel(channelSid);
                         List<CodeTraumaGroupMember> ACodeGroupMembers = new List<CodeTraumaGroupMember>();
                         foreach (var item in UserChannelSid.Distinct())
@@ -4240,7 +4250,7 @@ namespace Web.Services.Concrete
                             {
                                 var codeGroupMember = new CodeTraumaGroupMember()
                                 {
-                                    ChannelSid = channelSid,
+                                    //ChannelSid = channelSid,
                                     UserIdFk = item.UserId,
                                     TraumaCodeIdFk = row.CodeTraumaId,
                                     //ActiveCodeName = UCLEnums.Trauma.ToString(),
@@ -4274,7 +4284,8 @@ namespace Web.Services.Concrete
                     _communication.pushNotification(notification);
 
                 }
-                else {
+                else
+                {
 
                     var userIds = this._TraumaCodeGroupMembersRepo.Table.Where(x => x.TraumaCodeIdFk == row.CodeTraumaId).Select(x => x.UserIdFk).ToList();
                     var userUniqueIds = this._userRepo.Table.Where(x => userIds.Contains(x.UserId)).Select(x => x.UserUniqueId).Distinct().ToList();
@@ -4627,6 +4638,8 @@ namespace Web.Services.Concrete
                                         {ChannelAttributeEnums.TraumaId.ToString(), Truma.CodeTraumaId}
                                     }, Formatting.Indented);
                             var channel = _communication.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
+                            Truma.ChannelSid = channel.Sid;
+                            this._codeTrumaRepo.Update(Truma);
                             UserChannelSid = UserChannelSid.Distinct().ToList();
                             foreach (var item in UserChannelSid)
                             {
@@ -4634,7 +4647,7 @@ namespace Web.Services.Concrete
                                 {
                                     var codeGroupMember = new CodeTraumaGroupMember()
                                     {
-                                        ChannelSid = channel.Sid,
+                                        //ChannelSid = channel.Sid,
                                         UserIdFk = item.UserId,
                                         TraumaCodeIdFk = Truma.CodeTraumaId,
                                         //ActiveCodeName = UCLEnums.Trauma.ToString(),
@@ -5256,7 +5269,7 @@ namespace Web.Services.Concrete
                     };
                     this._codesServiceLinesMappingRepo.Insert(codeService);
 
-                    var channel = this._BlueCodeGroupMembersRepo.Table.Where(x => x.BlueCodeIdFk == row.CodeBlueId && !x.IsDeleted).ToList();
+                    //var channel = this._BlueCodeGroupMembersRepo.Table.Where(x => x.BlueCodeIdFk == row.CodeBlueId && !x.IsDeleted).ToList();
 
                     var UserChannelSid = (from us in this._userSchedulesRepo.Table
                                           join u in this._userRepo.Table on us.UserIdFk equals u.UserId
@@ -5267,11 +5280,14 @@ namespace Web.Services.Concrete
                     var loggedInUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).FirstOrDefault();
                     UserChannelSid.Add(loggedInUser);
 
-                    if (channel != null && channel.Count > 0)
+                    if (row.ChannelSid != null && row.ChannelSid != "")
                     {
-                        var channelSid = channel.Select(x => x.ChannelSid).FirstOrDefault();
+                        var channelSid = row.ChannelSid; //channel.Select(x => x.ChannelSid).FirstOrDefault();
 
-                        this._BlueCodeGroupMembersRepo.DeleteRange(channel);
+                        var groupMembers = this._BlueCodeGroupMembersRepo.Table.Where(x => x.BlueCodeIdFk == row.CodeBlueId).ToList();
+                        this._BlueCodeGroupMembersRepo.DeleteRange(groupMembers);
+
+                        //this._BlueCodeGroupMembersRepo.DeleteRange(channel);
                         bool isDeleted = _communication.DeleteUserToConversationChannel(channelSid);
                         List<CodeBlueGroupMember> ACodeGroupMembers = new List<CodeBlueGroupMember>();
                         foreach (var item in UserChannelSid.Distinct())
@@ -5280,7 +5296,7 @@ namespace Web.Services.Concrete
                             {
                                 var codeGroupMember = new CodeBlueGroupMember()
                                 {
-                                    ChannelSid = channelSid,
+                                    //ChannelSid = channelSid,
                                     UserIdFk = item.UserId,
                                     BlueCodeIdFk = row.CodeBlueId,
                                     //ActiveCodeName = UCLEnums.Blue.ToString(),
@@ -5314,7 +5330,8 @@ namespace Web.Services.Concrete
                     _communication.pushNotification(notification);
 
                 }
-                else {
+                else
+                {
                     var userIds = this._BlueCodeGroupMembersRepo.Table.Where(x => x.BlueCodeIdFk == row.CodeBlueId).Select(x => x.UserIdFk).ToList();
                     var userUniqueIds = this._userRepo.Table.Where(x => userIds.Contains(x.UserId)).Select(x => x.UserUniqueId).Distinct().ToList();
 
@@ -5669,6 +5686,8 @@ namespace Web.Services.Concrete
                             string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
                             string friendlyName = blue.IsEms.HasValue && blue.IsEms.Value ? $"EMS Code {UCLEnums.Blue.ToString()} {blue.CodeBlueId}" : $"Inhouse Code {UCLEnums.Blue.ToString()} {blue.CodeBlueId}";
                             var channel = _communication.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
+                            blue.ChannelSid = channel.Sid;
+                            this._codeBlueRepo.Update(blue);
                             UserChannelSid = UserChannelSid.Distinct().ToList();
                             foreach (var item in UserChannelSid)
                             {
@@ -5676,7 +5695,7 @@ namespace Web.Services.Concrete
                                 {
                                     var codeGroupMember = new CodeBlueGroupMember()
                                     {
-                                        ChannelSid = channel.Sid,
+                                        //ChannelSid = channel.Sid,
                                         UserIdFk = item.UserId,
                                         BlueCodeIdFk = blue.CodeBlueId,
                                         // ActiveCodeName = UCLEnums.Blue.ToString(),
