@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 #nullable disable
 
@@ -127,7 +129,7 @@ namespace Web.Data.Models
 
             modelBuilder.Entity<CallQueue>(entity =>
             {
-                entity.HasNoKey();
+                entity.HasKey(e => e.QueueId);
 
                 entity.Property(e => e.CallSid).HasMaxLength(50);
 
@@ -141,20 +143,22 @@ namespace Web.Data.Models
 
                 entity.Property(e => e.ParentCallSid).HasMaxLength(50);
 
-                entity.Property(e => e.QueueId).ValueGeneratedOnAdd();
-
                 entity.Property(e => e.ToPhoneNumber).HasMaxLength(30);
             });
 
             modelBuilder.Entity<CallReservation>(entity =>
             {
-                entity.HasNoKey();
+                entity.HasKey(e => e.ReservationId);
 
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");
 
                 entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
 
-                entity.Property(e => e.ReservationId).ValueGeneratedOnAdd();
+                entity.HasOne(d => d.QueueIdFkNavigation)
+                    .WithMany(p => p.CallReservations)
+                    .HasForeignKey(d => d.QueueIdFk)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_CallReservations_CallQueues");
             });
 
             modelBuilder.Entity<ChatSetting>(entity =>
