@@ -338,7 +338,7 @@ namespace Web.API.Controllers
 
         #region IVR
 
-        [HttpGet("ivr/getAllIvrs/{status}")]
+        [HttpGet("ivr/getAllIvrs")]
         public BaseResponse getAllIvrs()
         {
             try
@@ -353,7 +353,7 @@ namespace Web.API.Controllers
             }
 
         }
-        [HttpGet("ivr/getAllIvrsByOrgId/{orgId}")]
+        [HttpGet("ivr/getAllIvrsByOrgId/{orgId}/{status}")]
         public BaseResponse getAllIvrsByOrgId(int orgId,bool status=true)
         {
             try
