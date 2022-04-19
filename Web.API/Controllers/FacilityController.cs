@@ -267,8 +267,8 @@ namespace Web.API.Controllers
             }
         }
 
-        [Description("Active?InActive Department")]
-        [HttpGet("dpt/DeleteDepartment/{departmentId}/{userId}/{status}")]
+        [Description("Active/InActive Department")]
+        [HttpGet("dpt/ActiveOrInActiveDepartment/{departmentId}/{userId}/{status}")]
         public BaseResponse ActiveOrInActiveDepartment(int departmentId, int userId, bool status)
         {
             try
