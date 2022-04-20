@@ -11,6 +11,7 @@
         public string ConversationImage { get; set; }
         public string ChannelSid { get; set; }
         public bool? IsGroup { get; set; }
+        public bool? IsDeleted { get; set; }
         public int CreatedBy { get; set; }
     }
 }
