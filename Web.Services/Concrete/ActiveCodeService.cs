@@ -213,7 +213,7 @@ namespace Web.Services.Concrete
             var row = this._activeCodeRepo.Table.Where(x => x.ActiveCodeId == activeCodeId).FirstOrDefault();
             row.ModifiedBy = ApplicationSettings.UserId;
             row.ModifiedDate = DateTime.UtcNow;
-            row.IsDeleted = status;
+            row.IsActive = status;
             this._activeCodeRepo.Update(row);
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Deleted" };
         }
