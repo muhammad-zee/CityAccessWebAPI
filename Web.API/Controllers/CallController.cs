@@ -185,11 +185,11 @@ namespace Web.API.Controllers
         }
         [AllowAnonymous]
         [HttpPost("Call/ConferenceParticipantCallbackStatus")]
-        public string ConferenceParticipantCallbackStatus(int roleId, int serviceLineId, string conferenceSid,int queueId)
+        public string ConferenceParticipantCallbackStatus(int roleId, int serviceLineId, string conferenceSid, int queueId)
         {
             try
             {
-                return this._callService.ConferenceParticipantCallbackStatus(HttpContext.Request.Form, roleId, serviceLineId, conferenceSid,queueId);
+                return this._callService.ConferenceParticipantCallbackStatus(HttpContext.Request.Form, roleId, serviceLineId, conferenceSid, queueId);
             }
             catch (Exception ex)
             {
@@ -354,11 +354,11 @@ namespace Web.API.Controllers
 
         }
         [HttpGet("ivr/getAllIvrsByOrgId/{orgId}/{status}")]
-        public BaseResponse getAllIvrsByOrgId(int orgId,bool status=true)
+        public BaseResponse getAllIvrsByOrgId(int orgId, bool status = true)
         {
             try
             {
-                return this._callService.getAllIvrsByOrgId(orgId,status);
+                return this._callService.getAllIvrsByOrgId(orgId, status);
             }
             catch (Exception ex)
             {
@@ -402,11 +402,11 @@ namespace Web.API.Controllers
         }
 
         [HttpGet("ivr/Active/InActiveIVR/{Id}/{status}")]
-        public BaseResponse ActiveOrInActiveIVR(int Id,bool status)
+        public BaseResponse ActiveOrInActiveIVR(int Id, bool status)
         {
             try
             {
-                return this._callService.ActiveOrInActiveIVR(Id,status);
+                return this._callService.ActiveOrInActiveIVR(Id, status);
             }
             catch (Exception ex)
             {

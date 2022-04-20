@@ -828,6 +828,9 @@ namespace Web.Services.Concrete
                                     {
                                         { "id", model.Id},
                                         { "orgId", model.OrgId},
+                                        { "type", model.Type },
+                                        { "channelIsActive", model.ChannelIsActive },
+                                        { "channelSid", model.ChannelSid},
                                         { "routerLink1", model.RouteLink1},
                                         { "routerLink2", model.RouteLink2 },
                                         { "routerLink3", model.RouteLink3 },

@@ -15,6 +15,8 @@ namespace Web.Model.Common
         public string From { get; set; }
         public string To { get; set; }
         public string Msg { get; set; }
-
+        public string ChannelSid { get; set; }
+        public bool ChannelIsActive { get; set; }
+        public string Type { get; set; }
     }
 }

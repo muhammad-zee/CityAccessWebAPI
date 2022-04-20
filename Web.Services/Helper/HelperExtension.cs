@@ -275,6 +275,15 @@ namespace Web.Services.Helper
             return cmd;
         }
 
+        public static SqlCommand LoadSQLQuery(
+          this DbContext context, string qry)
+        {
+            var cmd = (SqlCommand)context.Database.GetDbConnection().CreateCommand();
+            cmd.CommandText = qry;
+            cmd.CommandType = CommandType.Text;
+            return cmd;
+        }
+
         public static SqlCommand WithSqlParam(
            this SqlCommand cmd, string paramName, object paramValue)
         {

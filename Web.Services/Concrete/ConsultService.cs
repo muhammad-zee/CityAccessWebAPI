@@ -683,6 +683,26 @@ namespace Web.Services.Concrete
             var rowsEffected = this._dbContext.Database.ExecuteSqlRaw(sql, parameters);
             if (rowsEffected > 0)
             {
+                var userIds = this._dbContext.LoadStoredProcedure("md_getConsultGroupUsersId")
+                                             .WithSqlParam("@consultId", consultId)
+                                             .ExecuteStoredProc<ConsultAcknowledgmentVM>();
+
+                var notification = new PushNotificationVM()
+                {
+                    Id = consultId,
+                    //OrgId = orgByServiceId.Value,
+                    Type = "ChannelStatusChanged",
+                    ChannelIsActive = status,
+                    ChannelSid = userIds.Select(x => x.channelSid).FirstOrDefault(),
+                    UserChannelSid = userIds.Select(x => x.userUniqueId).Distinct().ToList(),
+                    From = "Consult",
+                    Msg = "Consult is " + (status ? "Activated" : "Inactivated"),
+                    RouteLink1 = "/Home/Dashboard",
+                    RouteLink2 = "/Home/Consult"
+                };
+
+                _communicationService.pushNotification(notification);
+
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Consult Deleted" };
             }
             else
