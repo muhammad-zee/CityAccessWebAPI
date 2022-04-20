@@ -215,7 +215,23 @@ namespace Web.API.Controllers
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
         }
-
+        
+        [Description("Existing User")]
+        [HttpGet("admin/GetUserAlreadyExist/{userName}")]
+        public BaseResponse GetUserAlreadyExist(string userName)
+        {
+            try
+            {
+                var response = _adminService.GetUserAlreadyExist(userName);
+                return response;
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
         [Description("Delete User")]
         [HttpGet("admin/DeleteUser/{Id}")]
         public async Task<BaseResponse> DeleteUser(int Id)

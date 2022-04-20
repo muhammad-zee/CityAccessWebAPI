@@ -321,6 +321,19 @@ namespace Web.Services.Concrete
 
         }
 
+        public BaseResponse GetUserAlreadyExist(string userName)
+        {
+            var EXISTING_USER = _user.Table.Where(x => x.UserName == userName && x.IsDeleted == false).FirstOrDefault();
+            if( EXISTING_USER == null)
+            {
+                return new BaseResponse { Status = HttpStatusCode.OK, Message = "User Not Found", Body = EXISTING_USER };
+            }
+            else
+            {
+                return new BaseResponse { Status = HttpStatusCode.OK, Message = "User Found", Body = EXISTING_USER };
+            }
+            
+        }
         public BaseResponse DeleteUser(int Id)
         {
             var USER = _user.Table.Where(x => x.UserId == Id && x.IsDeleted == false).FirstOrDefault();

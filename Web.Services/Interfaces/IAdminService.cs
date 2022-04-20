@@ -36,6 +36,7 @@ namespace Web.Services.Interfaces
         BaseResponse getAllScheduleUsersByServiceAndRoleId(string OrganizationId, string ServiceLineId, string RoleIds);
         BaseResponse GetAllEMSUsers(bool status);
         BaseResponse GetUserById(int Id);
+        BaseResponse GetUserAlreadyExist(string userName);
         BaseResponse DeleteUser(int Id);
 
         #endregion
