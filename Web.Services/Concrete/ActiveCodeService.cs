@@ -1576,7 +1576,31 @@ namespace Web.Services.Concrete
                                                         new SqlParameter { ParameterName = "@UserId", Value = ApplicationSettings.UserId }
                                                       };
 
-            var isDeleted = this._dbContext.Database.ExecuteSqlRaw(sql, parameters);
+            var rowsEffected = this._dbContext.Database.ExecuteSqlRaw(sql, parameters);
+            if (rowsEffected > 0) 
+            {
+                var userIds = this._dbContext.LoadStoredProcedure("md_getAllActiveCodesGroupUserIds")
+                                                .WithSqlParam("@codeName", UCLEnums.Stroke.ToString())
+                                                .WithSqlParam("@codeId", strokeId)
+                                                .ExecuteStoredProc<CodeStrokeVM>();
+
+                var notification = new PushNotificationVM()
+                {
+                    Id = strokeId,
+                    OrgId = userIds.Select(x => x.OrganizationIdFk).FirstOrDefault(),
+                    Type = "ChannelStatusChanged",
+                    ChannelIsActive = status,
+                    ChannelSid = userIds.Select(x => x.ChannelSid).FirstOrDefault(),
+                    UserChannelSid = userIds.Select(x => x.UserUniqueId).Distinct().ToList(),
+                    From = UCLEnums.Stroke.ToString(),
+                    Msg = UCLEnums.Stroke.ToString() + " is " + (status ? "Activated" : "Inactivated"),
+                    RouteLink3 = "/Home/EMS",
+                    RouteLink4 = "/Home/Dashboard",
+                    RouteLink5 = "/Home/Inhouse%20Codes"
+                };
+
+                _communication.pushNotification(notification);
+            }
 
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Deleted" };
         }
@@ -2650,7 +2674,31 @@ namespace Web.Services.Concrete
                                                         new SqlParameter { ParameterName = "@UserId", Value = ApplicationSettings.UserId }
                                                       };
 
-            var isDeleted = this._dbContext.Database.ExecuteSqlRaw(sql, parameters);
+            var rowsEffected = this._dbContext.Database.ExecuteSqlRaw(sql, parameters);
+            if (rowsEffected > 0)
+            {
+                var userIds = this._dbContext.LoadStoredProcedure("md_getAllActiveCodesGroupUserIds")
+                                                .WithSqlParam("@codeName", UCLEnums.Sepsis.ToString())
+                                                .WithSqlParam("@codeId", SepsisId)
+                                                .ExecuteStoredProc<CodeStrokeVM>();
+
+                var notification = new PushNotificationVM()
+                {
+                    Id = SepsisId,
+                    OrgId = userIds.Select(x => x.OrganizationIdFk).FirstOrDefault(),
+                    Type = "ChannelStatusChanged",
+                    ChannelIsActive = status,
+                    ChannelSid = userIds.Select(x => x.ChannelSid).FirstOrDefault(),
+                    UserChannelSid = userIds.Select(x => x.UserUniqueId).Distinct().ToList(),
+                    From = UCLEnums.Sepsis.ToString(),
+                    Msg = UCLEnums.Sepsis.ToString() + " is " + (status ? "Activated" : "Inactivated"),
+                    RouteLink3 = "/Home/EMS",
+                    RouteLink4 = "/Home/Dashboard",
+                    RouteLink5 = "/Home/Inhouse%20Codes"
+                };
+
+                _communication.pushNotification(notification);
+            }
 
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Deleted" };
         }
@@ -3729,7 +3777,31 @@ namespace Web.Services.Concrete
                                                         new SqlParameter { ParameterName = "@UserId", Value = ApplicationSettings.UserId }
                                                       };
 
-            var isDeleted = this._dbContext.Database.ExecuteSqlRaw(sql, parameters);
+            var rowsEffected = this._dbContext.Database.ExecuteSqlRaw(sql, parameters);
+            if (rowsEffected > 0)
+            {
+                var userIds = this._dbContext.LoadStoredProcedure("md_getAllActiveCodesGroupUserIds")
+                                                .WithSqlParam("@codeName", UCLEnums.STEMI.ToString())
+                                                .WithSqlParam("@codeId", STEMIId)
+                                                .ExecuteStoredProc<CodeStrokeVM>();
+
+                var notification = new PushNotificationVM()
+                {
+                    Id = STEMIId,
+                    OrgId = userIds.Select(x => x.OrganizationIdFk).FirstOrDefault(),
+                    Type = "ChannelStatusChanged",
+                    ChannelIsActive = status,
+                    ChannelSid = userIds.Select(x => x.ChannelSid).FirstOrDefault(),
+                    UserChannelSid = userIds.Select(x => x.UserUniqueId).Distinct().ToList(),
+                    From = UCLEnums.STEMI.ToString(),
+                    Msg = UCLEnums.STEMI.ToString() + " is " + (status ? "Activated" : "Inactivated"),
+                    RouteLink3 = "/Home/EMS",
+                    RouteLink4 = "/Home/Dashboard",
+                    RouteLink5 = "/Home/Inhouse%20Codes"
+                };
+
+                _communication.pushNotification(notification);
+            }
 
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Deleted" };
         }
@@ -4789,7 +4861,7 @@ namespace Web.Services.Concrete
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Deleted" };
         }
 
-        public BaseResponse ActiveOrInActiveTruma(int TrumaId, bool status)
+        public BaseResponse ActiveOrInActiveTruma(int TraumaId, bool status)
         {
             //var row = this._codeTrumaRepo.Table.Where(x => x.CodeTraumaId == TrumaId && !x.IsDeleted).FirstOrDefault();
             //row.IsDeleted = true;
@@ -4800,11 +4872,35 @@ namespace Web.Services.Concrete
             var sql = "EXEC md_ActiveOrInActiveInHouseCodesOrEMSDynamic @Status, @CodeName, @CodeId, @UserId";
             var parameters = new List<SqlParameter>() { new SqlParameter { ParameterName = "@Status", Value = status },
                                                         new SqlParameter { ParameterName = "@CodeName", Value = UCLEnums.Trauma.ToString() },
-                                                        new SqlParameter { ParameterName = "@CodeId", Value = TrumaId },
+                                                        new SqlParameter { ParameterName = "@CodeId", Value = TraumaId },
                                                         new SqlParameter { ParameterName = "@UserId", Value = ApplicationSettings.UserId }
                                                       };
 
-            var isDeleted = this._dbContext.Database.ExecuteSqlRaw(sql, parameters);
+            var rowsEffected = this._dbContext.Database.ExecuteSqlRaw(sql, parameters);
+            if (rowsEffected > 0)
+            {
+                var userIds = this._dbContext.LoadStoredProcedure("md_getAllActiveCodesGroupUserIds")
+                                                .WithSqlParam("@codeName", UCLEnums.Trauma.ToString())
+                                                .WithSqlParam("@codeId", TraumaId)
+                                                .ExecuteStoredProc<CodeStrokeVM>();
+
+                var notification = new PushNotificationVM()
+                {
+                    Id = TraumaId,
+                    OrgId = userIds.Select(x => x.OrganizationIdFk).FirstOrDefault(),
+                    Type = "ChannelStatusChanged",
+                    ChannelIsActive = status,
+                    ChannelSid = userIds.Select(x => x.ChannelSid).FirstOrDefault(),
+                    UserChannelSid = userIds.Select(x => x.UserUniqueId).Distinct().ToList(),
+                    From = UCLEnums.Trauma.ToString(),
+                    Msg = UCLEnums.Trauma.ToString() + " is " + (status ? "Activated" : "Inactivated"),
+                    RouteLink3 = "/Home/EMS",
+                    RouteLink4 = "/Home/Dashboard",
+                    RouteLink5 = "/Home/Inhouse%20Codes"
+                };
+
+                _communication.pushNotification(notification);
+            }
 
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Deleted" };
         }
@@ -5871,7 +5967,31 @@ namespace Web.Services.Concrete
                                                         new SqlParameter { ParameterName = "@UserId", Value = ApplicationSettings.UserId }
                                                       };
 
-            var isDeleted = this._dbContext.Database.ExecuteSqlRaw(sql, parameters);
+            var rowsEffected = this._dbContext.Database.ExecuteSqlRaw(sql, parameters);
+            if (rowsEffected > 0)
+            {
+                var userIds = this._dbContext.LoadStoredProcedure("md_getAllActiveCodesGroupUserIds")
+                                                .WithSqlParam("@codeName", UCLEnums.Blue.ToString())
+                                                .WithSqlParam("@codeId", blueId)
+                                                .ExecuteStoredProc<CodeStrokeVM>();
+
+                var notification = new PushNotificationVM()
+                {
+                    Id = blueId,
+                    OrgId = userIds.Select(x => x.OrganizationIdFk).FirstOrDefault(),
+                    Type = "ChannelStatusChanged",
+                    ChannelIsActive = status,
+                    ChannelSid = userIds.Select(x => x.ChannelSid).FirstOrDefault(),
+                    UserChannelSid = userIds.Select(x => x.UserUniqueId).Distinct().ToList(),
+                    From = UCLEnums.Blue.ToString(),
+                    Msg = UCLEnums.Blue.ToString() + " is " + (status ? "Activated" : "Inactivated"),
+                    RouteLink3 = "/Home/EMS",
+                    RouteLink4 = "/Home/Dashboard",
+                    RouteLink5 = "/Home/Inhouse%20Codes"
+                };
+
+                _communication.pushNotification(notification);
+            }
 
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Deleted" };
         }

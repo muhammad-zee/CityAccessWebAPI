@@ -64,5 +64,9 @@ namespace Web.Model.Common
         public string VideoFolderRoot { get; set; }
         public string AttachmentsFolderRoot { get; set; }
 
+        public string ChannelSid { get; set; }
+        public string UserUniqueId { get; set; }
+        public int UserIdFk { get; set; }
+
     }
 }
