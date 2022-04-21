@@ -588,11 +588,7 @@ namespace Web.Data.Models
 
             modelBuilder.Entity<CommunicationLog>(entity =>
             {
-                entity.HasNoKey();
-
                 entity.ToTable("CommunicationLog");
-
-                entity.Property(e => e.CommunicationLogId).ValueGeneratedOnAdd();
 
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");
 

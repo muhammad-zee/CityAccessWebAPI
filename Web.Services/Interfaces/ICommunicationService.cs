@@ -61,6 +61,8 @@ namespace Web.Services.Interfaces
         BaseResponse GetCommunicationLogById(int logId, bool status);
         BaseResponse ActiveOrInActiveCommunicationlog(int logId, bool status);
 
+        BaseResponse GetAllCommunicationlog(bool status);
+
         #endregion
     }
 }

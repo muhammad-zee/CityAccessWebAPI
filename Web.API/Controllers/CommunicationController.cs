@@ -444,6 +444,20 @@ namespace Web.API.Controllers
             }
         }
 
+        [HttpGet("CommunicationLog/GetAllCommunicationLog")]
+        public BaseResponse GetAllCommunicationLog(bool status = true)
+        {
+            try
+            {
+                return this._communicaitonService.GetAllCommunicationlog(status);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
 
         [HttpGet("CommunicationLog/ActiveOrInActiveCommunicationLog/{logId}/{status}")]
         public BaseResponse ActiveOrInActiveCommunicationLog(int logId,bool status)

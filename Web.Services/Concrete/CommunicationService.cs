@@ -1075,13 +1075,13 @@ namespace Web.Services.Concrete
         public BaseResponse GetCommunicationLogById(int logId,bool status)
         {
             var communicationLog = this._communicationLog.Table.FirstOrDefault(x => x.CommunicationLogId == logId && x.IsDelete != true && x.IsActive== status);
-            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Chat data", Body = communicationLog };
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Communication Log data", Body = communicationLog };
         }
 
 
         public BaseResponse ActiveOrInActiveCommunicationlog(int logId, bool status)
         {
-            var communicationLog = this._communicationLog.Table.FirstOrDefault(x => x.CommunicationLogId == logId && x.IsDelete != true && x.IsActive == status);
+            var communicationLog = this._communicationLog.Table.FirstOrDefault(x => x.CommunicationLogId == logId && x.IsDelete != true );
 
             if (communicationLog != null)
             {
@@ -1096,6 +1096,16 @@ namespace Web.Services.Concrete
 
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = (status ? "Active" :"InActive") + "Successfully", Body = communicationLog };
         }
+
+
+        public BaseResponse GetAllCommunicationlog(bool status)
+        {
+            var communicationLog = this._communicationLog.Table.Where(x => x.IsDelete != true && x.IsActive==status);
+
+          
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "CommunicationLog Data", Body = communicationLog };
+        }
+
 
 
     }
