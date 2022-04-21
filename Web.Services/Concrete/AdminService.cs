@@ -295,6 +295,8 @@ namespace Web.Services.Concrete
                 user.serviceIdsFT = _favouriteTeam.Table.Where(x => x.UserIdFk == user.UserId).Select(x => x.ServiceLineIdFk).ToList();
                 user.dptIdsFT = _serviceRepo.Table.Where(x => user.serviceIdsFT.Contains(x.ServiceLineId) && !x.IsDeleted).Select(x => x.DepartmentIdFk).Distinct().ToList();
                 user.orgIdsFT = _departmentRepo.Table.Where(x => user.dptIdsFT.Contains(x.DepartmentId) && !x.IsDeleted).Select(x => x.OrganizationIdFk).Distinct().ToList();
+                user.RoleIds = user.UserRole.Select(x => x.RoleId).FirstOrDefault().ToString();
+                user.orgIds = user.Organizations.Select(x => x.OrganizationId).FirstOrDefault().ToString();
                 var schedule = this._userScheduleRepo.Table.Where(x => user.UserRole.Select(r => r.RoleId).Contains(x.RoleIdFk) && user.UserServices.Select(u => u.ServiceLineId).Contains(x.ServiceLineIdFk.Value) && x.UserIdFk == Id && x.ScheduleDate.Value.Date >= DateTime.UtcNow.Date && !x.IsDeleted).ToList();
 
                 List<UserProfileSchedulesVM> UserProfileSchedules = new();

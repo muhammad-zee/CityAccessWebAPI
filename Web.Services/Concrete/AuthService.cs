@@ -301,6 +301,13 @@ namespace Web.Services.Concrete
                 else
                 {
                     var roleIds = register.RoleIds.ToIntList();
+                    if (roleIds.Count > 0) 
+                    {
+                        var alreadyExistRoles = this._userRoleRepo.Table.Where(x => x.UserIdFk == user.UserId).ToList();
+                        if (alreadyExistRoles.Count > 0) {
+                            this._userRoleRepo.DeleteRange(alreadyExistRoles);
+                        }
+                    }
                     List<UserRole> userRoleList = new List<UserRole>();
                     foreach (var item in roleIds)
                     {
@@ -491,23 +498,23 @@ namespace Web.Services.Concrete
 
             List<UsersRelation> userRelations = new List<UsersRelation>();
 
-            if (!string.IsNullOrEmpty(associate.RoleIds))
-            {
-                var roleIds = associate.RoleIds.ToIntList();
-                var userRoles = _userRoleRepo.Table.Where(x => x.UserIdFk == associate.UserId).ToList();
-                _userRoleRepo.DeleteRange(userRoles);
+            //if (!string.IsNullOrEmpty(associate.RoleIds))
+            //{
+            //    var roleIds = associate.RoleIds.ToIntList();
+            //    var userRoles = _userRoleRepo.Table.Where(x => x.UserIdFk == associate.UserId).ToList();
+            //    _userRoleRepo.DeleteRange(userRoles);
 
-                if (roleIds.Count() > 0)
-                {
-                    List<UserRole> userRoleList = new List<UserRole>();
-                    foreach (var item in roleIds)
-                    {
-                        userRoleList.Add(new UserRole() { UserIdFk = associate.UserId, RoleIdFk = item });
-                    }
-                    _userRoleRepo.Insert(userRoleList);
-                }
+            //    if (roleIds.Count() > 0)
+            //    {
+            //        List<UserRole> userRoleList = new List<UserRole>();
+            //        foreach (var item in roleIds)
+            //        {
+            //            userRoleList.Add(new UserRole() { UserIdFk = associate.UserId, RoleIdFk = item });
+            //        }
+            //        _userRoleRepo.Insert(userRoleList);
+            //    }
 
-            }
+            //}
 
             var relation = _userRelationRepo.Table.Where(x => x.UserIdFk == associate.UserId && x.IsDeleted != true).ToList();
             if (relation.Count() > 0)
