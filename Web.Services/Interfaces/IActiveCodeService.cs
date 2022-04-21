@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Web.Data.Models;
 using Web.Model;
 using Web.Model.Common;
 
@@ -76,5 +77,6 @@ namespace Web.Services.Interfaces
         BaseResponse GetHospitalsOfStatesByCodeId(int codeId, string latlng);
 
         #endregion
-    }
+
+    }  
 }

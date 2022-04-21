@@ -60,6 +60,8 @@ namespace Web.Services.Concrete
         private IRepository<ControlList> _uclRepo;
         private IRepository<ControlListDetail> _uclDetailRepo;
 
+        private IActiveCodeHelperService _activeCodeHelperService;
+       
 
         private string _encryptionKey = "";
 
@@ -77,7 +79,8 @@ namespace Web.Services.Concrete
             IRepository<Department> dptRepo,
             IRepository<Organization> orgRepo,
             IRepository<ControlList> uclRepo,
-            IRepository<ControlListDetail> uclDetailRepo
+            IRepository<ControlListDetail> uclDetailRepo,
+            IActiveCodeHelperService activeCodeHelperService
             )
         {
 
@@ -107,6 +110,9 @@ namespace Web.Services.Concrete
             this._orgRepo = orgRepo;
             this._uclRepo = uclRepo;
             this._uclDetailRepo = uclDetailRepo;
+
+            this._activeCodeHelperService = activeCodeHelperService;
+
 
             this._encryptionKey = this._config["Encryption:key"].ToString();
         }
@@ -376,7 +382,9 @@ namespace Web.Services.Concrete
                     }
                 }
                 this._conversationParticipantsRepo.Insert(channelParticipantsList);
+                this._activeCodeHelperService.MemberAddedToConversationChannel(channelParticipantsList, model.ChannelSid);
 
+               
                 response.Status = HttpStatusCode.OK;
                 response.Message = "Channel Participants Saved";
                 //response.Body = newChannel;

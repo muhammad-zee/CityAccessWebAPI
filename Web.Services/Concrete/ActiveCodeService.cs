@@ -25,7 +25,7 @@ namespace Web.Services.Concrete
         private RAQ_DbContext _dbContext;
         private IHttpClient _httpClient;
         private IHostingEnvironment _environment;
-        private ICommunicationService _communication;
+        private ICommunicationService _communicationService;
         private IRepository<User> _userRepo;
         private IRepository<Organization> _orgRepo;
         private IRepository<ServiceLine> _serviceLineRepo;
@@ -43,6 +43,8 @@ namespace Web.Services.Concrete
         private IRepository<CodeTraumaGroupMember> _TraumaCodeGroupMembersRepo;
         private IRepository<CodeBlueGroupMember> _BlueCodeGroupMembersRepo;
         private IRepository<CodesServiceLinesMapping> _codesServiceLinesMappingRepo;
+        private IRepository<ConversationChannel> _conversationChannelsRepo;
+       
         IConfiguration _config;
         private string _RootPath;
         private string _GoogleApiKey;
@@ -50,7 +52,7 @@ namespace Web.Services.Concrete
             IConfiguration config,
             IHttpClient httpClient,
             IHostingEnvironment environment,
-            ICommunicationService communication,
+            ICommunicationService communicationService,
             IRepository<User> userRepo,
             IRepository<Organization> orgRepo,
             IRepository<ServiceLine> serviceLineRepo,
@@ -67,13 +69,14 @@ namespace Web.Services.Concrete
             IRepository<CodeSepsisGroupMember> SepsisCodeGroupMembersRepo,
             IRepository<CodeTraumaGroupMember> TraumaCodeGroupMembersRepo,
             IRepository<CodeBlueGroupMember> BlueCodeGroupMembersRepo,
-            IRepository<CodesServiceLinesMapping> codesServiceLinesMappingRepo)
+            IRepository<CodesServiceLinesMapping> codesServiceLinesMappingRepo,
+            IRepository<ConversationChannel> conversationChannelsRepo)
         {
             this._config = config;
             this._httpClient = httpClient;
             this._dbContext = dbContext;
             this._environment = environment;
-            this._communication = communication;
+            this._communicationService = communicationService;
             this._userRepo = userRepo;
             this._orgRepo = orgRepo;
             this._serviceLineRepo = serviceLineRepo;
@@ -93,8 +96,12 @@ namespace Web.Services.Concrete
             this._BlueCodeGroupMembersRepo = BlueCodeGroupMembersRepo;
 
             this._codesServiceLinesMappingRepo = codesServiceLinesMappingRepo;
+            this._conversationChannelsRepo = conversationChannelsRepo;
+
             this._RootPath = this._config["FilePath:Path"].ToString();
             this._GoogleApiKey = this._config["GoogleApi:Key"].ToString();
+
+
         }
 
         #region Active Code
@@ -405,7 +412,7 @@ namespace Web.Services.Concrete
                     RouteLink2 = "/Home/EMS/activateCode"
                 };
 
-                _communication.pushNotification(notification);
+                _communicationService.pushNotification(notification);
             }
             else if (files.CodeType == AuthorEnums.Sepsis.ToString())
             {
@@ -429,7 +436,7 @@ namespace Web.Services.Concrete
                     RouteLink2 = "/Home/EMS/activateCode"
                 };
 
-                _communication.pushNotification(notification);
+                _communicationService.pushNotification(notification);
             }
             else if (files.CodeType == AuthorEnums.STEMI.ToString())
             {
@@ -452,7 +459,7 @@ namespace Web.Services.Concrete
                     RouteLink2 = "/Home/EMS/activateCode"
                 };
 
-                _communication.pushNotification(notification);
+                _communicationService.pushNotification(notification);
             }
             else if (files.CodeType == AuthorEnums.Trauma.ToString())
             {
@@ -475,7 +482,7 @@ namespace Web.Services.Concrete
                     RouteLink2 = "/Home/EMS/activateCode"
                 };
 
-                _communication.pushNotification(notification);
+                _communicationService.pushNotification(notification);
             }
             else if (files.CodeType == AuthorEnums.Blue.ToString())
             {
@@ -498,7 +505,7 @@ namespace Web.Services.Concrete
                     RouteLink2 = "/Home/EMS/activateCode"
                 };
 
-                _communication.pushNotification(notification);
+                _communicationService.pushNotification(notification);
             }
 
 
@@ -1070,7 +1077,7 @@ namespace Web.Services.Concrete
                         var groupMembers = this._StrokeCodeGroupMembersRepo.Table.Where(x => x.StrokeCodeIdFk == row.CodeStrokeId).ToList();
                         this._StrokeCodeGroupMembersRepo.DeleteRange(groupMembers);
                         //this._StrokeCodeGroupMembersRepo.DeleteRange(channel);
-                        bool isDeleted = _communication.DeleteUserToConversationChannel(channelSid);
+                        bool isDeleted = _communicationService.DeleteUserToConversationChannel(channelSid);
                         List<CodeStrokeGroupMember> ACodeGroupMembers = new List<CodeStrokeGroupMember>();
                         foreach (var item in UserChannelSid.Distinct())
                         {
@@ -1087,7 +1094,7 @@ namespace Web.Services.Concrete
                                     IsDeleted = false
                                 };
                                 ACodeGroupMembers.Add(codeGroupMember);
-                                _communication.addNewUserToConversationChannel(channelSid, item.UserUniqueId);
+                                _communicationService.addNewUserToConversationChannel(channelSid, item.UserUniqueId);
                             }
                             catch (Exception ex)
                             {
@@ -1110,7 +1117,7 @@ namespace Web.Services.Concrete
                         RouteLink2 = "/Home/EMS/activateCode",
                     };
 
-                    _communication.pushNotification(notification);
+                    _communicationService.pushNotification(notification);
 
                 }
                 else
@@ -1130,7 +1137,7 @@ namespace Web.Services.Concrete
                         RouteLink2 = "/Home/EMS/activateCode",
                     };
 
-                    _communication.pushNotification(notification);
+                    _communicationService.pushNotification(notification);
                 }
 
                 return GetStrokeDataById(row.CodeStrokeId);
@@ -1472,7 +1479,7 @@ namespace Web.Services.Concrete
                         {
                             string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
                             string friendlyName = stroke.IsEms.HasValue && stroke.IsEms.Value ? $"EMS Code {UCLEnums.Stroke.ToString()} {stroke.CodeStrokeId}" : $"Inhouse Code {UCLEnums.Stroke.ToString()} {stroke.CodeStrokeId}";
-                            var channel = _communication.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
+                            var channel = _communicationService.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
                             stroke.ChannelSid = channel.Sid;
                             this._codeStrokeRepo.Update(stroke);
                             UserChannelSid = UserChannelSid.Distinct().ToList();
@@ -1491,7 +1498,7 @@ namespace Web.Services.Concrete
                                         IsDeleted = false
                                     };
                                     ACodeGroupMembers.Add(codeGroupMember);
-                                    _communication.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
+                                    _communicationService.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
                                 }
                                 catch (Exception ex)
                                 {
@@ -1512,7 +1519,7 @@ namespace Web.Services.Concrete
                                 msg.body += $"<strong>Chief Complaint: </strong> {codeStroke.ChiefComplant} </br>";
                             if (codeStroke.Hpi != null && codeStroke.Hpi != "")
                                 msg.body += $"<strong>Hpi: </strong> {codeStroke.Hpi} </br>";
-                            var sendMsg = _communication.sendPushNotification(msg);
+                            var sendMsg = _communicationService.sendPushNotification(msg);
 
                             var showAllAccessUsers = this._dbContext.LoadStoredProcedure("md_getUsersOfComponentAccess")
                                                 .WithSqlParam("@componentName", "Show All EMS,Show All Active Codes,Show Graphs,Show EMS,Show Active Codes")
@@ -1531,7 +1538,7 @@ namespace Web.Services.Concrete
                                 RouteLink5 = "/Home/Inhouse%20Codes"
                             };
 
-                            _communication.pushNotification(notification);
+                            _communicationService.pushNotification(notification);
                         }
                         return GetStrokeDataById(stroke.CodeStrokeId);
                     }
@@ -1599,7 +1606,7 @@ namespace Web.Services.Concrete
                     RouteLink5 = "/Home/Inhouse%20Codes"
                 };
 
-                _communication.pushNotification(notification);
+                _communicationService.pushNotification(notification);
             }
 
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Deleted" };
@@ -2174,7 +2181,7 @@ namespace Web.Services.Concrete
                         var groupMembers = this._SepsisCodeGroupMembersRepo.Table.Where(x => x.SepsisCodeIdFk == row.CodeSepsisId).ToList();
                         this._SepsisCodeGroupMembersRepo.DeleteRange(groupMembers);
                         //this._SepsisCodeGroupMembersRepo.DeleteRange(channel);
-                        bool isDeleted = _communication.DeleteUserToConversationChannel(channelSid);
+                        bool isDeleted = _communicationService.DeleteUserToConversationChannel(channelSid);
                         List<CodeSepsisGroupMember> ACodeGroupMembers = new List<CodeSepsisGroupMember>();
                         foreach (var item in UserChannelSid.Distinct())
                         {
@@ -2191,7 +2198,7 @@ namespace Web.Services.Concrete
                                     IsDeleted = false
                                 };
                                 ACodeGroupMembers.Add(codeGroupMember);
-                                _communication.addNewUserToConversationChannel(channelSid, item.UserUniqueId);
+                                _communicationService.addNewUserToConversationChannel(channelSid, item.UserUniqueId);
                             }
                             catch (Exception ex)
                             {
@@ -2212,7 +2219,7 @@ namespace Web.Services.Concrete
                         RouteLink2 = "/Home/EMS/activateCode"
                     };
 
-                    _communication.pushNotification(notification);
+                    _communicationService.pushNotification(notification);
 
                 }
                 else
@@ -2231,7 +2238,7 @@ namespace Web.Services.Concrete
                         RouteLink2 = "/Home/EMS/activateCode"
                     };
 
-                    _communication.pushNotification(notification);
+                    _communicationService.pushNotification(notification);
                 }
                 return GetSepsisDataById(row.CodeSepsisId);
             }
@@ -2568,7 +2575,7 @@ namespace Web.Services.Concrete
                                         {ChannelAttributeEnums.CodeType.ToString(), ChannelTypeEnums.Sepsis.ToString()},
                                         {ChannelAttributeEnums.SepsisId.ToString(), Sepsis.CodeSepsisId}
                                     }, Formatting.Indented);
-                            var channel = _communication.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
+                            var channel = _communicationService.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
                             Sepsis.ChannelSid = channel.Sid;
                             this._codeSepsisRepo.Update(Sepsis);
                             UserChannelSid = UserChannelSid.Distinct().ToList();
@@ -2587,7 +2594,7 @@ namespace Web.Services.Concrete
                                         IsDeleted = false
                                     };
                                     ACodeGroupMembers.Add(codeGroupMember);
-                                    _communication.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
+                                    _communicationService.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
                                 }
                                 catch (Exception ex)
                                 {
@@ -2610,7 +2617,7 @@ namespace Web.Services.Concrete
                             if (codeSepsis.Hpi != null && codeSepsis.Hpi != "")
                                 msg.body += $"<strong>Hpi: </strong> {codeSepsis.Hpi} </br>";
 
-                            var sendMsg = _communication.sendPushNotification(msg);
+                            var sendMsg = _communicationService.sendPushNotification(msg);
 
                             var showAllAccessUsers = this._dbContext.LoadStoredProcedure("md_getUsersOfComponentAccess")
                                                .WithSqlParam("@componentName", "Show All EMS,Show All Active Codes,Show Graphs,Show EMS,Show Active Codes")
@@ -2629,7 +2636,7 @@ namespace Web.Services.Concrete
                                 RouteLink5 = "/Home/Inhouse%20Codes"
                             };
 
-                            _communication.pushNotification(notification);
+                            _communicationService.pushNotification(notification);
                         }
                         return GetSepsisDataById(Sepsis.CodeSepsisId);
                     }
@@ -2697,7 +2704,7 @@ namespace Web.Services.Concrete
                     RouteLink5 = "/Home/Inhouse%20Codes"
                 };
 
-                _communication.pushNotification(notification);
+                _communicationService.pushNotification(notification);
             }
 
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Deleted" };
@@ -3276,7 +3283,7 @@ namespace Web.Services.Concrete
                         var groupMembers = this._STEMICodeGroupMembersRepo.Table.Where(x => x.StemicodeIdFk == row.CodeStemiid).ToList();
                         this._STEMICodeGroupMembersRepo.DeleteRange(groupMembers);
                         //this._STEMICodeGroupMembersRepo.DeleteRange(channel);
-                        bool isDeleted = _communication.DeleteUserToConversationChannel(channelSid);
+                        bool isDeleted = _communicationService.DeleteUserToConversationChannel(channelSid);
                         List<CodeStemigroupMember> ACodeGroupMembers = new List<CodeStemigroupMember>();
                         foreach (var item in UserChannelSid.Distinct())
                         {
@@ -3294,7 +3301,7 @@ namespace Web.Services.Concrete
                                     IsDeleted = false
                                 };
                                 ACodeGroupMembers.Add(codeGroupMember);
-                                _communication.addNewUserToConversationChannel(channelSid, item.UserUniqueId);
+                                _communicationService.addNewUserToConversationChannel(channelSid, item.UserUniqueId);
                             }
                             catch (Exception ex)
                             {
@@ -3314,7 +3321,7 @@ namespace Web.Services.Concrete
                         RouteLink2 = "/Home/EMS/activateCode"
                     };
 
-                    _communication.pushNotification(notification);
+                    _communicationService.pushNotification(notification);
 
                 }
                 else
@@ -3333,7 +3340,7 @@ namespace Web.Services.Concrete
                         RouteLink2 = "/Home/EMS/activateCode"
                     };
 
-                    _communication.pushNotification(notification);
+                    _communicationService.pushNotification(notification);
                 }
                 return GetSTEMIDataById(row.CodeStemiid);
             }
@@ -3671,7 +3678,7 @@ namespace Web.Services.Concrete
                                         {ChannelAttributeEnums.CodeType.ToString(), ChannelTypeEnums.STEMI.ToString()},
                                         {ChannelAttributeEnums.STEMIId.ToString(), STEMI.CodeStemiid}
                                     }, Formatting.Indented);
-                            var channel = _communication.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
+                            var channel = _communicationService.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
                             STEMI.ChannelSid = channel.Sid;
                             this._codeSTEMIRepo.Update(STEMI);
                             UserChannelSid = UserChannelSid.Distinct().ToList();
@@ -3691,7 +3698,7 @@ namespace Web.Services.Concrete
                                         IsDeleted = false
                                     };
                                     ACodeGroupMembers.Add(codeGroupMember);
-                                    _communication.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
+                                    _communicationService.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
                                 }
                                 catch (Exception ex)
                                 {
@@ -3713,7 +3720,7 @@ namespace Web.Services.Concrete
                                 msg.body += $"<strong>Chief Complaint: </strong> {codeSTEMI.ChiefComplant} </br>";
                             if (codeSTEMI.Hpi != null && codeSTEMI.Hpi != "")
                                 msg.body += $"<strong>Hpi: </strong> {codeSTEMI.Hpi} </br>";
-                            var sendMsg = _communication.sendPushNotification(msg);
+                            var sendMsg = _communicationService.sendPushNotification(msg);
 
                             var showAllAccessUsers = this._dbContext.LoadStoredProcedure("md_getUsersOfComponentAccess")
                                                .WithSqlParam("@componentName", "Show All EMS,Show All Active Codes,Show Graphs,Show EMS,Show Active Codes")
@@ -3732,7 +3739,7 @@ namespace Web.Services.Concrete
                                 RouteLink5 = "/Home/Inhouse%20Codes"
                             };
 
-                            _communication.pushNotification(notification);
+                            _communicationService.pushNotification(notification);
                         }
                         return GetSTEMIDataById(STEMI.CodeStemiid);
                     }
@@ -3800,7 +3807,7 @@ namespace Web.Services.Concrete
                     RouteLink5 = "/Home/Inhouse%20Codes"
                 };
 
-                _communication.pushNotification(notification);
+                _communicationService.pushNotification(notification);
             }
 
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Deleted" };
@@ -4375,7 +4382,7 @@ namespace Web.Services.Concrete
                         var groupMembers = this._TraumaCodeGroupMembersRepo.Table.Where(x => x.TraumaCodeIdFk == row.CodeTraumaId).ToList();
                         this._TraumaCodeGroupMembersRepo.DeleteRange(groupMembers);
                         //this._TraumaCodeGroupMembersRepo.DeleteRange(channel);
-                        bool isDeleted = _communication.DeleteUserToConversationChannel(channelSid);
+                        bool isDeleted = _communicationService.DeleteUserToConversationChannel(channelSid);
                         List<CodeTraumaGroupMember> ACodeGroupMembers = new List<CodeTraumaGroupMember>();
                         foreach (var item in UserChannelSid.Distinct())
                         {
@@ -4393,7 +4400,7 @@ namespace Web.Services.Concrete
                                     IsDeleted = false
                                 };
                                 ACodeGroupMembers.Add(codeGroupMember);
-                                _communication.addNewUserToConversationChannel(channelSid, item.UserUniqueId);
+                                _communicationService.addNewUserToConversationChannel(channelSid, item.UserUniqueId);
                             }
                             catch (Exception ex)
                             {
@@ -4414,7 +4421,7 @@ namespace Web.Services.Concrete
                         RouteLink2 = "/Home/EMS/activateCode"
                     };
 
-                    _communication.pushNotification(notification);
+                    _communicationService.pushNotification(notification);
 
                 }
                 else
@@ -4435,7 +4442,7 @@ namespace Web.Services.Concrete
                         RouteLink2 = "/Home/EMS/activateCode"
                     };
 
-                    _communication.pushNotification(notification);
+                    _communicationService.pushNotification(notification);
 
                 }
                 return GetTrumaDataById(row.CodeTraumaId);
@@ -4770,7 +4777,7 @@ namespace Web.Services.Concrete
                                         {ChannelAttributeEnums.CodeType.ToString(), ChannelTypeEnums.Trauma.ToString()},
                                         {ChannelAttributeEnums.TraumaId.ToString(), Truma.CodeTraumaId}
                                     }, Formatting.Indented);
-                            var channel = _communication.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
+                            var channel = _communicationService.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
                             Truma.ChannelSid = channel.Sid;
                             this._codeTrumaRepo.Update(Truma);
                             UserChannelSid = UserChannelSid.Distinct().ToList();
@@ -4790,7 +4797,7 @@ namespace Web.Services.Concrete
                                         IsDeleted = false
                                     };
                                     ACodeGroupMembers.Add(codeGroupMember);
-                                    _communication.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
+                                    _communicationService.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
                                 }
                                 catch (Exception ex)
                                 {
@@ -4812,7 +4819,7 @@ namespace Web.Services.Concrete
                                 msg.body += $"<strong>Chief Complaint: </strong> {codeTruma.ChiefComplant} </br>";
                             if (codeTruma.Hpi != null && codeTruma.Hpi != "")
                                 msg.body += $"<strong>Hpi: </strong> {codeTruma.Hpi} </br>";
-                            var sendMsg = _communication.sendPushNotification(msg);
+                            var sendMsg = _communicationService.sendPushNotification(msg);
 
                             var showAllAccessUsers = this._dbContext.LoadStoredProcedure("md_getUsersOfComponentAccess")
                                                .WithSqlParam("@componentName", "Show All EMS,Show All Active Codes,Show Graphs,Show EMS,Show Active Codes")
@@ -4831,7 +4838,7 @@ namespace Web.Services.Concrete
                                 RouteLink5 = "/Home/Inhouse%20Codes"
                             };
 
-                            _communication.pushNotification(notification);
+                            _communicationService.pushNotification(notification);
                         }
                         return GetTrumaDataById(Truma.CodeTraumaId);
                     }
@@ -4899,7 +4906,7 @@ namespace Web.Services.Concrete
                     RouteLink5 = "/Home/Inhouse%20Codes"
                 };
 
-                _communication.pushNotification(notification);
+                _communicationService.pushNotification(notification);
             }
 
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Deleted" };
@@ -5465,7 +5472,7 @@ namespace Web.Services.Concrete
                         this._BlueCodeGroupMembersRepo.DeleteRange(groupMembers);
 
                         //this._BlueCodeGroupMembersRepo.DeleteRange(channel);
-                        bool isDeleted = _communication.DeleteUserToConversationChannel(channelSid);
+                        bool isDeleted = _communicationService.DeleteUserToConversationChannel(channelSid);
                         List<CodeBlueGroupMember> ACodeGroupMembers = new List<CodeBlueGroupMember>();
                         foreach (var item in UserChannelSid.Distinct())
                         {
@@ -5483,7 +5490,7 @@ namespace Web.Services.Concrete
                                     IsDeleted = false
                                 };
                                 ACodeGroupMembers.Add(codeGroupMember);
-                                _communication.addNewUserToConversationChannel(channelSid, item.UserUniqueId);
+                                _communicationService.addNewUserToConversationChannel(channelSid, item.UserUniqueId);
                             }
                             catch (Exception ex)
                             {
@@ -5504,7 +5511,7 @@ namespace Web.Services.Concrete
                         RouteLink2 = "/Home/EMS/activateCode"
                     };
 
-                    _communication.pushNotification(notification);
+                    _communicationService.pushNotification(notification);
 
                 }
                 else
@@ -5523,7 +5530,7 @@ namespace Web.Services.Concrete
                         RouteLink2 = "/Home/EMS/activateCode"
                     };
 
-                    _communication.pushNotification(notification);
+                    _communicationService.pushNotification(notification);
 
                 }
                 return GetBlueDataById(row.CodeBlueId);
@@ -5862,7 +5869,7 @@ namespace Web.Services.Concrete
                         {
                             string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
                             string friendlyName = blue.IsEms.HasValue && blue.IsEms.Value ? $"EMS Code {UCLEnums.Blue.ToString()} {blue.CodeBlueId}" : $"Inhouse Code {UCLEnums.Blue.ToString()} {blue.CodeBlueId}";
-                            var channel = _communication.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
+                            var channel = _communicationService.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
                             blue.ChannelSid = channel.Sid;
                             this._codeBlueRepo.Update(blue);
                             UserChannelSid = UserChannelSid.Distinct().ToList();
@@ -5882,7 +5889,7 @@ namespace Web.Services.Concrete
                                         IsDeleted = false
                                     };
                                     ACodeGroupMembers.Add(codeGroupMember);
-                                    _communication.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
+                                    _communicationService.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
                                 }
                                 catch (Exception ex)
                                 {
@@ -5903,7 +5910,7 @@ namespace Web.Services.Concrete
                                 msg.body += $"<strong>Chief Complaint: </strong> {codeBlue.ChiefComplant} </br>";
                             if (codeBlue.Hpi != null && codeBlue.Hpi != "")
                                 msg.body += $"<strong>Hpi: </strong> {codeBlue.Hpi} </br>";
-                            var sendMsg = _communication.sendPushNotification(msg);
+                            var sendMsg = _communicationService.sendPushNotification(msg);
 
                             var showAllAccessUsers = this._dbContext.LoadStoredProcedure("md_getUsersOfComponentAccess")
                                                .WithSqlParam("@componentName", "Show All EMS,Show All Active Codes,Show Graphs,Show EMS,Show Active Codes")
@@ -5922,7 +5929,7 @@ namespace Web.Services.Concrete
                                 RouteLink5 = "/Home/Inhouse%20Codes"
                             };
 
-                            _communication.pushNotification(notification);
+                            _communicationService.pushNotification(notification);
                         }
                         return GetBlueDataById(blue.CodeBlueId);
                     }
@@ -5990,7 +5997,7 @@ namespace Web.Services.Concrete
                     RouteLink5 = "/Home/Inhouse%20Codes"
                 };
 
-                _communication.pushNotification(notification);
+                _communicationService.pushNotification(notification);
             }
 
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Deleted" };
@@ -6184,5 +6191,8 @@ namespace Web.Services.Concrete
         }
 
         #endregion
+
+
+      
     }
 }
