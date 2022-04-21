@@ -51,6 +51,7 @@ namespace Web.Services.Concrete
         private readonly IRepository<User> _userRepo;
         private readonly IRepository<ConversationChannel> _conversationChannelsRepo;
         private readonly IRepository<ChatSetting> _chatSettingRepo;
+        private readonly IRepository<CommunicationLog> _communicationLog;
         private readonly IRepository<ConversationParticipant> _conversationParticipantsRepo;
         private IRepository<UsersRelation> _userRelationRepo;
         private IRepository<ServiceLine> _serviceLineRepo;
@@ -69,6 +70,7 @@ namespace Web.Services.Concrete
             IRepository<ChatSetting> chatSettingRepo,
             IRepository<ConversationParticipant> conversationParticipantsRepo,
             IRepository<Role> role,
+            IRepository<CommunicationLog> communicationlog,
             IRepository<UserRole> userRole,
             IRepository<UsersRelation> userRelationRepo,
             IRepository<ServiceLine> serviceLineRepo,
@@ -95,7 +97,7 @@ namespace Web.Services.Concrete
             this._conversationChannelsRepo = conversationChannelsRepo;
             this._conversationParticipantsRepo = conversationParticipantsRepo;
             this._chatSettingRepo = chatSettingRepo;
-
+            this._communicationLog = communicationlog;
 
             this._role = role;
             this._userRole = userRole;
@@ -1012,5 +1014,86 @@ namespace Web.Services.Concrete
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Chat Setting Updated Successfully", Body = channelSetting };
             }
         }
+
+
+
+        public BaseResponse addUpdateCommunicationlog(CommunicationLogVM log)
+        {
+            var communicationLog = this._communicationLog.Table.FirstOrDefault(ch => ch.CommunicationLogId == log.CommunicationLogId && ch.IsDelete != true);
+            BaseResponse response = new BaseResponse();
+            if (communicationLog == null)
+            {
+                var newLog = new CommunicationLog
+                {
+                    //ChatSettingId = channel.ChatSettingId,
+                    Title = log.Title,
+                    Description = log.Description,
+                    SentFrom = log.SentFrom,
+                    SentTo = log.SentTo,
+                    LogType = log.LogType,
+                    Direction = log.Direction,
+                    MediaUrl = log.MediaUrl,
+                    UniqueSid = log.UniqueSid,
+                    CreatedDate = log.CreatedDate,
+                    ModifiedDate=log.ModifiedDate,
+                    IsActive = log.IsActive,
+                    IsDelete = log.IsDelete
+                };
+                this._communicationLog.Insert(newLog);
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Communication Log Saved Successfully", Body = newLog };
+            }
+            else
+            {
+                //ChatSettingId = channel.ChatSettingId,
+                communicationLog.Title = log.Title;
+                communicationLog.Description = log.Description;
+                communicationLog.SentFrom = log.SentFrom;
+                communicationLog.SentTo = log.SentTo;
+                communicationLog.LogType = log.LogType;
+                communicationLog.Direction = log.Direction;
+                communicationLog.MediaUrl = log.MediaUrl;
+                communicationLog.UniqueSid = log.UniqueSid;
+                communicationLog.CreatedDate = log.CreatedDate;
+                communicationLog.ModifiedDate = log.ModifiedDate;
+                communicationLog.IsActive = log.IsActive;
+                communicationLog.IsDelete = log.IsDelete;
+                }
+                this._communicationLog.Update(communicationLog);
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Communication Log Updated Successfully", Body = communicationLog };
+            
+        }
+
+
+        public BaseResponse GetCommunicationLogById(int logId,bool status)
+        {
+            var communicationLog = this._communicationLog.Table.FirstOrDefault(x => x.CommunicationLogId == logId && x.IsDelete != true && x.IsActive== status);
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Chat data", Body = communicationLog };
+        }
+
+
+        public BaseResponse ActiveOrInActiveCommunicationlog(int logId, bool status)
+        {
+            var communicationLog = this._communicationLog.Table.FirstOrDefault(x => x.CommunicationLogId == logId && x.IsDelete != true && x.IsActive == status);
+
+            if (communicationLog != null)
+            {
+                communicationLog.IsActive = status;
+                communicationLog.ModifiedDate = DateTime.UtcNow;
+
+                _communicationLog.Update(communicationLog);
+                
+
+            }
+
+
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = (status ? "Active" :"InActive") + "Successfully", Body = communicationLog };
+        }
+
+
     }
+
+
+
+
+
 }

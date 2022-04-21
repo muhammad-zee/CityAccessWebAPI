@@ -52,5 +52,15 @@ namespace Web.Services.Interfaces
         #endregion
 
         public BaseResponse addChatSettings(AddChatSettingVM channel);
+
+
+        #region Communication Log
+
+        BaseResponse addUpdateCommunicationlog(CommunicationLogVM log);
+
+        BaseResponse GetCommunicationLogById(int logId, bool status);
+        BaseResponse ActiveOrInActiveCommunicationlog(int logId, bool status);
+
+        #endregion
     }
 }

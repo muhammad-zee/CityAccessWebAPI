@@ -408,6 +408,61 @@ namespace Web.API.Controllers
             }
         }
         #endregion chat Setting
+
+
+        #region Communication Log
+
+
+        [HttpPost("CommunicationLog/addUpdateCommunicationLog")]
+        public BaseResponse addUpdateCommunicatonLog([FromBody] CommunicationLogVM log)
+        {
+            try
+            {
+                return this._communicaitonService.addUpdateCommunicationlog(log);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
+
+        [HttpGet("CommunicationLog/GetCommunicationLog/{logId}/{status}")]
+        public BaseResponse GetCommunicationLog(int logId, bool status=true)
+        {
+            try
+            {
+                return this._communicaitonService.GetCommunicationLogById(logId,status);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
+
+        [HttpGet("CommunicationLog/ActiveOrInActiveCommunicationLog/{logId}/{status}")]
+        public BaseResponse ActiveOrInActiveCommunicationLog(int logId,bool status)
+        {
+            try
+            {
+                return this._communicaitonService.ActiveOrInActiveCommunicationlog(logId,status);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
+
+        #endregion
+
     }
 
 
