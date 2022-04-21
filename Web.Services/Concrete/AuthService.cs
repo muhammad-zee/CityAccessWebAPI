@@ -283,6 +283,32 @@ namespace Web.Services.Concrete
                 }
                 _userRepo.Update(user);
 
+
+                if (user.IsEms)
+                {
+                    try
+                    {
+                        var codes = this._dbContext.LoadStoredProcedure("md_addEMSUserRole")
+                                          .WithSqlParam("@UserId", user.UserId)
+                                          .ExecuteStoredProc<string>();
+                    }
+                    catch (Exception ex)
+                    {
+
+                    }
+
+                }
+                else
+                {
+                    var roleIds = register.RoleIds.ToIntList();
+                    List<UserRole> userRoleList = new List<UserRole>();
+                    foreach (var item in roleIds)
+                    {
+                        userRoleList.Add(new UserRole() { UserIdFk = user.UserId, RoleIdFk = item });
+                    }
+                    _userRoleRepo.Insert(userRoleList);
+                }
+
                 return new BaseResponse()
                 {
                     Status = HttpStatusCode.OK,
