@@ -35,6 +35,7 @@ namespace Web.Data.Models
         public virtual DbSet<CodeTrauma> CodeTraumas { get; set; }
         public virtual DbSet<CodeTraumaGroupMember> CodeTraumaGroupMembers { get; set; }
         public virtual DbSet<CodesServiceLinesMapping> CodesServiceLinesMappings { get; set; }
+        public virtual DbSet<CommunicationLog> CommunicationLogs { get; set; }
         public virtual DbSet<Component> Components { get; set; }
         public virtual DbSet<ComponentAccess> ComponentAccesses { get; set; }
         public virtual DbSet<Consult> Consults { get; set; }
@@ -583,6 +584,27 @@ namespace Web.Data.Models
                     .HasMaxLength(15);
 
                 entity.Property(e => e.DefaultServiceLineIdFk).IsRequired();
+            });
+
+            modelBuilder.Entity<CommunicationLog>(entity =>
+            {
+                entity.HasNoKey();
+
+                entity.ToTable("CommunicationLog");
+
+                entity.Property(e => e.CommunicationLogId).ValueGeneratedOnAdd();
+
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.Direction).HasMaxLength(50);
+
+                entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.SentTo).HasMaxLength(50);
+
+                entity.Property(e => e.Title).HasMaxLength(50);
+
+                entity.Property(e => e.UniqueSid).HasMaxLength(50);
             });
 
             modelBuilder.Entity<Component>(entity =>
