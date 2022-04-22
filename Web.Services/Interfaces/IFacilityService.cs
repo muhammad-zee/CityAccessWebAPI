@@ -34,7 +34,7 @@ namespace Web.Services.Interfaces
 
         BaseResponse GetOutpatientOrganizationsIvr();
         BaseResponse GetAllOrganizations(PaginationVM vM);
-        BaseResponse GetAllOrganizations(bool status);
+        BaseResponse GetAllOrganizations(bool status = true, bool forHeader = false);
         BaseResponse GetOrganizationById(int Id);
         BaseResponse GetOrgAssociationTree(string Ids);
         BaseResponse GetOrganizationTypeByOrgId(int orgId);

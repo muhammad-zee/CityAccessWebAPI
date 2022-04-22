@@ -530,12 +530,18 @@ namespace Web.Services.Concrete
             };
         }
 
-        public BaseResponse GetAllOrganizations(bool status)
+        public BaseResponse GetAllOrganizations(bool status, bool forHeader)
         {
             var organizations = new List<Organization>();
             if (ApplicationSettings.isSuperAdmin)
             {
-                organizations = _organizationRepo.Table.Where(x => x.IsActive == status && !x.IsDeleted).ToList();
+                if (forHeader)
+                {
+                    organizations = _organizationRepo.Table.Where(x => !x.IsDeleted).ToList();
+                }
+                else {
+                    organizations = _organizationRepo.Table.Where(x => x.IsActive == status && !x.IsDeleted).ToList();
+                }
             }
             else
             {

@@ -221,6 +221,7 @@ namespace Web.Services.Concrete
                 item.UserRole = getRoleListByUserId(item.UserId).ToList();
                 item.GenderId = Convert.ToInt32(item.Gender);
                 item.Gender = genders.Where(x => x.ControlListDetailId == item.GenderId).Select(x => x.Title).FirstOrDefault();
+                item.IsSuperAdmin = item.UserRole.Any(x => x.IsSuperAdmin);
                 //item.UserImage = String.IsNullOrEmpty(item.UserImage) ? "" : item.UserImage.Replace(Directory.GetCurrentDirectory() + "/", "");
                 //item.DobStr = item.Dob?.ToString("yyyy-MM-dd");
                 //var dptids = _serviceRepo.Table.Where(x => userRelationIds.Where(x => x.UserIdFk == item.UserId).Select(x => x.ServiceLineIdFk).Distinct().ToList().Contains(x.ServiceLineId) && x.IsDeleted != true).Select(x => x.DepartmentIdFk).Distinct().ToList();

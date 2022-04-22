@@ -333,12 +333,12 @@ namespace Web.API.Controllers
 
 
         [Description("Get All Organizations")]
-        [HttpGet("org/GetAllOrganizations")]
-        public BaseResponse GetAllOrganizations(bool status = true)
+        [HttpGet("org/GetAllOrganizations/{status}/{forHeader}")]
+        public BaseResponse GetAllOrganizations(bool status = true, bool forHeader = false)
         {
             try
             {
-                var res = _facilityService.GetAllOrganizations(status);
+                var res = _facilityService.GetAllOrganizations(status, forHeader);
                 return res;
             }
             catch (Exception ex)
