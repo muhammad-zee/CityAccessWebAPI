@@ -40,6 +40,8 @@ namespace Web.Model.Common
         public string City { get; set; } = "";
         public int? StateKey { get; set; } = 0;
         public string State { get; set; } = "";
+        public string DepartmentIds { get; set; } = "";
+        public string ServiceLineIds { get; set; } = "";
         public string Zip { get; set; } = "";
         public bool TwoFactorEnabled { get; set; }
         public bool IsActive { get; set; }

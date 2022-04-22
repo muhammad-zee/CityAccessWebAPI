@@ -202,6 +202,9 @@ namespace Web.Services.Concrete
                 .WithSqlParam("@pOrganizationId", model.OrganizationId)
                 .WithSqlParam("@pIsSuperAdmin", ApplicationSettings.isSuperAdmin)
                 .WithSqlParam("@pstatus", model.status)
+                .WithSqlParam("@pdepartmentIds", model.DepartmentIds)
+                .WithSqlParam("@pserviceLineIds", model.ServiceLineIds)
+                .WithSqlParam("@proleIds", model.RoleIds)
 
                 .WithSqlParam("@page", model.PageNumber)
                 .WithSqlParam("@size", model.Rows)
