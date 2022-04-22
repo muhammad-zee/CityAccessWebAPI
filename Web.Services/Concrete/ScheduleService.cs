@@ -66,8 +66,11 @@ namespace Web.Services.Concrete
                 .WithSqlParam("@departmentIds", param.departmentIds)
                 .WithSqlParam("@serviceLineIds", param.ServiceLineIds)
                 .WithSqlParam("@roleIds", param.RoleIds)
-                .WithSqlParam("@userIds", param.ShowAllSchedule == "false" ? param.CreatedBy.ToString() : param.UserIds)
+                .WithSqlParam("@userIds", (param.ShowAllSchedule == "false" && param.ShowDepartmentSchedule == "false" && param.ShowServiceLineSchedule == "false") ? param.CreatedBy.ToString() : param.UserIds)
                 .WithSqlParam("@showAllSchedule", param.ShowAllSchedule)
+                .WithSqlParam("@ShowDepartmentSchedule", param.ShowDepartmentSchedule)
+                .WithSqlParam("@ShowServiceLineSchedule", param.ShowServiceLineSchedule)
+                .WithSqlParam("@ShowOnlyMySchedule", param.ShowOnlyMySchedule)
             .ExecuteStoredProc<ScheduleEventData>();
 
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Found", Body = scheduleList };

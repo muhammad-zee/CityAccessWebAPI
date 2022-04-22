@@ -63,6 +63,14 @@ namespace Web.Services.Concrete
                 Body = services
             };
         }
+        public BaseResponse GetUsersServiceLines()
+        {
+            var serviceLines = this._dbContext.LoadStoredProcedure("md_GetUsersServiceLines")
+                                      .WithSqlParam("@userId", ApplicationSettings.UserId)
+                                      .ExecuteStoredProc<ServiceLine>();
+
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = serviceLines };
+        }
         public BaseResponse GetAllServiceLinesByDepartmentId(int DepartmentId, bool status)
         {
             var services = _serviceRepo.Table.Where(x => x.IsActive == status && x.DepartmentIdFk == DepartmentId && !x.IsDeleted).ToList();
@@ -252,7 +260,14 @@ namespace Web.Services.Concrete
                 Body = dpts
             };
         }
+        public BaseResponse GetUsersDepartments()
+        {
+            var dpt = this._dbContext.LoadStoredProcedure("md_GetUsersDepartments")
+                                      .WithSqlParam("@userId", ApplicationSettings.UserId)
+                                      .ExecuteStoredProc<Department>();
 
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = dpt };
+        }
         public BaseResponse GetAllDepartmentsByOrganizationId(int OrganizationId, bool status)
         {
             var departments = this._departmentRepo.Table.Where(od => od.OrganizationIdFk == OrganizationId && od.IsActive == status && od.IsDeleted == false).ToList();
@@ -456,7 +471,7 @@ namespace Web.Services.Concrete
                 Body = orgs
             };
         }
-
+       
         public BaseResponse GetOutpatientOrganizationsIvr()
         {
             var organization = new List<Organization>();

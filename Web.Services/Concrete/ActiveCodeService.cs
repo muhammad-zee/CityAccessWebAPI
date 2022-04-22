@@ -189,6 +189,7 @@ namespace Web.Services.Concrete
                         row.DefaultServiceLineTeam = string.Join(",", oldServicesDefault.Distinct());
                         row.ServiceLineTeam1 = string.Join(",", oldServices1.Distinct());
                         row.ServiceLineTeam2 = string.Join(",", oldServices2.Distinct());
+                        row.IsActive = true;
                         row.ModifiedBy = item.CreatedBy;
                         row.ModifiedDate = DateTime.Now;
                         row.IsDeleted = false;

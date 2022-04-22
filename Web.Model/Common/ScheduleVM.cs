@@ -16,6 +16,9 @@ namespace Web.Model.Common
         public string RoleIds { get; set; }
         public string UserIds { get; set; }
         public string ShowAllSchedule { get; set; }
+        public string ShowDepartmentSchedule { get; set; }
+        public string ShowServiceLineSchedule { get; set; }
+        public string ShowOnlyMySchedule { get; set; }
         public List<ScheduleEventData> added { get; set; }
         public List<ScheduleEventData> changed { get; set; }
         public List<ScheduleEventData> deleted { get; set; }
@@ -37,13 +40,14 @@ namespace Web.Model.Common
         public string userId { get; set; }
 
         public string serviceLineId { get; set; }
-
+        public string departmentId { get; set; }
         public string roleId { get; set; }
         public string subject { get; set; }
         public string Description { get; set; }
         public string selectedUserId { get; set; }
         public string RoleName { get; set; }
         public string ServiceName { get; set; }
+        public string DepartmentName { get; set; }
 
     }
 

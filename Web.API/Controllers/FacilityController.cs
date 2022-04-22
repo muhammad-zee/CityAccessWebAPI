@@ -58,6 +58,23 @@ namespace Web.API.Controllers
             }
         }
 
+        [Description("Get User's Service Lines")]
+        [HttpGet("service/GetUsersServiceLines")]
+        public BaseResponse GetUsersServiceLines()
+        {
+            try
+            {
+                return _facilityService.GetUsersServiceLines();
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
+
         [Description("Get Service Line By Id")]
         [HttpGet("service/GetServiceLineById/{Id}")]
         public BaseResponse GetServiceLineById(int Id)
@@ -190,6 +207,24 @@ namespace Web.API.Controllers
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
         }
+
+        [Description("Get Users Departments")]
+        [HttpGet("dpt/GetUsersDepartments")]
+        public BaseResponse GetUsersDepartments()
+        {
+            try
+            {
+                return _facilityService.GetUsersDepartments();
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
+
 
         [Description("Get Department  By Id")]
         [HttpGet("dpt/GetDepartmentById/{Id}")]

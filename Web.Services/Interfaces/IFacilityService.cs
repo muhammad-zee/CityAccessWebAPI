@@ -8,6 +8,7 @@ namespace Web.Services.Interfaces
     {
         #region Service Lines
         BaseResponse GetAllServiceLines();
+        BaseResponse GetUsersServiceLines();
         BaseResponse GetAllServiceLinesByDepartmentId(int DepartmentId, bool status);
         BaseResponse GetServiceLineById(int Id);
         BaseResponse getServicesByDepartmentIds(string departmentIds);
@@ -19,6 +20,7 @@ namespace Web.Services.Interfaces
 
         #region Department
         BaseResponse GetAllDepartments();
+        BaseResponse GetUsersDepartments();
         BaseResponse GetAllDepartmentsByOrganizationId(int OrganizationId, bool status);
         BaseResponse GetDepartmentById(int Id);
         BaseResponse GetDepartmentsByIds(string Ids);
