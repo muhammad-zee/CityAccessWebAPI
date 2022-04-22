@@ -137,11 +137,11 @@ namespace Web.API.Controllers
 
         [AllowAnonymous]
         [HttpPost("Call/ReceiveVoicemail")]
-        public TwiMLResult ReceiveVoicemail(string RecordingUrl, string RecordingSid)
+        public TwiMLResult ReceiveVoicemail( int parentNodeId, int serviceLineId)
         {
             try
             {
-                return this._callService.ReceiveVoicemail(RecordingUrl, RecordingSid);
+                return this._callService.ReceiveVoicemail(HttpContext.Request.Form, parentNodeId, serviceLineId);
             }
             catch (Exception ex)
             {

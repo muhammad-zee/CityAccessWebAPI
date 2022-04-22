@@ -21,6 +21,7 @@ using Web.DLL.Generic_Repository;
 using Web.Model;
 using Web.Model.Common;
 using Web.Services.Enums;
+using Web.Services.Extensions;
 using Web.Services.Helper;
 using Web.Services.Interfaces;
 using static Twilio.Rest.Chat.V2.Service.ChannelResource;
@@ -1025,7 +1026,7 @@ namespace Web.Services.Concrete
 
 
 
-        public BaseResponse addUpdateCommunicationlog(CommunicationLogVM log)
+        public BaseResponse SaveCommunicatonLog(CommunicationLogVM log)
         {
             var communicationLog = this._communicationLog.Table.FirstOrDefault(ch => ch.CommunicationLogId == log.CommunicationLogId && ch.IsDelete != true);
             BaseResponse response = new BaseResponse();
@@ -1038,14 +1039,14 @@ namespace Web.Services.Concrete
                     Description = log.Description,
                     SentFrom = log.SentFrom,
                     SentTo = log.SentTo,
+                    ServiceLineIdFk = log.ServiceLineIdFk,
                     LogType = log.LogType,
                     Direction = log.Direction,
                     MediaUrl = log.MediaUrl,
                     UniqueSid = log.UniqueSid,
-                    CreatedDate = log.CreatedDate,
-                    ModifiedDate=log.ModifiedDate,
-                    IsActive = log.IsActive,
-                    IsDelete = log.IsDelete
+                    CreatedDate =DateTime.UtcNow,
+                    IsActive = true,
+                    IsDelete = false
                 };
                 this._communicationLog.Insert(newLog);
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Communication Log Saved Successfully", Body = newLog };

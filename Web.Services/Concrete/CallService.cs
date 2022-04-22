@@ -321,7 +321,7 @@ namespace Web.Services.Concrete
                 }
                 else if (ivrNode.NodeTypeId == IvrNodeTypeEnums.Voicemail.ToInt())
                 {
-                    var RecordUrl = $"{origin}/Call/ReceiveVoicemail";
+                    var RecordUrl = $"{origin}/Call/ReceiveVoicemail?parentNodeId={ivrNode.IvrSettingsId}&serviceLineId={serviceLineId}";
                     response.Say(ivrNode.Description).Pause(2).Say("press # key after recording message");
                     response.Record(action: new Uri(RecordUrl), finishOnKey: "#");
                     response.Say("I did not receive a recording");
@@ -351,9 +351,23 @@ namespace Web.Services.Concrete
 
             return TwiML(response);
         }
-        public TwiMLResult ReceiveVoicemail(string RecordingUrl, string RecordingSid)
+        public TwiMLResult ReceiveVoicemail(IFormCollection Request, int parentNodeId, int serviceLineId)
         {
-
+            string RecordingUrl = Request["RecordingUrl"];
+                string RecordingSid = Request["RecordingSid"];
+            var newLog = new CommunicationLogVM
+            {
+                //Title = log.Title,
+                //Description = log.Description,
+                SentFrom = Request["From"],
+                SentTo = Request["To"],
+                LogType = CommunicationTypeEnums.Voicemail.ToInt(),
+                Direction = CallDirectionEnums.Inbound.ToString(),
+                MediaUrl =RecordingUrl,
+                UniqueSid =RecordingSid,
+                ServiceLineIdFk= serviceLineId
+            };
+            this._communicationService.SaveCommunicatonLog(newLog);
             VoiceResponse response = new VoiceResponse();
             response.Say("Thankyou , Your Voicemail is received.");
             return TwiML(response);

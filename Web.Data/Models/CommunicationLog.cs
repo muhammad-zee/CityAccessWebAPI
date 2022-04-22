@@ -20,5 +20,6 @@ namespace Web.Data.Models
         public DateTime? ModifiedDate { get; set; }
         public bool? IsActive { get; set; }
         public bool? IsDelete { get; set; }
+        public int? ServiceLineIdFk { get; set; }
     }
 }

@@ -413,12 +413,12 @@ namespace Web.API.Controllers
         #region Communication Log
 
 
-        [HttpPost("CommunicationLog/addUpdateCommunicationLog")]
-        public BaseResponse addUpdateCommunicatonLog([FromBody] CommunicationLogVM log)
+        [HttpPost("CommunicationLog/SaveCommunicatonLog")]
+        public BaseResponse SaveCommunicatonLog([FromBody] CommunicationLogVM log)
         {
             try
             {
-                return this._communicaitonService.addUpdateCommunicationlog(log);
+                return this._communicaitonService.SaveCommunicatonLog(log);
             }
             catch (Exception ex)
             {

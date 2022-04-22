@@ -56,7 +56,7 @@ namespace Web.Services.Interfaces
 
         #region Communication Log
 
-        BaseResponse addUpdateCommunicationlog(CommunicationLogVM log);
+        BaseResponse SaveCommunicatonLog(CommunicationLogVM log);
 
         BaseResponse GetCommunicationLogById(int logId, bool status);
         BaseResponse ActiveOrInActiveCommunicationlog(int logId, bool status);

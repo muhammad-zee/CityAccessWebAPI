@@ -16,7 +16,7 @@ namespace Web.Services.Interfaces
         TwiMLResult CallConnected(string To, string From);
         TwiMLResult PromptResponse(int Digits, int ParentNodeId, int serviceLineId);
         TwiMLResult ExceptionResponse(Exception ex);
-        TwiMLResult ReceiveVoicemail(string RecordingUrl, string RecordingSid);
+        TwiMLResult ReceiveVoicemail(IFormCollection Request, int parentNodeId, int serviceLineId);
         string CallbackStatus(IFormCollection Request);
         string InboundCallbackStatus(IFormCollection Request, int parentNodeId, int serviceLineId);
         string ConferenceParticipantCallbackStatus(IFormCollection Request, int roleId, int serviceLineId, string conferenceSid, int queueId);
