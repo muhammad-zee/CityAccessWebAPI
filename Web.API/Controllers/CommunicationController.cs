@@ -444,7 +444,7 @@ namespace Web.API.Controllers
             }
         }
 
-        [HttpGet("CommunicationLog/GetAllCommunicationLog")]
+        [HttpGet("CommunicationLog/GetAllCommunicationLog/{status}")]
         public BaseResponse GetAllCommunicationLog(bool status = true)
         {
             try
