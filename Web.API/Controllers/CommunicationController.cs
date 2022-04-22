@@ -444,12 +444,12 @@ namespace Web.API.Controllers
             }
         }
 
-        [HttpGet("CommunicationLog/GetAllCommunicationLog/{status}")]
-        public BaseResponse GetAllCommunicationLog(bool status = true)
+        [HttpGet("CommunicationLog/GetAllCommunicationLog/{orgId}")]
+        public BaseResponse GetAllCommunicationLog(int orgId)
         {
             try
             {
-                return this._communicaitonService.GetAllCommunicationlog(status);
+                return this._communicaitonService.GetAllCommunicationlog(orgId);
             }
             catch (Exception ex)
             {

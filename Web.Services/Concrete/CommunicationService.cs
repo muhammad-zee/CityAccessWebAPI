@@ -1099,11 +1099,12 @@ namespace Web.Services.Concrete
         }
 
 
-        public BaseResponse GetAllCommunicationlog(bool status)
+        public BaseResponse GetAllCommunicationlog(int orgId)
         {
-            var communicationLog = this._communicationLog.Table.Where(x => x.IsDelete != true && x.IsActive==status);
+            var communicationLog = this._dbContext.LoadStoredProcedure("md_getCommunicationLog")
+            //.WithSqlParam("@pUserId", UserId)
+            .ExecuteStoredProc<CommunicationLogVM>();
 
-          
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "CommunicationLog Data", Body = communicationLog };
         }
 
