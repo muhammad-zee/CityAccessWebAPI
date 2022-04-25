@@ -90,35 +90,45 @@ namespace Web.Services.Concrete
                     if (user.Password == login.password)
                     {
 
-                        var UserIsAllowed = this._dbContext.LoadStoredProcedure("md_CheckUserOrOrganizationIsActive")
-                                                .WithSqlParam("@userId", user.UserId)
-                                                .ExecuteStoredProc<UserCredentialVM>().Select(x => new { x.UserIsActive, x.OrgIsActive }).FirstOrDefault();
-                        if (UserIsAllowed != null)
+                        if (ApplicationSettings.isSuperAdmin)
                         {
-                            if (!UserIsAllowed.UserIsActive)
-                            {
-                                response.Body = null;
-                                response.Status = HttpStatusCode.NotFound;
-                                response.Message = "User is not active.";
-                            }
-                            else if (!UserIsAllowed.OrgIsActive)
-                            {
-                                response.Body = null;
-                                response.Status = HttpStatusCode.NotFound;
-                                response.Message = "User's Organization is not active.";
-                            }
-                            else {
-                                var AuthorizedUser = GenerateJSONWebToken(user);
-                                response.Body = AuthorizedUser;
-                                response.Status = HttpStatusCode.OK;
-                                response.Message = "User found";
-                            }
+                            var AuthorizedUser = GenerateJSONWebToken(user);
+                            response.Body = AuthorizedUser;
+                            response.Status = HttpStatusCode.OK;
+                            response.Message = "User found";
                         }
-                        else 
-                        {
-                            response.Body = null;
-                            response.Status = HttpStatusCode.NotFound;
-                            response.Message = "User's role is not selected.";
+                        else {
+                            var UserIsAllowed = this._dbContext.LoadStoredProcedure("md_CheckUserOrOrganizationIsActive")
+                                                   .WithSqlParam("@userId", user.UserId)
+                                                   .ExecuteStoredProc<UserCredentialVM>().Select(x => new { x.UserIsActive, x.OrgIsActive }).FirstOrDefault();
+                            if (UserIsAllowed != null)
+                            {
+                                if (!UserIsAllowed.UserIsActive)
+                                {
+                                    response.Body = null;
+                                    response.Status = HttpStatusCode.NotFound;
+                                    response.Message = "User is not active.";
+                                }
+                                else if (!user.IsEms && !UserIsAllowed.OrgIsActive)
+                                {
+                                    response.Body = null;
+                                    response.Status = HttpStatusCode.NotFound;
+                                    response.Message = "User's Organization is not active.";
+                                }
+                                else
+                                {
+                                    var AuthorizedUser = GenerateJSONWebToken(user);
+                                    response.Body = AuthorizedUser;
+                                    response.Status = HttpStatusCode.OK;
+                                    response.Message = "User found";
+                                }
+                            }
+                            else
+                            {
+                                response.Body = null;
+                                response.Status = HttpStatusCode.NotFound;
+                                response.Message = "User's role is not selected.";
+                            }
                         }
 
                         
