@@ -290,7 +290,7 @@ namespace Web.Services.Concrete
                     {
                         var codes = this._dbContext.LoadStoredProcedure("md_addEMSUserRole")
                                           .WithSqlParam("@UserId", user.UserId)
-                                          .ExecuteStoredProc<string>();
+                                          .ExecuteStoredProc<int>();
                     }
                     catch (Exception ex)
                     {
@@ -409,7 +409,7 @@ namespace Web.Services.Concrete
                             {
                                 var codes = this._dbContext.LoadStoredProcedure("md_addEMSUserRole")
                                                   .WithSqlParam("@UserId", obj.UserId)
-                                                  .ExecuteStoredProc<string>();
+                                                  .ExecuteStoredProc<int>();
                             }
                             catch (Exception ex)
                             {
