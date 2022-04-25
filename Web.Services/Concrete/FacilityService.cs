@@ -477,7 +477,7 @@ namespace Web.Services.Concrete
             var organization = new List<Organization>();
             if (ApplicationSettings.isSuperAdmin)
             {
-                organization = _organizationRepo.Table.Where(x => x.IsDeleted == false).ToList();
+                organization = _organizationRepo.Table.Where(x => x.IsActive && x.IsDeleted == false).ToList();
             }
             else
             {

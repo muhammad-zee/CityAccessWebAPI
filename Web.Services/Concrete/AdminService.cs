@@ -287,6 +287,7 @@ namespace Web.Services.Concrete
                 user.UserRole = getRoleListByUserId(Id).ToList();
                 user.GenderId = Convert.ToInt32(user.Gender);
                 user.Gender = genders.Where(x => x.ControlListDetailId == user.GenderId).Select(x => x.Title).FirstOrDefault();
+                user.IsSuperAdmin = user.UserRole.Any(x => x.IsSuperAdmin);
                 user.UserImage = user.UserImage?.Replace(Directory.GetCurrentDirectory() + "/", "");
                 user.DobStr = user.Dob?.ToString("yyyy-MM-dd");
                 user.State = _controlListDetails.Table.Where(x => x.ControlListDetailId == user.StateKey).Select(x => x.Title).FirstOrDefault();
