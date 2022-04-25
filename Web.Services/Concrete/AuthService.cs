@@ -90,7 +90,7 @@ namespace Web.Services.Concrete
                     if (user.Password == login.password)
                     {
 
-                        if (ApplicationSettings.isSuperAdmin)
+                        if (this._adminService.getRoleListByUserId(user.UserId).ToList().Any(x => x.IsSuperAdmin))
                         {
                             var AuthorizedUser = GenerateJSONWebToken(user);
                             response.Body = AuthorizedUser;
