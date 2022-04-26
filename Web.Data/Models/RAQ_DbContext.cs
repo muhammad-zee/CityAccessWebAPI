@@ -1,6 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
+﻿using Microsoft.EntityFrameworkCore;
 
 #nullable disable
 
@@ -48,10 +46,16 @@ namespace Web.Data.Models
         public virtual DbSet<Department> Departments { get; set; }
         public virtual DbSet<ElmahError> ElmahErrors { get; set; }
         public virtual DbSet<FavouriteTeam> FavouriteTeams { get; set; }
+        public virtual DbSet<InhouseCodesField> InhouseCodesFields { get; set; }
         public virtual DbSet<InteractiveVoiceResponse> InteractiveVoiceResponses { get; set; }
         public virtual DbSet<Ivrsetting> Ivrsettings { get; set; }
         public virtual DbSet<MdrouteCounter> MdrouteCounters { get; set; }
         public virtual DbSet<Organization> Organizations { get; set; }
+        public virtual DbSet<OrganizationCodeBlueField> OrganizationCodeBlueFields { get; set; }
+        public virtual DbSet<OrganizationCodeSepsisField> OrganizationCodeSepsisFields { get; set; }
+        public virtual DbSet<OrganizationCodeStemifield> OrganizationCodeStemifields { get; set; }
+        public virtual DbSet<OrganizationCodeStrokeField> OrganizationCodeStrokeFields { get; set; }
+        public virtual DbSet<OrganizationCodeTraumaField> OrganizationCodeTraumaFields { get; set; }
         public virtual DbSet<OrganizationConsultField> OrganizationConsultFields { get; set; }
         public virtual DbSet<Role> Roles { get; set; }
         public virtual DbSet<ServiceLine> ServiceLines { get; set; }
@@ -908,6 +912,27 @@ namespace Web.Data.Models
                     .HasConstraintName("FK_FavouriteTeam_Users");
             });
 
+            modelBuilder.Entity<InhouseCodesField>(entity =>
+            {
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.FieldDataType)
+                    .IsRequired()
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.FieldLabel).HasMaxLength(50);
+
+                entity.Property(e => e.FieldName)
+                    .IsRequired()
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.FieldType)
+                    .IsRequired()
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+            });
+
             modelBuilder.Entity<InteractiveVoiceResponse>(entity =>
             {
                 entity.HasKey(e => e.IvrId)
@@ -1024,6 +1049,115 @@ namespace Web.Data.Models
                 entity.Property(e => e.PrimaryMobileNo2).HasMaxLength(15);
 
                 entity.Property(e => e.Zip).HasMaxLength(100);
+            });
+
+            modelBuilder.Entity<OrganizationCodeBlueField>(entity =>
+            {
+                entity.HasKey(e => e.OrgCodeBlueFieldId);
+
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+
+                entity.HasOne(d => d.InhouseCodesFieldIdFkNavigation)
+                    .WithMany(p => p.OrganizationCodeBlueFields)
+                    .HasForeignKey(d => d.InhouseCodesFieldIdFk)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_OrganizationCodeBlueFields_InhouseCodesFields");
+
+                entity.HasOne(d => d.OrganizationIdFkNavigation)
+                    .WithMany(p => p.OrganizationCodeBlueFields)
+                    .HasForeignKey(d => d.OrganizationIdFk)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_OrganizationCodeBlueFields_Organizations");
+            });
+
+            modelBuilder.Entity<OrganizationCodeSepsisField>(entity =>
+            {
+                entity.HasKey(e => e.OrgCodeSepsisFieldId);
+
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+
+                entity.HasOne(d => d.InhouseCodesFieldIdFkNavigation)
+                    .WithMany(p => p.OrganizationCodeSepsisFields)
+                    .HasForeignKey(d => d.InhouseCodesFieldIdFk)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_OrganizationCodeSepsisFields_InhouseCodesFields");
+
+                entity.HasOne(d => d.OrganizationIdFkNavigation)
+                    .WithMany(p => p.OrganizationCodeSepsisFields)
+                    .HasForeignKey(d => d.OrganizationIdFk)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_OrganizationCodeSepsisFields_Organizations");
+            });
+
+            modelBuilder.Entity<OrganizationCodeStemifield>(entity =>
+            {
+                entity.HasKey(e => e.OrgCodeStemifieldId);
+
+                entity.ToTable("OrganizationCodeSTEMIFields");
+
+                entity.Property(e => e.OrgCodeStemifieldId).HasColumnName("OrgCodeSTEMIFieldId");
+
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+
+                entity.HasOne(d => d.InhouseCodesFieldIdFkNavigation)
+                    .WithMany(p => p.OrganizationCodeStemifields)
+                    .HasForeignKey(d => d.InhouseCodesFieldIdFk)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_OrganizationCodeSTEMIFields_InhouseCodesFields");
+
+                entity.HasOne(d => d.OrganizationIdFkNavigation)
+                    .WithMany(p => p.OrganizationCodeStemifields)
+                    .HasForeignKey(d => d.OrganizationIdFk)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_OrganizationCodeSTEMIFields_Organizations");
+            });
+
+            modelBuilder.Entity<OrganizationCodeStrokeField>(entity =>
+            {
+                entity.HasKey(e => e.OrgCodeStrokeFieldId);
+
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+
+                entity.HasOne(d => d.InhouseCodesFieldIdFkNavigation)
+                    .WithMany(p => p.OrganizationCodeStrokeFields)
+                    .HasForeignKey(d => d.InhouseCodesFieldIdFk)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_OrganizationCodeStrokeFields_InhouseCodesFields");
+
+                entity.HasOne(d => d.OrganizationIdFkNavigation)
+                    .WithMany(p => p.OrganizationCodeStrokeFields)
+                    .HasForeignKey(d => d.OrganizationIdFk)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_OrganizationCodeStrokeFields_Organizations");
+            });
+
+            modelBuilder.Entity<OrganizationCodeTraumaField>(entity =>
+            {
+                entity.HasKey(e => e.OrgCodeTraumaFieldId);
+
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+
+                entity.HasOne(d => d.InhouseCodesFieldIdFkNavigation)
+                    .WithMany(p => p.OrganizationCodeTraumaFields)
+                    .HasForeignKey(d => d.InhouseCodesFieldIdFk)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_OrganizationCodeTraumaFields_InhouseCodesFields");
+
+                entity.HasOne(d => d.OrganizationIdFkNavigation)
+                    .WithMany(p => p.OrganizationCodeTraumaFields)
+                    .HasForeignKey(d => d.OrganizationIdFk)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_OrganizationCodeTraumaFields_Organizations");
             });
 
             modelBuilder.Entity<OrganizationConsultField>(entity =>

@@ -354,7 +354,7 @@ namespace Web.Services.Concrete
         public TwiMLResult ReceiveVoicemail(IFormCollection Request, int parentNodeId, int serviceLineId)
         {
             string RecordingUrl = Request["RecordingUrl"];
-                string RecordingSid = Request["RecordingSid"];
+            string RecordingSid = Request["RecordingSid"];
             var newLog = new CommunicationLogVM
             {
                 //Title = log.Title,
@@ -363,9 +363,9 @@ namespace Web.Services.Concrete
                 SentTo = Request["To"],
                 LogType = CommunicationTypeEnums.Voicemail.ToInt(),
                 Direction = CallDirectionEnums.Inbound.ToString(),
-                MediaUrl =RecordingUrl,
-                UniqueSid =RecordingSid,
-                ServiceLineIdFk= serviceLineId
+                MediaUrl = RecordingUrl,
+                UniqueSid = RecordingSid,
+                ServiceLineIdFk = serviceLineId
             };
             this._communicationService.SaveCommunicatonLog(newLog);
             VoiceResponse response = new VoiceResponse();
@@ -962,9 +962,9 @@ namespace Web.Services.Concrete
                 Body = IVRVMs
             };
         }
-        public BaseResponse getAllIvrsByOrgId(int orgId,bool status)
+        public BaseResponse getAllIvrsByOrgId(int orgId, bool status)
         {
-            var IVRs = _IVRRepo.Table.Where(x => x.IsDeleted != true && x.OrganizationIdFk == orgId && x.IsActive==status).ToList();
+            var IVRs = _IVRRepo.Table.Where(x => x.IsDeleted != true && x.OrganizationIdFk == orgId && x.IsActive == status).ToList();
             var types = _controlListDetailsRepo.Table.Where(x => x.ControlListIdFk == UCLEnums.OrgType.ToInt()).Select(x => new { x.ControlListDetailId, x.Title });
             var IVRVMs = AutoMapperHelper.MapList<InteractiveVoiceResponse, IVRVM>(IVRs);
             //IVRVMs.ForEach(x => x.OrganizationType = types.Where(t => t.ControlListDetailId == x.OrganizationTypeIdFk).Select(ty => ty.Title).FirstOrDefault());
@@ -1042,7 +1042,7 @@ namespace Web.Services.Concrete
 
         }
 
-        public BaseResponse ActiveOrInActiveIVR(int Id,bool status)
+        public BaseResponse ActiveOrInActiveIVR(int Id, bool status)
         {
             var IVRNode = this._IVRRepo.Table.Where(x => x.IvrId == Id && x.IsDeleted != true).FirstOrDefault();
             if (IVRNode != null)
@@ -1057,7 +1057,7 @@ namespace Web.Services.Concrete
 
                 _ivrSettingsRepo.Update(childNodes);
 
-                return new BaseResponse() { Status = HttpStatusCode.OK, Message = (status? "Activated" : "InActive") + "Successfully" };
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = (status ? "Activated" : "InActive") + "Successfully" };
             }
             else
             {

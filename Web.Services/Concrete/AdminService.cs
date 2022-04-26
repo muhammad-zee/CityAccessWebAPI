@@ -331,7 +331,7 @@ namespace Web.Services.Concrete
         public BaseResponse GetUserAlreadyExist(string userName)
         {
             var EXISTING_USER = _user.Table.Where(x => x.UserName == userName && x.IsDeleted == false).FirstOrDefault();
-            if( EXISTING_USER == null)
+            if (EXISTING_USER == null)
             {
                 return new BaseResponse { Status = HttpStatusCode.OK, Message = "User Not Found", Body = EXISTING_USER };
             }
@@ -339,7 +339,7 @@ namespace Web.Services.Concrete
             {
                 return new BaseResponse { Status = HttpStatusCode.OK, Message = "User Found", Body = EXISTING_USER };
             }
-            
+
         }
         public BaseResponse DeleteUser(int Id)
         {
@@ -409,7 +409,7 @@ namespace Web.Services.Concrete
             var roleList = this._dbContext.LoadStoredProcedure("md_getAllRoles")
                             .WithSqlParam("@organizationId", role.OrganizationId)
                             .WithSqlParam("@page", role.PageNumber)
-                            .WithSqlParam("@status",role.status)
+                            .WithSqlParam("@status", role.status)
                             .WithSqlParam("@size", role.Rows)
                             .WithSqlParam("@sortOrder", role.SortOrder)
                             .WithSqlParam("@sortCol", role.SortCol)
@@ -422,9 +422,9 @@ namespace Web.Services.Concrete
         {
             return this._role.GetList().Where(item => !item.IsDeleted);
         }
-        public IQueryable<Role> getRoleListByOrganizationId(int OrganizationId,bool status)
+        public IQueryable<Role> getRoleListByOrganizationId(int OrganizationId, bool status)
         {
-            var rolesList = this._role.Table.Where(item => item.OrganizationIdFk == OrganizationId && !item.IsDeleted &&item.IsActive==status && !item.IsSuperAdmin );
+            var rolesList = this._role.Table.Where(item => item.OrganizationIdFk == OrganizationId && !item.IsDeleted && item.IsActive == status && !item.IsSuperAdmin);
             //if (ApplicationSettings.isSuperAdmin)
             //{
             //    var superAdminRole = this._role.GetList().Where(item => item.RoleId == userRoleId);
@@ -557,7 +557,7 @@ namespace Web.Services.Concrete
             }
         }
 
-        public BaseResponse ActiveInActiveRole(int Id,bool status)
+        public BaseResponse ActiveInActiveRole(int Id, bool status)
         {
             var Role = _role.Table.Where(x => x.RoleId == Id && x.IsDeleted == false).FirstOrDefault();
             if (Role != null)

@@ -215,7 +215,7 @@ namespace Web.API.Controllers
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
         }
-        
+
         [Description("Existing User")]
         [HttpGet("admin/GetUserAlreadyExist/{userName}")]
         public BaseResponse GetUserAlreadyExist(string userName)
@@ -306,14 +306,14 @@ namespace Web.API.Controllers
 
 
         [HttpGet("admin/GetAllRoles")]
-        public BaseResponse GetRoles(int? OrganizationID,bool status =true)
+        public BaseResponse GetRoles(int? OrganizationID, bool status = true)
         {
             try
             {
                 IQueryable roleObj = null;
                 if (OrganizationID != null)
                 {
-                    roleObj = _adminService.getRoleListByOrganizationId(OrganizationID.Value,status);
+                    roleObj = _adminService.getRoleListByOrganizationId(OrganizationID.Value, status);
                 }
                 else
                 {
@@ -461,11 +461,11 @@ namespace Web.API.Controllers
 
         [Description("Active/InActive Role")]
         [HttpGet("admin/ActiveOrInActiveRole/{Id}/{status}")]
-        public async Task<BaseResponse> ActiveorInActiveRole(int Id,bool status)
+        public async Task<BaseResponse> ActiveorInActiveRole(int Id, bool status)
         {
             try
             {
-                var response = _adminService.ActiveInActiveRole(Id,status);
+                var response = _adminService.ActiveInActiveRole(Id, status);
                 return response;
             }
             catch (Exception ex)

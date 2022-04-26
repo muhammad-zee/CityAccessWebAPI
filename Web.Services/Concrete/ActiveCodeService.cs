@@ -31,6 +31,12 @@ namespace Web.Services.Concrete
         private IRepository<ServiceLine> _serviceLineRepo;
         private IRepository<UsersSchedule> _userSchedulesRepo;
         private IRepository<ControlListDetail> _controlListDetailsRepo;
+        private IRepository<InhouseCodesField> _InhouseCodeFeilds;
+        private IRepository<OrganizationCodeStrokeField> _orgCodeStrokeFeilds;
+        private IRepository<OrganizationCodeStemifield> _orgCodeSTEMIFeilds;
+        private IRepository<OrganizationCodeTraumaField> _orgCodeTraumaFeilds;
+        private IRepository<OrganizationCodeSepsisField> _orgCodeSepsisFeilds;
+        private IRepository<OrganizationCodeBlueField> _orgCodeBlueFeilds;
         private IRepository<ActiveCode> _activeCodeRepo;
         private IRepository<CodeStroke> _codeStrokeRepo;
         private IRepository<CodeSepsi> _codeSepsisRepo;
@@ -44,7 +50,7 @@ namespace Web.Services.Concrete
         private IRepository<CodeBlueGroupMember> _BlueCodeGroupMembersRepo;
         private IRepository<CodesServiceLinesMapping> _codesServiceLinesMappingRepo;
         private IRepository<ConversationChannel> _conversationChannelsRepo;
-       
+
         IConfiguration _config;
         private string _RootPath;
         private string _GoogleApiKey;
@@ -58,6 +64,12 @@ namespace Web.Services.Concrete
             IRepository<ServiceLine> serviceLineRepo,
             IRepository<UsersSchedule> userSchedulesRepo,
             IRepository<ControlListDetail> controlListDetailsRepo,
+            IRepository<InhouseCodesField> InhouseCodeFeilds,
+            IRepository<OrganizationCodeStrokeField> orgCodeStrokeFeilds,
+            IRepository<OrganizationCodeStemifield> orgCodeSTEMIFeilds,
+            IRepository<OrganizationCodeTraumaField> orgCodeTraumaFeilds,
+            IRepository<OrganizationCodeSepsisField> orgCodeSepsisFeilds,
+            IRepository<OrganizationCodeBlueField> orgCodeBlueFeilds,
             IRepository<ActiveCode> activeCodeRepo,
             IRepository<CodeStroke> codeStrokeRepo,
             IRepository<CodeSepsi> codeSepsisRepo,
@@ -82,6 +94,12 @@ namespace Web.Services.Concrete
             this._serviceLineRepo = serviceLineRepo;
             this._userSchedulesRepo = userSchedulesRepo;
             this._controlListDetailsRepo = controlListDetailsRepo;
+            this._InhouseCodeFeilds = InhouseCodeFeilds;
+            this._orgCodeStrokeFeilds = orgCodeStrokeFeilds;
+            this._orgCodeSTEMIFeilds = orgCodeSTEMIFeilds;
+            this._orgCodeSepsisFeilds = orgCodeSepsisFeilds;
+            this._orgCodeTraumaFeilds = orgCodeTraumaFeilds;
+            this._orgCodeBlueFeilds = orgCodeBlueFeilds;
             this._activeCodeRepo = activeCodeRepo;
             this._codeStrokeRepo = codeStrokeRepo;
             this._codeSepsisRepo = codeSepsisRepo;
@@ -1585,7 +1603,7 @@ namespace Web.Services.Concrete
                                                       };
 
             var rowsEffected = this._dbContext.Database.ExecuteSqlRaw(sql, parameters);
-            if (rowsEffected > 0) 
+            if (rowsEffected > 0)
             {
                 var userIds = this._dbContext.LoadStoredProcedure("md_getAllActiveCodesGroupUserIds")
                                                 .WithSqlParam("@codeName", UCLEnums.Stroke.ToString())
@@ -6096,6 +6114,349 @@ namespace Web.Services.Concrete
         #endregion
 
 
+        #region Inhouse Code Settings
+
+
+        public BaseResponse GetAllInhouseCodeFeilds()
+        {
+            var feilds = this._InhouseCodeFeilds.Table.Where(x => !x.IsDeleted).ToList();
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Feilds returend", Body = feilds };
+        }
+
+        public BaseResponse GetInhouseCodeFeildsForOrg(int OrgId, string codeName)
+        {
+            var InhouseCodeFields = this._InhouseCodeFeilds.Table.Where(x => !x.IsDeleted).ToList();
+            var qry = $"SELECT InhouseCodesFieldIdFk, IsRequired, SortOrder, IsShowInTable from OrganizationCode{codeName}Field WHERE OrganizationIdFk = {OrgId}";
+
+            var selectedInhouseCodeFields = this._dbContext.LoadSQLQuery(qry).ExecuteStoredProc<OrganizationCodeStrokeField>(); //this._orgInhouseCodeFeilds.Table.Where(x => x.OrganizationIdFk == OrgId && !x.IsDeleted).Select(x => new { x.InhouseCodesFieldIdFk, x.IsRequired, x.SortOrder }).ToList();
+
+            var InhouseCodeFieldVM = AutoMapperHelper.MapList<InhouseCodesField, InhouseCodeFeildsVM>(InhouseCodeFields);
+
+            foreach (var item in InhouseCodeFieldVM)
+            {
+                if (selectedInhouseCodeFields.Select(x => x.InhouseCodesFieldIdFk).Contains(item.InhouseCodesFieldId))
+                {
+                    item.IsRequired = selectedInhouseCodeFields.Where(x => x.InhouseCodesFieldIdFk == item.InhouseCodesFieldId).Select(s => s.IsRequired).FirstOrDefault();
+                    item.IsShowInTable = selectedInhouseCodeFields.Where(x => x.InhouseCodesFieldIdFk == item.InhouseCodesFieldId).Select(s => s.IsShowInTable).FirstOrDefault();
+                    item.SortOrder = selectedInhouseCodeFields.Where(x => x.InhouseCodesFieldIdFk == item.InhouseCodesFieldId).Select(s => s.SortOrder.Value).FirstOrDefault();
+                    item.IsSelected = true;
+                }
+                else
+                {
+                    item.IsSelected = false;
+                }
+            }
+
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Found", Body = InhouseCodeFieldVM };
+        }
+
+        //public BaseResponse GetInhouseCodeFormFieldByOrgId(int OrgId, string codeName)
+        //{
+        //    var formFields = (from cf in this._InhouseCodeFeilds.Table
+        //                      join ocf in this._orgInhouseCodeFeilds.Table on cf.InhouseCodesFieldId equals ocf.InhouseCodesFieldIdFk
+        //                      where ocf.OrganizationIdFk == OrgId && !ocf.IsDeleted && !cf.IsDeleted
+        //                      select new
+        //                      {
+        //                          cf.FieldLabel,
+        //                          cf.FieldName,
+        //                          cf.FieldType,
+        //                          cf.FieldData,
+        //                          cf.FieldDataType,
+        //                          cf.FieldDataLength,
+        //                          ocf.IsRequired
+        //                      }).Distinct().ToList();
+        //    return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Found", Body = formFields };
+        //}
+
+        #endregion
+
+
+        #region Organization InhouseCode Fields
+
+        public BaseResponse AddOrUpdateOrgCodeStrokeFeilds(List<OrgCodeStrokeFeildsVM> orgInhouseCodeFields)
+        {
+
+            if (orgInhouseCodeFields.Count == 1 && orgInhouseCodeFields.Select(x => x.InhouseCodesFieldIdFk).FirstOrDefault() == 0)
+            {
+                var toBeDeletedRows = this._orgCodeStrokeFeilds.Table.Where(x => x.OrganizationIdFk == orgInhouseCodeFields.Select(x => x.OrganizationIdFk).FirstOrDefault() && !x.IsDeleted).ToList();
+                toBeDeletedRows.ForEach(x => { x.ModifiedBy = ApplicationSettings.UserId; x.ModifiedDate = DateTime.UtcNow; x.IsDeleted = true; });
+                this._orgCodeStrokeFeilds.Update(toBeDeletedRows);
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Deleted Successfully" };
+            }
+            else
+            {
+                var duplicateObj = orgInhouseCodeFields.Select(x => new { x.OrganizationIdFk, x.InhouseCodesFieldIdFk }).ToList();
+
+                var alreadyExistFields = this._orgCodeStrokeFeilds.Table.Where(x => duplicateObj.Select(y => y.InhouseCodesFieldIdFk).Contains(x.InhouseCodesFieldIdFk) && duplicateObj.Select(y => y.OrganizationIdFk).Contains(x.OrganizationIdFk) && !x.IsDeleted).Distinct().ToList();
+
+                var objsNeedToUpdate = alreadyExistFields.Where(x => duplicateObj.Select(c => c.InhouseCodesFieldIdFk).Contains(x.InhouseCodesFieldIdFk)).ToList();
+
+                if (objsNeedToUpdate.Count > 0)
+                {
+                    foreach (var item in objsNeedToUpdate)
+                    {
+                        item.SortOrder = orgInhouseCodeFields.Where(x => x.InhouseCodesFieldIdFk == item.InhouseCodesFieldIdFk).Select(x => x.SortOrder).FirstOrDefault();
+                        item.IsRequired = orgInhouseCodeFields.Where(x => x.InhouseCodesFieldIdFk == item.InhouseCodesFieldIdFk).Select(x => x.IsRequired).FirstOrDefault();
+                    }
+                    this._orgCodeStrokeFeilds.Update(objsNeedToUpdate);
+                }
+
+                duplicateObj.RemoveAll(r => alreadyExistFields.Select(x => x.InhouseCodesFieldIdFk).Contains(r.InhouseCodesFieldIdFk));
+
+                var orgInhouseCodes = AutoMapperHelper.MapList<OrgCodeStrokeFeildsVM, OrganizationCodeStrokeField>(orgInhouseCodeFields.Where(x => duplicateObj.Select(c => c.InhouseCodesFieldIdFk).Contains(x.InhouseCodesFieldIdFk)).ToList());
+
+                if (orgInhouseCodes.Count > 0)
+                {
+                    this._orgCodeStrokeFeilds.Insert(orgInhouseCodes);
+                }
+
+                alreadyExistFields = this._orgCodeStrokeFeilds.Table.Where(x => duplicateObj.Select(y => y.InhouseCodesFieldIdFk).Contains(x.InhouseCodesFieldIdFk) && duplicateObj.Select(y => y.OrganizationIdFk).Contains(x.OrganizationIdFk) && !x.IsDeleted).Distinct().ToList();
+                duplicateObj.RemoveAll(r => alreadyExistFields.Select(x => x.InhouseCodesFieldIdFk).Contains(r.InhouseCodesFieldIdFk));
+
+                var deletedOnes = this._orgCodeStrokeFeilds.Table.Where(x => !(orgInhouseCodeFields.Select(y => y.InhouseCodesFieldIdFk).Contains(x.InhouseCodesFieldIdFk)) && orgInhouseCodeFields.Select(y => y.OrganizationIdFk).Contains(x.OrganizationIdFk) && !x.IsDeleted).ToList();
+
+                int? ModifiedBy = orgInhouseCodeFields.Select(x => x.ModifiedBy).FirstOrDefault();
+
+                if (deletedOnes.Count > 0)
+                {
+                    deletedOnes.ForEach(x => { x.ModifiedBy = ModifiedBy; x.ModifiedDate = DateTime.UtcNow; x.IsDeleted = true; });
+                    this._orgCodeStrokeFeilds.Update(deletedOnes);
+                }
+
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Saved Successfully" };
+            }
+        }
+
+        public BaseResponse AddOrUpdateOrgCodeSTEMIFeilds(List<OrgCodeSTEMIFeildsVM> orgInhouseCodeFields)
+        {
+
+            if (orgInhouseCodeFields.Count == 1 && orgInhouseCodeFields.Select(x => x.InhouseCodesFieldIdFk).FirstOrDefault() == 0)
+            {
+                var toBeDeletedRows = this._orgCodeSTEMIFeilds.Table.Where(x => x.OrganizationIdFk == orgInhouseCodeFields.Select(x => x.OrganizationIdFk).FirstOrDefault() && !x.IsDeleted).ToList();
+                toBeDeletedRows.ForEach(x => { x.ModifiedBy = ApplicationSettings.UserId; x.ModifiedDate = DateTime.UtcNow; x.IsDeleted = true; });
+                this._orgCodeSTEMIFeilds.Update(toBeDeletedRows);
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Deleted Successfully" };
+            }
+            else
+            {
+                var duplicateObj = orgInhouseCodeFields.Select(x => new { x.OrganizationIdFk, x.InhouseCodesFieldIdFk }).ToList();
+
+                var alreadyExistFields = this._orgCodeSTEMIFeilds.Table.Where(x => duplicateObj.Select(y => y.InhouseCodesFieldIdFk).Contains(x.InhouseCodesFieldIdFk) && duplicateObj.Select(y => y.OrganizationIdFk).Contains(x.OrganizationIdFk) && !x.IsDeleted).Distinct().ToList();
+
+                var objsNeedToUpdate = alreadyExistFields.Where(x => duplicateObj.Select(c => c.InhouseCodesFieldIdFk).Contains(x.InhouseCodesFieldIdFk)).ToList();
+
+                if (objsNeedToUpdate.Count > 0)
+                {
+                    foreach (var item in objsNeedToUpdate)
+                    {
+                        item.SortOrder = orgInhouseCodeFields.Where(x => x.InhouseCodesFieldIdFk == item.InhouseCodesFieldIdFk).Select(x => x.SortOrder).FirstOrDefault();
+                        item.IsRequired = orgInhouseCodeFields.Where(x => x.InhouseCodesFieldIdFk == item.InhouseCodesFieldIdFk).Select(x => x.IsRequired).FirstOrDefault();
+                    }
+                    this._orgCodeSTEMIFeilds.Update(objsNeedToUpdate);
+                }
+
+                duplicateObj.RemoveAll(r => alreadyExistFields.Select(x => x.InhouseCodesFieldIdFk).Contains(r.InhouseCodesFieldIdFk));
+
+                var orgInhouseCodes = AutoMapperHelper.MapList<OrgCodeSTEMIFeildsVM, OrganizationCodeStemifield>(orgInhouseCodeFields.Where(x => duplicateObj.Select(c => c.InhouseCodesFieldIdFk).Contains(x.InhouseCodesFieldIdFk)).ToList());
+
+                if (orgInhouseCodes.Count > 0)
+                {
+                    this._orgCodeSTEMIFeilds.Insert(orgInhouseCodes);
+                }
+
+                alreadyExistFields = this._orgCodeSTEMIFeilds.Table.Where(x => duplicateObj.Select(y => y.InhouseCodesFieldIdFk).Contains(x.InhouseCodesFieldIdFk) && duplicateObj.Select(y => y.OrganizationIdFk).Contains(x.OrganizationIdFk) && !x.IsDeleted).Distinct().ToList();
+                duplicateObj.RemoveAll(r => alreadyExistFields.Select(x => x.InhouseCodesFieldIdFk).Contains(r.InhouseCodesFieldIdFk));
+
+                var deletedOnes = this._orgCodeSTEMIFeilds.Table.Where(x => !(orgInhouseCodeFields.Select(y => y.InhouseCodesFieldIdFk).Contains(x.InhouseCodesFieldIdFk)) && orgInhouseCodeFields.Select(y => y.OrganizationIdFk).Contains(x.OrganizationIdFk) && !x.IsDeleted).ToList();
+
+                int? ModifiedBy = orgInhouseCodeFields.Select(x => x.ModifiedBy).FirstOrDefault();
+
+                if (deletedOnes.Count > 0)
+                {
+                    deletedOnes.ForEach(x => { x.ModifiedBy = ModifiedBy; x.ModifiedDate = DateTime.UtcNow; x.IsDeleted = true; });
+                    this._orgCodeSTEMIFeilds.Update(deletedOnes);
+                }
+
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Saved Successfully" };
+            }
+        }
+
+        public BaseResponse AddOrUpdateOrgCodeSepsisFeilds(List<OrgCodeSepsisFeildsVM> orgInhouseCodeFields)
+        {
+
+            if (orgInhouseCodeFields.Count == 1 && orgInhouseCodeFields.Select(x => x.InhouseCodesFieldIdFk).FirstOrDefault() == 0)
+            {
+                var toBeDeletedRows = this._orgCodeSepsisFeilds.Table.Where(x => x.OrganizationIdFk == orgInhouseCodeFields.Select(x => x.OrganizationIdFk).FirstOrDefault() && !x.IsDeleted).ToList();
+                toBeDeletedRows.ForEach(x => { x.ModifiedBy = ApplicationSettings.UserId; x.ModifiedDate = DateTime.UtcNow; x.IsDeleted = true; });
+                this._orgCodeSepsisFeilds.Update(toBeDeletedRows);
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Deleted Successfully" };
+            }
+            else
+            {
+                var duplicateObj = orgInhouseCodeFields.Select(x => new { x.OrganizationIdFk, x.InhouseCodesFieldIdFk }).ToList();
+
+                var alreadyExistFields = this._orgCodeSepsisFeilds.Table.Where(x => duplicateObj.Select(y => y.InhouseCodesFieldIdFk).Contains(x.InhouseCodesFieldIdFk) && duplicateObj.Select(y => y.OrganizationIdFk).Contains(x.OrganizationIdFk) && !x.IsDeleted).Distinct().ToList();
+
+                var objsNeedToUpdate = alreadyExistFields.Where(x => duplicateObj.Select(c => c.InhouseCodesFieldIdFk).Contains(x.InhouseCodesFieldIdFk)).ToList();
+
+                if (objsNeedToUpdate.Count > 0)
+                {
+                    foreach (var item in objsNeedToUpdate)
+                    {
+                        item.SortOrder = orgInhouseCodeFields.Where(x => x.InhouseCodesFieldIdFk == item.InhouseCodesFieldIdFk).Select(x => x.SortOrder).FirstOrDefault();
+                        item.IsRequired = orgInhouseCodeFields.Where(x => x.InhouseCodesFieldIdFk == item.InhouseCodesFieldIdFk).Select(x => x.IsRequired).FirstOrDefault();
+                    }
+                    this._orgCodeSepsisFeilds.Update(objsNeedToUpdate);
+                }
+
+                duplicateObj.RemoveAll(r => alreadyExistFields.Select(x => x.InhouseCodesFieldIdFk).Contains(r.InhouseCodesFieldIdFk));
+
+                var orgInhouseCodes = AutoMapperHelper.MapList<OrgCodeSepsisFeildsVM, OrganizationCodeSepsisField>(orgInhouseCodeFields.Where(x => duplicateObj.Select(c => c.InhouseCodesFieldIdFk).Contains(x.InhouseCodesFieldIdFk)).ToList());
+
+                if (orgInhouseCodes.Count > 0)
+                {
+                    this._orgCodeSepsisFeilds.Insert(orgInhouseCodes);
+                }
+
+                alreadyExistFields = this._orgCodeSepsisFeilds.Table.Where(x => duplicateObj.Select(y => y.InhouseCodesFieldIdFk).Contains(x.InhouseCodesFieldIdFk) && duplicateObj.Select(y => y.OrganizationIdFk).Contains(x.OrganizationIdFk) && !x.IsDeleted).Distinct().ToList();
+                duplicateObj.RemoveAll(r => alreadyExistFields.Select(x => x.InhouseCodesFieldIdFk).Contains(r.InhouseCodesFieldIdFk));
+
+                var deletedOnes = this._orgCodeSepsisFeilds.Table.Where(x => !(orgInhouseCodeFields.Select(y => y.InhouseCodesFieldIdFk).Contains(x.InhouseCodesFieldIdFk)) && orgInhouseCodeFields.Select(y => y.OrganizationIdFk).Contains(x.OrganizationIdFk) && !x.IsDeleted).ToList();
+
+                int? ModifiedBy = orgInhouseCodeFields.Select(x => x.ModifiedBy).FirstOrDefault();
+
+                if (deletedOnes.Count > 0)
+                {
+                    deletedOnes.ForEach(x => { x.ModifiedBy = ModifiedBy; x.ModifiedDate = DateTime.UtcNow; x.IsDeleted = true; });
+                    this._orgCodeSepsisFeilds.Update(deletedOnes);
+                }
+
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Saved Successfully" };
+            }
+        }
+
+        public BaseResponse AddOrUpdateOrgCodeTraumaFeilds(List<OrgCodeTraumaFeildsVM> orgInhouseCodeFields)
+        {
+
+            if (orgInhouseCodeFields.Count == 1 && orgInhouseCodeFields.Select(x => x.InhouseCodesFieldIdFk).FirstOrDefault() == 0)
+            {
+                var toBeDeletedRows = this._orgCodeTraumaFeilds.Table.Where(x => x.OrganizationIdFk == orgInhouseCodeFields.Select(x => x.OrganizationIdFk).FirstOrDefault() && !x.IsDeleted).ToList();
+                toBeDeletedRows.ForEach(x => { x.ModifiedBy = ApplicationSettings.UserId; x.ModifiedDate = DateTime.UtcNow; x.IsDeleted = true; });
+                this._orgCodeTraumaFeilds.Update(toBeDeletedRows);
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Deleted Successfully" };
+            }
+            else
+            {
+                var duplicateObj = orgInhouseCodeFields.Select(x => new { x.OrganizationIdFk, x.InhouseCodesFieldIdFk }).ToList();
+
+                var alreadyExistFields = this._orgCodeTraumaFeilds.Table.Where(x => duplicateObj.Select(y => y.InhouseCodesFieldIdFk).Contains(x.InhouseCodesFieldIdFk) && duplicateObj.Select(y => y.OrganizationIdFk).Contains(x.OrganizationIdFk) && !x.IsDeleted).Distinct().ToList();
+
+                var objsNeedToUpdate = alreadyExistFields.Where(x => duplicateObj.Select(c => c.InhouseCodesFieldIdFk).Contains(x.InhouseCodesFieldIdFk)).ToList();
+
+                if (objsNeedToUpdate.Count > 0)
+                {
+                    foreach (var item in objsNeedToUpdate)
+                    {
+                        item.SortOrder = orgInhouseCodeFields.Where(x => x.InhouseCodesFieldIdFk == item.InhouseCodesFieldIdFk).Select(x => x.SortOrder).FirstOrDefault();
+                        item.IsRequired = orgInhouseCodeFields.Where(x => x.InhouseCodesFieldIdFk == item.InhouseCodesFieldIdFk).Select(x => x.IsRequired).FirstOrDefault();
+                    }
+                    this._orgCodeTraumaFeilds.Update(objsNeedToUpdate);
+                }
+
+                duplicateObj.RemoveAll(r => alreadyExistFields.Select(x => x.InhouseCodesFieldIdFk).Contains(r.InhouseCodesFieldIdFk));
+
+                var orgInhouseCodes = AutoMapperHelper.MapList<OrgCodeTraumaFeildsVM, OrganizationCodeTraumaField>(orgInhouseCodeFields.Where(x => duplicateObj.Select(c => c.InhouseCodesFieldIdFk).Contains(x.InhouseCodesFieldIdFk)).ToList());
+
+                if (orgInhouseCodes.Count > 0)
+                {
+                    this._orgCodeTraumaFeilds.Insert(orgInhouseCodes);
+                }
+
+                alreadyExistFields = this._orgCodeTraumaFeilds.Table.Where(x => duplicateObj.Select(y => y.InhouseCodesFieldIdFk).Contains(x.InhouseCodesFieldIdFk) && duplicateObj.Select(y => y.OrganizationIdFk).Contains(x.OrganizationIdFk) && !x.IsDeleted).Distinct().ToList();
+                duplicateObj.RemoveAll(r => alreadyExistFields.Select(x => x.InhouseCodesFieldIdFk).Contains(r.InhouseCodesFieldIdFk));
+
+                var deletedOnes = this._orgCodeTraumaFeilds.Table.Where(x => !(orgInhouseCodeFields.Select(y => y.InhouseCodesFieldIdFk).Contains(x.InhouseCodesFieldIdFk)) && orgInhouseCodeFields.Select(y => y.OrganizationIdFk).Contains(x.OrganizationIdFk) && !x.IsDeleted).ToList();
+
+                int? ModifiedBy = orgInhouseCodeFields.Select(x => x.ModifiedBy).FirstOrDefault();
+
+                if (deletedOnes.Count > 0)
+                {
+                    deletedOnes.ForEach(x => { x.ModifiedBy = ModifiedBy; x.ModifiedDate = DateTime.UtcNow; x.IsDeleted = true; });
+                    this._orgCodeTraumaFeilds.Update(deletedOnes);
+                }
+
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Saved Successfully" };
+            }
+        }
+
+        public BaseResponse AddOrUpdateOrgCodeBlueFeilds(List<OrgCodeBlueFeildsVM> orgInhouseCodeFields)
+        {
+
+            if (orgInhouseCodeFields.Count == 1 && orgInhouseCodeFields.Select(x => x.InhouseCodesFieldIdFk).FirstOrDefault() == 0)
+            {
+                var toBeDeletedRows = this._orgCodeBlueFeilds.Table.Where(x => x.OrganizationIdFk == orgInhouseCodeFields.Select(x => x.OrganizationIdFk).FirstOrDefault() && !x.IsDeleted).ToList();
+                toBeDeletedRows.ForEach(x => { x.ModifiedBy = ApplicationSettings.UserId; x.ModifiedDate = DateTime.UtcNow; x.IsDeleted = true; });
+                this._orgCodeBlueFeilds.Update(toBeDeletedRows);
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Deleted Successfully" };
+            }
+            else
+            {
+                var duplicateObj = orgInhouseCodeFields.Select(x => new { x.OrganizationIdFk, x.InhouseCodesFieldIdFk }).ToList();
+
+                var alreadyExistFields = this._orgCodeBlueFeilds.Table.Where(x => duplicateObj.Select(y => y.InhouseCodesFieldIdFk).Contains(x.InhouseCodesFieldIdFk) && duplicateObj.Select(y => y.OrganizationIdFk).Contains(x.OrganizationIdFk) && !x.IsDeleted).Distinct().ToList();
+
+                var objsNeedToUpdate = alreadyExistFields.Where(x => duplicateObj.Select(c => c.InhouseCodesFieldIdFk).Contains(x.InhouseCodesFieldIdFk)).ToList();
+
+                if (objsNeedToUpdate.Count > 0)
+                {
+                    foreach (var item in objsNeedToUpdate)
+                    {
+                        item.SortOrder = orgInhouseCodeFields.Where(x => x.InhouseCodesFieldIdFk == item.InhouseCodesFieldIdFk).Select(x => x.SortOrder).FirstOrDefault();
+                        item.IsRequired = orgInhouseCodeFields.Where(x => x.InhouseCodesFieldIdFk == item.InhouseCodesFieldIdFk).Select(x => x.IsRequired).FirstOrDefault();
+                    }
+                    this._orgCodeBlueFeilds.Update(objsNeedToUpdate);
+                }
+
+                duplicateObj.RemoveAll(r => alreadyExistFields.Select(x => x.InhouseCodesFieldIdFk).Contains(r.InhouseCodesFieldIdFk));
+
+                var orgInhouseCodes = AutoMapperHelper.MapList<OrgCodeBlueFeildsVM, OrganizationCodeBlueField>(orgInhouseCodeFields.Where(x => duplicateObj.Select(c => c.InhouseCodesFieldIdFk).Contains(x.InhouseCodesFieldIdFk)).ToList());
+
+                if (orgInhouseCodes.Count > 0)
+                {
+                    this._orgCodeBlueFeilds.Insert(orgInhouseCodes);
+                }
+
+                alreadyExistFields = this._orgCodeBlueFeilds.Table.Where(x => duplicateObj.Select(y => y.InhouseCodesFieldIdFk).Contains(x.InhouseCodesFieldIdFk) && duplicateObj.Select(y => y.OrganizationIdFk).Contains(x.OrganizationIdFk) && !x.IsDeleted).Distinct().ToList();
+                duplicateObj.RemoveAll(r => alreadyExistFields.Select(x => x.InhouseCodesFieldIdFk).Contains(r.InhouseCodesFieldIdFk));
+
+                var deletedOnes = this._orgCodeBlueFeilds.Table.Where(x => !(orgInhouseCodeFields.Select(y => y.InhouseCodesFieldIdFk).Contains(x.InhouseCodesFieldIdFk)) && orgInhouseCodeFields.Select(y => y.OrganizationIdFk).Contains(x.OrganizationIdFk) && !x.IsDeleted).ToList();
+
+                int? ModifiedBy = orgInhouseCodeFields.Select(x => x.ModifiedBy).FirstOrDefault();
+
+                if (deletedOnes.Count > 0)
+                {
+                    deletedOnes.ForEach(x => { x.ModifiedBy = ModifiedBy; x.ModifiedDate = DateTime.UtcNow; x.IsDeleted = true; });
+                    this._orgCodeBlueFeilds.Update(deletedOnes);
+                }
+
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Saved Successfully" };
+            }
+        }
+
+
+        public BaseResponse GetInhouseCodeFormByOrgId(int orgId, string codeName)
+        {
+            var InhouseCodeFields = _dbContext.LoadStoredProcedure("md_getInhouseCodeFormByOrgId")
+                                .WithSqlParam("@OrgId", orgId)
+                                .WithSqlParam("@codeName", codeName)
+                                .ExecuteStoredProc<InhouseCodeFeildsVM>();
+
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = InhouseCodeFields };
+        }
+
+        #endregion
+
+
         #region Map & addresses
 
         public object GetHosplitalAddressObject(int orgId)
@@ -6194,6 +6555,6 @@ namespace Web.Services.Concrete
         #endregion
 
 
-      
+
     }
 }

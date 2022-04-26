@@ -430,11 +430,11 @@ namespace Web.API.Controllers
 
 
         [HttpGet("CommunicationLog/GetCommunicationLog/{logId}/{status}")]
-        public BaseResponse GetCommunicationLog(int logId, bool status=true)
+        public BaseResponse GetCommunicationLog(int logId, bool status = true)
         {
             try
             {
-                return this._communicaitonService.GetCommunicationLogById(logId,status);
+                return this._communicaitonService.GetCommunicationLogById(logId, status);
             }
             catch (Exception ex)
             {
@@ -460,11 +460,11 @@ namespace Web.API.Controllers
         }
 
         [HttpGet("CommunicationLog/ActiveOrInActiveCommunicationLog/{logId}/{status}")]
-        public BaseResponse ActiveOrInActiveCommunicationLog(int logId,bool status)
+        public BaseResponse ActiveOrInActiveCommunicationLog(int logId, bool status)
         {
             try
             {
-                return this._communicaitonService.ActiveOrInActiveCommunicationlog(logId,status);
+                return this._communicaitonService.ActiveOrInActiveCommunicationlog(logId, status);
             }
             catch (Exception ex)
             {

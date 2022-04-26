@@ -507,11 +507,11 @@ namespace Web.API.Controllers
 
         [Description("Get Clinical Hours By Service Line Id")]
         [HttpGet("ClinicalHour/GetClinicalHourByServiceLineId/{orgId}/{serviceLineId}")]
-        public BaseResponse GetClinicalHourByServiceLineId(int orgId, int serviceLineId,bool status=true)
+        public BaseResponse GetClinicalHourByServiceLineId(int orgId, int serviceLineId, bool status = true)
         {
             try
             {
-                var res = _facilityService.GetClinicalHourByServiceLineId(orgId, serviceLineId,status);
+                var res = _facilityService.GetClinicalHourByServiceLineId(orgId, serviceLineId, status);
 
                 return res;
             }
@@ -560,11 +560,11 @@ namespace Web.API.Controllers
 
         [Description("Active/InActive Clinical Hour")]
         [HttpGet("ClinicalHour/ActiveOrInActiveClinicalHour")]
-        public BaseResponse ActiveInActiveClinicalHour(int Id, int userId,bool status)
+        public BaseResponse ActiveInActiveClinicalHour(int Id, int userId, bool status)
         {
             try
             {
-                var res = _facilityService.ActiveOrInActiveClinicalHour(Id, userId,status);
+                var res = _facilityService.ActiveOrInActiveClinicalHour(Id, userId, status);
                 return res;
             }
             catch (Exception ex)

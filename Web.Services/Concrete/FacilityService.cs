@@ -471,7 +471,7 @@ namespace Web.Services.Concrete
                 Body = orgs
             };
         }
-       
+
         public BaseResponse GetOutpatientOrganizationsIvr()
         {
             var organization = new List<Organization>();
@@ -539,7 +539,8 @@ namespace Web.Services.Concrete
                 {
                     organizations = _organizationRepo.Table.Where(x => !x.IsDeleted).ToList();
                 }
-                else {
+                else
+                {
                     organizations = _organizationRepo.Table.Where(x => x.IsActive == status && !x.IsDeleted).ToList();
                 }
             }
@@ -787,7 +788,7 @@ namespace Web.Services.Concrete
 
         }
 
-        public BaseResponse GetClinicalHourByServiceLineId(int orgId, int serviceLineId,bool status)
+        public BaseResponse GetClinicalHourByServiceLineId(int orgId, int serviceLineId, bool status)
         {
             var cHours = (from ch in this._clinicalHourRepo.Table
                           join w in this._controlListDetailsRepo.Table on ch.WeekDayIdFk equals w.ControlListDetailId
@@ -801,11 +802,11 @@ namespace Web.Services.Concrete
                           && d.IsDeleted != true
                           && sl.IsDeleted != true
                           && ch.IsDeleted != true
-                          && ch.IsActive==status
-                          && sl.IsActive==status
-                          && d.IsActive==status
-                          && w.IsActive==status
-                          && org.IsActive==status
+                          && ch.IsActive == status
+                          && sl.IsActive == status
+                          && d.IsActive == status
+                          && w.IsActive == status
+                          && org.IsActive == status
 
                           select new clinicalHours()
                           {
@@ -1041,7 +1042,7 @@ namespace Web.Services.Concrete
             }
         }
 
-        public BaseResponse ActiveOrInActiveClinicalHour(int Id, int userId,bool status)
+        public BaseResponse ActiveOrInActiveClinicalHour(int Id, int userId, bool status)
         {
             var cHour = this._clinicalHourRepo.Table.Where(x => x.ClinicalHourId == Id).FirstOrDefault();
             if (cHour != null)

@@ -137,7 +137,7 @@ namespace Web.API.Controllers
 
         [AllowAnonymous]
         [HttpPost("Call/ReceiveVoicemail")]
-        public TwiMLResult ReceiveVoicemail( int parentNodeId, int serviceLineId)
+        public TwiMLResult ReceiveVoicemail(int parentNodeId, int serviceLineId)
         {
             try
             {

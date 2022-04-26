@@ -585,6 +585,159 @@ namespace Web.API.Controllers
 
         #endregion
 
+
+        #region Inhouse Code Settings
+
+        [Description("Get All Inhouse Code Feilds")]
+        [HttpGet("InhouseCode/GetAllInhouseCodeFeilds")]
+        public BaseResponse GetAllInhouseCodeFeilds()
+        {
+            try
+            {
+                return _activeCodesService.GetAllInhouseCodeFeilds();
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
+        [Description("Get All Inhouse Code Feilds")]
+        [HttpGet("InhouseCode/GetInhouseCodeFeildsForOrg/{OrgId}/{codeName}")]
+        public BaseResponse GetInhouseCodeFeildsForOrg(int OrgId, string codeName)
+        {
+            try
+            {
+                return _activeCodesService.GetInhouseCodeFeildsForOrg(OrgId, codeName);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+        //public BaseResponse GetInhouseCodeFormFieldByOrgId(int OrgId, string codeName) 
+        //{
+        //    try
+        //    {
+        //        return _activeCodesService.GetInhouseCodeFormFieldByOrgId(OrgId, codeName);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        ElmahExtensions.RiseError(ex);
+        //        _logger.LogExceptions(ex);
+        //        return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+        //    }
+
+        //}
+
+        #endregion
+
+        #region Organization InhouseCode Fields
+
+
+        [Description("Get All Inhouse Code Feilds")]
+        [HttpPost("InhouseCode/AddOrUpdateOrgCodeStrokeFeilds")]
+        public BaseResponse AddOrUpdateOrgCodeStrokeFeilds(List<OrgCodeStrokeFeildsVM> orgInhouseCodeFields)
+        {
+            try
+            {
+                return _activeCodesService.AddOrUpdateOrgCodeStrokeFeilds(orgInhouseCodeFields);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
+        [Description("Get All Inhouse Code Feilds")]
+        [HttpPost("InhouseCode/AddOrUpdateOrgCodeSTEMIFeilds")]
+        public BaseResponse AddOrUpdateOrgCodeSTEMIFeilds(List<OrgCodeSTEMIFeildsVM> orgInhouseCodeFields)
+        {
+            try
+            {
+                return _activeCodesService.AddOrUpdateOrgCodeSTEMIFeilds(orgInhouseCodeFields);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
+        [Description("Get All Inhouse Code Feilds")]
+        [HttpPost("InhouseCode/AddOrUpdateOrgCodeSepsisFeilds")]
+        public BaseResponse AddOrUpdateOrgCodeSepsisFeilds(List<OrgCodeSepsisFeildsVM> orgInhouseCodeFields)
+        {
+            try
+            {
+                return _activeCodesService.AddOrUpdateOrgCodeSepsisFeilds(orgInhouseCodeFields);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
+        [Description("Get All Inhouse Code Feilds")]
+        [HttpPost("InhouseCode/AddOrUpdateOrgCodeTraumaFeilds")]
+        public BaseResponse AddOrUpdateOrgCodeTraumaFeilds(List<OrgCodeTraumaFeildsVM> orgInhouseCodeFields)
+        {
+            try
+            {
+                return _activeCodesService.AddOrUpdateOrgCodeTraumaFeilds(orgInhouseCodeFields);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
+        [Description("Get All Inhouse Code Feilds")]
+        [HttpPost("InhouseCode/AddOrUpdateOrgCodeBlueFeilds")]
+        public BaseResponse AddOrUpdateOrgCodeBlueFeilds(List<OrgCodeBlueFeildsVM> orgInhouseCodeFields)
+        {
+            try
+            {
+                return _activeCodesService.AddOrUpdateOrgCodeBlueFeilds(orgInhouseCodeFields);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
+        [Description("Get All Inhouse Code Feilds")]
+        [HttpGet("InhouseCode/GetInhouseCodeFormByOrgId/{OrgId}/{codeName}")]
+        public BaseResponse GetInhouseCodeFormByOrgId(int orgId, string codeName)
+        {
+            try
+            {
+                return _activeCodesService.GetInhouseCodeFormByOrgId(orgId, codeName);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
+        #endregion
+
+
         #region Map & Addresses
 
         [HttpGet("map/GetHospitalsOfStatesByCodeId/{codeId}/{coordinates}")]

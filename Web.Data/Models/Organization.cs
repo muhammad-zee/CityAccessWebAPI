@@ -11,6 +11,11 @@ namespace Web.Data.Models
         {
             ActiveCodesNavigation = new HashSet<ActiveCode>();
             Departments = new HashSet<Department>();
+            OrganizationCodeBlueFields = new HashSet<OrganizationCodeBlueField>();
+            OrganizationCodeSepsisFields = new HashSet<OrganizationCodeSepsisField>();
+            OrganizationCodeStemifields = new HashSet<OrganizationCodeStemifield>();
+            OrganizationCodeStrokeFields = new HashSet<OrganizationCodeStrokeField>();
+            OrganizationCodeTraumaFields = new HashSet<OrganizationCodeTraumaField>();
             OrganizationConsultFields = new HashSet<OrganizationConsultField>();
         }
 
@@ -39,6 +44,11 @@ namespace Web.Data.Models
         public virtual Setting Setting { get; set; }
         public virtual ICollection<ActiveCode> ActiveCodesNavigation { get; set; }
         public virtual ICollection<Department> Departments { get; set; }
+        public virtual ICollection<OrganizationCodeBlueField> OrganizationCodeBlueFields { get; set; }
+        public virtual ICollection<OrganizationCodeSepsisField> OrganizationCodeSepsisFields { get; set; }
+        public virtual ICollection<OrganizationCodeStemifield> OrganizationCodeStemifields { get; set; }
+        public virtual ICollection<OrganizationCodeStrokeField> OrganizationCodeStrokeFields { get; set; }
+        public virtual ICollection<OrganizationCodeTraumaField> OrganizationCodeTraumaFields { get; set; }
         public virtual ICollection<OrganizationConsultField> OrganizationConsultFields { get; set; }
     }
 }

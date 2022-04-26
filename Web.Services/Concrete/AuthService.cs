@@ -97,7 +97,8 @@ namespace Web.Services.Concrete
                             response.Status = HttpStatusCode.OK;
                             response.Message = "User found";
                         }
-                        else {
+                        else
+                        {
                             var UserIsAllowed = this._dbContext.LoadStoredProcedure("md_CheckUserOrOrganizationIsActive")
                                                    .WithSqlParam("@userId", user.UserId)
                                                    .ExecuteStoredProc<UserCredentialVM>().Select(x => new { x.UserIsActive, x.OrgIsActive }).FirstOrDefault();
@@ -131,7 +132,7 @@ namespace Web.Services.Concrete
                             }
                         }
 
-                        
+
                     }
                     else
                     {
@@ -340,10 +341,11 @@ namespace Web.Services.Concrete
                 else
                 {
                     var roleIds = register.RoleIds.ToIntList();
-                    if (roleIds.Count > 0) 
+                    if (roleIds.Count > 0)
                     {
                         var alreadyExistRoles = this._userRoleRepo.Table.Where(x => x.UserIdFk == user.UserId).ToList();
-                        if (alreadyExistRoles.Count > 0) {
+                        if (alreadyExistRoles.Count > 0)
+                        {
                             this._userRoleRepo.DeleteRange(alreadyExistRoles);
                         }
                     }

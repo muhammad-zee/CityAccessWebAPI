@@ -21,7 +21,6 @@ using Web.DLL.Generic_Repository;
 using Web.Model;
 using Web.Model.Common;
 using Web.Services.Enums;
-using Web.Services.Extensions;
 using Web.Services.Helper;
 using Web.Services.Interfaces;
 using static Twilio.Rest.Chat.V2.Service.ChannelResource;
@@ -62,7 +61,7 @@ namespace Web.Services.Concrete
         private IRepository<ControlListDetail> _uclDetailRepo;
 
         private IActiveCodeHelperService _activeCodeHelperService;
-       
+
 
         private string _encryptionKey = "";
 
@@ -385,7 +384,7 @@ namespace Web.Services.Concrete
                 this._conversationParticipantsRepo.Insert(channelParticipantsList);
                 this._activeCodeHelperService.MemberAddedToConversationChannel(channelParticipantsList, model.ChannelSid);
 
-               
+
                 response.Status = HttpStatusCode.OK;
                 response.Message = "Channel Participants Saved";
                 //response.Body = newChannel;
@@ -1044,7 +1043,7 @@ namespace Web.Services.Concrete
                     Direction = log.Direction,
                     MediaUrl = log.MediaUrl,
                     UniqueSid = log.UniqueSid,
-                    CreatedDate =DateTime.UtcNow,
+                    CreatedDate = DateTime.UtcNow,
                     IsActive = true,
                     IsDelete = false
                 };
@@ -1066,23 +1065,23 @@ namespace Web.Services.Concrete
                 communicationLog.ModifiedDate = log.ModifiedDate;
                 communicationLog.IsActive = log.IsActive;
                 communicationLog.IsDelete = log.IsDelete;
-                }
-                this._communicationLog.Update(communicationLog);
-                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Communication Log Updated Successfully", Body = communicationLog };
-            
+            }
+            this._communicationLog.Update(communicationLog);
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Communication Log Updated Successfully", Body = communicationLog };
+
         }
 
 
-        public BaseResponse GetCommunicationLogById(int logId,bool status)
+        public BaseResponse GetCommunicationLogById(int logId, bool status)
         {
-            var communicationLog = this._communicationLog.Table.FirstOrDefault(x => x.CommunicationLogId == logId && x.IsDelete != true && x.IsActive== status);
+            var communicationLog = this._communicationLog.Table.FirstOrDefault(x => x.CommunicationLogId == logId && x.IsDelete != true && x.IsActive == status);
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Communication Log data", Body = communicationLog };
         }
 
 
         public BaseResponse ActiveOrInActiveCommunicationlog(int logId, bool status)
         {
-            var communicationLog = this._communicationLog.Table.FirstOrDefault(x => x.CommunicationLogId == logId && x.IsDelete != true );
+            var communicationLog = this._communicationLog.Table.FirstOrDefault(x => x.CommunicationLogId == logId && x.IsDelete != true);
 
             if (communicationLog != null)
             {
@@ -1090,12 +1089,12 @@ namespace Web.Services.Concrete
                 communicationLog.ModifiedDate = DateTime.UtcNow;
 
                 _communicationLog.Update(communicationLog);
-                
+
 
             }
 
 
-            return new BaseResponse() { Status = HttpStatusCode.OK, Message = (status ? "Active" :"InActive") + "Successfully", Body = communicationLog };
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = (status ? "Active" : "InActive") + "Successfully", Body = communicationLog };
         }
 
 

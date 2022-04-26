@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Web.Data.Models;
 using Web.Model;
 using Web.Model.Common;
 
@@ -72,11 +71,30 @@ namespace Web.Services.Interfaces
         BaseResponse GetActiveEMS(bool showAll, bool fromDashboard = false);
         #endregion
 
+        #region Inhouse Code Settings
+
+        BaseResponse GetAllInhouseCodeFeilds();
+        BaseResponse GetInhouseCodeFeildsForOrg(int OrgId, string codeName);
+        //BaseResponse GetInhouseCodeFormFieldByOrgId(int OrgId, string codeName);
+
+        #endregion
+
+        #region Organization InhouseCode Fields
+
+        BaseResponse AddOrUpdateOrgCodeStrokeFeilds(List<OrgCodeStrokeFeildsVM> orgInhouseCodeFields);
+        BaseResponse AddOrUpdateOrgCodeSTEMIFeilds(List<OrgCodeSTEMIFeildsVM> orgInhouseCodeFields);
+        BaseResponse AddOrUpdateOrgCodeSepsisFeilds(List<OrgCodeSepsisFeildsVM> orgInhouseCodeFields);
+        BaseResponse AddOrUpdateOrgCodeTraumaFeilds(List<OrgCodeTraumaFeildsVM> orgInhouseCodeFields);
+        BaseResponse AddOrUpdateOrgCodeBlueFeilds(List<OrgCodeBlueFeildsVM> orgInhouseCodeFields);
+        BaseResponse GetInhouseCodeFormByOrgId(int orgId, string codeName);
+
+        #endregion
+
         #region Map and Addresses
 
         BaseResponse GetHospitalsOfStatesByCodeId(int codeId, string latlng);
 
         #endregion
 
-    }  
+    }
 }
