@@ -6126,7 +6126,7 @@ namespace Web.Services.Concrete
         public BaseResponse GetInhouseCodeFeildsForOrg(int OrgId, string codeName)
         {
             var InhouseCodeFields = this._InhouseCodeFeilds.Table.Where(x => !x.IsDeleted).ToList();
-            var qry = $"SELECT InhouseCodesFieldIdFk, IsRequired, SortOrder, IsShowInTable from OrganizationCode{codeName}Field WHERE OrganizationIdFk = {OrgId}";
+            var qry = $"SELECT InhouseCodesFieldIdFk, IsRequired, SortOrder, IsShowInTable from OrganizationCode{codeName}Fields WHERE OrganizationIdFk = {OrgId}";
 
             var selectedInhouseCodeFields = this._dbContext.LoadSQLQuery(qry).ExecuteStoredProc<OrganizationCodeStrokeField>(); //this._orgInhouseCodeFeilds.Table.Where(x => x.OrganizationIdFk == OrgId && !x.IsDeleted).Select(x => new { x.InhouseCodesFieldIdFk, x.IsRequired, x.SortOrder }).ToList();
 

@@ -641,7 +641,7 @@ namespace Web.API.Controllers
 
         [Description("Get All Inhouse Code Feilds")]
         [HttpPost("InhouseCode/AddOrUpdateOrgCodeStrokeFeilds")]
-        public BaseResponse AddOrUpdateOrgCodeStrokeFeilds(List<OrgCodeStrokeFeildsVM> orgInhouseCodeFields)
+        public BaseResponse AddOrUpdateOrgCodeStrokeFeilds([FromBody] List<OrgCodeStrokeFeildsVM> orgInhouseCodeFields)
         {
             try
             {
@@ -657,7 +657,7 @@ namespace Web.API.Controllers
 
         [Description("Get All Inhouse Code Feilds")]
         [HttpPost("InhouseCode/AddOrUpdateOrgCodeSTEMIFeilds")]
-        public BaseResponse AddOrUpdateOrgCodeSTEMIFeilds(List<OrgCodeSTEMIFeildsVM> orgInhouseCodeFields)
+        public BaseResponse AddOrUpdateOrgCodeSTEMIFeilds([FromBody] List<OrgCodeSTEMIFeildsVM> orgInhouseCodeFields)
         {
             try
             {
@@ -689,7 +689,7 @@ namespace Web.API.Controllers
 
         [Description("Get All Inhouse Code Feilds")]
         [HttpPost("InhouseCode/AddOrUpdateOrgCodeTraumaFeilds")]
-        public BaseResponse AddOrUpdateOrgCodeTraumaFeilds(List<OrgCodeTraumaFeildsVM> orgInhouseCodeFields)
+        public BaseResponse AddOrUpdateOrgCodeTraumaFeilds([FromBody] List<OrgCodeTraumaFeildsVM> orgInhouseCodeFields)
         {
             try
             {
@@ -705,7 +705,7 @@ namespace Web.API.Controllers
 
         [Description("Get All Inhouse Code Feilds")]
         [HttpPost("InhouseCode/AddOrUpdateOrgCodeBlueFeilds")]
-        public BaseResponse AddOrUpdateOrgCodeBlueFeilds(List<OrgCodeBlueFeildsVM> orgInhouseCodeFields)
+        public BaseResponse AddOrUpdateOrgCodeBlueFeilds([FromBody] List<OrgCodeBlueFeildsVM> orgInhouseCodeFields)
         {
             try
             {
