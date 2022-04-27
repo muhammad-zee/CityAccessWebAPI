@@ -556,7 +556,7 @@ namespace Web.Services.Concrete
                 x.BloodThinnersTitle.AddRange(_controlListDetailsRepo.Table.Where(b => x.BloodThinners.ToIntList().Contains(b.ControlListDetailId)).Select(b => new { Id = b.ControlListDetailId, b.Title }).ToList());
             });
 
-            var gridColumns = GetInhouseCodeFormByOrgId(activeCode.OrganizationIdFk, UCLEnums.Stroke.ToString());
+            //var gridColumns = GetInhouseCodeFormByOrgId(activeCode.OrganizationIdFk, UCLEnums.Stroke.ToString());
 
             int totalRecords = 0;
             if (objList.Count > 0)
