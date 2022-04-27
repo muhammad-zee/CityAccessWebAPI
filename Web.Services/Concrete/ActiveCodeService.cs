@@ -6368,6 +6368,7 @@ namespace Web.Services.Concrete
             var InhouseCodeFields = _dbContext.LoadStoredProcedure("md_getInhouseCodeFormByOrgId")
                                 .WithSqlParam("@OrgId", orgId)
                                 .WithSqlParam("@codeName", codeName)
+                                .WithSqlParam("@IsEMSUser", ApplicationSettings.isEMS)
                                 .ExecuteStoredProc<InhouseCodeFeildsVM>();
 
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = InhouseCodeFields };
