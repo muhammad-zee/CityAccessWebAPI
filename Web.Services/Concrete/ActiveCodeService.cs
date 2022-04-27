@@ -563,7 +563,7 @@ namespace Web.Services.Concrete
             {
                 totalRecords = objList.Select(x => x.Total_Records).FirstOrDefault();
             }
-            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = new { totalRecords, objList, gridColumns = gridColumns.Body } };
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = new { totalRecords, objList} };
 
            
         }
