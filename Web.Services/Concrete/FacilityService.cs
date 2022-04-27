@@ -320,7 +320,7 @@ namespace Web.Services.Concrete
                 var idsList = Ids.ToIntList();
                 var department = new List<DepartmentVM>();
 
-                department = _departmentRepo.Table.Where(x => x.IsDeleted != true && idsList.Contains(x.OrganizationIdFk.Value)).Select(x => new DepartmentVM()
+                department = _departmentRepo.Table.Where(x => x.IsDeleted != true && x.IsActive.Value && idsList.Contains(x.OrganizationIdFk.Value)).Select(x => new DepartmentVM()
                 {
                     DepartmentId = x.DepartmentId,
                     DepartmentName = x.DepartmentName,
@@ -560,11 +560,11 @@ namespace Web.Services.Concrete
             }
 
             var orgs = AutoMapperHelper.MapList<Organization, OrganizationVM>(organizations);
-            var departments = this._departmentRepo.Table.Where(d => d.IsDeleted != true && orgs.Select(x => x.OrganizationId).Contains(d.OrganizationIdFk.Value)).ToList();
+            var departments = this._departmentRepo.Table.Where(d => d.IsDeleted != true && d.IsActive.Value && orgs.Select(x => x.OrganizationId).Contains(d.OrganizationIdFk.Value)).ToList();
             var dpts = AutoMapperHelper.MapList<Department, DepartmentVM>(departments);
 
             var dptServices = (from s in this._serviceRepo.Table
-                               where dpts.Select(x => x.DepartmentId).Contains(s.DepartmentIdFk) && s.IsDeleted != true
+                               where dpts.Select(x => x.DepartmentId).Contains(s.DepartmentIdFk) && s.IsDeleted != true && s.IsActive.Value
                                select new ServiceLineVM()
                                {
                                    ServiceLineId = s.ServiceLineId,

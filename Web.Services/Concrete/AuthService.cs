@@ -104,13 +104,13 @@ namespace Web.Services.Concrete
                                                    .ExecuteStoredProc<UserCredentialVM>().Select(x => new { x.UserIsActive, x.OrgIsActive }).FirstOrDefault();
                             if (UserIsAllowed != null)
                             {
-                                if (!UserIsAllowed.UserIsActive)
+                                if (UserIsAllowed.UserIsActive.HasValue && !UserIsAllowed.UserIsActive.Value)
                                 {
                                     response.Body = null;
                                     response.Status = HttpStatusCode.NotFound;
                                     response.Message = "User is not active.";
                                 }
-                                else if (!user.IsEms && !UserIsAllowed.OrgIsActive)
+                                else if (!user.IsEms && (UserIsAllowed.OrgIsActive == null || !UserIsAllowed.OrgIsActive.Value))
                                 {
                                     response.Body = null;
                                     response.Status = HttpStatusCode.NotFound;

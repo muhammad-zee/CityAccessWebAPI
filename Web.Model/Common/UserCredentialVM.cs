@@ -4,8 +4,8 @@
     {
         public string username { get; set; }
         public string password { get; set; }
-        public bool UserIsActive { get; set; }
-        public bool OrgIsActive { get; set; }
+        public bool? UserIsActive { get; set; }
+        public bool? OrgIsActive { get; set; }
     }
 
     public class ForgetPasswordVM
