@@ -444,12 +444,26 @@ namespace Web.API.Controllers
             }
         }
 
-        [HttpGet("CommunicationLog/GetAllCommunicationLog/{orgId}")]
-        public BaseResponse GetAllCommunicationLog(int orgId)
+        [HttpGet("CommunicationLog/GetAllCommunicationLog")]
+        public BaseResponse GetAllCommunicationLog(int orgId, string departmentIds, string serviceLineIds,bool showAllVoicemails)
         {
             try
             {
-                return this._communicaitonService.GetAllCommunicationlog(orgId);
+                return this._communicaitonService.GetAllCommunicationlog(orgId, departmentIds, serviceLineIds, showAllVoicemails);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+        [HttpGet("CommunicationLog/GetCallLog")]
+        public BaseResponse GetCallLog(int orgId, bool showAllCalls)
+        {
+            try
+            {
+                return this._communicaitonService.GetCallLog(orgId, showAllCalls);
             }
             catch (Exception ex)
             {

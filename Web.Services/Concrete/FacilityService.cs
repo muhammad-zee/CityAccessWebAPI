@@ -108,13 +108,16 @@ namespace Web.Services.Concrete
         {
             if (!string.IsNullOrEmpty(departmentIds))
             {
-                var idsList = departmentIds.ToIntList();
-                var services = _serviceRepo.Table.Where(x => idsList.Contains(x.DepartmentIdFk) && x.IsDeleted != true).Select(x => new ServiceLineVM()
-                {
-                    ServiceLineId = x.ServiceLineId,
-                    ServiceName = x.ServiceName,
-                    DepartmentIdFk = x.DepartmentIdFk
-                }).ToList();
+                //var idsList = departmentIds.ToIntList();
+                //var services = _serviceRepo.Table.Where(x => idsList.Contains(x.DepartmentIdFk) && x.IsDeleted != true).Select(x => new ServiceLineVM()
+                //{
+                //    ServiceLineId = x.ServiceLineId,
+                //    ServiceName = x.ServiceName,
+                //    DepartmentIdFk = x.DepartmentIdFk
+                //}).ToList();
+                var services = _dbContext.LoadStoredProcedure("md_getAllServicesByDepartmentIds")
+               .WithSqlParam("@pDeptartmentIds", departmentIds)
+           .ExecuteStoredProc<ServiceLineVM>();
                 //(from sl in _serviceRepo.Table
                 //                join d in _departmentRepo.Table on sl.DepartmentIdFk equals d.DepartmentId
                 //                join org in _organizationRepo.Table on d.OrganizationIdFk equals org.OrganizationId

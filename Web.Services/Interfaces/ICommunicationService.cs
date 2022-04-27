@@ -61,7 +61,8 @@ namespace Web.Services.Interfaces
         BaseResponse GetCommunicationLogById(int logId, bool status);
         BaseResponse ActiveOrInActiveCommunicationlog(int logId, bool status);
 
-        BaseResponse GetAllCommunicationlog(int orgId);
+        BaseResponse GetAllCommunicationlog(int orgId,string departmentIds,string serviceLineIds,bool showAllVoicemails);
+        BaseResponse GetCallLog(int orgId,bool showAllCalls);
 
         #endregion
     }

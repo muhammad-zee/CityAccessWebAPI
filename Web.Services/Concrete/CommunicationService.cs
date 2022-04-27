@@ -1098,10 +1098,28 @@ namespace Web.Services.Concrete
         }
 
 
-        public BaseResponse GetAllCommunicationlog(int orgId)
+        public BaseResponse GetAllCommunicationlog(int orgId, string departmentIds, string serviceLineIds,bool showAllVoicemails)
         {
             var communicationLog = this._dbContext.LoadStoredProcedure("md_getCommunicationLog")
             .WithSqlParam("@pOrganizationId", orgId)
+            .WithSqlParam("@pDepartmentIds", departmentIds)
+            .WithSqlParam("@pServiceLineIds", serviceLineIds)
+            .WithSqlParam("@pShowAllVoicemails", showAllVoicemails)
+            .WithSqlParam("@pUserId", ApplicationSettings.UserId)
+            .ExecuteStoredProc<CommunicationLogVM>();
+
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "CommunicationLog Data", Body = communicationLog };
+        }
+        
+
+        public BaseResponse GetCallLog(int orgId, bool showAllCalls)
+        {
+            var communicationLog = this._dbContext.LoadStoredProcedure("md_getCommunicationLog")
+            .WithSqlParam("@pOrganizationId", orgId)
+            //.WithSqlParam("@pDepartmentIds", departmentIds)
+            //.WithSqlParam("@pServiceLineIds", serviceLineIds)
+            //.WithSqlParam("@pShowAllVoicemails", showAllVoicemails)
+            .WithSqlParam("@pUserId", ApplicationSettings.UserId)
             .ExecuteStoredProc<CommunicationLogVM>();
 
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "CommunicationLog Data", Body = communicationLog };
