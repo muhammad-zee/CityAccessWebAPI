@@ -1114,13 +1114,11 @@ namespace Web.Services.Concrete
 
         public BaseResponse GetCallLog(int orgId, bool showAllCalls)
         {
-            var communicationLog = this._dbContext.LoadStoredProcedure("md_getCommunicationLog")
+            var communicationLog = this._dbContext.LoadStoredProcedure("md_getCallLog")
             .WithSqlParam("@pOrganizationId", orgId)
-            //.WithSqlParam("@pDepartmentIds", departmentIds)
-            //.WithSqlParam("@pServiceLineIds", serviceLineIds)
-            //.WithSqlParam("@pShowAllVoicemails", showAllVoicemails)
             .WithSqlParam("@pUserId", ApplicationSettings.UserId)
-            .ExecuteStoredProc<CommunicationLogVM>();
+            .WithSqlParam("@pShowAllCalls", showAllCalls)
+            .ExecuteStoredProc<CallLogVM>();
 
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "CommunicationLog Data", Body = communicationLog };
         }
