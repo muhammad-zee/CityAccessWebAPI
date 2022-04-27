@@ -445,7 +445,7 @@ namespace Web.API.Controllers
         }
 
         [HttpGet("CommunicationLog/GetAllCommunicationLog")]
-        public BaseResponse GetAllCommunicationLog(int orgId, string departmentIds, string serviceLineIds,bool showAllVoicemails)
+        public BaseResponse GetAllCommunicationLog(int orgId, string departmentIds, string serviceLineIds, bool showAllVoicemails)
         {
             try
             {

@@ -1098,7 +1098,7 @@ namespace Web.Services.Concrete
         }
 
 
-        public BaseResponse GetAllCommunicationlog(int orgId, string departmentIds, string serviceLineIds,bool showAllVoicemails)
+        public BaseResponse GetAllCommunicationlog(int orgId, string departmentIds, string serviceLineIds, bool showAllVoicemails)
         {
             var communicationLog = this._dbContext.LoadStoredProcedure("md_getCommunicationLog")
             .WithSqlParam("@pOrganizationId", orgId)
@@ -1110,7 +1110,7 @@ namespace Web.Services.Concrete
 
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "CommunicationLog Data", Body = communicationLog };
         }
-        
+
 
         public BaseResponse GetCallLog(int orgId, bool showAllCalls)
         {
