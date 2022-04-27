@@ -6370,7 +6370,6 @@ namespace Web.Services.Concrete
                                 .WithSqlParam("@codeName", codeName)
                                 .WithSqlParam("@IsEMSUser", ApplicationSettings.isEMS)
                                 .ExecuteStoredProc<InhouseCodeFeildsVM>();
-
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = InhouseCodeFields };
         }
 
