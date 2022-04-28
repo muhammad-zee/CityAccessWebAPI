@@ -248,7 +248,11 @@ namespace Web.Services.Concrete
             var afterOpenTime = TimeSpan.Compare(callTime, dsTime);
             var beforeCloseTime = TimeSpan.Compare(dcTime, callTime);
 
-            var serviceLineId = this._IVRRepo.Table.Where(i => i.IsDeleted != true && (i.LandlineNumber == To || i.LandlineNumber == From)).Select(i => i.ServicelineIdFk).FirstOrDefault();
+            var ivr = this._dbContext.LoadStoredProcedure("md_getIvrByNumber")
+                .WithSqlParam("@pFrom", From)
+                .WithSqlParam("@pTo", To)
+                .ExecuteStoredProc<InteractiveVoiceResponse>().FirstOrDefault();
+            var serviceLineId = ivr.ServicelineIdFk;
 
             var response = new VoiceResponse();
             //var GatherResponseUrl = $"https://" + origin + "/AutomatedCall/PatientResponse?PatientID=" + PatientID + "&AppointmentID=" + AppointmentID + "&Price=" + Price;

@@ -90,6 +90,22 @@ namespace Web.Services.Extensions
                 return 0;
             }
         }
+        public static string NormalizeCellNumber(this string number)
+        {
+            try
+            {
+                if (number != null)
+                {
+                    return number.Replace("(","").Replace(")","").Replace("-","").Replace(" ","");
+                }
+                return "";
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                return number;
+            }
+        }
         public static long ToLong(this object obj)
         {
             try
