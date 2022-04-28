@@ -54,7 +54,7 @@ namespace Web.Model.Common
         public List<int> dptIdsFT { get; set; }
         public List<int?> orgIdsFT { get; set; }
         public string serviceIds { get; set; } = "";
-
+        public int ServiceLineIdFk { get; set; }
         public bool IsAfterHours { get; set; }
         public string UserUniqueId { get; set; }
 
