@@ -112,7 +112,11 @@ namespace Web.Services.Concrete
                 x.UserServices = (from ur in _userRelationRepo.Table
                                   join s in _serviceRepo.Table on ur.ServiceLineIdFk equals s.ServiceLineId
                                   where ur.UserIdFk == x.UserId && !s.IsDeleted
-                                  select new ServiceLineVM() { ServiceLineId = s.ServiceLineId, ServiceName = s.ServiceName }).Distinct().ToList();
+                                  select new ServiceLineVM() 
+                                  { 
+                                      ServiceLineId = s.ServiceLineId, 
+                                      ServiceName = x.ServiceLineIdFk == s.ServiceLineId ?  s.ServiceName +" - On Call" : s.ServiceName
+                                  }).Distinct().ToList();
 
                 x.Organizations = (from ur in _userRole.Table
                                    join r in _role.Table on ur.RoleIdFk equals r.RoleId
