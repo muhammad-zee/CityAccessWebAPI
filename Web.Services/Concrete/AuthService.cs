@@ -27,6 +27,7 @@ namespace Web.Services.Concrete
         private RAQ_DbContext _dbContext;
         private readonly GenericRepository<User> _userRepo;
         private readonly GenericRepository<UserRole> _userRoleRepo;
+        private readonly IRepository<Role> _roleRepo;
         private readonly IRepository<UsersRelation> _userRelationRepo;
         private readonly IRepository<FavouriteTeam> _userFavouriteTeamRepo;
         private readonly IRepository<Setting> _settingRepo;
@@ -43,6 +44,7 @@ namespace Web.Services.Concrete
             IHostingEnvironment environment,
             IRepository<User> userRepo,
             IRepository<UserRole> userRoleRepo,
+            IRepository<Role> roleRepo,
             IRepository<UsersRelation> userRelationRepo,
             IRepository<FavouriteTeam> userFavouriteTeamRepo,
             IRepository<Setting> settingRepo,
@@ -54,6 +56,7 @@ namespace Web.Services.Concrete
             this._environment = environment;
             this._userRepo = (GenericRepository<User>)userRepo;
             this._userRoleRepo = (GenericRepository<UserRole>)userRoleRepo;
+            this._roleRepo = roleRepo;
             this._userRelationRepo = userRelationRepo;
             this._userFavouriteTeamRepo = userFavouriteTeamRepo;
             this._settingRepo = settingRepo;
@@ -338,6 +341,25 @@ namespace Web.Services.Concrete
                     }
 
                 }
+                else if (register.IsSuperAdmin)
+                {
+                    ///////////////// Delete Existing Roles /////////////////
+                    var existingRoles = this._userRoleRepo.Table.Where(x => x.UserIdFk == user.UserId).ToList();
+                    this._userRoleRepo.DeleteRange(existingRoles);
+                    /////////////////////////////////////////////////////////
+
+                    //////////////// Delete Existing User Relations /////////////////
+                    var existingUserRelation = this._userRelationRepo.Table.Where(x => x.UserIdFk == user.UserId).ToList();
+                    this._userRelationRepo.DeleteRange(existingUserRelation);
+                    /////////////////////////////////////////////////////////////////
+                    
+
+                    /////////////// Add Super Admin Role /////////////////////////////
+                    var superAdminRoleId = this._roleRepo.Table.Where(x => !x.IsDeleted && x.IsSuperAdmin).Select(x => x.RoleId).FirstOrDefault();
+                    var userRole = new UserRole() { UserIdFk = user.UserId, RoleIdFk = superAdminRoleId };
+                    this._userRoleRepo.Insert(userRole);
+                    /////////////////////////////////////////////////////////////////
+                }
                 else
                 {
                     var roleIds = register.RoleIds.ToIntList();
@@ -456,6 +478,12 @@ namespace Web.Services.Concrete
                             {
                             }
 
+                        }
+                        else if (register.IsSuperAdmin) 
+                        {
+                            var superAdminRoleId = this._roleRepo.Table.Where(x => !x.IsDeleted && x.IsSuperAdmin).Select(x => x.RoleId).FirstOrDefault();
+                            var userRole = new UserRole() { UserIdFk = obj.UserId, RoleIdFk = superAdminRoleId };
+                            this._userRoleRepo.Insert(userRole);
                         }
                         else
                         {
