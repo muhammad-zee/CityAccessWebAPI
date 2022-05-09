@@ -673,7 +673,7 @@ namespace Web.API.Controllers
 
         [Description("Get All Inhouse Code Feilds")]
         [HttpPost("InhouseCode/AddOrUpdateOrgCodeSepsisFeilds")]
-        public BaseResponse AddOrUpdateOrgCodeSepsisFeilds(List<OrgCodeSepsisFeildsVM> orgInhouseCodeFields)
+        public BaseResponse AddOrUpdateOrgCodeSepsisFeilds([FromBody] List<OrgCodeSepsisFeildsVM> orgInhouseCodeFields)
         {
             try
             {
