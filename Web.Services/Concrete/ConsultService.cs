@@ -315,8 +315,17 @@ namespace Web.Services.Concrete
 
         public BaseResponse GetConsultsByServiceLineId(ConsultVM consult)
         {
-            var consultData = _dbContext.LoadStoredProcedure("md_getGetConsultsByServiceLineId_Daynamic")
+
+            var fields = _dbContext.LoadStoredProcedure("md_getShowInTableColumnsForConsult")
+                                    .WithSqlParam("@orgId", consult.OrganizationId)
+                                    .ExecuteStoredProc<ConsultFieldsVM>().Select(x => new { x.FieldName, x.FieldDataType, x.FieldLabel }).FirstOrDefault();
+
+            var consultData = new List<object>();
+            if (fields.FieldName != null && fields.FieldName != null) 
+            {
+                consultData = _dbContext.LoadStoredProcedure("md_getGetConsultsByServiceLineId_Daynamic")
                                         .WithSqlParam("@status", consult.Status)
+                                        .WithSqlParam("@colName", fields.FieldName)
                                         .WithSqlParam("@organizationId", consult.OrganizationId)
                                         .WithSqlParam("@departmentIds", consult.DepartmentIds)
                                         .WithSqlParam("@serviceLineIds", consult.ServiceLineIds)
@@ -330,8 +339,9 @@ namespace Web.Services.Concrete
                                         .WithSqlParam("@sortCol", consult.SortCol)
                                         .WithSqlParam("@filterVal", consult.FilterVal)
                                         .ExecuteStoredProc_ToDictionary();
+            }
 
-            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = consultData };
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = new { consultData, fields} };
         }
 
 
