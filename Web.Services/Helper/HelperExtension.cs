@@ -74,7 +74,7 @@ namespace Web.Services.Helper
             var groups = source.GroupBy(i => i.ParentComponentId);
 
             //var roots = groups.FirstOrDefault(g => g.Key.HasValue == false).ToList();
-            var roots = source.Where(s => !s.IsAction).ToList();
+            var roots = source.Where(s => !s.IsAction || (s.ParentComponentId == null && s.IsAction)).ToList();
             if (roots.Count > 0)
             {
                 var dict = groups.Where(g => g.Key.HasValue).ToDictionary(g => g.Key.Value.ToString(), g => g.ToList());
