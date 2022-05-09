@@ -28,6 +28,11 @@ namespace Web.Data.Models
         public int? ModifiedBy { get; set; }
         public DateTime? ModifiedDate { get; set; }
         public bool IsDeleted { get; set; }
+        public bool ForStrokeEms { get; set; }
+        public bool ForSepsisEms { get; set; }
+        public bool ForStemiems { get; set; }
+        public bool ForTraumaEms { get; set; }
+        public bool ForBlueEms { get; set; }
 
         public virtual ICollection<OrganizationCodeBlueField> OrganizationCodeBlueFields { get; set; }
         public virtual ICollection<OrganizationCodeSepsisField> OrganizationCodeSepsisFields { get; set; }

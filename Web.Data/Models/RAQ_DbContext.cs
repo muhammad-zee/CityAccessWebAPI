@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 #nullable disable
 
@@ -74,7 +76,7 @@ namespace Web.Data.Models
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseSqlServer("Data Source=192.168.0.44;Initial Catalog=RouteAndQueue;User Id=sa;Password=4292;");
+                optionsBuilder.UseSqlServer("Data Source=192.168.0.31;Initial Catalog=RouteAndQueue;User Id=sa;Password=4292;");
             }
         }
 
@@ -929,6 +931,16 @@ namespace Web.Data.Models
                 entity.Property(e => e.FieldType)
                     .IsRequired()
                     .HasMaxLength(50);
+
+                entity.Property(e => e.ForBlueEms).HasColumnName("ForBlueEMS");
+
+                entity.Property(e => e.ForSepsisEms).HasColumnName("ForSepsisEMS");
+
+                entity.Property(e => e.ForStemiems).HasColumnName("ForSTEMIEMS");
+
+                entity.Property(e => e.ForStrokeEms).HasColumnName("ForStrokeEMS");
+
+                entity.Property(e => e.ForTraumaEms).HasColumnName("ForTraumaEMS");
 
                 entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
             });

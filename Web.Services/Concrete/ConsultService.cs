@@ -67,7 +67,7 @@ namespace Web.Services.Concrete
         public BaseResponse GetConsultFeildsForOrg(int OrgId)
         {
             var consultFields = this._consultFieldRepo.Table.Where(x => !x.IsDeleted).ToList();
-            var selectedConsultFields = this._orgConsultRepo.Table.Where(x => x.OrganizationIdFk == OrgId && !x.IsDeleted).Select(x => new { x.ConsultFieldIdFk, x.IsRequired, x.SortOrder }).ToList();
+            var selectedConsultFields = this._orgConsultRepo.Table.Where(x => x.OrganizationIdFk == OrgId && !x.IsDeleted).Select(x => new { x.ConsultFieldIdFk, x.IsShowInTable, x.SortOrder, x.IsRequired }).ToList();
 
             var consultFieldVM = AutoMapperHelper.MapList<ConsultField, ConsultFieldsVM>(consultFields);
 
@@ -76,6 +76,7 @@ namespace Web.Services.Concrete
                 if (selectedConsultFields.Select(x => x.ConsultFieldIdFk).Contains(item.ConsultFieldId))
                 {
                     item.IsRequired = selectedConsultFields.Where(x => x.ConsultFieldIdFk == item.ConsultFieldId).Select(s => s.IsRequired).FirstOrDefault();
+                    item.IsShowInTable = selectedConsultFields.Where(x => x.ConsultFieldIdFk == item.ConsultFieldId).Select(s => s.IsShowInTable).FirstOrDefault();
                     item.SortOrder = selectedConsultFields.Where(x => x.ConsultFieldIdFk == item.ConsultFieldId).Select(s => s.SortOrder.Value).FirstOrDefault();
                     item.IsSelected = true;
                 }
@@ -245,6 +246,7 @@ namespace Web.Services.Concrete
                     {
                         item.SortOrder = orgConsultFields.Where(x => x.ConsultFieldIdFk == item.ConsultFieldIdFk).Select(x => x.SortOrder).FirstOrDefault();
                         item.IsRequired = orgConsultFields.Where(x => x.ConsultFieldIdFk == item.ConsultFieldIdFk).Select(x => x.IsRequired).FirstOrDefault();
+                        item.IsShowInTable = orgConsultFields.Where(x => x.ConsultFieldIdFk == item.ConsultFieldIdFk).Select(x => x.IsShowInTable).FirstOrDefault();
                     }
                     this._orgConsultRepo.Update(objsNeedToUpdate);
                 }
