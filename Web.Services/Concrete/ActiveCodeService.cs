@@ -6116,6 +6116,7 @@ namespace Web.Services.Concrete
                     {
                         item.SortOrder = orgInhouseCodeFields.Where(x => x.InhouseCodesFieldIdFk == item.InhouseCodesFieldIdFk).Select(x => x.SortOrder).FirstOrDefault();
                         item.IsRequired = orgInhouseCodeFields.Where(x => x.InhouseCodesFieldIdFk == item.InhouseCodesFieldIdFk).Select(x => x.IsRequired).FirstOrDefault();
+                        item.IsShowInTable = orgInhouseCodeFields.Where(x => x.InhouseCodesFieldIdFk == item.InhouseCodesFieldIdFk).Select(x => x.IsShowInTable).FirstOrDefault();
                     }
                     this._orgCodeStrokeFeilds.Update(objsNeedToUpdate);
                 }
