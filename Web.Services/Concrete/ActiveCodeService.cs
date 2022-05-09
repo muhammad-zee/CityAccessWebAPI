@@ -557,14 +557,14 @@ namespace Web.Services.Concrete
                 x.BloodThinnersTitle.AddRange(_controlListDetailsRepo.Table.Where(b => x.BloodThinners.ToIntList().Contains(b.ControlListDetailId)).Select(b => new { Id = b.ControlListDetailId, b.Title }).ToList());
             });
 
-            var gridColumns = GetInhouseCodeFormByOrgId(activeCode.OrganizationIdFk, UCLEnums.Stroke.ToString());
+            var gridColumns = GetInhouseCodeTableFeilds(activeCode.OrganizationIdFk, UCLEnums.Stroke.ToString());
 
             int totalRecords = 0;
             if (objList.Count > 0)
             {
                 totalRecords = objList.Select(x => x.Total_Records).FirstOrDefault();
             }
-            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = new { totalRecords, objList } };
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = new { totalRecords, objList, gridColumns.Body } };
 
 
         }
@@ -6376,11 +6376,11 @@ namespace Web.Services.Concrete
 
         public BaseResponse GetInhouseCodeTableFeilds(int orgId, string codeName)
         {
-            var InhouseCodeFields = _dbContext.LoadStoredProcedure("md_getInhouseCodeFormByOrgId")
+            var InhouseCodeFields = _dbContext.LoadStoredProcedure("md_getShowInTableColumnsForInHouseCodes")
                                 .WithSqlParam("@OrgId", orgId)
                                 .WithSqlParam("@codeName", codeName)
                                 .WithSqlParam("@IsEMSUser", ApplicationSettings.isEMS)
-                                .ExecuteStoredProc<InhouseCodeFeildsVM>();
+                                .ExecuteStoredProc<InhouseCodeFeildsVM>().Select(x => new { x.FieldName, x.FieldDataType, x.FieldLabel }).FirstOrDefault();
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = InhouseCodeFields };
         }
 
