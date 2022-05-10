@@ -6175,6 +6175,7 @@ namespace Web.Services.Concrete
                     {
                         item.SortOrder = orgInhouseCodeFields.Where(x => x.InhouseCodesFieldIdFk == item.InhouseCodesFieldIdFk).Select(x => x.SortOrder).FirstOrDefault();
                         item.IsRequired = orgInhouseCodeFields.Where(x => x.InhouseCodesFieldIdFk == item.InhouseCodesFieldIdFk).Select(x => x.IsRequired).FirstOrDefault();
+                        item.IsShowInTable = orgInhouseCodeFields.Where(x => x.InhouseCodesFieldIdFk == item.InhouseCodesFieldIdFk).Select(x => x.IsShowInTable).FirstOrDefault();
                     }
                     this._orgCodeSTEMIFeilds.Update(objsNeedToUpdate);
                 }
@@ -6229,6 +6230,7 @@ namespace Web.Services.Concrete
                     {
                         item.SortOrder = orgInhouseCodeFields.Where(x => x.InhouseCodesFieldIdFk == item.InhouseCodesFieldIdFk).Select(x => x.SortOrder).FirstOrDefault();
                         item.IsRequired = orgInhouseCodeFields.Where(x => x.InhouseCodesFieldIdFk == item.InhouseCodesFieldIdFk).Select(x => x.IsRequired).FirstOrDefault();
+                        item.IsShowInTable = orgInhouseCodeFields.Where(x => x.InhouseCodesFieldIdFk == item.InhouseCodesFieldIdFk).Select(x => x.IsShowInTable).FirstOrDefault();
                     }
                     this._orgCodeSepsisFeilds.Update(objsNeedToUpdate);
                 }
@@ -6283,6 +6285,7 @@ namespace Web.Services.Concrete
                     {
                         item.SortOrder = orgInhouseCodeFields.Where(x => x.InhouseCodesFieldIdFk == item.InhouseCodesFieldIdFk).Select(x => x.SortOrder).FirstOrDefault();
                         item.IsRequired = orgInhouseCodeFields.Where(x => x.InhouseCodesFieldIdFk == item.InhouseCodesFieldIdFk).Select(x => x.IsRequired).FirstOrDefault();
+                        item.IsShowInTable = orgInhouseCodeFields.Where(x => x.InhouseCodesFieldIdFk == item.InhouseCodesFieldIdFk).Select(x => x.IsShowInTable).FirstOrDefault();
                     }
                     this._orgCodeTraumaFeilds.Update(objsNeedToUpdate);
                 }
@@ -6337,6 +6340,7 @@ namespace Web.Services.Concrete
                     {
                         item.SortOrder = orgInhouseCodeFields.Where(x => x.InhouseCodesFieldIdFk == item.InhouseCodesFieldIdFk).Select(x => x.SortOrder).FirstOrDefault();
                         item.IsRequired = orgInhouseCodeFields.Where(x => x.InhouseCodesFieldIdFk == item.InhouseCodesFieldIdFk).Select(x => x.IsRequired).FirstOrDefault();
+                        item.IsShowInTable = orgInhouseCodeFields.Where(x => x.InhouseCodesFieldIdFk == item.InhouseCodesFieldIdFk).Select(x => x.IsShowInTable).FirstOrDefault();
                     }
                     this._orgCodeBlueFeilds.Update(objsNeedToUpdate);
                 }
