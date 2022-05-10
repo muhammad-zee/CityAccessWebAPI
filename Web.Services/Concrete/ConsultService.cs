@@ -339,6 +339,16 @@ namespace Web.Services.Concrete
                                         .WithSqlParam("@sortCol", consult.SortCol)
                                         .WithSqlParam("@filterVal", consult.FilterVal)
                                         .ExecuteStoredProc_ToDictionary();
+
+                if (fields.FieldName.Contains("ConsultType")) 
+                {
+                    foreach (dynamic item in consultData)
+                    {
+                        string consultTypeStr = item["consultType"];
+                        int consultType = consultTypeStr.ToInt();
+                        item["consultType"] = _controlListDetailsRepo.Table.Where(x => x.ControlListDetailId == consultType).Select(x => x.Title).FirstOrDefault();
+                    }
+                }
             }
 
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = new { consultData, fields} };
