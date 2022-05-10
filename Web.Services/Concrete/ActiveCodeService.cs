@@ -6388,7 +6388,18 @@ namespace Web.Services.Concrete
                                 .WithSqlParam("@OrgId", orgId)
                                 .WithSqlParam("@codeName", codeName)
                                 .WithSqlParam("@IsEMSUser", ApplicationSettings.isEMS)
-                                .ExecuteStoredProc<InhouseCodeFeildsVM>().Select(x => new { x.FieldName, x.FieldDataType, x.FieldLabel }).FirstOrDefault();
+                                .ExecuteStoredProc<InhouseCodeFeildsVM>().FirstOrDefault();
+            if (InhouseCodeFields != null && InhouseCodeFields.FieldName != null) 
+            {
+                var fieldNames = InhouseCodeFields.FieldName.Split(",").ToList();
+                if (fieldNames.IndexOf(" Gender") > -1)
+                    fieldNames[fieldNames.IndexOf(" Gender")] = "GenderTitle";
+                if (fieldNames.IndexOf(" BloodThinners") > -1)
+                    fieldNames[fieldNames.IndexOf(" BloodThinners")] = "BloodThinnersTitle";
+
+                InhouseCodeFields.FieldName = string.Join(",", fieldNames);
+
+            }
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = InhouseCodeFields };
         }
 
