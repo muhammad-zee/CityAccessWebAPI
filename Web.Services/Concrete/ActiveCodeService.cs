@@ -1577,12 +1577,13 @@ namespace Web.Services.Concrete
                 x.BloodThinnersTitle = new List<object>();
                 x.BloodThinnersTitle.AddRange(_controlListDetailsRepo.Table.Where(b => x.BloodThinners.ToIntList().Contains(b.ControlListDetailId)).Select(b => new { Id = b.ControlListDetailId, b.Title }).ToList());
             });
+            var gridColumns = GetInhouseCodeTableFeilds(activeCode.OrganizationIdFk, UCLEnums.Sepsis.ToString());
             int totalRecords = 0;
             if (objList.Count > 0)
             {
                 totalRecords = objList.Select(x => x.Total_Records).FirstOrDefault();
             }
-            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = new { totalRecords, objList } };
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = new { totalRecords, objList, fields = gridColumns.Body } };
 
             //var SepsisData = new List<CodeSepsi>();
             //if (ApplicationSettings.isSuperAdmin)
@@ -2674,12 +2675,13 @@ namespace Web.Services.Concrete
                 x.BloodThinnersTitle = new List<object>();
                 x.BloodThinnersTitle.AddRange(_controlListDetailsRepo.Table.Where(b => x.BloodThinners.ToIntList().Contains(b.ControlListDetailId)).Select(b => new { Id = b.ControlListDetailId, b.Title }).ToList());
             });
+            var gridColumns = GetInhouseCodeTableFeilds(activeCode.OrganizationIdFk, UCLEnums.STEMI.ToString());
             int totalRecords = 0;
             if (objList.Count > 0)
             {
                 totalRecords = objList.Select(x => x.Total_Records).FirstOrDefault();
             }
-            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = new { totalRecords, objList } };
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = new { totalRecords, objList, fields = gridColumns.Body } };
 
             //var STEMIData = new List<CodeStemi>();
             //if (ApplicationSettings.isSuperAdmin)
@@ -3778,12 +3780,13 @@ namespace Web.Services.Concrete
                 x.BloodThinnersTitle = new List<object>();
                 x.BloodThinnersTitle.AddRange(_controlListDetailsRepo.Table.Where(b => x.BloodThinners.ToIntList().Contains(b.ControlListDetailId)).Select(b => new { Id = b.ControlListDetailId, b.Title }).ToList());
             });
+            var gridColumns = GetInhouseCodeTableFeilds(activeCode.OrganizationIdFk, UCLEnums.Trauma.ToString());
             int totalRecords = 0;
             if (objList.Count > 0)
             {
                 totalRecords = objList.Select(x => x.Total_Records).FirstOrDefault();
             }
-            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = new { totalRecords, objList } };
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = new { totalRecords, objList, fields = gridColumns.Body } };
 
             //var TrumaData = new List<CodeTrauma>();
             //if (ApplicationSettings.isSuperAdmin)
@@ -4876,12 +4879,13 @@ namespace Web.Services.Concrete
                 x.BloodThinnersTitle = new List<object>();
                 x.BloodThinnersTitle.AddRange(_controlListDetailsRepo.Table.Where(b => x.BloodThinners.ToIntList().Contains(b.ControlListDetailId)).Select(b => new { Id = b.ControlListDetailId, b.Title }).ToList());
             });
+            var gridColumns = GetInhouseCodeTableFeilds(activeCode.OrganizationIdFk, UCLEnums.Blue.ToString());
             int totalRecords = 0;
             if (objList.Count > 0)
             {
                 totalRecords = objList.Select(x => x.Total_Records).FirstOrDefault();
             }
-            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = new { totalRecords, objList } };
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = new { totalRecords, objList, gridColumns.Body } };
             //var blueData = new List<CodeBlue>();
             //if (ApplicationSettings.isSuperAdmin)
             //{
