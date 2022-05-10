@@ -320,33 +320,55 @@ namespace Web.Services.Concrete
         public BaseResponse saveConversationChannel(ConversationChannelVM channel)
         {
             BaseResponse response = new BaseResponse();
-            if (!channel.IsGroup.Value && !channel.FriendlyName.Contains("S_"))
+            if (this._userRepo.Table.Count(u => u.IsDeleted == false && u.IsActive == true && u.UserUniqueId == channel.UniqueName)>0)
             {
-                channel.IsGroup = true;
-            }
-            var channelSetting = this._conversationChannelsRepo.Table.Count(ch => ch.ChannelSid == channel.ChannelSid && ch.IsDeleted != true) == 0;
-            if (channelSetting)
-            {
-                var newChannel = new ConversationChannel
+
+                var ch = ChannelResource.Fetch(pathServiceSid: this.Twilio_ChatServiceSid, pathSid: channel.ChannelSid);
+                var members = MemberResource.Read(pathServiceSid: this.Twilio_ChatServiceSid, pathChannelSid: channel.ChannelSid);
+                foreach(var m in members)
                 {
-                    FriendlyName = channel.FriendlyName,
-                    UniqueName = channel.UniqueName,
-                    ChannelSid = channel.ChannelSid,
-                    IsGroup = channel.IsGroup,
-                    CreatedBy = channel.CreatedBy,
-                    CreatedDate = DateTime.UtcNow,
-                    IsDeleted = false,
-                };
-                this._conversationChannelsRepo.Insert(newChannel);
-                response.Status = HttpStatusCode.OK;
-                response.Message = "Notificaiton Channel Saved Successfully";
-                response.Body = newChannel;
+                    if(m.Identity != channel.UniqueName)
+                    {
+                        var delete = MemberResource.Delete(pathServiceSid: this.Twilio_ChatServiceSid, pathChannelSid: channel.ChannelSid,pathSid:m.Sid);
+                    }
+                    
+                }
+                var dbChannel = this._conversationChannelsRepo.Table.FirstOrDefault(ch => ch.ChannelSid == channel.ChannelSid);
+                var participants = this._conversationParticipantsRepo.Table.Where(p => p.ConversationChannelIdFk == dbChannel.ConversationChannelId);
+                this._conversationParticipantsRepo.DeleteRange(participants);
+                this._conversationChannelsRepo.Delete(dbChannel);
             }
             else
             {
-                response.Status = HttpStatusCode.OK;
-                response.Message = "Channel Already Exists";
+                if (!channel.IsGroup.Value && !channel.FriendlyName.Contains("S_"))
+                {
+                    channel.IsGroup = true;
+                }
+                var channelSetting = this._conversationChannelsRepo.Table.Count(ch => ch.ChannelSid == channel.ChannelSid && ch.IsDeleted != true) == 0;
+                if (channelSetting)
+                {
+                    var newChannel = new ConversationChannel
+                    {
+                        FriendlyName = channel.FriendlyName,
+                        UniqueName = channel.UniqueName,
+                        ChannelSid = channel.ChannelSid,
+                        IsGroup = channel.IsGroup,
+                        CreatedBy = channel.CreatedBy,
+                        CreatedDate = DateTime.UtcNow,
+                        IsDeleted = false,
+                    };
+                    this._conversationChannelsRepo.Insert(newChannel);
+                    response.Status = HttpStatusCode.OK;
+                    response.Message = "Notificaiton Channel Saved Successfully";
+                    response.Body = newChannel;
+                }
+                else
+                {
+                    response.Status = HttpStatusCode.OK;
+                    response.Message = "Channel Already Exists";
+                }
             }
+
             return response;
         }
         public BaseResponse saveConversationChannelParticipants(ConversationChannelParticipantsVM model)
