@@ -448,7 +448,7 @@ namespace Web.Services.Concrete
                 foreach (var ch in channels)
                 {
                     var delete = ChannelResource.Delete(pathServiceSid: this.Twilio_ChatServiceSid, pathSid: ch.Sid);
-                    var dbChannel = this._conversationChannelsRepo.Table.FirstOrDefault(c => c.ChannelSid == ch.Sid && c.IsDeleted != true);
+                    var dbChannel = this._conversationChannelsRepo.Table.FirstOrDefault(c => c.ChannelSid == ch.Sid );
                     if (dbChannel != null)
                     {
                         //dbChannel.IsDeleted = true;
