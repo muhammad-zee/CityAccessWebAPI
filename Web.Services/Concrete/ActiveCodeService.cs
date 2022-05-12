@@ -6379,6 +6379,12 @@ namespace Web.Services.Concrete
                                 .WithSqlParam("@codeName", codeName)
                                 .WithSqlParam("@IsEMSUser", ApplicationSettings.isEMS)
                                 .ExecuteStoredProc<InhouseCodeFeildsVM>();
+
+            var NonSortedFields = InhouseCodeFields.Where(x => x.SortOrder == 0).ToList();
+            InhouseCodeFields.RemoveAll(x => x.SortOrder == 0);
+            InhouseCodeFields.AddRange(NonSortedFields);
+
+
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = InhouseCodeFields };
         }
 
