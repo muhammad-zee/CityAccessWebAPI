@@ -653,11 +653,11 @@ namespace Web.Services.Concrete
         {
             if (codeStroke != null && !string.IsNullOrEmpty(codeStroke.LastKnownWellStr) && !string.IsNullOrWhiteSpace(codeStroke.LastKnownWellStr))
             {
-                codeStroke.LastKnownWell = DateTime.Parse(codeStroke.LastKnownWellStr);
+                codeStroke.LastKnownWell = DateTime.Parse(codeStroke.LastKnownWellStr).ToUniversalTimeZone();
             }
             if (codeStroke != null && !string.IsNullOrEmpty(codeStroke.DobStr) && !string.IsNullOrWhiteSpace(codeStroke.DobStr))
             {
-                codeStroke.Dob = DateTime.Parse(codeStroke.DobStr);
+                codeStroke.Dob = DateTime.Parse(codeStroke.DobStr).ToUniversalTimeZone();
             }
             if (codeStroke.CodeStrokeId > 0)
             {
@@ -1752,11 +1752,11 @@ namespace Web.Services.Concrete
         {
             if (codeSepsis != null && !string.IsNullOrEmpty(codeSepsis.LastKnownWellStr) && !string.IsNullOrWhiteSpace(codeSepsis.LastKnownWellStr))
             {
-                codeSepsis.LastKnownWell = DateTime.Parse(codeSepsis.LastKnownWellStr);
+                codeSepsis.LastKnownWell = DateTime.Parse(codeSepsis.LastKnownWellStr).ToUniversalTimeZone(); ;
             }
             if (codeSepsis != null && !string.IsNullOrEmpty(codeSepsis.DobStr) && !string.IsNullOrWhiteSpace(codeSepsis.DobStr))
             {
-                codeSepsis.Dob = DateTime.Parse(codeSepsis.DobStr);
+                codeSepsis.Dob = DateTime.Parse(codeSepsis.DobStr).ToUniversalTimeZone(); ;
             }
             if (codeSepsis.CodeSepsisId > 0)
             {
@@ -2855,11 +2855,11 @@ namespace Web.Services.Concrete
         {
             if (codeSTEMI != null && !string.IsNullOrEmpty(codeSTEMI.LastKnownWellStr) && !string.IsNullOrWhiteSpace(codeSTEMI.LastKnownWellStr))
             {
-                codeSTEMI.LastKnownWell = DateTime.Parse(codeSTEMI.LastKnownWellStr);
+                codeSTEMI.LastKnownWell = DateTime.Parse(codeSTEMI.LastKnownWellStr).ToUniversalTimeZone(); ;
             }
             if (codeSTEMI != null && !string.IsNullOrEmpty(codeSTEMI.DobStr) && !string.IsNullOrWhiteSpace(codeSTEMI.DobStr))
             {
-                codeSTEMI.Dob = DateTime.Parse(codeSTEMI.DobStr);
+                codeSTEMI.Dob = DateTime.Parse(codeSTEMI.DobStr).ToUniversalTimeZone(); ;
             }
             if (codeSTEMI.CodeStemiid > 0)
             {
@@ -3958,11 +3958,11 @@ namespace Web.Services.Concrete
         {
             if (codeTruma != null && !string.IsNullOrEmpty(codeTruma.LastKnownWellStr) && !string.IsNullOrWhiteSpace(codeTruma.LastKnownWellStr))
             {
-                codeTruma.LastKnownWell = DateTime.Parse(codeTruma.LastKnownWellStr);
+                codeTruma.LastKnownWell = DateTime.Parse(codeTruma.LastKnownWellStr).ToUniversalTimeZone(); ;
             }
             if (codeTruma != null && !string.IsNullOrEmpty(codeTruma.DobStr) && !string.IsNullOrWhiteSpace(codeTruma.DobStr))
             {
-                codeTruma.Dob = DateTime.Parse(codeTruma.DobStr);
+                codeTruma.Dob = DateTime.Parse(codeTruma.DobStr).ToUniversalTimeZone(); ;
             }
             if (codeTruma.CodeTraumaId > 0)
             {
@@ -5053,11 +5053,11 @@ namespace Web.Services.Concrete
         {
             if (codeBlue != null && !string.IsNullOrEmpty(codeBlue.LastKnownWellStr) && !string.IsNullOrWhiteSpace(codeBlue.LastKnownWellStr))
             {
-                codeBlue.LastKnownWell = DateTime.Parse(codeBlue.LastKnownWellStr);
+                codeBlue.LastKnownWell = DateTime.Parse(codeBlue.LastKnownWellStr).ToUniversalTimeZone(); ;
             }
             if (codeBlue != null && !string.IsNullOrEmpty(codeBlue.DobStr) && !string.IsNullOrWhiteSpace(codeBlue.DobStr))
             {
-                codeBlue.Dob = DateTime.Parse(codeBlue.DobStr);
+                codeBlue.Dob = DateTime.Parse(codeBlue.DobStr).ToUniversalTimeZone(); ;
             }
             if (codeBlue.CodeBlueId > 0)
             {
