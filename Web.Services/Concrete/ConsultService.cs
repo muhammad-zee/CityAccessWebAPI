@@ -321,7 +321,7 @@ namespace Web.Services.Concrete
                                     .ExecuteStoredProc<ConsultFieldsVM>().Select(x => new { x.FieldName, x.FieldDataType, x.FieldLabel }).FirstOrDefault();
 
             var consultData = new List<object>();
-            if (fields.FieldName != null && fields.FieldName != null) 
+            if (fields.FieldName != null && fields.FieldName != null)
             {
                 consultData = _dbContext.LoadStoredProcedure("md_getGetConsultsByServiceLineId_Daynamic")
                                         .WithSqlParam("@status", consult.Status)
@@ -340,7 +340,7 @@ namespace Web.Services.Concrete
                                         .WithSqlParam("@filterVal", consult.FilterVal)
                                         .ExecuteStoredProc_ToDictionary();
 
-                if (fields.FieldName.Contains("ConsultType")) 
+                if (fields.FieldName.Contains("ConsultType"))
                 {
                     foreach (dynamic item in consultData)
                     {
@@ -351,7 +351,7 @@ namespace Web.Services.Concrete
                 }
             }
 
-            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = new { consultData, fields} };
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = new { consultData, fields } };
         }
 
 
@@ -373,7 +373,7 @@ namespace Web.Services.Concrete
             if (isConsultIdExist && keyValues["ConsultId"].ToString() == "0")
             {
                 var Consult_Counter = _dbContext.LoadStoredProcedure("md_getMDRouteCounter").WithSqlParam("@C_Initails", "CC").ExecuteStoredProc<MDRoute_CounterVM>().FirstOrDefault();
-
+                keyValues.Add("Consult_Counter", Consult_Counter.Counter_Value);
                 string query = "INSERT INTO [dbo].[Consults] (";
 
                 for (int i = 0; i < keys.Count(); i++)
@@ -430,234 +430,234 @@ namespace Web.Services.Concrete
                 if (rowsEffect > 0)
                 {
 
-                    if (keys.Contains("ServiceLineIdFk") && keyValues["ServiceLineIdFk"].ToString() != "0")
-                    {
-                        var serviceLineId = keyValues["ServiceLineIdFk"].ToString().ToInt();
+                    //    if (keys.Contains("ServiceLineIdFk") && keyValues["ServiceLineIdFk"].ToString() != "0")
+                    //    {
+                    //        var serviceLineId = keyValues["ServiceLineIdFk"].ToString().ToInt();
 
-                        var users = _dbContext.LoadStoredProcedure("md_getAvailableUserOnSchedule")
-                                    .WithSqlParam("@servicelineIdFk", serviceLineId)
-                                    .WithSqlParam("@dayOfWeek", DateTime.UtcNow.DayOfWeek.ToString())
-                                    .ExecuteStoredProc<RegisterCredentialVM>();
+                    //        var users = _dbContext.LoadStoredProcedure("md_getAvailableUserOnSchedule")
+                    //                    .WithSqlParam("@servicelineIdFk", serviceLineId)
+                    //                    .WithSqlParam("@dayOfWeek", DateTime.UtcNow.DayOfWeek.ToString())
+                    //                    .ExecuteStoredProc<RegisterCredentialVM>();
 
-                        var consultType = _controlListDetailsRepo.Table.Where(x => x.ControlListDetailId == keyValues["ConsultType"].ToString().ToInt()).Select(x => x.Title).FirstOrDefault();
+                    //        var consultType = _controlListDetailsRepo.Table.Where(x => x.ControlListDetailId == keyValues["ConsultType"].ToString().ToInt()).Select(x => x.Title).FirstOrDefault();
 
-                        var conversationChannelAttributes = JsonConvert.SerializeObject(new Dictionary<string, Object>()
-                                    {
-                                        {ChannelAttributeEnums.ChannelType.ToString(), ChannelTypeEnums.Consult.ToString()},
-                                        {ChannelAttributeEnums.ConsultId.ToString(), Consult_Counter.Counter_Value}
-                                    }, Formatting.Indented);
+                    //        var conversationChannelAttributes = JsonConvert.SerializeObject(new Dictionary<string, Object>()
+                    //                    {
+                    //                        {ChannelAttributeEnums.ChannelType.ToString(), ChannelTypeEnums.Consult.ToString()},
+                    //                        {ChannelAttributeEnums.ConsultId.ToString(), Consult_Counter.Counter_Value}
+                    //                    }, Formatting.Indented);
 
-                        var superAdmins = this._usersRepo.Table.Where(x => x.IsInGroup && !x.IsDeleted).Select(x => new RegisterCredentialVM() { UserUniqueId = x.UserUniqueId, UserId = x.UserId }).ToList();
-                        users.AddRange(superAdmins);
-                        var loggedUser = (from u in this._usersRepo.Table
-                                          where u.UserId == ApplicationSettings.UserId
-                                          select new RegisterCredentialVM
-                                          {
-                                              UserUniqueId = u.UserUniqueId,
-                                              UserId = u.UserId
-                                          }).FirstOrDefault();
-                        users.Add(loggedUser);
+                    //        var superAdmins = this._usersRepo.Table.Where(x => x.IsInGroup && !x.IsDeleted).Select(x => new RegisterCredentialVM() { UserUniqueId = x.UserUniqueId, UserId = x.UserId }).ToList();
+                    //        users.AddRange(superAdmins);
+                    //        var loggedUser = (from u in this._usersRepo.Table
+                    //                          where u.UserId == ApplicationSettings.UserId
+                    //                          select new RegisterCredentialVM
+                    //                          {
+                    //                              UserUniqueId = u.UserUniqueId,
+                    //                              UserId = u.UserId
+                    //                          }).FirstOrDefault();
+                    //        users.Add(loggedUser);
 
-                        if (users != null && users.Count > 0 && users.FirstOrDefault().IsAfterHours == true)
-                        {
-                            if (keys.Contains("ConsultType") && keyValues["ConsultType"].ToString() != null && keyValues["ConsultType"].ToString() != "")
-                            {
+                    //        if (users != null && users.Count > 0 && users.FirstOrDefault().IsAfterHours == true)
+                    //        {
+                    //            if (keys.Contains("ConsultType") && keyValues["ConsultType"].ToString() != null && keyValues["ConsultType"].ToString() != "")
+                    //            {
 
-                                if (consultType != null && consultType == "Urgent")
-                                {
-                                    //string uniqueName = $"CONSULT_{Consult_Counter.Counter_Value.ToString()}";
-                                    string ServiceName = this._serviceLineRepo.Table.Where(x => x.ServiceLineId == serviceLineId && !x.IsDeleted).Select(x => x.ServiceName).FirstOrDefault();
-                                    string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
-                                    string friendlyName = $"{consultType} {ServiceName} Consult {Consult_Counter.Counter_Value}";
-                                    var channel = _communicationService.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
+                    //                if (consultType != null && consultType == "Urgent")
+                    //                {
+                    //                    //string uniqueName = $"CONSULT_{Consult_Counter.Counter_Value.ToString()}";
+                    //                    string ServiceName = this._serviceLineRepo.Table.Where(x => x.ServiceLineId == serviceLineId && !x.IsDeleted).Select(x => x.ServiceName).FirstOrDefault();
+                    //                    string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
+                    //                    string friendlyName = $"{consultType} {ServiceName} Consult {Consult_Counter.Counter_Value}";
+                    //                    var channel = _communicationService.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
 
-                                    //////////////// Update Consult For ChannelSid ////////////////////////////
+                    //                    //////////////// Update Consult For ChannelSid ////////////////////////////
 
-                                    string ConsultId = keyValues["ConsultId"].ToString();
-                                    string qry = $"UPDATE [dbo].[Consults] SET [ChannelSid] = '{channel.Sid}'";
+                    //                    string ConsultId = keyValues["ConsultId"].ToString();
+                    //                    string qry = $"UPDATE [dbo].[Consults] SET [ChannelSid] = '{channel.Sid}'";
 
-                                    qry += $" WHERE ConsultNumber = '{Consult_Counter.Counter_Value}'";
+                    //                    qry += $" WHERE ConsultNumber = '{Consult_Counter.Counter_Value}'";
 
-                                    int rowUpdate = this._dbContext.Database.ExecuteSqlRaw(qry);
+                    //                    int rowUpdate = this._dbContext.Database.ExecuteSqlRaw(qry);
 
-                                    ///////////////////////////////////////////////////////////////////////////
+                    //                    ///////////////////////////////////////////////////////////////////////////
 
 
-                                    List<ConsultAcknowledgment> consultAcknowledgmentList = new();
-                                    users = users.Distinct().ToList();
-                                    var distinctUsers = users.Select(x => new { x.UserUniqueId, x.UserId }).Distinct().ToList();
+                    //                    List<ConsultAcknowledgment> consultAcknowledgmentList = new();
+                    //                    users = users.Distinct().ToList();
+                    //                    var distinctUsers = users.Select(x => new { x.UserUniqueId, x.UserId }).Distinct().ToList();
 
-                                    foreach (var item in distinctUsers)
-                                    {
-                                        try
-                                        {
-                                            this._communicationService.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
-                                            var acknowledgeConsult = new ConsultAcknowledgment
-                                            {
-                                                IsAcknowledge = false,
-                                                ConsultIdFk = Consult_Counter.Counter_Value,
-                                                UserIdFk = item.UserId,
-                                                CreatedBy = ApplicationSettings.UserId,
-                                                CreatedDate = DateTime.UtcNow
-                                            };
-                                            consultAcknowledgmentList.Add(acknowledgeConsult);
-                                        }
-                                        catch (Exception ex)
-                                        {
+                    //                    foreach (var item in distinctUsers)
+                    //                    {
+                    //                        try
+                    //                        {
+                    //                            this._communicationService.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
+                    //                            var acknowledgeConsult = new ConsultAcknowledgment
+                    //                            {
+                    //                                IsAcknowledge = false,
+                    //                                ConsultIdFk = Consult_Counter.Counter_Value,
+                    //                                UserIdFk = item.UserId,
+                    //                                CreatedBy = ApplicationSettings.UserId,
+                    //                                CreatedDate = DateTime.UtcNow
+                    //                            };
+                    //                            consultAcknowledgmentList.Add(acknowledgeConsult);
+                    //                        }
+                    //                        catch (Exception ex)
+                    //                        {
 
-                                        }
-                                    }
-                                    this._consultAcknowledgmentRepo.Insert(consultAcknowledgmentList);
-                                    var msg = new ConversationMessageVM();
-                                    msg.channelSid = channel.Sid;
-                                    msg.author = "System";
-                                    msg.attributes = "";
-                                    msg.body = $"<strong> {consultType} {ServiceName} Consult</strong></br></br>";
-                                    if (keyValues.ContainsKey("PatientFirstName") && keyValues.ContainsKey("PatientLastName"))
-                                    {
-                                        msg.body += $"<strong>Patient Name:</strong> {keyValues["PatientFirstName"].ToString()} {keyValues["PatientLastName"].ToString()} </br>";
-                                    }
-                                    else
-                                    {
-                                        if (keyValues.ContainsKey("PatientFirstName"))
-                                        {
-                                            msg.body += $"<strong>Patient Name:</strong> {keyValues["PatientFirstName"].ToString()} </br>";
-                                        }
-                                        if (keyValues.ContainsKey("PatientLastName"))
-                                        {
-                                            msg.body += $"<strong>Patient Name:</strong> {keyValues["PatientLastName"].ToString()} </br>";
-                                        }
-                                    }
-                                    if (keyValues.ContainsKey("DateOfBirth"))
-                                    {
-                                        DateTime dob = DateTime.Parse(keyValues["DateOfBirth"].ToString());
-                                        msg.body += $"<strong>Dob:</strong> {dob:MM-dd-yyyy} </br>";
-                                    }
-                                    msg.body += keyValues.ContainsKey("MedicalRecordNumber") ? $"<strong>Medical Record Number:</strong> {keyValues["MedicalRecordNumber"].ToString()} </br>" : "";
-                                    msg.body += keyValues.ContainsKey("CallbackNumber") && keyValues["CallbackNumber"].ToString() != "(___) ___-____" ? $"<strong>Callback Number:</strong> {keyValues["CallbackNumber"].ToString()} </br>" : "";
-                                    _communicationService.sendPushNotification(msg);
+                    //                        }
+                    //                    }
+                    //                    this._consultAcknowledgmentRepo.Insert(consultAcknowledgmentList);
+                    //                    var msg = new ConversationMessageVM();
+                    //                    msg.channelSid = channel.Sid;
+                    //                    msg.author = "System";
+                    //                    msg.attributes = "";
+                    //                    msg.body = $"<strong> {consultType} {ServiceName} Consult</strong></br></br>";
+                    //                    if (keyValues.ContainsKey("PatientFirstName") && keyValues.ContainsKey("PatientLastName"))
+                    //                    {
+                    //                        msg.body += $"<strong>Patient Name:</strong> {keyValues["PatientFirstName"].ToString()} {keyValues["PatientLastName"].ToString()} </br>";
+                    //                    }
+                    //                    else
+                    //                    {
+                    //                        if (keyValues.ContainsKey("PatientFirstName"))
+                    //                        {
+                    //                            msg.body += $"<strong>Patient Name:</strong> {keyValues["PatientFirstName"].ToString()} </br>";
+                    //                        }
+                    //                        if (keyValues.ContainsKey("PatientLastName"))
+                    //                        {
+                    //                            msg.body += $"<strong>Patient Name:</strong> {keyValues["PatientLastName"].ToString()} </br>";
+                    //                        }
+                    //                    }
+                    //                    if (keyValues.ContainsKey("DateOfBirth"))
+                    //                    {
+                    //                        DateTime dob = DateTime.Parse(keyValues["DateOfBirth"].ToString());
+                    //                        msg.body += $"<strong>Dob:</strong> {dob:MM-dd-yyyy} </br>";
+                    //                    }
+                    //                    msg.body += keyValues.ContainsKey("MedicalRecordNumber") ? $"<strong>Medical Record Number:</strong> {keyValues["MedicalRecordNumber"].ToString()} </br>" : "";
+                    //                    msg.body += keyValues.ContainsKey("CallbackNumber") && keyValues["CallbackNumber"].ToString() != "(___) ___-____" ? $"<strong>Callback Number:</strong> {keyValues["CallbackNumber"].ToString()} </br>" : "";
+                    //                    _communicationService.sendPushNotification(msg);
 
-                                    var orgByServiceId = _dptRepo.Table.Where(x => !x.IsDeleted && x.DepartmentId == _serviceLineRepo.Table.Where(x => !x.IsDeleted && x.ServiceLineId == serviceLineId).Select(x => x.DepartmentIdFk).FirstOrDefault()).Select(x => x.OrganizationIdFk).FirstOrDefault();
-                                    var showAllAccessUsers = this._dbContext.LoadStoredProcedure("md_getUsersOfComponentAccess")
-                                                                                   .WithSqlParam("@componentName", "Show Consults,Show All Consults,Show Graphs")
-                                                                                   .WithSqlParam("@orgId", orgByServiceId.Value)
-                                                                                   .ExecuteStoredProc<RegisterCredentialVM>(); //.Select(x => new { x.UserUniqueId, x.UserId }).Distinct().ToList();
-                                    users.AddRange(showAllAccessUsers);
-                                    distinctUsers = users.Select(x => new { x.UserUniqueId, x.UserId }).Distinct().ToList();
-                                    var notification = new PushNotificationVM()
-                                    {
-                                        Id = keyValues["CallbackNumber"].ToString().ToInt(),
-                                        OrgId = orgByServiceId.Value,
-                                        UserChannelSid = users.Select(x => x.UserUniqueId).Distinct().ToList(),
-                                        From = "Consult",
-                                        Msg = "New Consult is Created",
-                                        RouteLink1 = "/Home/Dashboard",
-                                        RouteLink2 = "/Home/Consult"
-                                    };
+                    //                    var orgByServiceId = _dptRepo.Table.Where(x => !x.IsDeleted && x.DepartmentId == _serviceLineRepo.Table.Where(x => !x.IsDeleted && x.ServiceLineId == serviceLineId).Select(x => x.DepartmentIdFk).FirstOrDefault()).Select(x => x.OrganizationIdFk).FirstOrDefault();
+                    //                    var showAllAccessUsers = this._dbContext.LoadStoredProcedure("md_getUsersOfComponentAccess")
+                    //                                                                   .WithSqlParam("@componentName", "Show Consults,Show All Consults,Show Graphs")
+                    //                                                                   .WithSqlParam("@orgId", orgByServiceId.Value)
+                    //                                                                   .ExecuteStoredProc<RegisterCredentialVM>(); //.Select(x => new { x.UserUniqueId, x.UserId }).Distinct().ToList();
+                    //                    users.AddRange(showAllAccessUsers);
+                    //                    distinctUsers = users.Select(x => new { x.UserUniqueId, x.UserId }).Distinct().ToList();
+                    //                    var notification = new PushNotificationVM()
+                    //                    {
+                    //                        Id = keyValues["CallbackNumber"].ToString().ToInt(),
+                    //                        OrgId = orgByServiceId.Value,
+                    //                        UserChannelSid = users.Select(x => x.UserUniqueId).Distinct().ToList(),
+                    //                        From = "Consult",
+                    //                        Msg = "New Consult is Created",
+                    //                        RouteLink1 = "/Home/Dashboard",
+                    //                        RouteLink2 = "/Home/Consult"
+                    //                    };
 
-                                    _communicationService.pushNotification(notification);
-                                }
-                            }
-                        }
-                        else if (users != null && users.Count > 0)
-                        {
-                            //string uniqueName = $"CONSULT_{Consult_Counter.Counter_Value.ToString()}";
-                            string ServiceName = this._serviceLineRepo.Table.Where(x => x.ServiceLineId == serviceLineId && !x.IsDeleted).Select(x => x.ServiceName).FirstOrDefault();
-                            string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
-                            string friendlyName = $"{consultType} {ServiceName} Consult {Consult_Counter.Counter_Value}";
-                            var channel = _communicationService.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
+                    //                    _communicationService.pushNotification(notification);
+                    //                }
+                    //            }
+                    //        }
+                    //        else if (users != null && users.Count > 0)
+                    //        {
+                    //            //string uniqueName = $"CONSULT_{Consult_Counter.Counter_Value.ToString()}";
+                    //            string ServiceName = this._serviceLineRepo.Table.Where(x => x.ServiceLineId == serviceLineId && !x.IsDeleted).Select(x => x.ServiceName).FirstOrDefault();
+                    //            string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
+                    //            string friendlyName = $"{consultType} {ServiceName} Consult {Consult_Counter.Counter_Value}";
+                    //            var channel = _communicationService.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
 
-                            //////////////// Update Consult For ChannelSid ////////////////////////////
+                    //            //////////////// Update Consult For ChannelSid ////////////////////////////
 
-                            string ConsultId = keyValues["ConsultId"].ToString();
-                            string qry = $"UPDATE [dbo].[Consults] SET [ChannelSid] = '{channel.Sid}'";
+                    //            string ConsultId = keyValues["ConsultId"].ToString();
+                    //            string qry = $"UPDATE [dbo].[Consults] SET [ChannelSid] = '{channel.Sid}'";
 
-                            qry += $" WHERE ConsultNumber = '{Consult_Counter.Counter_Value}'";
+                    //            qry += $" WHERE ConsultNumber = '{Consult_Counter.Counter_Value}'";
 
-                            int rowUpdate = this._dbContext.Database.ExecuteSqlRaw(qry);
+                    //            int rowUpdate = this._dbContext.Database.ExecuteSqlRaw(qry);
 
-                            ///////////////////////////////////////////////////////////////////////////
+                    //            ///////////////////////////////////////////////////////////////////////////
 
-                            List<ConsultAcknowledgment> consultAcknowledgmentList = new();
-                            var distinctUsers = users.Select(x => new { x.UserUniqueId, x.UserId }).Distinct().ToList();
-                            foreach (var item in distinctUsers)
-                            {
-                                try
-                                {
-                                    this._communicationService.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
-                                    var acknowledgeConsult = new ConsultAcknowledgment
-                                    {
-                                        IsAcknowledge = false,
-                                        ConsultIdFk = Consult_Counter.Counter_Value,
-                                        UserIdFk = item.UserId,
-                                        CreatedBy = ApplicationSettings.UserId,
-                                        CreatedDate = DateTime.UtcNow
-                                    };
-                                    consultAcknowledgmentList.Add(acknowledgeConsult);
-                                }
-                                catch (Exception ex)
-                                {
+                    //            List<ConsultAcknowledgment> consultAcknowledgmentList = new();
+                    //            var distinctUsers = users.Select(x => new { x.UserUniqueId, x.UserId }).Distinct().ToList();
+                    //            foreach (var item in distinctUsers)
+                    //            {
+                    //                try
+                    //                {
+                    //                    this._communicationService.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
+                    //                    var acknowledgeConsult = new ConsultAcknowledgment
+                    //                    {
+                    //                        IsAcknowledge = false,
+                    //                        ConsultIdFk = Consult_Counter.Counter_Value,
+                    //                        UserIdFk = item.UserId,
+                    //                        CreatedBy = ApplicationSettings.UserId,
+                    //                        CreatedDate = DateTime.UtcNow
+                    //                    };
+                    //                    consultAcknowledgmentList.Add(acknowledgeConsult);
+                    //                }
+                    //                catch (Exception ex)
+                    //                {
 
-                                }
-                            }
-                            this._consultAcknowledgmentRepo.Insert(consultAcknowledgmentList);
-                            var msg = new ConversationMessageVM();
-                            msg.author = "System";
-                            msg.attributes = "";
-                            msg.body = $"<strong>{consultType} {ServiceName} Consult </strong> </br></br>";
-                            if (keyValues.ContainsKey("PatientFirstName") && keyValues.ContainsKey("PatientLastName"))
-                            {
-                                msg.body += $"<strong>Patient Name:</strong> {keyValues["PatientFirstName"].ToString()} {keyValues["PatientLastName"].ToString()} </br>";
-                            }
-                            else
-                            {
-                                if (keyValues.ContainsKey("PatientFirstName"))
-                                {
-                                    msg.body += $"<strong>Patient Name:</strong> {keyValues["PatientFirstName"].ToString()} </br>";
-                                }
-                                if (keyValues.ContainsKey("PatientLastName"))
-                                {
-                                    msg.body += $"<strong>Patient Name:</strong> {keyValues["PatientLastName"].ToString()} </br>";
-                                }
-                            }
-                            if (keyValues.ContainsKey("DateOfBirth"))
-                            {
-                                DateTime dob = DateTime.Parse(keyValues["DateOfBirth"].ToString());
-                                msg.body += $"<strong>Dob:</strong> {dob:MM-dd-yyyy} </br>";
-                            }
-                            msg.body += keyValues.ContainsKey("MedicalRecordNumber") ? $"<strong>Medical Record Number:</strong> {keyValues["MedicalRecordNumber"].ToString()} </br>" : "";
-                            msg.body += keyValues.ContainsKey("CallbackNumber") && keyValues["CallbackNumber"].ToString() != "(___) ___-____" ? $"<strong>Callback Number:</strong> {keyValues["CallbackNumber"].ToString()} </br>" : "";
-                            msg.channelSid = channel.Sid;
+                    //                }
+                    //            }
+                    //            this._consultAcknowledgmentRepo.Insert(consultAcknowledgmentList);
+                    //            var msg = new ConversationMessageVM();
+                    //            msg.author = "System";
+                    //            msg.attributes = "";
+                    //            msg.body = $"<strong>{consultType} {ServiceName} Consult </strong> </br></br>";
+                    //            if (keyValues.ContainsKey("PatientFirstName") && keyValues.ContainsKey("PatientLastName"))
+                    //            {
+                    //                msg.body += $"<strong>Patient Name:</strong> {keyValues["PatientFirstName"].ToString()} {keyValues["PatientLastName"].ToString()} </br>";
+                    //            }
+                    //            else
+                    //            {
+                    //                if (keyValues.ContainsKey("PatientFirstName"))
+                    //                {
+                    //                    msg.body += $"<strong>Patient Name:</strong> {keyValues["PatientFirstName"].ToString()} </br>";
+                    //                }
+                    //                if (keyValues.ContainsKey("PatientLastName"))
+                    //                {
+                    //                    msg.body += $"<strong>Patient Name:</strong> {keyValues["PatientLastName"].ToString()} </br>";
+                    //                }
+                    //            }
+                    //            if (keyValues.ContainsKey("DateOfBirth"))
+                    //            {
+                    //                DateTime dob = DateTime.Parse(keyValues["DateOfBirth"].ToString());
+                    //                msg.body += $"<strong>Dob:</strong> {dob:MM-dd-yyyy} </br>";
+                    //            }
+                    //            msg.body += keyValues.ContainsKey("MedicalRecordNumber") ? $"<strong>Medical Record Number:</strong> {keyValues["MedicalRecordNumber"].ToString()} </br>" : "";
+                    //            msg.body += keyValues.ContainsKey("CallbackNumber") && keyValues["CallbackNumber"].ToString() != "(___) ___-____" ? $"<strong>Callback Number:</strong> {keyValues["CallbackNumber"].ToString()} </br>" : "";
+                    //            msg.channelSid = channel.Sid;
 
-                            var sendMsg = _communicationService.sendPushNotification(msg);
+                    //            var sendMsg = _communicationService.sendPushNotification(msg);
 
-                            var orgByServiceId = _dptRepo.Table.Where(x => !x.IsDeleted && x.DepartmentId == _serviceLineRepo.Table.Where(x => !x.IsDeleted && x.ServiceLineId == serviceLineId).Select(x => x.DepartmentIdFk).FirstOrDefault()).Select(x => x.OrganizationIdFk).FirstOrDefault();
-                            var showAllAccessUsers = this._dbContext.LoadStoredProcedure("md_getUsersOfComponentAccess")
-                                               .WithSqlParam("@componentName", "Show Consults,Show All Consults,Show Graphs")
-                                               .WithSqlParam("@orgId", orgByServiceId.Value)
-                                               .ExecuteStoredProc<RegisterCredentialVM>(); //.Select(x => new { x.UserUniqueId, x.UserId }).Distinct().ToList();
-                            users.AddRange(showAllAccessUsers);
-                            distinctUsers = users.Select(x => new { x.UserUniqueId, x.UserId }).Distinct().ToList();
-                            var notification = new PushNotificationVM()
-                            {
-                                Id = keyValues["CallbackNumber"].ToString().ToInt(),
-                                OrgId = orgByServiceId.Value,
-                                UserChannelSid = distinctUsers.Select(x => x.UserUniqueId).Distinct().ToList(),
-                                From = "Consult",
-                                Msg = "New Consult is Created",
-                                RouteLink1 = "/Home/Dashboard",
-                                RouteLink2 = "/Home/Consult"
-                            };
+                    //            var orgByServiceId = _dptRepo.Table.Where(x => !x.IsDeleted && x.DepartmentId == _serviceLineRepo.Table.Where(x => !x.IsDeleted && x.ServiceLineId == serviceLineId).Select(x => x.DepartmentIdFk).FirstOrDefault()).Select(x => x.OrganizationIdFk).FirstOrDefault();
+                    //            var showAllAccessUsers = this._dbContext.LoadStoredProcedure("md_getUsersOfComponentAccess")
+                    //                               .WithSqlParam("@componentName", "Show Consults,Show All Consults,Show Graphs")
+                    //                               .WithSqlParam("@orgId", orgByServiceId.Value)
+                    //                               .ExecuteStoredProc<RegisterCredentialVM>(); //.Select(x => new { x.UserUniqueId, x.UserId }).Distinct().ToList();
+                    //            users.AddRange(showAllAccessUsers);
+                    //            distinctUsers = users.Select(x => new { x.UserUniqueId, x.UserId }).Distinct().ToList();
+                    //            var notification = new PushNotificationVM()
+                    //            {
+                    //                Id = keyValues["CallbackNumber"].ToString().ToInt(),
+                    //                OrgId = orgByServiceId.Value,
+                    //                UserChannelSid = distinctUsers.Select(x => x.UserUniqueId).Distinct().ToList(),
+                    //                From = "Consult",
+                    //                Msg = "New Consult is Created",
+                    //                RouteLink1 = "/Home/Dashboard",
+                    //                RouteLink2 = "/Home/Consult"
+                    //            };
 
-                            _communicationService.pushNotification(notification);
-                        }
-                    }
+                    //            _communicationService.pushNotification(notification);
+                    //        }
+                    //    }
 
-                    return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Added Successfully" };
+                    return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Added Successfully", Body = keyValues };
                 }
                 else
                 {
-                    return new BaseResponse() { Status = HttpStatusCode.OK, Message = "No Record Added" };
+                    return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = "No Record Added" };
                 }
             }
             if (isConsultIdExist && keyValues["ConsultId"].ToString() != "0")
@@ -686,14 +686,246 @@ namespace Web.Services.Concrete
                 }
                 else
                 {
-                    return new BaseResponse() { Status = HttpStatusCode.OK, Message = "No Record Updated" };
+                    return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = "No Record Updated" };
                 }
             }
 
 
             return new BaseResponse() { Status = HttpStatusCode.NotModified, Message = "Consult Id Column is not exist" };
         }
+        public BaseResponse CreateConsultGroup(IDictionary<string, object> keyValues)
+        {
 
+            var keys = keyValues.Keys.ToList();
+            var values = keyValues.Values.ToList();
+            bool usersFound = false;
+            var Consult_Counter = keyValues["Consult_Counter"].ToString().ToLong();
+            if (keys.Contains("ServiceLineIdFk") && keyValues["ServiceLineIdFk"].ToString() != "0")
+            {
+                var serviceLineId = keyValues["ServiceLineIdFk"].ToString().ToInt();
+
+                var users = _dbContext.LoadStoredProcedure("md_getAvailableUserOnSchedule")
+                            .WithSqlParam("@servicelineIdFk", serviceLineId)
+                            .WithSqlParam("@dayOfWeek", DateTime.UtcNow.DayOfWeek.ToString())
+                            .ExecuteStoredProc<RegisterCredentialVM>();
+                usersFound = users.Count() > 0;
+                var consultType = _controlListDetailsRepo.Table.Where(x => x.ControlListDetailId == keyValues["ConsultType"].ToString().ToInt()).Select(x => x.Title).FirstOrDefault();
+
+                var conversationChannelAttributes = JsonConvert.SerializeObject(new Dictionary<string, Object>()
+                                    {
+                                        {ChannelAttributeEnums.ChannelType.ToString(), ChannelTypeEnums.Consult.ToString()},
+                                        {ChannelAttributeEnums.ConsultId.ToString(), Consult_Counter}
+                                    }, Formatting.Indented);
+
+                var superAdmins = this._usersRepo.Table.Where(x => x.IsInGroup && !x.IsDeleted).Select(x => new RegisterCredentialVM() { UserUniqueId = x.UserUniqueId, UserId = x.UserId }).ToList();
+                users.AddRange(superAdmins);
+                var loggedUser = (from u in this._usersRepo.Table
+                                  where u.UserId == ApplicationSettings.UserId
+                                  select new RegisterCredentialVM
+                                  {
+                                      UserUniqueId = u.UserUniqueId,
+                                      UserId = u.UserId
+                                  }).FirstOrDefault();
+                users.Add(loggedUser);
+
+                if (users != null && users.Count > 0 && users.FirstOrDefault().IsAfterHours == true)
+                {
+                    if (keys.Contains("ConsultType") && keyValues["ConsultType"].ToString() != null && keyValues["ConsultType"].ToString() != "")
+                    {
+
+                        if (consultType != null && consultType == "Urgent")
+                        {
+                            //string uniqueName = $"CONSULT_{Consult_Counter.ToString()}";
+                            string ServiceName = this._serviceLineRepo.Table.Where(x => x.ServiceLineId == serviceLineId && !x.IsDeleted).Select(x => x.ServiceName).FirstOrDefault();
+                            string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
+                            string friendlyName = $"{consultType} {ServiceName} Consult {Consult_Counter}";
+                            var channel = _communicationService.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
+
+                            ////////////// Update Consult For ChannelSid ////////////////////////////
+
+                            string ConsultId = keyValues["ConsultId"].ToString();
+                            string qry = $"UPDATE [dbo].[Consults] SET [ChannelSid] = '{channel.Sid}'";
+
+                            qry += $" WHERE ConsultNumber = '{Consult_Counter}'";
+
+                            int rowUpdate = this._dbContext.Database.ExecuteSqlRaw(qry);
+
+                            /////////////////////////////////////////////////////////////////////////
+
+
+                            List<ConsultAcknowledgment> consultAcknowledgmentList = new();
+                            users = users.Distinct().ToList();
+                            var distinctUsers = users.Select(x => new { x.UserUniqueId, x.UserId }).Distinct().ToList();
+
+                            foreach (var item in distinctUsers)
+                            {
+                                try
+                                {
+                                    this._communicationService.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
+                                    var acknowledgeConsult = new ConsultAcknowledgment
+                                    {
+                                        IsAcknowledge = false,
+                                        ConsultIdFk = Consult_Counter,
+                                        UserIdFk = item.UserId,
+                                        CreatedBy = ApplicationSettings.UserId,
+                                        CreatedDate = DateTime.UtcNow
+                                    };
+                                    consultAcknowledgmentList.Add(acknowledgeConsult);
+                                }
+                                catch (Exception ex)
+                                {
+
+                                }
+                            }
+                            this._consultAcknowledgmentRepo.Insert(consultAcknowledgmentList);
+                            var msg = new ConversationMessageVM();
+                            msg.channelSid = channel.Sid;
+                            msg.author = "System";
+                            msg.attributes = "";
+                            msg.body = $"<strong> {consultType} {ServiceName} Consult</strong></br></br>";
+                            if (keyValues.ContainsKey("PatientFirstName") && keyValues.ContainsKey("PatientLastName"))
+                            {
+                                msg.body += $"<strong>Patient Name:</strong> {keyValues["PatientFirstName"].ToString()} {keyValues["PatientLastName"].ToString()} </br>";
+                            }
+                            else
+                            {
+                                if (keyValues.ContainsKey("PatientFirstName"))
+                                {
+                                    msg.body += $"<strong>Patient Name:</strong> {keyValues["PatientFirstName"].ToString()} </br>";
+                                }
+                                if (keyValues.ContainsKey("PatientLastName"))
+                                {
+                                    msg.body += $"<strong>Patient Name:</strong> {keyValues["PatientLastName"].ToString()} </br>";
+                                }
+                            }
+                            if (keyValues.ContainsKey("DateOfBirth"))
+                            {
+                                DateTime dob = DateTime.Parse(keyValues["DateOfBirth"].ToString());
+                                msg.body += $"<strong>Dob:</strong> {dob:MM-dd-yyyy} </br>";
+                            }
+                            msg.body += keyValues.ContainsKey("MedicalRecordNumber") ? $"<strong>Medical Record Number:</strong> {keyValues["MedicalRecordNumber"].ToString()} </br>" : "";
+                            msg.body += keyValues.ContainsKey("CallbackNumber") && keyValues["CallbackNumber"].ToString() != "(___) ___-____" ? $"<strong>Callback Number:</strong> {keyValues["CallbackNumber"].ToString()} </br>" : "";
+                            _communicationService.sendPushNotification(msg);
+
+                            var orgByServiceId = _dptRepo.Table.Where(x => !x.IsDeleted && x.DepartmentId == _serviceLineRepo.Table.Where(x => !x.IsDeleted && x.ServiceLineId == serviceLineId).Select(x => x.DepartmentIdFk).FirstOrDefault()).Select(x => x.OrganizationIdFk).FirstOrDefault();
+                            var showAllAccessUsers = this._dbContext.LoadStoredProcedure("md_getUsersOfComponentAccess")
+                                                                           .WithSqlParam("@componentName", "Show Consults,Show All Consults,Show Graphs")
+                                                                           .WithSqlParam("@orgId", orgByServiceId.Value)
+                                                                           .ExecuteStoredProc<RegisterCredentialVM>(); //.Select(x => new { x.UserUniqueId, x.UserId }).Distinct().ToList();
+                            users.AddRange(showAllAccessUsers);
+                            distinctUsers = users.Select(x => new { x.UserUniqueId, x.UserId }).Distinct().ToList();
+                            var notification = new PushNotificationVM()
+                            {
+                                Id = keyValues["CallbackNumber"].ToString().ToInt(),
+                                OrgId = orgByServiceId.Value,
+                                UserChannelSid = users.Select(x => x.UserUniqueId).Distinct().ToList(),
+                                From = "Consult",
+                                Msg = "New Consult is Created",
+                                RouteLink1 = "/Home/Dashboard",
+                                RouteLink2 = "/Home/Consult"
+                            };
+
+                            _communicationService.pushNotification(notification);
+                        }
+                    }
+                }
+                else if (users != null && users.Count > 0)
+                {
+                    //string uniqueName = $"CONSULT_{Consult_Counter.ToString()}";
+                    string ServiceName = this._serviceLineRepo.Table.Where(x => x.ServiceLineId == serviceLineId && !x.IsDeleted).Select(x => x.ServiceName).FirstOrDefault();
+                    string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
+                    string friendlyName = $"{consultType} {ServiceName} Consult {Consult_Counter}";
+                    var channel = _communicationService.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
+
+                    ////////////// Update Consult For ChannelSid ////////////////////////////
+
+                    string ConsultId = keyValues["ConsultId"].ToString();
+                    string qry = $"UPDATE [dbo].[Consults] SET [ChannelSid] = '{channel.Sid}'";
+
+                    qry += $" WHERE ConsultNumber = '{Consult_Counter}'";
+
+                    int rowUpdate = this._dbContext.Database.ExecuteSqlRaw(qry);
+
+                    /////////////////////////////////////////////////////////////////////////
+
+                    List<ConsultAcknowledgment> consultAcknowledgmentList = new();
+                    var distinctUsers = users.Select(x => new { x.UserUniqueId, x.UserId }).Distinct().ToList();
+                    foreach (var item in distinctUsers)
+                    {
+                        try
+                        {
+                            this._communicationService.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
+                            var acknowledgeConsult = new ConsultAcknowledgment
+                            {
+                                IsAcknowledge = false,
+                                ConsultIdFk = Consult_Counter,
+                                UserIdFk = item.UserId,
+                                CreatedBy = ApplicationSettings.UserId,
+                                CreatedDate = DateTime.UtcNow
+                            };
+                            consultAcknowledgmentList.Add(acknowledgeConsult);
+                        }
+                        catch (Exception ex)
+                        {
+
+                        }
+                    }
+                    this._consultAcknowledgmentRepo.Insert(consultAcknowledgmentList);
+                    var msg = new ConversationMessageVM();
+                    msg.author = "System";
+                    msg.attributes = "";
+                    msg.body = $"<strong>{consultType} {ServiceName} Consult </strong> </br></br>";
+                    if (keyValues.ContainsKey("PatientFirstName") && keyValues.ContainsKey("PatientLastName"))
+                    {
+                        msg.body += $"<strong>Patient Name:</strong> {keyValues["PatientFirstName"].ToString()} {keyValues["PatientLastName"].ToString()} </br>";
+                    }
+                    else
+                    {
+                        if (keyValues.ContainsKey("PatientFirstName"))
+                        {
+                            msg.body += $"<strong>Patient Name:</strong> {keyValues["PatientFirstName"].ToString()} </br>";
+                        }
+                        if (keyValues.ContainsKey("PatientLastName"))
+                        {
+                            msg.body += $"<strong>Patient Name:</strong> {keyValues["PatientLastName"].ToString()} </br>";
+                        }
+                    }
+                    if (keyValues.ContainsKey("DateOfBirth"))
+                    {
+                        DateTime dob = DateTime.Parse(keyValues["DateOfBirth"].ToString());
+                        msg.body += $"<strong>Dob:</strong> {dob:MM-dd-yyyy} </br>";
+                    }
+                    msg.body += keyValues.ContainsKey("MedicalRecordNumber") ? $"<strong>Medical Record Number:</strong> {keyValues["MedicalRecordNumber"].ToString()} </br>" : "";
+                    msg.body += keyValues.ContainsKey("CallbackNumber") && keyValues["CallbackNumber"].ToString() != "(___) ___-____" ? $"<strong>Callback Number:</strong> {keyValues["CallbackNumber"].ToString()} </br>" : "";
+                    msg.channelSid = channel.Sid;
+
+                    var sendMsg = _communicationService.sendPushNotification(msg);
+
+                    var orgByServiceId = _dptRepo.Table.Where(x => !x.IsDeleted && x.DepartmentId == _serviceLineRepo.Table.Where(x => !x.IsDeleted && x.ServiceLineId == serviceLineId).Select(x => x.DepartmentIdFk).FirstOrDefault()).Select(x => x.OrganizationIdFk).FirstOrDefault();
+                    var showAllAccessUsers = this._dbContext.LoadStoredProcedure("md_getUsersOfComponentAccess")
+                                       .WithSqlParam("@componentName", "Show Consults,Show All Consults,Show Graphs")
+                                       .WithSqlParam("@orgId", orgByServiceId.Value)
+                                       .ExecuteStoredProc<RegisterCredentialVM>(); //.Select(x => new { x.UserUniqueId, x.UserId }).Distinct().ToList();
+                    users.AddRange(showAllAccessUsers);
+                    distinctUsers = users.Select(x => new { x.UserUniqueId, x.UserId }).Distinct().ToList();
+                    var notification = new PushNotificationVM()
+                    {
+                        Id = keyValues["CallbackNumber"].ToString().ToInt(),
+                        OrgId = orgByServiceId.Value,
+                        UserChannelSid = distinctUsers.Select(x => x.UserUniqueId).Distinct().ToList(),
+                        From = "Consult",
+                        Msg = "New Consult is Created",
+                        RouteLink1 = "/Home/Dashboard",
+                        RouteLink2 = "/Home/Consult"
+                    };
+
+                    _communicationService.pushNotification(notification);
+                }
+            }
+
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Group Created Successfully",Body=new { serviceLineUsersFound = usersFound} };
+
+        }
         public BaseResponse ActiveOrInActiveConsult(int consultId, bool status)
         {
             var sql = "EXEC md_ActiveOrInActiveConsult @status, @userId, @consultId";

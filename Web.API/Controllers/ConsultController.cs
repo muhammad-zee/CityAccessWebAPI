@@ -217,6 +217,22 @@ namespace Web.API.Controllers
             }
         }
 
+        [Description("create Consult group")]
+        [HttpPost("consult/CreateConsultGroup")]
+        public BaseResponse CreateConsultGroup([FromBody]  IDictionary<string, object> keyValues)
+        {
+            try
+            {
+                return _consultService.CreateConsultGroup(keyValues);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
         [Description("Active Or InActive Consult Consult")]
         [HttpGet("consult/ActiveOrInActiveConsult/{consultId}/{status}")]
         public BaseResponse ActiveOrInActiveConsult(int consultId, bool status)
@@ -251,7 +267,6 @@ namespace Web.API.Controllers
 
 
         #endregion
-
 
         #region Consult Acknowledgments
 
