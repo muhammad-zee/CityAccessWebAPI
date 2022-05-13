@@ -108,27 +108,9 @@ namespace Web.Services.Concrete
         {
             if (!string.IsNullOrEmpty(departmentIds))
             {
-                //var idsList = departmentIds.ToIntList();
-                //var services = _serviceRepo.Table.Where(x => idsList.Contains(x.DepartmentIdFk) && x.IsDeleted != true).Select(x => new ServiceLineVM()
-                //{
-                //    ServiceLineId = x.ServiceLineId,
-                //    ServiceName = x.ServiceName,
-                //    DepartmentIdFk = x.DepartmentIdFk
-                //}).ToList();
                 var services = _dbContext.LoadStoredProcedure("md_getAllServicesByDepartmentIds")
-               .WithSqlParam("@pDeptartmentIds", departmentIds)
-           .ExecuteStoredProc<ServiceLineVM>();
-                //(from sl in _serviceRepo.Table
-                //                join d in _departmentRepo.Table on sl.DepartmentIdFk equals d.DepartmentId
-                //                join org in _organizationRepo.Table on d.OrganizationIdFk equals org.OrganizationId
-                //                where idsList.Contains(sl.DepartmentIdFk) && sl.IsDeleted != true && d.IsDeleted != true && org.IsDeleted != true
-                //                select new ServiceLineVM()
-                //                {
-                //                    ServiceLineId = sl.ServiceLineId,
-                //                    ServiceName = sl.ServiceName,
-                //                    DepartmentIdFk = d.DepartmentId
-                //                }).ToList();
-
+                                         .WithSqlParam("@pDeptartmentIds", departmentIds)
+                                         .ExecuteStoredProc<ServiceLineVM>();
                 return new BaseResponse()
                 {
                     Status = HttpStatusCode.OK,
@@ -327,16 +309,6 @@ namespace Web.Services.Concrete
                     OrganizationIdFk = x.OrganizationIdFk
                 }).ToList();
 
-                //this._departmentRepo.Table.Where(d=>d.IsDeleted!=true && idsList.Contains(d.OrganizationIdFk)).ToList()
-                //    (from od in _organizationDepartmentRepo.Table
-                //                  join d in _departmentRepo.Table on od.DepartmentIdFk equals d.DepartmentId
-                //                  where d.IsDeleted != true && idsList.Contains(od.OrganizationIdFk)
-                //                  select new DepartmentVM()
-                //                  {
-                //                      DepartmentId = d.DepartmentId,
-                //                      DepartmentName = d.DepartmentName,
-                //                      OrganizationIdFk = od.OrganizationIdFk
-                //                  }).DistinctBy(x => x.DepartmentName).ToList();
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Found", Body = department };
             }
             else

@@ -378,14 +378,14 @@ namespace Web.Services.Concrete
 
                 for (int i = 0; i < keys.Count(); i++)
                 {
-                    if (keys[i] != "ConsultId" && keys[i] != "CreatedBy" && keys[i] != "CreatedDate")
+                    if (keys[i] != "ConsultId" && keys[i] != "CreatedBy" && keys[i] != "CreatedDate" && keys[i] != "CallbackNumber")
                     {
                         query += $"[{keys[i]}]";
                         if ((i + 1) == keys.Count)
                         {
                             //if (keyValues.ContainsKey("DateOfBirth"))
                             //    query += ",[DateOfBirth]";
-
+                            query += keyValues.ContainsKey("CallbackNumber") ? ",[CallbackNumber]" : "";
                             query += ",[ConsultNumber]";
                             query += ",[CreatedBy]";
                             query += ",[CreatedDate]";
@@ -403,7 +403,7 @@ namespace Web.Services.Concrete
 
                 for (int i = 0; i < values.Count; i++)
                 {
-                    if (keys[i] != "ConsultId" && keys[i] != "CreatedBy" && keys[i] != "CreatedDate")
+                    if (keys[i] != "ConsultId" && keys[i] != "CreatedBy" && keys[i] != "CreatedDate" && keys[i] != "CallbackNumber")
                     {
                         query += $"'{values[i]}'";
                         if ((i + 1) == values.Count)
@@ -413,6 +413,7 @@ namespace Web.Services.Concrete
                             //    var dob = DateTime.Parse(keyValues["DateOfBirth"].ToString()).ToString("MM-dd-yyyy hh:mm:ss");
                             //    query += $",'{dob}'";
                             //}
+                            query += keyValues.ContainsKey("CallbackNumber") && keyValues["CallbackNumber"].ToString() != "(___) ___-____" ? keyValues["CallbackNumber"].ToString() : "";
                             query += $",'{Consult_Counter.Counter_Value}'";
                             query += $",'{ApplicationSettings.UserId}'";
                             query += $",'{DateTime.UtcNow}'";
@@ -667,7 +668,7 @@ namespace Web.Services.Concrete
 
                 for (int i = 0; i < keys.Count; i++)
                 {
-                    if (keys[i] != "ConsultId" && keys[i] != "ModifiedBy" && keys[i] != "ModifiedDate")
+                    if (keys[i] != "ConsultId" && keys[i] != "ModifiedBy" && keys[i] != "ModifiedDate" && keys[i] != "CallbackNumber")
                     {
                         query += $"[{keys[i]}] = '{values[i]}'";
                         if (i < keys.Count)
@@ -676,6 +677,7 @@ namespace Web.Services.Concrete
                         }
                     }
                 }
+                query += keyValues.ContainsKey("CallbackNumber") && keyValues["CallbackNumber"].ToString() != "(___) ___-____" ? " [CallbackNumber] =" + keyValues["CallbackNumber"].ToString() + "," : "";
                 query += $" [ModifiedBy] = '{ApplicationSettings.UserId}', [ModifiedDate] = '{DateTime.UtcNow.ToString("MM-dd-yyyy hh:mm:ss")}'";
                 query += $" WHERE ConsultId = '{ConsultId.ToInt()}'";
 
@@ -923,7 +925,7 @@ namespace Web.Services.Concrete
                 }
             }
 
-            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Group Created Successfully",Body=new { serviceLineUsersFound = usersFound} };
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Group Created Successfully", Body = new { serviceLineUsersFound = usersFound } };
 
         }
         public BaseResponse ActiveOrInActiveConsult(int consultId, bool status)
