@@ -64,6 +64,7 @@ namespace Web.API.Controllers
         }
 
         [AllowAnonymous]
+        [RequestHandler]
         [Description("Update Password")]
         [HttpPost("auth/UpdatePassword")]
         public BaseResponse UpdatePassword([FromBody] UserCredentialVM model)

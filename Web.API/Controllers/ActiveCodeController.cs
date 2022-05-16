@@ -393,11 +393,11 @@ namespace Web.API.Controllers
         #endregion
 
 
-        #region Code Truma
+        #region Code Trauma
 
-        [Description("Get All Truma Data")]
-        [HttpPost("Truma/GetAllTrumaData")]
-        public BaseResponse GetAllTrumaData([FromBody] ActiveCodeVM activeCode)
+        [Description("Get All Trauma Data")]
+        [HttpPost("Trauma/GetAllTraumaData")]
+        public BaseResponse GetAllTraumaData([FromBody] ActiveCodeVM activeCode)
         {
             try
             {
@@ -410,13 +410,13 @@ namespace Web.API.Controllers
             }
         }
 
-        [Description("Get Truma Data By Id")]
-        [HttpGet("Truma/GetTrumaDataById/{TrumaId}")]
-        public BaseResponse GetTrumaDataById(int TrumaId)
+        [Description("Get Trauma Data By Id")]
+        [HttpGet("Trauma/GetTraumaDataById/{TraumaId}")]
+        public BaseResponse GetTraumaDataById(int TraumaId)
         {
             try
             {
-                return _activeCodesService.GetTrumaDataById(TrumaId);
+                return _activeCodesService.GetTrumaDataById(TraumaId);
             }
             catch (Exception ex)
             {
@@ -427,13 +427,13 @@ namespace Web.API.Controllers
         }
 
 
-        [Description("Add Or Update Truma")]
-        [HttpPost("Truma/AddOrUpdateTruma")]
-        public BaseResponse AddOrUpdateTruma([FromBody] CodeTrumaVM codeTruma)
+        [Description("Add Or Update Trauma")]
+        [HttpPost("Trauma/AddOrUpdateTrauma")]
+        public BaseResponse AddOrUpdateTrauma([FromBody] CodeTrumaVM codeTrauma)
         {
             try
             {
-                return _activeCodesService.AddOrUpdateTrumaData(codeTruma);
+                return _activeCodesService.AddOrUpdateTrumaData(codeTrauma);
             }
             catch (Exception ex)
             {
@@ -444,13 +444,13 @@ namespace Web.API.Controllers
         }
 
 
-        [Description("Delete Truma Data By Id")]
-        [HttpGet("Truma/DeleteTrumaDataById/{TrumaId}/{status}")]
-        public BaseResponse DeleteTrumaDataById(int TrumaId, bool status)
+        [Description("Delete Trauma Data By Id")]
+        [HttpGet("Trauma/DeleteTraumaDataById/{TraumaId}/{status}")]
+        public BaseResponse DeleteTraumaDataById(int TraumaId, bool status)
         {
             try
             {
-                return _activeCodesService.DeleteTruma(TrumaId, status);
+                return _activeCodesService.DeleteTruma(TraumaId, status);
             }
             catch (Exception ex)
             {
@@ -460,13 +460,13 @@ namespace Web.API.Controllers
             }
         }
 
-        [Description("Active/InActive Truma Data By Id")]
-        [HttpGet("Truma/ActiveOrInActiveTrumaDataById/{TrumaId}/{status}")]
-        public BaseResponse ActiveOrInActiveTrumaDataById(int TrumaId, bool status)
+        [Description("Active/InActive Trauma Data By Id")]
+        [HttpGet("Trauma/ActiveOrInActiveTraumaDataById/{TraumaId}/{status}")]
+        public BaseResponse ActiveOrInActiveTraumaDataById(int TraumaId, bool status)
         {
             try
             {
-                return _activeCodesService.ActiveOrInActiveTruma(TrumaId, status);
+                return _activeCodesService.ActiveOrInActiveTruma(TraumaId, status);
             }
             catch (Exception ex)
             {

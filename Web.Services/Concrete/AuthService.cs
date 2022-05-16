@@ -179,6 +179,10 @@ namespace Web.Services.Concrete
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Secret"]));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
             List<UserRoleVM> UserRole = this._adminService.getRoleListByUserId(user.UserId).ToList();
+            var settings = this._dbContext.LoadStoredProcedure("md_getSettingsByUserId")
+                                .WithSqlParam("@userId", user.UserId)
+                                .ExecuteStoredProc<SettingsVM>().FirstOrDefault();
+
             var claims = new[]
             {
                     new Claim(JwtRegisteredClaimNames.Sub, user.PrimaryEmail),
@@ -186,6 +190,7 @@ namespace Web.Services.Concrete
                     new Claim("RoleIds",string.Join(",",UserRole.Select(x => x.RoleId).ToList())),
                     new Claim("isEMS", (UserRole.Where(x => x.RoleName == "EMS").Count() > 0).ToString()),
                     new Claim("isSuperAdmin",UserRole.Any(x =>x.IsSuperAdmin).ToString()),
+                    new Claim("organizationId", (settings != null ? settings.OrganizationIdFk.ToString() : "0")),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
 
             };
@@ -193,9 +198,6 @@ namespace Web.Services.Concrete
 
 
             /////////////////  Set user Two Factor Settings According to Organization Setting /////////////////
-            var settings = this._dbContext.LoadStoredProcedure("md_getSettingsByUserId")
-                                .WithSqlParam("@userId", user.UserId)
-                                .ExecuteStoredProc<SettingsVM>().FirstOrDefault();
             if (settings != null)
             {
                 user.TwoFactorEnabled = settings.TwoFactorEnabled;
@@ -204,7 +206,7 @@ namespace Web.Services.Concrete
                 tokenExpiryTime = settings.TokenExpiryTime > 0 ? DateTime.UtcNow.AddDays(settings.TokenExpiryTime.Value) : tokenExpiryTime;
             }
             ///////////////////////////////////////////////////////////////////////////////////////////////////
-
+            
             ////////////////////// Checking Verified for future or not ////////////////////////////////////////
             if (user.TwoFactorEnabled && user.IsTwoFactRememberChecked && DateTime.UtcNow <= user.TwoFactorExpiryDate)
             {
@@ -248,6 +250,12 @@ namespace Web.Services.Concrete
 
         public BaseResponse ConfirmPassword(UserCredentialVM modelUser)
         {
+            var OrgSettings = this._dbContext.LoadStoredProcedure("md_getOrganizationSettings")
+                                .WithSqlParam("@IsSuperAdmin", ApplicationSettings.isSuperAdmin)
+                                .WithSqlParam("@IsEMS", ApplicationSettings.isEMS)
+                                .WithSqlParam("@orgId", ApplicationSettings.OrganizationId)
+                                .ExecuteStoredProc<Setting>().FirstOrDefault();
+
             var user = _userRepo.Table.Where(x => x.UserName == modelUser.username && x.IsDeleted != true).FirstOrDefault();
             if (user != null)
             {
@@ -257,7 +265,7 @@ namespace Web.Services.Concrete
                 }
                 user.IsRequirePasswordReset = false;                
                 user.Password = modelUser.password;
-                user.PasswordExpiryDate = user.PasswordExpiryDate.HasValue ? user.PasswordExpiryDate.Value.AddMonths(1) : DateTime.UtcNow.AddMonths(1);
+                user.PasswordExpiryDate = OrgSettings != null && OrgSettings.EnablePasswordAge.HasValue ? DateTime.UtcNow.AddDays(OrgSettings.EnablePasswordAge.Value) : user.PasswordExpiryDate.Value.AddMonths(1);
                 _userRepo.Update(user);
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Password Updated" };
             }
@@ -702,8 +710,13 @@ namespace Web.Services.Concrete
             {
                 var userOldPass = Encryption.decryptData(user.Password, this._encryptionKey);
                 var oldPass = Encryption.decryptData(changePassword.OldPassword, this._encryptionKey);
+                var newpasscode = Encryption.decryptData(changePassword.NewPassword, this._encryptionKey);
                 if (userOldPass == oldPass)
                 {
+                    if (oldPass == newpasscode)
+                    {
+                        return new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "Old password and new password could not be same. Please update with new Password." };
+                    }
                     user.TwoFactorEnabled = OrgSettings.TwoFactorEnable;
                     user.TwoFactorExpiryDate = OrgSettings.TwoFactorAuthenticationExpiryMinutes > 0 ? DateTime.UtcNow.AddMinutes(OrgSettings.TwoFactorAuthenticationExpiryMinutes) : user.TwoFactorExpiryDate;
                     user.PasswordExpiryDate = passwordExpiryDate;
@@ -715,7 +728,7 @@ namespace Web.Services.Concrete
                 }
                 else
                 {
-                    return new BaseResponse() { Status = HttpStatusCode.NotModified, Message = "Old Password is not correct. Please write correct old password" };
+                    return new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "Old Password is not correct. Please write correct old password" };
                 }
             }
             else
@@ -723,6 +736,7 @@ namespace Web.Services.Concrete
                 user.TwoFactorEnabled = OrgSettings.TwoFactorEnable;
                 user.TwoFactorExpiryDate = OrgSettings.TwoFactorAuthenticationExpiryMinutes > 0 ? DateTime.UtcNow.AddMinutes(OrgSettings.TwoFactorAuthenticationExpiryMinutes) : user.TwoFactorExpiryDate;
                 user.PasswordExpiryDate = passwordExpiryDate;
+                user.IsRequirePasswordReset = true;
                 user.Password = changePassword.NewPassword;
                 user.ModifiedBy = ApplicationSettings.UserId;
                 user.ModifiedDate = DateTime.UtcNow;
