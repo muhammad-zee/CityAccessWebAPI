@@ -251,8 +251,13 @@ namespace Web.Services.Concrete
             var user = _userRepo.Table.Where(x => x.UserName == modelUser.username && x.IsDeleted != true).FirstOrDefault();
             if (user != null)
             {
-                user.IsRequirePasswordReset = false;
+                if (Encryption.decryptData(user.Password, this._encryptionKey) == Encryption.decryptData(modelUser.password, this._encryptionKey))
+                {
+                    return new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "Password matches the previous password. Please update with new Password." };
+                }
+                user.IsRequirePasswordReset = false;                
                 user.Password = modelUser.password;
+                user.PasswordExpiryDate = user.PasswordExpiryDate.HasValue ? user.PasswordExpiryDate.Value.AddMonths(1) : DateTime.UtcNow.AddMonths(1);
                 _userRepo.Update(user);
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Password Updated" };
             }
