@@ -707,10 +707,13 @@ namespace Web.Services.Concrete
                     var participant = new ConversationParticipant();
                     delete = MemberResource.Delete(pathServiceSid: this.Twilio_ChatServiceSid, pathChannelSid: ChannelSid, pathSid: item.Sid);
                     participant = this._conversationParticipantsRepo.Table.Where(x => x.ConversationChannelIdFk == channelId && !x.IsDeleted).FirstOrDefault();
-                    participant.IsDeleted = true;
-                    participant.ModifiedBy = ApplicationSettings.UserId;
-                    participant.ModifiedDate = DateTime.UtcNow;
-                    participantsList.Add(participant);
+                    if (participant != null) 
+                    {
+                        participant.IsDeleted = true;
+                        participant.ModifiedBy = ApplicationSettings.UserId;
+                        participant.ModifiedDate = DateTime.UtcNow;
+                        participantsList.Add(participant);
+                    }
                 }
                 if (participantsList.Count > 0)
                     this._conversationParticipantsRepo.Update(participantsList);

@@ -33,6 +33,7 @@ namespace Web.Model.Common
         public TimeSpan? ActualTime { get; set; }
         public string Distance { get; set; }
         public string StartingPoint { get; set; }
+        public string ChannelSid { get; set; }
         public int DefaultServiceLineId { get; set; }
         public string SelectedServiceLineIds { get; set; }
         public ServiceLineVM DefaultServiceLine { get; set; }

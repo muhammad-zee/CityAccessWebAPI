@@ -672,7 +672,7 @@ namespace Web.Services.Concrete
                 row.Hpi = codeStroke.Hpi;
                 row.BloodThinners = codeStroke.BloodThinners;
                 row.FamilyContactName = codeStroke.FamilyContactName;
-                row.FamilyContactNumber = codeStroke.FamilyContactNumber;
+                row.FamilyContactNumber = codeStroke.FamilyContactNumber != null && codeStroke.FamilyContactNumber != "" && codeStroke.FamilyContactNumber != "(___) ___-____" ? codeStroke.FamilyContactNumber : "";
                 row.IsEms = codeStroke.IsEms;
                 //row.IsCompleted = codeStroke.IsCompleted;
                 if (codeStroke.IsCompleted != null && codeStroke.IsCompleted == true && row.IsCompleted != true)
@@ -969,114 +969,130 @@ namespace Web.Services.Concrete
 
                 this._codeStrokeRepo.Update(row);
 
-                if (codeStroke.DefaultServiceLineIds == null || codeStroke.DefaultServiceLineIds == "")
+                //if (codeStroke.DefaultServiceLineIds == null || codeStroke.DefaultServiceLineIds == "")
+                //{
+                //    string IsEMS = row.IsEms.HasValue && row.IsEms.Value ? "EMS Code" : "Inhouse Code";
+                //    codeStroke.DefaultServiceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeStroke.OrganizationIdFk && x.CodeIdFk == UCLEnums.Stroke.ToInt() && x.Type == IsEMS && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
+                //}
+
+                //if (codeStroke.DefaultServiceLineIds != null && codeStroke.DefaultServiceLineIds != "")
+                //{
+                //    var DefaultServiceLineIds = codeStroke.DefaultServiceLineIds.ToIntList();
+                //    var ServiceLineTeam1Ids = codeStroke.ServiceLineTeam1Ids.ToIntList();
+                //    var ServiceLineTeam2Ids = codeStroke.ServiceLineTeam2Ids.ToIntList();
+
+                //    var codeServiceMapping = this._codesServiceLinesMappingRepo.Table.Where(x => x.OrganizationIdFk == row.OrganizationIdFk && x.CodeIdFk == UCLEnums.Stroke.ToInt() && x.ActiveCodeId == row.CodeStrokeId).ToList();
+                //    if (codeServiceMapping.Count > 0)
+                //        this._codesServiceLinesMappingRepo.DeleteRange(codeServiceMapping);
+
+                //    var codeService = new CodesServiceLinesMapping()
+                //    {
+                //        OrganizationIdFk = row.OrganizationIdFk,
+                //        CodeIdFk = UCLEnums.Stroke.ToInt(),
+                //        DefaultServiceLineIdFk = codeStroke.DefaultServiceLineIds,
+                //        ServiceLineId1Fk = codeStroke.ServiceLineTeam1Ids,
+                //        ServiceLineId2Fk = codeStroke.ServiceLineTeam2Ids,
+                //        ActiveCodeId = row.CodeStrokeId,
+                //        ActiveCodeName = UCLEnums.Stroke.ToString()
+                //    };
+                //    this._codesServiceLinesMappingRepo.Insert(codeService);
+
+                //    //var channel = this._StrokeCodeGroupMembersRepo.Table.Where(x => x.StrokeCodeIdFk == row.CodeStrokeId && !x.IsDeleted).ToList();
+
+                //    var UserChannelSid = (from us in this._userSchedulesRepo.Table
+                //                          join u in this._userRepo.Table on us.UserIdFk equals u.UserId
+                //                          where (DefaultServiceLineIds.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam1Ids.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam2Ids.Contains(us.ServiceLineIdFk.Value)) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
+                //                          select new { u.UserUniqueId, u.UserId }).Distinct().ToList();
+                //    var superAdmins = this._userRepo.Table.Where(x => x.IsInGroup && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).ToList();
+                //    UserChannelSid.AddRange(superAdmins);
+                //    var loggedInUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).FirstOrDefault();
+                //    UserChannelSid.Add(loggedInUser);
+
+                //    if (row.ChannelSid != null && row.ChannelSid != "")
+                //    {
+                //        var channelSid = row.ChannelSid; //channel.Select(x => x.ChannelSid).FirstOrDefault();
+
+                //        var groupMembers = this._StrokeCodeGroupMembersRepo.Table.Where(x => x.StrokeCodeIdFk == row.CodeStrokeId).ToList();
+                //        this._StrokeCodeGroupMembersRepo.DeleteRange(groupMembers);
+                //        //this._StrokeCodeGroupMembersRepo.DeleteRange(channel);
+                //        bool isDeleted = _communicationService.DeleteUserToConversationChannel(channelSid);
+                //        List<CodeStrokeGroupMember> ACodeGroupMembers = new List<CodeStrokeGroupMember>();
+                //        foreach (var item in UserChannelSid.Distinct())
+                //        {
+                //            try
+                //            {
+                //                var codeGroupMember = new CodeStrokeGroupMember()
+                //                {
+                //                    UserIdFk = item.UserId,
+                //                    StrokeCodeIdFk = row.CodeStrokeId,
+                //                    //ActiveCodeName = UCLEnums.Stroke.ToString(),
+                //                    IsAcknowledge = false,
+                //                    CreatedBy = ApplicationSettings.UserId,
+                //                    CreatedDate = DateTime.UtcNow,
+                //                    IsDeleted = false
+                //                };
+                //                ACodeGroupMembers.Add(codeGroupMember);
+                //                _communicationService.addNewUserToConversationChannel(channelSid, item.UserUniqueId);
+                //            }
+                //            catch (Exception ex)
+                //            {
+                //                //ElmahExtensions.RiseError(ex);
+                //            }
+                //        }
+                //        this._StrokeCodeGroupMembersRepo.Insert(ACodeGroupMembers);
+
+                //    }
+
+
+                //    var notification = new PushNotificationVM()
+                //    {
+                //        Id = row.CodeStrokeId,
+                //        OrgId = row.OrganizationIdFk,
+                //        UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).Distinct().ToList(),
+                //        From = AuthorEnums.Stroke.ToString(),
+                //        Msg = (codeStroke.IsEms.HasValue && codeStroke.IsEms.Value ? "EMS" : "Inhouse") + " Code Stroke From is Changed",
+                //        RouteLink1 = "/Home/Inhouse%20Codes/code-strok-form",
+                //        RouteLink2 = "/Home/EMS/activateCode",
+                //    };
+
+                //    _communicationService.pushNotification(notification);
+
+                //}
+                //else
+                //{
+
+                //    var userIds = this._StrokeCodeGroupMembersRepo.Table.Where(x => x.StrokeCodeIdFk == row.CodeStrokeId).Select(x => x.UserIdFk).ToList();
+                //    var userUniqueIds = this._userRepo.Table.Where(x => userIds.Contains(x.UserId)).Select(x => x.UserUniqueId).Distinct().ToList();
+
+                //    var notification = new PushNotificationVM()
+                //    {
+                //        Id = row.CodeStrokeId,
+                //        OrgId = row.OrganizationIdFk,
+                //        UserChannelSid = userUniqueIds,
+                //        From = AuthorEnums.Stroke.ToString(),
+                //        Msg = (codeStroke.IsEms.HasValue && codeStroke.IsEms.Value ? "EMS" : "Inhouse") + " Code Stroke From is Changed",
+                //        RouteLink1 = "/Home/Inhouse%20Codes/code-strok-form",
+                //        RouteLink2 = "/Home/EMS/activateCode",
+                //    };
+
+                //    _communicationService.pushNotification(notification);
+                //}
+
+                var userIds = this._StrokeCodeGroupMembersRepo.Table.Where(x => x.StrokeCodeIdFk == row.CodeStrokeId).Select(x => x.UserIdFk).ToList();
+                var userUniqueIds = this._userRepo.Table.Where(x => userIds.Contains(x.UserId)).Select(x => x.UserUniqueId).Distinct().ToList();
+
+                var notification = new PushNotificationVM()
                 {
-                    string IsEMS = row.IsEms.HasValue && row.IsEms.Value ? "EMS Code" : "Inhouse Code";
-                    codeStroke.DefaultServiceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeStroke.OrganizationIdFk && x.CodeIdFk == UCLEnums.Stroke.ToInt() && x.Type == IsEMS && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
-                }
+                    Id = row.CodeStrokeId,
+                    OrgId = row.OrganizationIdFk,
+                    UserChannelSid = userUniqueIds,
+                    From = AuthorEnums.Stroke.ToString(),
+                    Msg = (codeStroke.IsEms.HasValue && codeStroke.IsEms.Value ? "EMS" : "Inhouse") + " Code Stroke From is Changed",
+                    RouteLink1 = "/Home/Inhouse%20Codes/code-strok-form",
+                    RouteLink2 = "/Home/EMS/activateCode",
+                };
 
-                if (codeStroke.DefaultServiceLineIds != null && codeStroke.DefaultServiceLineIds != "")
-                {
-                    var DefaultServiceLineIds = codeStroke.DefaultServiceLineIds.ToIntList();
-                    var ServiceLineTeam1Ids = codeStroke.ServiceLineTeam1Ids.ToIntList();
-                    var ServiceLineTeam2Ids = codeStroke.ServiceLineTeam2Ids.ToIntList();
-
-                    var codeServiceMapping = this._codesServiceLinesMappingRepo.Table.Where(x => x.OrganizationIdFk == row.OrganizationIdFk && x.CodeIdFk == UCLEnums.Stroke.ToInt() && x.ActiveCodeId == row.CodeStrokeId).ToList();
-                    if (codeServiceMapping.Count > 0)
-                        this._codesServiceLinesMappingRepo.DeleteRange(codeServiceMapping);
-
-                    var codeService = new CodesServiceLinesMapping()
-                    {
-                        OrganizationIdFk = row.OrganizationIdFk,
-                        CodeIdFk = UCLEnums.Stroke.ToInt(),
-                        DefaultServiceLineIdFk = codeStroke.DefaultServiceLineIds,
-                        ServiceLineId1Fk = codeStroke.ServiceLineTeam1Ids,
-                        ServiceLineId2Fk = codeStroke.ServiceLineTeam2Ids,
-                        ActiveCodeId = row.CodeStrokeId,
-                        ActiveCodeName = UCLEnums.Stroke.ToString()
-                    };
-                    this._codesServiceLinesMappingRepo.Insert(codeService);
-
-                    //var channel = this._StrokeCodeGroupMembersRepo.Table.Where(x => x.StrokeCodeIdFk == row.CodeStrokeId && !x.IsDeleted).ToList();
-
-                    var UserChannelSid = (from us in this._userSchedulesRepo.Table
-                                          join u in this._userRepo.Table on us.UserIdFk equals u.UserId
-                                          where (DefaultServiceLineIds.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam1Ids.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam2Ids.Contains(us.ServiceLineIdFk.Value)) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
-                                          select new { u.UserUniqueId, u.UserId }).Distinct().ToList();
-                    var superAdmins = this._userRepo.Table.Where(x => x.IsInGroup && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).ToList();
-                    UserChannelSid.AddRange(superAdmins);
-                    var loggedInUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).FirstOrDefault();
-                    UserChannelSid.Add(loggedInUser);
-
-                    if (row.ChannelSid != null && row.ChannelSid != "")
-                    {
-                        var channelSid = row.ChannelSid; //channel.Select(x => x.ChannelSid).FirstOrDefault();
-
-                        var groupMembers = this._StrokeCodeGroupMembersRepo.Table.Where(x => x.StrokeCodeIdFk == row.CodeStrokeId).ToList();
-                        this._StrokeCodeGroupMembersRepo.DeleteRange(groupMembers);
-                        //this._StrokeCodeGroupMembersRepo.DeleteRange(channel);
-                        bool isDeleted = _communicationService.DeleteUserToConversationChannel(channelSid);
-                        List<CodeStrokeGroupMember> ACodeGroupMembers = new List<CodeStrokeGroupMember>();
-                        foreach (var item in UserChannelSid.Distinct())
-                        {
-                            try
-                            {
-                                var codeGroupMember = new CodeStrokeGroupMember()
-                                {
-                                    UserIdFk = item.UserId,
-                                    StrokeCodeIdFk = row.CodeStrokeId,
-                                    //ActiveCodeName = UCLEnums.Stroke.ToString(),
-                                    IsAcknowledge = false,
-                                    CreatedBy = ApplicationSettings.UserId,
-                                    CreatedDate = DateTime.UtcNow,
-                                    IsDeleted = false
-                                };
-                                ACodeGroupMembers.Add(codeGroupMember);
-                                _communicationService.addNewUserToConversationChannel(channelSid, item.UserUniqueId);
-                            }
-                            catch (Exception ex)
-                            {
-                                //ElmahExtensions.RiseError(ex);
-                            }
-                        }
-                        this._StrokeCodeGroupMembersRepo.Insert(ACodeGroupMembers);
-
-                    }
-
-
-                    var notification = new PushNotificationVM()
-                    {
-                        Id = row.CodeStrokeId,
-                        OrgId = row.OrganizationIdFk,
-                        UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).Distinct().ToList(),
-                        From = AuthorEnums.Stroke.ToString(),
-                        Msg = (codeStroke.IsEms.HasValue && codeStroke.IsEms.Value ? "EMS" : "Inhouse") + " Code Stroke From is Changed",
-                        RouteLink1 = "/Home/Inhouse%20Codes/code-strok-form",
-                        RouteLink2 = "/Home/EMS/activateCode",
-                    };
-
-                    _communicationService.pushNotification(notification);
-
-                }
-                else
-                {
-
-                    var userIds = this._StrokeCodeGroupMembersRepo.Table.Where(x => x.StrokeCodeIdFk == row.CodeStrokeId).Select(x => x.UserIdFk).ToList();
-                    var userUniqueIds = this._userRepo.Table.Where(x => userIds.Contains(x.UserId)).Select(x => x.UserUniqueId).Distinct().ToList();
-
-                    var notification = new PushNotificationVM()
-                    {
-                        Id = row.CodeStrokeId,
-                        OrgId = row.OrganizationIdFk,
-                        UserChannelSid = userUniqueIds,
-                        From = AuthorEnums.Stroke.ToString(),
-                        Msg = (codeStroke.IsEms.HasValue && codeStroke.IsEms.Value ? "EMS" : "Inhouse") + " Code Stroke From is Changed",
-                        RouteLink1 = "/Home/Inhouse%20Codes/code-strok-form",
-                        RouteLink2 = "/Home/EMS/activateCode",
-                    };
-
-                    _communicationService.pushNotification(notification);
-                }
+                _communicationService.pushNotification(notification);
 
                 return GetStrokeDataById(row.CodeStrokeId);
             }
@@ -1093,6 +1109,7 @@ namespace Web.Services.Concrete
                         //var ServiceLineTeam2Ids = codeStroke.ServiceLineTeam2Ids.ToIntList();
 
                         codeStroke.CreatedDate = DateTime.UtcNow;
+                        codeStroke.FamilyContactNumber = codeStroke.FamilyContactNumber != null && codeStroke.FamilyContactNumber != "" && codeStroke.FamilyContactNumber != "(___) ___-____" ? codeStroke.FamilyContactNumber : "";
                         var stroke = AutoMapperHelper.MapSingleRow<CodeStrokeVM, CodeStroke>(codeStroke);
 
                         if (codeStroke.Attachment != null && codeStroke.Attachment.Count > 0)
@@ -1397,93 +1414,204 @@ namespace Web.Services.Concrete
                         };
                         this._codesServiceLinesMappingRepo.Insert(codeService);
 
-                        var UserChannelSid = (from us in this._userSchedulesRepo.Table
-                                              join u in this._userRepo.Table on us.UserIdFk equals u.UserId
-                                              where DefaultServiceLineIds.Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
-                                              select new { u.UserUniqueId, u.UserId }).Distinct().ToList();
-
-                        var superAdmins = this._userRepo.Table.Where(x => x.IsInGroup && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).ToList();
-                        UserChannelSid.AddRange(superAdmins);
-                        var loggedUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).FirstOrDefault();
-                        UserChannelSid.Add(loggedUser);
-                        var conversationChannelAttributes = JsonConvert.SerializeObject(new Dictionary<string, Object>()
-                                    {
-                                        {ChannelAttributeEnums.ChannelType.ToString(), ChannelTypeEnums.EMS.ToString()},
-                                        {ChannelAttributeEnums.CodeType.ToString(), ChannelTypeEnums.Stroke.ToString()},
-                                        {ChannelAttributeEnums.StrokeId.ToString(), stroke.CodeStrokeId}
-                                    }, Formatting.Indented);
-                        List<CodeStrokeGroupMember> ACodeGroupMembers = new List<CodeStrokeGroupMember>();
-                        if (UserChannelSid != null && UserChannelSid.Count > 0)
-                        {
-                            string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
-                            string friendlyName = stroke.IsEms.HasValue && stroke.IsEms.Value ? $"EMS Code {UCLEnums.Stroke.ToString()} {stroke.CodeStrokeId}" : $"Inhouse Code {UCLEnums.Stroke.ToString()} {stroke.CodeStrokeId}";
-                            var channel = _communicationService.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
-                            stroke.ChannelSid = channel.Sid;
-                            this._codeStrokeRepo.Update(stroke);
-                            UserChannelSid = UserChannelSid.Distinct().ToList();
-                            foreach (var item in UserChannelSid)
-                            {
-                                try
-                                {
-                                    var codeGroupMember = new CodeStrokeGroupMember()
-                                    {
-                                        UserIdFk = item.UserId,
-                                        StrokeCodeIdFk = stroke.CodeStrokeId,
-                                        //ActiveCodeName = UCLEnums.Stroke.ToString(),
-                                        IsAcknowledge = false,
-                                        CreatedBy = ApplicationSettings.UserId,
-                                        CreatedDate = DateTime.UtcNow,
-                                        IsDeleted = false
-                                    };
-                                    ACodeGroupMembers.Add(codeGroupMember);
-                                    _communicationService.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
-                                }
-                                catch (Exception ex)
-                                {
-
-                                }
-                            }
-                            this._StrokeCodeGroupMembersRepo.Insert(ACodeGroupMembers);
-                            var msg = new ConversationMessageVM();
-                            msg.channelSid = channel.Sid;
-                            msg.author = "System";
-                            msg.attributes = "";
-                            msg.body = $"<strong> {(codeStroke.IsEms.HasValue && codeStroke.IsEms.Value ? "EMS Code" : "Inhouse Code")} {UCLEnums.Stroke.ToString()} </strong></br></br>";
-                            if (codeStroke.PatientName != null && codeStroke.PatientName != "")
-                                msg.body += $"<strong>Patient Name: </strong> {codeStroke.PatientName} </br>";
-                            msg.body += $"<strong>Dob: </strong> {codeStroke.Dob:MM-dd-yyyy} </br>";
-                            msg.body += $"<strong>Last Well Known: </strong> {codeStroke.LastKnownWell:MM-dd-yyyy hh:mm tt} </br>";
-                            if (codeStroke.ChiefComplant != null && codeStroke.ChiefComplant != "")
-                                msg.body += $"<strong>Chief Complaint: </strong> {codeStroke.ChiefComplant} </br>";
-                            if (codeStroke.Hpi != null && codeStroke.Hpi != "")
-                                msg.body += $"<strong>Hpi: </strong> {codeStroke.Hpi} </br>";
-                            var sendMsg = _communicationService.sendPushNotification(msg);
-
-                            var showAllAccessUsers = this._dbContext.LoadStoredProcedure("md_getUsersOfComponentAccess")
-                                                .WithSqlParam("@componentName", "Show All EMS,Show All Active Codes,Show Graphs,Show EMS,Show Active Codes")
-                                                .WithSqlParam("@orgId", stroke.OrganizationIdFk)
-                                                .ExecuteStoredProc<RegisterCredentialVM>().Select(x => new { x.UserUniqueId, x.UserId }).Distinct().ToList();
-                            UserChannelSid.AddRange(showAllAccessUsers);
-                            var notification = new PushNotificationVM()
-                            {
-                                Id = stroke.CodeStrokeId,
-                                OrgId = stroke.OrganizationIdFk,
-                                UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).Distinct().ToList(),
-                                From = AuthorEnums.Stroke.ToString(),
-                                Msg = (codeStroke.IsEms.HasValue && codeStroke.IsEms.Value ? "EMS" : "Inhouse") + " Code Stroke is update",
-                                RouteLink3 = "/Home/EMS",
-                                RouteLink4 = "/Home/Dashboard",
-                                RouteLink5 = "/Home/Inhouse%20Codes"
-                            };
-
-                            _communicationService.pushNotification(notification);
-                        }
-                        return GetStrokeDataById(stroke.CodeStrokeId);
+                       return GetStrokeDataById(stroke.CodeStrokeId);
                     }
                     return new BaseResponse() { Status = HttpStatusCode.NotAcceptable, Message = "There is no Service Line in this organization related to Code Stroke" };
                 }
                 return new BaseResponse() { Status = HttpStatusCode.NotAcceptable, Message = "Organization is not selected" };
             }
+        }
+
+        public BaseResponse CreateStrokeGroup(CodeStrokeVM codeStroke) 
+        {
+
+            var DefaultServiceLineIds = codeStroke.DefaultServiceLineIds.ToIntList();
+            bool usersFound = false;
+            var UserChannelSid = (from us in this._userSchedulesRepo.Table
+                                  join u in this._userRepo.Table on us.UserIdFk equals u.UserId
+                                  where DefaultServiceLineIds.Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
+                                  select new { u.UserUniqueId, u.UserId }).Distinct().ToList();
+            usersFound = UserChannelSid.Count() > 0;
+            var superAdmins = this._userRepo.Table.Where(x => x.IsInGroup && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).ToList();
+            UserChannelSid.AddRange(superAdmins);
+            var loggedUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).FirstOrDefault();
+            UserChannelSid.Add(loggedUser);
+            var conversationChannelAttributes = JsonConvert.SerializeObject(new Dictionary<string, Object>()
+                                    {
+                                        {ChannelAttributeEnums.ChannelType.ToString(), ChannelTypeEnums.EMS.ToString()},
+                                        {ChannelAttributeEnums.CodeType.ToString(), ChannelTypeEnums.Stroke.ToString()},
+                                        {ChannelAttributeEnums.StrokeId.ToString(), codeStroke.CodeStrokeId}
+                                    }, Formatting.Indented);
+            List<CodeStrokeGroupMember> ACodeGroupMembers = new List<CodeStrokeGroupMember>();
+            if (UserChannelSid != null && UserChannelSid.Count > 0)
+            {
+                string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
+                string friendlyName = codeStroke.IsEms.HasValue && codeStroke.IsEms.Value ? $"EMS Code {UCLEnums.Stroke.ToString()} {codeStroke.CodeStrokeId}" : $"Inhouse Code {UCLEnums.Stroke.ToString()} {codeStroke.CodeStrokeId}";
+                var channel = _communicationService.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
+                var stroke = this._codeStrokeRepo.Table.Where(x => x.CodeStrokeId == codeStroke.CodeStrokeId && x.IsActive == true && !x.IsDeleted).FirstOrDefault();
+                if (stroke != null) {
+                    stroke.ChannelSid = channel.Sid;
+                    this._codeStrokeRepo.Update(stroke);
+                }
+                UserChannelSid = UserChannelSid.Distinct().ToList();
+                foreach (var item in UserChannelSid)
+                {
+                    try
+                    {
+                        var codeGroupMember = new CodeStrokeGroupMember()
+                        {
+                            UserIdFk = item.UserId,
+                            StrokeCodeIdFk = stroke.CodeStrokeId,
+                            //ActiveCodeName = UCLEnums.Stroke.ToString(),
+                            IsAcknowledge = false,
+                            CreatedBy = ApplicationSettings.UserId,
+                            CreatedDate = DateTime.UtcNow,
+                            IsDeleted = false
+                        };
+                        ACodeGroupMembers.Add(codeGroupMember);
+                        _communicationService.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
+                    }
+                    catch (Exception ex)
+                    {
+
+                    }
+                }
+                this._StrokeCodeGroupMembersRepo.Insert(ACodeGroupMembers);
+                var msg = new ConversationMessageVM();
+                msg.channelSid = channel.Sid;
+                msg.author = "System";
+                msg.attributes = "";
+                msg.body = $"<strong> {(codeStroke.IsEms.HasValue && codeStroke.IsEms.Value ? "EMS Code" : "Inhouse Code")} {UCLEnums.Stroke.ToString()} </strong></br></br>";
+                if (codeStroke.PatientName != null && codeStroke.PatientName != "")
+                    msg.body += $"<strong>Patient Name: </strong> {codeStroke.PatientName} </br>";
+                if (codeStroke.Dob != null)
+                    msg.body += $"<strong>Dob: </strong> {codeStroke.Dob:MM-dd-yyyy} </br>";
+                if (codeStroke.LastKnownWell != null)
+                    msg.body += $"<strong>Last Well Known: </strong> {codeStroke.LastKnownWell:MM-dd-yyyy hh:mm tt} </br>";
+                if (codeStroke.ChiefComplant != null && codeStroke.ChiefComplant != "")
+                    msg.body += $"<strong>Chief Complaint: </strong> {codeStroke.ChiefComplant} </br>";
+                if (codeStroke.Hpi != null && codeStroke.Hpi != "")
+                    msg.body += $"<strong>Hpi: </strong> {codeStroke.Hpi} </br>";
+
+                var sendMsg = _communicationService.sendPushNotification(msg);
+
+                var showAllAccessUsers = this._dbContext.LoadStoredProcedure("md_getUsersOfComponentAccess")
+                                    .WithSqlParam("@componentName", "Show All EMS,Show All Active Codes,Show Graphs,Show EMS,Show Active Codes")
+                                    .WithSqlParam("@orgId", stroke.OrganizationIdFk)
+                                    .ExecuteStoredProc<RegisterCredentialVM>().Select(x => new { x.UserUniqueId, x.UserId }).Distinct().ToList();
+                UserChannelSid.AddRange(showAllAccessUsers);
+                var notification = new PushNotificationVM()
+                {
+                    Id = stroke.CodeStrokeId,
+                    OrgId = stroke.OrganizationIdFk,
+                    UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).Distinct().ToList(),
+                    From = AuthorEnums.Stroke.ToString(),
+                    Msg = (codeStroke.IsEms.HasValue && codeStroke.IsEms.Value ? "EMS" : "Inhouse") + " Code Stroke is update",
+                    RouteLink3 = "/Home/EMS",
+                    RouteLink4 = "/Home/Dashboard",
+                    RouteLink5 = "/Home/Inhouse%20Codes"
+                };
+
+                _communicationService.pushNotification(notification);
+            }
+
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Group Created Successfully", Body = new { serviceLineUsersFound = usersFound } };
+        }
+
+        public BaseResponse UpdateStrokeGroupMembers(CodeStrokeVM codeStroke)
+        {
+
+            if (codeStroke.DefaultServiceLineIds == null || codeStroke.DefaultServiceLineIds == "")
+            {
+                string IsEMS = codeStroke.IsEms.HasValue && codeStroke.IsEms.Value ? "EMS Code" : "Inhouse Code";
+                codeStroke.DefaultServiceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeStroke.OrganizationIdFk && x.CodeIdFk == UCLEnums.Stroke.ToInt() && x.Type == IsEMS && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
+            }
+
+            if (codeStroke.DefaultServiceLineIds != null && codeStroke.DefaultServiceLineIds != "")
+            {
+                var DefaultServiceLineIds = codeStroke.DefaultServiceLineIds.ToIntList();
+                var ServiceLineTeam1Ids = codeStroke.ServiceLineTeam1Ids.ToIntList();
+                var ServiceLineTeam2Ids = codeStroke.ServiceLineTeam2Ids.ToIntList();
+
+                var codeServiceMapping = this._codesServiceLinesMappingRepo.Table.Where(x => x.OrganizationIdFk == codeStroke.OrganizationIdFk && x.CodeIdFk == UCLEnums.Stroke.ToInt() && x.ActiveCodeId == codeStroke.CodeStrokeId).ToList();
+                if (codeServiceMapping.Count > 0)
+                    this._codesServiceLinesMappingRepo.DeleteRange(codeServiceMapping);
+
+                var codeService = new CodesServiceLinesMapping()
+                {
+                    OrganizationIdFk = codeStroke.OrganizationIdFk,
+                    CodeIdFk = UCLEnums.Stroke.ToInt(),
+                    DefaultServiceLineIdFk = codeStroke.DefaultServiceLineIds,
+                    ServiceLineId1Fk = codeStroke.ServiceLineTeam1Ids,
+                    ServiceLineId2Fk = codeStroke.ServiceLineTeam2Ids,
+                    ActiveCodeId = codeStroke.CodeStrokeId,
+                    ActiveCodeName = UCLEnums.Stroke.ToString()
+                };
+                this._codesServiceLinesMappingRepo.Insert(codeService);
+
+                //var channel = this._StrokeCodeGroupMembersRepo.Table.Where(x => x.StrokeCodeIdFk == codeStroke.CodeStrokeId && !x.IsDeleted).ToList();
+
+                var UserChannelSid = (from us in this._userSchedulesRepo.Table
+                                      join u in this._userRepo.Table on us.UserIdFk equals u.UserId
+                                      where (DefaultServiceLineIds.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam1Ids.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam2Ids.Contains(us.ServiceLineIdFk.Value)) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
+                                      select new { u.UserUniqueId, u.UserId }).Distinct().ToList();
+                var superAdmins = this._userRepo.Table.Where(x => x.IsInGroup && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).ToList();
+                UserChannelSid.AddRange(superAdmins);
+                var loggedInUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).FirstOrDefault();
+                UserChannelSid.Add(loggedInUser);
+
+                if (codeStroke.ChannelSid != null && codeStroke.ChannelSid != "")
+                {
+                    var channelSid = codeStroke.ChannelSid; //channel.Select(x => x.ChannelSid).FirstOrDefault();
+
+                    var groupMembers = this._StrokeCodeGroupMembersRepo.Table.Where(x => x.StrokeCodeIdFk == codeStroke.CodeStrokeId).ToList();
+                    this._StrokeCodeGroupMembersRepo.DeleteRange(groupMembers);
+                    //this._StrokeCodeGroupMembersRepo.DeleteRange(channel);
+                    bool isDeleted = _communicationService.DeleteUserToConversationChannel(channelSid);
+                    List<CodeStrokeGroupMember> ACodeGroupMembers = new List<CodeStrokeGroupMember>();
+                    foreach (var item in UserChannelSid.Distinct())
+                    {
+                        try
+                        {
+                            var codeGroupMember = new CodeStrokeGroupMember()
+                            {
+                                UserIdFk = item.UserId,
+                                StrokeCodeIdFk = codeStroke.CodeStrokeId,
+                                //ActiveCodeName = UCLEnums.Stroke.ToString(),
+                                IsAcknowledge = false,
+                                CreatedBy = ApplicationSettings.UserId,
+                                CreatedDate = DateTime.UtcNow,
+                                IsDeleted = false
+                            };
+                            ACodeGroupMembers.Add(codeGroupMember);
+                            _communicationService.addNewUserToConversationChannel(channelSid, item.UserUniqueId);
+                        }
+                        catch (Exception ex)
+                        {
+                            //ElmahExtensions.RiseError(ex);
+                        }
+                    }
+                    this._StrokeCodeGroupMembersRepo.Insert(ACodeGroupMembers);
+
+                }
+
+
+                var notification = new PushNotificationVM()
+                {
+                    Id = codeStroke.CodeStrokeId,
+                    OrgId = codeStroke.OrganizationIdFk,
+                    UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).Distinct().ToList(),
+                    From = AuthorEnums.Stroke.ToString(),
+                    Msg = (codeStroke.IsEms.HasValue && codeStroke.IsEms.Value ? "EMS" : "Inhouse") + " Code Stroke From is Changed",
+                    RouteLink1 = "/Home/Inhouse%20Codes/code-strok-form",
+                    RouteLink2 = "/Home/EMS/activateCode",
+                };
+
+                _communicationService.pushNotification(notification);
+
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Group Updated." };
+            }
+            return new BaseResponse() { Status = HttpStatusCode.NotModified, Message = "Group Not Updated" };
         }
 
         public BaseResponse DeleteStroke(int strokeId, bool status)
@@ -1770,7 +1898,7 @@ namespace Web.Services.Concrete
                 row.Hpi = codeSepsis.Hpi;
                 row.BloodThinners = codeSepsis.BloodThinners;
                 row.FamilyContactName = codeSepsis.FamilyContactName;
-                row.FamilyContactNumber = codeSepsis.FamilyContactNumber;
+                row.FamilyContactNumber = codeSepsis.FamilyContactNumber != null && codeSepsis.FamilyContactNumber != "" && codeSepsis.FamilyContactNumber != "(___) ___-____" ? codeSepsis.FamilyContactNumber : "";
                 row.IsEms = codeSepsis.IsEms;
                 //row.IsCompleted = codeSepsis.IsCompleted;
                 if (codeSepsis.IsCompleted == true && row.IsCompleted != true)
@@ -2074,111 +2202,127 @@ namespace Web.Services.Concrete
 
                 this._codeSepsisRepo.Update(row);
 
-                if (codeSepsis.DefaultServiceLineIds == null || codeSepsis.DefaultServiceLineIds == "")
+                //if (codeSepsis.DefaultServiceLineIds == null || codeSepsis.DefaultServiceLineIds == "")
+                //{
+                //    string IsEMS = row.IsEms ? "EMS Code" : "Inhouse Code";
+                //    codeSepsis.DefaultServiceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeSepsis.OrganizationIdFk && x.CodeIdFk == UCLEnums.Sepsis.ToInt() && x.Type == IsEMS && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
+                //}
+
+                //if (codeSepsis.DefaultServiceLineIds != null && codeSepsis.DefaultServiceLineIds != "")
+                //{
+                //    var DefaultServiceLineIds = codeSepsis.DefaultServiceLineIds.ToIntList();
+                //    var ServiceLineTeam1Ids = codeSepsis.ServiceLineTeam1Ids.ToIntList();
+                //    var ServiceLineTeam2Ids = codeSepsis.ServiceLineTeam2Ids.ToIntList();
+
+                //    var codeServiceMapping = this._codesServiceLinesMappingRepo.Table.Where(x => x.OrganizationIdFk == row.OrganizationIdFk && x.CodeIdFk == UCLEnums.Sepsis.ToInt() && x.ActiveCodeId == row.CodeSepsisId).ToList();
+
+                //    if (codeServiceMapping.Count > 0)
+                //        this._codesServiceLinesMappingRepo.DeleteRange(codeServiceMapping);
+
+                //    var codeService = new CodesServiceLinesMapping()
+                //    {
+                //        OrganizationIdFk = row.OrganizationIdFk,
+                //        CodeIdFk = UCLEnums.Sepsis.ToInt(),
+                //        DefaultServiceLineIdFk = codeSepsis.DefaultServiceLineIds,
+                //        ServiceLineId1Fk = codeSepsis.ServiceLineTeam1Ids,
+                //        ServiceLineId2Fk = codeSepsis.ServiceLineTeam2Ids,
+                //        ActiveCodeId = row.CodeSepsisId,
+                //        ActiveCodeName = UCLEnums.Sepsis.ToString()
+                //    };
+                //    this._codesServiceLinesMappingRepo.Insert(codeService);
+
+                //    //var channel = this._SepsisCodeGroupMembersRepo.Table.Where(x => x.SepsisCodeIdFk == row.CodeSepsisId && !x.IsDeleted).ToList();
+
+                //    var UserChannelSid = (from us in this._userSchedulesRepo.Table
+                //                          join u in this._userRepo.Table on us.UserIdFk equals u.UserId
+                //                          where (DefaultServiceLineIds.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam1Ids.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam2Ids.Contains(us.ServiceLineIdFk.Value)) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
+                //                          select new { u.UserUniqueId, u.UserId }).Distinct().ToList();
+                //    var superAdmins = this._userRepo.Table.Where(x => x.IsInGroup && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).ToList();
+                //    UserChannelSid.AddRange(superAdmins);
+                //    var loggedInUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).FirstOrDefault();
+                //    UserChannelSid.Add(loggedInUser);
+
+                //    if (row.ChannelSid != null && row.ChannelSid != "")
+                //    {
+                //        var channelSid = row.ChannelSid; //channel.Select(x => x.ChannelSid).FirstOrDefault();
+                //        var groupMembers = this._SepsisCodeGroupMembersRepo.Table.Where(x => x.SepsisCodeIdFk == row.CodeSepsisId).ToList();
+                //        this._SepsisCodeGroupMembersRepo.DeleteRange(groupMembers);
+                //        //this._SepsisCodeGroupMembersRepo.DeleteRange(channel);
+                //        bool isDeleted = _communicationService.DeleteUserToConversationChannel(channelSid);
+                //        List<CodeSepsisGroupMember> ACodeGroupMembers = new List<CodeSepsisGroupMember>();
+                //        foreach (var item in UserChannelSid.Distinct())
+                //        {
+                //            try
+                //            {
+                //                var codeGroupMember = new CodeSepsisGroupMember()
+                //                {
+                //                    UserIdFk = item.UserId,
+                //                    SepsisCodeIdFk = row.CodeSepsisId,
+                //                    //ActiveCodeName = UCLEnums.Sepsis.ToString(),
+                //                    IsAcknowledge = false,
+                //                    CreatedBy = ApplicationSettings.UserId,
+                //                    CreatedDate = DateTime.UtcNow,
+                //                    IsDeleted = false
+                //                };
+                //                ACodeGroupMembers.Add(codeGroupMember);
+                //                _communicationService.addNewUserToConversationChannel(channelSid, item.UserUniqueId);
+                //            }
+                //            catch (Exception ex)
+                //            {
+
+                //            }
+                //        }
+                //        this._SepsisCodeGroupMembersRepo.Insert(ACodeGroupMembers);
+                //    }
+
+                //    var notification = new PushNotificationVM()
+                //    {
+                //        Id = row.CodeSepsisId,
+                //        OrgId = row.OrganizationIdFk,
+                //        UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).Distinct().ToList(),
+                //        From = AuthorEnums.Sepsis.ToString(),
+                //        Msg = (codeSepsis.IsEms ? "EMS" : "Inhouse") + " Code Sepsis From is Changed",
+                //        RouteLink1 = "/Home/Inhouse%20Codes/code-sepsis-form",
+                //        RouteLink2 = "/Home/EMS/activateCode"
+                //    };
+
+                //    _communicationService.pushNotification(notification);
+
+                //}
+                //else
+                //{
+                //    var userIds = this._SepsisCodeGroupMembersRepo.Table.Where(x => x.SepsisCodeIdFk == row.CodeSepsisId).Select(x => x.UserIdFk).ToList();
+                //    var userUniqueIds = this._userRepo.Table.Where(x => userIds.Contains(x.UserId)).Select(x => x.UserUniqueId).Distinct().ToList();
+
+                //    var notification = new PushNotificationVM()
+                //    {
+                //        Id = row.CodeSepsisId,
+                //        OrgId = row.OrganizationIdFk,
+                //        UserChannelSid = userUniqueIds,
+                //        From = AuthorEnums.Sepsis.ToString(),
+                //        Msg = (codeSepsis.IsEms ? "EMS" : "Inhouse") + " Code Sepsis From is Changed",
+                //        RouteLink1 = "/Home/Inhouse%20Codes/code-sepsis-form",
+                //        RouteLink2 = "/Home/EMS/activateCode"
+                //    };
+
+                //    _communicationService.pushNotification(notification);
+                //}
+
+                var userIds = this._SepsisCodeGroupMembersRepo.Table.Where(x => x.SepsisCodeIdFk == row.CodeSepsisId).Select(x => x.UserIdFk).ToList();
+                var userUniqueIds = this._userRepo.Table.Where(x => userIds.Contains(x.UserId)).Select(x => x.UserUniqueId).Distinct().ToList();
+
+                var notification = new PushNotificationVM()
                 {
-                    string IsEMS = row.IsEms ? "EMS Code" : "Inhouse Code";
-                    codeSepsis.DefaultServiceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeSepsis.OrganizationIdFk && x.CodeIdFk == UCLEnums.Sepsis.ToInt() && x.Type == IsEMS && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
-                }
+                    Id = row.CodeSepsisId,
+                    OrgId = row.OrganizationIdFk,
+                    UserChannelSid = userUniqueIds,
+                    From = AuthorEnums.Sepsis.ToString(),
+                    Msg = (codeSepsis.IsEms ? "EMS" : "Inhouse") + " Code Sepsis From is Changed",
+                    RouteLink1 = "/Home/Inhouse%20Codes/code-sepsis-form",
+                    RouteLink2 = "/Home/EMS/activateCode"
+                };
 
-                if (codeSepsis.DefaultServiceLineIds != null && codeSepsis.DefaultServiceLineIds != "")
-                {
-                    var DefaultServiceLineIds = codeSepsis.DefaultServiceLineIds.ToIntList();
-                    var ServiceLineTeam1Ids = codeSepsis.ServiceLineTeam1Ids.ToIntList();
-                    var ServiceLineTeam2Ids = codeSepsis.ServiceLineTeam2Ids.ToIntList();
-
-                    var codeServiceMapping = this._codesServiceLinesMappingRepo.Table.Where(x => x.OrganizationIdFk == row.OrganizationIdFk && x.CodeIdFk == UCLEnums.Sepsis.ToInt() && x.ActiveCodeId == row.CodeSepsisId).ToList();
-
-                    if (codeServiceMapping.Count > 0)
-                        this._codesServiceLinesMappingRepo.DeleteRange(codeServiceMapping);
-
-                    var codeService = new CodesServiceLinesMapping()
-                    {
-                        OrganizationIdFk = row.OrganizationIdFk,
-                        CodeIdFk = UCLEnums.Sepsis.ToInt(),
-                        DefaultServiceLineIdFk = codeSepsis.DefaultServiceLineIds,
-                        ServiceLineId1Fk = codeSepsis.ServiceLineTeam1Ids,
-                        ServiceLineId2Fk = codeSepsis.ServiceLineTeam2Ids,
-                        ActiveCodeId = row.CodeSepsisId,
-                        ActiveCodeName = UCLEnums.Sepsis.ToString()
-                    };
-                    this._codesServiceLinesMappingRepo.Insert(codeService);
-
-                    //var channel = this._SepsisCodeGroupMembersRepo.Table.Where(x => x.SepsisCodeIdFk == row.CodeSepsisId && !x.IsDeleted).ToList();
-
-                    var UserChannelSid = (from us in this._userSchedulesRepo.Table
-                                          join u in this._userRepo.Table on us.UserIdFk equals u.UserId
-                                          where (DefaultServiceLineIds.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam1Ids.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam2Ids.Contains(us.ServiceLineIdFk.Value)) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
-                                          select new { u.UserUniqueId, u.UserId }).Distinct().ToList();
-                    var superAdmins = this._userRepo.Table.Where(x => x.IsInGroup && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).ToList();
-                    UserChannelSid.AddRange(superAdmins);
-                    var loggedInUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).FirstOrDefault();
-                    UserChannelSid.Add(loggedInUser);
-
-                    if (row.ChannelSid != null && row.ChannelSid != "")
-                    {
-                        var channelSid = row.ChannelSid; //channel.Select(x => x.ChannelSid).FirstOrDefault();
-                        var groupMembers = this._SepsisCodeGroupMembersRepo.Table.Where(x => x.SepsisCodeIdFk == row.CodeSepsisId).ToList();
-                        this._SepsisCodeGroupMembersRepo.DeleteRange(groupMembers);
-                        //this._SepsisCodeGroupMembersRepo.DeleteRange(channel);
-                        bool isDeleted = _communicationService.DeleteUserToConversationChannel(channelSid);
-                        List<CodeSepsisGroupMember> ACodeGroupMembers = new List<CodeSepsisGroupMember>();
-                        foreach (var item in UserChannelSid.Distinct())
-                        {
-                            try
-                            {
-                                var codeGroupMember = new CodeSepsisGroupMember()
-                                {
-                                    UserIdFk = item.UserId,
-                                    SepsisCodeIdFk = row.CodeSepsisId,
-                                    //ActiveCodeName = UCLEnums.Sepsis.ToString(),
-                                    IsAcknowledge = false,
-                                    CreatedBy = ApplicationSettings.UserId,
-                                    CreatedDate = DateTime.UtcNow,
-                                    IsDeleted = false
-                                };
-                                ACodeGroupMembers.Add(codeGroupMember);
-                                _communicationService.addNewUserToConversationChannel(channelSid, item.UserUniqueId);
-                            }
-                            catch (Exception ex)
-                            {
-
-                            }
-                        }
-                        this._SepsisCodeGroupMembersRepo.Insert(ACodeGroupMembers);
-                    }
-
-                    var notification = new PushNotificationVM()
-                    {
-                        Id = row.CodeSepsisId,
-                        OrgId = row.OrganizationIdFk,
-                        UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).Distinct().ToList(),
-                        From = AuthorEnums.Sepsis.ToString(),
-                        Msg = (codeSepsis.IsEms ? "EMS" : "Inhouse") + " Code Sepsis From is Changed",
-                        RouteLink1 = "/Home/Inhouse%20Codes/code-sepsis-form",
-                        RouteLink2 = "/Home/EMS/activateCode"
-                    };
-
-                    _communicationService.pushNotification(notification);
-
-                }
-                else
-                {
-                    var userIds = this._SepsisCodeGroupMembersRepo.Table.Where(x => x.SepsisCodeIdFk == row.CodeSepsisId).Select(x => x.UserIdFk).ToList();
-                    var userUniqueIds = this._userRepo.Table.Where(x => userIds.Contains(x.UserId)).Select(x => x.UserUniqueId).Distinct().ToList();
-
-                    var notification = new PushNotificationVM()
-                    {
-                        Id = row.CodeSepsisId,
-                        OrgId = row.OrganizationIdFk,
-                        UserChannelSid = userUniqueIds,
-                        From = AuthorEnums.Sepsis.ToString(),
-                        Msg = (codeSepsis.IsEms ? "EMS" : "Inhouse") + " Code Sepsis From is Changed",
-                        RouteLink1 = "/Home/Inhouse%20Codes/code-sepsis-form",
-                        RouteLink2 = "/Home/EMS/activateCode"
-                    };
-
-                    _communicationService.pushNotification(notification);
-                }
+                _communicationService.pushNotification(notification);
                 return GetSepsisDataById(row.CodeSepsisId);
             }
             else
@@ -2195,6 +2339,7 @@ namespace Web.Services.Concrete
                         //var ServiceLineTeam2Ids = codeSepsis.ServiceLineTeam2Ids.ToIntList();
 
                         codeSepsis.CreatedDate = DateTime.UtcNow;
+                        codeSepsis.FamilyContactNumber = codeSepsis.FamilyContactNumber != null && codeSepsis.FamilyContactNumber != "" && codeSepsis.FamilyContactNumber != "(___) ___-____" ? codeSepsis.FamilyContactNumber : "";
                         var Sepsis = AutoMapperHelper.MapSingleRow<CodeSepsisVM, CodeSepsi>(codeSepsis);
 
                         if (codeSepsis.Attachment != null && codeSepsis.Attachment.Count > 0)
@@ -2495,88 +2640,88 @@ namespace Web.Services.Concrete
                         };
                         this._codesServiceLinesMappingRepo.Insert(codeService);
 
-                        var UserChannelSid = (from us in this._userSchedulesRepo.Table
-                                              join u in this._userRepo.Table on us.UserIdFk equals u.UserId
-                                              where DefaultServiceLineIds.Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
-                                              select new { u.UserUniqueId, u.UserId }).ToList();
-                        var superAdmins = this._userRepo.Table.Where(x => x.IsInGroup && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).ToList();
-                        UserChannelSid.AddRange(superAdmins);
-                        var loggedUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).FirstOrDefault();
-                        UserChannelSid.Add(loggedUser);
-                        List<CodeSepsisGroupMember> ACodeGroupMembers = new List<CodeSepsisGroupMember>();
-                        if (UserChannelSid != null && UserChannelSid.Count > 0)
-                        {
-                            string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
-                            string friendlyName = Sepsis.IsEms ? $"EMS Code {UCLEnums.Sepsis.ToString()} {Sepsis.CodeSepsisId}" : $"Inhouse Code {UCLEnums.Sepsis.ToString()} {Sepsis.CodeSepsisId}";
-                            var conversationChannelAttributes = JsonConvert.SerializeObject(new Dictionary<string, Object>()
-                                    {
-                                        {ChannelAttributeEnums.ChannelType.ToString(), ChannelTypeEnums.EMS.ToString()},
-                                        {ChannelAttributeEnums.CodeType.ToString(), ChannelTypeEnums.Sepsis.ToString()},
-                                        {ChannelAttributeEnums.SepsisId.ToString(), Sepsis.CodeSepsisId}
-                                    }, Formatting.Indented);
-                            var channel = _communicationService.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
-                            Sepsis.ChannelSid = channel.Sid;
-                            this._codeSepsisRepo.Update(Sepsis);
-                            UserChannelSid = UserChannelSid.Distinct().ToList();
-                            foreach (var item in UserChannelSid)
-                            {
-                                try
-                                {
-                                    var codeGroupMember = new CodeSepsisGroupMember()
-                                    {
-                                        UserIdFk = item.UserId,
-                                        SepsisCodeIdFk = Sepsis.CodeSepsisId,
-                                        //ActiveCodeName = UCLEnums.Sepsis.ToString(),
-                                        IsAcknowledge = false,
-                                        CreatedBy = ApplicationSettings.UserId,
-                                        CreatedDate = DateTime.UtcNow,
-                                        IsDeleted = false
-                                    };
-                                    ACodeGroupMembers.Add(codeGroupMember);
-                                    _communicationService.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
-                                }
-                                catch (Exception ex)
-                                {
-                                    //ElmahExtensions.RiseError(ex);
-                                }
-                            }
-                            this._SepsisCodeGroupMembersRepo.Insert(ACodeGroupMembers);
+                        //var UserChannelSid = (from us in this._userSchedulesRepo.Table
+                        //                      join u in this._userRepo.Table on us.UserIdFk equals u.UserId
+                        //                      where DefaultServiceLineIds.Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
+                        //                      select new { u.UserUniqueId, u.UserId }).ToList();
+                        //var superAdmins = this._userRepo.Table.Where(x => x.IsInGroup && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).ToList();
+                        //UserChannelSid.AddRange(superAdmins);
+                        //var loggedUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).FirstOrDefault();
+                        //UserChannelSid.Add(loggedUser);
+                        //List<CodeSepsisGroupMember> ACodeGroupMembers = new List<CodeSepsisGroupMember>();
+                        //if (UserChannelSid != null && UserChannelSid.Count > 0)
+                        //{
+                        //    string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
+                        //    string friendlyName = Sepsis.IsEms ? $"EMS Code {UCLEnums.Sepsis.ToString()} {Sepsis.CodeSepsisId}" : $"Inhouse Code {UCLEnums.Sepsis.ToString()} {Sepsis.CodeSepsisId}";
+                        //    var conversationChannelAttributes = JsonConvert.SerializeObject(new Dictionary<string, Object>()
+                        //            {
+                        //                {ChannelAttributeEnums.ChannelType.ToString(), ChannelTypeEnums.EMS.ToString()},
+                        //                {ChannelAttributeEnums.CodeType.ToString(), ChannelTypeEnums.Sepsis.ToString()},
+                        //                {ChannelAttributeEnums.SepsisId.ToString(), Sepsis.CodeSepsisId}
+                        //            }, Formatting.Indented);
+                        //    var channel = _communicationService.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
+                        //    Sepsis.ChannelSid = channel.Sid;
+                        //    this._codeSepsisRepo.Update(Sepsis);
+                        //    UserChannelSid = UserChannelSid.Distinct().ToList();
+                        //    foreach (var item in UserChannelSid)
+                        //    {
+                        //        try
+                        //        {
+                        //            var codeGroupMember = new CodeSepsisGroupMember()
+                        //            {
+                        //                UserIdFk = item.UserId,
+                        //                SepsisCodeIdFk = Sepsis.CodeSepsisId,
+                        //                //ActiveCodeName = UCLEnums.Sepsis.ToString(),
+                        //                IsAcknowledge = false,
+                        //                CreatedBy = ApplicationSettings.UserId,
+                        //                CreatedDate = DateTime.UtcNow,
+                        //                IsDeleted = false
+                        //            };
+                        //            ACodeGroupMembers.Add(codeGroupMember);
+                        //            _communicationService.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
+                        //        }
+                        //        catch (Exception ex)
+                        //        {
+                        //            //ElmahExtensions.RiseError(ex);
+                        //        }
+                        //    }
+                        //    this._SepsisCodeGroupMembersRepo.Insert(ACodeGroupMembers);
 
-                            var msg = new ConversationMessageVM();
-                            msg.channelSid = channel.Sid;
-                            msg.author = "System";
-                            msg.attributes = "";
-                            msg.body = $"<strong> {(codeSepsis.IsEms ? "EMS Code" : "Inhouse Code")} {UCLEnums.Sepsis.ToString()} </strong></br></br>";
-                            if (codeSepsis.PatientName != null && codeSepsis.PatientName != "")
-                                msg.body += $"<strong>Patient Name: </strong> {codeSepsis.PatientName} </br>";
-                            msg.body += $"<strong>Dob: </strong> {codeSepsis.Dob:MM-dd-yyyy} </br>";
-                            msg.body += $"<strong>Last Well Known: </strong> {codeSepsis.LastKnownWell:MM-dd-yyyy hh:mm tt} </br>";
-                            if (codeSepsis.ChiefComplant != null && codeSepsis.ChiefComplant != "")
-                                msg.body += $"<strong>Chief Complaint: </strong> {codeSepsis.ChiefComplant} </br>";
-                            if (codeSepsis.Hpi != null && codeSepsis.Hpi != "")
-                                msg.body += $"<strong>Hpi: </strong> {codeSepsis.Hpi} </br>";
+                        //    var msg = new ConversationMessageVM();
+                        //    msg.channelSid = channel.Sid;
+                        //    msg.author = "System";
+                        //    msg.attributes = "";
+                        //    msg.body = $"<strong> {(codeSepsis.IsEms ? "EMS Code" : "Inhouse Code")} {UCLEnums.Sepsis.ToString()} </strong></br></br>";
+                        //    if (codeSepsis.PatientName != null && codeSepsis.PatientName != "")
+                        //        msg.body += $"<strong>Patient Name: </strong> {codeSepsis.PatientName} </br>";
+                        //    msg.body += $"<strong>Dob: </strong> {codeSepsis.Dob:MM-dd-yyyy} </br>";
+                        //    msg.body += $"<strong>Last Well Known: </strong> {codeSepsis.LastKnownWell:MM-dd-yyyy hh:mm tt} </br>";
+                        //    if (codeSepsis.ChiefComplant != null && codeSepsis.ChiefComplant != "")
+                        //        msg.body += $"<strong>Chief Complaint: </strong> {codeSepsis.ChiefComplant} </br>";
+                        //    if (codeSepsis.Hpi != null && codeSepsis.Hpi != "")
+                        //        msg.body += $"<strong>Hpi: </strong> {codeSepsis.Hpi} </br>";
 
-                            var sendMsg = _communicationService.sendPushNotification(msg);
+                        //    var sendMsg = _communicationService.sendPushNotification(msg);
 
-                            var showAllAccessUsers = this._dbContext.LoadStoredProcedure("md_getUsersOfComponentAccess")
-                                               .WithSqlParam("@componentName", "Show All EMS,Show All Active Codes,Show Graphs,Show EMS,Show Active Codes")
-                                               .WithSqlParam("@orgId", Sepsis.OrganizationIdFk)
-                                               .ExecuteStoredProc<RegisterCredentialVM>().Select(x => new { x.UserUniqueId, x.UserId }).Distinct().ToList();
-                            UserChannelSid.AddRange(showAllAccessUsers);
-                            var notification = new PushNotificationVM()
-                            {
-                                Id = Sepsis.CodeSepsisId,
-                                OrgId = Sepsis.OrganizationIdFk,
-                                UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).Distinct().ToList(),
-                                From = AuthorEnums.Sepsis.ToString(),
-                                Msg = (codeSepsis.IsEms ? "EMS" : "Inhouse") + " Code Sepsis is update",
-                                RouteLink3 = "/Home/EMS",
-                                RouteLink4 = "/Home/Dashboard",
-                                RouteLink5 = "/Home/Inhouse%20Codes"
-                            };
+                        //    var showAllAccessUsers = this._dbContext.LoadStoredProcedure("md_getUsersOfComponentAccess")
+                        //                       .WithSqlParam("@componentName", "Show All EMS,Show All Active Codes,Show Graphs,Show EMS,Show Active Codes")
+                        //                       .WithSqlParam("@orgId", Sepsis.OrganizationIdFk)
+                        //                       .ExecuteStoredProc<RegisterCredentialVM>().Select(x => new { x.UserUniqueId, x.UserId }).Distinct().ToList();
+                        //    UserChannelSid.AddRange(showAllAccessUsers);
+                        //    var notification = new PushNotificationVM()
+                        //    {
+                        //        Id = Sepsis.CodeSepsisId,
+                        //        OrgId = Sepsis.OrganizationIdFk,
+                        //        UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).Distinct().ToList(),
+                        //        From = AuthorEnums.Sepsis.ToString(),
+                        //        Msg = (codeSepsis.IsEms ? "EMS" : "Inhouse") + " Code Sepsis is update",
+                        //        RouteLink3 = "/Home/EMS",
+                        //        RouteLink4 = "/Home/Dashboard",
+                        //        RouteLink5 = "/Home/Inhouse%20Codes"
+                        //    };
 
-                            _communicationService.pushNotification(notification);
-                        }
+                        //    _communicationService.pushNotification(notification);
+                        //}
                         return GetSepsisDataById(Sepsis.CodeSepsisId);
                     }
                     return new BaseResponse() { Status = HttpStatusCode.NotAcceptable, Message = "There is no Service Line in this organization related to Code Sepsis" };
@@ -2584,6 +2729,199 @@ namespace Web.Services.Concrete
                 return new BaseResponse() { Status = HttpStatusCode.NotAcceptable, Message = "Organization is not selected" };
             }
         }
+      
+        public BaseResponse UpdateSepsisGroupMembers(CodeSepsisVM codeSepsis)
+        {
+
+            if (codeSepsis.DefaultServiceLineIds == null || codeSepsis.DefaultServiceLineIds == "")
+            {
+                string IsEMS = codeSepsis.IsEms ? "EMS Code" : "Inhouse Code";
+                codeSepsis.DefaultServiceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeSepsis.OrganizationIdFk && x.CodeIdFk == UCLEnums.Sepsis.ToInt() && x.Type == IsEMS && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
+            }
+
+            if (codeSepsis.DefaultServiceLineIds != null && codeSepsis.DefaultServiceLineIds != "")
+            {
+                var DefaultServiceLineIds = codeSepsis.DefaultServiceLineIds.ToIntList();
+                var ServiceLineTeam1Ids = codeSepsis.ServiceLineTeam1Ids.ToIntList();
+                var ServiceLineTeam2Ids = codeSepsis.ServiceLineTeam2Ids.ToIntList();
+
+                var codeServiceMapping = this._codesServiceLinesMappingRepo.Table.Where(x => x.OrganizationIdFk == codeSepsis.OrganizationIdFk && x.CodeIdFk == UCLEnums.Sepsis.ToInt() && x.ActiveCodeId == codeSepsis.CodeSepsisId).ToList();
+                if (codeServiceMapping.Count > 0)
+                    this._codesServiceLinesMappingRepo.DeleteRange(codeServiceMapping);
+
+                var codeService = new CodesServiceLinesMapping()
+                {
+                    OrganizationIdFk = codeSepsis.OrganizationIdFk,
+                    CodeIdFk = UCLEnums.Sepsis.ToInt(),
+                    DefaultServiceLineIdFk = codeSepsis.DefaultServiceLineIds,
+                    ServiceLineId1Fk = codeSepsis.ServiceLineTeam1Ids,
+                    ServiceLineId2Fk = codeSepsis.ServiceLineTeam2Ids,
+                    ActiveCodeId = codeSepsis.CodeSepsisId,
+                    ActiveCodeName = UCLEnums.Sepsis.ToString()
+                };
+                this._codesServiceLinesMappingRepo.Insert(codeService);
+
+                //var channel = this._SepsisCodeGroupMembersRepo.Table.Where(x => x.SepsisCodeIdFk == codeSepsis.CodeSepsisId && !x.IsDeleted).ToList();
+
+                var UserChannelSid = (from us in this._userSchedulesRepo.Table
+                                      join u in this._userRepo.Table on us.UserIdFk equals u.UserId
+                                      where (DefaultServiceLineIds.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam1Ids.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam2Ids.Contains(us.ServiceLineIdFk.Value)) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
+                                      select new { u.UserUniqueId, u.UserId }).Distinct().ToList();
+                var superAdmins = this._userRepo.Table.Where(x => x.IsInGroup && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).ToList();
+                UserChannelSid.AddRange(superAdmins);
+                var loggedInUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).FirstOrDefault();
+                UserChannelSid.Add(loggedInUser);
+
+                if (codeSepsis.ChannelSid != null && codeSepsis.ChannelSid != "")
+                {
+                    var channelSid = codeSepsis.ChannelSid; //channel.Select(x => x.ChannelSid).FirstOrDefault();
+
+                    var groupMembers = this._SepsisCodeGroupMembersRepo.Table.Where(x => x.SepsisCodeIdFk == codeSepsis.CodeSepsisId).ToList();
+                    this._SepsisCodeGroupMembersRepo.DeleteRange(groupMembers);
+                    //this._SepsisCodeGroupMembersRepo.DeleteRange(channel);
+                    bool isDeleted = _communicationService.DeleteUserToConversationChannel(channelSid);
+                    List<CodeSepsisGroupMember> ACodeGroupMembers = new List<CodeSepsisGroupMember>();
+                    foreach (var item in UserChannelSid.Distinct())
+                    {
+                        try
+                        {
+                            var codeGroupMember = new CodeSepsisGroupMember()
+                            {
+                                UserIdFk = item.UserId,
+                                SepsisCodeIdFk = codeSepsis.CodeSepsisId,
+                                //ActiveCodeName = UCLEnums.Sepsis.ToString(),
+                                IsAcknowledge = false,
+                                CreatedBy = ApplicationSettings.UserId,
+                                CreatedDate = DateTime.UtcNow,
+                                IsDeleted = false
+                            };
+                            ACodeGroupMembers.Add(codeGroupMember);
+                            _communicationService.addNewUserToConversationChannel(channelSid, item.UserUniqueId);
+                        }
+                        catch (Exception ex)
+                        {
+                            //ElmahExtensions.RiseError(ex);
+                        }
+                    }
+                    this._SepsisCodeGroupMembersRepo.Insert(ACodeGroupMembers);
+
+                }
+
+
+                var notification = new PushNotificationVM()
+                {
+                    Id = codeSepsis.CodeSepsisId,
+                    OrgId = codeSepsis.OrganizationIdFk,
+                    UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).Distinct().ToList(),
+                    From = AuthorEnums.Sepsis.ToString(),
+                    Msg = (codeSepsis.IsEms ? "EMS" : "Inhouse") + " Code Sepsis From is Changed",
+                    RouteLink1 = "/Home/Inhouse%20Codes/code-strok-form",
+                    RouteLink2 = "/Home/EMS/activateCode",
+                };
+
+                _communicationService.pushNotification(notification);
+
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Group Updated." };
+            }
+            return new BaseResponse() { Status = HttpStatusCode.NotModified, Message = "Group Not Updated" };
+        }
+
+        public BaseResponse CreateSepsisGroup(CodeSepsisVM codeSepsis)
+        {
+
+            var DefaultServiceLineIds = codeSepsis.DefaultServiceLineIds.ToIntList();
+            bool usersFound = false;
+            var UserChannelSid = (from us in this._userSchedulesRepo.Table
+                                  join u in this._userRepo.Table on us.UserIdFk equals u.UserId
+                                  where DefaultServiceLineIds.Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
+                                  select new { u.UserUniqueId, u.UserId }).Distinct().ToList();
+            usersFound = UserChannelSid.Count() > 0;
+            var superAdmins = this._userRepo.Table.Where(x => x.IsInGroup && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).ToList();
+            UserChannelSid.AddRange(superAdmins);
+            var loggedUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).FirstOrDefault();
+            UserChannelSid.Add(loggedUser);
+            var conversationChannelAttributes = JsonConvert.SerializeObject(new Dictionary<string, Object>()
+                                    {
+                                        {ChannelAttributeEnums.ChannelType.ToString(), ChannelTypeEnums.EMS.ToString()},
+                                        {ChannelAttributeEnums.CodeType.ToString(), ChannelTypeEnums.Sepsis.ToString()},
+                                        {ChannelAttributeEnums.SepsisId.ToString(), codeSepsis.CodeSepsisId}
+                                    }, Formatting.Indented);
+            List<CodeSepsisGroupMember> ACodeGroupMembers = new List<CodeSepsisGroupMember>();
+            if (UserChannelSid != null && UserChannelSid.Count > 0)
+            {
+                string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
+                string friendlyName = codeSepsis.IsEms ? $"EMS Code {UCLEnums.Sepsis.ToString()} {codeSepsis.CodeSepsisId}" : $"Inhouse Code {UCLEnums.Sepsis.ToString()} {codeSepsis.CodeSepsisId}";
+                var channel = _communicationService.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
+                var Sepsis = this._codeSepsisRepo.Table.Where(x => x.CodeSepsisId == codeSepsis.CodeSepsisId && x.IsActive == true && !x.IsDeleted).FirstOrDefault();
+                if (Sepsis != null)
+                {
+                    Sepsis.ChannelSid = channel.Sid;
+                    this._codeSepsisRepo.Update(Sepsis);
+                }
+                UserChannelSid = UserChannelSid.Distinct().ToList();
+                foreach (var item in UserChannelSid)
+                {
+                    try
+                    {
+                        var codeGroupMember = new CodeSepsisGroupMember()
+                        {
+                            UserIdFk = item.UserId,
+                            SepsisCodeIdFk = Sepsis.CodeSepsisId,
+                            //ActiveCodeName = UCLEnums.Sepsis.ToString(),
+                            IsAcknowledge = false,
+                            CreatedBy = ApplicationSettings.UserId,
+                            CreatedDate = DateTime.UtcNow,
+                            IsDeleted = false
+                        };
+                        ACodeGroupMembers.Add(codeGroupMember);
+                        _communicationService.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
+                    }
+                    catch (Exception ex)
+                    {
+
+                    }
+                }
+                this._SepsisCodeGroupMembersRepo.Insert(ACodeGroupMembers);
+                var msg = new ConversationMessageVM();
+                msg.channelSid = channel.Sid;
+                msg.author = "System";
+                msg.attributes = "";
+                msg.body = $"<strong> {(codeSepsis.IsEms ? "EMS Code" : "Inhouse Code")} {UCLEnums.Sepsis.ToString()} </strong></br></br>";
+                if (codeSepsis.PatientName != null && codeSepsis.PatientName != "")
+                    msg.body += $"<strong>Patient Name: </strong> {codeSepsis.PatientName} </br>";
+                if (codeSepsis.Dob != null)
+                    msg.body += $"<strong>Dob: </strong> {codeSepsis.Dob:MM-dd-yyyy} </br>";
+                if (codeSepsis.LastKnownWell != null)
+                    msg.body += $"<strong>Last Well Known: </strong> {codeSepsis.LastKnownWell:MM-dd-yyyy hh:mm tt} </br>";
+                if (codeSepsis.ChiefComplant != null && codeSepsis.ChiefComplant != "")
+                    msg.body += $"<strong>Chief Complaint: </strong> {codeSepsis.ChiefComplant} </br>";
+                if (codeSepsis.Hpi != null && codeSepsis.Hpi != "")
+                    msg.body += $"<strong>Hpi: </strong> {codeSepsis.Hpi} </br>";
+                var sendMsg = _communicationService.sendPushNotification(msg);
+
+                var showAllAccessUsers = this._dbContext.LoadStoredProcedure("md_getUsersOfComponentAccess")
+                                    .WithSqlParam("@componentName", "Show All EMS,Show All Active Codes,Show Graphs,Show EMS,Show Active Codes")
+                                    .WithSqlParam("@orgId", Sepsis.OrganizationIdFk)
+                                    .ExecuteStoredProc<RegisterCredentialVM>().Select(x => new { x.UserUniqueId, x.UserId }).Distinct().ToList();
+                UserChannelSid.AddRange(showAllAccessUsers);
+                var notification = new PushNotificationVM()
+                {
+                    Id = Sepsis.CodeSepsisId,
+                    OrgId = Sepsis.OrganizationIdFk,
+                    UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).Distinct().ToList(),
+                    From = AuthorEnums.Sepsis.ToString(),
+                    Msg = (codeSepsis.IsEms ? "EMS" : "Inhouse") + " Code Sepsis is update",
+                    RouteLink3 = "/Home/EMS",
+                    RouteLink4 = "/Home/Dashboard",
+                    RouteLink5 = "/Home/Inhouse%20Codes"
+                };
+
+                _communicationService.pushNotification(notification);
+            }
+
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Group Created Successfully", Body = new { serviceLineUsersFound = usersFound } };
+        }
+
 
         public BaseResponse DeleteSepsis(int SepsisId, bool status)
         {
@@ -2873,7 +3211,7 @@ namespace Web.Services.Concrete
                 row.Hpi = codeSTEMI.Hpi;
                 row.BloodThinners = codeSTEMI.BloodThinners;
                 row.FamilyContactName = codeSTEMI.FamilyContactName;
-                row.FamilyContactNumber = codeSTEMI.FamilyContactNumber;
+                row.FamilyContactNumber = codeSTEMI.FamilyContactNumber != null && codeSTEMI.FamilyContactNumber != "" && codeSTEMI.FamilyContactNumber != "(___) ___-____" ? codeSTEMI.FamilyContactNumber : "";
                 row.IsEms = codeSTEMI.IsEms;
                 //row.IsCompleted = codeSTEMI.IsCompleted;
                 if (codeSTEMI.IsCompleted != null && codeSTEMI.IsCompleted == true && row.IsCompleted != true)
@@ -3176,112 +3514,128 @@ namespace Web.Services.Concrete
 
                 this._codeSTEMIRepo.Update(row);
 
-                if (codeSTEMI.DefaultServiceLineIds == null || codeSTEMI.DefaultServiceLineIds == "")
+                //if (codeSTEMI.DefaultServiceLineIds == null || codeSTEMI.DefaultServiceLineIds == "")
+                //{
+                //    string IsEMS = row.IsEms.HasValue && row.IsEms.Value ? "EMS Code" : "Inhouse Code";
+                //    codeSTEMI.DefaultServiceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeSTEMI.OrganizationIdFk && x.CodeIdFk == UCLEnums.STEMI.ToInt() && x.Type == IsEMS && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
+                //}
+
+                //if (codeSTEMI.DefaultServiceLineIds != null && codeSTEMI.DefaultServiceLineIds != "")
+                //{
+                //    var DefaultServiceLineIds = codeSTEMI.DefaultServiceLineIds.ToIntList();
+                //    var ServiceLineTeam1Ids = codeSTEMI.ServiceLineTeam1Ids.ToIntList();
+                //    var ServiceLineTeam2Ids = codeSTEMI.ServiceLineTeam2Ids.ToIntList();
+
+                //    var codeServiceMapping = this._codesServiceLinesMappingRepo.Table.Where(x => x.OrganizationIdFk == row.OrganizationIdFk && x.CodeIdFk == UCLEnums.STEMI.ToInt() && x.ActiveCodeId == row.CodeStemiid).ToList();
+
+                //    if (codeServiceMapping.Count > 0)
+                //        this._codesServiceLinesMappingRepo.DeleteRange(codeServiceMapping);
+
+                //    var codeService = new CodesServiceLinesMapping()
+                //    {
+                //        OrganizationIdFk = row.OrganizationIdFk,
+                //        CodeIdFk = UCLEnums.STEMI.ToInt(),
+                //        DefaultServiceLineIdFk = codeSTEMI.DefaultServiceLineIds,
+                //        ServiceLineId1Fk = codeSTEMI.ServiceLineTeam1Ids,
+                //        ServiceLineId2Fk = codeSTEMI.ServiceLineTeam2Ids,
+                //        ActiveCodeId = row.CodeStemiid,
+                //        ActiveCodeName = UCLEnums.STEMI.ToString()
+                //    };
+                //    this._codesServiceLinesMappingRepo.Insert(codeService);
+
+                //    //var channel = this._STEMICodeGroupMembersRepo.Table.Where(x => x.StemicodeIdFk == row.CodeStemiid && !x.IsDeleted).ToList();
+
+                //    var UserChannelSid = (from us in this._userSchedulesRepo.Table
+                //                          join u in this._userRepo.Table on us.UserIdFk equals u.UserId
+                //                          where (DefaultServiceLineIds.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam1Ids.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam2Ids.Contains(us.ServiceLineIdFk.Value)) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
+                //                          select new { u.UserUniqueId, u.UserId }).Distinct().ToList();
+                //    var superAdmins = this._userRepo.Table.Where(x => x.IsInGroup && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).ToList();
+                //    UserChannelSid.AddRange(superAdmins);
+                //    var loggedInUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).FirstOrDefault();
+                //    UserChannelSid.Add(loggedInUser);
+
+                //    if (row.ChannelSid != null && row.ChannelSid != "")
+                //    {
+                //        var channelSid = row.ChannelSid; //channel.Select(x => x.ChannelSid).FirstOrDefault();
+
+                //        var groupMembers = this._STEMICodeGroupMembersRepo.Table.Where(x => x.StemicodeIdFk == row.CodeStemiid).ToList();
+                //        this._STEMICodeGroupMembersRepo.DeleteRange(groupMembers);
+                //        //this._STEMICodeGroupMembersRepo.DeleteRange(channel);
+                //        bool isDeleted = _communicationService.DeleteUserToConversationChannel(channelSid);
+                //        List<CodeStemigroupMember> ACodeGroupMembers = new List<CodeStemigroupMember>();
+                //        foreach (var item in UserChannelSid.Distinct())
+                //        {
+                //            try
+                //            {
+                //                var codeGroupMember = new CodeStemigroupMember()
+                //                {
+                //                    //ChannelSid = channelSid,
+                //                    UserIdFk = item.UserId,
+                //                    StemicodeIdFk = row.CodeStemiid,
+                //                    //ActiveCodeName = UCLEnums.STEMI.ToString(),
+                //                    IsAcknowledge = false,
+                //                    CreatedBy = ApplicationSettings.UserId,
+                //                    CreatedDate = DateTime.UtcNow,
+                //                    IsDeleted = false
+                //                };
+                //                ACodeGroupMembers.Add(codeGroupMember);
+                //                _communicationService.addNewUserToConversationChannel(channelSid, item.UserUniqueId);
+                //            }
+                //            catch (Exception ex)
+                //            {
+                //                //ElmahExtensions.RiseError(ex);
+                //            }
+                //        }
+                //        this._STEMICodeGroupMembersRepo.Insert(ACodeGroupMembers);
+                //    }
+                //    var notification = new PushNotificationVM()
+                //    {
+                //        Id = row.CodeStemiid,
+                //        OrgId = row.OrganizationIdFk,
+                //        UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).Distinct().ToList(),
+                //        From = AuthorEnums.STEMI.ToString(),
+                //        Msg = (codeSTEMI.IsEms.HasValue && codeSTEMI.IsEms.Value ? "EMS" : "Inhouse") + " Code STEMI From is Changed",
+                //        RouteLink1 = "/Home/Inhouse%20Codes/code-STEMI-form",
+                //        RouteLink2 = "/Home/EMS/activateCode"
+                //    };
+
+                //    _communicationService.pushNotification(notification);
+
+                //}
+                //else
+                //{
+                //    var userIds = this._STEMICodeGroupMembersRepo.Table.Where(x => x.StemicodeIdFk == row.CodeStemiid).Select(x => x.UserIdFk).ToList();
+                //    var userUniqueIds = this._userRepo.Table.Where(x => userIds.Contains(x.UserId)).Select(x => x.UserUniqueId).Distinct().ToList();
+
+                //    var notification = new PushNotificationVM()
+                //    {
+                //        Id = row.CodeStemiid,
+                //        OrgId = row.OrganizationIdFk,
+                //        UserChannelSid = userUniqueIds,
+                //        From = AuthorEnums.STEMI.ToString(),
+                //        Msg = (codeSTEMI.IsEms.HasValue && codeSTEMI.IsEms.Value ? "EMS" : "Inhouse") + " Code STEMI From is Changed",
+                //        RouteLink1 = "/Home/Inhouse%20Codes/code-STEMI-form",
+                //        RouteLink2 = "/Home/EMS/activateCode"
+                //    };
+
+                //    _communicationService.pushNotification(notification);
+                //}
+
+                var userIds = this._STEMICodeGroupMembersRepo.Table.Where(x => x.StemicodeIdFk == row.CodeStemiid).Select(x => x.UserIdFk).ToList();
+                var userUniqueIds = this._userRepo.Table.Where(x => userIds.Contains(x.UserId)).Select(x => x.UserUniqueId).Distinct().ToList();
+
+                var notification = new PushNotificationVM()
                 {
-                    string IsEMS = row.IsEms.HasValue && row.IsEms.Value ? "EMS Code" : "Inhouse Code";
-                    codeSTEMI.DefaultServiceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeSTEMI.OrganizationIdFk && x.CodeIdFk == UCLEnums.STEMI.ToInt() && x.Type == IsEMS && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
-                }
+                    Id = row.CodeStemiid,
+                    OrgId = row.OrganizationIdFk,
+                    UserChannelSid = userUniqueIds,
+                    From = AuthorEnums.STEMI.ToString(),
+                    Msg = (codeSTEMI.IsEms.HasValue && codeSTEMI.IsEms.Value ? "EMS" : "Inhouse") + " Code STEMI From is Changed",
+                    RouteLink1 = "/Home/Inhouse%20Codes/code-STEMI-form",
+                    RouteLink2 = "/Home/EMS/activateCode"
+                };
 
-                if (codeSTEMI.DefaultServiceLineIds != null && codeSTEMI.DefaultServiceLineIds != "")
-                {
-                    var DefaultServiceLineIds = codeSTEMI.DefaultServiceLineIds.ToIntList();
-                    var ServiceLineTeam1Ids = codeSTEMI.ServiceLineTeam1Ids.ToIntList();
-                    var ServiceLineTeam2Ids = codeSTEMI.ServiceLineTeam2Ids.ToIntList();
-
-                    var codeServiceMapping = this._codesServiceLinesMappingRepo.Table.Where(x => x.OrganizationIdFk == row.OrganizationIdFk && x.CodeIdFk == UCLEnums.STEMI.ToInt() && x.ActiveCodeId == row.CodeStemiid).ToList();
-
-                    if (codeServiceMapping.Count > 0)
-                        this._codesServiceLinesMappingRepo.DeleteRange(codeServiceMapping);
-
-                    var codeService = new CodesServiceLinesMapping()
-                    {
-                        OrganizationIdFk = row.OrganizationIdFk,
-                        CodeIdFk = UCLEnums.STEMI.ToInt(),
-                        DefaultServiceLineIdFk = codeSTEMI.DefaultServiceLineIds,
-                        ServiceLineId1Fk = codeSTEMI.ServiceLineTeam1Ids,
-                        ServiceLineId2Fk = codeSTEMI.ServiceLineTeam2Ids,
-                        ActiveCodeId = row.CodeStemiid,
-                        ActiveCodeName = UCLEnums.STEMI.ToString()
-                    };
-                    this._codesServiceLinesMappingRepo.Insert(codeService);
-
-                    //var channel = this._STEMICodeGroupMembersRepo.Table.Where(x => x.StemicodeIdFk == row.CodeStemiid && !x.IsDeleted).ToList();
-
-                    var UserChannelSid = (from us in this._userSchedulesRepo.Table
-                                          join u in this._userRepo.Table on us.UserIdFk equals u.UserId
-                                          where (DefaultServiceLineIds.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam1Ids.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam2Ids.Contains(us.ServiceLineIdFk.Value)) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
-                                          select new { u.UserUniqueId, u.UserId }).Distinct().ToList();
-                    var superAdmins = this._userRepo.Table.Where(x => x.IsInGroup && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).ToList();
-                    UserChannelSid.AddRange(superAdmins);
-                    var loggedInUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).FirstOrDefault();
-                    UserChannelSid.Add(loggedInUser);
-
-                    if (row.ChannelSid != null && row.ChannelSid != "")
-                    {
-                        var channelSid = row.ChannelSid; //channel.Select(x => x.ChannelSid).FirstOrDefault();
-
-                        var groupMembers = this._STEMICodeGroupMembersRepo.Table.Where(x => x.StemicodeIdFk == row.CodeStemiid).ToList();
-                        this._STEMICodeGroupMembersRepo.DeleteRange(groupMembers);
-                        //this._STEMICodeGroupMembersRepo.DeleteRange(channel);
-                        bool isDeleted = _communicationService.DeleteUserToConversationChannel(channelSid);
-                        List<CodeStemigroupMember> ACodeGroupMembers = new List<CodeStemigroupMember>();
-                        foreach (var item in UserChannelSid.Distinct())
-                        {
-                            try
-                            {
-                                var codeGroupMember = new CodeStemigroupMember()
-                                {
-                                    //ChannelSid = channelSid,
-                                    UserIdFk = item.UserId,
-                                    StemicodeIdFk = row.CodeStemiid,
-                                    //ActiveCodeName = UCLEnums.STEMI.ToString(),
-                                    IsAcknowledge = false,
-                                    CreatedBy = ApplicationSettings.UserId,
-                                    CreatedDate = DateTime.UtcNow,
-                                    IsDeleted = false
-                                };
-                                ACodeGroupMembers.Add(codeGroupMember);
-                                _communicationService.addNewUserToConversationChannel(channelSid, item.UserUniqueId);
-                            }
-                            catch (Exception ex)
-                            {
-                                //ElmahExtensions.RiseError(ex);
-                            }
-                        }
-                        this._STEMICodeGroupMembersRepo.Insert(ACodeGroupMembers);
-                    }
-                    var notification = new PushNotificationVM()
-                    {
-                        Id = row.CodeStemiid,
-                        OrgId = row.OrganizationIdFk,
-                        UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).Distinct().ToList(),
-                        From = AuthorEnums.STEMI.ToString(),
-                        Msg = (codeSTEMI.IsEms.HasValue && codeSTEMI.IsEms.Value ? "EMS" : "Inhouse") + " Code STEMI From is Changed",
-                        RouteLink1 = "/Home/Inhouse%20Codes/code-STEMI-form",
-                        RouteLink2 = "/Home/EMS/activateCode"
-                    };
-
-                    _communicationService.pushNotification(notification);
-
-                }
-                else
-                {
-                    var userIds = this._STEMICodeGroupMembersRepo.Table.Where(x => x.StemicodeIdFk == row.CodeStemiid).Select(x => x.UserIdFk).ToList();
-                    var userUniqueIds = this._userRepo.Table.Where(x => userIds.Contains(x.UserId)).Select(x => x.UserUniqueId).Distinct().ToList();
-
-                    var notification = new PushNotificationVM()
-                    {
-                        Id = row.CodeStemiid,
-                        OrgId = row.OrganizationIdFk,
-                        UserChannelSid = userUniqueIds,
-                        From = AuthorEnums.STEMI.ToString(),
-                        Msg = (codeSTEMI.IsEms.HasValue && codeSTEMI.IsEms.Value ? "EMS" : "Inhouse") + " Code STEMI From is Changed",
-                        RouteLink1 = "/Home/Inhouse%20Codes/code-STEMI-form",
-                        RouteLink2 = "/Home/EMS/activateCode"
-                    };
-
-                    _communicationService.pushNotification(notification);
-                }
+                _communicationService.pushNotification(notification);
                 return GetSTEMIDataById(row.CodeStemiid);
             }
             else
@@ -3296,6 +3650,7 @@ namespace Web.Services.Concrete
 
 
                         codeSTEMI.CreatedDate = DateTime.UtcNow;
+                        codeSTEMI.FamilyContactNumber = codeSTEMI.FamilyContactNumber != null && codeSTEMI.FamilyContactNumber != "" && codeSTEMI.FamilyContactNumber != "(___) ___-____" ? codeSTEMI.FamilyContactNumber : "";
                         var STEMI = AutoMapperHelper.MapSingleRow<CodeSTEMIVM, CodeStemi>(codeSTEMI);
 
                         if (codeSTEMI.Attachment != null && codeSTEMI.Attachment.Count > 0)
@@ -3597,90 +3952,6 @@ namespace Web.Services.Concrete
                         };
                         this._codesServiceLinesMappingRepo.Insert(codeService);
 
-                        var UserChannelSid = (from us in this._userSchedulesRepo.Table
-                                              join u in this._userRepo.Table on us.UserIdFk equals u.UserId
-                                              where DefaultServiceLineIds.Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
-                                              select new { u.UserUniqueId, u.UserId }).ToList();
-
-                        var superAdmins = this._userRepo.Table.Where(x => x.IsInGroup && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).ToList();
-                        UserChannelSid.AddRange(superAdmins);
-                        var loggedUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).FirstOrDefault();
-                        UserChannelSid.Add(loggedUser);
-                        List<CodeStemigroupMember> ACodeGroupMembers = new List<CodeStemigroupMember>();
-                        if (UserChannelSid != null && UserChannelSid.Count > 0)
-                        {
-                            //string uniqueName = $"CONSULT_{Consult_Counter.Counter_Value.ToString()}";
-                            string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
-                            string friendlyName = STEMI.IsEms.HasValue && STEMI.IsEms.Value ? $"EMS Code {UCLEnums.STEMI.ToString()} {STEMI.CodeStemiid}" : $"Inhouse Code {UCLEnums.STEMI.ToString()} {STEMI.CodeStemiid}";
-                            var conversationChannelAttributes = JsonConvert.SerializeObject(new Dictionary<string, Object>()
-                                    {
-                                        {ChannelAttributeEnums.ChannelType.ToString(), ChannelTypeEnums.EMS.ToString()},
-                                        {ChannelAttributeEnums.CodeType.ToString(), ChannelTypeEnums.STEMI.ToString()},
-                                        {ChannelAttributeEnums.STEMIId.ToString(), STEMI.CodeStemiid}
-                                    }, Formatting.Indented);
-                            var channel = _communicationService.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
-                            STEMI.ChannelSid = channel.Sid;
-                            this._codeSTEMIRepo.Update(STEMI);
-                            UserChannelSid = UserChannelSid.Distinct().ToList();
-                            foreach (var item in UserChannelSid)
-                            {
-                                try
-                                {
-                                    var codeGroupMember = new CodeStemigroupMember()
-                                    {
-                                        //ChannelSid = channel.Sid,
-                                        UserIdFk = item.UserId,
-                                        StemicodeIdFk = STEMI.CodeStemiid,
-                                        //  ActiveCodeName = UCLEnums.STEMI.ToString(),
-                                        IsAcknowledge = false,
-                                        CreatedBy = ApplicationSettings.UserId,
-                                        CreatedDate = DateTime.UtcNow,
-                                        IsDeleted = false
-                                    };
-                                    ACodeGroupMembers.Add(codeGroupMember);
-                                    _communicationService.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
-                                }
-                                catch (Exception ex)
-                                {
-                                    //ElmahExtensions.RiseError(ex);
-                                }
-                            }
-                            this._STEMICodeGroupMembersRepo.Insert(ACodeGroupMembers);
-
-                            var msg = new ConversationMessageVM();
-                            msg.channelSid = channel.Sid;
-                            msg.author = "System";
-                            msg.attributes = "";
-                            msg.body = $"<strong> {(codeSTEMI.IsEms.HasValue && codeSTEMI.IsEms.Value ? "EMS Code" : "Inhouse Code")} {UCLEnums.STEMI.ToString()} </strong></br></br>";
-                            if (codeSTEMI.PatientName != null && codeSTEMI.PatientName != "")
-                                msg.body += $"<strong>Patient Name: </strong> {codeSTEMI.PatientName} </br>";
-                            msg.body += $"<strong>Dob: </strong> {codeSTEMI.Dob:MM-dd-yyyy} </br>";
-                            msg.body += $"<strong>Last Well Known: </strong> {codeSTEMI.LastKnownWell:MM-dd-yyyy hh:mm tt} </br>";
-                            if (codeSTEMI.ChiefComplant != null && codeSTEMI.ChiefComplant != "")
-                                msg.body += $"<strong>Chief Complaint: </strong> {codeSTEMI.ChiefComplant} </br>";
-                            if (codeSTEMI.Hpi != null && codeSTEMI.Hpi != "")
-                                msg.body += $"<strong>Hpi: </strong> {codeSTEMI.Hpi} </br>";
-                            var sendMsg = _communicationService.sendPushNotification(msg);
-
-                            var showAllAccessUsers = this._dbContext.LoadStoredProcedure("md_getUsersOfComponentAccess")
-                                               .WithSqlParam("@componentName", "Show All EMS,Show All Active Codes,Show Graphs,Show EMS,Show Active Codes")
-                                               .WithSqlParam("@orgId", STEMI.OrganizationIdFk)
-                                               .ExecuteStoredProc<RegisterCredentialVM>().Select(x => new { x.UserUniqueId, x.UserId }).Distinct().ToList();
-                            UserChannelSid.AddRange(showAllAccessUsers);
-                            var notification = new PushNotificationVM()
-                            {
-                                Id = STEMI.CodeStemiid,
-                                OrgId = STEMI.OrganizationIdFk,
-                                UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).Distinct().ToList(),
-                                From = AuthorEnums.STEMI.ToString(),
-                                Msg = (codeSTEMI.IsEms.HasValue && codeSTEMI.IsEms.Value ? "EMS" : "Inhouse") + " Code Stemi is update",
-                                RouteLink3 = "/Home/EMS",
-                                RouteLink4 = "/Home/Dashboard",
-                                RouteLink5 = "/Home/Inhouse%20Codes"
-                            };
-
-                            _communicationService.pushNotification(notification);
-                        }
                         return GetSTEMIDataById(STEMI.CodeStemiid);
                     }
                     return new BaseResponse() { Status = HttpStatusCode.NotAcceptable, Message = "There is no Service Line in this organization related to Code STEMI" };
@@ -3688,6 +3959,199 @@ namespace Web.Services.Concrete
                 return new BaseResponse() { Status = HttpStatusCode.NotAcceptable, Message = "Organization is not selected" };
             }
         }
+
+        public BaseResponse CreateSTEMIGroup(CodeSTEMIVM codeSTEMI)
+        {
+
+            var DefaultServiceLineIds = codeSTEMI.DefaultServiceLineIds.ToIntList();
+            bool usersFound = false;
+            var UserChannelSid = (from us in this._userSchedulesRepo.Table
+                                  join u in this._userRepo.Table on us.UserIdFk equals u.UserId
+                                  where DefaultServiceLineIds.Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
+                                  select new { u.UserUniqueId, u.UserId }).Distinct().ToList();
+            usersFound = UserChannelSid.Count() > 0;
+            var superAdmins = this._userRepo.Table.Where(x => x.IsInGroup && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).ToList();
+            UserChannelSid.AddRange(superAdmins);
+            var loggedUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).FirstOrDefault();
+            UserChannelSid.Add(loggedUser);
+            var conversationChannelAttributes = JsonConvert.SerializeObject(new Dictionary<string, Object>()
+                                    {
+                                        {ChannelAttributeEnums.ChannelType.ToString(), ChannelTypeEnums.EMS.ToString()},
+                                        {ChannelAttributeEnums.CodeType.ToString(), ChannelTypeEnums.STEMI.ToString()},
+                                        {ChannelAttributeEnums.STEMIId.ToString(), codeSTEMI.CodeStemiid}
+                                    }, Formatting.Indented);
+            List<CodeStemigroupMember> ACodeGroupMembers = new List<CodeStemigroupMember>();
+            if (UserChannelSid != null && UserChannelSid.Count > 0)
+            {
+                string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
+                string friendlyName = codeSTEMI.IsEms.HasValue && codeSTEMI.IsEms.Value ? $"EMS Code {UCLEnums.STEMI.ToString()} {codeSTEMI.CodeStemiid}" : $"Inhouse Code {UCLEnums.STEMI.ToString()} {codeSTEMI.CodeStemiid}";
+                var channel = _communicationService.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
+                var STEMI = this._codeSTEMIRepo.Table.Where(x => x.CodeStemiid == codeSTEMI.CodeStemiid && x.IsActive == true && !x.IsDeleted).FirstOrDefault();
+                if (STEMI != null)
+                {
+                    STEMI.ChannelSid = channel.Sid;
+                    this._codeSTEMIRepo.Update(STEMI);
+                }
+                UserChannelSid = UserChannelSid.Distinct().ToList();
+                foreach (var item in UserChannelSid)
+                {
+                    try
+                    {
+                        var codeGroupMember = new CodeStemigroupMember()
+                        {
+                            UserIdFk = item.UserId,
+                            StemicodeIdFk = STEMI.CodeStemiid,
+                            //ActiveCodeName = UCLEnums.STEMI.ToString(),
+                            IsAcknowledge = false,
+                            CreatedBy = ApplicationSettings.UserId,
+                            CreatedDate = DateTime.UtcNow,
+                            IsDeleted = false
+                        };
+                        ACodeGroupMembers.Add(codeGroupMember);
+                        _communicationService.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
+                    }
+                    catch (Exception ex)
+                    {
+
+                    }
+                }
+                this._STEMICodeGroupMembersRepo.Insert(ACodeGroupMembers);
+                var msg = new ConversationMessageVM();
+                msg.channelSid = channel.Sid;
+                msg.author = "System";
+                msg.attributes = "";
+                msg.body = $"<strong> {(codeSTEMI.IsEms.HasValue && codeSTEMI.IsEms.Value ? "EMS Code" : "Inhouse Code")} {UCLEnums.STEMI.ToString()} </strong></br></br>";
+                if (codeSTEMI.PatientName != null && codeSTEMI.PatientName != "")
+                    msg.body += $"<strong>Patient Name: </strong> {codeSTEMI.PatientName} </br>";
+                if (codeSTEMI.Dob != null)
+                    msg.body += $"<strong>Dob: </strong> {codeSTEMI.Dob:MM-dd-yyyy} </br>";
+                if (codeSTEMI.LastKnownWell != null)
+                    msg.body += $"<strong>Last Well Known: </strong> {codeSTEMI.LastKnownWell:MM-dd-yyyy hh:mm tt} </br>";
+                if (codeSTEMI.ChiefComplant != null && codeSTEMI.ChiefComplant != "")
+                    msg.body += $"<strong>Chief Complaint: </strong> {codeSTEMI.ChiefComplant} </br>";
+                if (codeSTEMI.Hpi != null && codeSTEMI.Hpi != "")
+                    msg.body += $"<strong>Hpi: </strong> {codeSTEMI.Hpi} </br>";
+                var sendMsg = _communicationService.sendPushNotification(msg);
+
+                var showAllAccessUsers = this._dbContext.LoadStoredProcedure("md_getUsersOfComponentAccess")
+                                    .WithSqlParam("@componentName", "Show All EMS,Show All Active Codes,Show Graphs,Show EMS,Show Active Codes")
+                                    .WithSqlParam("@orgId", STEMI.OrganizationIdFk)
+                                    .ExecuteStoredProc<RegisterCredentialVM>().Select(x => new { x.UserUniqueId, x.UserId }).Distinct().ToList();
+                UserChannelSid.AddRange(showAllAccessUsers);
+                var notification = new PushNotificationVM()
+                {
+                    Id = STEMI.CodeStemiid,
+                    OrgId = STEMI.OrganizationIdFk,
+                    UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).Distinct().ToList(),
+                    From = AuthorEnums.STEMI.ToString(),
+                    Msg = (codeSTEMI.IsEms.HasValue && codeSTEMI.IsEms.Value ? "EMS" : "Inhouse") + " Code STEMI is update",
+                    RouteLink3 = "/Home/EMS",
+                    RouteLink4 = "/Home/Dashboard",
+                    RouteLink5 = "/Home/Inhouse%20Codes"
+                };
+
+                _communicationService.pushNotification(notification);
+            }
+
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Group Created Successfully", Body = new { serviceLineUsersFound = usersFound } };
+        }
+
+        public BaseResponse UpdateSTEMIGroupMembers(CodeSTEMIVM codeSTEMI)
+        {
+
+            if (codeSTEMI.DefaultServiceLineIds == null || codeSTEMI.DefaultServiceLineIds == "")
+            {
+                string IsEMS = codeSTEMI.IsEms.HasValue && codeSTEMI.IsEms.Value ? "EMS Code" : "Inhouse Code";
+                codeSTEMI.DefaultServiceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeSTEMI.OrganizationIdFk && x.CodeIdFk == UCLEnums.STEMI.ToInt() && x.Type == IsEMS && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
+            }
+
+            if (codeSTEMI.DefaultServiceLineIds != null && codeSTEMI.DefaultServiceLineIds != "")
+            {
+                var DefaultServiceLineIds = codeSTEMI.DefaultServiceLineIds.ToIntList();
+                var ServiceLineTeam1Ids = codeSTEMI.ServiceLineTeam1Ids.ToIntList();
+                var ServiceLineTeam2Ids = codeSTEMI.ServiceLineTeam2Ids.ToIntList();
+
+                var codeServiceMapping = this._codesServiceLinesMappingRepo.Table.Where(x => x.OrganizationIdFk == codeSTEMI.OrganizationIdFk && x.CodeIdFk == UCLEnums.STEMI.ToInt() && x.ActiveCodeId == codeSTEMI.CodeStemiid).ToList();
+                if (codeServiceMapping.Count > 0)
+                    this._codesServiceLinesMappingRepo.DeleteRange(codeServiceMapping);
+
+                var codeService = new CodesServiceLinesMapping()
+                {
+                    OrganizationIdFk = codeSTEMI.OrganizationIdFk,
+                    CodeIdFk = UCLEnums.STEMI.ToInt(),
+                    DefaultServiceLineIdFk = codeSTEMI.DefaultServiceLineIds,
+                    ServiceLineId1Fk = codeSTEMI.ServiceLineTeam1Ids,
+                    ServiceLineId2Fk = codeSTEMI.ServiceLineTeam2Ids,
+                    ActiveCodeId = codeSTEMI.CodeStemiid,
+                    ActiveCodeName = UCLEnums.STEMI.ToString()
+                };
+                this._codesServiceLinesMappingRepo.Insert(codeService);
+
+                //var channel = this._STEMICodeGroupMembersRepo.Table.Where(x => x.STEMICodeIdFk == codeSTEMI.CodeSTEMIId && !x.IsDeleted).ToList();
+
+                var UserChannelSid = (from us in this._userSchedulesRepo.Table
+                                      join u in this._userRepo.Table on us.UserIdFk equals u.UserId
+                                      where (DefaultServiceLineIds.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam1Ids.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam2Ids.Contains(us.ServiceLineIdFk.Value)) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
+                                      select new { u.UserUniqueId, u.UserId }).Distinct().ToList();
+                var superAdmins = this._userRepo.Table.Where(x => x.IsInGroup && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).ToList();
+                UserChannelSid.AddRange(superAdmins);
+                var loggedInUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).FirstOrDefault();
+                UserChannelSid.Add(loggedInUser);
+
+                if (codeSTEMI.ChannelSid != null && codeSTEMI.ChannelSid != "")
+                {
+                    var channelSid = codeSTEMI.ChannelSid; //channel.Select(x => x.ChannelSid).FirstOrDefault();
+
+                    var groupMembers = this._STEMICodeGroupMembersRepo.Table.Where(x => x.StemicodeIdFk == codeSTEMI.CodeStemiid).ToList();
+                    this._STEMICodeGroupMembersRepo.DeleteRange(groupMembers);
+                    //this._STEMICodeGroupMembersRepo.DeleteRange(channel);
+                    bool isDeleted = _communicationService.DeleteUserToConversationChannel(channelSid);
+                    List<CodeStemigroupMember> ACodeGroupMembers = new List<CodeStemigroupMember>();
+                    foreach (var item in UserChannelSid.Distinct())
+                    {
+                        try
+                        {
+                            var codeGroupMember = new CodeStemigroupMember()
+                            {
+                                UserIdFk = item.UserId,
+                                StemicodeIdFk = codeSTEMI.CodeStemiid,
+                                //ActiveCodeName = UCLEnums.STEMI.ToString(),
+                                IsAcknowledge = false,
+                                CreatedBy = ApplicationSettings.UserId,
+                                CreatedDate = DateTime.UtcNow,
+                                IsDeleted = false
+                            };
+                            ACodeGroupMembers.Add(codeGroupMember);
+                            _communicationService.addNewUserToConversationChannel(channelSid, item.UserUniqueId);
+                        }
+                        catch (Exception ex)
+                        {
+                            //ElmahExtensions.RiseError(ex);
+                        }
+                    }
+                    this._STEMICodeGroupMembersRepo.Insert(ACodeGroupMembers);
+
+                }
+
+
+                var notification = new PushNotificationVM()
+                {
+                    Id = codeSTEMI.CodeStemiid,
+                    OrgId = codeSTEMI.OrganizationIdFk,
+                    UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).Distinct().ToList(),
+                    From = AuthorEnums.STEMI.ToString(),
+                    Msg = (codeSTEMI.IsEms.HasValue && codeSTEMI.IsEms.Value ? "EMS" : "Inhouse") + " Code STEMI From is Changed",
+                    RouteLink1 = "/Home/Inhouse%20Codes/code-strok-form",
+                    RouteLink2 = "/Home/EMS/activateCode",
+                };
+
+                _communicationService.pushNotification(notification);
+
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Group Updated." };
+            }
+            return new BaseResponse() { Status = HttpStatusCode.NotModified, Message = "Group Not Updated" };
+        }
+
 
         public BaseResponse DeleteSTEMI(int STEMIId, bool status)
         {
@@ -3976,7 +4440,7 @@ namespace Web.Services.Concrete
                 row.Hpi = codeTruma.Hpi;
                 row.BloodThinners = codeTruma.BloodThinners;
                 row.FamilyContactName = codeTruma.FamilyContactName;
-                row.FamilyContactNumber = codeTruma.FamilyContactNumber;
+                row.FamilyContactNumber = codeTruma.FamilyContactNumber != null && codeTruma.FamilyContactNumber != "" && codeTruma.FamilyContactNumber != "(___) ___-____" ? codeTruma.FamilyContactNumber : "";
                 row.IsEms = codeTruma.IsEms;
                 //row.IsCompleted = codeTruma.IsCompleted;
                 if (codeTruma.IsCompleted != null && codeTruma.IsCompleted == true && row.IsCompleted != true)
@@ -4279,113 +4743,130 @@ namespace Web.Services.Concrete
 
                 this._codeTrumaRepo.Update(row);
 
-                if (codeTruma.DefaultServiceLineIds == null || codeTruma.DefaultServiceLineIds == "")
+                //if (codeTruma.DefaultServiceLineIds == null || codeTruma.DefaultServiceLineIds == "")
+                //{
+                //    string IsEMS = row.IsEms.HasValue && row.IsEms.Value ? "EMS Code" : "Inhouse Code";
+                //    codeTruma.DefaultServiceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeTruma.OrganizationIdFk && x.CodeIdFk == UCLEnums.Trauma.ToInt() && x.Type == IsEMS && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
+                //}
+
+                //if (codeTruma.DefaultServiceLineIds != null && codeTruma.DefaultServiceLineIds != "")
+                //{
+                //    var DefaultServiceLineIds = codeTruma.DefaultServiceLineIds.ToIntList();
+                //    var ServiceLineTeam1Ids = codeTruma.ServiceLineTeam1Ids.ToIntList();
+                //    var ServiceLineTeam2Ids = codeTruma.ServiceLineTeam2Ids.ToIntList();
+
+                //    var codeServiceMapping = this._codesServiceLinesMappingRepo.Table.Where(x => x.OrganizationIdFk == row.OrganizationIdFk && x.CodeIdFk == UCLEnums.Trauma.ToInt() && x.ActiveCodeId == row.CodeTraumaId).ToList();
+                //    if (codeServiceMapping.Count > 0)
+                //        this._codesServiceLinesMappingRepo.DeleteRange(codeServiceMapping);
+                //    var codeService = new CodesServiceLinesMapping()
+                //    {
+                //        OrganizationIdFk = row.OrganizationIdFk,
+                //        CodeIdFk = UCLEnums.Trauma.ToInt(),
+                //        DefaultServiceLineIdFk = codeTruma.DefaultServiceLineIds,
+                //        ServiceLineId1Fk = codeTruma.ServiceLineTeam1Ids,
+                //        ServiceLineId2Fk = codeTruma.ServiceLineTeam2Ids,
+                //        ActiveCodeId = row.CodeTraumaId,
+                //        ActiveCodeName = UCLEnums.Trauma.ToString()
+                //    };
+                //    this._codesServiceLinesMappingRepo.Insert(codeService);
+
+                //    //var channel = this._TraumaCodeGroupMembersRepo.Table.Where(x => x.TraumaCodeIdFk == row.CodeTraumaId && !x.IsDeleted).ToList();
+
+                //    var UserChannelSid = (from us in this._userSchedulesRepo.Table
+                //                          join u in this._userRepo.Table on us.UserIdFk equals u.UserId
+                //                          where (DefaultServiceLineIds.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam1Ids.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam2Ids.Contains(us.ServiceLineIdFk.Value)) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
+                //                          select new { u.UserUniqueId, u.UserId }).Distinct().ToList();
+                //    var superAdmins = this._userRepo.Table.Where(x => x.IsInGroup && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).ToList();
+                //    UserChannelSid.AddRange(superAdmins);
+                //    var loggedInUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).FirstOrDefault();
+                //    UserChannelSid.Add(loggedInUser);
+
+                //    if (row.ChannelSid != null && row.ChannelSid != "")
+                //    {
+                //        var channelSid = row.ChannelSid; //channel.Select(x => x.ChannelSid).FirstOrDefault();
+                //        var groupMembers = this._TraumaCodeGroupMembersRepo.Table.Where(x => x.TraumaCodeIdFk == row.CodeTraumaId).ToList();
+                //        this._TraumaCodeGroupMembersRepo.DeleteRange(groupMembers);
+                //        //this._TraumaCodeGroupMembersRepo.DeleteRange(channel);
+                //        bool isDeleted = _communicationService.DeleteUserToConversationChannel(channelSid);
+                //        List<CodeTraumaGroupMember> ACodeGroupMembers = new List<CodeTraumaGroupMember>();
+                //        foreach (var item in UserChannelSid.Distinct())
+                //        {
+                //            try
+                //            {
+                //                var codeGroupMember = new CodeTraumaGroupMember()
+                //                {
+                //                    //ChannelSid = channelSid,
+                //                    UserIdFk = item.UserId,
+                //                    TraumaCodeIdFk = row.CodeTraumaId,
+                //                    //ActiveCodeName = UCLEnums.Trauma.ToString(),
+                //                    IsAcknowledge = false,
+                //                    CreatedBy = ApplicationSettings.UserId,
+                //                    CreatedDate = DateTime.UtcNow,
+                //                    IsDeleted = false
+                //                };
+                //                ACodeGroupMembers.Add(codeGroupMember);
+                //                _communicationService.addNewUserToConversationChannel(channelSid, item.UserUniqueId);
+                //            }
+                //            catch (Exception ex)
+                //            {
+                //                //ElmahExtensions.RiseError(ex);
+                //            }
+                //        }
+                //        this._TraumaCodeGroupMembersRepo.Insert(ACodeGroupMembers);
+                //    }
+
+                //    var notification = new PushNotificationVM()
+                //    {
+                //        Id = row.CodeTraumaId,
+                //        OrgId = row.OrganizationIdFk,
+                //        UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).Distinct().ToList(),
+                //        From = AuthorEnums.Trauma.ToString(),
+                //        Msg = (codeTruma.IsEms.HasValue && codeTruma.IsEms.Value ? "EMS" : "Inhouse") + " Code Trauma From is Changed",
+                //        RouteLink1 = "/Home/Inhouse%20Codes/code-trauma-form",
+                //        RouteLink2 = "/Home/EMS/activateCode"
+                //    };
+
+                //    _communicationService.pushNotification(notification);
+
+                //}
+                //else
+                //{
+
+                //    var userIds = this._TraumaCodeGroupMembersRepo.Table.Where(x => x.TraumaCodeIdFk == row.CodeTraumaId).Select(x => x.UserIdFk).ToList();
+                //    var userUniqueIds = this._userRepo.Table.Where(x => userIds.Contains(x.UserId)).Select(x => x.UserUniqueId).Distinct().ToList();
+
+
+                //    var notification = new PushNotificationVM()
+                //    {
+                //        Id = row.CodeTraumaId,
+                //        OrgId = row.OrganizationIdFk,
+                //        UserChannelSid = userUniqueIds,
+                //        From = AuthorEnums.Trauma.ToString(),
+                //        Msg = (codeTruma.IsEms.HasValue && codeTruma.IsEms.Value ? "EMS" : "Inhouse") + " Code Trauma From is Changed",
+                //        RouteLink1 = "/Home/Inhouse%20Codes/code-trauma-form",
+                //        RouteLink2 = "/Home/EMS/activateCode"
+                //    };
+
+                //    _communicationService.pushNotification(notification);
+
+                //}
+
+                var userIds = this._TraumaCodeGroupMembersRepo.Table.Where(x => x.TraumaCodeIdFk == row.CodeTraumaId).Select(x => x.UserIdFk).ToList();
+                var userUniqueIds = this._userRepo.Table.Where(x => userIds.Contains(x.UserId)).Select(x => x.UserUniqueId).Distinct().ToList();
+
+
+                var notification = new PushNotificationVM()
                 {
-                    string IsEMS = row.IsEms.HasValue && row.IsEms.Value ? "EMS Code" : "Inhouse Code";
-                    codeTruma.DefaultServiceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeTruma.OrganizationIdFk && x.CodeIdFk == UCLEnums.Trauma.ToInt() && x.Type == IsEMS && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
-                }
+                    Id = row.CodeTraumaId,
+                    OrgId = row.OrganizationIdFk,
+                    UserChannelSid = userUniqueIds,
+                    From = AuthorEnums.Trauma.ToString(),
+                    Msg = (codeTruma.IsEms.HasValue && codeTruma.IsEms.Value ? "EMS" : "Inhouse") + " Code Trauma From is Changed",
+                    RouteLink1 = "/Home/Inhouse%20Codes/code-trauma-form",
+                    RouteLink2 = "/Home/EMS/activateCode"
+                };
 
-                if (codeTruma.DefaultServiceLineIds != null && codeTruma.DefaultServiceLineIds != "")
-                {
-                    var DefaultServiceLineIds = codeTruma.DefaultServiceLineIds.ToIntList();
-                    var ServiceLineTeam1Ids = codeTruma.ServiceLineTeam1Ids.ToIntList();
-                    var ServiceLineTeam2Ids = codeTruma.ServiceLineTeam2Ids.ToIntList();
-
-                    var codeServiceMapping = this._codesServiceLinesMappingRepo.Table.Where(x => x.OrganizationIdFk == row.OrganizationIdFk && x.CodeIdFk == UCLEnums.Trauma.ToInt() && x.ActiveCodeId == row.CodeTraumaId).ToList();
-                    if (codeServiceMapping.Count > 0)
-                        this._codesServiceLinesMappingRepo.DeleteRange(codeServiceMapping);
-                    var codeService = new CodesServiceLinesMapping()
-                    {
-                        OrganizationIdFk = row.OrganizationIdFk,
-                        CodeIdFk = UCLEnums.Trauma.ToInt(),
-                        DefaultServiceLineIdFk = codeTruma.DefaultServiceLineIds,
-                        ServiceLineId1Fk = codeTruma.ServiceLineTeam1Ids,
-                        ServiceLineId2Fk = codeTruma.ServiceLineTeam2Ids,
-                        ActiveCodeId = row.CodeTraumaId,
-                        ActiveCodeName = UCLEnums.Trauma.ToString()
-                    };
-                    this._codesServiceLinesMappingRepo.Insert(codeService);
-
-                    //var channel = this._TraumaCodeGroupMembersRepo.Table.Where(x => x.TraumaCodeIdFk == row.CodeTraumaId && !x.IsDeleted).ToList();
-
-                    var UserChannelSid = (from us in this._userSchedulesRepo.Table
-                                          join u in this._userRepo.Table on us.UserIdFk equals u.UserId
-                                          where (DefaultServiceLineIds.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam1Ids.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam2Ids.Contains(us.ServiceLineIdFk.Value)) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
-                                          select new { u.UserUniqueId, u.UserId }).Distinct().ToList();
-                    var superAdmins = this._userRepo.Table.Where(x => x.IsInGroup && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).ToList();
-                    UserChannelSid.AddRange(superAdmins);
-                    var loggedInUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).FirstOrDefault();
-                    UserChannelSid.Add(loggedInUser);
-
-                    if (row.ChannelSid != null && row.ChannelSid != "")
-                    {
-                        var channelSid = row.ChannelSid; //channel.Select(x => x.ChannelSid).FirstOrDefault();
-                        var groupMembers = this._TraumaCodeGroupMembersRepo.Table.Where(x => x.TraumaCodeIdFk == row.CodeTraumaId).ToList();
-                        this._TraumaCodeGroupMembersRepo.DeleteRange(groupMembers);
-                        //this._TraumaCodeGroupMembersRepo.DeleteRange(channel);
-                        bool isDeleted = _communicationService.DeleteUserToConversationChannel(channelSid);
-                        List<CodeTraumaGroupMember> ACodeGroupMembers = new List<CodeTraumaGroupMember>();
-                        foreach (var item in UserChannelSid.Distinct())
-                        {
-                            try
-                            {
-                                var codeGroupMember = new CodeTraumaGroupMember()
-                                {
-                                    //ChannelSid = channelSid,
-                                    UserIdFk = item.UserId,
-                                    TraumaCodeIdFk = row.CodeTraumaId,
-                                    //ActiveCodeName = UCLEnums.Trauma.ToString(),
-                                    IsAcknowledge = false,
-                                    CreatedBy = ApplicationSettings.UserId,
-                                    CreatedDate = DateTime.UtcNow,
-                                    IsDeleted = false
-                                };
-                                ACodeGroupMembers.Add(codeGroupMember);
-                                _communicationService.addNewUserToConversationChannel(channelSid, item.UserUniqueId);
-                            }
-                            catch (Exception ex)
-                            {
-                                //ElmahExtensions.RiseError(ex);
-                            }
-                        }
-                        this._TraumaCodeGroupMembersRepo.Insert(ACodeGroupMembers);
-                    }
-
-                    var notification = new PushNotificationVM()
-                    {
-                        Id = row.CodeTraumaId,
-                        OrgId = row.OrganizationIdFk,
-                        UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).Distinct().ToList(),
-                        From = AuthorEnums.Trauma.ToString(),
-                        Msg = (codeTruma.IsEms.HasValue && codeTruma.IsEms.Value ? "EMS" : "Inhouse") + " Code Trauma From is Changed",
-                        RouteLink1 = "/Home/Inhouse%20Codes/code-trauma-form",
-                        RouteLink2 = "/Home/EMS/activateCode"
-                    };
-
-                    _communicationService.pushNotification(notification);
-
-                }
-                else
-                {
-
-                    var userIds = this._TraumaCodeGroupMembersRepo.Table.Where(x => x.TraumaCodeIdFk == row.CodeTraumaId).Select(x => x.UserIdFk).ToList();
-                    var userUniqueIds = this._userRepo.Table.Where(x => userIds.Contains(x.UserId)).Select(x => x.UserUniqueId).Distinct().ToList();
-
-
-                    var notification = new PushNotificationVM()
-                    {
-                        Id = row.CodeTraumaId,
-                        OrgId = row.OrganizationIdFk,
-                        UserChannelSid = userUniqueIds,
-                        From = AuthorEnums.Trauma.ToString(),
-                        Msg = (codeTruma.IsEms.HasValue && codeTruma.IsEms.Value ? "EMS" : "Inhouse") + " Code Trauma From is Changed",
-                        RouteLink1 = "/Home/Inhouse%20Codes/code-trauma-form",
-                        RouteLink2 = "/Home/EMS/activateCode"
-                    };
-
-                    _communicationService.pushNotification(notification);
-
-                }
+                _communicationService.pushNotification(notification);
                 return GetTrumaDataById(row.CodeTraumaId);
             }
             else
@@ -4400,6 +4881,7 @@ namespace Web.Services.Concrete
                         var DefaultServiceLineIds = DefaultServiceLineTeam.ToIntList();
 
                         codeTruma.CreatedDate = DateTime.UtcNow;
+                        codeTruma.FamilyContactNumber = codeTruma.FamilyContactNumber != null && codeTruma.FamilyContactNumber != "" && codeTruma.FamilyContactNumber != "(___) ___-____" ? codeTruma.FamilyContactNumber : "";
                         var Truma = AutoMapperHelper.MapSingleRow<CodeTrumaVM, CodeTrauma>(codeTruma);
 
                         if (codeTruma.Attachment != null && codeTruma.Attachment.Count > 0)
@@ -4699,94 +5181,287 @@ namespace Web.Services.Concrete
                         };
                         this._codesServiceLinesMappingRepo.Insert(codeService);
 
-                        var UserChannelSid = (from us in this._userSchedulesRepo.Table
-                                              join u in this._userRepo.Table on us.UserIdFk equals u.UserId
-                                              where DefaultServiceLineIds.Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
-                                              select new { u.UserUniqueId, u.UserId }).ToList();
-                        var superAdmins = this._userRepo.Table.Where(x => x.IsInGroup && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).ToList();
-                        UserChannelSid.AddRange(superAdmins);
-                        var loggedUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).FirstOrDefault();
-                        UserChannelSid.Add(loggedUser);
-                        List<CodeTraumaGroupMember> ACodeGroupMembers = new();
-                        if (UserChannelSid != null && UserChannelSid.Count > 0)
-                        {
-                            string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
-                            string friendlyName = Truma.IsEms.HasValue && Truma.IsEms.Value ? $"EMS Code {UCLEnums.Trauma.ToString()} {Truma.CodeTraumaId}" : $"Inhouse Code {UCLEnums.Trauma.ToString()} {Truma.CodeTraumaId}";
-                            var conversationChannelAttributes = JsonConvert.SerializeObject(new Dictionary<string, Object>()
-                                    {
-                                        {ChannelAttributeEnums.ChannelType.ToString(), ChannelTypeEnums.EMS.ToString()},
-                                        {ChannelAttributeEnums.CodeType.ToString(), ChannelTypeEnums.Trauma.ToString()},
-                                        {ChannelAttributeEnums.TraumaId.ToString(), Truma.CodeTraumaId}
-                                    }, Formatting.Indented);
-                            var channel = _communicationService.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
-                            Truma.ChannelSid = channel.Sid;
-                            this._codeTrumaRepo.Update(Truma);
-                            UserChannelSid = UserChannelSid.Distinct().ToList();
-                            foreach (var item in UserChannelSid)
-                            {
-                                try
-                                {
-                                    var codeGroupMember = new CodeTraumaGroupMember()
-                                    {
-                                        //ChannelSid = channel.Sid,
-                                        UserIdFk = item.UserId,
-                                        TraumaCodeIdFk = Truma.CodeTraumaId,
-                                        //ActiveCodeName = UCLEnums.Trauma.ToString(),
-                                        IsAcknowledge = false,
-                                        CreatedBy = ApplicationSettings.UserId,
-                                        CreatedDate = DateTime.UtcNow,
-                                        IsDeleted = false
-                                    };
-                                    ACodeGroupMembers.Add(codeGroupMember);
-                                    _communicationService.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
-                                }
-                                catch (Exception ex)
-                                {
-                                    //ElmahExtensions.RiseError(ex);
-                                }
-                            }
-                            this._TraumaCodeGroupMembersRepo.Insert(ACodeGroupMembers);
+                        //var UserChannelSid = (from us in this._userSchedulesRepo.Table
+                        //                      join u in this._userRepo.Table on us.UserIdFk equals u.UserId
+                        //                      where DefaultServiceLineIds.Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
+                        //                      select new { u.UserUniqueId, u.UserId }).ToList();
+                        //var superAdmins = this._userRepo.Table.Where(x => x.IsInGroup && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).ToList();
+                        //UserChannelSid.AddRange(superAdmins);
+                        //var loggedUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).FirstOrDefault();
+                        //UserChannelSid.Add(loggedUser);
+                        //List<CodeTraumaGroupMember> ACodeGroupMembers = new();
+                        //if (UserChannelSid != null && UserChannelSid.Count > 0)
+                        //{
+                        //    string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
+                        //    string friendlyName = Truma.IsEms.HasValue && Truma.IsEms.Value ? $"EMS Code {UCLEnums.Trauma.ToString()} {Truma.CodeTraumaId}" : $"Inhouse Code {UCLEnums.Trauma.ToString()} {Truma.CodeTraumaId}";
+                        //    var conversationChannelAttributes = JsonConvert.SerializeObject(new Dictionary<string, Object>()
+                        //            {
+                        //                {ChannelAttributeEnums.ChannelType.ToString(), ChannelTypeEnums.EMS.ToString()},
+                        //                {ChannelAttributeEnums.CodeType.ToString(), ChannelTypeEnums.Trauma.ToString()},
+                        //                {ChannelAttributeEnums.TraumaId.ToString(), Truma.CodeTraumaId}
+                        //            }, Formatting.Indented);
+                        //    var channel = _communicationService.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
+                        //    Truma.ChannelSid = channel.Sid;
+                        //    this._codeTrumaRepo.Update(Truma);
+                        //    UserChannelSid = UserChannelSid.Distinct().ToList();
+                        //    foreach (var item in UserChannelSid)
+                        //    {
+                        //        try
+                        //        {
+                        //            var codeGroupMember = new CodeTraumaGroupMember()
+                        //            {
+                        //                //ChannelSid = channel.Sid,
+                        //                UserIdFk = item.UserId,
+                        //                TraumaCodeIdFk = Truma.CodeTraumaId,
+                        //                //ActiveCodeName = UCLEnums.Trauma.ToString(),
+                        //                IsAcknowledge = false,
+                        //                CreatedBy = ApplicationSettings.UserId,
+                        //                CreatedDate = DateTime.UtcNow,
+                        //                IsDeleted = false
+                        //            };
+                        //            ACodeGroupMembers.Add(codeGroupMember);
+                        //            _communicationService.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
+                        //        }
+                        //        catch (Exception ex)
+                        //        {
+                        //            //ElmahExtensions.RiseError(ex);
+                        //        }
+                        //    }
+                        //    this._TraumaCodeGroupMembersRepo.Insert(ACodeGroupMembers);
 
-                            var msg = new ConversationMessageVM();
-                            msg.channelSid = channel.Sid;
-                            msg.author = "System";
-                            msg.attributes = "";
-                            msg.body = $"<strong> {(codeTruma.IsEms.HasValue && codeTruma.IsEms.Value ? "EMS Code" : "Inhouse Code")} {UCLEnums.Trauma.ToString()} </strong></br></br>";
-                            if (codeTruma.PatientName != null && codeTruma.PatientName != "")
-                                msg.body += $"<strong>Patient Name: </strong> {codeTruma.PatientName} </br>";
-                            msg.body += $"<strong>Dob: </strong> {codeTruma.Dob:MM-dd-yyyy} </br>";
-                            msg.body += $"<strong>Last Well Known: </strong> {codeTruma.LastKnownWell:MM-dd-yyyy hh:mm tt} </br>";
-                            if (codeTruma.ChiefComplant != null && codeTruma.ChiefComplant != "")
-                                msg.body += $"<strong>Chief Complaint: </strong> {codeTruma.ChiefComplant} </br>";
-                            if (codeTruma.Hpi != null && codeTruma.Hpi != "")
-                                msg.body += $"<strong>Hpi: </strong> {codeTruma.Hpi} </br>";
-                            var sendMsg = _communicationService.sendPushNotification(msg);
+                        //    var msg = new ConversationMessageVM();
+                        //    msg.channelSid = channel.Sid;
+                        //    msg.author = "System";
+                        //    msg.attributes = "";
+                        //    msg.body = $"<strong> {(codeTruma.IsEms.HasValue && codeTruma.IsEms.Value ? "EMS Code" : "Inhouse Code")} {UCLEnums.Trauma.ToString()} </strong></br></br>";
+                        //    if (codeTruma.PatientName != null && codeTruma.PatientName != "")
+                        //        msg.body += $"<strong>Patient Name: </strong> {codeTruma.PatientName} </br>";
+                        //    msg.body += $"<strong>Dob: </strong> {codeTruma.Dob:MM-dd-yyyy} </br>";
+                        //    msg.body += $"<strong>Last Well Known: </strong> {codeTruma.LastKnownWell:MM-dd-yyyy hh:mm tt} </br>";
+                        //    if (codeTruma.ChiefComplant != null && codeTruma.ChiefComplant != "")
+                        //        msg.body += $"<strong>Chief Complaint: </strong> {codeTruma.ChiefComplant} </br>";
+                        //    if (codeTruma.Hpi != null && codeTruma.Hpi != "")
+                        //        msg.body += $"<strong>Hpi: </strong> {codeTruma.Hpi} </br>";
+                        //    var sendMsg = _communicationService.sendPushNotification(msg);
 
-                            var showAllAccessUsers = this._dbContext.LoadStoredProcedure("md_getUsersOfComponentAccess")
-                                               .WithSqlParam("@componentName", "Show All EMS,Show All Active Codes,Show Graphs,Show EMS,Show Active Codes")
-                                               .WithSqlParam("@orgId", Truma.OrganizationIdFk)
-                                               .ExecuteStoredProc<RegisterCredentialVM>().Select(x => new { x.UserUniqueId, x.UserId }).Distinct().ToList();
-                            UserChannelSid.AddRange(showAllAccessUsers);
-                            var notification = new PushNotificationVM()
-                            {
-                                Id = Truma.CodeTraumaId,
-                                OrgId = Truma.OrganizationIdFk,
-                                UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).Distinct().ToList(),
-                                From = AuthorEnums.Trauma.ToString(),
-                                Msg = (codeTruma.IsEms.HasValue && codeTruma.IsEms.Value ? "EMS" : "Inhouse") + " Code Trauma is update",
-                                RouteLink3 = "/Home/EMS",
-                                RouteLink4 = "/Home/Dashboard",
-                                RouteLink5 = "/Home/Inhouse%20Codes"
-                            };
+                        //    var showAllAccessUsers = this._dbContext.LoadStoredProcedure("md_getUsersOfComponentAccess")
+                        //                       .WithSqlParam("@componentName", "Show All EMS,Show All Active Codes,Show Graphs,Show EMS,Show Active Codes")
+                        //                       .WithSqlParam("@orgId", Truma.OrganizationIdFk)
+                        //                       .ExecuteStoredProc<RegisterCredentialVM>().Select(x => new { x.UserUniqueId, x.UserId }).Distinct().ToList();
+                        //    UserChannelSid.AddRange(showAllAccessUsers);
+                        //    var notification = new PushNotificationVM()
+                        //    {
+                        //        Id = Truma.CodeTraumaId,
+                        //        OrgId = Truma.OrganizationIdFk,
+                        //        UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).Distinct().ToList(),
+                        //        From = AuthorEnums.Trauma.ToString(),
+                        //        Msg = (codeTruma.IsEms.HasValue && codeTruma.IsEms.Value ? "EMS" : "Inhouse") + " Code Trauma is update",
+                        //        RouteLink3 = "/Home/EMS",
+                        //        RouteLink4 = "/Home/Dashboard",
+                        //        RouteLink5 = "/Home/Inhouse%20Codes"
+                        //    };
 
-                            _communicationService.pushNotification(notification);
-                        }
+                        //    _communicationService.pushNotification(notification);
+                        //}
                         return GetTrumaDataById(Truma.CodeTraumaId);
                     }
                     return new BaseResponse() { Status = HttpStatusCode.NotAcceptable, Message = "There is no Service Line in this organization related to Code Trauma" };
                 }
                 return new BaseResponse() { Status = HttpStatusCode.NotAcceptable, Message = "Organization is not selected" };
             }
+        }
+
+
+        public BaseResponse CreateTrumaGroup(CodeTrumaVM codeTruma)
+        {
+
+            var DefaultServiceLineIds = codeTruma.DefaultServiceLineIds.ToIntList();
+            bool usersFound = false;
+            var UserChannelSid = (from us in this._userSchedulesRepo.Table
+                                  join u in this._userRepo.Table on us.UserIdFk equals u.UserId
+                                  where DefaultServiceLineIds.Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
+                                  select new { u.UserUniqueId, u.UserId }).Distinct().ToList();
+            usersFound = UserChannelSid.Count() > 0;
+            var superAdmins = this._userRepo.Table.Where(x => x.IsInGroup && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).ToList();
+            UserChannelSid.AddRange(superAdmins);
+            var loggedUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).FirstOrDefault();
+            UserChannelSid.Add(loggedUser);
+            var conversationChannelAttributes = JsonConvert.SerializeObject(new Dictionary<string, Object>()
+                                    {
+                                        {ChannelAttributeEnums.ChannelType.ToString(), ChannelTypeEnums.EMS.ToString()},
+                                        {ChannelAttributeEnums.CodeType.ToString(), ChannelTypeEnums.Trauma.ToString()},
+                                        {ChannelAttributeEnums.TraumaId.ToString(), codeTruma.CodeTraumaId}
+                                    }, Formatting.Indented);
+            List<CodeTraumaGroupMember> ACodeGroupMembers = new List<CodeTraumaGroupMember>();
+            if (UserChannelSid != null && UserChannelSid.Count > 0)
+            {
+                string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
+                string friendlyName = codeTruma.IsEms.HasValue && codeTruma.IsEms.Value ? $"EMS Code {UCLEnums.Trauma.ToString()} {codeTruma.CodeTraumaId}" : $"Inhouse Code {UCLEnums.Trauma.ToString()} {codeTruma.CodeTraumaId}";
+                var channel = _communicationService.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
+                var Truma = this._codeTrumaRepo.Table.Where(x => x.CodeTraumaId == codeTruma.CodeTraumaId && x.IsActive == true && !x.IsDeleted).FirstOrDefault();
+                if (Truma != null)
+                {
+                    Truma.ChannelSid = channel.Sid;
+                    this._codeTrumaRepo.Update(Truma);
+                }
+                UserChannelSid = UserChannelSid.Distinct().ToList();
+                foreach (var item in UserChannelSid)
+                {
+                    try
+                    {
+                        var codeGroupMember = new CodeTraumaGroupMember()
+                        {
+                            UserIdFk = item.UserId,
+                            TraumaCodeIdFk = Truma.CodeTraumaId,
+                            //ActiveCodeName = UCLEnums.Truma.ToString(),
+                            IsAcknowledge = false,
+                            CreatedBy = ApplicationSettings.UserId,
+                            CreatedDate = DateTime.UtcNow,
+                            IsDeleted = false
+                        };
+                        ACodeGroupMembers.Add(codeGroupMember);
+                        _communicationService.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
+                    }
+                    catch (Exception ex)
+                    {
+
+                    }
+                }
+                this._TraumaCodeGroupMembersRepo.Insert(ACodeGroupMembers);
+                var msg = new ConversationMessageVM();
+                msg.channelSid = channel.Sid;
+                msg.author = "System";
+                msg.attributes = "";
+                msg.body = $"<strong> {(codeTruma.IsEms.HasValue && codeTruma.IsEms.Value ? "EMS Code" : "Inhouse Code")} {UCLEnums.Trauma.ToString()} </strong></br></br>";
+                if (codeTruma.PatientName != null && codeTruma.PatientName != "")
+                    msg.body += $"<strong>Patient Name: </strong> {codeTruma.PatientName} </br>";
+                if (codeTruma.Dob != null)
+                    msg.body += $"<strong>Dob: </strong> {codeTruma.Dob:MM-dd-yyyy} </br>";
+                if (codeTruma.LastKnownWell != null)
+                    msg.body += $"<strong>Last Well Known: </strong> {codeTruma.LastKnownWell:MM-dd-yyyy hh:mm tt} </br>";
+                if (codeTruma.ChiefComplant != null && codeTruma.ChiefComplant != "")
+                    msg.body += $"<strong>Chief Complaint: </strong> {codeTruma.ChiefComplant} </br>";
+                if (codeTruma.Hpi != null && codeTruma.Hpi != "")
+                    msg.body += $"<strong>Hpi: </strong> {codeTruma.Hpi} </br>";
+                var sendMsg = _communicationService.sendPushNotification(msg);
+
+                var showAllAccessUsers = this._dbContext.LoadStoredProcedure("md_getUsersOfComponentAccess")
+                                    .WithSqlParam("@componentName", "Show All EMS,Show All Active Codes,Show Graphs,Show EMS,Show Active Codes")
+                                    .WithSqlParam("@orgId", Truma.OrganizationIdFk)
+                                    .ExecuteStoredProc<RegisterCredentialVM>().Select(x => new { x.UserUniqueId, x.UserId }).Distinct().ToList();
+                UserChannelSid.AddRange(showAllAccessUsers);
+                var notification = new PushNotificationVM()
+                {
+                    Id = Truma.CodeTraumaId,
+                    OrgId = Truma.OrganizationIdFk,
+                    UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).Distinct().ToList(),
+                    From = AuthorEnums.Trauma.ToString(),
+                    Msg = (codeTruma.IsEms.HasValue && codeTruma.IsEms.Value ? "EMS" : "Inhouse") + " Code Truma is update",
+                    RouteLink3 = "/Home/EMS",
+                    RouteLink4 = "/Home/Dashboard",
+                    RouteLink5 = "/Home/Inhouse%20Codes"
+                };
+
+                _communicationService.pushNotification(notification);
+            }
+
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Group Created Successfully", Body = new { serviceLineUsersFound = usersFound } };
+        }
+
+        public BaseResponse UpdateTrumaGroupMembers(CodeTrumaVM codeTruma)
+        {
+
+            if (codeTruma.DefaultServiceLineIds == null || codeTruma.DefaultServiceLineIds == "")
+            {
+                string IsEMS = codeTruma.IsEms.HasValue && codeTruma.IsEms.Value ? "EMS Code" : "Inhouse Code";
+                codeTruma.DefaultServiceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeTruma.OrganizationIdFk && x.CodeIdFk == UCLEnums.Trauma.ToInt() && x.Type == IsEMS && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
+            }
+
+            if (codeTruma.DefaultServiceLineIds != null && codeTruma.DefaultServiceLineIds != "")
+            {
+                var DefaultServiceLineIds = codeTruma.DefaultServiceLineIds.ToIntList();
+                var ServiceLineTeam1Ids = codeTruma.ServiceLineTeam1Ids.ToIntList();
+                var ServiceLineTeam2Ids = codeTruma.ServiceLineTeam2Ids.ToIntList();
+
+                var codeServiceMapping = this._codesServiceLinesMappingRepo.Table.Where(x => x.OrganizationIdFk == codeTruma.OrganizationIdFk && x.CodeIdFk == UCLEnums.Trauma.ToInt() && x.ActiveCodeId == codeTruma.CodeTraumaId).ToList();
+                if (codeServiceMapping.Count > 0)
+                    this._codesServiceLinesMappingRepo.DeleteRange(codeServiceMapping);
+
+                var codeService = new CodesServiceLinesMapping()
+                {
+                    OrganizationIdFk = codeTruma.OrganizationIdFk,
+                    CodeIdFk = UCLEnums.Trauma.ToInt(),
+                    DefaultServiceLineIdFk = codeTruma.DefaultServiceLineIds,
+                    ServiceLineId1Fk = codeTruma.ServiceLineTeam1Ids,
+                    ServiceLineId2Fk = codeTruma.ServiceLineTeam2Ids,
+                    ActiveCodeId = codeTruma.CodeTraumaId,
+                    ActiveCodeName = UCLEnums.Trauma.ToString()
+                };
+                this._codesServiceLinesMappingRepo.Insert(codeService);
+
+                //var channel = this._TrumaCodeGroupMembersRepo.Table.Where(x => x.TrumaCodeIdFk == codeTruma.CodeTrumaId && !x.IsDeleted).ToList();
+
+                var UserChannelSid = (from us in this._userSchedulesRepo.Table
+                                      join u in this._userRepo.Table on us.UserIdFk equals u.UserId
+                                      where (DefaultServiceLineIds.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam1Ids.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam2Ids.Contains(us.ServiceLineIdFk.Value)) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
+                                      select new { u.UserUniqueId, u.UserId }).Distinct().ToList();
+                var superAdmins = this._userRepo.Table.Where(x => x.IsInGroup && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).ToList();
+                UserChannelSid.AddRange(superAdmins);
+                var loggedInUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).FirstOrDefault();
+                UserChannelSid.Add(loggedInUser);
+
+                if (codeTruma.ChannelSid != null && codeTruma.ChannelSid != "")
+                {
+                    var channelSid = codeTruma.ChannelSid; //channel.Select(x => x.ChannelSid).FirstOrDefault();
+
+                    var groupMembers = this._TraumaCodeGroupMembersRepo.Table.Where(x => x.TraumaCodeIdFk == codeTruma.CodeTraumaId).ToList();
+                    this._TraumaCodeGroupMembersRepo.DeleteRange(groupMembers);
+                    //this._TrumaCodeGroupMembersRepo.DeleteRange(channel);
+                    bool isDeleted = _communicationService.DeleteUserToConversationChannel(channelSid);
+                    List<CodeTraumaGroupMember> ACodeGroupMembers = new List<CodeTraumaGroupMember>();
+                    foreach (var item in UserChannelSid.Distinct())
+                    {
+                        try
+                        {
+                            var codeGroupMember = new CodeTraumaGroupMember()
+                            {
+                                UserIdFk = item.UserId,
+                                TraumaCodeIdFk = codeTruma.CodeTraumaId,
+                                //ActiveCodeName = UCLEnums.Truma.ToString(),
+                                IsAcknowledge = false,
+                                CreatedBy = ApplicationSettings.UserId,
+                                CreatedDate = DateTime.UtcNow,
+                                IsDeleted = false
+                            };
+                            ACodeGroupMembers.Add(codeGroupMember);
+                            _communicationService.addNewUserToConversationChannel(channelSid, item.UserUniqueId);
+                        }
+                        catch (Exception ex)
+                        {
+                            //ElmahExtensions.RiseError(ex);
+                        }
+                    }
+                    this._TraumaCodeGroupMembersRepo.Insert(ACodeGroupMembers);
+
+                }
+
+
+                var notification = new PushNotificationVM()
+                {
+                    Id = codeTruma.CodeTraumaId,
+                    OrgId = codeTruma.OrganizationIdFk,
+                    UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).Distinct().ToList(),
+                    From = AuthorEnums.Trauma.ToString(),
+                    Msg = (codeTruma.IsEms.HasValue && codeTruma.IsEms.Value ? "EMS" : "Inhouse") + " Code Truma From is Changed",
+                    RouteLink1 = "/Home/Inhouse%20Codes/code-strok-form",
+                    RouteLink2 = "/Home/EMS/activateCode",
+                };
+
+                _communicationService.pushNotification(notification);
+
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Group Updated." };
+            }
+            return new BaseResponse() { Status = HttpStatusCode.NotModified, Message = "Group Not Updated" };
         }
 
         public BaseResponse DeleteTruma(int TrumaId, bool status)
@@ -5072,7 +5747,7 @@ namespace Web.Services.Concrete
                 row.Hpi = codeBlue.Hpi;
                 row.BloodThinners = codeBlue.BloodThinners;
                 row.FamilyContactName = codeBlue.FamilyContactName;
-                row.FamilyContactNumber = codeBlue.FamilyContactNumber;
+                row.FamilyContactNumber = codeBlue.FamilyContactNumber != null && codeBlue.FamilyContactNumber != "" && codeBlue.FamilyContactNumber != "(___) ___-____" ? codeBlue.FamilyContactNumber : "";
                 row.IsEms = codeBlue.IsEms;
                 //row.IsCompleted = codeStroke.IsCompleted;
                 if (codeBlue.IsCompleted != null && codeBlue.IsCompleted == true && row.IsCompleted != true)
@@ -5369,112 +6044,128 @@ namespace Web.Services.Concrete
 
                 this._codeBlueRepo.Update(row);
 
-                if (codeBlue.DefaultServiceLineIds == null || codeBlue.DefaultServiceLineIds == "")
+                //if (codeBlue.DefaultServiceLineIds == null || codeBlue.DefaultServiceLineIds == "")
+                //{
+                //    string IsEMS = row.IsEms.HasValue && row.IsEms.Value ? "EMS Code" : "Inhouse Code";
+                //    codeBlue.DefaultServiceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeBlue.OrganizationIdFk && x.CodeIdFk == UCLEnums.Blue.ToInt() && x.Type == IsEMS && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
+                //}
+
+                //if (codeBlue.DefaultServiceLineIds != null && codeBlue.DefaultServiceLineIds != "")
+                //{
+                //    var DefaultServiceLineIds = codeBlue.DefaultServiceLineIds.ToIntList();
+                //    var ServiceLineTeam1Ids = codeBlue.ServiceLineTeam1Ids.ToIntList();
+                //    var ServiceLineTeam2Ids = codeBlue.ServiceLineTeam2Ids.ToIntList();
+                //    var codeServiceMapping = this._codesServiceLinesMappingRepo.Table.Where(x => x.OrganizationIdFk == row.OrganizationIdFk && x.CodeIdFk == UCLEnums.Blue.ToInt() && x.ActiveCodeId == row.CodeBlueId).ToList();
+                //    if (codeServiceMapping.Count > 0)
+                //        this._codesServiceLinesMappingRepo.DeleteRange(codeServiceMapping);
+                //    var codeService = new CodesServiceLinesMapping()
+                //    {
+                //        OrganizationIdFk = row.OrganizationIdFk,
+                //        CodeIdFk = UCLEnums.Blue.ToInt(),
+                //        DefaultServiceLineIdFk = codeBlue.DefaultServiceLineIds,
+                //        ServiceLineId1Fk = codeBlue.ServiceLineTeam1Ids,
+                //        ServiceLineId2Fk = codeBlue.ServiceLineTeam2Ids,
+                //        ActiveCodeId = row.CodeBlueId,
+                //        ActiveCodeName = UCLEnums.Blue.ToString()
+                //    };
+                //    this._codesServiceLinesMappingRepo.Insert(codeService);
+
+                //    //var channel = this._BlueCodeGroupMembersRepo.Table.Where(x => x.BlueCodeIdFk == row.CodeBlueId && !x.IsDeleted).ToList();
+
+                //    var UserChannelSid = (from us in this._userSchedulesRepo.Table
+                //                          join u in this._userRepo.Table on us.UserIdFk equals u.UserId
+                //                          where (DefaultServiceLineIds.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam1Ids.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam2Ids.Contains(us.ServiceLineIdFk.Value)) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
+                //                          select new { u.UserUniqueId, u.UserId }).Distinct().ToList();
+                //    var superAdmins = this._userRepo.Table.Where(x => x.IsInGroup && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).ToList();
+                //    UserChannelSid.AddRange(superAdmins);
+                //    var loggedInUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).FirstOrDefault();
+                //    UserChannelSid.Add(loggedInUser);
+
+                //    if (row.ChannelSid != null && row.ChannelSid != "")
+                //    {
+                //        var channelSid = row.ChannelSid; //channel.Select(x => x.ChannelSid).FirstOrDefault();
+
+                //        var groupMembers = this._BlueCodeGroupMembersRepo.Table.Where(x => x.BlueCodeIdFk == row.CodeBlueId).ToList();
+                //        this._BlueCodeGroupMembersRepo.DeleteRange(groupMembers);
+
+                //        //this._BlueCodeGroupMembersRepo.DeleteRange(channel);
+                //        bool isDeleted = _communicationService.DeleteUserToConversationChannel(channelSid);
+                //        List<CodeBlueGroupMember> ACodeGroupMembers = new List<CodeBlueGroupMember>();
+                //        foreach (var item in UserChannelSid.Distinct())
+                //        {
+                //            try
+                //            {
+                //                var codeGroupMember = new CodeBlueGroupMember()
+                //                {
+                //                    //ChannelSid = channelSid,
+                //                    UserIdFk = item.UserId,
+                //                    BlueCodeIdFk = row.CodeBlueId,
+                //                    //ActiveCodeName = UCLEnums.Blue.ToString(),
+                //                    IsAcknowledge = false,
+                //                    CreatedBy = ApplicationSettings.UserId,
+                //                    CreatedDate = DateTime.UtcNow,
+                //                    IsDeleted = false
+                //                };
+                //                ACodeGroupMembers.Add(codeGroupMember);
+                //                _communicationService.addNewUserToConversationChannel(channelSid, item.UserUniqueId);
+                //            }
+                //            catch (Exception ex)
+                //            {
+                //                //ElmahExtensions.RiseError(ex);
+                //            }
+                //        }
+                //        this._BlueCodeGroupMembersRepo.Insert(ACodeGroupMembers);
+                //    }
+
+                //    var notification = new PushNotificationVM()
+                //    {
+                //        Id = row.CodeBlueId,
+                //        OrgId = row.OrganizationIdFk,
+                //        UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).Distinct().ToList(),
+                //        From = AuthorEnums.Blue.ToString(),
+                //        Msg = (codeBlue.IsEms.HasValue && codeBlue.IsEms.Value ? "EMS" : "Inhouse") + " Code Blue From is Changed",
+                //        RouteLink1 = "/Home/Activate%20Code/code-blue-form",
+                //        RouteLink2 = "/Home/EMS/activateCode"
+                //    };
+
+                //    _communicationService.pushNotification(notification);
+
+                //}
+                //else
+                //{
+                //    var userIds = this._BlueCodeGroupMembersRepo.Table.Where(x => x.BlueCodeIdFk == row.CodeBlueId).Select(x => x.UserIdFk).ToList();
+                //    var userUniqueIds = this._userRepo.Table.Where(x => userIds.Contains(x.UserId)).Select(x => x.UserUniqueId).Distinct().ToList();
+
+                //    var notification = new PushNotificationVM()
+                //    {
+                //        Id = row.CodeBlueId,
+                //        OrgId = row.OrganizationIdFk,
+                //        UserChannelSid = userUniqueIds,
+                //        From = AuthorEnums.Blue.ToString(),
+                //        Msg = (codeBlue.IsEms.HasValue && codeBlue.IsEms.Value ? "EMS" : "Inhouse") + " Code Blue From is Changed",
+                //        RouteLink1 = "/Home/Activate%20Code/code-blue-form",
+                //        RouteLink2 = "/Home/EMS/activateCode"
+                //    };
+
+                //    _communicationService.pushNotification(notification);
+
+                //}
+
+                var userIds = this._BlueCodeGroupMembersRepo.Table.Where(x => x.BlueCodeIdFk == row.CodeBlueId).Select(x => x.UserIdFk).ToList();
+                var userUniqueIds = this._userRepo.Table.Where(x => userIds.Contains(x.UserId)).Select(x => x.UserUniqueId).Distinct().ToList();
+
+                var notification = new PushNotificationVM()
                 {
-                    string IsEMS = row.IsEms.HasValue && row.IsEms.Value ? "EMS Code" : "Inhouse Code";
-                    codeBlue.DefaultServiceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeBlue.OrganizationIdFk && x.CodeIdFk == UCLEnums.Blue.ToInt() && x.Type == IsEMS && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
-                }
+                    Id = row.CodeBlueId,
+                    OrgId = row.OrganizationIdFk,
+                    UserChannelSid = userUniqueIds,
+                    From = AuthorEnums.Blue.ToString(),
+                    Msg = (codeBlue.IsEms.HasValue && codeBlue.IsEms.Value ? "EMS" : "Inhouse") + " Code Blue From is Changed",
+                    RouteLink1 = "/Home/Activate%20Code/code-blue-form",
+                    RouteLink2 = "/Home/EMS/activateCode"
+                };
 
-                if (codeBlue.DefaultServiceLineIds != null && codeBlue.DefaultServiceLineIds != "")
-                {
-                    var DefaultServiceLineIds = codeBlue.DefaultServiceLineIds.ToIntList();
-                    var ServiceLineTeam1Ids = codeBlue.ServiceLineTeam1Ids.ToIntList();
-                    var ServiceLineTeam2Ids = codeBlue.ServiceLineTeam2Ids.ToIntList();
-                    var codeServiceMapping = this._codesServiceLinesMappingRepo.Table.Where(x => x.OrganizationIdFk == row.OrganizationIdFk && x.CodeIdFk == UCLEnums.Blue.ToInt() && x.ActiveCodeId == row.CodeBlueId).ToList();
-                    if (codeServiceMapping.Count > 0)
-                        this._codesServiceLinesMappingRepo.DeleteRange(codeServiceMapping);
-                    var codeService = new CodesServiceLinesMapping()
-                    {
-                        OrganizationIdFk = row.OrganizationIdFk,
-                        CodeIdFk = UCLEnums.Blue.ToInt(),
-                        DefaultServiceLineIdFk = codeBlue.DefaultServiceLineIds,
-                        ServiceLineId1Fk = codeBlue.ServiceLineTeam1Ids,
-                        ServiceLineId2Fk = codeBlue.ServiceLineTeam2Ids,
-                        ActiveCodeId = row.CodeBlueId,
-                        ActiveCodeName = UCLEnums.Blue.ToString()
-                    };
-                    this._codesServiceLinesMappingRepo.Insert(codeService);
-
-                    //var channel = this._BlueCodeGroupMembersRepo.Table.Where(x => x.BlueCodeIdFk == row.CodeBlueId && !x.IsDeleted).ToList();
-
-                    var UserChannelSid = (from us in this._userSchedulesRepo.Table
-                                          join u in this._userRepo.Table on us.UserIdFk equals u.UserId
-                                          where (DefaultServiceLineIds.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam1Ids.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam2Ids.Contains(us.ServiceLineIdFk.Value)) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
-                                          select new { u.UserUniqueId, u.UserId }).Distinct().ToList();
-                    var superAdmins = this._userRepo.Table.Where(x => x.IsInGroup && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).ToList();
-                    UserChannelSid.AddRange(superAdmins);
-                    var loggedInUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).FirstOrDefault();
-                    UserChannelSid.Add(loggedInUser);
-
-                    if (row.ChannelSid != null && row.ChannelSid != "")
-                    {
-                        var channelSid = row.ChannelSid; //channel.Select(x => x.ChannelSid).FirstOrDefault();
-
-                        var groupMembers = this._BlueCodeGroupMembersRepo.Table.Where(x => x.BlueCodeIdFk == row.CodeBlueId).ToList();
-                        this._BlueCodeGroupMembersRepo.DeleteRange(groupMembers);
-
-                        //this._BlueCodeGroupMembersRepo.DeleteRange(channel);
-                        bool isDeleted = _communicationService.DeleteUserToConversationChannel(channelSid);
-                        List<CodeBlueGroupMember> ACodeGroupMembers = new List<CodeBlueGroupMember>();
-                        foreach (var item in UserChannelSid.Distinct())
-                        {
-                            try
-                            {
-                                var codeGroupMember = new CodeBlueGroupMember()
-                                {
-                                    //ChannelSid = channelSid,
-                                    UserIdFk = item.UserId,
-                                    BlueCodeIdFk = row.CodeBlueId,
-                                    //ActiveCodeName = UCLEnums.Blue.ToString(),
-                                    IsAcknowledge = false,
-                                    CreatedBy = ApplicationSettings.UserId,
-                                    CreatedDate = DateTime.UtcNow,
-                                    IsDeleted = false
-                                };
-                                ACodeGroupMembers.Add(codeGroupMember);
-                                _communicationService.addNewUserToConversationChannel(channelSid, item.UserUniqueId);
-                            }
-                            catch (Exception ex)
-                            {
-                                //ElmahExtensions.RiseError(ex);
-                            }
-                        }
-                        this._BlueCodeGroupMembersRepo.Insert(ACodeGroupMembers);
-                    }
-
-                    var notification = new PushNotificationVM()
-                    {
-                        Id = row.CodeBlueId,
-                        OrgId = row.OrganizationIdFk,
-                        UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).Distinct().ToList(),
-                        From = AuthorEnums.Blue.ToString(),
-                        Msg = (codeBlue.IsEms.HasValue && codeBlue.IsEms.Value ? "EMS" : "Inhouse") + " Code Blue From is Changed",
-                        RouteLink1 = "/Home/Activate%20Code/code-blue-form",
-                        RouteLink2 = "/Home/EMS/activateCode"
-                    };
-
-                    _communicationService.pushNotification(notification);
-
-                }
-                else
-                {
-                    var userIds = this._BlueCodeGroupMembersRepo.Table.Where(x => x.BlueCodeIdFk == row.CodeBlueId).Select(x => x.UserIdFk).ToList();
-                    var userUniqueIds = this._userRepo.Table.Where(x => userIds.Contains(x.UserId)).Select(x => x.UserUniqueId).Distinct().ToList();
-
-                    var notification = new PushNotificationVM()
-                    {
-                        Id = row.CodeBlueId,
-                        OrgId = row.OrganizationIdFk,
-                        UserChannelSid = userUniqueIds,
-                        From = AuthorEnums.Blue.ToString(),
-                        Msg = (codeBlue.IsEms.HasValue && codeBlue.IsEms.Value ? "EMS" : "Inhouse") + " Code Blue From is Changed",
-                        RouteLink1 = "/Home/Activate%20Code/code-blue-form",
-                        RouteLink2 = "/Home/EMS/activateCode"
-                    };
-
-                    _communicationService.pushNotification(notification);
-
-                }
+                _communicationService.pushNotification(notification);
                 return GetBlueDataById(row.CodeBlueId);
             }
             else
@@ -5488,6 +6179,7 @@ namespace Web.Services.Concrete
                         var DefaultServiceLineIds = DefaultServiceLineTeam.ToIntList();
 
                         codeBlue.CreatedDate = DateTime.UtcNow;
+                        codeBlue.FamilyContactNumber = codeBlue.FamilyContactNumber != null && codeBlue.FamilyContactNumber != "" && codeBlue.FamilyContactNumber != "(___) ___-____" ? codeBlue.FamilyContactNumber : "";
                         var blue = AutoMapperHelper.MapSingleRow<CodeBlueVM, CodeBlue>(codeBlue);
 
                         if (codeBlue.Attachment != null && codeBlue.Attachment.Count > 0)
@@ -5792,93 +6484,284 @@ namespace Web.Services.Concrete
                         };
                         this._codesServiceLinesMappingRepo.Insert(codeService);
 
-                        var UserChannelSid = (from us in this._userSchedulesRepo.Table
-                                              join u in this._userRepo.Table on us.UserIdFk equals u.UserId
-                                              where DefaultServiceLineIds.Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
-                                              select new { u.UserUniqueId, u.UserId }).ToList();
-                        var superAdmins = this._userRepo.Table.Where(x => x.IsInGroup && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).ToList();
-                        UserChannelSid.AddRange(superAdmins);
-                        var loggedUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).FirstOrDefault();
-                        UserChannelSid.Add(loggedUser);
-                        var conversationChannelAttributes = JsonConvert.SerializeObject(new Dictionary<string, Object>()
-                                    {
-                                        {ChannelAttributeEnums.ChannelType.ToString(), ChannelTypeEnums.EMS.ToString()},
-                                        {ChannelAttributeEnums.CodeType.ToString(), ChannelTypeEnums.Blue.ToString()},
-                                        {ChannelAttributeEnums.BlueId.ToString(), blue.CodeBlueId}
-                                    }, Formatting.Indented);
-                        List<CodeBlueGroupMember> ACodeGroupMembers = new List<CodeBlueGroupMember>();
-                        if (UserChannelSid != null && UserChannelSid.Count > 0)
-                        {
-                            string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
-                            string friendlyName = blue.IsEms.HasValue && blue.IsEms.Value ? $"EMS Code {UCLEnums.Blue.ToString()} {blue.CodeBlueId}" : $"Inhouse Code {UCLEnums.Blue.ToString()} {blue.CodeBlueId}";
-                            var channel = _communicationService.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
-                            blue.ChannelSid = channel.Sid;
-                            this._codeBlueRepo.Update(blue);
-                            UserChannelSid = UserChannelSid.Distinct().ToList();
-                            foreach (var item in UserChannelSid)
-                            {
-                                try
-                                {
-                                    var codeGroupMember = new CodeBlueGroupMember()
-                                    {
-                                        //ChannelSid = channel.Sid,
-                                        UserIdFk = item.UserId,
-                                        BlueCodeIdFk = blue.CodeBlueId,
-                                        // ActiveCodeName = UCLEnums.Blue.ToString(),
-                                        IsAcknowledge = false,
-                                        CreatedBy = ApplicationSettings.UserId,
-                                        CreatedDate = DateTime.UtcNow,
-                                        IsDeleted = false
-                                    };
-                                    ACodeGroupMembers.Add(codeGroupMember);
-                                    _communicationService.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
-                                }
-                                catch (Exception ex)
-                                {
-                                    //ElmahExtensions.RiseError(ex);
-                                }
-                            }
-                            this._BlueCodeGroupMembersRepo.Insert(ACodeGroupMembers);
-                            var msg = new ConversationMessageVM();
-                            msg.channelSid = channel.Sid;
-                            msg.author = "System";
-                            msg.attributes = "";
-                            msg.body = $"<strong> {(codeBlue.IsEms.HasValue && codeBlue.IsEms.Value ? "EMS Code" : "Inhouse Code")} {UCLEnums.Blue.ToString()} </strong></br></br>";
-                            if (codeBlue.PatientName != null && codeBlue.PatientName != "")
-                                msg.body += $"<strong>Patient Name: </strong> {codeBlue.PatientName} </br>";
-                            msg.body += $"<strong>Dob: </strong> {codeBlue.Dob:MM-dd-yyyy} </br>";
-                            msg.body += $"<strong>Last Well Known: </strong> {codeBlue.LastKnownWell:MM-dd-yyyy hh:mm tt} </br>";
-                            if (codeBlue.ChiefComplant != null && codeBlue.ChiefComplant != "")
-                                msg.body += $"<strong>Chief Complaint: </strong> {codeBlue.ChiefComplant} </br>";
-                            if (codeBlue.Hpi != null && codeBlue.Hpi != "")
-                                msg.body += $"<strong>Hpi: </strong> {codeBlue.Hpi} </br>";
-                            var sendMsg = _communicationService.sendPushNotification(msg);
+                        //var UserChannelSid = (from us in this._userSchedulesRepo.Table
+                        //                      join u in this._userRepo.Table on us.UserIdFk equals u.UserId
+                        //                      where DefaultServiceLineIds.Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
+                        //                      select new { u.UserUniqueId, u.UserId }).ToList();
+                        //var superAdmins = this._userRepo.Table.Where(x => x.IsInGroup && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).ToList();
+                        //UserChannelSid.AddRange(superAdmins);
+                        //var loggedUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).FirstOrDefault();
+                        //UserChannelSid.Add(loggedUser);
+                        //var conversationChannelAttributes = JsonConvert.SerializeObject(new Dictionary<string, Object>()
+                        //            {
+                        //                {ChannelAttributeEnums.ChannelType.ToString(), ChannelTypeEnums.EMS.ToString()},
+                        //                {ChannelAttributeEnums.CodeType.ToString(), ChannelTypeEnums.Blue.ToString()},
+                        //                {ChannelAttributeEnums.BlueId.ToString(), blue.CodeBlueId}
+                        //            }, Formatting.Indented);
+                        //List<CodeBlueGroupMember> ACodeGroupMembers = new List<CodeBlueGroupMember>();
+                        //if (UserChannelSid != null && UserChannelSid.Count > 0)
+                        //{
+                        //    string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
+                        //    string friendlyName = blue.IsEms.HasValue && blue.IsEms.Value ? $"EMS Code {UCLEnums.Blue.ToString()} {blue.CodeBlueId}" : $"Inhouse Code {UCLEnums.Blue.ToString()} {blue.CodeBlueId}";
+                        //    var channel = _communicationService.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
+                        //    blue.ChannelSid = channel.Sid;
+                        //    this._codeBlueRepo.Update(blue);
+                        //    UserChannelSid = UserChannelSid.Distinct().ToList();
+                        //    foreach (var item in UserChannelSid)
+                        //    {
+                        //        try
+                        //        {
+                        //            var codeGroupMember = new CodeBlueGroupMember()
+                        //            {
+                        //                //ChannelSid = channel.Sid,
+                        //                UserIdFk = item.UserId,
+                        //                BlueCodeIdFk = blue.CodeBlueId,
+                        //                // ActiveCodeName = UCLEnums.Blue.ToString(),
+                        //                IsAcknowledge = false,
+                        //                CreatedBy = ApplicationSettings.UserId,
+                        //                CreatedDate = DateTime.UtcNow,
+                        //                IsDeleted = false
+                        //            };
+                        //            ACodeGroupMembers.Add(codeGroupMember);
+                        //            _communicationService.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
+                        //        }
+                        //        catch (Exception ex)
+                        //        {
+                        //            //ElmahExtensions.RiseError(ex);
+                        //        }
+                        //    }
+                        //    this._BlueCodeGroupMembersRepo.Insert(ACodeGroupMembers);
+                        //    var msg = new ConversationMessageVM();
+                        //    msg.channelSid = channel.Sid;
+                        //    msg.author = "System";
+                        //    msg.attributes = "";
+                        //    msg.body = $"<strong> {(codeBlue.IsEms.HasValue && codeBlue.IsEms.Value ? "EMS Code" : "Inhouse Code")} {UCLEnums.Blue.ToString()} </strong></br></br>";
+                        //    if (codeBlue.PatientName != null && codeBlue.PatientName != "")
+                        //        msg.body += $"<strong>Patient Name: </strong> {codeBlue.PatientName} </br>";
+                        //    msg.body += $"<strong>Dob: </strong> {codeBlue.Dob:MM-dd-yyyy} </br>";
+                        //    msg.body += $"<strong>Last Well Known: </strong> {codeBlue.LastKnownWell:MM-dd-yyyy hh:mm tt} </br>";
+                        //    if (codeBlue.ChiefComplant != null && codeBlue.ChiefComplant != "")
+                        //        msg.body += $"<strong>Chief Complaint: </strong> {codeBlue.ChiefComplant} </br>";
+                        //    if (codeBlue.Hpi != null && codeBlue.Hpi != "")
+                        //        msg.body += $"<strong>Hpi: </strong> {codeBlue.Hpi} </br>";
+                        //    var sendMsg = _communicationService.sendPushNotification(msg);
 
-                            var showAllAccessUsers = this._dbContext.LoadStoredProcedure("md_getUsersOfComponentAccess")
-                                               .WithSqlParam("@componentName", "Show All EMS,Show All Active Codes,Show Graphs,Show EMS,Show Active Codes")
-                                               .WithSqlParam("@orgId", blue.OrganizationIdFk)
-                                               .ExecuteStoredProc<RegisterCredentialVM>().Select(x => new { x.UserUniqueId, x.UserId }).Distinct().ToList();
-                            UserChannelSid.AddRange(showAllAccessUsers);
-                            var notification = new PushNotificationVM()
-                            {
-                                Id = blue.CodeBlueId,
-                                OrgId = blue.OrganizationIdFk,
-                                UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).Distinct().ToList(),
-                                From = AuthorEnums.Blue.ToString(),
-                                Msg = (codeBlue.IsEms.HasValue && codeBlue.IsEms.Value ? "EMS" : "Inhouse") + " Code Blue is update",
-                                RouteLink3 = "/Home/EMS",
-                                RouteLink4 = "/Home/Dashboard",
-                                RouteLink5 = "/Home/Inhouse%20Codes"
-                            };
+                        //    var showAllAccessUsers = this._dbContext.LoadStoredProcedure("md_getUsersOfComponentAccess")
+                        //                       .WithSqlParam("@componentName", "Show All EMS,Show All Active Codes,Show Graphs,Show EMS,Show Active Codes")
+                        //                       .WithSqlParam("@orgId", blue.OrganizationIdFk)
+                        //                       .ExecuteStoredProc<RegisterCredentialVM>().Select(x => new { x.UserUniqueId, x.UserId }).Distinct().ToList();
+                        //    UserChannelSid.AddRange(showAllAccessUsers);
+                        //    var notification = new PushNotificationVM()
+                        //    {
+                        //        Id = blue.CodeBlueId,
+                        //        OrgId = blue.OrganizationIdFk,
+                        //        UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).Distinct().ToList(),
+                        //        From = AuthorEnums.Blue.ToString(),
+                        //        Msg = (codeBlue.IsEms.HasValue && codeBlue.IsEms.Value ? "EMS" : "Inhouse") + " Code Blue is update",
+                        //        RouteLink3 = "/Home/EMS",
+                        //        RouteLink4 = "/Home/Dashboard",
+                        //        RouteLink5 = "/Home/Inhouse%20Codes"
+                        //    };
 
-                            _communicationService.pushNotification(notification);
-                        }
+                        //    _communicationService.pushNotification(notification);
+                        //}
                         return GetBlueDataById(blue.CodeBlueId);
                     }
                     return new BaseResponse() { Status = HttpStatusCode.NotAcceptable, Message = "There is no Service Line in this organization related to Code Blue" };
                 }
                 return new BaseResponse() { Status = HttpStatusCode.NotAcceptable, Message = "Organization is not selected" };
             }
+        }
+
+        public BaseResponse CreateBlueGroup(CodeBlueVM codeBlue)
+        {
+
+            var DefaultServiceLineIds = codeBlue.DefaultServiceLineIds.ToIntList();
+            bool usersFound = false;
+            var UserChannelSid = (from us in this._userSchedulesRepo.Table
+                                  join u in this._userRepo.Table on us.UserIdFk equals u.UserId
+                                  where DefaultServiceLineIds.Contains(us.ServiceLineIdFk.Value) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
+                                  select new { u.UserUniqueId, u.UserId }).Distinct().ToList();
+            usersFound = UserChannelSid.Count() > 0;
+            var superAdmins = this._userRepo.Table.Where(x => x.IsInGroup && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).ToList();
+            UserChannelSid.AddRange(superAdmins);
+            var loggedUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).FirstOrDefault();
+            UserChannelSid.Add(loggedUser);
+            var conversationChannelAttributes = JsonConvert.SerializeObject(new Dictionary<string, Object>()
+                                    {
+                                        {ChannelAttributeEnums.ChannelType.ToString(), ChannelTypeEnums.EMS.ToString()},
+                                        {ChannelAttributeEnums.CodeType.ToString(), ChannelTypeEnums.Blue.ToString()},
+                                        {ChannelAttributeEnums.BlueId.ToString(), codeBlue.CodeBlueId}
+                                    }, Formatting.Indented);
+            List<CodeBlueGroupMember> ACodeGroupMembers = new List<CodeBlueGroupMember>();
+            if (UserChannelSid != null && UserChannelSid.Count > 0)
+            {
+                string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
+                string friendlyName = codeBlue.IsEms.HasValue && codeBlue.IsEms.Value ? $"EMS Code {UCLEnums.Blue.ToString()} {codeBlue.CodeBlueId}" : $"Inhouse Code {UCLEnums.Blue.ToString()} {codeBlue.CodeBlueId}";
+                var channel = _communicationService.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
+                var Blue = this._codeBlueRepo.Table.Where(x => x.CodeBlueId == codeBlue.CodeBlueId && x.IsActive == true && !x.IsDeleted).FirstOrDefault();
+                if (Blue != null)
+                {
+                    Blue.ChannelSid = channel.Sid;
+                    this._codeBlueRepo.Update(Blue);
+                }
+                UserChannelSid = UserChannelSid.Distinct().ToList();
+                foreach (var item in UserChannelSid)
+                {
+                    try
+                    {
+                        var codeGroupMember = new CodeBlueGroupMember()
+                        {
+                            UserIdFk = item.UserId,
+                            BlueCodeIdFk = Blue.CodeBlueId,
+                            //ActiveCodeName = UCLEnums.Blue.ToString(),
+                            IsAcknowledge = false,
+                            CreatedBy = ApplicationSettings.UserId,
+                            CreatedDate = DateTime.UtcNow,
+                            IsDeleted = false
+                        };
+                        ACodeGroupMembers.Add(codeGroupMember);
+                        _communicationService.addNewUserToConversationChannel(channel.Sid, item.UserUniqueId);
+                    }
+                    catch (Exception ex)
+                    {
+
+                    }
+                }
+                this._BlueCodeGroupMembersRepo.Insert(ACodeGroupMembers);
+                var msg = new ConversationMessageVM();
+                msg.channelSid = channel.Sid;
+                msg.author = "System";
+                msg.attributes = "";
+                msg.body = $"<strong> {(codeBlue.IsEms.HasValue && codeBlue.IsEms.Value ? "EMS Code" : "Inhouse Code")} {UCLEnums.Blue.ToString()} </strong></br></br>";
+                if (codeBlue.PatientName != null && codeBlue.PatientName != "")
+                    msg.body += $"<strong>Patient Name: </strong> {codeBlue.PatientName} </br>";
+                msg.body += $"<strong>Dob: </strong> {codeBlue.Dob:MM-dd-yyyy} </br>";
+                msg.body += $"<strong>Last Well Known: </strong> {codeBlue.LastKnownWell:MM-dd-yyyy hh:mm tt} </br>";
+                if (codeBlue.ChiefComplant != null && codeBlue.ChiefComplant != "")
+                    msg.body += $"<strong>Chief Complaint: </strong> {codeBlue.ChiefComplant} </br>";
+                if (codeBlue.Hpi != null && codeBlue.Hpi != "")
+                    msg.body += $"<strong>Hpi: </strong> {codeBlue.Hpi} </br>";
+                var sendMsg = _communicationService.sendPushNotification(msg);
+
+                var showAllAccessUsers = this._dbContext.LoadStoredProcedure("md_getUsersOfComponentAccess")
+                                    .WithSqlParam("@componentName", "Show All EMS,Show All Active Codes,Show Graphs,Show EMS,Show Active Codes")
+                                    .WithSqlParam("@orgId", Blue.OrganizationIdFk)
+                                    .ExecuteStoredProc<RegisterCredentialVM>().Select(x => new { x.UserUniqueId, x.UserId }).Distinct().ToList();
+                UserChannelSid.AddRange(showAllAccessUsers);
+                var notification = new PushNotificationVM()
+                {
+                    Id = Blue.CodeBlueId,
+                    OrgId = Blue.OrganizationIdFk,
+                    UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).Distinct().ToList(),
+                    From = AuthorEnums.Blue.ToString(),
+                    Msg = (codeBlue.IsEms.HasValue && codeBlue.IsEms.Value ? "EMS" : "Inhouse") + " Code Blue is update",
+                    RouteLink3 = "/Home/EMS",
+                    RouteLink4 = "/Home/Dashboard",
+                    RouteLink5 = "/Home/Inhouse%20Codes"
+                };
+
+                _communicationService.pushNotification(notification);
+            }
+
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Group Created Successfully", Body = new { serviceLineUsersFound = usersFound } };
+        }
+
+
+        public BaseResponse UpdateBlueGroupMembers(CodeBlueVM codeBlue)
+        {
+
+            if (codeBlue.DefaultServiceLineIds == null || codeBlue.DefaultServiceLineIds == "")
+            {
+                string IsEMS = codeBlue.IsEms.HasValue && codeBlue.IsEms.Value ? "EMS Code" : "Inhouse Code";
+                codeBlue.DefaultServiceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeBlue.OrganizationIdFk && x.CodeIdFk == UCLEnums.Blue.ToInt() && x.Type == IsEMS && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
+            }
+
+            if (codeBlue.DefaultServiceLineIds != null && codeBlue.DefaultServiceLineIds != "")
+            {
+                var DefaultServiceLineIds = codeBlue.DefaultServiceLineIds.ToIntList();
+                var ServiceLineTeam1Ids = codeBlue.ServiceLineTeam1Ids.ToIntList();
+                var ServiceLineTeam2Ids = codeBlue.ServiceLineTeam2Ids.ToIntList();
+
+                var codeServiceMapping = this._codesServiceLinesMappingRepo.Table.Where(x => x.OrganizationIdFk == codeBlue.OrganizationIdFk && x.CodeIdFk == UCLEnums.Blue.ToInt() && x.ActiveCodeId == codeBlue.CodeBlueId).ToList();
+                if (codeServiceMapping.Count > 0)
+                    this._codesServiceLinesMappingRepo.DeleteRange(codeServiceMapping);
+
+                var codeService = new CodesServiceLinesMapping()
+                {
+                    OrganizationIdFk = codeBlue.OrganizationIdFk,
+                    CodeIdFk = UCLEnums.Blue.ToInt(),
+                    DefaultServiceLineIdFk = codeBlue.DefaultServiceLineIds,
+                    ServiceLineId1Fk = codeBlue.ServiceLineTeam1Ids,
+                    ServiceLineId2Fk = codeBlue.ServiceLineTeam2Ids,
+                    ActiveCodeId = codeBlue.CodeBlueId,
+                    ActiveCodeName = UCLEnums.Blue.ToString()
+                };
+                this._codesServiceLinesMappingRepo.Insert(codeService);
+
+                //var channel = this._BlueCodeGroupMembersRepo.Table.Where(x => x.BlueCodeIdFk == codeBlue.CodeBlueId && !x.IsDeleted).ToList();
+
+                var UserChannelSid = (from us in this._userSchedulesRepo.Table
+                                      join u in this._userRepo.Table on us.UserIdFk equals u.UserId
+                                      where (DefaultServiceLineIds.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam1Ids.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam2Ids.Contains(us.ServiceLineIdFk.Value)) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
+                                      select new { u.UserUniqueId, u.UserId }).Distinct().ToList();
+                var superAdmins = this._userRepo.Table.Where(x => x.IsInGroup && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).ToList();
+                UserChannelSid.AddRange(superAdmins);
+                var loggedInUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId }).FirstOrDefault();
+                UserChannelSid.Add(loggedInUser);
+
+                if (codeBlue.ChannelSid != null && codeBlue.ChannelSid != "")
+                {
+                    var channelSid = codeBlue.ChannelSid; //channel.Select(x => x.ChannelSid).FirstOrDefault();
+
+                    var groupMembers = this._BlueCodeGroupMembersRepo.Table.Where(x => x.BlueCodeIdFk == codeBlue.CodeBlueId).ToList();
+                    this._BlueCodeGroupMembersRepo.DeleteRange(groupMembers);
+                    //this._BlueCodeGroupMembersRepo.DeleteRange(channel);
+                    bool isDeleted = _communicationService.DeleteUserToConversationChannel(channelSid);
+                    List<CodeBlueGroupMember> ACodeGroupMembers = new List<CodeBlueGroupMember>();
+                    foreach (var item in UserChannelSid.Distinct())
+                    {
+                        try
+                        {
+                            var codeGroupMember = new CodeBlueGroupMember()
+                            {
+                                UserIdFk = item.UserId,
+                                BlueCodeIdFk = codeBlue.CodeBlueId,
+                                //ActiveCodeName = UCLEnums.Blue.ToString(),
+                                IsAcknowledge = false,
+                                CreatedBy = ApplicationSettings.UserId,
+                                CreatedDate = DateTime.UtcNow,
+                                IsDeleted = false
+                            };
+                            ACodeGroupMembers.Add(codeGroupMember);
+                            _communicationService.addNewUserToConversationChannel(channelSid, item.UserUniqueId);
+                        }
+                        catch (Exception ex)
+                        {
+                            //ElmahExtensions.RiseError(ex);
+                        }
+                    }
+                    this._BlueCodeGroupMembersRepo.Insert(ACodeGroupMembers);
+
+                }
+
+
+                var notification = new PushNotificationVM()
+                {
+                    Id = codeBlue.CodeBlueId,
+                    OrgId = codeBlue.OrganizationIdFk,
+                    UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).Distinct().ToList(),
+                    From = AuthorEnums.Blue.ToString(),
+                    Msg = (codeBlue.IsEms.HasValue && codeBlue.IsEms.Value ? "EMS" : "Inhouse") + " Code Blue From is Changed",
+                    RouteLink1 = "/Home/Inhouse%20Codes/code-strok-form",
+                    RouteLink2 = "/Home/EMS/activateCode",
+                };
+
+                _communicationService.pushNotification(notification);
+
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Group Updated." };
+            }
+            return new BaseResponse() { Status = HttpStatusCode.NotModified, Message = "Group Not Updated" };
         }
 
         public BaseResponse DeleteBlue(int blueId, bool status)

@@ -22,6 +22,8 @@ namespace Web.Services.Interfaces
         BaseResponse GetAllStrokeCode(ActiveCodeVM activeCode);
         BaseResponse GetStrokeDataById(int strokeId);
         BaseResponse AddOrUpdateStrokeData(CodeStrokeVM codeStroke);
+        BaseResponse CreateStrokeGroup(CodeStrokeVM codeStroke);
+        BaseResponse UpdateStrokeGroupMembers(CodeStrokeVM codeStroke);
         BaseResponse DeleteStroke(int strokeId, bool status);
 
         BaseResponse ActiveOrInActiveStroke(int strokeId, bool status);
@@ -32,6 +34,8 @@ namespace Web.Services.Interfaces
         BaseResponse GetAllSepsisCode(ActiveCodeVM activeCode);
         BaseResponse GetSepsisDataById(int SepsisId);
         BaseResponse AddOrUpdateSepsisData(CodeSepsisVM codeSepsis);
+        BaseResponse CreateSepsisGroup(CodeSepsisVM codeSepsis);
+        BaseResponse UpdateSepsisGroupMembers(CodeSepsisVM codeSepsis);
         BaseResponse DeleteSepsis(int SepsisId, bool status);
 
         BaseResponse ActiveOrInActiveSepsis(int SepsisId, bool status);
@@ -41,6 +45,8 @@ namespace Web.Services.Interfaces
         BaseResponse GetAllSTEMICode(ActiveCodeVM activeCode);
         BaseResponse GetSTEMIDataById(int STEMIId);
         BaseResponse AddOrUpdateSTEMIData(CodeSTEMIVM codeSTEMI);
+        BaseResponse CreateSTEMIGroup(CodeSTEMIVM codeSTEMI);
+        BaseResponse UpdateSTEMIGroupMembers(CodeSTEMIVM codeSTEMI);
         BaseResponse DeleteSTEMI(int STEMIId, bool status);
 
         BaseResponse ActiveOrInActiveSTEMI(int STEMIId, bool status);
@@ -50,6 +56,8 @@ namespace Web.Services.Interfaces
         BaseResponse GetAllTrumaCode(ActiveCodeVM activeCode);
         BaseResponse GetTrumaDataById(int TrumaId);
         BaseResponse AddOrUpdateTrumaData(CodeTrumaVM codeTruma);
+        BaseResponse CreateTrumaGroup(CodeTrumaVM codeTruma);
+        BaseResponse UpdateTrumaGroupMembers(CodeTrumaVM codeTruma);
         BaseResponse DeleteTruma(int TrumaId, bool status);
 
         BaseResponse ActiveOrInActiveTruma(int TrumaId, bool status);
@@ -60,6 +68,8 @@ namespace Web.Services.Interfaces
         BaseResponse GetAllBlueCode(ActiveCodeVM activeCode);
         BaseResponse GetBlueDataById(int blueId);
         BaseResponse AddOrUpdateBlueData(CodeBlueVM codeBlue);
+        BaseResponse CreateBlueGroup(CodeBlueVM codeBlue);
+        BaseResponse UpdateBlueGroupMembers(CodeBlueVM codeBlue);
         BaseResponse DeleteBlue(int blueId, bool status);
 
         BaseResponse ActiveOrInActiveBlue(int blueId, bool status);

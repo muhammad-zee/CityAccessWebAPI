@@ -182,6 +182,38 @@ namespace Web.API.Controllers
             }
         }
 
+        [Description("Create Group for Code Stroke")]
+        [HttpPost("stroke/createGroupForCodeStroke")]
+        public BaseResponse CreateStrokeGroup([FromBody] CodeStrokeVM codeStroke)
+        {
+            try
+            {
+                return _activeCodesService.CreateStrokeGroup(codeStroke);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
+        [Description("Update Group for Code Stroke")]
+        [HttpPost("stroke/UpdateGroupForCodeStroke")]
+        public BaseResponse UpdateStrokeGroup([FromBody] CodeStrokeVM codeStroke)
+        {
+            try
+            {
+                return _activeCodesService.UpdateStrokeGroupMembers(codeStroke);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
 
         [Description("Delete Stroke Data By Id")]
         [HttpGet("stroke/DeleteStrokeDataById/{strokeId}/{status}")]
@@ -270,6 +302,37 @@ namespace Web.API.Controllers
             }
         }
 
+        [Description("Create Group for Code Sepsis")]
+        [HttpPost("Sepsis/createGroupForCodeSepsis")]
+        public BaseResponse CreateSepsisGroup([FromBody] CodeSepsisVM codeSepsis)
+        {
+            try
+            {
+                return _activeCodesService.CreateSepsisGroup(codeSepsis);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
+        [Description("Update Group for Code Sepsis")]
+        [HttpPost("Sepsis/UpdateGroupForCodeSepsis")]
+        public BaseResponse UpdateSepsisGroup([FromBody] CodeSepsisVM codeSepsis)
+        {
+            try
+            {
+                return _activeCodesService.UpdateSepsisGroupMembers(codeSepsis);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
 
         [Description("Delete Sepsis Data By Id")]
         [HttpGet("Sepsis/DeleteSepsisDataById/{SepsisId}/{status}")]
@@ -357,6 +420,37 @@ namespace Web.API.Controllers
             }
         }
 
+        [Description("Create Group for Code STEMI")]
+        [HttpPost("STEMI/createGroupForCodeSTEMI")]
+        public BaseResponse CreateSTEMIGroup([FromBody] CodeSTEMIVM codeSTEMI) 
+        {
+            try
+            {
+                return _activeCodesService.CreateSTEMIGroup(codeSTEMI);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
+        [Description("Update Group for Code STEMI")]
+        [HttpPost("STEMI/UpdateGroupForCodeSTEMI")]
+        public BaseResponse UpdateSTEMIGroup([FromBody] CodeSTEMIVM codeSTEMI)
+        {
+            try
+            {
+                return _activeCodesService.UpdateSTEMIGroupMembers(codeSTEMI);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
 
         [Description("Delete STEMI Data By Id")]
         [HttpGet("STEMI/DeleteSTEMIDataById/{STEMIId}/{status}")]
@@ -443,6 +537,37 @@ namespace Web.API.Controllers
             }
         }
 
+        [Description("Create Group for Code Trauma")]
+        [HttpPost("Trauma/createGroupForCodeTrauma")]
+        public BaseResponse CreateTraumaGroup([FromBody] CodeTrumaVM codeTrauma)
+        {
+            try
+            {
+                return _activeCodesService.CreateTrumaGroup(codeTrauma);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
+        [Description("Update Group for Code Trauma")]
+        [HttpPost("Trauma/UpdateGroupForCodeTrauma")]
+        public BaseResponse UpdateTrumaGroup([FromBody] CodeTrumaVM codeTruma)
+        {
+            try
+            {
+                return _activeCodesService.UpdateTrumaGroupMembers(codeTruma);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
 
         [Description("Delete Trauma Data By Id")]
         [HttpGet("Trauma/DeleteTraumaDataById/{TraumaId}/{status}")]
@@ -530,6 +655,37 @@ namespace Web.API.Controllers
             }
         }
 
+        [Description("Create Group for Code Blue")]
+        [HttpPost("Blue/createGroupForCodeBlue")]
+        public BaseResponse CreateBlueGroup([FromBody] CodeBlueVM codeBlue)
+        {
+            try
+            {
+                return _activeCodesService.CreateBlueGroup(codeBlue);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
+        [Description("Update Group for Code Blue")]
+        [HttpPost("Blue/UpdateGroupForCodeBlue")]
+        public BaseResponse UpdateBlueGroup([FromBody] CodeBlueVM codeBlue)
+        {
+            try
+            {
+                return _activeCodesService.UpdateBlueGroupMembers(codeBlue);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
 
         [Description("Delete Blue Data By Id")]
         [HttpGet("blue/DeleteBlueDataById/{blueId}/{status}")]
