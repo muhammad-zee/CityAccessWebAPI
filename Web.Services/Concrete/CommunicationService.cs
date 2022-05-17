@@ -480,7 +480,7 @@ namespace Web.Services.Concrete
                 dbChannel.ModifiedDate = DateTime.UtcNow;
 
                 //this._conversationChannelsRepo.Update(dbChannel);
-                var channelParticipants = this._conversationParticipantsRepo.Table.Where(p => p.ConversationChannelIdFk == dbChannel.ConversationChannelId && p.IsDeleted != true);
+                var channelParticipants = this._conversationParticipantsRepo.Table.Where(p => p.ConversationChannelIdFk == dbChannel.ConversationChannelId);
                 foreach (var p in channelParticipants)
                 {
                     p.IsDeleted = true;
