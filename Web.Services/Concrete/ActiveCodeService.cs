@@ -621,7 +621,7 @@ namespace Web.Services.Concrete
                     }
                 }
                 string Type = StrokeDataVM.IsEms.HasValue && StrokeDataVM.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription();
-                var serviceIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == strokeData.OrganizationIdFk && x.CodeIdFk == UCLEnums.Stroke.ToInt() && x.Type == Type && !x.IsDeleted).Select(x => new { x.DefaultServiceLineTeam, x.ServiceLineTeam1, x.ServiceLineTeam2 }).FirstOrDefault();
+                var serviceIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == strokeData.OrganizationIdFk && x.CodeIdFk == UCLEnums.Stroke.ToInt() && x.Type == Type && x.IsActive.HasValue && x.IsActive.Value && !x.IsDeleted).Select(x => new { x.DefaultServiceLineTeam, x.ServiceLineTeam1, x.ServiceLineTeam2 }).FirstOrDefault();
                 var serviceLineIds = (from x in this._codesServiceLinesMappingRepo.Table
                                       where x.OrganizationIdFk == strokeData.OrganizationIdFk && x.CodeIdFk == UCLEnums.Stroke.ToInt()
                                       && x.ActiveCodeId == strokeData.CodeStrokeId && x.ActiveCodeName == UCLEnums.Stroke.ToString()
@@ -1108,7 +1108,7 @@ namespace Web.Services.Concrete
                 if (codeStroke.OrganizationIdFk > 0)
                 {
                     string IsEMS = codeStroke.IsEms.HasValue && codeStroke.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription();
-                    var DefaultServiceLineTeam = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeStroke.OrganizationIdFk && x.CodeIdFk == UCLEnums.Stroke.ToInt() && x.Type == IsEMS && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
+                    var DefaultServiceLineTeam = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeStroke.OrganizationIdFk && x.CodeIdFk == UCLEnums.Stroke.ToInt() && x.Type == IsEMS && x.IsActive.HasValue && x.IsActive.Value && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
                     if (DefaultServiceLineTeam != null && DefaultServiceLineTeam != "")
                     {
                         var DefaultServiceLineIds = DefaultServiceLineTeam.ToIntList();
@@ -1435,15 +1435,28 @@ namespace Web.Services.Concrete
             if (UserChannelSid.Count > 0)
             {
                 usersFound = true;
-                var defaultExist = DefaultServiceLineIds.Where(d => UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d)).Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
-                if (defaultExist.Count > 0 && !defaultExist.Select(x => x.IsExist).All(x => x == true))
+                var defaultExist = DefaultServiceLineIds.Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
+                if (defaultExist.Count > 0)
                 {
-                    DefaultServiceLineIds.RemoveAll(d => defaultExist.Where(x => !x.IsExist).Select(x => x.ServiceLineId).Contains(d));
-                    var services = this._serviceLineRepo.Table.Where(x => defaultExist.Where(d => !d.IsExist).Select(d => d.ServiceLineId).Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
+                    if (!defaultExist.Select(x => x.IsExist).All(x => x == true))
+                    {
+                        var notExisted = defaultExist.Where(x => !x.IsExist).Select(x => x.ServiceLineId).ToList();
+                        DefaultServiceLineIds.RemoveAll(d => notExisted.Contains(d));
+                        var services = this._serviceLineRepo.Table.Where(x => notExisted.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
+                        foreach (var item in services)
+                        {
+                            errorMsg += Environment.NewLine + "No OnCall user found in " + item.ServiceName;
+                        }
+                    }
+                }
+                else
+                {
+                    var services = this._serviceLineRepo.Table.Where(x => DefaultServiceLineIds.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
                     foreach (var item in services)
                     {
                         errorMsg += Environment.NewLine + "No OnCall user found in " + item.ServiceName;
                     }
+                    DefaultServiceLineIds = new List<int>();
                 }
 
                 if (DefaultServiceLineIds.Count > 0)
@@ -1553,7 +1566,7 @@ namespace Web.Services.Concrete
             if (codeStroke.DefaultServiceLineIds == null || codeStroke.DefaultServiceLineIds == "")
             {
                 string IsEMS = codeStroke.IsEms.HasValue && codeStroke.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription();
-                codeStroke.DefaultServiceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeStroke.OrganizationIdFk && x.CodeIdFk == UCLEnums.Stroke.ToInt() && x.Type == IsEMS && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
+                codeStroke.DefaultServiceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeStroke.OrganizationIdFk && x.CodeIdFk == UCLEnums.Stroke.ToInt() && x.Type == IsEMS && x.IsActive.HasValue && x.IsActive.Value && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
             }
 
             if (codeStroke.DefaultServiceLineIds != null && codeStroke.DefaultServiceLineIds != "")
@@ -1578,47 +1591,75 @@ namespace Web.Services.Concrete
                 if (UserChannelSid.Count > 0)
                 {
                     userNotFound = true;
-                    var defaultExist = DefaultServiceLineIds.Where(d => UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d)).Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
-                    if (defaultExist.Count > 0 && !defaultExist.Select(x => x.IsExist).All(x => x == true))
+                    var defaultExist = DefaultServiceLineIds.Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
+                    if (defaultExist.Count > 0)
                     {
-                        DefaultServiceLineIds.RemoveAll(d => defaultExist.Where(x => !x.IsExist).Select(x => x.ServiceLineId).Contains(d));
-                        var services = this._serviceLineRepo.Table.Where(x => defaultExist.Where(d => !d.IsExist).Select(d => d.ServiceLineId).Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
+                        if (!defaultExist.Select(x => x.IsExist).All(x => x == true)) {
+                            var notExisted = defaultExist.Where(x => !x.IsExist).Select(x => x.ServiceLineId).ToList();
+                            DefaultServiceLineIds.RemoveAll(d => notExisted.Contains(d));
+                            var services = this._serviceLineRepo.Table.Where(x => notExisted.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
+                            foreach (var item in services)
+                            {
+                                msg += Environment.NewLine + "No OnCall user found in " + item.ServiceName;
+                            }
+                        }
+                    }
+                    else {
+                        var services = this._serviceLineRepo.Table.Where(x => DefaultServiceLineIds.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
                         foreach (var item in services)
                         {
                             msg += Environment.NewLine + "No OnCall user found in " + item.ServiceName;
                         }
+                        DefaultServiceLineIds = new List<int>();
+                    }
+
+                    var serviceLineTeam1Exist = ServiceLineTeam1Ids.Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
+                    if (serviceLineTeam1Exist.Count > 0)
+                    {
+                        if (!serviceLineTeam1Exist.Select(x => x.IsExist).All(x => x == true))
+                        {
+                            var notExisted = defaultExist.Where(x => !x.IsExist).Select(x => x.ServiceLineId).ToList();
+                            ServiceLineTeam1Ids.RemoveAll(d => notExisted.Contains(d));
+                            var services = this._serviceLineRepo.Table.Where(x => notExisted.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
+                            foreach (var item in services)
+                            {
+                                msg += Environment.NewLine + "No OnCall user found in " + item.ServiceName;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        var services = this._serviceLineRepo.Table.Where(x => ServiceLineTeam1Ids.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
+                        foreach (var item in services)
+                        {
+                            msg += Environment.NewLine + "No OnCall user found in " + item.ServiceName;
+                        }
+                        ServiceLineTeam1Ids = new List<int>();
                     }
 
 
-                    var serviceLineTeam1Exist = ServiceLineTeam1Ids.Where(d => UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d)).Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
-                    if (serviceLineTeam1Exist.Count > 0 && !serviceLineTeam1Exist.Select(x => x.IsExist).All(x => x == true))
+                    var serviceLineTeam2Exist = ServiceLineTeam2Ids.Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
+                    if (serviceLineTeam2Exist.Count > 0)
                     {
-                        ServiceLineTeam1Ids.RemoveAll(d => serviceLineTeam1Exist.Where(x => !x.IsExist).Select(x => x.ServiceLineId).Contains(d));
-                        var services = this._serviceLineRepo.Table.Where(x => serviceLineTeam1Exist.Where(d => !d.IsExist).Select(d => d.ServiceLineId).Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
-                        foreach (var item in services)
+                        if (!serviceLineTeam2Exist.Select(x => x.IsExist).All(x => x == true))
                         {
-                            msg += Environment.NewLine + "No OnCall user found in " + item.ServiceName;
+                            var notExisted = defaultExist.Where(x => !x.IsExist).Select(x => x.ServiceLineId).ToList();
+                            ServiceLineTeam2Ids.RemoveAll(d => notExisted.Contains(d));
+                            var services = this._serviceLineRepo.Table.Where(x => notExisted.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
+                            foreach (var item in services)
+                            {
+                                msg += Environment.NewLine + "No OnCall user found in " + item.ServiceName;
+                            }
                         }
                     }
-
-
-                    var serviceLineTeam2Exist = ServiceLineTeam2Ids.Where(d => UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d))
-                                                                    .Select(d => new
-                                                                    {
-                                                                        ServiceLineId = d,
-                                                                        IsExist = UserChannelSid
-                                                                    .Select(x => x.ServiceLineIdFk).Contains(d)
-                                                                    }).ToList();
-                    if (serviceLineTeam2Exist.Count > 0 && !serviceLineTeam2Exist.Select(x => x.IsExist).All(x => x == true))
+                    else
                     {
-                        ServiceLineTeam2Ids.RemoveAll(d => serviceLineTeam2Exist.Where(x => !x.IsExist).Select(x => x.ServiceLineId).Contains(d));
-                        var services = this._serviceLineRepo.Table.Where(x => serviceLineTeam2Exist
-                                                                    .Where(d => !d.IsExist).Select(d => d.ServiceLineId).Contains(x.ServiceLineId))
-                                                                    .Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
+                        var services = this._serviceLineRepo.Table.Where(x => ServiceLineTeam2Ids.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
                         foreach (var item in services)
                         {
                             msg += Environment.NewLine + "No OnCall user found in " + item.ServiceName;
                         }
+                        ServiceLineTeam2Ids = new List<int>();
                     }
 
 
@@ -1935,7 +1976,7 @@ namespace Web.Services.Concrete
                     }
                 }
                 string Type = SepsisDataVM.IsEms ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription();
-                var serviceIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == SepsisData.OrganizationIdFk && x.CodeIdFk == UCLEnums.Sepsis.ToInt() && x.Type == Type && !x.IsDeleted).Select(x => new { x.DefaultServiceLineTeam, x.ServiceLineTeam1, x.ServiceLineTeam2 }).FirstOrDefault();
+                var serviceIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == SepsisData.OrganizationIdFk && x.CodeIdFk == UCLEnums.Sepsis.ToInt() && x.Type == Type && x.IsActive.HasValue && x.IsActive.Value && !x.IsDeleted).Select(x => new { x.DefaultServiceLineTeam, x.ServiceLineTeam1, x.ServiceLineTeam2 }).FirstOrDefault();
                 var serviceLineIds = (from x in this._codesServiceLinesMappingRepo.Table
                                       where x.OrganizationIdFk == SepsisData.OrganizationIdFk && x.CodeIdFk == UCLEnums.Sepsis.ToInt()
                                       && x.ActiveCodeId == SepsisData.CodeSepsisId && x.ActiveCodeName == UCLEnums.Sepsis.ToString()
@@ -2422,7 +2463,7 @@ namespace Web.Services.Concrete
                 if (codeSepsis.OrganizationIdFk > 0)
                 {
                     string IsEMS = codeSepsis.IsEms ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription();
-                    var DefaultServiceLineTeam = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeSepsis.OrganizationIdFk && x.CodeIdFk == UCLEnums.Sepsis.ToInt() && x.Type == IsEMS && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
+                    var DefaultServiceLineTeam = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeSepsis.OrganizationIdFk && x.CodeIdFk == UCLEnums.Sepsis.ToInt() && x.Type == IsEMS && x.IsActive.HasValue && x.IsActive.Value && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
                     if (DefaultServiceLineTeam != null && DefaultServiceLineTeam != "")
                     {
                         var DefaultServiceLineIds = DefaultServiceLineTeam.ToIntList();
@@ -2827,7 +2868,7 @@ namespace Web.Services.Concrete
             if (codeSepsis.DefaultServiceLineIds == null || codeSepsis.DefaultServiceLineIds == "")
             {
                 string IsEMS = codeSepsis.IsEms ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription();
-                codeSepsis.DefaultServiceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeSepsis.OrganizationIdFk && x.CodeIdFk == UCLEnums.Sepsis.ToInt() && x.Type == IsEMS && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
+                codeSepsis.DefaultServiceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeSepsis.OrganizationIdFk && x.CodeIdFk == UCLEnums.Sepsis.ToInt() && x.Type == IsEMS && x.IsActive.HasValue && x.IsActive.Value && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
             }
 
             if (codeSepsis.DefaultServiceLineIds != null && codeSepsis.DefaultServiceLineIds != "")
@@ -2852,48 +2893,79 @@ namespace Web.Services.Concrete
                 if (UserChannelSid.Count > 0)
                 {
                     userNotFound = true;
-                    var defaultExist = DefaultServiceLineIds.Where(d => UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d)).Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
-                    if (defaultExist.Count > 0 && !defaultExist.Select(x => x.IsExist).All(x => x == true))
+                    var defaultExist = DefaultServiceLineIds.Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
+                    if (defaultExist.Count > 0)
                     {
-                        DefaultServiceLineIds.RemoveAll(d => defaultExist.Where(x => !x.IsExist).Select(x => x.ServiceLineId).Contains(d));
-                        var services = this._serviceLineRepo.Table.Where(x => defaultExist.Where(d => !d.IsExist).Select(d => d.ServiceLineId).Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
+                        if (!defaultExist.Select(x => x.IsExist).All(x => x == true))
+                        {
+                            var notExisted = defaultExist.Where(x => !x.IsExist).Select(x => x.ServiceLineId).ToList();
+                            DefaultServiceLineIds.RemoveAll(d => notExisted.Contains(d));
+                            var services = this._serviceLineRepo.Table.Where(x => notExisted.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
+                            foreach (var item in services)
+                            {
+                                msg += Environment.NewLine + "No OnCall user found in " + item.ServiceName;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        var services = this._serviceLineRepo.Table.Where(x => DefaultServiceLineIds.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
                         foreach (var item in services)
                         {
                             msg += Environment.NewLine + "No OnCall user found in " + item.ServiceName;
                         }
+                        DefaultServiceLineIds = new List<int>();
                     }
 
-
-                    var serviceLineTeam1Exist = ServiceLineTeam1Ids.Where(d => UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d)).Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
-                    if (serviceLineTeam1Exist.Count > 0 && !serviceLineTeam1Exist.Select(x => x.IsExist).All(x => x == true))
+                    var serviceLineTeam1Exist = ServiceLineTeam1Ids.Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
+                    if (serviceLineTeam1Exist.Count > 0)
                     {
-                        ServiceLineTeam1Ids.RemoveAll(d => serviceLineTeam1Exist.Where(x => !x.IsExist).Select(x => x.ServiceLineId).Contains(d));
-                        var services = this._serviceLineRepo.Table.Where(x => serviceLineTeam1Exist.Where(d => !d.IsExist).Select(d => d.ServiceLineId).Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
+                        if (!serviceLineTeam1Exist.Select(x => x.IsExist).All(x => x == true))
+                        {
+                            var notExisted = defaultExist.Where(x => !x.IsExist).Select(x => x.ServiceLineId).ToList();
+                            ServiceLineTeam1Ids.RemoveAll(d => notExisted.Contains(d));
+                            var services = this._serviceLineRepo.Table.Where(x => notExisted.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
+                            foreach (var item in services)
+                            {
+                                msg += Environment.NewLine + "No OnCall user found in " + item.ServiceName;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        var services = this._serviceLineRepo.Table.Where(x => ServiceLineTeam1Ids.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
                         foreach (var item in services)
                         {
                             msg += Environment.NewLine + "No OnCall user found in " + item.ServiceName;
                         }
+                        ServiceLineTeam1Ids = new List<int>();
                     }
 
 
-                    var serviceLineTeam2Exist = ServiceLineTeam2Ids.Where(d => UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d))
-                                                                    .Select(d => new
-                                                                    {
-                                                                        ServiceLineId = d,
-                                                                        IsExist = UserChannelSid
-                                                                    .Select(x => x.ServiceLineIdFk).Contains(d)
-                                                                    }).ToList();
-                    if (serviceLineTeam2Exist.Count > 0 && !serviceLineTeam2Exist.Select(x => x.IsExist).All(x => x == true))
+                    var serviceLineTeam2Exist = ServiceLineTeam2Ids.Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
+                    if (serviceLineTeam2Exist.Count > 0)
                     {
-                        ServiceLineTeam2Ids.RemoveAll(d => serviceLineTeam2Exist.Where(x => !x.IsExist).Select(x => x.ServiceLineId).Contains(d));
-                        var services = this._serviceLineRepo.Table.Where(x => serviceLineTeam2Exist
-                                                                    .Where(d => !d.IsExist).Select(d => d.ServiceLineId).Contains(x.ServiceLineId))
-                                                                    .Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
+                        if (!serviceLineTeam2Exist.Select(x => x.IsExist).All(x => x == true))
+                        {
+                            var notExisted = defaultExist.Where(x => !x.IsExist).Select(x => x.ServiceLineId).ToList();
+                            ServiceLineTeam2Ids.RemoveAll(d => notExisted.Contains(d));
+                            var services = this._serviceLineRepo.Table.Where(x => notExisted.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
+                            foreach (var item in services)
+                            {
+                                msg += Environment.NewLine + "No OnCall user found in " + item.ServiceName;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        var services = this._serviceLineRepo.Table.Where(x => ServiceLineTeam2Ids.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
                         foreach (var item in services)
                         {
                             msg += Environment.NewLine + "No OnCall user found in " + item.ServiceName;
                         }
+                        ServiceLineTeam2Ids = new List<int>();
                     }
+
 
                     if (DefaultServiceLineIds.Count > 0 || ServiceLineTeam1Ids.Count > 0 || ServiceLineTeam2Ids.Count > 0)
                     {
@@ -2987,17 +3059,29 @@ namespace Web.Services.Concrete
             if (UserChannelSid.Count > 0)
             {
                 usersFound = true;
-                var defaultExist = DefaultServiceLineIds.Where(d => UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d)).Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
-                if (defaultExist.Count > 0 && !defaultExist.Select(x => x.IsExist).All(x => x == true))
+                var defaultExist = DefaultServiceLineIds.Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
+                if (defaultExist.Count > 0)
                 {
-                    DefaultServiceLineIds.RemoveAll(d => defaultExist.Where(x => !x.IsExist).Select(x => x.ServiceLineId).Contains(d));
-                    var services = this._serviceLineRepo.Table.Where(x => defaultExist.Where(d => !d.IsExist).Select(d => d.ServiceLineId).Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
+                    if (!defaultExist.Select(x => x.IsExist).All(x => x == true))
+                    {
+                        var notExisted = defaultExist.Where(x => !x.IsExist).Select(x => x.ServiceLineId).ToList();
+                        DefaultServiceLineIds.RemoveAll(d => notExisted.Contains(d));
+                        var services = this._serviceLineRepo.Table.Where(x => notExisted.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
+                        foreach (var item in services)
+                        {
+                            errorMsg += Environment.NewLine + "No OnCall user found in " + item.ServiceName;
+                        }
+                    }
+                }
+                else
+                {
+                    var services = this._serviceLineRepo.Table.Where(x => DefaultServiceLineIds.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
                     foreach (var item in services)
                     {
                         errorMsg += Environment.NewLine + "No OnCall user found in " + item.ServiceName;
                     }
+                    DefaultServiceLineIds = new List<int>();
                 }
-
 
                 if (DefaultServiceLineIds.Count > 0)
                 {
@@ -3007,7 +3091,7 @@ namespace Web.Services.Concrete
                         CodeIdFk = UCLEnums.Sepsis.ToInt(),
                         DefaultServiceLineIdFk = string.Join(",", DefaultServiceLineIds),
                         ActiveCodeId = codeSepsis.CodeSepsisId,
-                        ActiveCodeName = UCLEnums.Sepsis.ToString()
+                        ActiveCodeName = UCLEnums.Sepsis.ToString(),
                     };
                     this._codesServiceLinesMappingRepo.Insert(codeService);
                 }
@@ -3337,7 +3421,7 @@ namespace Web.Services.Concrete
                     }
                 }
                 string Type = STEMIDataVM.IsEms.HasValue && STEMIDataVM.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription();
-                var serviceIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == STEMIData.OrganizationIdFk && x.CodeIdFk == UCLEnums.STEMI.ToInt() && x.Type == Type && !x.IsDeleted).Select(x => new { x.DefaultServiceLineTeam, x.ServiceLineTeam1, x.ServiceLineTeam2 }).FirstOrDefault();
+                var serviceIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == STEMIData.OrganizationIdFk && x.CodeIdFk == UCLEnums.STEMI.ToInt() && x.Type == Type && x.IsActive.HasValue && x.IsActive.Value && !x.IsDeleted).Select(x => new { x.DefaultServiceLineTeam, x.ServiceLineTeam1, x.ServiceLineTeam2 }).FirstOrDefault();
 
                 var serviceLineIds = (from x in this._codesServiceLinesMappingRepo.Table
                                       where x.OrganizationIdFk == STEMIData.OrganizationIdFk && x.CodeIdFk == UCLEnums.STEMI.ToInt()
@@ -3826,7 +3910,7 @@ namespace Web.Services.Concrete
                 if (codeSTEMI.OrganizationIdFk > 0)
                 {
                     string IsEMS = codeSTEMI.IsEms.HasValue && codeSTEMI.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription();
-                    var DefaultServiceLineTeam = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeSTEMI.OrganizationIdFk && x.CodeIdFk == UCLEnums.STEMI.ToInt() && x.Type == IsEMS && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
+                    var DefaultServiceLineTeam = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeSTEMI.OrganizationIdFk && x.CodeIdFk == UCLEnums.STEMI.ToInt() && x.Type == IsEMS && x.IsActive.HasValue && x.IsActive.Value && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
                     if (DefaultServiceLineTeam != null && DefaultServiceLineTeam != "")
                     {
                         var DefaultServiceLineIds = DefaultServiceLineTeam.ToIntList();
@@ -4159,17 +4243,30 @@ namespace Web.Services.Concrete
             if (UserChannelSid.Count > 0)
             {
                 usersFound = true;
-                var defaultExist = DefaultServiceLineIds.Where(d => UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d)).Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
-                if (defaultExist.Count > 0 && !defaultExist.Select(x => x.IsExist).All(x => x == true))
+                var defaultExist = DefaultServiceLineIds.Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
+                if (defaultExist.Count > 0)
                 {
-                    DefaultServiceLineIds.RemoveAll(d => defaultExist.Where(x => !x.IsExist).Select(x => x.ServiceLineId).Contains(d));
-                    var services = this._serviceLineRepo.Table.Where(x => defaultExist.Where(d => !d.IsExist).Select(d => d.ServiceLineId).Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
+                    if (!defaultExist.Select(x => x.IsExist).All(x => x == true))
+                    {
+                        var notExisted = defaultExist.Where(x => !x.IsExist).Select(x => x.ServiceLineId).ToList();
+                        DefaultServiceLineIds.RemoveAll(d => notExisted.Contains(d));
+                        var services = this._serviceLineRepo.Table.Where(x => notExisted.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
+                        foreach (var item in services)
+                        {
+                            errorMsg += Environment.NewLine + "No OnCall user found in " + item.ServiceName;
+                        }
+                    }
+                }
+                else
+                {
+                    var services = this._serviceLineRepo.Table.Where(x => DefaultServiceLineIds.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
                     foreach (var item in services)
                     {
                         errorMsg += Environment.NewLine + "No OnCall user found in " + item.ServiceName;
                     }
+                    DefaultServiceLineIds = new List<int>();
                 }
-               
+
                 if (DefaultServiceLineIds.Count > 0)
                 {
                     var codeService = new CodesServiceLinesMapping()
@@ -4277,7 +4374,7 @@ namespace Web.Services.Concrete
             if (codeSTEMI.DefaultServiceLineIds == null || codeSTEMI.DefaultServiceLineIds == "")
             {
                 string IsEMS = codeSTEMI.IsEms.HasValue && codeSTEMI.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription();
-                codeSTEMI.DefaultServiceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeSTEMI.OrganizationIdFk && x.CodeIdFk == UCLEnums.STEMI.ToInt() && x.Type == IsEMS && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
+                codeSTEMI.DefaultServiceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeSTEMI.OrganizationIdFk && x.CodeIdFk == UCLEnums.STEMI.ToInt() && x.Type == IsEMS && x.IsActive.HasValue && x.IsActive.Value && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
             }
 
 
@@ -4303,47 +4400,77 @@ namespace Web.Services.Concrete
                 if (UserChannelSid.Count > 0)
                 {
                     userNotFound = true;
-                    var defaultExist = DefaultServiceLineIds.Where(d => UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d)).Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
-                    if (defaultExist.Count > 0 && !defaultExist.Select(x => x.IsExist).All(x => x == true))
+                    var defaultExist = DefaultServiceLineIds.Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
+                    if (defaultExist.Count > 0)
                     {
-                        DefaultServiceLineIds.RemoveAll(d => defaultExist.Where(x => !x.IsExist).Select(x => x.ServiceLineId).Contains(d));
-                        var services = this._serviceLineRepo.Table.Where(x => defaultExist.Where(d => !d.IsExist).Select(d => d.ServiceLineId).Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
-                        foreach (var item in services)
+                        if (!defaultExist.Select(x => x.IsExist).All(x => x == true))
                         {
-                            msg += Environment.NewLine + "No OnCall user found in " + item.ServiceName;
+                            var notExisted = defaultExist.Where(x => !x.IsExist).Select(x => x.ServiceLineId).ToList();
+                            DefaultServiceLineIds.RemoveAll(d => notExisted.Contains(d));
+                            var services = this._serviceLineRepo.Table.Where(x => notExisted.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
+                            foreach (var item in services)
+                            {
+                                msg += Environment.NewLine + "No OnCall user found in " + item.ServiceName;
+                            }
                         }
                     }
-                   
-
-                    var serviceLineTeam1Exist = ServiceLineTeam1Ids.Where(d => UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d)).Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
-                    if (serviceLineTeam1Exist.Count > 0 && !serviceLineTeam1Exist.Select(x => x.IsExist).All(x => x == true))
+                    else
                     {
-                        ServiceLineTeam1Ids.RemoveAll(d => serviceLineTeam1Exist.Where(x => !x.IsExist).Select(x => x.ServiceLineId).Contains(d));
-                        var services = this._serviceLineRepo.Table.Where(x => serviceLineTeam1Exist.Where(d => !d.IsExist).Select(d => d.ServiceLineId).Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
+                        var services = this._serviceLineRepo.Table.Where(x => DefaultServiceLineIds.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
                         foreach (var item in services)
                         {
                             msg += Environment.NewLine + "No OnCall user found in " + item.ServiceName;
+                        }
+                        DefaultServiceLineIds = new List<int>();
+                    }
+
+                    var serviceLineTeam1Exist = ServiceLineTeam1Ids.Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
+                    if (serviceLineTeam1Exist.Count > 0)
+                    {
+                        if (!serviceLineTeam1Exist.Select(x => x.IsExist).All(x => x == true))
+                        {
+                            var notExisted = defaultExist.Where(x => !x.IsExist).Select(x => x.ServiceLineId).ToList();
+                            ServiceLineTeam1Ids.RemoveAll(d => notExisted.Contains(d));
+                            var services = this._serviceLineRepo.Table.Where(x => notExisted.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
+                            foreach (var item in services)
+                            {
+                                msg += Environment.NewLine + "No OnCall user found in " + item.ServiceName;
+                            }
                         }
                     }
-                   
-
-                    var serviceLineTeam2Exist = ServiceLineTeam2Ids.Where(d => UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d))
-                                                                    .Select(d => new
-                                                                    {
-                                                                        ServiceLineId = d,
-                                                                        IsExist = UserChannelSid
-                                                                    .Select(x => x.ServiceLineIdFk).Contains(d)
-                                                                    }).ToList();
-                    if (serviceLineTeam2Exist.Count > 0 && !serviceLineTeam2Exist.Select(x => x.IsExist).All(x => x == true))
+                    else
                     {
-                        ServiceLineTeam2Ids.RemoveAll(d => serviceLineTeam2Exist.Where(x => !x.IsExist).Select(x => x.ServiceLineId).Contains(d));
-                        var services = this._serviceLineRepo.Table.Where(x => serviceLineTeam2Exist
-                                                                    .Where(d => !d.IsExist).Select(d => d.ServiceLineId).Contains(x.ServiceLineId))
-                                                                    .Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
+                        var services = this._serviceLineRepo.Table.Where(x => ServiceLineTeam1Ids.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
                         foreach (var item in services)
                         {
                             msg += Environment.NewLine + "No OnCall user found in " + item.ServiceName;
                         }
+                        ServiceLineTeam1Ids = new List<int>();
+                    }
+
+
+                    var serviceLineTeam2Exist = ServiceLineTeam2Ids.Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
+                    if (serviceLineTeam2Exist.Count > 0)
+                    {
+                        if (!serviceLineTeam2Exist.Select(x => x.IsExist).All(x => x == true))
+                        {
+                            var notExisted = defaultExist.Where(x => !x.IsExist).Select(x => x.ServiceLineId).ToList();
+                            ServiceLineTeam2Ids.RemoveAll(d => notExisted.Contains(d));
+                            var services = this._serviceLineRepo.Table.Where(x => notExisted.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
+                            foreach (var item in services)
+                            {
+                                msg += Environment.NewLine + "No OnCall user found in " + item.ServiceName;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        var services = this._serviceLineRepo.Table.Where(x => ServiceLineTeam2Ids.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
+                        foreach (var item in services)
+                        {
+                            msg += Environment.NewLine + "No OnCall user found in " + item.ServiceName;
+                        }
+                        ServiceLineTeam2Ids = new List<int>();
                     }
 
                     if (DefaultServiceLineIds.Count > 0 || ServiceLineTeam1Ids.Count > 0 || ServiceLineTeam2Ids.Count > 0)
@@ -4659,7 +4786,7 @@ namespace Web.Services.Concrete
                     }
                 }
                 string Type = TrumaDataVM.IsEms.HasValue && TrumaDataVM.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription();
-                var serviceIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == TrumaData.OrganizationIdFk && x.CodeIdFk == UCLEnums.Trauma.ToInt() && x.Type == Type && !x.IsDeleted).Select(x => new { x.DefaultServiceLineTeam, x.ServiceLineTeam1, x.ServiceLineTeam2 }).FirstOrDefault();
+                var serviceIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == TrumaData.OrganizationIdFk && x.CodeIdFk == UCLEnums.Trauma.ToInt() && x.Type == Type && x.IsActive.HasValue && x.IsActive.Value && !x.IsDeleted).Select(x => new { x.DefaultServiceLineTeam, x.ServiceLineTeam1, x.ServiceLineTeam2 }).FirstOrDefault();
 
 
                 var serviceLineIds = (from x in this._codesServiceLinesMappingRepo.Table
@@ -5151,7 +5278,7 @@ namespace Web.Services.Concrete
                 if (codeTruma.OrganizationIdFk > 0)
                 {
                     string IsEMS = codeTruma.IsEms.HasValue && codeTruma.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription();
-                    var DefaultServiceLineTeam = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeTruma.OrganizationIdFk && x.CodeIdFk == UCLEnums.Trauma.ToInt() && x.Type == IsEMS && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
+                    var DefaultServiceLineTeam = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeTruma.OrganizationIdFk && x.CodeIdFk == UCLEnums.Trauma.ToInt() && x.Type == IsEMS && x.IsActive.HasValue && x.IsActive.Value && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
                     if (DefaultServiceLineTeam != null && DefaultServiceLineTeam != "")
                     {
                         var DefaultServiceLineIds = DefaultServiceLineTeam.ToIntList();
@@ -5564,17 +5691,30 @@ namespace Web.Services.Concrete
             if (UserChannelSid.Count > 0)
             {
                 usersFound = true;
-                var defaultExist = DefaultServiceLineIds.Where(d => UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d)).Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
-                if (defaultExist.Count > 0 && !defaultExist.Select(x => x.IsExist).All(x => x == true))
+                var defaultExist = DefaultServiceLineIds.Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
+                if (defaultExist.Count > 0)
                 {
-                    DefaultServiceLineIds.RemoveAll(d => defaultExist.Where(x => !x.IsExist).Select(x => x.ServiceLineId).Contains(d));
-                    var services = this._serviceLineRepo.Table.Where(x => defaultExist.Where(d => !d.IsExist).Select(d => d.ServiceLineId).Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
+                    if (!defaultExist.Select(x => x.IsExist).All(x => x == true))
+                    {
+                        var notExisted = defaultExist.Where(x => !x.IsExist).Select(x => x.ServiceLineId).ToList();
+                        DefaultServiceLineIds.RemoveAll(d => notExisted.Contains(d));
+                        var services = this._serviceLineRepo.Table.Where(x => notExisted.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
+                        foreach (var item in services)
+                        {
+                            errorMsg += Environment.NewLine + "No OnCall user found in " + item.ServiceName;
+                        }
+                    }
+                }
+                else
+                {
+                    var services = this._serviceLineRepo.Table.Where(x => DefaultServiceLineIds.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
                     foreach (var item in services)
                     {
                         errorMsg += Environment.NewLine + "No OnCall user found in " + item.ServiceName;
                     }
+                    DefaultServiceLineIds = new List<int>();
                 }
-               
+
 
                 if (DefaultServiceLineIds.Count > 0)
                 {
@@ -5683,7 +5823,7 @@ namespace Web.Services.Concrete
             if (codeTruma.DefaultServiceLineIds == null || codeTruma.DefaultServiceLineIds == "")
             {
                 string IsEMS = codeTruma.IsEms.HasValue && codeTruma.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription();
-                codeTruma.DefaultServiceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeTruma.OrganizationIdFk && x.CodeIdFk == UCLEnums.Trauma.ToInt() && x.Type == IsEMS && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
+                codeTruma.DefaultServiceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeTruma.OrganizationIdFk && x.CodeIdFk == UCLEnums.Trauma.ToInt() && x.Type == IsEMS && x.IsActive.HasValue && x.IsActive.Value && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
             }
 
 
@@ -5709,49 +5849,78 @@ namespace Web.Services.Concrete
                 if (UserChannelSid.Count > 0)
                 {
                     userNotFound = true;
-                    var defaultExist = DefaultServiceLineIds.Where(d => UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d)).Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
-                    if (defaultExist.Count > 0 && !defaultExist.Select(x => x.IsExist).All(x => x == true))
+                    var defaultExist = DefaultServiceLineIds.Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
+                    if (defaultExist.Count > 0)
                     {
-                        DefaultServiceLineIds.RemoveAll(d => defaultExist.Where(x => !x.IsExist).Select(x => x.ServiceLineId).Contains(d));
-                        var services = this._serviceLineRepo.Table.Where(x => defaultExist.Where(d => !d.IsExist).Select(d => d.ServiceLineId).Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
+                        if (!defaultExist.Select(x => x.IsExist).All(x => x == true))
+                        {
+                            var notExisted = defaultExist.Where(x => !x.IsExist).Select(x => x.ServiceLineId).ToList();
+                            DefaultServiceLineIds.RemoveAll(d => notExisted.Contains(d));
+                            var services = this._serviceLineRepo.Table.Where(x => notExisted.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
+                            foreach (var item in services)
+                            {
+                                msg += Environment.NewLine + "No OnCall user found in " + item.ServiceName;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        var services = this._serviceLineRepo.Table.Where(x => DefaultServiceLineIds.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
                         foreach (var item in services)
                         {
                             msg += Environment.NewLine + "No OnCall user found in " + item.ServiceName;
                         }
+                        DefaultServiceLineIds = new List<int>();
                     }
-                   
 
-                    var serviceLineTeam1Exist = ServiceLineTeam1Ids.Where(d => UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d)).Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
-                    if (serviceLineTeam1Exist.Count > 0 && !serviceLineTeam1Exist.Select(x => x.IsExist).All(x => x == true))
+                    var serviceLineTeam1Exist = ServiceLineTeam1Ids.Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
+                    if (serviceLineTeam1Exist.Count > 0)
                     {
-                        ServiceLineTeam1Ids.RemoveAll(d => serviceLineTeam1Exist.Where(x => !x.IsExist).Select(x => x.ServiceLineId).Contains(d));
-                        var services = this._serviceLineRepo.Table.Where(x => serviceLineTeam1Exist.Where(d => !d.IsExist).Select(d => d.ServiceLineId).Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
+                        if (!serviceLineTeam1Exist.Select(x => x.IsExist).All(x => x == true))
+                        {
+                            var notExisted = defaultExist.Where(x => !x.IsExist).Select(x => x.ServiceLineId).ToList();
+                            ServiceLineTeam1Ids.RemoveAll(d => notExisted.Contains(d));
+                            var services = this._serviceLineRepo.Table.Where(x => notExisted.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
+                            foreach (var item in services)
+                            {
+                                msg += Environment.NewLine + "No OnCall user found in " + item.ServiceName;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        var services = this._serviceLineRepo.Table.Where(x => ServiceLineTeam1Ids.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
                         foreach (var item in services)
                         {
                             msg += Environment.NewLine + "No OnCall user found in " + item.ServiceName;
                         }
+                        ServiceLineTeam1Ids = new List<int>();
                     }
-                   
 
-                    var serviceLineTeam2Exist = ServiceLineTeam2Ids.Where(d => UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d))
-                                                                    .Select(d => new
-                                                                    {
-                                                                        ServiceLineId = d,
-                                                                        IsExist = UserChannelSid
-                                                                    .Select(x => x.ServiceLineIdFk).Contains(d)
-                                                                    }).ToList();
-                    if (serviceLineTeam2Exist.Count > 0 && !serviceLineTeam2Exist.Select(x => x.IsExist).All(x => x == true))
+
+                    var serviceLineTeam2Exist = ServiceLineTeam2Ids.Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
+                    if (serviceLineTeam2Exist.Count > 0)
                     {
-                        ServiceLineTeam2Ids.RemoveAll(d => serviceLineTeam2Exist.Where(x => !x.IsExist).Select(x => x.ServiceLineId).Contains(d));
-                        var services = this._serviceLineRepo.Table.Where(x => serviceLineTeam2Exist
-                                                                    .Where(d => !d.IsExist).Select(d => d.ServiceLineId).Contains(x.ServiceLineId))
-                                                                    .Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
+                        if (!serviceLineTeam2Exist.Select(x => x.IsExist).All(x => x == true))
+                        {
+                            var notExisted = defaultExist.Where(x => !x.IsExist).Select(x => x.ServiceLineId).ToList();
+                            ServiceLineTeam2Ids.RemoveAll(d => notExisted.Contains(d));
+                            var services = this._serviceLineRepo.Table.Where(x => notExisted.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
+                            foreach (var item in services)
+                            {
+                                msg += Environment.NewLine + "No OnCall user found in " + item.ServiceName;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        var services = this._serviceLineRepo.Table.Where(x => ServiceLineTeam2Ids.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
                         foreach (var item in services)
                         {
                             msg += Environment.NewLine + "No OnCall user found in " + item.ServiceName;
                         }
+                        ServiceLineTeam2Ids = new List<int>();
                     }
-                  
 
 
                     if (DefaultServiceLineIds.Count > 0 || ServiceLineTeam1Ids.Count > 0 || ServiceLineTeam2Ids.Count > 0)
@@ -6063,7 +6232,7 @@ namespace Web.Services.Concrete
                     }
                 }
                 string Type = BlueDataVM.IsEms.HasValue && BlueDataVM.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription();
-                var serviceIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == blueData.OrganizationIdFk && x.CodeIdFk == UCLEnums.Blue.ToInt() && x.Type == Type && !x.IsDeleted).Select(x => new { x.DefaultServiceLineTeam, x.ServiceLineTeam1, x.ServiceLineTeam2 }).FirstOrDefault();
+                var serviceIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == blueData.OrganizationIdFk && x.CodeIdFk == UCLEnums.Blue.ToInt() && x.Type == Type && x.IsActive.HasValue && x.IsActive.Value && !x.IsDeleted).Select(x => new { x.DefaultServiceLineTeam, x.ServiceLineTeam1, x.ServiceLineTeam2 }).FirstOrDefault();
 
                 var serviceLineIds = (from x in this._codesServiceLinesMappingRepo.Table
                                       where x.OrganizationIdFk == blueData.OrganizationIdFk && x.CodeIdFk == UCLEnums.Blue.ToInt()
@@ -6545,7 +6714,7 @@ namespace Web.Services.Concrete
                 if (codeBlue.OrganizationIdFk > 0)
                 {
                     string IsEMS = codeBlue.IsEms.HasValue && codeBlue.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription();
-                    var DefaultServiceLineTeam = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeBlue.OrganizationIdFk && x.CodeIdFk == UCLEnums.Blue.ToInt() && x.Type == IsEMS && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
+                    var DefaultServiceLineTeam = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeBlue.OrganizationIdFk && x.CodeIdFk == UCLEnums.Blue.ToInt() && x.Type == IsEMS && x.IsActive.HasValue && x.IsActive.Value && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
                     if (DefaultServiceLineTeam != null && DefaultServiceLineTeam != "")
                     {
                         var DefaultServiceLineIds = DefaultServiceLineTeam.ToIntList();
@@ -6961,17 +7130,29 @@ namespace Web.Services.Concrete
             if (UserChannelSid.Count > 0)
             {
                 usersFound = true;
-                var defaultExist = DefaultServiceLineIds.Where(d => UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d)).Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
-                if (defaultExist.Count > 0 && !defaultExist.Select(x => x.IsExist).All(x => x == true))
+                var defaultExist = DefaultServiceLineIds.Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
+                if (defaultExist.Count > 0)
                 {
-                    DefaultServiceLineIds.RemoveAll(d => defaultExist.Where(x => !x.IsExist).Select(x => x.ServiceLineId).Contains(d));
-                    var services = this._serviceLineRepo.Table.Where(x => defaultExist.Where(d => !d.IsExist).Select(d => d.ServiceLineId).Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
+                    if (!defaultExist.Select(x => x.IsExist).All(x => x == true))
+                    {
+                        var notExisted = defaultExist.Where(x => !x.IsExist).Select(x => x.ServiceLineId).ToList();
+                        DefaultServiceLineIds.RemoveAll(d => notExisted.Contains(d));
+                        var services = this._serviceLineRepo.Table.Where(x => notExisted.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
+                        foreach (var item in services)
+                        {
+                            errorMsg += Environment.NewLine + "No OnCall user found in " + item.ServiceName;
+                        }
+                    }
+                }
+                else
+                {
+                    var services = this._serviceLineRepo.Table.Where(x => DefaultServiceLineIds.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
                     foreach (var item in services)
                     {
                         errorMsg += Environment.NewLine + "No OnCall user found in " + item.ServiceName;
                     }
+                    DefaultServiceLineIds = new List<int>();
                 }
-               
 
                 if (DefaultServiceLineIds.Count > 0)
                 {
@@ -7080,7 +7261,7 @@ namespace Web.Services.Concrete
             if (codeBlue.DefaultServiceLineIds == null || codeBlue.DefaultServiceLineIds == "")
             {
                 string IsEMS = codeBlue.IsEms.HasValue && codeBlue.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription();
-                codeBlue.DefaultServiceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeBlue.OrganizationIdFk && x.CodeIdFk == UCLEnums.Blue.ToInt() && x.Type == IsEMS && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
+                codeBlue.DefaultServiceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeBlue.OrganizationIdFk && x.CodeIdFk == UCLEnums.Blue.ToInt() && x.Type == IsEMS && x.IsActive.HasValue && x.IsActive.Value && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
             }
 
 
@@ -7106,49 +7287,79 @@ namespace Web.Services.Concrete
                 if (UserChannelSid.Count > 0)
                 {
                     userNotFound = true;
-                    var defaultExist = DefaultServiceLineIds.Where(d => UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d)).Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
-                    if (defaultExist.Count > 0 && !defaultExist.Select(x => x.IsExist).All(x => x == true))
+                    var defaultExist = DefaultServiceLineIds.Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
+                    if (defaultExist.Count > 0)
                     {
-                        DefaultServiceLineIds.RemoveAll(d => defaultExist.Where(x => !x.IsExist).Select(x => x.ServiceLineId).Contains(d));
-                        var services = this._serviceLineRepo.Table.Where(x => defaultExist.Where(d => !d.IsExist).Select(d => d.ServiceLineId).Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
+                        if (!defaultExist.Select(x => x.IsExist).All(x => x == true))
+                        {
+                            var notExisted = defaultExist.Where(x => !x.IsExist).Select(x => x.ServiceLineId).ToList();
+                            DefaultServiceLineIds.RemoveAll(d => notExisted.Contains(d));
+                            var services = this._serviceLineRepo.Table.Where(x => notExisted.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
+                            foreach (var item in services)
+                            {
+                                msg += Environment.NewLine + "No OnCall user found in " + item.ServiceName;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        var services = this._serviceLineRepo.Table.Where(x => DefaultServiceLineIds.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
                         foreach (var item in services)
                         {
                             msg += Environment.NewLine + "No OnCall user found in " + item.ServiceName;
                         }
+                        DefaultServiceLineIds = new List<int>();
                     }
-                   
 
-                    var serviceLineTeam1Exist = ServiceLineTeam1Ids.Where(d => UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d)).Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
-                    if (serviceLineTeam1Exist.Count > 0 && !serviceLineTeam1Exist.Select(x => x.IsExist).All(x => x == true))
+                    var serviceLineTeam1Exist = ServiceLineTeam1Ids.Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
+                    if (serviceLineTeam1Exist.Count > 0)
                     {
-                        ServiceLineTeam1Ids.RemoveAll(d => serviceLineTeam1Exist.Where(x => !x.IsExist).Select(x => x.ServiceLineId).Contains(d));
-                        var services = this._serviceLineRepo.Table.Where(x => serviceLineTeam1Exist.Where(d => !d.IsExist).Select(d => d.ServiceLineId).Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
+                        if (!serviceLineTeam1Exist.Select(x => x.IsExist).All(x => x == true))
+                        {
+                            var notExisted = defaultExist.Where(x => !x.IsExist).Select(x => x.ServiceLineId).ToList();
+                            ServiceLineTeam1Ids.RemoveAll(d => notExisted.Contains(d));
+                            var services = this._serviceLineRepo.Table.Where(x => notExisted.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
+                            foreach (var item in services)
+                            {
+                                msg += Environment.NewLine + "No OnCall user found in " + item.ServiceName;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        var services = this._serviceLineRepo.Table.Where(x => ServiceLineTeam1Ids.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
                         foreach (var item in services)
                         {
                             msg += Environment.NewLine + "No OnCall user found in " + item.ServiceName;
                         }
+                        ServiceLineTeam1Ids = new List<int>();
                     }
-                   
 
-                    var serviceLineTeam2Exist = ServiceLineTeam2Ids.Where(d => UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d))
-                                                                    .Select(d => new
-                                                                    {
-                                                                        ServiceLineId = d,
-                                                                        IsExist = UserChannelSid
-                                                                    .Select(x => x.ServiceLineIdFk).Contains(d)
-                                                                    }).ToList();
-                    if (serviceLineTeam2Exist.Count > 0 && !serviceLineTeam2Exist.Select(x => x.IsExist).All(x => x == true))
+
+                    var serviceLineTeam2Exist = ServiceLineTeam2Ids.Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
+                    if (serviceLineTeam2Exist.Count > 0)
                     {
-                        ServiceLineTeam2Ids.RemoveAll(d => serviceLineTeam2Exist.Where(x => !x.IsExist).Select(x => x.ServiceLineId).Contains(d));
-                        var services = this._serviceLineRepo.Table.Where(x => serviceLineTeam2Exist
-                                                                    .Where(d => !d.IsExist).Select(d => d.ServiceLineId).Contains(x.ServiceLineId))
-                                                                    .Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
+                        if (!serviceLineTeam2Exist.Select(x => x.IsExist).All(x => x == true))
+                        {
+                            var notExisted = defaultExist.Where(x => !x.IsExist).Select(x => x.ServiceLineId).ToList();
+                            ServiceLineTeam2Ids.RemoveAll(d => notExisted.Contains(d));
+                            var services = this._serviceLineRepo.Table.Where(x => notExisted.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
+                            foreach (var item in services)
+                            {
+                                msg += Environment.NewLine + "No OnCall user found in " + item.ServiceName;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        var services = this._serviceLineRepo.Table.Where(x => ServiceLineTeam2Ids.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
                         foreach (var item in services)
                         {
                             msg += Environment.NewLine + "No OnCall user found in " + item.ServiceName;
                         }
+                        ServiceLineTeam2Ids = new List<int>();
                     }
-                   
+
 
                     if (DefaultServiceLineIds.Count > 0 || ServiceLineTeam1Ids.Count > 0 || ServiceLineTeam2Ids.Count > 0)
                     {
