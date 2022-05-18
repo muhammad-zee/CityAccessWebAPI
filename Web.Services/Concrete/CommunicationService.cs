@@ -1110,6 +1110,40 @@ namespace Web.Services.Concrete
         }
 
 
+        public BaseResponse refreshConsversationUsers(string key)
+        {
+            if (key == "qw4hddqcrg")
+            {
+                var dbUsers = this._userRepo.Table.Where(x => x.IsDeleted == false && x.IsActive == true && !string.IsNullOrEmpty(x.ConversationUserSid)).ToList();
+                List<User> usersToUpdate = new();
+                TwilioClient.Init(this.Twilio_AccountSid, this.Twilio_AuthToken);
+                foreach (var u in dbUsers)
+                {
+                    try
+                    {
+                        var twilioUser = UserResource.Fetch(pathServiceSid: this.Twilio_ChatServiceSid, pathSid: u.ConversationUserSid);
+                    }
+                    catch (Exception e)
+                    {
+                        u.ConversationUserSid = "";
+                        usersToUpdate.Add(u);
+                    }
+
+                    //var createUser = UserResource.Create(pathServiceSid: this.Twilio_ChatServiceSid, identity: Identity, friendlyName: FriendlyName);
+                }
+                if (usersToUpdate.Count() > 0)
+                {
+                this._userRepo.Update(usersToUpdate);
+                }
+                return new BaseResponse { Status = HttpStatusCode.OK, Body = "conversation users refreshed" };
+            }
+            else
+            {
+                return new BaseResponse { Status = HttpStatusCode.OK, Body = "Incorrect Key" };
+            }
+        }
+
+
 
         public BaseResponse SaveCommunicatonLog(CommunicationLogVM log)
         {

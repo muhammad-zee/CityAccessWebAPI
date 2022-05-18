@@ -316,6 +316,22 @@ namespace Web.API.Controllers
             }
         }
 
+        [AllowAnonymous]
+        [HttpGet("Conversation/refreshConsversationUsers")]
+        public BaseResponse refreshConsversationUsers(string key)
+        {
+            try
+            {
+                return this._communicaitonService.refreshConsversationUsers(key);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
         #region [video call]
         [HttpGet("VideoCall/generateVideoCallToken")]
         public BaseResponse generateVideoCallToken(string Identity)
