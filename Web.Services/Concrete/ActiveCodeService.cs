@@ -142,7 +142,7 @@ namespace Web.Services.Concrete
             }
             else
             {
-                return new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "No Active Code Found", Body = codes };
+                return new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "No Code Found", Body = codes };
             }
         }
 
@@ -368,14 +368,14 @@ namespace Web.Services.Concrete
                 }
                 datasets.Add(new
                 {
-                    label = "EMS",
+                    label = UCLEnums.EMS.ToDescription(),
                     backgroundColor = "#089bab",
                     borderColor = "#089bab",
                     data = EMS
                 });
                 datasets.Add(new
                 {
-                    label = "Inhouse Codes",
+                    label = UCLEnums.InhouseCode.ToDescription(),
                     backgroundColor = "#CEEBEE",
                     borderColor = "#CEEBEE",
                     data = activeCodes
@@ -386,13 +386,13 @@ namespace Web.Services.Concrete
             {
                 datasets = new List<object>() { new
                                                 {
-                                                  label= "EMS",
+                                                  label= UCLEnums.EMS.ToDescription(),
                                                   backgroundColor= "#089bab",
                                                   data= ActiveCodes.Select(c=>c.EMS).ToList()
                                                 },
                                                 new
                                                 {
-                                                  label= "Inhouse Codes",
+                                                  label= UCLEnums.InhouseCode.ToDescription(),
                                                   backgroundColor= "#CEEBEE",
                                                   data= ActiveCodes.Select(c=>c.ActiveCodes).ToList()
                                                 }
@@ -426,9 +426,9 @@ namespace Web.Services.Concrete
                     OrgId = rootPath.OrganizationIdFk,
                     UserChannelSid = UserChannelSid,
                     From = AuthorEnums.Stroke.ToString(),
-                    Msg = (rootPath.IsEms.HasValue && rootPath.IsEms.Value ? "EMS" : "Active") + " Code Stroke Form is Changed",
-                    RouteLink1 = "/Home/Activate%20Code/code-strok-form",
-                    RouteLink2 = "/Home/EMS/activateCode"
+                    Msg = (rootPath.IsEms.HasValue && rootPath.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription()) + " Stroke Form is Changed",
+                    RouteLink1 = RouteEnums.CodeStrokeForm.ToDescription(),
+                    RouteLink2 = RouteEnums.EMSForms.ToDescription()
                 };
 
                 _communicationService.pushNotification(notification);
@@ -450,9 +450,9 @@ namespace Web.Services.Concrete
                     OrgId = rootPath.OrganizationIdFk,
                     UserChannelSid = UserChannelSid,
                     From = AuthorEnums.Sepsis.ToString(),
-                    Msg = (rootPath.IsEms.HasValue && rootPath.IsEms.Value ? "EMS" : "Active") + " Code Sepsis Form is Changed",
-                    RouteLink1 = "/Home/Activate%20Code/code-sepsis-form",
-                    RouteLink2 = "/Home/EMS/activateCode"
+                    Msg = (rootPath.IsEms.HasValue && rootPath.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription()) + " Sepsis Form is Changed",
+                    RouteLink1 = RouteEnums.CodeSepsisForm.ToDescription(),
+                    RouteLink2 = RouteEnums.EMSForms.ToDescription()
                 };
 
                 _communicationService.pushNotification(notification);
@@ -473,9 +473,9 @@ namespace Web.Services.Concrete
                     OrgId = rootPath.OrganizationIdFk,
                     UserChannelSid = UserChannelSid,
                     From = AuthorEnums.STEMI.ToString(),
-                    Msg = (rootPath.IsEms.HasValue && rootPath.IsEms.Value ? "EMS" : "Active") + " Code STEMI Form is Changed",
-                    RouteLink1 = "/Home/Activate%20Code/code-stemi-form",
-                    RouteLink2 = "/Home/EMS/activateCode"
+                    Msg = (rootPath.IsEms.HasValue && rootPath.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription()) + " STEMI Form is Changed",
+                    RouteLink1 = RouteEnums.CodeSTEMIForm.ToDescription(),
+                    RouteLink2 = RouteEnums.EMSForms.ToDescription()
                 };
 
                 _communicationService.pushNotification(notification);
@@ -496,9 +496,9 @@ namespace Web.Services.Concrete
                     OrgId = rootPath.OrganizationIdFk,
                     UserChannelSid = UserChannelSid,
                     From = AuthorEnums.Trauma.ToString(),
-                    Msg = (rootPath.IsEms.HasValue && rootPath.IsEms.Value ? "EMS" : "Active") + " Code Trauma Form is Changed",
-                    RouteLink1 = "/Home/Activate%20Code/code-trauma-form",
-                    RouteLink2 = "/Home/EMS/activateCode"
+                    Msg = (rootPath.IsEms.HasValue && rootPath.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription()) + " Trauma Form is Changed",
+                    RouteLink1 = RouteEnums.CodeTraumaForm.ToDescription(),
+                    RouteLink2 = RouteEnums.EMSForms.ToDescription()
                 };
 
                 _communicationService.pushNotification(notification);
@@ -519,9 +519,9 @@ namespace Web.Services.Concrete
                     OrgId = rootPath.OrganizationIdFk,
                     UserChannelSid = UserChannelSid,
                     From = AuthorEnums.Blue.ToString(),
-                    Msg = (rootPath.IsEms.HasValue && rootPath.IsEms.Value ? "EMS" : "Active") + " Code Blue Form is Changed",
-                    RouteLink1 = "/Home/Activate%20Code/code-blue-form",
-                    RouteLink2 = "/Home/EMS/activateCode"
+                    Msg = (rootPath.IsEms.HasValue && rootPath.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription()) + " Blue Form is Changed",
+                    RouteLink1 = RouteEnums.CodeBlueForm.ToDescription(),
+                    RouteLink2 = RouteEnums.EMSForms.ToDescription()
                 };
 
                 _communicationService.pushNotification(notification);
@@ -620,7 +620,7 @@ namespace Web.Services.Concrete
                         }
                     }
                 }
-                string Type = StrokeDataVM.IsEms.HasValue && StrokeDataVM.IsEms.Value ? "EMS Code" : "Inhouse Code";
+                string Type = StrokeDataVM.IsEms.HasValue && StrokeDataVM.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription();
                 var serviceIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == strokeData.OrganizationIdFk && x.CodeIdFk == UCLEnums.Stroke.ToInt() && x.Type == Type && !x.IsDeleted).Select(x => new { x.DefaultServiceLineTeam, x.ServiceLineTeam1, x.ServiceLineTeam2 }).FirstOrDefault();
                 var serviceLineIds = (from x in this._codesServiceLinesMappingRepo.Table
                                       where x.OrganizationIdFk == strokeData.OrganizationIdFk && x.CodeIdFk == UCLEnums.Stroke.ToInt()
@@ -971,7 +971,7 @@ namespace Web.Services.Concrete
 
                 //if (codeStroke.DefaultServiceLineIds == null || codeStroke.DefaultServiceLineIds == "")
                 //{
-                //    string IsEMS = row.IsEms.HasValue && row.IsEms.Value ? "EMS Code" : "Inhouse Code";
+                //    string IsEMS = row.IsEms.HasValue && row.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription();
                 //    codeStroke.DefaultServiceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeStroke.OrganizationIdFk && x.CodeIdFk == UCLEnums.Stroke.ToInt() && x.Type == IsEMS && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
                 //}
 
@@ -1050,9 +1050,9 @@ namespace Web.Services.Concrete
                 //        OrgId = row.OrganizationIdFk,
                 //        UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).Distinct().ToList(),
                 //        From = AuthorEnums.Stroke.ToString(),
-                //        Msg = (codeStroke.IsEms.HasValue && codeStroke.IsEms.Value ? "EMS" : "Inhouse") + " Code Stroke From is Changed",
+                //        Msg = (codeStroke.IsEms.HasValue && codeStroke.IsEms.Value ? UCLEnums.EMS.ToDescription() : "{UCLEnums.InhouseCode.ToDescription()}) + " Code Stroke From is Changed",
                 //        RouteLink1 = "/Home/Inhouse%20Codes/code-strok-form",
-                //        RouteLink2 = "/Home/EMS/activateCode",
+                //        RouteLink2 = RouteEnums.EMSForms.ToDescription(),
                 //    };
 
                 //    _communicationService.pushNotification(notification);
@@ -1070,9 +1070,9 @@ namespace Web.Services.Concrete
                 //        OrgId = row.OrganizationIdFk,
                 //        UserChannelSid = userUniqueIds,
                 //        From = AuthorEnums.Stroke.ToString(),
-                //        Msg = (codeStroke.IsEms.HasValue && codeStroke.IsEms.Value ? "EMS" : "Inhouse") + " Code Stroke From is Changed",
+                //        Msg = (codeStroke.IsEms.HasValue && codeStroke.IsEms.Value ? UCLEnums.EMS.ToDescription() : "{UCLEnums.InhouseCode.ToDescription()}) + " Code Stroke From is Changed",
                 //        RouteLink1 = "/Home/Inhouse%20Codes/code-strok-form",
-                //        RouteLink2 = "/Home/EMS/activateCode",
+                //        RouteLink2 = RouteEnums.EMSForms.ToDescription(),
                 //    };
 
                 //    _communicationService.pushNotification(notification);
@@ -1087,9 +1087,9 @@ namespace Web.Services.Concrete
                     OrgId = row.OrganizationIdFk,
                     UserChannelSid = userUniqueIds,
                     From = AuthorEnums.Stroke.ToString(),
-                    Msg = (codeStroke.IsEms.HasValue && codeStroke.IsEms.Value ? "EMS" : "Inhouse") + " Code Stroke From is Changed",
-                    RouteLink1 = "/Home/Inhouse%20Codes/code-strok-form",
-                    RouteLink2 = "/Home/EMS/activateCode",
+                    Msg = (codeStroke.IsEms.HasValue && codeStroke.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription()) + " Stroke From is Changed",
+                    RouteLink1 = RouteEnums.CodeStrokeForm.ToDescription(), // "/Home/Inhouse%20Codes/code-strok-form",
+                    RouteLink2 = RouteEnums.EMSForms.ToDescription(), // RouteEnums.EMSForms.ToDescription(),
                 };
 
                 _communicationService.pushNotification(notification);
@@ -1100,7 +1100,7 @@ namespace Web.Services.Concrete
             {
                 if (codeStroke.OrganizationIdFk > 0)
                 {
-                    string IsEMS = codeStroke.IsEms.HasValue && codeStroke.IsEms.Value ? "EMS Code" : "Inhouse Code";
+                    string IsEMS = codeStroke.IsEms.HasValue && codeStroke.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription();
                     var DefaultServiceLineTeam = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeStroke.OrganizationIdFk && x.CodeIdFk == UCLEnums.Stroke.ToInt() && x.Type == IsEMS && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
                     if (DefaultServiceLineTeam != null && DefaultServiceLineTeam != "")
                     {
@@ -1476,7 +1476,7 @@ namespace Web.Services.Concrete
             if (UserChannelSid != null && UserChannelSid.Count > 0)
             {
                 string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
-                string friendlyName = codeStroke.IsEms.HasValue && codeStroke.IsEms.Value ? $"EMS Code {UCLEnums.Stroke.ToString()} {codeStroke.CodeStrokeId}" : $"Inhouse Code {UCLEnums.Stroke.ToString()} {codeStroke.CodeStrokeId}";
+                string friendlyName = codeStroke.IsEms.HasValue && codeStroke.IsEms.Value ? $"{UCLEnums.EMS.ToDescription()} {UCLEnums.Stroke.ToString()} {codeStroke.CodeStrokeId}" : $"{UCLEnums.InhouseCode.ToDescription()} {UCLEnums.Stroke.ToString()} {codeStroke.CodeStrokeId}";
                 var channel = _communicationService.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
                 var stroke = this._codeStrokeRepo.Table.Where(x => x.CodeStrokeId == codeStroke.CodeStrokeId && x.IsActive == true && !x.IsDeleted).FirstOrDefault();
                 if (stroke != null) {
@@ -1511,7 +1511,7 @@ namespace Web.Services.Concrete
                 msg.channelSid = channel.Sid;
                 msg.author = "System";
                 msg.attributes = "";
-                msg.body = $"<strong> {(codeStroke.IsEms.HasValue && codeStroke.IsEms.Value ? "EMS Code" : "Inhouse Code")} {UCLEnums.Stroke.ToString()} </strong></br></br>";
+                msg.body = $"<strong> {(codeStroke.IsEms.HasValue && codeStroke.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription())} {UCLEnums.Stroke.ToString()} </strong></br></br>";
                 if (codeStroke.PatientName != null && codeStroke.PatientName != "")
                     msg.body += $"<strong>Patient Name: </strong> {codeStroke.PatientName} </br>";
                 if (codeStroke.Dob != null)
@@ -1536,10 +1536,10 @@ namespace Web.Services.Concrete
                     OrgId = stroke.OrganizationIdFk,
                     UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).Distinct().ToList(),
                     From = AuthorEnums.Stroke.ToString(),
-                    Msg = (codeStroke.IsEms.HasValue && codeStroke.IsEms.Value ? "EMS" : "Inhouse") + " Code Stroke is update",
-                    RouteLink3 = "/Home/EMS",
-                    RouteLink4 = "/Home/Dashboard",
-                    RouteLink5 = "/Home/Inhouse%20Codes"
+                    Msg = (codeStroke.IsEms.HasValue && codeStroke.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription()) + " Stroke is update",
+                    RouteLink3 = RouteEnums.ActiveEMS.ToDescription(), // RouteEnums.ActiveEMS.ToDescription(),
+                    RouteLink4 = RouteEnums.Dashboard.ToDescription(),
+                    RouteLink5 = RouteEnums.InhouseCodeGrid.ToDescription(), // RouteEnums.InhouseCodeGrid.ToDescription()
                 };
 
                 _communicationService.pushNotification(notification);
@@ -1553,7 +1553,7 @@ namespace Web.Services.Concrete
 
             if (codeStroke.DefaultServiceLineIds == null || codeStroke.DefaultServiceLineIds == "")
             {
-                string IsEMS = codeStroke.IsEms.HasValue && codeStroke.IsEms.Value ? "EMS Code" : "Inhouse Code";
+                string IsEMS = codeStroke.IsEms.HasValue && codeStroke.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription();
                 codeStroke.DefaultServiceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeStroke.OrganizationIdFk && x.CodeIdFk == UCLEnums.Stroke.ToInt() && x.Type == IsEMS && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
             }
 
@@ -1707,9 +1707,9 @@ namespace Web.Services.Concrete
                     OrgId = codeStroke.OrganizationIdFk,
                     UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).Distinct().ToList(),
                     From = AuthorEnums.Stroke.ToString(),
-                    Msg = (codeStroke.IsEms.HasValue && codeStroke.IsEms.Value ? "EMS" : "Inhouse") + " Code Stroke From is Changed",
-                    RouteLink1 = "/Home/Inhouse%20Codes/code-strok-form",
-                    RouteLink2 = "/Home/EMS/activateCode",
+                    Msg = (codeStroke.IsEms.HasValue && codeStroke.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription()) + " Stroke From is Changed",
+                    RouteLink1 = RouteEnums.CodeStrokeForm.ToDescription(), // "/Home/Inhouse%20Codes/code-strok-form",
+                    RouteLink2 = RouteEnums.EMSForms.ToDescription(), // RouteEnums.EMSForms.ToDescription(),
                 };
 
                 _communicationService.pushNotification(notification);
@@ -1772,9 +1772,9 @@ namespace Web.Services.Concrete
                     UserChannelSid = userIds.Select(x => x.UserUniqueId).Distinct().ToList(),
                     From = UCLEnums.Stroke.ToString(),
                     Msg = UCLEnums.Stroke.ToString() + " is " + (status ? "Activated" : "Inactivated"),
-                    RouteLink3 = "/Home/EMS",
-                    RouteLink4 = "/Home/Dashboard",
-                    RouteLink5 = "/Home/Inhouse%20Codes"
+                    RouteLink3 = RouteEnums.ActiveEMS.ToDescription(), // RouteEnums.ActiveEMS.ToDescription(),
+                    RouteLink4 = RouteEnums.Dashboard.ToDescription(), // RouteEnums.Dashboard.ToDescription(),
+                    RouteLink5 = RouteEnums.InhouseCodeGrid.ToDescription(), // RouteEnums.InhouseCodeGrid.ToDescription()
                 };
 
                 _communicationService.pushNotification(notification);
@@ -1954,7 +1954,7 @@ namespace Web.Services.Concrete
                         }
                     }
                 }
-                string Type = SepsisDataVM.IsEms ? "EMS Code" : "Inhouse Code";
+                string Type = SepsisDataVM.IsEms ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription();
                 var serviceIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == SepsisData.OrganizationIdFk && x.CodeIdFk == UCLEnums.Sepsis.ToInt() && x.Type == Type && !x.IsDeleted).Select(x => new { x.DefaultServiceLineTeam, x.ServiceLineTeam1, x.ServiceLineTeam2 }).FirstOrDefault();
                 var serviceLineIds = (from x in this._codesServiceLinesMappingRepo.Table
                                       where x.OrganizationIdFk == SepsisData.OrganizationIdFk && x.CodeIdFk == UCLEnums.Sepsis.ToInt()
@@ -2309,7 +2309,7 @@ namespace Web.Services.Concrete
 
                 //if (codeSepsis.DefaultServiceLineIds == null || codeSepsis.DefaultServiceLineIds == "")
                 //{
-                //    string IsEMS = row.IsEms ? "EMS Code" : "Inhouse Code";
+                //    string IsEMS = row.IsEms ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription();
                 //    codeSepsis.DefaultServiceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeSepsis.OrganizationIdFk && x.CodeIdFk == UCLEnums.Sepsis.ToInt() && x.Type == IsEMS && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
                 //}
 
@@ -2386,9 +2386,9 @@ namespace Web.Services.Concrete
                 //        OrgId = row.OrganizationIdFk,
                 //        UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).Distinct().ToList(),
                 //        From = AuthorEnums.Sepsis.ToString(),
-                //        Msg = (codeSepsis.IsEms ? "EMS" : "Inhouse") + " Code Sepsis From is Changed",
+                //        Msg = (codeSepsis.IsEms ? UCLEnums.EMS.ToDescription() : "{UCLEnums.InhouseCode.ToDescription()}) + " Code Sepsis From is Changed",
                 //        RouteLink1 = "/Home/Inhouse%20Codes/code-sepsis-form",
-                //        RouteLink2 = "/Home/EMS/activateCode"
+                //        RouteLink2 = RouteEnums.EMSForms.ToDescription()
                 //    };
 
                 //    _communicationService.pushNotification(notification);
@@ -2405,9 +2405,9 @@ namespace Web.Services.Concrete
                 //        OrgId = row.OrganizationIdFk,
                 //        UserChannelSid = userUniqueIds,
                 //        From = AuthorEnums.Sepsis.ToString(),
-                //        Msg = (codeSepsis.IsEms ? "EMS" : "Inhouse") + " Code Sepsis From is Changed",
+                //        Msg = (codeSepsis.IsEms ? UCLEnums.EMS.ToDescription() : "{UCLEnums.InhouseCode.ToDescription()}) + " Code Sepsis From is Changed",
                 //        RouteLink1 = "/Home/Inhouse%20Codes/code-sepsis-form",
-                //        RouteLink2 = "/Home/EMS/activateCode"
+                //        RouteLink2 = RouteEnums.EMSForms.ToDescription()
                 //    };
 
                 //    _communicationService.pushNotification(notification);
@@ -2422,9 +2422,9 @@ namespace Web.Services.Concrete
                     OrgId = row.OrganizationIdFk,
                     UserChannelSid = userUniqueIds,
                     From = AuthorEnums.Sepsis.ToString(),
-                    Msg = (codeSepsis.IsEms ? "EMS" : "Inhouse") + " Code Sepsis From is Changed",
-                    RouteLink1 = "/Home/Inhouse%20Codes/code-sepsis-form",
-                    RouteLink2 = "/Home/EMS/activateCode"
+                    Msg = (codeSepsis.IsEms ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription()) + " Sepsis From is Changed",
+                    RouteLink1 = RouteEnums.CodeSepsisForm.ToDescription(), // "/Home/Inhouse%20Codes/code-sepsis-form",
+                    RouteLink2 = RouteEnums.EMSForms.ToDescription(), // RouteEnums.EMSForms.ToDescription()
                 };
 
                 _communicationService.pushNotification(notification);
@@ -2435,7 +2435,7 @@ namespace Web.Services.Concrete
 
                 if (codeSepsis.OrganizationIdFk > 0)
                 {
-                    string IsEMS = codeSepsis.IsEms ? "EMS Code" : "Inhouse Code";
+                    string IsEMS = codeSepsis.IsEms ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription();
                     var DefaultServiceLineTeam = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeSepsis.OrganizationIdFk && x.CodeIdFk == UCLEnums.Sepsis.ToInt() && x.Type == IsEMS && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
                     if (DefaultServiceLineTeam != null && DefaultServiceLineTeam != "")
                     {
@@ -2757,7 +2757,7 @@ namespace Web.Services.Concrete
                         //if (UserChannelSid != null && UserChannelSid.Count > 0)
                         //{
                         //    string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
-                        //    string friendlyName = Sepsis.IsEms ? $"EMS Code {UCLEnums.Sepsis.ToString()} {Sepsis.CodeSepsisId}" : $"Inhouse Code {UCLEnums.Sepsis.ToString()} {Sepsis.CodeSepsisId}";
+                        //    string friendlyName = Sepsis.IsEms ? $"{UCLEnums.EMS.ToDescription()} {UCLEnums.Sepsis.ToString()} {Sepsis.CodeSepsisId}" : $"{UCLEnums.InhouseCode.ToDescription()} {UCLEnums.Sepsis.ToString()} {Sepsis.CodeSepsisId}";
                         //    var conversationChannelAttributes = JsonConvert.SerializeObject(new Dictionary<string, Object>()
                         //            {
                         //                {ChannelAttributeEnums.ChannelType.ToString(), ChannelTypeEnums.EMS.ToString()},
@@ -2796,7 +2796,7 @@ namespace Web.Services.Concrete
                         //    msg.channelSid = channel.Sid;
                         //    msg.author = "System";
                         //    msg.attributes = "";
-                        //    msg.body = $"<strong> {(codeSepsis.IsEms ? "EMS Code" : "Inhouse Code")} {UCLEnums.Sepsis.ToString()} </strong></br></br>";
+                        //    msg.body = $"<strong> {(codeSepsis.IsEms ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription())} {UCLEnums.Sepsis.ToString()} </strong></br></br>";
                         //    if (codeSepsis.PatientName != null && codeSepsis.PatientName != "")
                         //        msg.body += $"<strong>Patient Name: </strong> {codeSepsis.PatientName} </br>";
                         //    msg.body += $"<strong>Dob: </strong> {codeSepsis.Dob:MM-dd-yyyy} </br>";
@@ -2819,10 +2819,10 @@ namespace Web.Services.Concrete
                         //        OrgId = Sepsis.OrganizationIdFk,
                         //        UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).Distinct().ToList(),
                         //        From = AuthorEnums.Sepsis.ToString(),
-                        //        Msg = (codeSepsis.IsEms ? "EMS" : "Inhouse") + " Code Sepsis is update",
-                        //        RouteLink3 = "/Home/EMS",
-                        //        RouteLink4 = "/Home/Dashboard",
-                        //        RouteLink5 = "/Home/Inhouse%20Codes"
+                        //        Msg = (codeSepsis.IsEms ? UCLEnums.EMS.ToDescription() : "{UCLEnums.InhouseCode.ToDescription()}) + " Code Sepsis is update",
+                        //        RouteLink3 = RouteEnums.ActiveEMS.ToDescription(),
+                        //        RouteLink4 = RouteEnums.Dashboard.ToDescription(),
+                        //        RouteLink5 = RouteEnums.InhouseCodeGrid.ToDescription()
                         //    };
 
                         //    _communicationService.pushNotification(notification);
@@ -2840,7 +2840,7 @@ namespace Web.Services.Concrete
 
             if (codeSepsis.DefaultServiceLineIds == null || codeSepsis.DefaultServiceLineIds == "")
             {
-                string IsEMS = codeSepsis.IsEms ? "EMS Code" : "Inhouse Code";
+                string IsEMS = codeSepsis.IsEms ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription();
                 codeSepsis.DefaultServiceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeSepsis.OrganizationIdFk && x.CodeIdFk == UCLEnums.Sepsis.ToInt() && x.Type == IsEMS && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
             }
 
@@ -2998,9 +2998,9 @@ namespace Web.Services.Concrete
                     OrgId = codeSepsis.OrganizationIdFk,
                     UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).Distinct().ToList(),
                     From = AuthorEnums.Sepsis.ToString(),
-                    Msg = (codeSepsis.IsEms ? "EMS" : "Inhouse") + " Code Sepsis From is Changed",
-                    RouteLink1 = "/Home/Inhouse%20Codes/code-strok-form",
-                    RouteLink2 = "/Home/EMS/activateCode",
+                    Msg = (codeSepsis.IsEms ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription()) + " Sepsis From is Changed",
+                    RouteLink1 = RouteEnums.CodeSepsisForm.ToDescription(), // "/Home/Inhouse%20Codes/code-sepsis-form",
+                    RouteLink2 = RouteEnums.EMSForms.ToDescription(),
                 };
 
                 _communicationService.pushNotification(notification);
@@ -3074,7 +3074,7 @@ namespace Web.Services.Concrete
             if (UserChannelSid != null && UserChannelSid.Count > 0)
             {
                 string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
-                string friendlyName = codeSepsis.IsEms ? $"EMS Code {UCLEnums.Sepsis.ToString()} {codeSepsis.CodeSepsisId}" : $"Inhouse Code {UCLEnums.Sepsis.ToString()} {codeSepsis.CodeSepsisId}";
+                string friendlyName = codeSepsis.IsEms ? $"{UCLEnums.EMS.ToDescription()} {UCLEnums.Sepsis.ToString()} {codeSepsis.CodeSepsisId}" : $"{UCLEnums.InhouseCode.ToDescription()} {UCLEnums.Sepsis.ToString()} {codeSepsis.CodeSepsisId}";
                 var channel = _communicationService.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
                 var Sepsis = this._codeSepsisRepo.Table.Where(x => x.CodeSepsisId == codeSepsis.CodeSepsisId && x.IsActive == true && !x.IsDeleted).FirstOrDefault();
                 if (Sepsis != null)
@@ -3110,7 +3110,7 @@ namespace Web.Services.Concrete
                 msg.channelSid = channel.Sid;
                 msg.author = "System";
                 msg.attributes = "";
-                msg.body = $"<strong> {(codeSepsis.IsEms ? "EMS Code" : "Inhouse Code")} {UCLEnums.Sepsis.ToString()} </strong></br></br>";
+                msg.body = $"<strong> {(codeSepsis.IsEms ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription())} {UCLEnums.Sepsis.ToString()} </strong></br></br>";
                 if (codeSepsis.PatientName != null && codeSepsis.PatientName != "")
                     msg.body += $"<strong>Patient Name: </strong> {codeSepsis.PatientName} </br>";
                 if (codeSepsis.Dob != null)
@@ -3135,10 +3135,10 @@ namespace Web.Services.Concrete
                     OrgId = Sepsis.OrganizationIdFk,
                     UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).Distinct().ToList(),
                     From = AuthorEnums.Sepsis.ToString(),
-                    Msg = (codeSepsis.IsEms ? "EMS" : "Inhouse") + " Code Sepsis is update",
-                    RouteLink3 = "/Home/EMS",
-                    RouteLink4 = "/Home/Dashboard",
-                    RouteLink5 = "/Home/Inhouse%20Codes"
+                    Msg = (codeSepsis.IsEms ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription()) + " Sepsis is update",
+                    RouteLink3 = RouteEnums.ActiveEMS.ToDescription(),
+                    RouteLink4 = RouteEnums.Dashboard.ToDescription(),
+                    RouteLink5 = RouteEnums.InhouseCodeGrid.ToDescription()
                 };
 
                 _communicationService.pushNotification(notification);
@@ -3200,9 +3200,9 @@ namespace Web.Services.Concrete
                     UserChannelSid = userIds.Select(x => x.UserUniqueId).Distinct().ToList(),
                     From = UCLEnums.Sepsis.ToString(),
                     Msg = UCLEnums.Sepsis.ToString() + " is " + (status ? "Activated" : "Inactivated"),
-                    RouteLink3 = "/Home/EMS",
-                    RouteLink4 = "/Home/Dashboard",
-                    RouteLink5 = "/Home/Inhouse%20Codes"
+                    RouteLink3 = RouteEnums.ActiveEMS.ToDescription(),
+                    RouteLink4 = RouteEnums.Dashboard.ToDescription(),
+                    RouteLink5 = RouteEnums.InhouseCodeGrid.ToDescription()
                 };
 
                 _communicationService.pushNotification(notification);
@@ -3383,7 +3383,7 @@ namespace Web.Services.Concrete
                         }
                     }
                 }
-                string Type = STEMIDataVM.IsEms.HasValue && STEMIDataVM.IsEms.Value ? "EMS Code" : "Inhouse Code";
+                string Type = STEMIDataVM.IsEms.HasValue && STEMIDataVM.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription();
                 var serviceIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == STEMIData.OrganizationIdFk && x.CodeIdFk == UCLEnums.STEMI.ToInt() && x.Type == Type && !x.IsDeleted).Select(x => new { x.DefaultServiceLineTeam, x.ServiceLineTeam1, x.ServiceLineTeam2 }).FirstOrDefault();
 
                 var serviceLineIds = (from x in this._codesServiceLinesMappingRepo.Table
@@ -3740,7 +3740,7 @@ namespace Web.Services.Concrete
 
                 //if (codeSTEMI.DefaultServiceLineIds == null || codeSTEMI.DefaultServiceLineIds == "")
                 //{
-                //    string IsEMS = row.IsEms.HasValue && row.IsEms.Value ? "EMS Code" : "Inhouse Code";
+                //    string IsEMS = row.IsEms.HasValue && row.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription();
                 //    codeSTEMI.DefaultServiceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeSTEMI.OrganizationIdFk && x.CodeIdFk == UCLEnums.STEMI.ToInt() && x.Type == IsEMS && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
                 //}
 
@@ -3818,9 +3818,9 @@ namespace Web.Services.Concrete
                 //        OrgId = row.OrganizationIdFk,
                 //        UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).Distinct().ToList(),
                 //        From = AuthorEnums.STEMI.ToString(),
-                //        Msg = (codeSTEMI.IsEms.HasValue && codeSTEMI.IsEms.Value ? "EMS" : "Inhouse") + " Code STEMI From is Changed",
-                //        RouteLink1 = "/Home/Inhouse%20Codes/code-STEMI-form",
-                //        RouteLink2 = "/Home/EMS/activateCode"
+                //        Msg = (codeSTEMI.IsEms.HasValue && codeSTEMI.IsEms.Value ? UCLEnums.EMS.ToDescription() : "{UCLEnums.InhouseCode.ToDescription()}) + " Code STEMI From is Changed",
+                //        RouteLink1 = RouteEnums.CodeSTEMIForm.ToDescription(),
+                //        RouteLink2 = RouteEnums.EMSForms.ToDescription()
                 //    };
 
                 //    _communicationService.pushNotification(notification);
@@ -3837,9 +3837,9 @@ namespace Web.Services.Concrete
                 //        OrgId = row.OrganizationIdFk,
                 //        UserChannelSid = userUniqueIds,
                 //        From = AuthorEnums.STEMI.ToString(),
-                //        Msg = (codeSTEMI.IsEms.HasValue && codeSTEMI.IsEms.Value ? "EMS" : "Inhouse") + " Code STEMI From is Changed",
-                //        RouteLink1 = "/Home/Inhouse%20Codes/code-STEMI-form",
-                //        RouteLink2 = "/Home/EMS/activateCode"
+                //        Msg = (codeSTEMI.IsEms.HasValue && codeSTEMI.IsEms.Value ? UCLEnums.EMS.ToDescription() : "{UCLEnums.InhouseCode.ToDescription()}) + " Code STEMI From is Changed",
+                //        RouteLink1 = RouteEnums.CodeSTEMIForm.ToDescription(),
+                //        RouteLink2 = RouteEnums.EMSForms.ToDescription()
                 //    };
 
                 //    _communicationService.pushNotification(notification);
@@ -3854,9 +3854,9 @@ namespace Web.Services.Concrete
                     OrgId = row.OrganizationIdFk,
                     UserChannelSid = userUniqueIds,
                     From = AuthorEnums.STEMI.ToString(),
-                    Msg = (codeSTEMI.IsEms.HasValue && codeSTEMI.IsEms.Value ? "EMS" : "Inhouse") + " Code STEMI From is Changed",
-                    RouteLink1 = "/Home/Inhouse%20Codes/code-STEMI-form",
-                    RouteLink2 = "/Home/EMS/activateCode"
+                    Msg = (codeSTEMI.IsEms.HasValue && codeSTEMI.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription()) + " STEMI From is Changed",
+                    RouteLink1 = RouteEnums.CodeSTEMIForm.ToDescription(), //RouteEnums.CodeSTEMIForm.ToDescription(),
+                    RouteLink2 = RouteEnums.EMSForms.ToDescription()
                 };
 
                 _communicationService.pushNotification(notification);
@@ -3866,7 +3866,7 @@ namespace Web.Services.Concrete
             {
                 if (codeSTEMI.OrganizationIdFk > 0)
                 {
-                    string IsEMS = codeSTEMI.IsEms.HasValue && codeSTEMI.IsEms.Value ? "EMS Code" : "Inhouse Code";
+                    string IsEMS = codeSTEMI.IsEms.HasValue && codeSTEMI.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription();
                     var DefaultServiceLineTeam = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeSTEMI.OrganizationIdFk && x.CodeIdFk == UCLEnums.STEMI.ToInt() && x.Type == IsEMS && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
                     if (DefaultServiceLineTeam != null && DefaultServiceLineTeam != "")
                     {
@@ -4248,7 +4248,7 @@ namespace Web.Services.Concrete
             if (UserChannelSid != null && UserChannelSid.Count > 0)
             {
                 string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
-                string friendlyName = codeSTEMI.IsEms.HasValue && codeSTEMI.IsEms.Value ? $"EMS Code {UCLEnums.STEMI.ToString()} {codeSTEMI.CodeStemiid}" : $"Inhouse Code {UCLEnums.STEMI.ToString()} {codeSTEMI.CodeStemiid}";
+                string friendlyName = codeSTEMI.IsEms.HasValue && codeSTEMI.IsEms.Value ? $"{UCLEnums.EMS.ToDescription()} {UCLEnums.STEMI.ToString()} {codeSTEMI.CodeStemiid}" : $"{UCLEnums.InhouseCode.ToDescription()} {UCLEnums.STEMI.ToString()} {codeSTEMI.CodeStemiid}";
                 var channel = _communicationService.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
                 var STEMI = this._codeSTEMIRepo.Table.Where(x => x.CodeStemiid == codeSTEMI.CodeStemiid && x.IsActive == true && !x.IsDeleted).FirstOrDefault();
                 if (STEMI != null)
@@ -4284,7 +4284,7 @@ namespace Web.Services.Concrete
                 msg.channelSid = channel.Sid;
                 msg.author = "System";
                 msg.attributes = "";
-                msg.body = $"<strong> {(codeSTEMI.IsEms.HasValue && codeSTEMI.IsEms.Value ? "EMS Code" : "Inhouse Code")} {UCLEnums.STEMI.ToString()} </strong></br></br>";
+                msg.body = $"<strong> {(codeSTEMI.IsEms.HasValue && codeSTEMI.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription())} {UCLEnums.STEMI.ToString()} </strong></br></br>";
                 if (codeSTEMI.PatientName != null && codeSTEMI.PatientName != "")
                     msg.body += $"<strong>Patient Name: </strong> {codeSTEMI.PatientName} </br>";
                 if (codeSTEMI.Dob != null)
@@ -4309,10 +4309,10 @@ namespace Web.Services.Concrete
                     OrgId = STEMI.OrganizationIdFk,
                     UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).Distinct().ToList(),
                     From = AuthorEnums.STEMI.ToString(),
-                    Msg = (codeSTEMI.IsEms.HasValue && codeSTEMI.IsEms.Value ? "EMS" : "Inhouse") + " Code STEMI is update",
-                    RouteLink3 = "/Home/EMS",
-                    RouteLink4 = "/Home/Dashboard",
-                    RouteLink5 = "/Home/Inhouse%20Codes"
+                    Msg = (codeSTEMI.IsEms.HasValue && codeSTEMI.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription()) + " STEMI is update",
+                    RouteLink3 = RouteEnums.ActiveEMS.ToDescription(),
+                    RouteLink4 = RouteEnums.Dashboard.ToDescription(),
+                    RouteLink5 = RouteEnums.InhouseCodeGrid.ToDescription()
                 };
 
                 _communicationService.pushNotification(notification);
@@ -4326,7 +4326,7 @@ namespace Web.Services.Concrete
 
             if (codeSTEMI.DefaultServiceLineIds == null || codeSTEMI.DefaultServiceLineIds == "")
             {
-                string IsEMS = codeSTEMI.IsEms.HasValue && codeSTEMI.IsEms.Value ? "EMS Code" : "Inhouse Code";
+                string IsEMS = codeSTEMI.IsEms.HasValue && codeSTEMI.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription();
                 codeSTEMI.DefaultServiceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeSTEMI.OrganizationIdFk && x.CodeIdFk == UCLEnums.STEMI.ToInt() && x.Type == IsEMS && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
             }
 
@@ -4485,9 +4485,9 @@ namespace Web.Services.Concrete
                     OrgId = codeSTEMI.OrganizationIdFk,
                     UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).Distinct().ToList(),
                     From = AuthorEnums.STEMI.ToString(),
-                    Msg = (codeSTEMI.IsEms.HasValue && codeSTEMI.IsEms.Value ? "EMS" : "Inhouse") + " Code STEMI From is Changed",
-                    RouteLink1 = "/Home/Inhouse%20Codes/code-strok-form",
-                    RouteLink2 = "/Home/EMS/activateCode",
+                    Msg = (codeSTEMI.IsEms.HasValue && codeSTEMI.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription()) + " STEMI From is Changed",
+                    RouteLink1 = RouteEnums.CodeSTEMIForm.ToDescription(),
+                    RouteLink2 = RouteEnums.EMSForms.ToDescription(),
                 };
 
                 _communicationService.pushNotification(notification);
@@ -4551,9 +4551,9 @@ namespace Web.Services.Concrete
                     UserChannelSid = userIds.Select(x => x.UserUniqueId).Distinct().ToList(),
                     From = UCLEnums.STEMI.ToString(),
                     Msg = UCLEnums.STEMI.ToString() + " is " + (status ? "Activated" : "Inactivated"),
-                    RouteLink3 = "/Home/EMS",
-                    RouteLink4 = "/Home/Dashboard",
-                    RouteLink5 = "/Home/Inhouse%20Codes"
+                    RouteLink3 = RouteEnums.ActiveEMS.ToDescription(),
+                    RouteLink4 = RouteEnums.Dashboard.ToDescription(),
+                    RouteLink5 = RouteEnums.InhouseCodeGrid.ToDescription()
                 };
 
                 _communicationService.pushNotification(notification);
@@ -4733,7 +4733,7 @@ namespace Web.Services.Concrete
                         }
                     }
                 }
-                string Type = TrumaDataVM.IsEms.HasValue && TrumaDataVM.IsEms.Value ? "EMS Code" : "Inhouse Code";
+                string Type = TrumaDataVM.IsEms.HasValue && TrumaDataVM.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription();
                 var serviceIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == TrumaData.OrganizationIdFk && x.CodeIdFk == UCLEnums.Trauma.ToInt() && x.Type == Type && !x.IsDeleted).Select(x => new { x.DefaultServiceLineTeam, x.ServiceLineTeam1, x.ServiceLineTeam2 }).FirstOrDefault();
 
 
@@ -5090,7 +5090,7 @@ namespace Web.Services.Concrete
 
                 //if (codeTruma.DefaultServiceLineIds == null || codeTruma.DefaultServiceLineIds == "")
                 //{
-                //    string IsEMS = row.IsEms.HasValue && row.IsEms.Value ? "EMS Code" : "Inhouse Code";
+                //    string IsEMS = row.IsEms.HasValue && row.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription();
                 //    codeTruma.DefaultServiceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeTruma.OrganizationIdFk && x.CodeIdFk == UCLEnums.Trauma.ToInt() && x.Type == IsEMS && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
                 //}
 
@@ -5166,9 +5166,9 @@ namespace Web.Services.Concrete
                 //        OrgId = row.OrganizationIdFk,
                 //        UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).Distinct().ToList(),
                 //        From = AuthorEnums.Trauma.ToString(),
-                //        Msg = (codeTruma.IsEms.HasValue && codeTruma.IsEms.Value ? "EMS" : "Inhouse") + " Code Trauma From is Changed",
-                //        RouteLink1 = "/Home/Inhouse%20Codes/code-trauma-form",
-                //        RouteLink2 = "/Home/EMS/activateCode"
+                //        Msg = (codeTruma.IsEms.HasValue && codeTruma.IsEms.Value ? UCLEnums.EMS.ToDescription() : "{UCLEnums.InhouseCode.ToDescription()}) + " Code Trauma From is Changed",
+                //        RouteLink1 = RouteEnums.CodeTraumaForm.ToDescription(),
+                //        RouteLink2 = RouteEnums.EMSForms.ToDescription()
                 //    };
 
                 //    _communicationService.pushNotification(notification);
@@ -5187,9 +5187,9 @@ namespace Web.Services.Concrete
                 //        OrgId = row.OrganizationIdFk,
                 //        UserChannelSid = userUniqueIds,
                 //        From = AuthorEnums.Trauma.ToString(),
-                //        Msg = (codeTruma.IsEms.HasValue && codeTruma.IsEms.Value ? "EMS" : "Inhouse") + " Code Trauma From is Changed",
-                //        RouteLink1 = "/Home/Inhouse%20Codes/code-trauma-form",
-                //        RouteLink2 = "/Home/EMS/activateCode"
+                //        Msg = (codeTruma.IsEms.HasValue && codeTruma.IsEms.Value ? UCLEnums.EMS.ToDescription() : "{UCLEnums.InhouseCode.ToDescription()}) + " Code Trauma From is Changed",
+                //        RouteLink1 = RouteEnums.CodeTraumaForm.ToDescription(),
+                //        RouteLink2 = RouteEnums.EMSForms.ToDescription()
                 //    };
 
                 //    _communicationService.pushNotification(notification);
@@ -5206,9 +5206,9 @@ namespace Web.Services.Concrete
                     OrgId = row.OrganizationIdFk,
                     UserChannelSid = userUniqueIds,
                     From = AuthorEnums.Trauma.ToString(),
-                    Msg = (codeTruma.IsEms.HasValue && codeTruma.IsEms.Value ? "EMS" : "Inhouse") + " Code Trauma From is Changed",
-                    RouteLink1 = "/Home/Inhouse%20Codes/code-trauma-form",
-                    RouteLink2 = "/Home/EMS/activateCode"
+                    Msg = (codeTruma.IsEms.HasValue && codeTruma.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription()) + " Trauma From is Changed",
+                    RouteLink1 = RouteEnums.CodeTraumaForm.ToDescription(), // RouteEnums.CodeTraumaForm.ToDescription(),
+                    RouteLink2 = RouteEnums.EMSForms.ToDescription()
                 };
 
                 _communicationService.pushNotification(notification);
@@ -5219,7 +5219,7 @@ namespace Web.Services.Concrete
 
                 if (codeTruma.OrganizationIdFk > 0)
                 {
-                    string IsEMS = codeTruma.IsEms.HasValue && codeTruma.IsEms.Value ? "EMS Code" : "Inhouse Code";
+                    string IsEMS = codeTruma.IsEms.HasValue && codeTruma.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription();
                     var DefaultServiceLineTeam = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeTruma.OrganizationIdFk && x.CodeIdFk == UCLEnums.Trauma.ToInt() && x.Type == IsEMS && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
                     if (DefaultServiceLineTeam != null && DefaultServiceLineTeam != "")
                     {
@@ -5538,7 +5538,7 @@ namespace Web.Services.Concrete
                         //if (UserChannelSid != null && UserChannelSid.Count > 0)
                         //{
                         //    string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
-                        //    string friendlyName = Truma.IsEms.HasValue && Truma.IsEms.Value ? $"EMS Code {UCLEnums.Trauma.ToString()} {Truma.CodeTraumaId}" : $"Inhouse Code {UCLEnums.Trauma.ToString()} {Truma.CodeTraumaId}";
+                        //    string friendlyName = Truma.IsEms.HasValue && Truma.IsEms.Value ? $"{UCLEnums.EMS.ToDescription()} {UCLEnums.Trauma.ToString()} {Truma.CodeTraumaId}" : $"{UCLEnums.InhouseCode.ToDescription()} {UCLEnums.Trauma.ToString()} {Truma.CodeTraumaId}";
                         //    var conversationChannelAttributes = JsonConvert.SerializeObject(new Dictionary<string, Object>()
                         //            {
                         //                {ChannelAttributeEnums.ChannelType.ToString(), ChannelTypeEnums.EMS.ToString()},
@@ -5578,7 +5578,7 @@ namespace Web.Services.Concrete
                         //    msg.channelSid = channel.Sid;
                         //    msg.author = "System";
                         //    msg.attributes = "";
-                        //    msg.body = $"<strong> {(codeTruma.IsEms.HasValue && codeTruma.IsEms.Value ? "EMS Code" : "Inhouse Code")} {UCLEnums.Trauma.ToString()} </strong></br></br>";
+                        //    msg.body = $"<strong> {(codeTruma.IsEms.HasValue && codeTruma.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription())} {UCLEnums.Trauma.ToString()} </strong></br></br>";
                         //    if (codeTruma.PatientName != null && codeTruma.PatientName != "")
                         //        msg.body += $"<strong>Patient Name: </strong> {codeTruma.PatientName} </br>";
                         //    msg.body += $"<strong>Dob: </strong> {codeTruma.Dob:MM-dd-yyyy} </br>";
@@ -5600,10 +5600,10 @@ namespace Web.Services.Concrete
                         //        OrgId = Truma.OrganizationIdFk,
                         //        UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).Distinct().ToList(),
                         //        From = AuthorEnums.Trauma.ToString(),
-                        //        Msg = (codeTruma.IsEms.HasValue && codeTruma.IsEms.Value ? "EMS" : "Inhouse") + " Code Trauma is update",
-                        //        RouteLink3 = "/Home/EMS",
-                        //        RouteLink4 = "/Home/Dashboard",
-                        //        RouteLink5 = "/Home/Inhouse%20Codes"
+                        //        Msg = (codeTruma.IsEms.HasValue && codeTruma.IsEms.Value ? UCLEnums.EMS.ToDescription() : "{UCLEnums.InhouseCode.ToDescription()}) + " Code Trauma is update",
+                        //        RouteLink3 = RouteEnums.ActiveEMS.ToDescription(),
+                        //        RouteLink4 = RouteEnums.Dashboard.ToDescription(),
+                        //        RouteLink5 = RouteEnums.InhouseCodeGrid.ToDescription()
                         //    };
 
                         //    _communicationService.pushNotification(notification);
@@ -5681,7 +5681,7 @@ namespace Web.Services.Concrete
             if (UserChannelSid != null && UserChannelSid.Count > 0)
             {
                 string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
-                string friendlyName = codeTruma.IsEms.HasValue && codeTruma.IsEms.Value ? $"EMS Code {UCLEnums.Trauma.ToString()} {codeTruma.CodeTraumaId}" : $"Inhouse Code {UCLEnums.Trauma.ToString()} {codeTruma.CodeTraumaId}";
+                string friendlyName = codeTruma.IsEms.HasValue && codeTruma.IsEms.Value ? $"{UCLEnums.EMS.ToDescription()} {UCLEnums.Trauma.ToString()} {codeTruma.CodeTraumaId}" : $"{UCLEnums.InhouseCode.ToDescription()} {UCLEnums.Trauma.ToString()} {codeTruma.CodeTraumaId}";
                 var channel = _communicationService.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
                 var Truma = this._codeTrumaRepo.Table.Where(x => x.CodeTraumaId == codeTruma.CodeTraumaId && x.IsActive == true && !x.IsDeleted).FirstOrDefault();
                 if (Truma != null)
@@ -5717,7 +5717,7 @@ namespace Web.Services.Concrete
                 msg.channelSid = channel.Sid;
                 msg.author = "System";
                 msg.attributes = "";
-                msg.body = $"<strong> {(codeTruma.IsEms.HasValue && codeTruma.IsEms.Value ? "EMS Code" : "Inhouse Code")} {UCLEnums.Trauma.ToString()} </strong></br></br>";
+                msg.body = $"<strong> {(codeTruma.IsEms.HasValue && codeTruma.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription())} {UCLEnums.Trauma.ToString()} </strong></br></br>";
                 if (codeTruma.PatientName != null && codeTruma.PatientName != "")
                     msg.body += $"<strong>Patient Name: </strong> {codeTruma.PatientName} </br>";
                 if (codeTruma.Dob != null)
@@ -5742,10 +5742,10 @@ namespace Web.Services.Concrete
                     OrgId = Truma.OrganizationIdFk,
                     UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).Distinct().ToList(),
                     From = AuthorEnums.Trauma.ToString(),
-                    Msg = (codeTruma.IsEms.HasValue && codeTruma.IsEms.Value ? "EMS" : "Inhouse") + " Code Truma is update",
-                    RouteLink3 = "/Home/EMS",
-                    RouteLink4 = "/Home/Dashboard",
-                    RouteLink5 = "/Home/Inhouse%20Codes"
+                    Msg = (codeTruma.IsEms.HasValue && codeTruma.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription()) + " Trauma is update",
+                    RouteLink3 = RouteEnums.ActiveEMS.ToDescription(),
+                    RouteLink4 = RouteEnums.Dashboard.ToDescription(),
+                    RouteLink5 = RouteEnums.InhouseCodeGrid.ToDescription()
                 };
 
                 _communicationService.pushNotification(notification);
@@ -5759,7 +5759,7 @@ namespace Web.Services.Concrete
 
             if (codeTruma.DefaultServiceLineIds == null || codeTruma.DefaultServiceLineIds == "")
             {
-                string IsEMS = codeTruma.IsEms.HasValue && codeTruma.IsEms.Value ? "EMS Code" : "Inhouse Code";
+                string IsEMS = codeTruma.IsEms.HasValue && codeTruma.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription();
                 codeTruma.DefaultServiceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeTruma.OrganizationIdFk && x.CodeIdFk == UCLEnums.Trauma.ToInt() && x.Type == IsEMS && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
             }
 
@@ -5918,9 +5918,9 @@ namespace Web.Services.Concrete
                     OrgId = codeTruma.OrganizationIdFk,
                     UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).Distinct().ToList(),
                     From = AuthorEnums.Trauma.ToString(),
-                    Msg = (codeTruma.IsEms.HasValue && codeTruma.IsEms.Value ? "EMS" : "Inhouse") + " Code Truma From is Changed",
-                    RouteLink1 = "/Home/Inhouse%20Codes/code-strok-form",
-                    RouteLink2 = "/Home/EMS/activateCode",
+                    Msg = (codeTruma.IsEms.HasValue && codeTruma.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription()) + " Truma From is Changed",
+                    RouteLink1 = RouteEnums.CodeTraumaForm.ToDescription(),
+                    RouteLink2 = RouteEnums.EMSForms.ToDescription(),
                 };
 
                 _communicationService.pushNotification(notification);
@@ -5983,9 +5983,9 @@ namespace Web.Services.Concrete
                     UserChannelSid = userIds.Select(x => x.UserUniqueId).Distinct().ToList(),
                     From = UCLEnums.Trauma.ToString(),
                     Msg = UCLEnums.Trauma.ToString() + " is " + (status ? "Activated" : "Inactivated"),
-                    RouteLink3 = "/Home/EMS",
-                    RouteLink4 = "/Home/Dashboard",
-                    RouteLink5 = "/Home/Inhouse%20Codes"
+                    RouteLink3 = RouteEnums.ActiveEMS.ToDescription(),
+                    RouteLink4 = RouteEnums.Dashboard.ToDescription(),
+                    RouteLink5 = RouteEnums.InhouseCodeGrid.ToDescription()
                 };
 
                 _communicationService.pushNotification(notification);
@@ -6162,7 +6162,7 @@ namespace Web.Services.Concrete
                         }
                     }
                 }
-                string Type = BlueDataVM.IsEms.HasValue && BlueDataVM.IsEms.Value ? "EMS Code" : "Inhouse Code";
+                string Type = BlueDataVM.IsEms.HasValue && BlueDataVM.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription();
                 var serviceIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == blueData.OrganizationIdFk && x.CodeIdFk == UCLEnums.Blue.ToInt() && x.Type == Type && !x.IsDeleted).Select(x => new { x.DefaultServiceLineTeam, x.ServiceLineTeam1, x.ServiceLineTeam2 }).FirstOrDefault();
 
                 var serviceLineIds = (from x in this._codesServiceLinesMappingRepo.Table
@@ -6512,7 +6512,7 @@ namespace Web.Services.Concrete
 
                 //if (codeBlue.DefaultServiceLineIds == null || codeBlue.DefaultServiceLineIds == "")
                 //{
-                //    string IsEMS = row.IsEms.HasValue && row.IsEms.Value ? "EMS Code" : "Inhouse Code";
+                //    string IsEMS = row.IsEms.HasValue && row.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription();
                 //    codeBlue.DefaultServiceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeBlue.OrganizationIdFk && x.CodeIdFk == UCLEnums.Blue.ToInt() && x.Type == IsEMS && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
                 //}
 
@@ -6589,9 +6589,9 @@ namespace Web.Services.Concrete
                 //        OrgId = row.OrganizationIdFk,
                 //        UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).Distinct().ToList(),
                 //        From = AuthorEnums.Blue.ToString(),
-                //        Msg = (codeBlue.IsEms.HasValue && codeBlue.IsEms.Value ? "EMS" : "Inhouse") + " Code Blue From is Changed",
+                //        Msg = (codeBlue.IsEms.HasValue && codeBlue.IsEms.Value ? UCLEnums.EMS.ToDescription() : "{UCLEnums.InhouseCode.ToDescription()}) + " Code Blue From is Changed",
                 //        RouteLink1 = "/Home/Activate%20Code/code-blue-form",
-                //        RouteLink2 = "/Home/EMS/activateCode"
+                //        RouteLink2 = RouteEnums.EMSForms.ToDescription()
                 //    };
 
                 //    _communicationService.pushNotification(notification);
@@ -6608,9 +6608,9 @@ namespace Web.Services.Concrete
                 //        OrgId = row.OrganizationIdFk,
                 //        UserChannelSid = userUniqueIds,
                 //        From = AuthorEnums.Blue.ToString(),
-                //        Msg = (codeBlue.IsEms.HasValue && codeBlue.IsEms.Value ? "EMS" : "Inhouse") + " Code Blue From is Changed",
+                //        Msg = (codeBlue.IsEms.HasValue && codeBlue.IsEms.Value ? UCLEnums.EMS.ToDescription() : "{UCLEnums.InhouseCode.ToDescription()}) + " Code Blue From is Changed",
                 //        RouteLink1 = "/Home/Activate%20Code/code-blue-form",
-                //        RouteLink2 = "/Home/EMS/activateCode"
+                //        RouteLink2 = RouteEnums.EMSForms.ToDescription()
                 //    };
 
                 //    _communicationService.pushNotification(notification);
@@ -6626,9 +6626,9 @@ namespace Web.Services.Concrete
                     OrgId = row.OrganizationIdFk,
                     UserChannelSid = userUniqueIds,
                     From = AuthorEnums.Blue.ToString(),
-                    Msg = (codeBlue.IsEms.HasValue && codeBlue.IsEms.Value ? "EMS" : "Inhouse") + " Code Blue From is Changed",
-                    RouteLink1 = "/Home/Activate%20Code/code-blue-form",
-                    RouteLink2 = "/Home/EMS/activateCode"
+                    Msg = (codeBlue.IsEms.HasValue && codeBlue.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription()) + " Blue From is Changed",
+                    RouteLink1 = RouteEnums.CodeBlueForm.ToDescription(),
+                    RouteLink2 = RouteEnums.EMSForms.ToDescription()
                 };
 
                 _communicationService.pushNotification(notification);
@@ -6638,7 +6638,7 @@ namespace Web.Services.Concrete
             {
                 if (codeBlue.OrganizationIdFk > 0)
                 {
-                    string IsEMS = codeBlue.IsEms.HasValue && codeBlue.IsEms.Value ? "EMS Code" : "Inhouse Code";
+                    string IsEMS = codeBlue.IsEms.HasValue && codeBlue.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription();
                     var DefaultServiceLineTeam = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeBlue.OrganizationIdFk && x.CodeIdFk == UCLEnums.Blue.ToInt() && x.Type == IsEMS && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
                     if (DefaultServiceLineTeam != null && DefaultServiceLineTeam != "")
                     {
@@ -6968,7 +6968,7 @@ namespace Web.Services.Concrete
                         //if (UserChannelSid != null && UserChannelSid.Count > 0)
                         //{
                         //    string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
-                        //    string friendlyName = blue.IsEms.HasValue && blue.IsEms.Value ? $"EMS Code {UCLEnums.Blue.ToString()} {blue.CodeBlueId}" : $"Inhouse Code {UCLEnums.Blue.ToString()} {blue.CodeBlueId}";
+                        //    string friendlyName = blue.IsEms.HasValue && blue.IsEms.Value ? $"{UCLEnums.EMS.ToDescription()} {UCLEnums.Blue.ToString()} {blue.CodeBlueId}" : $"{UCLEnums.InhouseCode.ToDescription()} {UCLEnums.Blue.ToString()} {blue.CodeBlueId}";
                         //    var channel = _communicationService.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
                         //    blue.ChannelSid = channel.Sid;
                         //    this._codeBlueRepo.Update(blue);
@@ -7001,7 +7001,7 @@ namespace Web.Services.Concrete
                         //    msg.channelSid = channel.Sid;
                         //    msg.author = "System";
                         //    msg.attributes = "";
-                        //    msg.body = $"<strong> {(codeBlue.IsEms.HasValue && codeBlue.IsEms.Value ? "EMS Code" : "Inhouse Code")} {UCLEnums.Blue.ToString()} </strong></br></br>";
+                        //    msg.body = $"<strong> {(codeBlue.IsEms.HasValue && codeBlue.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription())} {UCLEnums.Blue.ToString()} </strong></br></br>";
                         //    if (codeBlue.PatientName != null && codeBlue.PatientName != "")
                         //        msg.body += $"<strong>Patient Name: </strong> {codeBlue.PatientName} </br>";
                         //    msg.body += $"<strong>Dob: </strong> {codeBlue.Dob:MM-dd-yyyy} </br>";
@@ -7023,10 +7023,10 @@ namespace Web.Services.Concrete
                         //        OrgId = blue.OrganizationIdFk,
                         //        UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).Distinct().ToList(),
                         //        From = AuthorEnums.Blue.ToString(),
-                        //        Msg = (codeBlue.IsEms.HasValue && codeBlue.IsEms.Value ? "EMS" : "Inhouse") + " Code Blue is update",
-                        //        RouteLink3 = "/Home/EMS",
-                        //        RouteLink4 = "/Home/Dashboard",
-                        //        RouteLink5 = "/Home/Inhouse%20Codes"
+                        //        Msg = (codeBlue.IsEms.HasValue && codeBlue.IsEms.Value ? UCLEnums.EMS.ToDescription() : "{UCLEnums.InhouseCode.ToDescription()}) + " Code Blue is update",
+                        //        RouteLink3 = RouteEnums.ActiveEMS.ToDescription(),
+                        //        RouteLink4 = RouteEnums.Dashboard.ToDescription(),
+                        //        RouteLink5 = RouteEnums.InhouseCodeGrid.ToDescription()
                         //    };
 
                         //    _communicationService.pushNotification(notification);
@@ -7103,7 +7103,7 @@ namespace Web.Services.Concrete
             if (UserChannelSid != null && UserChannelSid.Count > 0)
             {
                 string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
-                string friendlyName = codeBlue.IsEms.HasValue && codeBlue.IsEms.Value ? $"EMS Code {UCLEnums.Blue.ToString()} {codeBlue.CodeBlueId}" : $"Inhouse Code {UCLEnums.Blue.ToString()} {codeBlue.CodeBlueId}";
+                string friendlyName = codeBlue.IsEms.HasValue && codeBlue.IsEms.Value ? $"{UCLEnums.EMS.ToDescription()} {UCLEnums.Blue.ToString()} {codeBlue.CodeBlueId}" : $"{UCLEnums.InhouseCode.ToDescription()} {UCLEnums.Blue.ToString()} {codeBlue.CodeBlueId}";
                 var channel = _communicationService.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
                 var Blue = this._codeBlueRepo.Table.Where(x => x.CodeBlueId == codeBlue.CodeBlueId && x.IsActive == true && !x.IsDeleted).FirstOrDefault();
                 if (Blue != null)
@@ -7139,7 +7139,7 @@ namespace Web.Services.Concrete
                 msg.channelSid = channel.Sid;
                 msg.author = "System";
                 msg.attributes = "";
-                msg.body = $"<strong> {(codeBlue.IsEms.HasValue && codeBlue.IsEms.Value ? "EMS Code" : "Inhouse Code")} {UCLEnums.Blue.ToString()} </strong></br></br>";
+                msg.body = $"<strong> {(codeBlue.IsEms.HasValue && codeBlue.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription())} {UCLEnums.Blue.ToString()} </strong></br></br>";
                 if (codeBlue.PatientName != null && codeBlue.PatientName != "")
                     msg.body += $"<strong>Patient Name: </strong> {codeBlue.PatientName} </br>";
                 if (codeBlue.Dob != null)
@@ -7164,10 +7164,10 @@ namespace Web.Services.Concrete
                     OrgId = Blue.OrganizationIdFk,
                     UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).Distinct().ToList(),
                     From = AuthorEnums.Blue.ToString(),
-                    Msg = (codeBlue.IsEms.HasValue && codeBlue.IsEms.Value ? "EMS" : "Inhouse") + " Code Blue is update",
-                    RouteLink3 = "/Home/EMS",
-                    RouteLink4 = "/Home/Dashboard",
-                    RouteLink5 = "/Home/Inhouse%20Codes"
+                    Msg = (codeBlue.IsEms.HasValue && codeBlue.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription()) + " Blue is update",
+                    RouteLink3 = RouteEnums.ActiveEMS.ToDescription(),
+                    RouteLink4 = RouteEnums.Dashboard.ToDescription(),
+                    RouteLink5 = RouteEnums.InhouseCodeGrid.ToDescription()
                 };
 
                 _communicationService.pushNotification(notification);
@@ -7181,7 +7181,7 @@ namespace Web.Services.Concrete
 
             if (codeBlue.DefaultServiceLineIds == null || codeBlue.DefaultServiceLineIds == "")
             {
-                string IsEMS = codeBlue.IsEms.HasValue && codeBlue.IsEms.Value ? "EMS Code" : "Inhouse Code";
+                string IsEMS = codeBlue.IsEms.HasValue && codeBlue.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription();
                 codeBlue.DefaultServiceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeBlue.OrganizationIdFk && x.CodeIdFk == UCLEnums.Blue.ToInt() && x.Type == IsEMS && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
             }
 
@@ -7340,9 +7340,9 @@ namespace Web.Services.Concrete
                     OrgId = codeBlue.OrganizationIdFk,
                     UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).Distinct().ToList(),
                     From = AuthorEnums.Blue.ToString(),
-                    Msg = (codeBlue.IsEms.HasValue && codeBlue.IsEms.Value ? "EMS" : "Inhouse") + " Code Blue From is Changed",
-                    RouteLink1 = "/Home/Inhouse%20Codes/code-strok-form",
-                    RouteLink2 = "/Home/EMS/activateCode",
+                    Msg = (codeBlue.IsEms.HasValue && codeBlue.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription()) + " Blue From is Changed",
+                    RouteLink1 = RouteEnums.CodeBlueForm.ToDescription(),
+                    RouteLink2 = RouteEnums.EMSForms.ToDescription(),
                 };
 
                 _communicationService.pushNotification(notification);
@@ -7405,9 +7405,9 @@ namespace Web.Services.Concrete
                     UserChannelSid = userIds.Select(x => x.UserUniqueId).Distinct().ToList(),
                     From = UCLEnums.Blue.ToString(),
                     Msg = UCLEnums.Blue.ToString() + " is " + (status ? "Activated" : "Inactivated"),
-                    RouteLink3 = "/Home/EMS",
-                    RouteLink4 = "/Home/Dashboard",
-                    RouteLink5 = "/Home/Inhouse%20Codes"
+                    RouteLink3 = RouteEnums.ActiveEMS.ToDescription(),
+                    RouteLink4 = RouteEnums.Dashboard.ToDescription(),
+                    RouteLink5 = RouteEnums.InhouseCodeGrid.ToDescription()
                 };
 
                 _communicationService.pushNotification(notification);
