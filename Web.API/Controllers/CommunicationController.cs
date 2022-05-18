@@ -298,7 +298,6 @@ namespace Web.API.Controllers
             }
         }
         
-        [AllowAnonymous]
         [HttpPost("Conversation/UploadAttachment")]
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
         public BaseResponse UploadAttachment()
