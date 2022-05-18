@@ -1435,7 +1435,7 @@ namespace Web.Services.Concrete
             if (UserChannelSid.Count > 0)
             {
                 usersFound = true;
-                var defaultExist = DefaultServiceLineIds.Where(d => UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d)).Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
+                var defaultExist = DefaultServiceLineIds.Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
                 if (defaultExist.Count > 0)
                 {
                     if (!defaultExist.Select(x => x.IsExist).All(x => x == true))
@@ -1589,7 +1589,7 @@ namespace Web.Services.Concrete
                 if (UserChannelSid.Count > 0)
                 {
                     userNotFound = true;
-                    var defaultExist = DefaultServiceLineIds.Where(d => UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d)).Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
+                    var defaultExist = DefaultServiceLineIds.Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
                     if (defaultExist.Count > 0)
                     {
                         if (!defaultExist.Select(x => x.IsExist).All(x => x == true)) {
@@ -1610,7 +1610,7 @@ namespace Web.Services.Concrete
                         DefaultServiceLineIds = new List<int>();
                     }
 
-                    var serviceLineTeam1Exist = ServiceLineTeam1Ids.Where(d => UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d)).Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
+                    var serviceLineTeam1Exist = ServiceLineTeam1Ids.Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
                     if (serviceLineTeam1Exist.Count > 0)
                     {
                         if (!serviceLineTeam1Exist.Select(x => x.IsExist).All(x => x == true))
@@ -1634,13 +1634,7 @@ namespace Web.Services.Concrete
                     }
 
 
-                    var serviceLineTeam2Exist = ServiceLineTeam2Ids.Where(d => UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d))
-                                                                    .Select(d => new
-                                                                    {
-                                                                        ServiceLineId = d,
-                                                                        IsExist = UserChannelSid
-                                                                    .Select(x => x.ServiceLineIdFk).Contains(d)
-                                                                    }).ToList();
+                    var serviceLineTeam2Exist = ServiceLineTeam2Ids.Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
                     if (serviceLineTeam2Exist.Count > 0)
                     {
                         if (!serviceLineTeam2Exist.Select(x => x.IsExist).All(x => x == true))
@@ -2896,7 +2890,7 @@ namespace Web.Services.Concrete
                 if (UserChannelSid.Count > 0)
                 {
                     userNotFound = true;
-                    var defaultExist = DefaultServiceLineIds.Where(d => UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d)).Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
+                    var defaultExist = DefaultServiceLineIds.Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
                     if (defaultExist.Count > 0)
                     {
                         if (!defaultExist.Select(x => x.IsExist).All(x => x == true))
@@ -2919,7 +2913,7 @@ namespace Web.Services.Concrete
                         DefaultServiceLineIds = new List<int>();
                     }
 
-                    var serviceLineTeam1Exist = ServiceLineTeam1Ids.Where(d => UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d)).Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
+                    var serviceLineTeam1Exist = ServiceLineTeam1Ids.Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
                     if (serviceLineTeam1Exist.Count > 0)
                     {
                         if (!serviceLineTeam1Exist.Select(x => x.IsExist).All(x => x == true))
@@ -2943,7 +2937,7 @@ namespace Web.Services.Concrete
                     }
 
 
-                    var serviceLineTeam2Exist = ServiceLineTeam2Ids.Where(d => UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d))
+                    var serviceLineTeam2Exist = ServiceLineTeam2Ids
                                                                     .Select(d => new
                                                                     {
                                                                         ServiceLineId = d,
@@ -3067,7 +3061,7 @@ namespace Web.Services.Concrete
             if (UserChannelSid.Count > 0)
             {
                 usersFound = true;
-                var defaultExist = DefaultServiceLineIds.Where(d => UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d)).Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
+                var defaultExist = DefaultServiceLineIds.Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
                 if (defaultExist.Count > 0)
                 {
                     if (!defaultExist.Select(x => x.IsExist).All(x => x == true))
@@ -4251,7 +4245,7 @@ namespace Web.Services.Concrete
             if (UserChannelSid.Count > 0)
             {
                 usersFound = true;
-                var defaultExist = DefaultServiceLineIds.Where(d => UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d)).Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
+                var defaultExist = DefaultServiceLineIds.Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
                 if (defaultExist.Count > 0)
                 {
                     if (!defaultExist.Select(x => x.IsExist).All(x => x == true))
@@ -4407,7 +4401,7 @@ namespace Web.Services.Concrete
                 if (UserChannelSid.Count > 0)
                 {
                     userNotFound = true;
-                    var defaultExist = DefaultServiceLineIds.Where(d => UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d)).Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
+                    var defaultExist = DefaultServiceLineIds.Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
                     if (defaultExist.Count > 0)
                     {
                         if (!defaultExist.Select(x => x.IsExist).All(x => x == true))
@@ -4430,7 +4424,7 @@ namespace Web.Services.Concrete
                         DefaultServiceLineIds = new List<int>();
                     }
 
-                    var serviceLineTeam1Exist = ServiceLineTeam1Ids.Where(d => UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d)).Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
+                    var serviceLineTeam1Exist = ServiceLineTeam1Ids.Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
                     if (serviceLineTeam1Exist.Count > 0)
                     {
                         if (!serviceLineTeam1Exist.Select(x => x.IsExist).All(x => x == true))
@@ -4454,7 +4448,7 @@ namespace Web.Services.Concrete
                     }
 
 
-                    var serviceLineTeam2Exist = ServiceLineTeam2Ids.Where(d => UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d))
+                    var serviceLineTeam2Exist = ServiceLineTeam2Ids
                                                                     .Select(d => new
                                                                     {
                                                                         ServiceLineId = d,
@@ -5704,7 +5698,7 @@ namespace Web.Services.Concrete
             if (UserChannelSid.Count > 0)
             {
                 usersFound = true;
-                var defaultExist = DefaultServiceLineIds.Where(d => UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d)).Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
+                var defaultExist = DefaultServiceLineIds.Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
                 if (defaultExist.Count > 0)
                 {
                     if (!defaultExist.Select(x => x.IsExist).All(x => x == true))
@@ -5861,7 +5855,7 @@ namespace Web.Services.Concrete
                 if (UserChannelSid.Count > 0)
                 {
                     userNotFound = true;
-                    var defaultExist = DefaultServiceLineIds.Where(d => UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d)).Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
+                    var defaultExist = DefaultServiceLineIds.Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
                     if (defaultExist.Count > 0)
                     {
                         if (!defaultExist.Select(x => x.IsExist).All(x => x == true))
@@ -5884,7 +5878,7 @@ namespace Web.Services.Concrete
                         DefaultServiceLineIds = new List<int>();
                     }
 
-                    var serviceLineTeam1Exist = ServiceLineTeam1Ids.Where(d => UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d)).Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
+                    var serviceLineTeam1Exist = ServiceLineTeam1Ids.Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
                     if (serviceLineTeam1Exist.Count > 0)
                     {
                         if (!serviceLineTeam1Exist.Select(x => x.IsExist).All(x => x == true))
@@ -5908,7 +5902,7 @@ namespace Web.Services.Concrete
                     }
 
 
-                    var serviceLineTeam2Exist = ServiceLineTeam2Ids.Where(d => UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d))
+                    var serviceLineTeam2Exist = ServiceLineTeam2Ids
                                                                     .Select(d => new
                                                                     {
                                                                         ServiceLineId = d,
@@ -7149,7 +7143,7 @@ namespace Web.Services.Concrete
             if (UserChannelSid.Count > 0)
             {
                 usersFound = true;
-                var defaultExist = DefaultServiceLineIds.Where(d => UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d)).Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
+                var defaultExist = DefaultServiceLineIds.Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
                 if (defaultExist.Count > 0)
                 {
                     if (!defaultExist.Select(x => x.IsExist).All(x => x == true))
@@ -7305,7 +7299,7 @@ namespace Web.Services.Concrete
                 if (UserChannelSid.Count > 0)
                 {
                     userNotFound = true;
-                    var defaultExist = DefaultServiceLineIds.Where(d => UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d)).Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
+                    var defaultExist = DefaultServiceLineIds.Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
                     if (defaultExist.Count > 0)
                     {
                         if (!defaultExist.Select(x => x.IsExist).All(x => x == true))
@@ -7328,7 +7322,7 @@ namespace Web.Services.Concrete
                         DefaultServiceLineIds = new List<int>();
                     }
 
-                    var serviceLineTeam1Exist = ServiceLineTeam1Ids.Where(d => UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d)).Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
+                    var serviceLineTeam1Exist = ServiceLineTeam1Ids.Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
                     if (serviceLineTeam1Exist.Count > 0)
                     {
                         if (!serviceLineTeam1Exist.Select(x => x.IsExist).All(x => x == true))
@@ -7352,7 +7346,7 @@ namespace Web.Services.Concrete
                     }
 
 
-                    var serviceLineTeam2Exist = ServiceLineTeam2Ids.Where(d => UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d))
+                    var serviceLineTeam2Exist = ServiceLineTeam2Ids
                                                                     .Select(d => new
                                                                     {
                                                                         ServiceLineId = d,

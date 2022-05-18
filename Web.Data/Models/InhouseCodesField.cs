@@ -27,7 +27,7 @@ namespace Web.Data.Models
         public DateTime CreatedDate { get; set; }
         public int? ModifiedBy { get; set; }
         public DateTime? ModifiedDate { get; set; }
-        public bool IsRequried { get; set; }
+        public bool IsRequired { get; set; }
         public bool IsDeleted { get; set; }
         public bool ForStrokeEms { get; set; }
         public bool ForSepsisEms { get; set; }
