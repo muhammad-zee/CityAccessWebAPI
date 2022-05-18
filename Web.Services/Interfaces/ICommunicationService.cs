@@ -1,4 +1,6 @@
-﻿using Twilio.Rest.Chat.V2.Service;
+﻿using Microsoft.AspNetCore.Http;
+using System.Collections.Generic;
+using Twilio.Rest.Chat.V2.Service;
 using Twilio.Rest.Chat.V2.Service.Channel;
 using Web.Model;
 using Web.Model.Common;
@@ -32,6 +34,7 @@ namespace Web.Services.Interfaces
         UserResource createConversationUser(string Identity, string FriendlyName);
         MemberResource addNewUserToConversationChannel(string ChannelSid, string ParticipantUniqueName);
         BaseResponse createOrRemoveGroupMemberAsAdmin(bool isAdmin, string uniqueName, string channleSid);
+        BaseResponse UploadAttachment(IFormFileCollection file);
         bool DeleteUserToConversationChannel(string ChannelSid);
 
         #region [Video Call]

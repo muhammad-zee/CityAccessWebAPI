@@ -1,4 +1,5 @@
 ﻿using ElmahCore;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using SendGrid;
@@ -40,6 +41,9 @@ namespace Web.Services.Concrete
         private string Twilio_ChatPushCredentialSid;
         private string Twilio_ChatApiKey;
         private string Twilio_ChatApiKeySecret;
+
+        private string origin = "";
+
 
         private IRepository<Role> _role;
         private IRepository<UserRole> _userRole;
@@ -96,6 +100,9 @@ namespace Web.Services.Concrete
             this.Twilio_ChatApiKey = this._config["Twilio:ChatApiKey"].ToString();
             this.Twilio_ChatApiKeySecret = this._config["Twilio:ChatApiKeySecret"].ToString();
             this._RootPath = this._config["FilePath:Path"].ToString();
+
+            this.origin = this._config["Twilio:CallbackDomain"].ToString();
+
             this._userRepo = userRepo;
             this._conversationChannelsRepo = conversationChannelsRepo;
             this._conversationParticipantsRepo = conversationParticipantsRepo;
@@ -320,18 +327,18 @@ namespace Web.Services.Concrete
         public BaseResponse saveConversationChannel(ConversationChannelVM channel)
         {
             BaseResponse response = new BaseResponse();
-            if (this._userRepo.Table.Count(u => u.IsDeleted == false && u.IsActive == true && u.UserUniqueId == channel.UniqueName)>0)
+            if (this._userRepo.Table.Count(u => u.IsDeleted == false && u.IsActive == true && u.UserUniqueId == channel.UniqueName) > 0)
             {
 
                 var ch = ChannelResource.Fetch(pathServiceSid: this.Twilio_ChatServiceSid, pathSid: channel.ChannelSid);
                 var members = MemberResource.Read(pathServiceSid: this.Twilio_ChatServiceSid, pathChannelSid: channel.ChannelSid);
-                foreach(var m in members)
+                foreach (var m in members)
                 {
-                    if(m.Identity != channel.UniqueName)
+                    if (m.Identity != channel.UniqueName)
                     {
-                        var delete = MemberResource.Delete(pathServiceSid: this.Twilio_ChatServiceSid, pathChannelSid: channel.ChannelSid,pathSid:m.Sid);
+                        var delete = MemberResource.Delete(pathServiceSid: this.Twilio_ChatServiceSid, pathChannelSid: channel.ChannelSid, pathSid: m.Sid);
                     }
-                    
+
                 }
                 var dbChannel = this._conversationChannelsRepo.Table.FirstOrDefault(ch => ch.ChannelSid == channel.ChannelSid);
                 var participants = this._conversationParticipantsRepo.Table.Where(p => p.ConversationChannelIdFk == dbChannel.ConversationChannelId);
@@ -448,7 +455,7 @@ namespace Web.Services.Concrete
                 foreach (var ch in channels)
                 {
                     var delete = ChannelResource.Delete(pathServiceSid: this.Twilio_ChatServiceSid, pathSid: ch.Sid);
-                    var dbChannel = this._conversationChannelsRepo.Table.FirstOrDefault(c => c.ChannelSid == ch.Sid );
+                    var dbChannel = this._conversationChannelsRepo.Table.FirstOrDefault(c => c.ChannelSid == ch.Sid);
                     if (dbChannel != null)
                     {
                         //dbChannel.IsDeleted = true;
@@ -617,7 +624,6 @@ namespace Web.Services.Concrete
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Chat users found", Body = chatUsers };
         }
 
-
         public BaseResponse getAllConversationUsersByOrgId(int orgid)
         {
 
@@ -633,10 +639,6 @@ namespace Web.Services.Concrete
                                   where ur.UserIdFk == user.UserId && !r.IsDeleted
                                   select new UserRoleVM
                                   {
-
-
-
-
 
                                       RoleId = ur.RoleIdFk,
                                       RoleName = r.IsSuperAdmin == true ? "MD-Support" : r.RoleName,
@@ -798,6 +800,65 @@ namespace Web.Services.Concrete
 
             return new BaseResponse() { Status = status, Message = message };
         }
+
+        public BaseResponse UploadAttachment(IFormFileCollection file)
+        {
+            if (file.Count() > 0)
+            {
+                var attachment = file.FirstOrDefault();
+                var extension = Path.GetExtension(attachment.FileName);
+                string fileActualName = attachment.FileName;
+                string contentType = attachment.ContentType;
+                string fileUniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + "-" + ApplicationSettings.UserId + extension;
+
+
+                var RootPath = this._RootPath;
+                string FilePath = "conversationAttachments";
+                var targetPath = Path.Combine(RootPath, FilePath);
+
+                if (!Directory.Exists(targetPath))
+                {
+                    Directory.CreateDirectory(targetPath);
+                }
+                targetPath += "/" + $"{fileUniqueName}";
+                using (var ms = new MemoryStream())
+                {
+                    attachment.CopyTo(ms);
+                    var fileBytes = ms.ToArray();
+                    using (FileStream fs = new FileStream(targetPath, FileMode.Create, FileAccess.Write))
+                    {
+                        fs.Write(fileBytes);
+                    }
+                }
+
+
+
+                origin = origin.Contains("ngrok.io") ? "http://localhost:60113" : origin;
+                var MediaUrl = $"{origin}/{FilePath}/{fileUniqueName}";
+                //string extension = Path.GetExtension(ImageFile.FileName);
+
+                ////ImageFile.SaveAs(path + filename);
+                ///       
+                return new BaseResponse
+                {
+                    Status = HttpStatusCode.OK,
+                    Message = "File Uploaded...!",
+                    Body = new
+                    {
+                        media = new ConversationAttachmentVM { fileName = fileActualName, contentType = contentType, mediaUrl = MediaUrl }
+                    }
+                };
+            }
+            return new BaseResponse
+            {
+                Status = HttpStatusCode.BadRequest,
+                Message = "File Not Uploaded...!",
+            };
+
+
+
+        }
+
 
         #endregion
 
