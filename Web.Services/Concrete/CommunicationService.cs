@@ -597,10 +597,14 @@ namespace Web.Services.Concrete
 
             //    //var chatUser = UserResource.Read(pathServiceSid: this.Twilio_ChatServiceSid,)
             //}
-            if (user != null)
+            if (!string.IsNullOrEmpty(UserSid))
             {
-                user.ConversationUserSid = UserSid;
-                this._userRepo.Update(user);
+
+                if (user != null)
+                {
+                    user.ConversationUserSid = UserSid;
+                    this._userRepo.Update(user);
+                }
             }
             response.Status = HttpStatusCode.OK;
             response.Message = "User Sid Saved Successfully";
@@ -699,6 +703,8 @@ namespace Web.Services.Concrete
         public BaseResponse getConversationUsersStatus(string UserSid)
         {
             List<ConversationUserStatus> statusList = new();
+            if (!string.IsNullOrEmpty(UserSid))
+            {
             string[] userSidList = UserSid.Split(",");
             var status = false;
             foreach (var sid in userSidList)
@@ -710,6 +716,11 @@ namespace Web.Services.Concrete
                 }
             }
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Chat users found", Body = statusList };
+            }
+            else
+            {
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "User not found", Body = statusList };
+            }
         }
         public BaseResponse GetCurrentConversationParticipants(string channelSid)
         {
