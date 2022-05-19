@@ -382,7 +382,7 @@ namespace Web.Services.Concrete
         {
             BaseResponse response = new BaseResponse();
 
-            var channel = this._conversationChannelsRepo.Table.FirstOrDefault(ch => ch.ChannelSid == model.ChannelSid && ch.IsDeleted != true);
+            var channel = this._conversationChannelsRepo.Table.FirstOrDefault(ch => ch.ChannelSid == model.ChannelSid);
             if (channel != null)
             {
                 List<ConversationParticipant> channelParticipantsList = new List<ConversationParticipant>();
@@ -391,6 +391,7 @@ namespace Web.Services.Concrete
                 foreach (var p in model.Participants)
                 {
                     user = this._userRepo.Table.FirstOrDefault(u => u.IsDeleted != true && u.IsActive == true && u.UserUniqueId == p.UniqueName);
+                    if (user!=null) { 
                     bool participantExists = this._conversationParticipantsRepo.Table.Count(cp => cp.IsDeleted != true && cp.UserIdFk == user.UserId && cp.ConversationChannelIdFk == channel.ConversationChannelId && cp.UniqueName == p.UniqueName) > 0;
                     if (!participantExists)
                     {
@@ -409,9 +410,14 @@ namespace Web.Services.Concrete
 
                         channelParticipantsList.Add(newParticipant);
                     }
+                    }
                 }
+                if (channelParticipantsList.Count() > 0)
+                {
                 this._conversationParticipantsRepo.Insert(channelParticipantsList);
                 this._activeCodeHelperService.MemberAddedToConversationChannel(channelParticipantsList, model.ChannelSid);
+                }
+
 
 
                 response.Status = HttpStatusCode.OK;
@@ -572,11 +578,25 @@ namespace Web.Services.Concrete
             }
 
         }
-        public BaseResponse updateConversationUserSid(string UserSid)
+        public BaseResponse updateConversationUserSid(string UserSid,int userId)
         {
             BaseResponse response = new BaseResponse();
 
             var user = this._userRepo.Table.FirstOrDefault(u => u.UserId == ApplicationSettings.UserId && !u.IsDeleted);
+
+            //if (string.IsNullOrEmpty(UserSid))
+            //{
+            //    try
+            //    {
+            //        var chatUser = this.createConversationUser(user.UserUniqueId, user.FirstName + " " + user.LastName);
+            //    }
+            //    catch(Exception e)
+            //    {
+
+            //    }
+
+            //    //var chatUser = UserResource.Read(pathServiceSid: this.Twilio_ChatServiceSid,)
+            //}
             if (user != null)
             {
                 user.ConversationUserSid = UserSid;
@@ -593,34 +613,9 @@ namespace Web.Services.Concrete
 
             //var chatusers = this._userrepo.table.where(u => u.isdeleted != true && u.isactive == true && !string.isnullorempty(u.userchannelsid));
             var chatUsers = this._dbContext.LoadStoredProcedure("md_getAllConversationUsers")
-             .WithSqlParam("@pRoleid", ApplicationSettings.RoleIds)
+             .WithSqlParam("@pUserId", ApplicationSettings.UserId)
+             .WithSqlParam("@pIsSuperAdmin", ApplicationSettings.isSuperAdmin)
              .ExecuteStoredProc<ChatUsersVM>();
-            foreach (var user in chatUsers)
-            {
-                user.UserRoles = (from ur in this._userRole.Table
-                                  join r in this._role.Table on ur.RoleIdFk equals r.RoleId
-                                  where ur.UserIdFk == user.UserId && !r.IsDeleted
-                                  select new UserRoleVM
-                                  {
-                                      RoleId = ur.RoleIdFk,
-                                      RoleName = r.RoleName,
-                                      OrganizationIdFk = r.OrganizationIdFk
-                                  }).ToList();
-
-                user.ServiceLines = (from sl in this._serviceLineRepo.Table
-                                     join ur in this._userRelationRepo.Table
-                                     on sl.ServiceLineId equals ur.ServiceLineIdFk
-                                     where sl.IsDeleted != true && ur.UserIdFk == user.UserId
-                                     select new ServiceLineVM
-                                     {
-                                         ServiceLineId = sl.ServiceLineId,
-                                         ServiceName = sl.ServiceName,
-                                         DepartmentIdFk = sl.DepartmentIdFk,
-                                     }).ToList();
-                user.Departments = this._dptRepo.Table.Where(x => !x.IsDeleted && user.ServiceLines.Select(y => y.DepartmentIdFk).Contains(x.DepartmentId)).Select(x => new DepartmentVM() { DepartmentId = x.DepartmentId, DepartmentName = x.DepartmentName, OrganizationIdFk = x.OrganizationIdFk }).ToList();
-                user.Organizations = user.Departments.Count > 0 ? this._orgRepo.Table.Where(x => !x.IsDeleted && user.Departments.Select(y => y.OrganizationIdFk).Contains(x.OrganizationId)).Select(x => new OrganizationVM() { OrganizationId = x.OrganizationId, OrganizationName = x.OrganizationName }).ToList() : this._orgRepo.Table.Where(x => !x.IsDeleted && user.UserRoles.Select(y => y.OrganizationIdFk).Contains(x.OrganizationId)).Select(x => new OrganizationVM() { OrganizationId = x.OrganizationId, OrganizationName = x.OrganizationName }).ToList();
-            }
-
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Chat users found", Body = chatUsers };
         }
 
@@ -632,33 +627,6 @@ namespace Web.Services.Concrete
              .WithSqlParam("@pOrganizationId", orgid)
              .WithSqlParam("@pIsSuperAdmin", ApplicationSettings.isSuperAdmin)
              .ExecuteStoredProc<ChatUsersVM>();
-            foreach (var user in chatUsers)
-            {
-                user.UserRoles = (from ur in this._userRole.Table
-                                  join r in this._role.Table on ur.RoleIdFk equals r.RoleId
-                                  where ur.UserIdFk == user.UserId && !r.IsDeleted
-                                  select new UserRoleVM
-                                  {
-
-                                      RoleId = ur.RoleIdFk,
-                                      RoleName = r.IsSuperAdmin == true ? "MD-Support" : r.RoleName,
-                                      OrganizationIdFk = r.OrganizationIdFk
-                                  }).ToList();
-
-                user.ServiceLines = (from sl in this._serviceLineRepo.Table
-                                     join ur in this._userRelationRepo.Table
-                                     on sl.ServiceLineId equals ur.ServiceLineIdFk
-                                     where sl.IsDeleted != true && ur.UserIdFk == user.UserId
-                                     select new ServiceLineVM
-                                     {
-                                         ServiceLineId = sl.ServiceLineId,
-                                         ServiceName = sl.ServiceName,
-                                         DepartmentIdFk = sl.DepartmentIdFk,
-                                     }).ToList();
-                user.Departments = this._dptRepo.Table.Where(x => !x.IsDeleted && user.ServiceLines.Select(y => y.DepartmentIdFk).Contains(x.DepartmentId)).Select(x => new DepartmentVM() { DepartmentId = x.DepartmentId, DepartmentName = x.DepartmentName, OrganizationIdFk = x.OrganizationIdFk }).ToList();
-                user.Organizations = user.Departments.Count > 0 ? this._orgRepo.Table.Where(x => !x.IsDeleted && user.Departments.Select(y => y.OrganizationIdFk).Contains(x.OrganizationId)).Select(x => new OrganizationVM() { OrganizationId = x.OrganizationId, OrganizationName = x.OrganizationName }).ToList() : this._orgRepo.Table.Where(x => !x.IsDeleted && user.UserRoles.Select(y => y.OrganizationIdFk).Contains(x.OrganizationId)).Select(x => new OrganizationVM() { OrganizationId = x.OrganizationId, OrganizationName = x.OrganizationName }).ToList();
-            }
-
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Chat users found", Body = chatUsers };
         }
 
