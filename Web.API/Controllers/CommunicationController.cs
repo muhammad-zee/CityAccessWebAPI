@@ -240,11 +240,11 @@ namespace Web.API.Controllers
             }
         }
         [HttpGet("Conversation/updateConversationUserSid")]
-        public BaseResponse updateConversationUserSid(string UserSid)
+        public BaseResponse updateConversationUserSid(string UserSid, int userId)
         {
             try
             {
-                return this._communicaitonService.updateConversationUserSid(UserSid);
+                return this._communicaitonService.updateConversationUserSid(UserSid,userId);
             }
             catch (Exception ex)
             {

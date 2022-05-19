@@ -23,7 +23,7 @@ namespace Web.Services.Interfaces
         BaseResponse deleteConversationParticipant(string ChannelSid, string ParticipantUniqueName, int UserId);
         BaseResponse addUserToChannelUsingApi(string ChannelUniqueName, string ParticipantUniqueName, int UserId);
         BaseResponse updateConversationGroup(string FriendlyName, string ChannelSid);
-        BaseResponse updateConversationUserSid(string UserSid);
+        BaseResponse updateConversationUserSid(string UserSid, int userId);
         BaseResponse getAllConversationUsers();
 
         public BaseResponse getAllConversationUsersByOrgId(int orgid);
