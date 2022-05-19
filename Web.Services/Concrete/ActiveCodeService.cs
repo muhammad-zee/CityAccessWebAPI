@@ -1472,6 +1472,10 @@ namespace Web.Services.Concrete
                     this._codesServiceLinesMappingRepo.Insert(codeService);
                 }
             }
+            else
+            {
+                DefaultServiceLineIds = new List<int>();
+            }
 
             var superAdmins = this._userRepo.Table.Where(x => x.IsInGroup && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId, ServiceLineIdFk = 0 }).ToList();
             UserChannelSid.AddRange(superAdmins);
@@ -1594,7 +1598,8 @@ namespace Web.Services.Concrete
                     var defaultExist = DefaultServiceLineIds.Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
                     if (defaultExist.Count > 0)
                     {
-                        if (!defaultExist.Select(x => x.IsExist).All(x => x == true)) {
+                        if (!defaultExist.Select(x => x.IsExist).All(x => x == true))
+                        {
                             var notExisted = defaultExist.Where(x => !x.IsExist).Select(x => x.ServiceLineId).ToList();
                             DefaultServiceLineIds.RemoveAll(d => notExisted.Contains(d));
                             var services = this._serviceLineRepo.Table.Where(x => notExisted.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
@@ -1604,7 +1609,8 @@ namespace Web.Services.Concrete
                             }
                         }
                     }
-                    else {
+                    else
+                    {
                         var services = this._serviceLineRepo.Table.Where(x => DefaultServiceLineIds.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
                         foreach (var item in services)
                         {
@@ -1678,6 +1684,12 @@ namespace Web.Services.Concrete
                         };
                         this._codesServiceLinesMappingRepo.Insert(codeService);
                     }
+                }
+                else
+                {
+                    DefaultServiceLineIds = new List<int>();
+                    ServiceLineTeam1Ids = new List<int>();
+                    ServiceLineTeam2Ids = new List<int>();
                 }
 
 
