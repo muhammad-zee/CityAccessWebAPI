@@ -1557,7 +1557,7 @@ namespace Web.Services.Concrete
                 _communicationService.pushNotification(notification);
             }
 
-            return new BaseResponse() { Status = HttpStatusCode.OK, Message = errorMsg, Body = new { serviceLineUsersFound = usersFound, DefaultServiceLineIds } };
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = errorMsg, Body = new { serviceLineUsersFound = usersFound, DefaultServiceLineIds, ServiceLineTeam1Ids = new List<int>(), ServiceLineTeam2Ids = new List<int>() } };
         }
 
         public BaseResponse UpdateStrokeGroupMembers(CodeStrokeVM codeStroke)
