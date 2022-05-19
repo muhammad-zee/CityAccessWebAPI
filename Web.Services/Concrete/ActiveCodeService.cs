@@ -1618,7 +1618,7 @@ namespace Web.Services.Concrete
                     {
                         if (!serviceLineTeam1Exist.Select(x => x.IsExist).All(x => x == true))
                         {
-                            var notExisted = defaultExist.Where(x => !x.IsExist).Select(x => x.ServiceLineId).ToList();
+                            var notExisted = serviceLineTeam1Exist.Where(x => !x.IsExist).Select(x => x.ServiceLineId).ToList();
                             ServiceLineTeam1Ids.RemoveAll(d => notExisted.Contains(d));
                             var services = this._serviceLineRepo.Table.Where(x => notExisted.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
                             foreach (var item in services)
@@ -1643,7 +1643,7 @@ namespace Web.Services.Concrete
                     {
                         if (!serviceLineTeam2Exist.Select(x => x.IsExist).All(x => x == true))
                         {
-                            var notExisted = defaultExist.Where(x => !x.IsExist).Select(x => x.ServiceLineId).ToList();
+                            var notExisted = serviceLineTeam2Exist.Where(x => !x.IsExist).Select(x => x.ServiceLineId).ToList();
                             ServiceLineTeam2Ids.RemoveAll(d => notExisted.Contains(d));
                             var services = this._serviceLineRepo.Table.Where(x => notExisted.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
                             foreach (var item in services)
