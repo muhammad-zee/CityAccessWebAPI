@@ -7567,18 +7567,15 @@ namespace Web.Services.Concrete
                             .ExecuteStoredProc<CodeStrokeVM>();
 
             var orgDataList = new List<dynamic>();
-            if (!fromDashboard)
+            foreach (var item in activeEMS.Select(x => x.OrganizationIdFk).Distinct().ToList())
             {
-                foreach (var item in activeEMS.Select(x => x.OrganizationIdFk).Distinct().ToList())
-                {
-                    var orgData = GetHosplitalAddressObject(item);
-                    if (orgData != null)
-                        orgDataList.Add(orgData);
-                }
+                var orgData = GetHosplitalAddressObject(item);
+                if (orgData != null)
+                    orgDataList.Add(orgData);
             }
             foreach (var item in activeEMS)
             {
-                item.OrganizationData = !fromDashboard ? orgDataList.Where(x => x.OrganizationId == item.OrganizationIdFk).FirstOrDefault() : new object();
+                item.OrganizationData = orgDataList.Where(x => x.OrganizationId == item.OrganizationIdFk).FirstOrDefault();
 
                 item.AttachmentsPath = new List<string>();
                 item.AudiosPath = new List<string>();
