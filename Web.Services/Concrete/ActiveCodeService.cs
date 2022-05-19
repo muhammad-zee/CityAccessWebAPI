@@ -2934,7 +2934,7 @@ namespace Web.Services.Concrete
                     {
                         if (!serviceLineTeam1Exist.Select(x => x.IsExist).All(x => x == true))
                         {
-                            var notExisted = defaultExist.Where(x => !x.IsExist).Select(x => x.ServiceLineId).ToList();
+                            var notExisted = serviceLineTeam1Exist.Where(x => !x.IsExist).Select(x => x.ServiceLineId).ToList();
                             ServiceLineTeam1Ids.RemoveAll(d => notExisted.Contains(d));
                             var services = this._serviceLineRepo.Table.Where(x => notExisted.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
                             foreach (var item in services)
@@ -2959,7 +2959,7 @@ namespace Web.Services.Concrete
                     {
                         if (!serviceLineTeam2Exist.Select(x => x.IsExist).All(x => x == true))
                         {
-                            var notExisted = defaultExist.Where(x => !x.IsExist).Select(x => x.ServiceLineId).ToList();
+                            var notExisted = serviceLineTeam2Exist.Where(x => !x.IsExist).Select(x => x.ServiceLineId).ToList();
                             ServiceLineTeam2Ids.RemoveAll(d => notExisted.Contains(d));
                             var services = this._serviceLineRepo.Table.Where(x => notExisted.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
                             foreach (var item in services)
@@ -2979,6 +2979,7 @@ namespace Web.Services.Concrete
                     }
 
 
+
                     if (DefaultServiceLineIds.Count > 0 || ServiceLineTeam1Ids.Count > 0 || ServiceLineTeam2Ids.Count > 0)
                     {
                         var codeService = new CodesServiceLinesMapping()
@@ -2993,6 +2994,12 @@ namespace Web.Services.Concrete
                         };
                         this._codesServiceLinesMappingRepo.Insert(codeService);
                     }
+                }
+                else
+                {
+                    DefaultServiceLineIds = new List<int>();
+                    ServiceLineTeam1Ids = new List<int>();
+                    ServiceLineTeam2Ids = new List<int>();
                 }
 
 
@@ -3044,8 +3051,8 @@ namespace Web.Services.Concrete
                     UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).Distinct().ToList(),
                     From = AuthorEnums.Sepsis.ToString(),
                     Msg = (codeSepsis.IsEms ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription()) + " Sepsis From is Changed",
-                    RouteLink1 = RouteEnums.CodeSepsisForm.ToDescription(), // "/Home/Inhouse%20Codes/code-sepsis-form",
-                    RouteLink2 = RouteEnums.EMSForms.ToDescription(),
+                    RouteLink1 = RouteEnums.CodeSepsisForm.ToDescription(), // "/Home/Inhouse%20Codes/code-strok-form",
+                    RouteLink2 = RouteEnums.EMSForms.ToDescription(), // RouteEnums.EMSForms.ToDescription(),
                 };
 
                 _communicationService.pushNotification(notification);
@@ -3103,10 +3110,14 @@ namespace Web.Services.Concrete
                         CodeIdFk = UCLEnums.Sepsis.ToInt(),
                         DefaultServiceLineIdFk = string.Join(",", DefaultServiceLineIds),
                         ActiveCodeId = codeSepsis.CodeSepsisId,
-                        ActiveCodeName = UCLEnums.Sepsis.ToString(),
+                        ActiveCodeName = UCLEnums.Sepsis.ToString()
                     };
                     this._codesServiceLinesMappingRepo.Insert(codeService);
                 }
+            }
+            else
+            {
+                DefaultServiceLineIds = new List<int>();
             }
 
             var superAdmins = this._userRepo.Table.Where(x => x.IsInGroup && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId, ServiceLineIdFk = 0 }).ToList();
@@ -3159,7 +3170,7 @@ namespace Web.Services.Concrete
                 msg.channelSid = channel.Sid;
                 msg.author = "System";
                 msg.attributes = "";
-                msg.body = $"<strong> {(codeSepsis.IsEms ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription())} {UCLEnums.Sepsis.ToString()} </strong></br></br>";
+                msg.body = $"<strong> {( codeSepsis.IsEms ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription())} {UCLEnums.Sepsis.ToString()} </strong></br></br>";
                 if (codeSepsis.PatientName != null && codeSepsis.PatientName != "")
                     msg.body += $"<strong>Patient Name: </strong> {codeSepsis.PatientName} </br>";
                 if (codeSepsis.Dob != null)
@@ -3185,15 +3196,15 @@ namespace Web.Services.Concrete
                     UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).Distinct().ToList(),
                     From = AuthorEnums.Sepsis.ToString(),
                     Msg = (codeSepsis.IsEms ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription()) + " Sepsis is update",
-                    RouteLink3 = RouteEnums.ActiveEMS.ToDescription(),
+                    RouteLink3 = RouteEnums.ActiveEMS.ToDescription(), // RouteEnums.ActiveEMS.ToDescription(),
                     RouteLink4 = RouteEnums.Dashboard.ToDescription(),
-                    RouteLink5 = RouteEnums.InhouseCodeGrid.ToDescription()
+                    RouteLink5 = RouteEnums.InhouseCodeGrid.ToDescription(), // RouteEnums.InhouseCodeGrid.ToDescription()
                 };
 
                 _communicationService.pushNotification(notification);
             }
 
-            return new BaseResponse() { Status = HttpStatusCode.OK, Message = errorMsg, Body = new { serviceLineUsersFound = usersFound, DefaultServiceLineIds } };
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = errorMsg, Body = new { serviceLineUsersFound = usersFound, DefaultServiceLineIds, ServiceLineTeam1Ids = new List<int>(), ServiceLineTeam2Ids = new List<int>() } };
         }
 
         public BaseResponse DeleteSepsis(int SepsisId, bool status)
@@ -4292,6 +4303,10 @@ namespace Web.Services.Concrete
                     this._codesServiceLinesMappingRepo.Insert(codeService);
                 }
             }
+            else
+            {
+                DefaultServiceLineIds = new List<int>();
+            }
 
             var superAdmins = this._userRepo.Table.Where(x => x.IsInGroup && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId, ServiceLineIdFk = 0 }).ToList();
             UserChannelSid.AddRange(superAdmins);
@@ -4369,15 +4384,15 @@ namespace Web.Services.Concrete
                     UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).Distinct().ToList(),
                     From = AuthorEnums.STEMI.ToString(),
                     Msg = (codeSTEMI.IsEms.HasValue && codeSTEMI.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription()) + " STEMI is update",
-                    RouteLink3 = RouteEnums.ActiveEMS.ToDescription(),
+                    RouteLink3 = RouteEnums.ActiveEMS.ToDescription(), // RouteEnums.ActiveEMS.ToDescription(),
                     RouteLink4 = RouteEnums.Dashboard.ToDescription(),
-                    RouteLink5 = RouteEnums.InhouseCodeGrid.ToDescription()
+                    RouteLink5 = RouteEnums.InhouseCodeGrid.ToDescription(), // RouteEnums.InhouseCodeGrid.ToDescription()
                 };
 
                 _communicationService.pushNotification(notification);
             }
 
-            return new BaseResponse() { Status = HttpStatusCode.OK, Message = errorMsg, Body = new { serviceLineUsersFound = usersFound, DefaultServiceLineIds } };
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = errorMsg, Body = new { serviceLineUsersFound = usersFound, DefaultServiceLineIds, ServiceLineTeam1Ids = new List<int>(), ServiceLineTeam2Ids = new List<int>() } };
         }
 
         public BaseResponse UpdateSTEMIGroupMembers(CodeSTEMIVM codeSTEMI)
@@ -4388,7 +4403,6 @@ namespace Web.Services.Concrete
                 string IsEMS = codeSTEMI.IsEms.HasValue && codeSTEMI.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription();
                 codeSTEMI.DefaultServiceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeSTEMI.OrganizationIdFk && x.CodeIdFk == UCLEnums.STEMI.ToInt() && x.Type == IsEMS && x.IsActive.HasValue && x.IsActive.Value && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
             }
-
 
             if (codeSTEMI.DefaultServiceLineIds != null && codeSTEMI.DefaultServiceLineIds != "")
             {
@@ -4441,7 +4455,7 @@ namespace Web.Services.Concrete
                     {
                         if (!serviceLineTeam1Exist.Select(x => x.IsExist).All(x => x == true))
                         {
-                            var notExisted = defaultExist.Where(x => !x.IsExist).Select(x => x.ServiceLineId).ToList();
+                            var notExisted = serviceLineTeam1Exist.Where(x => !x.IsExist).Select(x => x.ServiceLineId).ToList();
                             ServiceLineTeam1Ids.RemoveAll(d => notExisted.Contains(d));
                             var services = this._serviceLineRepo.Table.Where(x => notExisted.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
                             foreach (var item in services)
@@ -4466,7 +4480,7 @@ namespace Web.Services.Concrete
                     {
                         if (!serviceLineTeam2Exist.Select(x => x.IsExist).All(x => x == true))
                         {
-                            var notExisted = defaultExist.Where(x => !x.IsExist).Select(x => x.ServiceLineId).ToList();
+                            var notExisted = serviceLineTeam2Exist.Where(x => !x.IsExist).Select(x => x.ServiceLineId).ToList();
                             ServiceLineTeam2Ids.RemoveAll(d => notExisted.Contains(d));
                             var services = this._serviceLineRepo.Table.Where(x => notExisted.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
                             foreach (var item in services)
@@ -4485,6 +4499,8 @@ namespace Web.Services.Concrete
                         ServiceLineTeam2Ids = new List<int>();
                     }
 
+
+
                     if (DefaultServiceLineIds.Count > 0 || ServiceLineTeam1Ids.Count > 0 || ServiceLineTeam2Ids.Count > 0)
                     {
                         var codeService = new CodesServiceLinesMapping()
@@ -4499,6 +4515,12 @@ namespace Web.Services.Concrete
                         };
                         this._codesServiceLinesMappingRepo.Insert(codeService);
                     }
+                }
+                else
+                {
+                    DefaultServiceLineIds = new List<int>();
+                    ServiceLineTeam1Ids = new List<int>();
+                    ServiceLineTeam2Ids = new List<int>();
                 }
 
 
@@ -4550,8 +4572,8 @@ namespace Web.Services.Concrete
                     UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).Distinct().ToList(),
                     From = AuthorEnums.STEMI.ToString(),
                     Msg = (codeSTEMI.IsEms.HasValue && codeSTEMI.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription()) + " STEMI From is Changed",
-                    RouteLink1 = RouteEnums.CodeSTEMIForm.ToDescription(),
-                    RouteLink2 = RouteEnums.EMSForms.ToDescription(),
+                    RouteLink1 = RouteEnums.CodeSTEMIForm.ToDescription(), // "/Home/Inhouse%20Codes/code-strok-form",
+                    RouteLink2 = RouteEnums.EMSForms.ToDescription(), // RouteEnums.EMSForms.ToDescription(),
                 };
 
                 _communicationService.pushNotification(notification);
@@ -5685,8 +5707,6 @@ namespace Web.Services.Concrete
                 return new BaseResponse() { Status = HttpStatusCode.NotAcceptable, Message = "Organization is not selected" };
             }
         }
-
-
         public BaseResponse CreateTrumaGroup(CodeTrumaVM codeTruma)
         {
 
@@ -5727,7 +5747,6 @@ namespace Web.Services.Concrete
                     DefaultServiceLineIds = new List<int>();
                 }
 
-
                 if (DefaultServiceLineIds.Count > 0)
                 {
                     var codeService = new CodesServiceLinesMapping()
@@ -5740,6 +5759,10 @@ namespace Web.Services.Concrete
                     };
                     this._codesServiceLinesMappingRepo.Insert(codeService);
                 }
+            }
+            else
+            {
+                DefaultServiceLineIds = new List<int>();
             }
 
             var superAdmins = this._userRepo.Table.Where(x => x.IsInGroup && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId, ServiceLineIdFk = 0 }).ToList();
@@ -5817,16 +5840,16 @@ namespace Web.Services.Concrete
                     OrgId = Truma.OrganizationIdFk,
                     UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).Distinct().ToList(),
                     From = AuthorEnums.Trauma.ToString(),
-                    Msg = (codeTruma.IsEms.HasValue && codeTruma.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription()) + " Trauma is update",
-                    RouteLink3 = RouteEnums.ActiveEMS.ToDescription(),
+                    Msg = (codeTruma.IsEms.HasValue && codeTruma.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription()) + " Truma is update",
+                    RouteLink3 = RouteEnums.ActiveEMS.ToDescription(), // RouteEnums.ActiveEMS.ToDescription(),
                     RouteLink4 = RouteEnums.Dashboard.ToDescription(),
-                    RouteLink5 = RouteEnums.InhouseCodeGrid.ToDescription()
+                    RouteLink5 = RouteEnums.InhouseCodeGrid.ToDescription(), // RouteEnums.InhouseCodeGrid.ToDescription()
                 };
 
                 _communicationService.pushNotification(notification);
             }
 
-            return new BaseResponse() { Status = HttpStatusCode.OK, Message = errorMsg, Body = new { serviceLineUsersFound = usersFound, DefaultServiceLineIds } };
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = errorMsg, Body = new { serviceLineUsersFound = usersFound, DefaultServiceLineIds, ServiceLineTeam1Ids = new List<int>(), ServiceLineTeam2Ids = new List<int>() } };
         }
 
         public BaseResponse UpdateTrumaGroupMembers(CodeTrumaVM codeTruma)
@@ -5837,7 +5860,6 @@ namespace Web.Services.Concrete
                 string IsEMS = codeTruma.IsEms.HasValue && codeTruma.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription();
                 codeTruma.DefaultServiceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeTruma.OrganizationIdFk && x.CodeIdFk == UCLEnums.Trauma.ToInt() && x.Type == IsEMS && x.IsActive.HasValue && x.IsActive.Value && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
             }
-
 
             if (codeTruma.DefaultServiceLineIds != null && codeTruma.DefaultServiceLineIds != "")
             {
@@ -5890,7 +5912,7 @@ namespace Web.Services.Concrete
                     {
                         if (!serviceLineTeam1Exist.Select(x => x.IsExist).All(x => x == true))
                         {
-                            var notExisted = defaultExist.Where(x => !x.IsExist).Select(x => x.ServiceLineId).ToList();
+                            var notExisted = serviceLineTeam1Exist.Where(x => !x.IsExist).Select(x => x.ServiceLineId).ToList();
                             ServiceLineTeam1Ids.RemoveAll(d => notExisted.Contains(d));
                             var services = this._serviceLineRepo.Table.Where(x => notExisted.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
                             foreach (var item in services)
@@ -5915,7 +5937,7 @@ namespace Web.Services.Concrete
                     {
                         if (!serviceLineTeam2Exist.Select(x => x.IsExist).All(x => x == true))
                         {
-                            var notExisted = defaultExist.Where(x => !x.IsExist).Select(x => x.ServiceLineId).ToList();
+                            var notExisted = serviceLineTeam2Exist.Where(x => !x.IsExist).Select(x => x.ServiceLineId).ToList();
                             ServiceLineTeam2Ids.RemoveAll(d => notExisted.Contains(d));
                             var services = this._serviceLineRepo.Table.Where(x => notExisted.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
                             foreach (var item in services)
@@ -5935,6 +5957,7 @@ namespace Web.Services.Concrete
                     }
 
 
+
                     if (DefaultServiceLineIds.Count > 0 || ServiceLineTeam1Ids.Count > 0 || ServiceLineTeam2Ids.Count > 0)
                     {
                         var codeService = new CodesServiceLinesMapping()
@@ -5949,6 +5972,12 @@ namespace Web.Services.Concrete
                         };
                         this._codesServiceLinesMappingRepo.Insert(codeService);
                     }
+                }
+                else
+                {
+                    DefaultServiceLineIds = new List<int>();
+                    ServiceLineTeam1Ids = new List<int>();
+                    ServiceLineTeam2Ids = new List<int>();
                 }
 
 
@@ -6000,8 +6029,8 @@ namespace Web.Services.Concrete
                     UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).Distinct().ToList(),
                     From = AuthorEnums.Trauma.ToString(),
                     Msg = (codeTruma.IsEms.HasValue && codeTruma.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription()) + " Truma From is Changed",
-                    RouteLink1 = RouteEnums.CodeTraumaForm.ToDescription(),
-                    RouteLink2 = RouteEnums.EMSForms.ToDescription(),
+                    RouteLink1 = RouteEnums.CodeTraumaForm.ToDescription(), // "/Home/Inhouse%20Codes/code-strok-form",
+                    RouteLink2 = RouteEnums.EMSForms.ToDescription(), // RouteEnums.EMSForms.ToDescription(),
                 };
 
                 _communicationService.pushNotification(notification);
@@ -7179,6 +7208,10 @@ namespace Web.Services.Concrete
                     this._codesServiceLinesMappingRepo.Insert(codeService);
                 }
             }
+            else
+            {
+                DefaultServiceLineIds = new List<int>();
+            }
 
             var superAdmins = this._userRepo.Table.Where(x => x.IsInGroup && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId, ServiceLineIdFk = 0 }).ToList();
             UserChannelSid.AddRange(superAdmins);
@@ -7256,15 +7289,15 @@ namespace Web.Services.Concrete
                     UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).Distinct().ToList(),
                     From = AuthorEnums.Blue.ToString(),
                     Msg = (codeBlue.IsEms.HasValue && codeBlue.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription()) + " Blue is update",
-                    RouteLink3 = RouteEnums.ActiveEMS.ToDescription(),
+                    RouteLink3 = RouteEnums.ActiveEMS.ToDescription(), // RouteEnums.ActiveEMS.ToDescription(),
                     RouteLink4 = RouteEnums.Dashboard.ToDescription(),
-                    RouteLink5 = RouteEnums.InhouseCodeGrid.ToDescription()
+                    RouteLink5 = RouteEnums.InhouseCodeGrid.ToDescription(), // RouteEnums.InhouseCodeGrid.ToDescription()
                 };
 
                 _communicationService.pushNotification(notification);
             }
 
-            return new BaseResponse() { Status = HttpStatusCode.OK, Message = errorMsg, Body = new { serviceLineUsersFound = usersFound, DefaultServiceLineIds } };
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = errorMsg, Body = new { serviceLineUsersFound = usersFound, DefaultServiceLineIds, ServiceLineTeam1Ids = new List<int>(), ServiceLineTeam2Ids = new List<int>() } };
         }
 
         public BaseResponse UpdateBlueGroupMembers(CodeBlueVM codeBlue)
@@ -7275,7 +7308,6 @@ namespace Web.Services.Concrete
                 string IsEMS = codeBlue.IsEms.HasValue && codeBlue.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription();
                 codeBlue.DefaultServiceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeBlue.OrganizationIdFk && x.CodeIdFk == UCLEnums.Blue.ToInt() && x.Type == IsEMS && x.IsActive.HasValue && x.IsActive.Value && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
             }
-
 
             if (codeBlue.DefaultServiceLineIds != null && codeBlue.DefaultServiceLineIds != "")
             {
@@ -7328,7 +7360,7 @@ namespace Web.Services.Concrete
                     {
                         if (!serviceLineTeam1Exist.Select(x => x.IsExist).All(x => x == true))
                         {
-                            var notExisted = defaultExist.Where(x => !x.IsExist).Select(x => x.ServiceLineId).ToList();
+                            var notExisted = serviceLineTeam1Exist.Where(x => !x.IsExist).Select(x => x.ServiceLineId).ToList();
                             ServiceLineTeam1Ids.RemoveAll(d => notExisted.Contains(d));
                             var services = this._serviceLineRepo.Table.Where(x => notExisted.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
                             foreach (var item in services)
@@ -7353,7 +7385,7 @@ namespace Web.Services.Concrete
                     {
                         if (!serviceLineTeam2Exist.Select(x => x.IsExist).All(x => x == true))
                         {
-                            var notExisted = defaultExist.Where(x => !x.IsExist).Select(x => x.ServiceLineId).ToList();
+                            var notExisted = serviceLineTeam2Exist.Where(x => !x.IsExist).Select(x => x.ServiceLineId).ToList();
                             ServiceLineTeam2Ids.RemoveAll(d => notExisted.Contains(d));
                             var services = this._serviceLineRepo.Table.Where(x => notExisted.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
                             foreach (var item in services)
@@ -7373,6 +7405,7 @@ namespace Web.Services.Concrete
                     }
 
 
+
                     if (DefaultServiceLineIds.Count > 0 || ServiceLineTeam1Ids.Count > 0 || ServiceLineTeam2Ids.Count > 0)
                     {
                         var codeService = new CodesServiceLinesMapping()
@@ -7387,6 +7420,12 @@ namespace Web.Services.Concrete
                         };
                         this._codesServiceLinesMappingRepo.Insert(codeService);
                     }
+                }
+                else
+                {
+                    DefaultServiceLineIds = new List<int>();
+                    ServiceLineTeam1Ids = new List<int>();
+                    ServiceLineTeam2Ids = new List<int>();
                 }
 
 
@@ -7438,8 +7477,8 @@ namespace Web.Services.Concrete
                     UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).Distinct().ToList(),
                     From = AuthorEnums.Blue.ToString(),
                     Msg = (codeBlue.IsEms.HasValue && codeBlue.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription()) + " Blue From is Changed",
-                    RouteLink1 = RouteEnums.CodeBlueForm.ToDescription(),
-                    RouteLink2 = RouteEnums.EMSForms.ToDescription(),
+                    RouteLink1 = RouteEnums.CodeBlueForm.ToDescription(), // "/Home/Inhouse%20Codes/code-strok-form",
+                    RouteLink2 = RouteEnums.EMSForms.ToDescription(), // RouteEnums.EMSForms.ToDescription(),
                 };
 
                 _communicationService.pushNotification(notification);
