@@ -375,7 +375,7 @@ namespace Web.Services.Concrete
                 }
                 else
                 {
-                    var roleIds = register.RoleIds.ToIntList();
+                    var roleIds = register.RoleIds != null && register.RoleIds != "" && register.RoleIds != "0" ? register.RoleIds.ToIntList() : new List<int>();
                     if (roleIds.Count > 0)
                     {
                         var alreadyExistRoles = this._userRoleRepo.Table.Where(x => x.UserIdFk == user.UserId).ToList();
@@ -389,7 +389,8 @@ namespace Web.Services.Concrete
                     {
                         userRoleList.Add(new UserRole() { UserIdFk = user.UserId, RoleIdFk = item });
                     }
-                    _userRoleRepo.Insert(userRoleList);
+                    if (userRoleList.Count > 0)
+                        _userRoleRepo.Insert(userRoleList);
                 }
 
                 return new BaseResponse()
