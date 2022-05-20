@@ -769,7 +769,7 @@ namespace Web.Services.Concrete
             if (row != null)
             {
                 status = HttpStatusCode.OK;
-                message = $"{row.FriendlyName} is admin now.";
+                message = isAdmin ? $"{row.FriendlyName} is admin now.": $"{row.FriendlyName} is not an admin now." ;
                 row.IsAdmin = isAdmin;
                 row.ModifiedBy = ApplicationSettings.UserId;
                 row.ModifiedDate = DateTime.UtcNow;
