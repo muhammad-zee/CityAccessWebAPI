@@ -106,5 +106,9 @@ namespace Web.Services.Interfaces
 
         #endregion
 
+        #region Apis for Mobile App
+        BaseResponse GetAllCodesData(ActiveCodeVM activeCode);
+        #endregion
+
     }
 }

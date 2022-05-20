@@ -93,38 +93,39 @@ namespace Web.Services.Concrete
                     .WithSqlParam("@is_SuperAdmin", ApplicationSettings.isSuperAdmin)
                     .WithSqlParam("@userId", ApplicationSettings.UserId)
                     .WithSqlParam("@orgId", orgId)
-                    .ExecuteStoredProc<RegisterCredentialVM>();
+                    .ExecuteStoredProc_ToDictionary();
+                    //.ExecuteStoredProc<RegisterCredentialVM>();
 
 
-            users.ForEach(x =>
-            {
-                x.UserRole = (from ur in _userRole.Table
-                              join r in _role.Table on ur.RoleIdFk equals r.RoleId
-                              //join o in _organizationRepo.Table on r.OrganizationIdFk equals o.OrganizationId
-                              where ur.UserIdFk == x.UserId && !r.IsDeleted
-                              //&& !o.IsDeleted
-                              select new UserRoleVM()
-                              {
-                                  RoleId = r.RoleId,
-                                  //RoleName = r.RoleName + " | " + o.OrganizationName
-                                  RoleName = r.RoleName,
-                              }).Distinct().ToList();
-                x.UserServices = (from ur in _userRelationRepo.Table
-                                  join s in _serviceRepo.Table on ur.ServiceLineIdFk equals s.ServiceLineId
-                                  where ur.UserIdFk == x.UserId && !s.IsDeleted
-                                  select new ServiceLineVM()
-                                  {
-                                      ServiceLineId = s.ServiceLineId,
-                                      ServiceName = s.ServiceName,
-                                      IsOnCall = x.ServiceLineIdFk == s.ServiceLineId
-                                  }).OrderBy(x => x.IsOnCall).Distinct().ToList();
+            //users.ForEach(x =>
+            //{
+            //    x.UserRole = (from ur in _userRole.Table
+            //                  join r in _role.Table on ur.RoleIdFk equals r.RoleId
+            //                  //join o in _organizationRepo.Table on r.OrganizationIdFk equals o.OrganizationId
+            //                  where ur.UserIdFk == x.UserId && !r.IsDeleted
+            //                  //&& !o.IsDeleted
+            //                  select new UserRoleVM()
+            //                  {
+            //                      RoleId = r.RoleId,
+            //                      //RoleName = r.RoleName + " | " + o.OrganizationName
+            //                      RoleName = r.RoleName,
+            //                  }).Distinct().ToList();
+            //    x.UserServices = (from ur in _userRelationRepo.Table
+            //                      join s in _serviceRepo.Table on ur.ServiceLineIdFk equals s.ServiceLineId
+            //                      where ur.UserIdFk == x.UserId && !s.IsDeleted
+            //                      select new ServiceLineVM()
+            //                      {
+            //                          ServiceLineId = s.ServiceLineId,
+            //                          ServiceName = s.ServiceName,
+            //                          IsOnCall = x.ServiceLineIdFk == s.ServiceLineId
+            //                      }).OrderBy(x => x.IsOnCall).Distinct().ToList();
 
-                x.Organizations = (from ur in _userRole.Table
-                                   join r in _role.Table on ur.RoleIdFk equals r.RoleId
-                                   join o in _organizationRepo.Table on r.OrganizationIdFk equals o.OrganizationId
-                                   where ur.UserIdFk == x.UserId && !o.IsDeleted
-                                   select new OrganizationVM() { OrganizationId = o.OrganizationId, OrganizationName = o.OrganizationName }).Distinct().ToList();
-            });
+            //    x.Organizations = (from ur in _userRole.Table
+            //                       join r in _role.Table on ur.RoleIdFk equals r.RoleId
+            //                       join o in _organizationRepo.Table on r.OrganizationIdFk equals o.OrganizationId
+            //                       where ur.UserIdFk == x.UserId && !o.IsDeleted
+            //                       select new OrganizationVM() { OrganizationId = o.OrganizationId, OrganizationName = o.OrganizationName }).Distinct().ToList();
+            //});
 
             return new BaseResponse { Status = HttpStatusCode.OK, Message = "Users List Returned", Body = users };
         }

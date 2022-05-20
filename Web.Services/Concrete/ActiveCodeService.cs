@@ -7554,7 +7554,6 @@ namespace Web.Services.Concrete
 
         #endregion
 
-
         #region EMS
 
         public BaseResponse GetActiveEMS(bool showAll, bool fromDashboard = false)
@@ -7643,7 +7642,6 @@ namespace Web.Services.Concrete
 
         #endregion
 
-
         #region Inhouse Code Settings
 
 
@@ -7699,7 +7697,6 @@ namespace Web.Services.Concrete
         //}
 
         #endregion
-
 
         #region Organization InhouseCode Fields
 
@@ -8018,7 +8015,6 @@ namespace Web.Services.Concrete
 
         #endregion
 
-
         #region Map & addresses
 
         public object GetHosplitalAddressObject(int orgId)
@@ -8116,7 +8112,26 @@ namespace Web.Services.Concrete
 
         #endregion
 
+        #region Apis For Mobile App
 
+        public BaseResponse GetAllCodesData(ActiveCodeVM activeCode) 
+        {
+            var objList = this._dbContext.LoadStoredProcedure("md_getAllCodes")
+                            .WithSqlParam("@status", activeCode.Status)
+                            .WithSqlParam("@organizationId", activeCode.OrganizationIdFk)
+                            .WithSqlParam("@currentUserId", ApplicationSettings.UserId)
+                            .WithSqlParam("@IsSuperAdmin", ApplicationSettings.isSuperAdmin)
+                            .WithSqlParam("@showAll", activeCode.showAllActiveCodes)
+                            .WithSqlParam("@page", activeCode.PageNumber)
+                            .WithSqlParam("@size", activeCode.Rows)
+                            .WithSqlParam("@filterCol", activeCode.FilterCol)
+                            .WithSqlParam("@filterVal", activeCode.FilterVal)
+                           .ExecuteStoredProc_ToDictionary();
+
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = objList.Count > 0 ? "Data Returned" : "No Data Found", Body = objList };
+        }
+
+        #endregion
 
     }
 }

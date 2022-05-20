@@ -39,6 +39,7 @@ namespace Web.Model.Common
         public string Filter { get; set; }
         public string SortOrder { get; set; }
         public string SortCol { get; set; }
+        public string FilterCol { get; set; }
         public string FilterVal { get; set; }
     }
 }
