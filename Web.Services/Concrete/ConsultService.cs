@@ -312,7 +312,6 @@ namespace Web.Services.Concrete
 
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = consultData };
         }
-
         public BaseResponse GetConsultsByServiceLineId(ConsultVM consult)
         {
 
@@ -344,8 +343,6 @@ namespace Web.Services.Concrete
 
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = new { consultData, fields } };
         }
-
-
         public BaseResponse GetConsultById(int Id)
         {
             var consultData = _dbContext.LoadStoredProcedure("md_getConsultById")
@@ -354,7 +351,6 @@ namespace Web.Services.Concrete
 
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = consultData };
         }
-
         public BaseResponse AddOrUpdateConsult(IDictionary<string, object> keyValues)
         {
             var keys = keyValues.Keys.ToList();
@@ -957,7 +953,6 @@ namespace Web.Services.Concrete
                 return new BaseResponse() { Status = HttpStatusCode.NotModified, Message = "No Recored deleted" };
             }
         }
-
         public BaseResponse DeleteConsult(int consultId, bool status)
         {
             var sql = "EXEC md_DeleteConsultAndGroup @status, @userId, @consultId";

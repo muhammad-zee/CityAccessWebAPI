@@ -913,5 +913,27 @@ namespace Web.API.Controllers
 
         #endregion
 
+
+        #region Apis For Mobile App
+
+        [Description("Get All Codes Data")]
+        [HttpPost("activecode/GetAllCodesData")]
+        public BaseResponse GetAllCodesData([FromBody] ActiveCodeVM activeCode)
+        {
+            try
+            {
+                var m_state = ModelState;
+                return _activeCodesService.GetAllCodesData(activeCode);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
+        #endregion
+
     }
 }
