@@ -653,8 +653,8 @@ namespace Web.Services.Concrete
                 if (StrokeDataVM.IsEms.HasValue && StrokeDataVM.IsEms.Value)
                     StrokeDataVM.OrganizationData = GetHosplitalAddressObject(StrokeDataVM.OrganizationIdFk);
 
-                StrokeDataVM.LastKnownWellStr = StrokeDataVM.LastKnownWell?.ToString("yyyy-MM-dd hh:mm:ss tt");
-                StrokeDataVM.DobStr = StrokeDataVM.Dob?.ToString("yyyy-MM-dd hh:mm:ss tt");
+                StrokeDataVM.LastKnownWellStr = StrokeDataVM.LastKnownWell?.ToEST().ToString("yyyy-MM-dd hh:mm:ss tt");
+                StrokeDataVM.DobStr = StrokeDataVM.Dob?.ToEST().ToString("yyyy-MM-dd hh:mm:ss tt");
                 StrokeDataVM.GenderTitle = _controlListDetailsRepo.Table.Where(g => g.ControlListDetailId == StrokeDataVM.Gender).Select(g => g.Title).FirstOrDefault();
                 StrokeDataVM.BloodThinnersTitle.AddRange(_controlListDetailsRepo.Table.Where(b => StrokeDataVM.BloodThinners.ToIntList().Contains(b.ControlListDetailId)).Select(b => new { Id = b.ControlListDetailId, b.Title }).ToList());
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Found", Body = StrokeDataVM };
