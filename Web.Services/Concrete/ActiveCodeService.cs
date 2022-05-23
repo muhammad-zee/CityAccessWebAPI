@@ -537,36 +537,42 @@ namespace Web.Services.Concrete
 
         public BaseResponse GetAllStrokeCode(ActiveCodeVM activeCode)
         {
-            var objList = this._dbContext.LoadStoredProcedure("md_getAllActiveCodesOrEMS_Dynamic")
-                            .WithSqlParam("@status", activeCode.Status)
-                            .WithSqlParam("@codeName", UCLEnums.Stroke.ToString())
-                            .WithSqlParam("@IsSuperAdmin", ApplicationSettings.isSuperAdmin)
-                            .WithSqlParam("@showAll", activeCode.showAllActiveCodes)
-                            .WithSqlParam("@userId", ApplicationSettings.UserId)
-                            .WithSqlParam("@organizationId", activeCode.OrganizationIdFk)
-                            .WithSqlParam("@page", activeCode.PageNumber)
-                            .WithSqlParam("@size", activeCode.Rows)
-                            .WithSqlParam("@sortOrder", activeCode.SortOrder)
-                            .WithSqlParam("@sortCol", activeCode.SortCol)
-                            .WithSqlParam("@filterVal", activeCode.FilterVal)
-                            .ExecuteStoredProc<ActiveOrEMSCodesVM>();
-
-            objList.ForEach(x =>
-            {
-                x.BloodThinnersTitle = new List<object>();
-                x.BloodThinnersTitle.AddRange(_controlListDetailsRepo.Table.Where(b => x.BloodThinners.ToIntList().Contains(b.ControlListDetailId)).Select(b => new { Id = b.ControlListDetailId, b.Title }).ToList());
-            });
 
             var gridColumns = GetInhouseCodeTableFeilds(activeCode.OrganizationIdFk, UCLEnums.Stroke.ToString());
-
-            int totalRecords = 0;
-            if (objList.Count > 0)
+            dynamic Fields = gridColumns.Body;
+            if (Fields != null && Fields.FieldName != null) 
             {
-                totalRecords = objList.Select(x => x.Total_Records).FirstOrDefault();
+                string FieldNames = Convert.ToString(Fields.FieldName);
+                var objList = this._dbContext.LoadStoredProcedure("md_getAllActiveCodesOrEMS_Dynamic")
+                                .WithSqlParam("@status", activeCode.Status)
+                                .WithSqlParam("@colName", FieldNames)
+                                .WithSqlParam("@codeName", UCLEnums.Stroke.ToString())
+                                .WithSqlParam("@IsSuperAdmin", ApplicationSettings.isSuperAdmin)
+                                .WithSqlParam("@showAll", activeCode.showAllActiveCodes)
+                                .WithSqlParam("@userId", ApplicationSettings.UserId)
+                                .WithSqlParam("@organizationId", activeCode.OrganizationIdFk)
+                                .WithSqlParam("@page", activeCode.PageNumber)
+                                .WithSqlParam("@size", activeCode.Rows)
+                                .WithSqlParam("@sortOrder", activeCode.SortOrder)
+                                .WithSqlParam("@sortCol", activeCode.SortCol)
+                                .WithSqlParam("@filterVal", activeCode.FilterVal)
+                                .ExecuteStoredProc<ActiveOrEMSCodesVM>();
+
+                objList.ForEach(x =>
+                {
+                    x.BloodThinnersTitle = new List<object>();
+                    x.BloodThinnersTitle.AddRange(_controlListDetailsRepo.Table.Where(b => x.BloodThinners.ToIntList().Contains(b.ControlListDetailId)).Select(b => new { Id = b.ControlListDetailId, b.Title }).ToList());
+                });
+
+                int totalRecords = 0;
+                if (objList.Count > 0)
+                {
+                    totalRecords = objList.Select(x => x.Total_Records).FirstOrDefault();
+                }
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = new { totalRecords, objList, fields = gridColumns.Body } };
+
             }
-            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = new { totalRecords, objList, fields = gridColumns.Body } };
-
-
+            return new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "Fields Name Not Found" };
         }
 
         public BaseResponse GetStrokeDataById(int strokeId)
@@ -1824,118 +1830,41 @@ namespace Web.Services.Concrete
         public BaseResponse GetAllSepsisCode(ActiveCodeVM activeCode)
         {
 
-            var objList = this._dbContext.LoadStoredProcedure("md_getAllActiveCodesOrEMS_Dynamic")
-                            .WithSqlParam("@status", activeCode.Status)
-                            .WithSqlParam("@codeName", UCLEnums.Sepsis.ToString())
-                            .WithSqlParam("@IsSuperAdmin", ApplicationSettings.isSuperAdmin)
-                            .WithSqlParam("@showAll", activeCode.showAllActiveCodes)
-                            .WithSqlParam("@userId", ApplicationSettings.UserId)
-                            .WithSqlParam("@organizationId", activeCode.OrganizationIdFk)
-                            .WithSqlParam("@page", activeCode.PageNumber)
-                            .WithSqlParam("@size", activeCode.Rows)
-                            .WithSqlParam("@sortOrder", activeCode.SortOrder)
-                            .WithSqlParam("@sortCol", activeCode.SortCol)
-                            .WithSqlParam("@filterVal", activeCode.FilterVal)
-                           .ExecuteStoredProc<ActiveOrEMSCodesVM>();
-
-            objList.ForEach(x =>
-            {
-                x.BloodThinnersTitle = new List<object>();
-                x.BloodThinnersTitle.AddRange(_controlListDetailsRepo.Table.Where(b => x.BloodThinners.ToIntList().Contains(b.ControlListDetailId)).Select(b => new { Id = b.ControlListDetailId, b.Title }).ToList());
-            });
             var gridColumns = GetInhouseCodeTableFeilds(activeCode.OrganizationIdFk, UCLEnums.Sepsis.ToString());
-            int totalRecords = 0;
-            if (objList.Count > 0)
+            dynamic Fields = gridColumns.Body;
+            if (Fields != null && Fields.FieldName != null)
             {
-                totalRecords = objList.Select(x => x.Total_Records).FirstOrDefault();
+                string FieldNames = Convert.ToString(Fields.FieldName);
+                var objList = this._dbContext.LoadStoredProcedure("md_getAllActiveCodesOrEMS_Dynamic")
+                                .WithSqlParam("@status", activeCode.Status)
+                                .WithSqlParam("@colName", FieldNames)
+                                .WithSqlParam("@codeName", UCLEnums.Sepsis.ToString())
+                                .WithSqlParam("@IsSuperAdmin", ApplicationSettings.isSuperAdmin)
+                                .WithSqlParam("@showAll", activeCode.showAllActiveCodes)
+                                .WithSqlParam("@userId", ApplicationSettings.UserId)
+                                .WithSqlParam("@organizationId", activeCode.OrganizationIdFk)
+                                .WithSqlParam("@page", activeCode.PageNumber)
+                                .WithSqlParam("@size", activeCode.Rows)
+                                .WithSqlParam("@sortOrder", activeCode.SortOrder)
+                                .WithSqlParam("@sortCol", activeCode.SortCol)
+                                .WithSqlParam("@filterVal", activeCode.FilterVal)
+                                .ExecuteStoredProc<ActiveOrEMSCodesVM>();
+
+                objList.ForEach(x =>
+                {
+                    x.BloodThinnersTitle = new List<object>();
+                    x.BloodThinnersTitle.AddRange(_controlListDetailsRepo.Table.Where(b => x.BloodThinners.ToIntList().Contains(b.ControlListDetailId)).Select(b => new { Id = b.ControlListDetailId, b.Title }).ToList());
+                });
+
+                int totalRecords = 0;
+                if (objList.Count > 0)
+                {
+                    totalRecords = objList.Select(x => x.Total_Records).FirstOrDefault();
+                }
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = new { totalRecords, objList, fields = gridColumns.Body } };
+
             }
-            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = new { totalRecords, objList, fields = gridColumns.Body } };
-
-            //var SepsisData = new List<CodeSepsi>();
-            //if (ApplicationSettings.isSuperAdmin)
-            //{
-            //    SepsisData = this._codeSepsisRepo.Table.Where(x => x.OrganizationIdFk == activeCode.OrganizationIdFk && !x.IsDeleted).OrderByDescending(x => x.CodeSepsisId).ToList();
-            //}
-            //else if (activeCode.showAllActiveCodes)
-            //{
-            //    SepsisData = this._codeSepsisRepo.Table.Where(x => x.OrganizationIdFk == activeCode.OrganizationIdFk && !x.IsDeleted).OrderByDescending(x => x.CodeSepsisId).ToList();
-            //}
-            //else
-            //{
-            //    SepsisData = (from cs in this._codeSepsisRepo.Table
-            //                  join agm in this._activeCodesGroupMembersRepo.Table on cs.CodeSepsisId equals agm.ActiveCodeIdFk
-            //                  where agm.UserIdFk == ApplicationSettings.UserId && agm.ActiveCodeName == UCLEnums.Sepsis.ToString() && !cs.IsDeleted
-            //                  select cs).OrderByDescending(x => x.CodeSepsisId).AsQueryable().ToList();
-
-            //    //SepsisData = this._codeSepsisRepo.Table.Where(x => x.CreatedBy == ApplicationSettings.UserId && !x.IsDeleted).OrderByDescending(x => x.CodeSepsisId).ToList();
-            //}
-            //var SepsisDataVM = AutoMapperHelper.MapList<CodeSepsi, CodeSepsisVM>(SepsisData);
-
-            ////var orgData = GetHosplitalAddressObject(activeCode.OrganizationIdFk);
-
-            //SepsisDataVM.ForEach(x =>
-            //{
-            //    x.AttachmentsPath = new List<string>();
-            //    x.AudiosPath = new List<string>();
-            //    x.VideosPath = new List<string>();
-            //    x.BloodThinnersTitle = new List<object>();
-            //    x.ServiceLines = new List<ServiceLineVM>();
-            //    //x.OrganizationData == new object();
-
-            //    //if (!string.IsNullOrEmpty(x.Attachments) && !string.IsNullOrWhiteSpace(x.Attachments))
-            //    //{
-            //    //    string path = this._RootPath + x.Attachments;
-            //    //    if (Directory.Exists(path))
-            //    //    {
-            //    //        DirectoryInfo AttachFiles = new DirectoryInfo(path);
-            //    //        foreach (var item in AttachFiles.GetFiles())
-            //    //        {
-            //    //            x.AttachmentsPath.Add(x.Attachments + "/" + item.Name);
-            //    //        }
-            //    //    }
-            //    //}
-
-            //    //if (!string.IsNullOrEmpty(x.Audio) && !string.IsNullOrWhiteSpace(x.Audio))
-            //    //{
-            //    //    string path = this._RootPath + x.Audio;
-            //    //    if (Directory.Exists(path))
-            //    //    {
-            //    //        DirectoryInfo AudioFiles = new DirectoryInfo(path);
-            //    //        foreach (var item in AudioFiles.GetFiles())
-            //    //        {
-            //    //            x.AudiosPath.Add(x.Audio + "/" + item.Name);
-            //    //        }
-            //    //    }
-            //    //}
-
-            //    //if (!string.IsNullOrEmpty(x.Video) && !string.IsNullOrWhiteSpace(x.Video))
-            //    //{
-            //    //    var path = this._RootPath + x.Video;
-            //    //    if (Directory.Exists(path))
-            //    //    {
-            //    //        DirectoryInfo VideoFiles = new DirectoryInfo(path);
-            //    //        foreach (var item in VideoFiles.GetFiles())
-            //    //        {
-            //    //            x.VideosPath.Add(x.Video + "/" + item.Name);
-            //    //        }
-            //    //    }
-            //    //}
-            //    //var serviceIds = this._activeCodeRepo.Table.Where(s => s.OrganizationIdFk == x.OrganizationIdFk && s.CodeIdFk == UCLEnums.Sepsis.ToInt() && !s.IsDeleted).Select(s => new { s.ServiceLineIds, s.DefaultServiceLineId }).FirstOrDefault();
-            //    //var serviceLineIds = (from s in this._codesServiceLinesMappingRepo.Table
-            //    //                      where s.OrganizationIdFk == x.OrganizationIdFk && s.CodeIdFk == UCLEnums.Sepsis.ToInt()
-            //    //                      && s.ActiveCodeId == x.CodeSepsisId && s.ActiveCodeName == UCLEnums.Sepsis.ToString() && s.ServiceLineIdFk != serviceIds.DefaultServiceLineId
-            //    //                      select s.ServiceLineIdFk).ToList();
-            //    //x.ServiceLines = this._serviceLineRepo.Table.Where(s => serviceIds.ServiceLineIds.ToIntList().Distinct().Contains(s.ServiceLineId) && s.ServiceLineId != serviceIds.DefaultServiceLineId && !s.IsDeleted).Select(s => new ServiceLineVM() { ServiceLineId = s.ServiceLineId, ServiceName = s.ServiceName, IsSelected = serviceLineIds.Contains(s.ServiceLineId) }).ToList();
-            //    //x.DefaultServiceLineId = serviceIds.DefaultServiceLineId;
-            //    //x.DefaultServiceLine = this._serviceLineRepo.Table.Where(s => s.ServiceLineId == serviceIds.DefaultServiceLineId && !s.IsDeleted).Select(s => new ServiceLineVM() { ServiceLineId = s.ServiceLineId, ServiceName = s.ServiceName }).FirstOrDefault();
-            //    //x.SelectedServiceLineIds = string.Join(",", serviceLineIds);
-            //    x.LastKnownWellStr = x.LastKnownWell.ToString("yyyy-MM-dd hh:mm:ss tt");
-            //    x.DobStr = x.Dob.ToString("yyyy-MM-dd hh:mm:ss tt");
-            //    //x.OrganizationData = orgData;
-            //    x.GenderTitle = _controlListDetailsRepo.Table.Where(g => g.ControlListDetailId == x.Gender).Select(g => g.Title).FirstOrDefault();
-            //    x.BloodThinnersTitle.AddRange(_controlListDetailsRepo.Table.Where(b => x.BloodThinners.ToIntList().Contains(b.ControlListDetailId)).Select(b => new { Id = b.ControlListDetailId, b.Title }).ToList());
-            //});
-            //return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = SepsisDataVM };
+            return new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "Fields Name Not Found" };
         }
 
         public BaseResponse GetSepsisDataById(int SepsisId)
@@ -3278,119 +3207,41 @@ namespace Web.Services.Concrete
 
         public BaseResponse GetAllSTEMICode(ActiveCodeVM activeCode)
         {
-            var objList = this._dbContext.LoadStoredProcedure("md_getAllActiveCodesOrEMS_Dynamic")
-                                        .WithSqlParam("@status", activeCode.Status)
-                                        .WithSqlParam("@codeName", UCLEnums.STEMI.ToString())
-                                        .WithSqlParam("@IsSuperAdmin", ApplicationSettings.isSuperAdmin)
-                                        .WithSqlParam("@showAll", activeCode.showAllActiveCodes)
-                                        .WithSqlParam("@userId", ApplicationSettings.UserId)
-                                        .WithSqlParam("@organizationId", activeCode.OrganizationIdFk)
-                                        .WithSqlParam("@page", activeCode.PageNumber)
-                                        .WithSqlParam("@size", activeCode.Rows)
-                                        .WithSqlParam("@sortOrder", activeCode.SortOrder)
-                                        .WithSqlParam("@sortCol", activeCode.SortCol)
-                                        .WithSqlParam("@filterVal", activeCode.FilterVal)
-                                       .ExecuteStoredProc<ActiveOrEMSCodesVM>();
-
-            objList.ForEach(x =>
-            {
-                x.BloodThinnersTitle = new List<object>();
-                x.BloodThinnersTitle.AddRange(_controlListDetailsRepo.Table.Where(b => x.BloodThinners.ToIntList().Contains(b.ControlListDetailId)).Select(b => new { Id = b.ControlListDetailId, b.Title }).ToList());
-            });
             var gridColumns = GetInhouseCodeTableFeilds(activeCode.OrganizationIdFk, UCLEnums.STEMI.ToString());
-            int totalRecords = 0;
-            if (objList.Count > 0)
+            dynamic Fields = gridColumns.Body;
+            if (Fields != null && Fields.FieldName != null)
             {
-                totalRecords = objList.Select(x => x.Total_Records).FirstOrDefault();
+                string FieldNames = Convert.ToString(Fields.FieldName);
+                var objList = this._dbContext.LoadStoredProcedure("md_getAllActiveCodesOrEMS_Dynamic")
+                                .WithSqlParam("@status", activeCode.Status)
+                                .WithSqlParam("@colName", FieldNames)
+                                .WithSqlParam("@codeName", UCLEnums.STEMI.ToString())
+                                .WithSqlParam("@IsSuperAdmin", ApplicationSettings.isSuperAdmin)
+                                .WithSqlParam("@showAll", activeCode.showAllActiveCodes)
+                                .WithSqlParam("@userId", ApplicationSettings.UserId)
+                                .WithSqlParam("@organizationId", activeCode.OrganizationIdFk)
+                                .WithSqlParam("@page", activeCode.PageNumber)
+                                .WithSqlParam("@size", activeCode.Rows)
+                                .WithSqlParam("@sortOrder", activeCode.SortOrder)
+                                .WithSqlParam("@sortCol", activeCode.SortCol)
+                                .WithSqlParam("@filterVal", activeCode.FilterVal)
+                                .ExecuteStoredProc<ActiveOrEMSCodesVM>();
+
+                objList.ForEach(x =>
+                {
+                    x.BloodThinnersTitle = new List<object>();
+                    x.BloodThinnersTitle.AddRange(_controlListDetailsRepo.Table.Where(b => x.BloodThinners.ToIntList().Contains(b.ControlListDetailId)).Select(b => new { Id = b.ControlListDetailId, b.Title }).ToList());
+                });
+
+                int totalRecords = 0;
+                if (objList.Count > 0)
+                {
+                    totalRecords = objList.Select(x => x.Total_Records).FirstOrDefault();
+                }
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = new { totalRecords, objList, fields = gridColumns.Body } };
+
             }
-            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = new { totalRecords, objList, fields = gridColumns.Body } };
-
-            //var STEMIData = new List<CodeStemi>();
-            //if (ApplicationSettings.isSuperAdmin)
-            //{
-            //    STEMIData = this._codeSTEMIRepo.Table.Where(x => x.OrganizationIdFk == activeCode.OrganizationIdFk && !x.IsDeleted).OrderByDescending(x => x.CodeStemiid).ToList();
-            //}
-            //else if (activeCode.showAllActiveCodes)
-            //{
-            //    STEMIData = this._codeSTEMIRepo.Table.Where(x => x.OrganizationIdFk == activeCode.OrganizationIdFk && !x.IsDeleted).OrderByDescending(x => x.CodeStemiid).ToList();
-            //}
-            //else
-            //{
-            //    STEMIData = (from cs in this._codeSTEMIRepo.Table
-            //                 join agm in this._activeCodesGroupMembersRepo.Table on cs.CodeStemiid equals agm.ActiveCodeIdFk
-            //                 where agm.UserIdFk == ApplicationSettings.UserId && agm.ActiveCodeName == UCLEnums.STEMI.ToString() && !cs.IsDeleted
-            //                 select cs).OrderByDescending(x => x.CodeStemiid).AsQueryable().ToList();
-
-
-            //    //STEMIData = this._codeSTEMIRepo.Table.Where(x => x.CreatedBy == ApplicationSettings.UserId && !x.IsDeleted).OrderByDescending(x => x.CodeStemiid).ToList();
-            //}
-            //var STEMIDataVM = AutoMapperHelper.MapList<CodeStemi, CodeSTEMIVM>(STEMIData);
-
-            ////var orgData = GetHosplitalAddressObject(activeCode.OrganizationIdFk);
-
-            //STEMIDataVM.ForEach(x =>
-            //{
-            //    x.AttachmentsPath = new List<string>();
-            //    x.AudiosPath = new List<string>();
-            //    x.VideosPath = new List<string>();
-            //    x.BloodThinnersTitle = new List<object>();
-            //    x.ServiceLines = new List<ServiceLineVM>();
-
-            //    //if (!string.IsNullOrEmpty(x.Attachments) && !string.IsNullOrWhiteSpace(x.Attachments))
-            //    //{
-            //    //    string path = this._RootPath + x.Attachments;
-            //    //    if (Directory.Exists(path))
-            //    //    {
-            //    //        DirectoryInfo AttachFiles = new DirectoryInfo(path);
-            //    //        foreach (var item in AttachFiles.GetFiles())
-            //    //        {
-            //    //            x.AttachmentsPath.Add(x.Attachments + "/" + item.Name);
-            //    //        }
-            //    //    }
-            //    //}
-
-            //    //if (!string.IsNullOrEmpty(x.Audio) && !string.IsNullOrWhiteSpace(x.Audio))
-            //    //{
-            //    //    string path = this._RootPath + x.Audio;
-            //    //    if (Directory.Exists(path))
-            //    //    {
-            //    //        DirectoryInfo AudioFiles = new DirectoryInfo(path);
-            //    //        foreach (var item in AudioFiles.GetFiles())
-            //    //        {
-            //    //            x.AudiosPath.Add(x.Audio + "/" + item.Name);
-            //    //        }
-            //    //    }
-            //    //}
-
-            //    //if (!string.IsNullOrEmpty(x.Video) && !string.IsNullOrWhiteSpace(x.Video))
-            //    //{
-            //    //    var path = this._RootPath + x.Video;
-            //    //    if (Directory.Exists(path))
-            //    //    {
-            //    //        DirectoryInfo VideoFiles = new DirectoryInfo(path);
-            //    //        foreach (var item in VideoFiles.GetFiles())
-            //    //        {
-            //    //            x.VideosPath.Add(x.Video + "/" + item.Name);
-            //    //        }
-            //    //    }
-            //    //}
-
-            //    //var serviceIds = this._activeCodeRepo.Table.Where(s => s.OrganizationIdFk == x.OrganizationIdFk && s.CodeIdFk == UCLEnums.STEMI.ToInt() && !s.IsDeleted).Select(s => new { s.ServiceLineIds, s.DefaultServiceLineId }).FirstOrDefault();
-            //    //var serviceLineIds = (from s in this._codesServiceLinesMappingRepo.Table
-            //    //                      where s.OrganizationIdFk == x.OrganizationIdFk && s.CodeIdFk == UCLEnums.STEMI.ToInt()
-            //    //                      && s.ActiveCodeId == x.CodeStemiid && s.ActiveCodeName == UCLEnums.STEMI.ToString() && s.ServiceLineIdFk != serviceIds.DefaultServiceLineId
-            //    //                      select s.ServiceLineIdFk).ToList();
-            //    //x.ServiceLines = this._serviceLineRepo.Table.Where(s => serviceIds.ServiceLineIds.ToIntList().Distinct().Contains(s.ServiceLineId) && s.ServiceLineId != serviceIds.DefaultServiceLineId && !s.IsDeleted).Select(s => new ServiceLineVM() { ServiceLineId = s.ServiceLineId, ServiceName = s.ServiceName, IsSelected = serviceLineIds.Contains(s.ServiceLineId) }).ToList();
-            //    //x.DefaultServiceLineId = serviceIds.DefaultServiceLineId;
-            //    //x.DefaultServiceLine = this._serviceLineRepo.Table.Where(s => s.ServiceLineId == serviceIds.DefaultServiceLineId && !s.IsDeleted).Select(s => new ServiceLineVM() { ServiceLineId = s.ServiceLineId, ServiceName = s.ServiceName }).FirstOrDefault();
-            //    //x.SelectedServiceLineIds = string.Join(",", serviceLineIds);
-            //    x.LastKnownWellStr = x.LastKnownWell?.ToString("yyyy-MM-dd hh:mm:ss tt");
-            //    x.DobStr = x.Dob?.ToString("yyyy-MM-dd hh:mm:ss tt");
-            //    //x.OrganizationData = orgData;
-            //    x.GenderTitle = _controlListDetailsRepo.Table.Where(g => g.ControlListDetailId == x.Gender).Select(g => g.Title).FirstOrDefault();
-            //    x.BloodThinnersTitle.AddRange(_controlListDetailsRepo.Table.Where(b => x.BloodThinners.ToIntList().Contains(b.ControlListDetailId)).Select(b => new { Id = b.ControlListDetailId, b.Title }).ToList());
-            //});
-            //return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = STEMIDataVM };
+            return new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "Fields Name Not Found" };
         }
 
         public BaseResponse GetSTEMIDataById(int STEMIId)
@@ -4656,118 +4507,41 @@ namespace Web.Services.Concrete
 
         public BaseResponse GetAllTrumaCode(ActiveCodeVM activeCode)
         {
-            var objList = this._dbContext.LoadStoredProcedure("md_getAllActiveCodesOrEMS_Dynamic")
-                            .WithSqlParam("@status", activeCode.Status)
-                            .WithSqlParam("@codeName", UCLEnums.Trauma.ToString())
-                            .WithSqlParam("@IsSuperAdmin", ApplicationSettings.isSuperAdmin)
-                            .WithSqlParam("@showAll", activeCode.showAllActiveCodes)
-                            .WithSqlParam("@userId", ApplicationSettings.UserId)
-                            .WithSqlParam("@organizationId", activeCode.OrganizationIdFk)
-                            .WithSqlParam("@page", activeCode.PageNumber)
-                            .WithSqlParam("@size", activeCode.Rows)
-                            .WithSqlParam("@sortOrder", activeCode.SortOrder)
-                            .WithSqlParam("@sortCol", activeCode.SortCol)
-                            .WithSqlParam("@filterVal", activeCode.FilterVal)
-                           .ExecuteStoredProc<ActiveOrEMSCodesVM>();
-
-            objList.ForEach(x =>
-            {
-                x.BloodThinnersTitle = new List<object>();
-                x.BloodThinnersTitle.AddRange(_controlListDetailsRepo.Table.Where(b => x.BloodThinners.ToIntList().Contains(b.ControlListDetailId)).Select(b => new { Id = b.ControlListDetailId, b.Title }).ToList());
-            });
             var gridColumns = GetInhouseCodeTableFeilds(activeCode.OrganizationIdFk, UCLEnums.Trauma.ToString());
-            int totalRecords = 0;
-            if (objList.Count > 0)
+            dynamic Fields = gridColumns.Body;
+            if (Fields != null && Fields.FieldName != null)
             {
-                totalRecords = objList.Select(x => x.Total_Records).FirstOrDefault();
+                string FieldNames = Convert.ToString(Fields.FieldName);
+                var objList = this._dbContext.LoadStoredProcedure("md_getAllActiveCodesOrEMS_Dynamic")
+                                .WithSqlParam("@status", activeCode.Status)
+                                .WithSqlParam("@colName", FieldNames)
+                                .WithSqlParam("@codeName", UCLEnums.Trauma.ToString())
+                                .WithSqlParam("@IsSuperAdmin", ApplicationSettings.isSuperAdmin)
+                                .WithSqlParam("@showAll", activeCode.showAllActiveCodes)
+                                .WithSqlParam("@userId", ApplicationSettings.UserId)
+                                .WithSqlParam("@organizationId", activeCode.OrganizationIdFk)
+                                .WithSqlParam("@page", activeCode.PageNumber)
+                                .WithSqlParam("@size", activeCode.Rows)
+                                .WithSqlParam("@sortOrder", activeCode.SortOrder)
+                                .WithSqlParam("@sortCol", activeCode.SortCol)
+                                .WithSqlParam("@filterVal", activeCode.FilterVal)
+                                .ExecuteStoredProc<ActiveOrEMSCodesVM>();
+
+                objList.ForEach(x =>
+                {
+                    x.BloodThinnersTitle = new List<object>();
+                    x.BloodThinnersTitle.AddRange(_controlListDetailsRepo.Table.Where(b => x.BloodThinners.ToIntList().Contains(b.ControlListDetailId)).Select(b => new { Id = b.ControlListDetailId, b.Title }).ToList());
+                });
+
+                int totalRecords = 0;
+                if (objList.Count > 0)
+                {
+                    totalRecords = objList.Select(x => x.Total_Records).FirstOrDefault();
+                }
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = new { totalRecords, objList, fields = gridColumns.Body } };
+
             }
-            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = new { totalRecords, objList, fields = gridColumns.Body } };
-
-            //var TrumaData = new List<CodeTrauma>();
-            //if (ApplicationSettings.isSuperAdmin)
-            //{
-            //    TrumaData = this._codeTrumaRepo.Table.Where(x => x.OrganizationIdFk == activeCode.OrganizationIdFk && !x.IsDeleted).OrderByDescending(x => x.CodeTraumaId).ToList();
-            //}
-            //else if (activeCode.showAllActiveCodes)
-            //{
-            //    TrumaData = this._codeTrumaRepo.Table.Where(x => x.OrganizationIdFk == activeCode.OrganizationIdFk && !x.IsDeleted).OrderByDescending(x => x.CodeTraumaId).ToList();
-            //}
-            //else
-            //{
-            //    TrumaData = (from cs in this._codeTrumaRepo.Table
-            //                 join agm in this._activeCodesGroupMembersRepo.Table on cs.CodeTraumaId equals agm.ActiveCodeIdFk
-            //                 where agm.UserIdFk == ApplicationSettings.UserId && agm.ActiveCodeName == UCLEnums.Trauma.ToString() && !cs.IsDeleted
-            //                 select cs).OrderByDescending(x => x.CodeTraumaId).AsQueryable().ToList();
-
-            //    //TrumaData = this._codeTrumaRepo.Table.Where(x => x.CreatedBy == ApplicationSettings.UserId && !x.IsDeleted).OrderByDescending(x => x.CodeTraumaId).ToList();
-            //}
-
-            //var TrumaDataVM = AutoMapperHelper.MapList<CodeTrauma, CodeTrumaVM>(TrumaData);
-
-            ////var orgData = GetHosplitalAddressObject(activeCode.OrganizationIdFk);
-
-            //TrumaDataVM.ForEach(x =>
-            //{
-            //    x.AttachmentsPath = new List<string>();
-            //    x.AudiosPath = new List<string>();
-            //    x.VideosPath = new List<string>();
-            //    x.BloodThinnersTitle = new List<object>();
-            //    //if (!string.IsNullOrEmpty(x.Attachments) && !string.IsNullOrWhiteSpace(x.Attachments))
-            //    //{
-            //    //    string path = this._RootPath + x.Attachments;
-            //    //    if (Directory.Exists(path))
-            //    //    {
-            //    //        DirectoryInfo AttachFiles = new DirectoryInfo(path);
-            //    //        foreach (var item in AttachFiles.GetFiles())
-            //    //        {
-            //    //            x.AttachmentsPath.Add(x.Attachments + "/" + item.Name);
-            //    //        }
-            //    //    }
-            //    //}
-
-            //    //if (!string.IsNullOrEmpty(x.Audio) && !string.IsNullOrWhiteSpace(x.Audio))
-            //    //{
-            //    //    string path = this._RootPath + x.Audio;
-            //    //    if (Directory.Exists(path))
-            //    //    {
-            //    //        DirectoryInfo AudioFiles = new DirectoryInfo(path);
-            //    //        foreach (var item in AudioFiles.GetFiles())
-            //    //        {
-            //    //            x.AudiosPath.Add(x.Audio + "/" + item.Name);
-            //    //        }
-            //    //    }
-            //    //}
-
-            //    //if (!string.IsNullOrEmpty(x.Video) && !string.IsNullOrWhiteSpace(x.Video))
-            //    //{
-            //    //    var path = this._RootPath + x.Video;
-            //    //    if (Directory.Exists(path))
-            //    //    {
-            //    //        DirectoryInfo VideoFiles = new DirectoryInfo(path);
-            //    //        foreach (var item in VideoFiles.GetFiles())
-            //    //        {
-            //    //            x.VideosPath.Add(x.Video + "/" + item.Name);
-            //    //        }
-            //    //    }
-            //    //}
-
-            //    //var serviceIds = this._activeCodeRepo.Table.Where(s => s.OrganizationIdFk == x.OrganizationIdFk && s.CodeIdFk == UCLEnums.Trauma.ToInt() && !s.IsDeleted).Select(s => new { s.ServiceLineIds, s.DefaultServiceLineId }).FirstOrDefault();
-            //    //var serviceLineIds = (from s in this._codesServiceLinesMappingRepo.Table
-            //    //                      where s.OrganizationIdFk == x.OrganizationIdFk && s.CodeIdFk == UCLEnums.Trauma.ToInt()
-            //    //                      && s.ActiveCodeId == x.CodeTraumaId && s.ActiveCodeName == UCLEnums.Trauma.ToString() && s.ServiceLineIdFk != serviceIds.DefaultServiceLineId
-            //    //                      select s.ServiceLineIdFk).ToList();
-            //    //x.ServiceLines = this._serviceLineRepo.Table.Where(s => serviceIds.ServiceLineIds.ToIntList().Distinct().Contains(s.ServiceLineId) && s.ServiceLineId != serviceIds.DefaultServiceLineId && !s.IsDeleted).Select(s => new ServiceLineVM() { ServiceLineId = s.ServiceLineId, ServiceName = s.ServiceName, IsSelected = serviceLineIds.Contains(s.ServiceLineId) }).ToList();
-            //    //x.DefaultServiceLineId = serviceIds.DefaultServiceLineId;
-            //    //x.DefaultServiceLine = this._serviceLineRepo.Table.Where(s => s.ServiceLineId == serviceIds.DefaultServiceLineId && !s.IsDeleted).Select(s => new ServiceLineVM() { ServiceLineId = s.ServiceLineId, ServiceName = s.ServiceName }).FirstOrDefault();
-            //    //x.SelectedServiceLineIds = string.Join(",", serviceLineIds);
-
-            //    x.LastKnownWellStr = x.LastKnownWell?.ToString("yyyy-MM-dd hh:mm:ss tt");
-            //    x.DobStr = x.Dob?.ToString("yyyy-MM-dd hh:mm:ss tt");
-            //    //x.OrganizationData = orgData;
-            //    x.GenderTitle = _controlListDetailsRepo.Table.Where(g => g.ControlListDetailId == x.Gender).Select(g => g.Title).FirstOrDefault();
-            //    x.BloodThinnersTitle.AddRange(_controlListDetailsRepo.Table.Where(b => x.BloodThinners.ToIntList().Contains(b.ControlListDetailId)).Select(b => new { Id = b.ControlListDetailId, b.Title }).ToList());
-            //});
-            //return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = TrumaDataVM };
+            return new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "Fields Name Not Found" };
         }
 
         public BaseResponse GetTrumaDataById(int TrumaId)
@@ -6111,115 +5885,41 @@ namespace Web.Services.Concrete
 
         public BaseResponse GetAllBlueCode(ActiveCodeVM activeCode)
         {
-            var objList = this._dbContext.LoadStoredProcedure("md_getAllActiveCodesOrEMS_Dynamic")
-                            .WithSqlParam("@status", activeCode.Status)
-                            .WithSqlParam("@codeName", UCLEnums.Blue.ToString())
-                            .WithSqlParam("@IsSuperAdmin", ApplicationSettings.isSuperAdmin)
-                            .WithSqlParam("@showAll", activeCode.showAllActiveCodes)
-                            .WithSqlParam("@userId", ApplicationSettings.UserId)
-                            .WithSqlParam("@organizationId", activeCode.OrganizationIdFk)
-                            .WithSqlParam("@page", activeCode.PageNumber)
-                            .WithSqlParam("@size", activeCode.Rows)
-                            .WithSqlParam("@sortOrder", activeCode.SortOrder)
-                            .WithSqlParam("@sortCol", activeCode.SortCol)
-                            .WithSqlParam("@filterVal", activeCode.FilterVal)
-                           .ExecuteStoredProc<ActiveOrEMSCodesVM>();
-
-            objList.ForEach(x =>
-            {
-                x.BloodThinnersTitle = new List<object>();
-                x.BloodThinnersTitle.AddRange(_controlListDetailsRepo.Table.Where(b => x.BloodThinners.ToIntList().Contains(b.ControlListDetailId)).Select(b => new { Id = b.ControlListDetailId, b.Title }).ToList());
-            });
             var gridColumns = GetInhouseCodeTableFeilds(activeCode.OrganizationIdFk, UCLEnums.Blue.ToString());
-            int totalRecords = 0;
-            if (objList.Count > 0)
+            dynamic Fields = gridColumns.Body;
+            if (Fields != null && Fields.FieldName != null)
             {
-                totalRecords = objList.Select(x => x.Total_Records).FirstOrDefault();
+                string FieldNames = Convert.ToString(Fields.FieldName);
+                var objList = this._dbContext.LoadStoredProcedure("md_getAllActiveCodesOrEMS_Dynamic")
+                                .WithSqlParam("@status", activeCode.Status)
+                                .WithSqlParam("@colName", FieldNames)
+                                .WithSqlParam("@codeName", UCLEnums.Blue.ToString())
+                                .WithSqlParam("@IsSuperAdmin", ApplicationSettings.isSuperAdmin)
+                                .WithSqlParam("@showAll", activeCode.showAllActiveCodes)
+                                .WithSqlParam("@userId", ApplicationSettings.UserId)
+                                .WithSqlParam("@organizationId", activeCode.OrganizationIdFk)
+                                .WithSqlParam("@page", activeCode.PageNumber)
+                                .WithSqlParam("@size", activeCode.Rows)
+                                .WithSqlParam("@sortOrder", activeCode.SortOrder)
+                                .WithSqlParam("@sortCol", activeCode.SortCol)
+                                .WithSqlParam("@filterVal", activeCode.FilterVal)
+                                .ExecuteStoredProc<ActiveOrEMSCodesVM>();
+
+                objList.ForEach(x =>
+                {
+                    x.BloodThinnersTitle = new List<object>();
+                    x.BloodThinnersTitle.AddRange(_controlListDetailsRepo.Table.Where(b => x.BloodThinners.ToIntList().Contains(b.ControlListDetailId)).Select(b => new { Id = b.ControlListDetailId, b.Title }).ToList());
+                });
+
+                int totalRecords = 0;
+                if (objList.Count > 0)
+                {
+                    totalRecords = objList.Select(x => x.Total_Records).FirstOrDefault();
+                }
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = new { totalRecords, objList, fields = gridColumns.Body } };
+
             }
-            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = new { totalRecords, objList, fields = gridColumns.Body } };
-            //var blueData = new List<CodeBlue>();
-            //if (ApplicationSettings.isSuperAdmin)
-            //{
-            //    blueData = this._codeBlueRepo.Table.Where(x => x.OrganizationIdFk == activeCode.OrganizationIdFk && !x.IsDeleted).OrderByDescending(x => x.CodeBlueId).ToList();
-            //}
-            //if (activeCode.showAllActiveCodes)
-            //{
-            //    blueData = this._codeBlueRepo.Table.Where(x => x.OrganizationIdFk == activeCode.OrganizationIdFk && !x.IsDeleted).OrderByDescending(x => x.CodeBlueId).ToList();
-            //}
-            //else
-            //{
-            //    blueData = (from cs in this._codeBlueRepo.Table
-            //                join agm in this._activeCodesGroupMembersRepo.Table on cs.CodeBlueId equals agm.ActiveCodeIdFk
-            //                where agm.UserIdFk == ApplicationSettings.UserId && agm.ActiveCodeName == UCLEnums.Blue.ToString() && !cs.IsDeleted
-            //                select cs).OrderByDescending(x => x.BloodThinners).AsQueryable().ToList();
-
-            //    //blueData = this._codeBlueRepo.Table.Where(x => x.CreatedBy == ApplicationSettings.UserId && !x.IsDeleted).OrderByDescending(x => x.CodeBlueId).ToList();
-            //}
-            //var blueDataVM = AutoMapperHelper.MapList<CodeBlue, CodeBlueVM>(blueData);
-            ////var orgData = GetHosplitalAddressObject(activeCode.OrganizationIdFk);
-
-            //blueDataVM.ForEach(x =>
-            //{
-            //    x.AttachmentsPath = new List<string>();
-            //    x.AudiosPath = new List<string>();
-            //    x.VideosPath = new List<string>();
-            //    x.OrganizationData = new object();
-            //    x.BloodThinnersTitle = new List<object>();
-            //    x.ServiceLines = new List<ServiceLineVM>();
-            //    //if (!string.IsNullOrEmpty(x.Attachments) && !string.IsNullOrWhiteSpace(x.Attachments))
-            //    //{
-            //    //    string path = this._RootPath + x.Attachments; //this._RootPath  + x.Attachments;
-            //    //    if (Directory.Exists(path))
-            //    //    {
-            //    //        DirectoryInfo AttachFiles = new DirectoryInfo(path);
-            //    //        foreach (var item in AttachFiles.GetFiles())
-            //    //        {
-            //    //            x.AttachmentsPath.Add(x.Attachments + "/" + item.Name);
-            //    //        }
-            //    //    }
-            //    //}
-
-            //    //if (!string.IsNullOrEmpty(x.Audio) && !string.IsNullOrWhiteSpace(x.Audio))
-            //    //{
-            //    //    string path = this._RootPath + x.Audio; //this._RootPath  + x.Audio;
-            //    //    if (Directory.Exists(path))
-            //    //    {
-            //    //        DirectoryInfo AudioFiles = new DirectoryInfo(path);
-            //    //        foreach (var item in AudioFiles.GetFiles())
-            //    //        {
-            //    //            x.AudiosPath.Add(x.Audio + "/" + item.Name);
-            //    //        }
-            //    //    }
-            //    //}
-
-            //    //if (!string.IsNullOrEmpty(x.Video) && !string.IsNullOrWhiteSpace(x.Video))
-            //    //{
-            //    //    var path = this._RootPath + x.Video; //this._RootPath  + x.Video;
-            //    //    if (Directory.Exists(path))
-            //    //    {
-            //    //        DirectoryInfo VideoFiles = new DirectoryInfo(path);
-            //    //        foreach (var item in VideoFiles.GetFiles())
-            //    //        {
-            //    //            x.VideosPath.Add(x.Video + "/" + item.Name);
-            //    //        }
-            //    //    }
-            //    //}
-            //    //var serviceIds = this._activeCodeRepo.Table.Where(s => s.OrganizationIdFk == x.OrganizationIdFk && s.CodeIdFk == UCLEnums.Blue.ToInt() && !s.IsDeleted).Select(s => new { s.ServiceLineIds, s.DefaultServiceLineId }).FirstOrDefault();
-            //    //var serviceLineIds = (from s in this._codesServiceLinesMappingRepo.Table
-            //    //                      where s.OrganizationIdFk == x.OrganizationIdFk && s.CodeIdFk == UCLEnums.Blue.ToInt()
-            //    //                      && s.ActiveCodeId == x.CodeBlueId && s.ActiveCodeName == UCLEnums.Blue.ToString() && s.ServiceLineIdFk != serviceIds.DefaultServiceLineId
-            //    //                      select s.ServiceLineIdFk).ToList();
-            //    //x.ServiceLines = this._serviceLineRepo.Table.Where(s => serviceIds.ServiceLineIds.ToIntList().Distinct().Contains(s.ServiceLineId) && s.ServiceLineId != serviceIds.DefaultServiceLineId && !s.IsDeleted).Select(s => new ServiceLineVM() { ServiceLineId = s.ServiceLineId, ServiceName = s.ServiceName, IsSelected = serviceLineIds.Contains(s.ServiceLineId) }).ToList();
-            //    //x.DefaultServiceLineId = serviceIds.DefaultServiceLineId;
-            //    //x.DefaultServiceLine = this._serviceLineRepo.Table.Where(s => s.ServiceLineId == serviceIds.DefaultServiceLineId && !s.IsDeleted).Select(s => new ServiceLineVM() { ServiceLineId = s.ServiceLineId, ServiceName = s.ServiceName }).FirstOrDefault();
-            //    //x.SelectedServiceLineIds = string.Join(",", serviceLineIds);
-            //    x.LastKnownWellStr = x.LastKnownWell?.ToString("yyyy-MM-dd hh:mm:ss tt");
-            //    x.DobStr = x.Dob?.ToString("yyyy-MM-dd hh:mm:ss tt");
-            //    //x.OrganizationData = orgData;
-            //    x.GenderTitle = _controlListDetailsRepo.Table.Where(g => g.ControlListDetailId == x.Gender).Select(g => g.Title).FirstOrDefault();
-            //    x.BloodThinnersTitle.AddRange(_controlListDetailsRepo.Table.Where(b => x.BloodThinners.ToIntList().Contains(b.ControlListDetailId)).Select(b => new { Id = b.ControlListDetailId, b.Title }).ToList());
-            //});
-            //return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = blueDataVM };
+            return new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "Fields Name Not Found" };
         }
 
         public BaseResponse GetBlueDataById(int blueId)
