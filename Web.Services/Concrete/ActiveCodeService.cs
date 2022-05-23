@@ -314,10 +314,10 @@ namespace Web.Services.Concrete
             //    item.DefaultServiceLine = this._serviceLineRepo.Table.Where(s => s.ServiceLineId == serviceIds.DefaultServiceLineId && !s.IsDeleted).Select(s => new ServiceLineVM() { ServiceLineId = s.ServiceLineId, ServiceName = s.ServiceName }).FirstOrDefault();
             //    item.SelectedServiceLineIds = string.Join(",", serviceLineIds);
 
-            //    item.LastKnownWellStr = item.LastKnownWell?.ToString("yyyy-MM-dd hh:mm:ss tt");
+            //    item.LastKnownWellStr = item.LastKnownWell?.ToTimezoneFromUtc("Eastern Standard Time").ToString("yyyy-MM-dd hh:mm:ss tt");
             //    //new
             //    item.CreatedDateStr = item.CreatedDate.ToString("yyyy-MM-dd hh:mm:ss tt");
-            //    item.DobStr = item.Dob?.ToString("yyyy-MM-dd hh:mm:ss tt");
+            //    item.DobStr = item.Dob?.ToTimezoneFromUtc("Eastern Standard Time").ToString("yyyy-MM-dd hh:mm:ss tt");
             //    //item.OrganizationData = orgData;
             //    item.GenderTitle = _controlListDetailsRepo.Table.Where(g => g.ControlListDetailId == item.Gender).Select(g => g.Title).FirstOrDefault();
             //    item.BloodThinnersTitle.AddRange(_controlListDetailsRepo.Table.Where(b => item.BloodThinners.ToIntList().Contains(b.ControlListDetailId)).Select(b => new { Id = b.ControlListDetailId, b.Title }).ToList());
@@ -653,8 +653,8 @@ namespace Web.Services.Concrete
                 if (StrokeDataVM.IsEms.HasValue && StrokeDataVM.IsEms.Value)
                     StrokeDataVM.OrganizationData = GetHosplitalAddressObject(StrokeDataVM.OrganizationIdFk);
 
-                StrokeDataVM.LastKnownWellStr = StrokeDataVM.LastKnownWell?.ToEST().ToString("yyyy-MM-dd hh:mm:ss tt");
-                StrokeDataVM.DobStr = StrokeDataVM.Dob?.ToEST().ToString("yyyy-MM-dd hh:mm:ss tt");
+                StrokeDataVM.LastKnownWellStr = StrokeDataVM.LastKnownWell?.ToTimezoneFromUtc("Eastern Standard Time").ToString("yyyy-MM-dd hh:mm:ss tt");
+                StrokeDataVM.DobStr = StrokeDataVM.Dob?.ToTimezoneFromUtc("Eastern Standard Time").ToString("yyyy-MM-dd hh:mm:ss tt");
                 StrokeDataVM.GenderTitle = _controlListDetailsRepo.Table.Where(g => g.ControlListDetailId == StrokeDataVM.Gender).Select(g => g.Title).FirstOrDefault();
                 StrokeDataVM.BloodThinnersTitle.AddRange(_controlListDetailsRepo.Table.Where(b => StrokeDataVM.BloodThinners.ToIntList().Contains(b.ControlListDetailId)).Select(b => new { Id = b.ControlListDetailId, b.Title }).ToList());
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Found", Body = StrokeDataVM };
@@ -1940,8 +1940,8 @@ namespace Web.Services.Concrete
 
                 if (SepsisDataVM.IsEms)
                     SepsisDataVM.OrganizationData = GetHosplitalAddressObject(SepsisDataVM.OrganizationIdFk);
-                SepsisDataVM.LastKnownWellStr = SepsisDataVM.LastKnownWell.ToString("yyyy-MM-dd hh:mm:ss tt");
-                SepsisDataVM.DobStr = SepsisDataVM.Dob.ToString("yyyy-MM-dd hh:mm:ss tt");
+                SepsisDataVM.LastKnownWellStr = SepsisDataVM.LastKnownWell.ToTimezoneFromUtc("Eastern Standard Time").ToString("yyyy-MM-dd hh:mm:ss tt");
+                SepsisDataVM.DobStr = SepsisDataVM.Dob.ToTimezoneFromUtc("Eastern Standard Time").ToString("yyyy-MM-dd hh:mm:ss tt");
                 SepsisDataVM.GenderTitle = _controlListDetailsRepo.Table.Where(g => g.ControlListDetailId == SepsisDataVM.Gender).Select(g => g.Title).FirstOrDefault();
                 SepsisDataVM.BloodThinnersTitle.AddRange(_controlListDetailsRepo.Table.Where(b => SepsisDataVM.BloodThinners.ToIntList().Contains(b.ControlListDetailId)).Select(b => new { Id = b.ControlListDetailId, b.Title }).ToList());
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Found", Body = SepsisDataVM };
@@ -3318,8 +3318,8 @@ namespace Web.Services.Concrete
                     STEMIDataVM.ServiceLineTeam2 = this._serviceLineRepo.Table.Where(x => serviceIds.ServiceLineTeam2.ToIntList().Distinct().Contains(x.ServiceLineId) && !x.IsDeleted).Select(x => new ServiceLineVM() { ServiceLineId = x.ServiceLineId, ServiceName = x.ServiceName, IsSelected = team2.Contains(x.ServiceLineId) }).ToList();
                 }
 
-                STEMIDataVM.LastKnownWellStr = STEMIDataVM.LastKnownWell?.ToString("yyyy-MM-dd hh:mm:ss tt");
-                STEMIDataVM.DobStr = STEMIDataVM.Dob?.ToString("yyyy-MM-dd hh:mm:ss tt");
+                STEMIDataVM.LastKnownWellStr = STEMIDataVM.LastKnownWell?.ToTimezoneFromUtc("Eastern Standard Time").ToString("yyyy-MM-dd hh:mm:ss tt");
+                STEMIDataVM.DobStr = STEMIDataVM.Dob?.ToTimezoneFromUtc("Eastern Standard Time").ToString("yyyy-MM-dd hh:mm:ss tt");
                 if (STEMIDataVM.IsEms.HasValue && STEMIDataVM.IsEms.Value)
                     STEMIDataVM.OrganizationData = GetHosplitalAddressObject(STEMIDataVM.OrganizationIdFk);
 
@@ -4620,8 +4620,8 @@ namespace Web.Services.Concrete
 
                 if (TrumaDataVM.IsEms.HasValue && TrumaDataVM.IsEms.Value)
                     TrumaDataVM.OrganizationData = GetHosplitalAddressObject(TrumaDataVM.OrganizationIdFk);
-                TrumaDataVM.LastKnownWellStr = TrumaDataVM.LastKnownWell?.ToString("yyyy-MM-dd hh:mm:ss tt");
-                TrumaDataVM.DobStr = TrumaDataVM.Dob?.ToString("yyyy-MM-dd hh:mm:ss tt");
+                TrumaDataVM.LastKnownWellStr = TrumaDataVM.LastKnownWell?.ToTimezoneFromUtc("Eastern Standard Time").ToString("yyyy-MM-dd hh:mm:ss tt");
+                TrumaDataVM.DobStr = TrumaDataVM.Dob?.ToTimezoneFromUtc("Eastern Standard Time").ToString("yyyy-MM-dd hh:mm:ss tt");
                 TrumaDataVM.GenderTitle = _controlListDetailsRepo.Table.Where(g => g.ControlListDetailId == TrumaDataVM.Gender).Select(g => g.Title).FirstOrDefault();
                 TrumaDataVM.BloodThinnersTitle.AddRange(_controlListDetailsRepo.Table.Where(b => TrumaDataVM.BloodThinners.ToIntList().Contains(b.ControlListDetailId)).Select(b => new { Id = b.ControlListDetailId, b.Title }).ToList());
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Found", Body = TrumaDataVM };
@@ -5997,8 +5997,8 @@ namespace Web.Services.Concrete
 
                 if (BlueDataVM.IsEms.HasValue && BlueDataVM.IsEms.Value)
                     BlueDataVM.OrganizationData = GetHosplitalAddressObject(BlueDataVM.OrganizationIdFk);
-                BlueDataVM.LastKnownWellStr = BlueDataVM.LastKnownWell?.ToString("yyyy-MM-dd hh:mm:ss tt");
-                BlueDataVM.DobStr = BlueDataVM.Dob?.ToString("yyyy-MM-dd hh:mm:ss tt");
+                BlueDataVM.LastKnownWellStr = BlueDataVM.LastKnownWell?.ToTimezoneFromUtc("Eastern Standard Time").ToString("yyyy-MM-dd hh:mm:ss tt");
+                BlueDataVM.DobStr = BlueDataVM.Dob?.ToTimezoneFromUtc("Eastern Standard Time").ToString("yyyy-MM-dd hh:mm:ss tt");
                 BlueDataVM.GenderTitle = _controlListDetailsRepo.Table.Where(g => g.ControlListDetailId == BlueDataVM.Gender).Select(g => g.Title).FirstOrDefault();
                 BlueDataVM.BloodThinnersTitle.AddRange(_controlListDetailsRepo.Table.Where(b => BlueDataVM.BloodThinners.ToIntList().Contains(b.ControlListDetailId)).Select(b => new { Id = b.ControlListDetailId, b.Title }).ToList());
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Found", Body = BlueDataVM };
@@ -7330,9 +7330,9 @@ namespace Web.Services.Concrete
                 //item.DefaultServiceLine = this._serviceLineRepo.Table.Where(s => s.ServiceLineId == serviceIds.DefaultServiceLineId && !s.IsDeleted).Select(s => new ServiceLineVM() { ServiceLineId = s.ServiceLineId, ServiceName = s.ServiceName }).FirstOrDefault();
                 //item.SelectedServiceLineIds = string.Join(",", serviceLineIds);
 
-                item.LastKnownWellStr = item.LastKnownWell?.ToString("yyyy-MM-dd hh:mm:ss tt");
+                item.LastKnownWellStr = item.LastKnownWell?.ToTimezoneFromUtc("Eastern Standard Time").ToString("yyyy-MM-dd hh:mm:ss tt");
                 //item.OrganizationData = orgData;
-                item.DobStr = item.Dob?.ToString("yyyy-MM-dd hh:mm:ss tt");
+                item.DobStr = item.Dob?.ToTimezoneFromUtc("Eastern Standard Time").ToString("yyyy-MM-dd hh:mm:ss tt");
                 item.CreatedDateStr = item.CreatedDate.ToString("MM-dd-yyyy hh:mm:ss tt");
                 item.GenderTitle = _controlListDetailsRepo.Table.Where(g => g.ControlListDetailId == item.Gender).Select(g => g.Title).FirstOrDefault();
                 item.BloodThinnersTitle.AddRange(_controlListDetailsRepo.Table.Where(b => item.BloodThinners.ToIntList().Contains(b.ControlListDetailId)).Select(b => new { Id = b.ControlListDetailId, b.Title }).ToList());
