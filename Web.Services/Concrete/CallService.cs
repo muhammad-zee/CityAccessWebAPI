@@ -526,6 +526,7 @@ namespace Web.Services.Concrete
                 var users = _dbContext.LoadStoredProcedure("md_getAllUsersByServiceLineId")
                             .WithSqlParam("@pServiceLineId", serviceLineId)
                             .WithSqlParam("@pRoleId", roleId)
+                            .WithSqlParam("@pQueueId", queueId)
                             .ExecuteStoredProc<UserListVm>().ToList();
 
                 var assigntoUser = users.Where(u => u.UserUniqueId != UserUniqueId).FirstOrDefault();
@@ -546,6 +547,10 @@ namespace Web.Services.Concrete
                         ReservationAssignedTo = assigntoUser.UserUniqueId
                     };
                     var saveReservation = this.saveReservation(reservation);
+                }
+                else
+                {
+                    ConferenceResource.Update(pathAccountSid: this.Twilio_AccountSid, pathSid: conferenceSid, status: ConferenceResource.UpdateStatusEnum.Completed);
                 }
 
             }
@@ -1124,6 +1129,7 @@ namespace Web.Services.Concrete
                 var users = _dbContext.LoadStoredProcedure("md_getAllUsersByServiceLineId")
                           .WithSqlParam("@pServiceLineId", q.ServiceLineIdFk)
                           .WithSqlParam("@pRoleId", q.RoleIdFk)
+                          .WithSqlParam("@pQueueId", q.QueueId)
                           .ExecuteStoredProc<UserListVm>().ToList();
                 if (users.Count() > 0)
                 {
