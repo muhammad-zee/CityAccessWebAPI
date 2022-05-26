@@ -37,7 +37,7 @@ namespace Web.Services.Interfaces
         BaseResponse UploadAttachment(IFormFileCollection file);
         bool DeleteUserToConversationChannel(string ChannelSid);
         BaseResponse refreshConsversationUsers(string key);
-
+        BaseResponse updateConsversationUserSidFromTwilio(string key);
         #region [Video Call]
         BaseResponse generateVideoCallToken(string identity);
 

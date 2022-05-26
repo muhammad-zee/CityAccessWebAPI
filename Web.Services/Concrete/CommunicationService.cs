@@ -1114,11 +1114,51 @@ namespace Web.Services.Concrete
                 {
                 this._userRepo.Update(usersToUpdate);
                 }
-                return new BaseResponse { Status = HttpStatusCode.OK, Body = "conversation users refreshed" };
+                return new BaseResponse { Status = HttpStatusCode.OK, Message = "conversation users refreshed" };
             }
             else
             {
-                return new BaseResponse { Status = HttpStatusCode.OK, Body = "Incorrect Key" };
+                return new BaseResponse { Status = HttpStatusCode.OK, Message = "Incorrect Key" };
+            }
+        }
+
+        public BaseResponse updateConsversationUserSidFromTwilio(string key)
+        {
+            if (key == "qw4hddqcrg")
+            {
+                var dbUsersList = this._userRepo.Table.Where(x => x.IsDeleted == false && x.IsActive == true && string.IsNullOrEmpty(x.ConversationUserSid)).ToList();
+                User dbUser = null;
+                        List<User> usersToUpdate = new();
+                System.Net.ServicePointManager.SecurityProtocol = (System.Net.SecurityProtocolType)3072; //TLS 1.2
+                TwilioClient.Init(Twilio_AccountSid, Twilio_AuthToken);
+
+                var users = UserResource.Read(
+                    pathServiceSid: Twilio_ChatServiceSid,
+                    limit:1000
+                );
+                foreach (var user in users)
+                {
+                    dbUser = dbUsersList.FirstOrDefault(u => u.UserUniqueId == user.Identity);
+                    if(dbUser!= null)
+                    {
+                        if (string.IsNullOrEmpty(dbUser.ConversationUserSid))
+                        {
+                            dbUser.ConversationUserSid = user.Sid;
+                        usersToUpdate.Add(dbUser);
+                        }
+
+                    }
+                }
+                        if (usersToUpdate.Count() > 0)
+                        {
+                            this._userRepo.Update(usersToUpdate);
+                        }
+
+                return new BaseResponse { Status = HttpStatusCode.OK, Message = "User Sids Updated", Body = new { TwilioUsers=users.Count(),UpdatedUsers= usersToUpdate.Count() } };
+            }
+            else
+            {
+                return new BaseResponse { Status = HttpStatusCode.OK, Message = "Incorrect Key" };
             }
         }
 
