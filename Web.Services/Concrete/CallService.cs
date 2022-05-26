@@ -1096,7 +1096,7 @@ namespace Web.Services.Concrete
                         // Create parameters    
                         new SqlParameter { ParameterName = "@pToPhoneNumber", Value = queue.ToPhoneNumber },
                         new SqlParameter { ParameterName = "@pFromPhoneNumber", Value = queue.FromPhoneNumber },
-                        new SqlParameter { ParameterName = "@pQueueStatus", Value = queue.QueueStatus },
+                        new SqlParameter { ParameterName = "@pQueueStatus", Value = queue.QueueStatus.ToInt() },
                         new SqlParameter { ParameterName = "@pRoleIdFk", Value = queue.RoleIdFk },
                         new SqlParameter { ParameterName = "@pServiceLineIdFk", Value = queue.ServiceLineIdFk },
                         new SqlParameter { ParameterName = "@pConfrenceSid", Value = queue.ConfrenceSid },
