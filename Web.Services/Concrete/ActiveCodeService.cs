@@ -413,7 +413,7 @@ namespace Web.Services.Concrete
             if (files.CodeType == AuthorEnums.Stroke.ToString())
             {
                 var rootPath = this._codeStrokeRepo.Table.Where(x => x.CodeStrokeId == files.Id).Select($"new({files.Type},IsEms,OrganizationIdFk)").FirstOrDefault();
-                var pathval = rootPath.GetPropertyValueByName(files.Type);
+                var pathval = rootPath.GetType().GetProperty(files.Type).GetValue(rootPath, null);
                 string path = _environment.WebRootFileProvider.GetFileInfo(pathval + '/' + files.FileName)?.PhysicalPath;
                 File.Delete(path);
 
@@ -494,7 +494,7 @@ namespace Web.Services.Concrete
             else if (files.CodeType == AuthorEnums.Sepsis.ToString())
             {
                 var rootPath = this._codeSepsisRepo.Table.Where(x => x.CodeSepsisId == files.Id).Select($"new({files.Type},IsEms,OrganizationIdFk)").FirstOrDefault();
-                var pathval = rootPath.GetPropertyValueByName(files.Type);
+                var pathval = rootPath.GetType().GetProperty(files.Type).GetValue(rootPath, null);
                 string path = _environment.WebRootFileProvider.GetFileInfo(pathval + '/' + files.FileName)?.PhysicalPath;
                 File.Delete(path);
 
@@ -575,7 +575,7 @@ namespace Web.Services.Concrete
             else if (files.CodeType == AuthorEnums.STEMI.ToString())
             {
                 var rootPath = this._codeSTEMIRepo.Table.Where(x => x.CodeStemiid == files.Id).Select($"new({files.Type},IsEms,OrganizationIdFk)").FirstOrDefault();
-                var pathval = rootPath.GetPropertyValueByName(files.Type);
+                var pathval = rootPath.GetType().GetProperty(files.Type).GetValue(rootPath, null);
                 string path = _environment.WebRootFileProvider.GetFileInfo(pathval + '/' + files.FileName)?.PhysicalPath;
                 File.Delete(path);
 
@@ -656,7 +656,7 @@ namespace Web.Services.Concrete
             else if (files.CodeType == AuthorEnums.Trauma.ToString())
             {
                 var rootPath = this._codeTrumaRepo.Table.Where(x => x.CodeTraumaId == files.Id).Select($"new({files.Type},IsEms,OrganizationIdFk)").FirstOrDefault();
-                var pathval = rootPath.GetPropertyValueByName(files.Type);
+                var pathval = rootPath.GetType().GetProperty(files.Type).GetValue(rootPath, null);
                 string path = _environment.WebRootFileProvider.GetFileInfo(pathval + '/' + files.FileName)?.PhysicalPath;
                 File.Delete(path);
 
@@ -737,7 +737,7 @@ namespace Web.Services.Concrete
             else if (files.CodeType == AuthorEnums.Blue.ToString())
             {
                 var rootPath = this._codeBlueRepo.Table.Where(x => x.CodeBlueId == files.Id).Select($"new({files.Type},IsEms,OrganizationIdFk)").FirstOrDefault();
-                var pathval = rootPath.GetPropertyValueByName(files.Type);
+                var pathval = rootPath.GetType().GetProperty(files.Type).GetValue(rootPath, null);
                 string path = _environment.WebRootFileProvider.GetFileInfo(pathval + '/' + files.FileName)?.PhysicalPath;
                 File.Delete(path);
 
@@ -1108,7 +1108,7 @@ namespace Web.Services.Concrete
                         var RootPath = this._RootPath + "/Organizations";
                         string FileRoot = null;
                         List<string> Attachments = new();
-                        FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeStroke.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
+                        FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == row.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
                         FileRoot = Path.Combine(RootPath, FileRoot);
                         if (!Directory.Exists(FileRoot))
                         {
@@ -1198,7 +1198,7 @@ namespace Web.Services.Concrete
                         string FileRoot = null;
                         List<string> Attachments = new();
 
-                        FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeStroke.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
+                        FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == row.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
                         FileRoot = Path.Combine(RootPath, FileRoot);
                         if (!Directory.Exists(FileRoot))
                         {
@@ -2353,7 +2353,7 @@ namespace Web.Services.Concrete
                         var RootPath = this._RootPath + "/Organizations";
                         string FileRoot = null;
                         List<string> Attachments = new();
-                        FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeSepsis.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
+                        FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == row.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
                         FileRoot = Path.Combine(RootPath, FileRoot);
                         if (!Directory.Exists(FileRoot))
                         {
@@ -2443,7 +2443,7 @@ namespace Web.Services.Concrete
                         string FileRoot = null;
                         List<string> Attachments = new();
 
-                        FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeSepsis.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
+                        FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == row.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
                         FileRoot = Path.Combine(RootPath, FileRoot);
                         if (!Directory.Exists(FileRoot))
                         {
@@ -3690,7 +3690,7 @@ namespace Web.Services.Concrete
                         var RootPath = this._RootPath + "/Organizations";
                         string FileRoot = null;
                         List<string> Attachments = new();
-                        FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeSTEMI.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
+                        FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == row.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
                         FileRoot = Path.Combine(RootPath, FileRoot);
                         if (!Directory.Exists(FileRoot))
                         {
@@ -3780,7 +3780,7 @@ namespace Web.Services.Concrete
                         string FileRoot = null;
                         List<string> Attachments = new();
 
-                        FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeSTEMI.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
+                        FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == row.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
                         FileRoot = Path.Combine(RootPath, FileRoot);
                         if (!Directory.Exists(FileRoot))
                         {
@@ -4945,7 +4945,7 @@ namespace Web.Services.Concrete
                         var RootPath = this._RootPath + "/Organizations";
                         string FileRoot = null;
                         List<string> Attachments = new();
-                        FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeTruma.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
+                        FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == row.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
                         FileRoot = Path.Combine(RootPath, FileRoot);
                         if (!Directory.Exists(FileRoot))
                         {
@@ -5035,7 +5035,7 @@ namespace Web.Services.Concrete
                         string FileRoot = null;
                         List<string> Attachments = new();
 
-                        FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeTruma.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
+                        FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == row.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
                         FileRoot = Path.Combine(RootPath, FileRoot);
                         if (!Directory.Exists(FileRoot))
                         {
@@ -6276,7 +6276,7 @@ namespace Web.Services.Concrete
                         var RootPath = this._RootPath + "/Organizations";
                         string FileRoot = null;
                         List<string> Attachments = new();
-                        FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeBlue.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
+                        FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == row.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
                         FileRoot = Path.Combine(RootPath, FileRoot);
                         if (!Directory.Exists(FileRoot))
                         {
@@ -6366,7 +6366,7 @@ namespace Web.Services.Concrete
                         string FileRoot = null;
                         List<string> Attachments = new();
 
-                        FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == codeBlue.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
+                        FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == row.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
                         FileRoot = Path.Combine(RootPath, FileRoot);
                         if (!Directory.Exists(FileRoot))
                         {
