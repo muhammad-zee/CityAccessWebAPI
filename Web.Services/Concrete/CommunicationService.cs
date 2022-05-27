@@ -647,9 +647,17 @@ namespace Web.Services.Concrete
 
         public UserResource createConversationUser(string Identity, string FriendlyName)
         {
+            try
+            {
+
             TwilioClient.Init(this.Twilio_AccountSid, this.Twilio_AuthToken);
             var user = UserResource.Create(pathServiceSid: this.Twilio_ChatServiceSid, identity: Identity, friendlyName: FriendlyName);
             return user;
+            }
+            catch(Exception e)
+            {
+                return null;
+            }
 
         }
         public MemberResource addNewUserToConversationChannel(string ChannelSid, string ParticipantUniqueName)
@@ -1103,11 +1111,38 @@ namespace Web.Services.Concrete
                 {
                     try
                     {
-                        var twilioUser = UserResource.Fetch(pathServiceSid: this.Twilio_ChatServiceSid, pathSid: u.ConversationUserSid);
+                        if (string.IsNullOrEmpty(u.ConversationUserSid))
+                        {
+                            var newUser = this.createConversationUser(u.UserUniqueId, $"{u.FirstName} {u.LastName}");
+                            if (newUser != null)
+                            {
+                                u.ConversationUserSid = newUser.Sid;
+                            }
+                            else
+                            {
+                                u.ConversationUserSid = "";
+                            }
+
+                            usersToUpdate.Add(u);
+                        }
+                        else
+                        {
+                            var twilioUser = UserResource.Fetch(pathServiceSid: this.Twilio_ChatServiceSid, pathSid: u.ConversationUserSid);
+                        }
+
                     }
                     catch (Exception e)
                     {
-                        u.ConversationUserSid = "";
+                        var newUser = this.createConversationUser(u.UserUniqueId, $"{u.FirstName} {u.LastName}");
+                        if (newUser != null)
+                        {
+                            u.ConversationUserSid = newUser.Sid;
+                        }
+                        else
+                        {
+                            u.ConversationUserSid = "";
+                        }
+
                         usersToUpdate.Add(u);
                     }
 
@@ -1146,8 +1181,9 @@ namespace Web.Services.Concrete
                     {
                         if (string.IsNullOrEmpty(dbUser.ConversationUserSid))
                         {
+
                             dbUser.ConversationUserSid = user.Sid;
-                        usersToUpdate.Add(dbUser);
+                            usersToUpdate.Add(dbUser);
                         }
 
                     }
