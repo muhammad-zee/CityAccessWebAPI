@@ -431,14 +431,14 @@ namespace Web.Services.Concrete
                 if (files.Type == "Video")
                 {
                     codeStroke.VideoFolderRoot = pathval;
-                    string VideoPath = this._RootPath + codeStroke.AttachmentsFolderRoot;
+                    string VideoPath = this._RootPath + codeStroke.VideoFolderRoot;
                     if (Directory.Exists(VideoPath))
                     {
                         DirectoryInfo AttachFiles = new DirectoryInfo(VideoPath);
                         codeStroke.VideosPath = new List<string>();
                         foreach (var item in AttachFiles.GetFiles())
                         {
-                            codeStroke.VideosPath.Add(codeStroke.AttachmentsFolderRoot + "/" + item.Name);
+                            codeStroke.VideosPath.Add(codeStroke.VideoFolderRoot + "/" + item.Name);
                         }
                     }
                 }
@@ -512,14 +512,14 @@ namespace Web.Services.Concrete
                 if (files.Type == "Video")
                 {
                     codeSepsis.VideoFolderRoot = pathval;
-                    string VideoPath = this._RootPath + codeSepsis.AttachmentsFolderRoot;
+                    string VideoPath = this._RootPath + codeSepsis.VideoFolderRoot;
                     if (Directory.Exists(VideoPath))
                     {
                         DirectoryInfo AttachFiles = new DirectoryInfo(VideoPath);
                         codeSepsis.VideosPath = new List<string>();
                         foreach (var item in AttachFiles.GetFiles())
                         {
-                            codeSepsis.VideosPath.Add(codeSepsis.AttachmentsFolderRoot + "/" + item.Name);
+                            codeSepsis.VideosPath.Add(codeSepsis.VideoFolderRoot + "/" + item.Name);
                         }
                     }
                 }
@@ -593,14 +593,14 @@ namespace Web.Services.Concrete
                 if (files.Type == "Video")
                 {
                     codeSTEMI.VideoFolderRoot = pathval;
-                    string VideoPath = this._RootPath + codeSTEMI.AttachmentsFolderRoot;
+                    string VideoPath = this._RootPath + codeSTEMI.VideoFolderRoot;
                     if (Directory.Exists(VideoPath))
                     {
                         DirectoryInfo AttachFiles = new DirectoryInfo(VideoPath);
                         codeSTEMI.VideosPath = new List<string>();
                         foreach (var item in AttachFiles.GetFiles())
                         {
-                            codeSTEMI.VideosPath.Add(codeSTEMI.AttachmentsFolderRoot + "/" + item.Name);
+                            codeSTEMI.VideosPath.Add(codeSTEMI.VideoFolderRoot + "/" + item.Name);
                         }
                     }
                 }
@@ -674,14 +674,14 @@ namespace Web.Services.Concrete
                 if (files.Type == "Video")
                 {
                     codeTrauma.VideoFolderRoot = pathval;
-                    string VideoPath = this._RootPath + codeTrauma.AttachmentsFolderRoot;
+                    string VideoPath = this._RootPath + codeTrauma.VideoFolderRoot;
                     if (Directory.Exists(VideoPath))
                     {
                         DirectoryInfo AttachFiles = new DirectoryInfo(VideoPath);
                         codeTrauma.VideosPath = new List<string>();
                         foreach (var item in AttachFiles.GetFiles())
                         {
-                            codeTrauma.VideosPath.Add(codeTrauma.AttachmentsFolderRoot + "/" + item.Name);
+                            codeTrauma.VideosPath.Add(codeTrauma.VideoFolderRoot + "/" + item.Name);
                         }
                     }
                 }
@@ -755,14 +755,14 @@ namespace Web.Services.Concrete
                 if (files.Type == "Video")
                 {
                     codeBlue.VideoFolderRoot = pathval;
-                    string VideoPath = this._RootPath + codeBlue.AttachmentsFolderRoot;
+                    string VideoPath = this._RootPath + codeBlue.VideoFolderRoot;
                     if (Directory.Exists(VideoPath))
                     {
                         DirectoryInfo AttachFiles = new DirectoryInfo(VideoPath);
                         codeBlue.VideosPath = new List<string>();
                         foreach (var item in AttachFiles.GetFiles())
                         {
-                            codeBlue.VideosPath.Add(codeBlue.AttachmentsFolderRoot + "/" + item.Name);
+                            codeBlue.VideosPath.Add(codeBlue.VideoFolderRoot + "/" + item.Name);
                         }
                     }
                 }
