@@ -200,7 +200,7 @@ namespace Web.Services.Concrete
             /////////////////  Set user Two Factor Settings According to Organization Setting /////////////////
             if (settings != null)
             {
-                user.TwoFactorEnabled = settings.TwoFactorEnabled;
+                user.TwoFactorEnabled = settings.TwoFactorEnable;
                 user.IsTwoFactRememberChecked = settings.VerifyCodeForFutureDays > 0;
                 user.TwoFactorExpiryDate = settings.TwoFactorCodeExpiry > 0 ? DateTime.UtcNow.AddDays(settings.TwoFactorCodeExpiry.Value) : user.TwoFactorExpiryDate;
                 tokenExpiryTime = settings.TokenExpiryTime > 0 ? DateTime.UtcNow.AddDays(settings.TokenExpiryTime.Value) : tokenExpiryTime;

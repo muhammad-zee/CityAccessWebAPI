@@ -6,7 +6,7 @@ namespace Web.Model.Common
     {
         public int SettingId { get; set; } = 0;
         public int? OrganizationIdFk { get; set; } = 0;
-        public bool TwoFactorEnabled { get; set; }
+        public bool TwoFactorEnable { get; set; }
         public int? TokenExpiryTime { get; set; } = 0;
         public string OrganizationEmail { get; set; }
         public int? TwoFactorCodeExpiry { get; set; } = 0;

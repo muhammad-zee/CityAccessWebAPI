@@ -36,7 +36,7 @@ namespace Web.Services.Concrete
                 SettingId = x.SettingId,
                 OrganizationIdFk = x.OrganizationIdFk,
                 TwoFactorCodeExpiry = x.TwoFactorAuthenticationExpiryMinutes,
-                TwoFactorEnabled = x.TwoFactorEnable,
+                TwoFactorEnable = x.TwoFactorEnable,
                 VerifyCodeForFutureDays = x.VerifyForFutureDays,
 
                 PasswordLength = x.PasswordLength,
@@ -82,7 +82,7 @@ namespace Web.Services.Concrete
             if (settings.SettingId > 0)
             {
                 var setting = this._settingRepo.Table.Where(x => x.SettingId == settings.SettingId && !x.IsDeleted).FirstOrDefault();
-                setting.TwoFactorEnable = settings.TwoFactorEnabled;
+                setting.TwoFactorEnable = settings.TwoFactorEnable;
                 setting.TwoFactorAuthenticationExpiryMinutes = settings.TwoFactorCodeExpiry.HasValue && settings.TwoFactorCodeExpiry.Value > 0 ? settings.TwoFactorCodeExpiry.Value : _config["TwoFactorAuthentication:TwoFactorAuthenticationExpiryMinutes"].ToInt();
                 setting.VerifyForFutureDays = settings.VerifyCodeForFutureDays.HasValue && settings.VerifyCodeForFutureDays.Value > 0 ? settings.VerifyCodeForFutureDays.Value : _config["TwoFactorAuthentication:VerifyForFutureDays"].ToInt();
                 setting.TokenExpiryTime = settings.TokenExpiryTime.Value;
@@ -108,7 +108,7 @@ namespace Web.Services.Concrete
                 var setting = new Setting()
                 {
                     OrganizationIdFk = settings.OrganizationIdFk.Value,
-                    TwoFactorEnable = settings.TwoFactorEnabled,
+                    TwoFactorEnable = settings.TwoFactorEnable,
                     TwoFactorAuthenticationExpiryMinutes = settings.TwoFactorCodeExpiry.HasValue && settings.TwoFactorCodeExpiry.Value > 0 ? settings.TwoFactorCodeExpiry.Value : _config["TwoFactorAuthentication:TwoFactorAuthenticationExpiryMinutes"].ToInt(),
                     VerifyForFutureDays = settings.VerifyCodeForFutureDays.HasValue && settings.VerifyCodeForFutureDays.Value > 0 ? settings.VerifyCodeForFutureDays.Value : _config["TwoFactorAuthentication:VerifyForFutureDays"].ToInt(),
                     TokenExpiryTime = settings.TokenExpiryTime.Value,
