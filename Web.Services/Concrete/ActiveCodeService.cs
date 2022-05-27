@@ -484,7 +484,7 @@ namespace Web.Services.Concrete
                     FieldValue = fieldValue,
                     UserChannelSid = UserChannelSid.Distinct().ToList(),
                     From = AuthorEnums.Stroke.ToString(),
-                    Msg = (rootPath.IsEms != null && rootPath.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription()) + " Stroke From is Changed",
+                    Msg = (rootPath.IsEms != null && rootPath.IsEms ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription()) + " Stroke From is Changed",
                     RouteLink1 = RouteEnums.CodeStrokeForm.ToDescription(),
                     RouteLink2 = RouteEnums.EMSForms.ToDescription(),
                 };
@@ -565,7 +565,7 @@ namespace Web.Services.Concrete
                     FieldValue = fieldValue,
                     UserChannelSid = UserChannelSid.Distinct().ToList(),
                     From = AuthorEnums.Sepsis.ToString(),
-                    Msg = (rootPath.IsEms != null && rootPath.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription()) + " Sepsis From is Changed",
+                    Msg = (rootPath.IsEms != null && rootPath.IsEms ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription()) + " Sepsis From is Changed",
                     RouteLink1 = RouteEnums.CodeSepsisForm.ToDescription(),
                     RouteLink2 = RouteEnums.EMSForms.ToDescription(),
                 };
@@ -646,7 +646,7 @@ namespace Web.Services.Concrete
                     FieldValue = fieldValue,
                     UserChannelSid = UserChannelSid.Distinct().ToList(),
                     From = AuthorEnums.STEMI.ToString(),
-                    Msg = (rootPath.IsEms != null && rootPath.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription()) + " STEMI From is Changed",
+                    Msg = (rootPath.IsEms != null && rootPath.IsEms ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription()) + " STEMI From is Changed",
                     RouteLink1 = RouteEnums.CodeSTEMIForm.ToDescription(),
                     RouteLink2 = RouteEnums.EMSForms.ToDescription(),
                 };
@@ -727,7 +727,7 @@ namespace Web.Services.Concrete
                     FieldValue = fieldValue,
                     UserChannelSid = UserChannelSid.Distinct().ToList(),
                     From = AuthorEnums.Trauma.ToString(),
-                    Msg = (rootPath.IsEms != null && rootPath.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription()) + " Trauma From is Changed",
+                    Msg = (rootPath.IsEms != null && rootPath.IsEms ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription()) + " Trauma From is Changed",
                     RouteLink1 = RouteEnums.CodeTraumaForm.ToDescription(),
                     RouteLink2 = RouteEnums.EMSForms.ToDescription(),
                 };
@@ -808,7 +808,7 @@ namespace Web.Services.Concrete
                     FieldValue = fieldValue,
                     UserChannelSid = UserChannelSid.Distinct().ToList(),
                     From = AuthorEnums.Blue.ToString(),
-                    Msg = (rootPath.IsEms != null && rootPath.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription()) + " Blue From is Changed",
+                    Msg = (rootPath.IsEms != null && rootPath.IsEms ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription()) + " Blue From is Changed",
                     RouteLink1 = RouteEnums.CodeBlueForm.ToDescription(),
                     RouteLink2 = RouteEnums.EMSForms.ToDescription(),
                 };
