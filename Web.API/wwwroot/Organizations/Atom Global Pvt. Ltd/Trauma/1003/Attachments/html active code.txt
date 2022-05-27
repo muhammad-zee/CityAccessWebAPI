@@ -1,0 +1,79 @@
+<div class="fixed transform z-1" *ngIf="showProgressSpinner">
+  <app-custom-spinner></app-custom-spinner>
+</div>
+<div class="bg-default pb-3">
+  <div class="flex justify-content-between align-items-center title-bg mb-5">
+    <div>
+      <h1 class="title pl-2">Consult</h1>
+    </div>
+  </div>
+  <h3 style="color: red; margin-left: 1rem;">{{nullException}}</h3>
+  <form [formGroup]="form" (ngSubmit)="Save()">
+    <div class="grid m-2">
+
+      <!-- <div class="field consult-header col-12 md:col-4">
+        <div class="title">Organization : <span class="consult-label">{{organizationName}}</span>
+        </div>
+      </div>
+      <div class="field consult-header col-12 md:col-4">
+        <div class="title ">Department : <span class="consult-label">{{departmentName}}</span></div>
+      </div>
+      <div class="field consult-header col-12 md:col-4">
+        <div class="title">Service Line : <span class="consult-label">{{serviceLineName}}</span></div>
+      </div> -->
+
+      <div class="field col-12 md:col-4" *ngFor="let control of data">
+        <label for="control.fieldName" class="col-12">{{ control.fieldLabel }}
+          <span [ngClass]="isValid(control.fieldName) ? 'invalid-feedback': ''" *ngIf="control.isRequired">*</span>
+        </label>
+        <span class="p-input-icon-right w-full">
+          <input class="w-full" *ngIf="
+          [
+            'text',
+            'email',
+            'number',
+            'search',
+            'url'
+          ].includes(control.fieldDataType)" [type]="control.fieldDataType" [formControlName]="control.fieldName"
+            [max]="control.fieldDataLength" pInputText />
+          <textarea class="w-full" *ngIf="control.fieldDataType === 'textarea'" [formControlName]="control.fieldName"
+            [value]="control.value"></textarea>
+          <!-- <p-checkbox
+            *ngIf="control.fieldType === 'checkbox'" 
+            [formControlName]="control.fieldName"></p-checkbox> -->
+          <p-checkbox *ngIf="control.fieldDataType === 'checkbox'" [binary]="binary" inputId="binary" name="checkbox"
+            [formControlName]="control.fieldName"></p-checkbox>
+          <toggle *ngIf="control.fieldDataType === 'toggle'" [formControlName]="control.fieldName"></toggle>
+
+          <!-- Calender -->
+          <p-calendar class="p-fluid" *ngIf="control.fieldDataType === 'date'" [showIcon]="true"
+            [formControlName]="control.fieldName"></p-calendar>
+
+          <p-inputMask *ngIf="control.fieldDataType === 'tel'" [formControlName]="control.fieldName"
+            mask="(999) 999-9999" placeholder="(999) 999-9999" class="p-fluid w-full"></p-inputMask>
+
+          <p-dropdown *ngIf="control.fieldDataType === 'dropdown'" placeholder="Select {{control.fieldLabel}}"
+            [options]="control.ddlList" [formControlName]="control.fieldName" optionLabel="title" optionValue="id">
+          </p-dropdown>
+          <div *ngIf=" f[control.fieldName].errors && (f[control.fieldName].touched || f[control.fieldName].dirty)"
+            class="invalid-feedback">
+            <div *ngIf="isValid(control.fieldName)">{{control.fieldLabel}} is required</div>
+            <div *ngIf="isMaxLenExceed(control.fieldName, control.fieldDataLength)">Max. Length Does Not Exceeded
+              {{control.fieldDataLength}} Characters</div>
+          </div>
+        </span>
+      </div>
+    </div>
+    <div class="formgrid flex m-2" *ngIf="nullException == ''">
+      <div class="grid justify-content-end col-12 md:col-12">
+        <span class="p-input-icon-right">
+          <button [ngStyle]="inhouseCodeSubmitBtnCheck?{'pointer-events': 'none'} : {'pointer-events': 'all'}" pButton
+            pRipple label="Submit" [disabled]="form.invalid || disabledSubmit" class="p-button-primary"
+            icon="pi pi-check"></button>
+          <button pButton pRipple label="Cancel" class="ml-3 all-cancel p-button-secondary" (click)="changeRoute()"
+            icon="pi pi-times"></button>
+        </span>
+      </div>
+    </div>
+  </form>
+</div>

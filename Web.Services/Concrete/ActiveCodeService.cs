@@ -453,7 +453,7 @@ namespace Web.Services.Concrete
                         codeStroke.AudiosPath = new List<string>();
                         foreach (var item in AttachFiles.GetFiles())
                         {
-                            codeStroke.AudiosPath.Add(codeStroke.AttachmentsFolderRoot + "/" + item.Name);
+                            codeStroke.AudiosPath.Add(codeStroke.AudioFolderRoot + "/" + item.Name);
                         }
                     }
                 }
@@ -534,7 +534,7 @@ namespace Web.Services.Concrete
                         codeSepsis.AudiosPath = new List<string>();
                         foreach (var item in AttachFiles.GetFiles())
                         {
-                            codeSepsis.AudiosPath.Add(codeSepsis.AttachmentsFolderRoot + "/" + item.Name);
+                            codeSepsis.AudiosPath.Add(codeSepsis.AudioFolderRoot + "/" + item.Name);
                         }
                     }
                 }
@@ -615,7 +615,7 @@ namespace Web.Services.Concrete
                         codeSTEMI.AudiosPath = new List<string>();
                         foreach (var item in AttachFiles.GetFiles())
                         {
-                            codeSTEMI.AudiosPath.Add(codeSTEMI.AttachmentsFolderRoot + "/" + item.Name);
+                            codeSTEMI.AudiosPath.Add(codeSTEMI.AudioFolderRoot + "/" + item.Name);
                         }
                     }
                 }
@@ -696,7 +696,7 @@ namespace Web.Services.Concrete
                         codeTrauma.AudiosPath = new List<string>();
                         foreach (var item in AttachFiles.GetFiles())
                         {
-                            codeTrauma.AudiosPath.Add(codeTrauma.AttachmentsFolderRoot + "/" + item.Name);
+                            codeTrauma.AudiosPath.Add(codeTrauma.AudioFolderRoot + "/" + item.Name);
                         }
                     }
                 }
@@ -777,7 +777,7 @@ namespace Web.Services.Concrete
                         codeBlue.AudiosPath = new List<string>();
                         foreach (var item in AttachFiles.GetFiles())
                         {
-                            codeBlue.AudiosPath.Add(codeBlue.AttachmentsFolderRoot + "/" + item.Name);
+                            codeBlue.AudiosPath.Add(codeBlue.AudioFolderRoot + "/" + item.Name);
                         }
                     }
                 }
