@@ -48,6 +48,7 @@ namespace Web.Services.Concrete
         private string Twillio_TwiMLAppSid;
         private string Twillio_VoiceApiKey;
         private string Twillio_VoiceApiKeySecret;
+        private String Twilio_PhoneNumber;
 
 
         public CallService(RAQ_DbContext dbContext,
@@ -76,6 +77,7 @@ namespace Web.Services.Concrete
             this.Twillio_TwiMLAppSid = this._config["Twilio:TwiMLAppSid"].ToString();
             this.Twillio_VoiceApiKey = this._config["Twilio:VoiceApiKey"].ToString();
             this.Twillio_VoiceApiKeySecret = this._config["Twilio:VoiceApiKeySecret"].ToString();
+            this.Twilio_PhoneNumber = this._config["Twilio:PhoneNumber"].ToString();
 
         }
 
@@ -224,7 +226,7 @@ namespace Web.Services.Concrete
             //url = url.Replace(" ", "%20");
             //var To = new PhoneNumber("+923327097498");
             var To = new PhoneNumber("+923327097498");
-            var From = new PhoneNumber("+12562516861");
+            var From = new PhoneNumber(this.Twilio_PhoneNumber);
             ServicePointManager.SecurityProtocol = (SecurityProtocolType)3072; //TLS 1.2                                                                             
             TwilioClient.Init(this.Twilio_AccountSid, this.Twilio_AuthToken);
             var call = CallResource.Create(to: To,
@@ -413,7 +415,7 @@ namespace Web.Services.Concrete
             statusCallback: new Uri(StatusCallbackUrl),
             statusCallbackEvent: statusCallbackEvent,
             record: true,
-            from: new Twilio.Types.PhoneNumber("+12562516861"),
+            from: new Twilio.Types.PhoneNumber(this.Twilio_PhoneNumber),
             to: new Twilio.Types.PhoneNumber($"client:{User.UserUniqueId}"),
             pathConferenceSid: ConferenceSid
         );
