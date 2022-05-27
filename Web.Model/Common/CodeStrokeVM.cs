@@ -56,9 +56,9 @@ namespace Web.Model.Common
         public string Attachments { get; set; }
         public string CodeName { get; set; }
 
-        public List<string> AudiosPath { get; set; }
-        public List<string> VideosPath { get; set; }
-        public List<string> AttachmentsPath { get; set; }
+        public List<string> AudiosPath { get; set; } = new List<string>();
+        public List<string> VideosPath { get; set; } = new List<string>();
+        public List<string> AttachmentsPath { get; set; } = new List<string>();
         public object OrganizationData { get; set; }
         public string AudioFolderRoot { get; set; }
         public string VideoFolderRoot { get; set; }
@@ -67,6 +67,8 @@ namespace Web.Model.Common
         public string ChannelSid { get; set; }
         public string UserUniqueId { get; set; }
         public int UserIdFk { get; set; }
+        public string FieldName { get; set; }
+        public string FieldDataType { get; set; }
 
     }
 }
