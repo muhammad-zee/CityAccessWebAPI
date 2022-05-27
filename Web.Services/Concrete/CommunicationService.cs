@@ -1104,7 +1104,7 @@ namespace Web.Services.Concrete
         {
             if (key == "qw4hddqcrg")
             {
-                var dbUsers = this._userRepo.Table.Where(x => x.IsDeleted == false && x.IsActive == true && !string.IsNullOrEmpty(x.ConversationUserSid)).ToList();
+                var dbUsers = this._userRepo.Table.Where(x => x.IsDeleted == false && x.IsActive == true /*&& !string.IsNullOrEmpty(x.ConversationUserSid)*/).ToList();
                 List<User> usersToUpdate = new();
                 TwilioClient.Init(this.Twilio_AccountSid, this.Twilio_AuthToken);
                 foreach (var u in dbUsers)
