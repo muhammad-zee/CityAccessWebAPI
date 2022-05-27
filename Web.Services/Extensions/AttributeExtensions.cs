@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
 using Web.Services.Enums;
 
@@ -96,7 +97,7 @@ namespace Web.Services.Extensions
             {
                 if (number != null)
                 {
-                    return number.Replace("(","").Replace(")","").Replace("-","").Replace(" ","");
+                    return number.Replace("(", "").Replace(")", "").Replace("-", "").Replace(" ", "");
                 }
                 return "";
             }
@@ -247,5 +248,37 @@ namespace Web.Services.Extensions
             }
             return result;
         }
+
+        public static object GetPropertyValueByName(this object obj, string propertyName)
+        {
+            if (obj.GetType().GetProperty(propertyName) != null)
+            {
+                return obj.GetType().GetProperty(propertyName).GetValue(obj, null);
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        public static string ToCapitalize(this string str)
+        {
+            if (str != null)
+            {
+                return char.ToUpper(str[0]) + str.Substring(1).ToLower();
+            }
+            return null;
+        }
+
+        public static string ToTitleCase(this string str)
+        {
+            if (str != null)
+            {
+                var textinfo = new CultureInfo("en-US", false).TextInfo;
+                return textinfo.ToTitleCase(str);
+            }
+            return null;
+        }
+
     }
 }

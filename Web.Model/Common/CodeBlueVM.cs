@@ -63,5 +63,7 @@ namespace Web.Model.Common
         public string AudioFolderRoot { get; set; }
         public string VideoFolderRoot { get; set; }
         public string AttachmentsFolderRoot { get; set; }
+        public string FieldName { get; set; }
+        public string FieldDataType { get; set; }
     }
 }
