@@ -18,5 +18,10 @@ namespace Web.Model.Common
         public string ChannelSid { get; set; }
         public bool ChannelIsActive { get; set; }
         public string Type { get; set; }
+
+        public string FieldName { get; set; }
+        public object FieldValue { get; set; }
+        public string FieldDataType { get; set; }
+
     }
 }
