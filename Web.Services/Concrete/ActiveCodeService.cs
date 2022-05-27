@@ -565,7 +565,7 @@ namespace Web.Services.Concrete
                     FieldValue = fieldValue,
                     UserChannelSid = UserChannelSid.Distinct().ToList(),
                     From = AuthorEnums.Sepsis.ToString(),
-                    Msg = (rootPath.IsEms != null && rootPath.IsEms ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription()) + " Sepsis From is Changed",
+                    Msg = (rootPath.IsEms ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription()) + " Sepsis From is Changed",
                     RouteLink1 = RouteEnums.CodeSepsisForm.ToDescription(),
                     RouteLink2 = RouteEnums.EMSForms.ToDescription(),
                 };
