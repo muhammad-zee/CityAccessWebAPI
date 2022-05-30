@@ -99,6 +99,8 @@ namespace Web.Services.Concrete
                             response.Body = AuthorizedUser;
                             response.Status = HttpStatusCode.OK;
                             response.Message = "User found";
+                            this._dbContext.Log(login, TableEnums.Users.ToString(), user.UserId, ActivityLogActionEnums.SignIn.ToInt());
+
                         }
                         else
                         {
@@ -125,6 +127,7 @@ namespace Web.Services.Concrete
                                     response.Body = AuthorizedUser;
                                     response.Status = HttpStatusCode.OK;
                                     response.Message = "User found";
+                                    this._dbContext.Log(login, "Users", user.UserId, ActivityLogActionEnums.SignIn.ToInt());
                                 }
                             }
                             else

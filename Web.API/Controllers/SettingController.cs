@@ -79,5 +79,24 @@ namespace Web.API.Controllers
             }
         }
 
+        #region [Activity Log]
+        [HttpGet("ActivityLog/GetActivityLog")]
+        public BaseResponse GetActivityLog(int UserId,string? ModuleName,DateTime? FromDate,DateTime? ToDate,int? CodeId)
+        {
+            var state = ModelState;
+            try
+            {
+                return _settingService.GetActivityLog(UserId);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
+        #endregion
+
     }
 }

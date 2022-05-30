@@ -18,6 +18,7 @@ namespace Web.Data.Models
         }
 
         public virtual DbSet<ActiveCode> ActiveCodes { get; set; }
+        public virtual DbSet<ActiveLog> ActiveLogs { get; set; }
         public virtual DbSet<CallLog> CallLogs { get; set; }
         public virtual DbSet<CallQueue> CallQueues { get; set; }
         public virtual DbSet<CallReservation> CallReservations { get; set; }
@@ -76,7 +77,7 @@ namespace Web.Data.Models
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseSqlServer("Data Source=192.168.0.31;Initial Catalog=RouteAndQueue;User Id=sa;Password=4292;");
+                optionsBuilder.UseSqlServer("Data Source=192.168.0.28;Initial Catalog=RouteAndQueue;User Id=sa;Password=4292;");
             }
         }
 
@@ -103,6 +104,22 @@ namespace Web.Data.Models
                     .HasForeignKey(d => d.OrganizationIdFk)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_ActiveCodes_Organizations");
+            });
+
+            modelBuilder.Entity<ActiveLog>(entity =>
+            {
+                entity.Property(e => e.Changeset).IsUnicode(false);
+
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.Description)
+                    .HasMaxLength(400)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.TableName)
+                    .IsRequired()
+                    .HasMaxLength(200)
+                    .IsUnicode(false);
             });
 
             modelBuilder.Entity<CallLog>(entity =>

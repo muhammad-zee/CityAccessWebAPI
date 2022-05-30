@@ -1011,6 +1011,7 @@ namespace Web.Services.Concrete
                     };
 
                     _communicationService.pushNotification(notification);
+                    this._dbContext.Log(row, TableEnums.CodeStrokes.ToString(), row.CodeStrokeId, ActivityLogActionEnums.Update.ToInt());
                     return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Updated Successfully" };
                 }
                 else
@@ -1351,6 +1352,8 @@ namespace Web.Services.Concrete
                     };
 
                     _communicationService.pushNotification(notification);
+                    this._dbContext.Log(row, TableEnums.CodeStrokes.ToString(), row.CodeStrokeId, ActivityLogActionEnums.Update.ToInt());
+
                     return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Updated Successfully" };
                 }
                
@@ -1662,6 +1665,8 @@ namespace Web.Services.Concrete
                         }
 
                         this._codeStrokeRepo.Insert(stroke);
+                        this._dbContext.Log(stroke, TableEnums.CodeStrokes.ToString(), stroke.CodeStrokeId, ActivityLogActionEnums.Create.ToInt());
+
 
                         return GetStrokeDataById(stroke.CodeStrokeId);
                     }
@@ -1722,6 +1727,7 @@ namespace Web.Services.Concrete
                         ActiveCodeName = UCLEnums.Stroke.ToString()
                     };
                     this._codesServiceLinesMappingRepo.Insert(codeService);
+
                 }
             }
             else
@@ -1744,7 +1750,7 @@ namespace Web.Services.Concrete
             {
                 string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
                 string friendlyName = codeStroke.IsEms.HasValue && codeStroke.IsEms.Value ? $"{UCLEnums.EMS.ToDescription()} {UCLEnums.Stroke.ToString()} {codeStroke.CodeStrokeId}" : $"{UCLEnums.InhouseCode.ToDescription()} {UCLEnums.Stroke.ToString()} {codeStroke.CodeStrokeId}";
-                var channel = _communicationService.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
+                var channel = this._communicationService.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
                 var stroke = this._codeStrokeRepo.Table.Where(x => x.CodeStrokeId == codeStroke.CodeStrokeId && x.IsActive == true && !x.IsDeleted).FirstOrDefault();
                 if (stroke != null)
                 {
@@ -1775,6 +1781,7 @@ namespace Web.Services.Concrete
                     }
                 }
                 this._StrokeCodeGroupMembersRepo.Insert(ACodeGroupMembers);
+
                 var msg = new ConversationMessageVM();
                 msg.channelSid = channel.Sid;
                 msg.author = "System";
@@ -2021,6 +2028,8 @@ namespace Web.Services.Concrete
 
             var isDeleted = this._dbContext.Database.ExecuteSqlRaw(sql, parameters);
 
+            this._dbContext.Log(string.Empty, TableEnums.CodeStrokes.ToString(), strokeId, ActivityLogActionEnums.Delete.ToInt());
+
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Deleted" };
         }
 
@@ -2042,6 +2051,7 @@ namespace Web.Services.Concrete
             var rowsEffected = this._dbContext.Database.ExecuteSqlRaw(sql, parameters);
             if (rowsEffected > 0)
             {
+            this._dbContext.Log(string.Empty, TableEnums.CodeStrokes.ToString(), strokeId, status == false ? ActivityLogActionEnums.Inactive.ToInt(): ActivityLogActionEnums.Active.ToInt());
                 var userIds = this._dbContext.LoadStoredProcedure("md_getAllActiveCodesGroupUserIds")
                                                 .WithSqlParam("@codeName", UCLEnums.Stroke.ToString())
                                                 .WithSqlParam("@codeId", strokeId)
@@ -2573,6 +2583,8 @@ namespace Web.Services.Concrete
                     }
 
                     this._codeSepsisRepo.Update(row);
+                    this._dbContext.Log(row, TableEnums.CodeSepsis.ToString(), row.CodeSepsisId, ActivityLogActionEnums.Update.ToInt());
+
                     fieldValue = new { videosPath = codeSepsis.VideosPath, audiosPath = codeSepsis.AudiosPath, attachmentsPath = codeSepsis.AttachmentsPath };
                     var userIds = this._SepsisCodeGroupMembersRepo.Table.Where(x => x.SepsisCodeIdFk == row.CodeSepsisId).Select(x => x.UserIdFk).ToList();
                     var userUniqueIds = this._userRepo.Table.Where(x => userIds.Contains(x.UserId)).Select(x => x.UserUniqueId).Distinct().ToList();
@@ -2904,6 +2916,7 @@ namespace Web.Services.Concrete
                             Sepsis.Audio = codeSepsis.AudioFolderRoot;
                         }
                         this._codeSepsisRepo.Insert(Sepsis);
+                        this._dbContext.Log(Sepsis, TableEnums.CodeSepsis.ToString(), Sepsis.CodeSepsisId, ActivityLogActionEnums.Create.ToInt());
 
                         var codeService = new CodesServiceLinesMapping()
                         {
@@ -3354,7 +3367,7 @@ namespace Web.Services.Concrete
                                                       };
 
             var isDeleted = this._dbContext.Database.ExecuteSqlRaw(sql, parameters);
-
+            this._dbContext.Log(string.Empty, TableEnums.CodeSepsis.ToString(), SepsisId, ActivityLogActionEnums.Delete.ToInt());
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Deleted" };
         }
 
@@ -3376,6 +3389,8 @@ namespace Web.Services.Concrete
             var rowsEffected = this._dbContext.Database.ExecuteSqlRaw(sql, parameters);
             if (rowsEffected > 0)
             {
+                this._dbContext.Log(string.Empty, TableEnums.CodeSepsis.ToString(), SepsisId, status == false ? ActivityLogActionEnums.Inactive.ToInt() : ActivityLogActionEnums.Active.ToInt());
+
                 var userIds = this._dbContext.LoadStoredProcedure("md_getAllActiveCodesGroupUserIds")
                                                 .WithSqlParam("@codeName", UCLEnums.Sepsis.ToString())
                                                 .WithSqlParam("@codeId", SepsisId)
@@ -3910,6 +3925,8 @@ namespace Web.Services.Concrete
                     }
 
                     this._codeSTEMIRepo.Update(row);
+                    this._dbContext.Log(row, TableEnums.CodeSTEMIs.ToString(), row.CodeStemiid,ActivityLogActionEnums.Update.ToInt());
+
                     fieldValue = new { videosPath = codeSTEMI.VideosPath, audiosPath = codeSTEMI.AudiosPath, attachmentsPath = codeSTEMI.AttachmentsPath };
                     var userIds = this._STEMICodeGroupMembersRepo.Table.Where(x => x.StemicodeIdFk == row.CodeStemiid).Select(x => x.UserIdFk).ToList();
                     var userUniqueIds = this._userRepo.Table.Where(x => userIds.Contains(x.UserId)).Select(x => x.UserUniqueId).Distinct().ToList();
@@ -4240,7 +4257,7 @@ namespace Web.Services.Concrete
                         }
 
                         this._codeSTEMIRepo.Insert(STEMI);
-
+                        this._dbContext.Log(STEMI, TableEnums.CodeSTEMIs.ToString(), STEMI.CodeStemiid, ActivityLogActionEnums.Create.ToInt());
                         var codeService = new CodesServiceLinesMapping()
                         {
                             OrganizationIdFk = STEMI.OrganizationIdFk,
@@ -4610,6 +4627,8 @@ namespace Web.Services.Concrete
 
             var isDeleted = this._dbContext.Database.ExecuteSqlRaw(sql, parameters);
 
+            this._dbContext.Log(string.Empty, TableEnums.CodeSTEMIs.ToString(), STEMIId, ActivityLogActionEnums.Delete.ToInt());
+
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Deleted" };
         }
 
@@ -4631,6 +4650,8 @@ namespace Web.Services.Concrete
             var rowsEffected = this._dbContext.Database.ExecuteSqlRaw(sql, parameters);
             if (rowsEffected > 0)
             {
+                this._dbContext.Log(string.Empty, TableEnums.CodeSTEMIs.ToString(), STEMIId, status == false ? ActivityLogActionEnums.Inactive.ToInt() : ActivityLogActionEnums.Active.ToInt());
+
                 var userIds = this._dbContext.LoadStoredProcedure("md_getAllActiveCodesGroupUserIds")
                                                 .WithSqlParam("@codeName", UCLEnums.STEMI.ToString())
                                                 .WithSqlParam("@codeId", STEMIId)
@@ -5165,6 +5186,7 @@ namespace Web.Services.Concrete
                     }
 
                     this._codeTrumaRepo.Update(row);
+                    this._dbContext.Log(row, TableEnums.CodeTraumas.ToString(), row.CodeTraumaId, ActivityLogActionEnums.Update.ToInt());
                     fieldValue = new { videosPath = codeTruma.VideosPath, audiosPath = codeTruma.AudiosPath, attachmentsPath = codeTruma.AttachmentsPath };
                     var userIds = this._TraumaCodeGroupMembersRepo.Table.Where(x => x.TraumaCodeIdFk == row.CodeTraumaId).Select(x => x.UserIdFk).ToList();
                     var userUniqueIds = this._userRepo.Table.Where(x => userIds.Contains(x.UserId)).Select(x => x.UserUniqueId).Distinct().ToList();
@@ -5493,6 +5515,7 @@ namespace Web.Services.Concrete
                             Truma.Audio = codeTruma.AudioFolderRoot;
                         }
                         this._codeTrumaRepo.Insert(Truma);
+                        this._dbContext.Log(Truma, TableEnums.CodeTraumas.ToString(), Truma.CodeTraumaId, ActivityLogActionEnums.Create.ToInt());
 
                         var codeService = new CodesServiceLinesMapping()
                         {
@@ -5942,7 +5965,7 @@ namespace Web.Services.Concrete
                                                       };
 
             var isDeleted = this._dbContext.Database.ExecuteSqlRaw(sql, parameters);
-
+            this._dbContext.Log(string.Empty, TableEnums.CodeTraumas.ToString(), TrumaId, ActivityLogActionEnums.Delete.ToInt());
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Deleted" };
         }
 
@@ -5963,6 +5986,7 @@ namespace Web.Services.Concrete
 
             var rowsEffected = this._dbContext.Database.ExecuteSqlRaw(sql, parameters);
             if (rowsEffected > 0)
+                this._dbContext.Log(string.Empty, TableEnums.CodeTraumas.ToString(), TraumaId, status == false ? ActivityLogActionEnums.Inactive.ToInt() : ActivityLogActionEnums.Active.ToInt());
             {
                 var userIds = this._dbContext.LoadStoredProcedure("md_getAllActiveCodesGroupUserIds")
                                                 .WithSqlParam("@codeName", UCLEnums.Trauma.ToString())
@@ -6496,6 +6520,7 @@ namespace Web.Services.Concrete
                     }
 
                     this._codeBlueRepo.Update(row);
+                    this._dbContext.Log(row, TableEnums.CodeBlues.ToString(), row.CodeBlueId, ActivityLogActionEnums.Update.ToInt());
                     fieldValue = new { videosPath = codeBlue.VideosPath, audiosPath = codeBlue.AudiosPath, attachmentsPath = codeBlue.AttachmentsPath };
                     var userIds = this._BlueCodeGroupMembersRepo.Table.Where(x => x.BlueCodeIdFk == row.CodeBlueId).Select(x => x.UserIdFk).ToList();
                     var userUniqueIds = this._userRepo.Table.Where(x => userIds.Contains(x.UserId)).Select(x => x.UserUniqueId).Distinct().ToList();
@@ -6828,7 +6853,7 @@ namespace Web.Services.Concrete
                         }
 
                         this._codeBlueRepo.Insert(blue);
-
+                        this._dbContext.Log(blue, TableEnums.CodeBlues.ToString(), blue.CodeBlueId, ActivityLogActionEnums.Create.ToInt());
                         var codeService = new CodesServiceLinesMapping()
                         {
                             OrganizationIdFk = blue.OrganizationIdFk,

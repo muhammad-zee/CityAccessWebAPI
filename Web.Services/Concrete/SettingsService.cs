@@ -18,14 +18,17 @@ namespace Web.Services.Concrete
         IConfiguration _config;
         private RAQ_DbContext _dbContext;
         private readonly IRepository<Setting> _settingRepo;
+        public readonly IRepository<ActiveLog> _activityLogRepo;
 
         public SettingsService(RAQ_DbContext dbContext,
             IConfiguration configuration,
-            IRepository<Setting> settingsRepo)
+            IRepository<Setting> settingsRepo,
+            IRepository<ActiveLog> activityLogRepo)
         {
             this._dbContext = dbContext;
             this._config = configuration;
             this._settingRepo = settingsRepo;
+            this._activityLogRepo = activityLogRepo;
         }
 
 
@@ -133,5 +136,25 @@ namespace Web.Services.Concrete
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Saved Successfully" };
         }
 
+
+        #region [Activity Log]
+
+        public BaseResponse GetActivityLog(int UserId)
+        {
+            var rec = this._dbContext.LoadStoredProcedure("md_getActivityLogReport")
+                                .WithSqlParam("@pUserId", UserId)
+                                .ExecuteStoredProc<ActivityLogVm>().AsQueryable();
+            if (rec != null)
+            {
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Found", Body = rec };
+            }
+            else
+            {
+                return new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "Data Not Found" };
+            }
+        }
+
+      
+        #endregion
     }
 }

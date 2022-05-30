@@ -417,6 +417,9 @@ namespace Web.Services.Concrete
                 int rowsEffect = this._dbContext.Database.ExecuteSqlRaw(query);
                 if (rowsEffect > 0)
                 {
+                    var consult = this._dbContext.LoadSQLQuery($"Select ConsultId from consults where consultNumber = { Consult_Counter.Counter_Value.ToInt()}").ExecuteStoredProc<Consult>().FirstOrDefault();
+
+                    this._dbContext.Log(keyValues, TableEnums.Consults.ToString(), consult.ConsultId.ToInt(), ActivityLogActionEnums.Create.ToInt());
 
                     //    if (keys.Contains("ServiceLineIdFk") && keyValues["ServiceLineIdFk"].ToString() != "0")
                     //    {
@@ -664,13 +667,14 @@ namespace Web.Services.Concrete
                         }
                     }
                 }
-                query += keyValues.ContainsKey("CallbackNumber") && keyValues["CallbackNumber"].ToString() != "(___) ___-____" ? " [CallbackNumber] =" + keyValues["CallbackNumber"].ToString() + "," : "";
+                query += keyValues.ContainsKey("CallbackNumber") && keyValues["CallbackNumber"].ToString() != "(___) ___-____" ? " [CallbackNumber] ='" + keyValues["CallbackNumber"].ToString() + "'," : "";
                 query += $" [ModifiedBy] = '{ApplicationSettings.UserId}', [ModifiedDate] = '{DateTime.UtcNow.ToString("MM-dd-yyyy hh:mm:ss")}'";
                 query += $" WHERE ConsultId = '{ConsultId.ToInt()}'";
 
                 int rowsEffect = this._dbContext.Database.ExecuteSqlRaw(query);
                 if (rowsEffect > 0)
                 {
+                    this._dbContext.Log(keyValues, TableEnums.Consults.ToString(), keyValues["ConsultId"].ToString().ToInt(), ActivityLogActionEnums.Update.ToInt());
                     return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Updated Successfully" };
                 }
                 else
