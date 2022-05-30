@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Dynamic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -241,6 +242,33 @@ namespace Web.Services.Helper
             return clearText;
         }
 
+        public static object RemoveNullValues<T>(this T obj)
+        {
+            try
+            {
+               
+                    var type = obj.GetType();
+                    var returnClass = new ExpandoObject() as IDictionary<string, object>;
+                    var props = type.GetProperties();
+                    foreach (var propertyInfo in props)
+                    {
+                        var value = propertyInfo.GetValue(obj);
+                        //var valueIsNotAString = value != null;//!(value is string && !string.IsNullOrWhiteSpace(value.ToString()));
+                        if (value != null && propertyInfo.Name.ToLower() != "isdeleted" 
+                        && propertyInfo.Name.ToLower() != "createddate" && propertyInfo.Name.ToLower() != "createdby"
+                        && propertyInfo.Name.ToLower() != "modifieddate" && propertyInfo.Name.ToLower() != "modifiedby")
+                        {
+                            returnClass.Add(propertyInfo.Name, value);
+                        }
+                    }
+                    
+                return returnClass;
+            }
+            catch(Exception ex)
+            {
+                return obj;
+            }
+        }
         public static string Decrypt(string cipherText)
         {
             string EncryptionKey = "WebApi1122";

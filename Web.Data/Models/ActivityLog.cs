@@ -13,6 +13,7 @@ namespace Web.Data.Models
         public int? TablePrimaryKey { get; set; }
         public int Action { get; set; }
         public string Changeset { get; set; }
+        public string PreviousValue { get; set; }
         public string Description { get; set; }
         public DateTime CreatedDate { get; set; }
         public bool? IsActive { get; set; }

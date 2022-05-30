@@ -985,7 +985,8 @@ namespace Web.Services.Concrete
                                              .WithSqlParam("codeId", codeStroke.CodeStrokeId)
                                              .WithSqlParam("modifiedBy", ApplicationSettings.UserId)
                                              .ExecuteStoredProc<CodeStroke>().FirstOrDefault();
-
+                    //var removedNullValues = row.RemoveNullValues();
+                    this._dbContext.Log(row, TableEnums.CodeStrokes.ToString(), row.CodeStrokeId, ActivityLogActionEnums.Update.ToInt());
                     var userIds = this._StrokeCodeGroupMembersRepo.Table.Where(x => x.StrokeCodeIdFk == row.CodeStrokeId).Select(x => x.UserIdFk).ToList();
                     var userUniqueIds = this._userRepo.Table.Where(x => userIds.Contains(x.UserId)).Select(x => x.UserUniqueId).Distinct().ToList();
                     var superAdmins = this._userRepo.Table.Where(x => x.IsInGroup && !x.IsDeleted).Select(x => x.UserUniqueId).ToList();
@@ -1011,7 +1012,7 @@ namespace Web.Services.Concrete
                     };
 
                     _communicationService.pushNotification(notification);
-                    this._dbContext.Log(row, TableEnums.CodeStrokes.ToString(), row.CodeStrokeId, ActivityLogActionEnums.Update.ToInt());
+                    
                     return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Updated Successfully" };
                 }
                 else

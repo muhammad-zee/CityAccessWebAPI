@@ -80,8 +80,8 @@ namespace Web.API.Controllers
         }
 
         #region [Activity Log]
-        [HttpGet("ActivityLog/GetActivityLog")]
-        public BaseResponse GetActivityLog(FilterActivityLogVM filter)
+        [HttpPost("ActivityLog/GetActivityLog")]
+        public BaseResponse GetActivityLog([FromBody] FilterActivityLogVM filter)
         {
             var state = ModelState;
             try

@@ -120,6 +120,8 @@ namespace Web.Data.Models
                     .IsRequired()
                     .HasDefaultValueSql("((1))");
 
+                entity.Property(e => e.PreviousValue).IsUnicode(false);
+
                 entity.Property(e => e.TableName)
                     .IsRequired()
                     .HasMaxLength(200)
