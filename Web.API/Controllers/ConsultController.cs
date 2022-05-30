@@ -34,6 +34,7 @@ namespace Web.API.Controllers
         #region Consult Fields
         [Description("Get All Consult Feilds")]
         [HttpGet("consult/GetAllConsultFields")]
+        [ValidateAntiForgeryToken]
         public BaseResponse GetAllConsultFields()
         {
             try
@@ -50,6 +51,7 @@ namespace Web.API.Controllers
 
         [Description("Get Consult Feilds For Org")]
         [HttpGet("consult/GetConsultFeildsForOrg/{OrgId}")]
+        [ValidateAntiForgeryToken]
         public BaseResponse GetConsultFeildsForOrg(int OrgId)
         {
             try
@@ -65,6 +67,7 @@ namespace Web.API.Controllers
         }
         [Description("Get Consult Fields For Org")]
         [HttpGet("consult/GetConsultGraphDataForOrg/{OrgId}/{days}")]
+        
         public BaseResponse GetConsultGraphDataForOrg(int OrgId, int days = 6)
         {
             try
@@ -81,6 +84,7 @@ namespace Web.API.Controllers
 
         [Description("Get Consult Feilds For Org")]
         [HttpGet("consult/GetConsultFormFieldByOrgId/{OrgId}")]
+        [ValidateAntiForgeryToken]
         public BaseResponse GetConsultFormFieldByOrgId(int OrgId)
         {
             try
@@ -97,6 +101,7 @@ namespace Web.API.Controllers
 
         [Description("Add Or Update Consult Feilds")]
         [HttpPost("consult/AddOrUpdateConsultFeilds")]
+        [ValidateAntiForgeryToken]
         public BaseResponse AddOrUpdateConsultFeilds([FromBody] ConsultFieldsVM consultField)
         {
             try
@@ -117,6 +122,7 @@ namespace Web.API.Controllers
 
         [Description("Get Consult Feilds For Org")]
         [HttpPost("consult/AddOrUpdateOrgConsultFeilds")]
+        [ValidateAntiForgeryToken]
         public BaseResponse AddOrUpdateOrgConsultFeilds([FromBody] List<OrgConsultFieldsVM> orgConsultFields)
         {
             try
@@ -134,6 +140,7 @@ namespace Web.API.Controllers
 
         [Description("Get Consult Forms For Org")]
         [HttpGet("consult/GetConsultFormByOrgId/{orgId}")]
+        
         public BaseResponse GetConsultFormByOrgId(int orgId)
         {
             try
@@ -187,6 +194,7 @@ namespace Web.API.Controllers
 
         [Description("Get Consults By Service Line Id")]
         [HttpPost("consult/GetConsultsByServiceLineId")]
+        
         public BaseResponse GetConsultsByServiceLineId([FromBody] ConsultVM consult)
         {
             try
@@ -252,6 +260,7 @@ namespace Web.API.Controllers
 
         [Description("Delete Consult")]
         [HttpGet("consult/DeleteConsult/{consultId}/{status}")]
+        [ValidateAntiForgeryToken]
         public BaseResponse DeleteConsult(int consultId, bool status)
         {
             try
@@ -272,6 +281,7 @@ namespace Web.API.Controllers
         #region Consult Acknowledgments
 
         [HttpGet("consult/GetAllConsultAcknowledgments")]
+        [ValidateAntiForgeryToken]
         public BaseResponse GetAllConsultAcknowledgments()
         {
             try
@@ -287,6 +297,7 @@ namespace Web.API.Controllers
         }
 
         [HttpGet("consult/GetConsultAcknowledgmentByConsultId/{consultId}")]
+       
         public BaseResponse GetConsultAcknowledgmentByConsultId(int consultId)
         {
             try
@@ -302,6 +313,7 @@ namespace Web.API.Controllers
         }
 
         [HttpGet("consult/GetConsultAcknowledgmentByUserId/{userId}")]
+       
         public BaseResponse GetConsultAcknowledgmentByUserId(int userId)
         {
             try
@@ -318,6 +330,7 @@ namespace Web.API.Controllers
 
 
         [HttpGet("consult/AcknowledgeConsult/{consultId}")]
+        [ValidateAntiForgeryToken]
         public BaseResponse AcknowledgeConsult(int consultId)
         {
             try
