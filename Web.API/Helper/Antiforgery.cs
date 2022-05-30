@@ -24,7 +24,7 @@ namespace Web.API.Helper
             {
                 var context = (HttpContext)state;
                 var tokens = antiforgery.GetAndStoreTokens(httpContext);
-                httpContext.Response.Cookies.Append("XSRF-TOKEN", tokens.RequestToken, new CookieOptions() { Path = "/", HttpOnly = false });
+                httpContext.Response.Cookies.Append("XSRF-TOKEN", tokens.RequestToken, new CookieOptions() { Path = "/", HttpOnly = true });
                 return Task.CompletedTask;
             }, httpContext);
 
