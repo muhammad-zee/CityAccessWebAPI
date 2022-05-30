@@ -154,6 +154,7 @@ namespace Web.API.Controllers
 
         [Description("Get All Consults")]
         [HttpGet("consult/GetAllConsults")]
+        [ValidateAntiForgeryToken]
         public BaseResponse GetAllConsults()
         {
             try

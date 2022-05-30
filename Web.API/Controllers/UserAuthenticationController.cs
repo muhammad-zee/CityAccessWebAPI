@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using System;
 using System.ComponentModel;
 using System.Net;
+using System.Threading.Tasks;
 using Web.API.Helper;
 using Web.Model;
 using Web.Model.Common;
@@ -298,5 +299,13 @@ namespace Web.API.Controllers
             }
         }
         #endregion
+
+
+        [HttpPost("csrf-refresh")]
+        public async Task<ActionResult> RefreshCsrfToken()
+        {
+            await Task.Delay(5);
+            return Ok();
+        }
     }
 }
