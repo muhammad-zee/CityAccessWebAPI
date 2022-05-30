@@ -131,6 +131,15 @@ namespace Web.API
 
             //Register Services Repositories
 
+            services.AddAntiforgery(options =>
+            {
+                options.HeaderName = "X-XSRF-TOKEN";
+                options.Cookie = new CookieBuilder()
+                {
+                    Name = "XSRF-TOKEN"
+                };
+            });
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -172,6 +181,8 @@ namespace Web.API
             app.UseAuthentication();
 
             app.UseAuthorization();
+
+            app.UseAntiforgery();
 
             //app.UseStaticFiles(new StaticFileOptions
             //{
