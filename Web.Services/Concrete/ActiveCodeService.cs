@@ -1329,6 +1329,7 @@ namespace Web.Services.Concrete
                     }
 
                     this._codeStrokeRepo.Update(row);
+                    this._dbContext.Log(row, TableEnums.CodeStrokes.ToString(), row.CodeStrokeId, ActivityLogActionEnums.Update.ToInt());
                     fieldValue = new { videosPath = codeStroke.VideosPath, audiosPath = codeStroke.AudiosPath, attachmentsPath = codeStroke.AttachmentsPath };
                     var userIds = this._StrokeCodeGroupMembersRepo.Table.Where(x => x.StrokeCodeIdFk == row.CodeStrokeId).Select(x => x.UserIdFk).ToList();
                     var userUniqueIds = this._userRepo.Table.Where(x => userIds.Contains(x.UserId)).Select(x => x.UserUniqueId).Distinct().ToList();
@@ -1352,7 +1353,6 @@ namespace Web.Services.Concrete
                     };
 
                     _communicationService.pushNotification(notification);
-                    this._dbContext.Log(row, TableEnums.CodeStrokes.ToString(), row.CodeStrokeId, ActivityLogActionEnums.Update.ToInt());
 
                     return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Updated Successfully" };
                 }

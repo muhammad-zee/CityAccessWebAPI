@@ -18,12 +18,12 @@ namespace Web.Services.Concrete
         IConfiguration _config;
         private RAQ_DbContext _dbContext;
         private readonly IRepository<Setting> _settingRepo;
-        public readonly IRepository<ActiveLog> _activityLogRepo;
+        public readonly IRepository<ActivityLog> _activityLogRepo;
 
         public SettingsService(RAQ_DbContext dbContext,
             IConfiguration configuration,
             IRepository<Setting> settingsRepo,
-            IRepository<ActiveLog> activityLogRepo)
+            IRepository<ActivityLog> activityLogRepo)
         {
             this._dbContext = dbContext;
             this._config = configuration;
@@ -139,10 +139,10 @@ namespace Web.Services.Concrete
 
         #region [Activity Log]
 
-        public BaseResponse GetActivityLog(int UserId)
+        public BaseResponse GetActivityLog(FilterActivityLogVM filter)
         {
             var rec = this._dbContext.LoadStoredProcedure("md_getActivityLogReport")
-                                .WithSqlParam("@pUserId", UserId)
+                                .WithSqlParam("@pUserId", filter.UserId)
                                 .ExecuteStoredProc<ActivityLogVm>().AsQueryable();
             if (rec != null)
             {

@@ -81,12 +81,12 @@ namespace Web.API.Controllers
 
         #region [Activity Log]
         [HttpGet("ActivityLog/GetActivityLog")]
-        public BaseResponse GetActivityLog(int UserId,string? ModuleName,DateTime? FromDate,DateTime? ToDate,int? CodeId)
+        public BaseResponse GetActivityLog(FilterActivityLogVM filter)
         {
             var state = ModelState;
             try
             {
-                return _settingService.GetActivityLog(UserId);
+                return _settingService.GetActivityLog(filter);
             }
             catch (Exception ex)
             {

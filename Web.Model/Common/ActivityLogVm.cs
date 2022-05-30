@@ -16,7 +16,18 @@ namespace Web.Model.Common
         public int Action { get; set; }
         public int ActionName { get; set; }
         public string Changeset { get; set; }
+        public string PreviousValue { get; set; }
         public string Description { get; set; }
         public DateTime CreatedDate { get; set; }
+    }
+    
+
+    public class FilterActivityLogVM
+    {
+public int CodeId{get; set;}
+public int ModuleId{get; set;}
+public int UserId { get; set; }
+public DateTime FromDate { get; set; }
+public DateTime ToDate { get; set; }
     }
 }

@@ -930,6 +930,8 @@ namespace Web.Services.Concrete
             var rowsEffected = this._dbContext.Database.ExecuteSqlRaw(sql, parameters);
             if (rowsEffected > 0)
             {
+                this._dbContext.Log(string.Empty, TableEnums.Consults.ToString(), consultId, status == false ? ActivityLogActionEnums.Inactive.ToInt(): ActivityLogActionEnums.Active.ToInt());
+
                 var userIds = this._dbContext.LoadStoredProcedure("md_getConsultGroupUsersId")
                                              .WithSqlParam("@consultId", consultId)
                                              .ExecuteStoredProc<ConsultAcknowledgmentVM>();

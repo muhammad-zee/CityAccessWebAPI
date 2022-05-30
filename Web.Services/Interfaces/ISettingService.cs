@@ -8,6 +8,6 @@ namespace Web.Services.Interfaces
         BaseResponse GetSettingsByOrgId(int OrgId);
         BaseResponse AddOrUpdateOrgSettings(SettingsVM settings);
         BaseResponse GetSettingsChangePasswordByOrgId(SettingsVM settings);
-        BaseResponse GetActivityLog(int UserId);
+        BaseResponse GetActivityLog(FilterActivityLogVM filter);
     }
 }

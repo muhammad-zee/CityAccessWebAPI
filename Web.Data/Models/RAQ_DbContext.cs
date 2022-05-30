@@ -18,7 +18,7 @@ namespace Web.Data.Models
         }
 
         public virtual DbSet<ActiveCode> ActiveCodes { get; set; }
-        public virtual DbSet<ActiveLog> ActiveLogs { get; set; }
+        public virtual DbSet<ActivityLog> ActivityLogs { get; set; }
         public virtual DbSet<CallLog> CallLogs { get; set; }
         public virtual DbSet<CallQueue> CallQueues { get; set; }
         public virtual DbSet<CallReservation> CallReservations { get; set; }
@@ -106,7 +106,7 @@ namespace Web.Data.Models
                     .HasConstraintName("FK_ActiveCodes_Organizations");
             });
 
-            modelBuilder.Entity<ActiveLog>(entity =>
+            modelBuilder.Entity<ActivityLog>(entity =>
             {
                 entity.Property(e => e.Changeset).IsUnicode(false);
 
@@ -115,6 +115,10 @@ namespace Web.Data.Models
                 entity.Property(e => e.Description)
                     .HasMaxLength(400)
                     .IsUnicode(false);
+
+                entity.Property(e => e.IsActive)
+                    .IsRequired()
+                    .HasDefaultValueSql("((1))");
 
                 entity.Property(e => e.TableName)
                     .IsRequired()
