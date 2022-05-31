@@ -330,7 +330,6 @@ namespace Web.API.Controllers
 
 
         [HttpGet("consult/AcknowledgeConsult/{consultId}")]
-        [ValidateAntiForgeryToken]
         public BaseResponse AcknowledgeConsult(int consultId)
         {
             try

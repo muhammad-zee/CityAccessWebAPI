@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System;
 using System.Text;
 using Web.API.Helper;
 using Web.Data;
@@ -44,7 +45,22 @@ namespace Web.API
                     options.JsonSerializerOptions.IgnoreNullValues = true;
                     options.JsonSerializerOptions.Converters.Add(new DateTimeConverter());
                 });
-            services.AddCors();
+            //services.AddCors();
+
+            services.AddCors(options =>
+                           options.AddPolicy("MDRouteCorsPolicy", p => p.WithOrigins("http://localhost:4200", "https://mdroute.com")
+                                                                        .AllowAnyHeader()
+                                                                        .AllowAnyMethod()));
+
+            // Security Headers
+
+            services.AddHsts(options =>
+            {
+                options.Preload = true;
+                options.IncludeSubDomains = true;
+                options.MaxAge = TimeSpan.FromDays(365);
+            });
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo
@@ -161,7 +177,37 @@ namespace Web.API
                 c.SwaggerEndpoint("/mysite/swagger/v1/swagger.json", "Web API V1");
                 c.RoutePrefix = string.Empty;
             });
+
+            // Security Headers
+
+
+            app.Use(async (context, next) =>
+            {
+                context.Response.Headers.Add("Feature-Policy", "camera '*'; geolocation '*'; microphone '*'; fullscreen '*'; picture-in-picture '*'; sync-xhr '*'; encrypted-media '*'; oversized-images '*'");
+                await next();
+            });
+
+            app.UseHsts();
             app.UseHttpsRedirection();
+
+            app.Use(async (context, next) =>
+            {
+                context.Response.Headers.Add("X-Frame-Options", "SAMEORIGIN");
+                await next();
+            });
+
+            app.Use(async (context, next) =>
+            {
+                context.Response.Headers.Add("X-Xss-Protection", "1; mode=block");
+                await next();
+            });
+
+
+            app.Use(async (ctx, next) =>
+            {
+                ctx.Response.Headers.Add("Content-Security-Policy", "script-src https 'unsafe-inline' 'unsafe-eval';style-src https 'unsafe-inline' 'unsafe-eval';img-src https: data:;font-src https: data:;");
+                await next();
+            });
 
             app.UseStaticFiles(new StaticFileOptions
             {
@@ -172,11 +218,12 @@ namespace Web.API
 
             app.UseRouting();
 
-            app.UseCors(x => x
-                //.SetIsOriginAllowed(origin => true)
-                .AllowAnyOrigin()
-                .AllowAnyMethod()
-                .AllowAnyHeader());
+            app.UseCors("MDRouteCorsPolicy");
+            //app.UseCors(x => x
+            //    //.SetIsOriginAllowed(origin => true)
+            //    .AllowAnyOrigin()
+            //    .AllowAnyMethod()
+            //    .AllowAnyHeader());
 
             app.UseAuthentication();
 
