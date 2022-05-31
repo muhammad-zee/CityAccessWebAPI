@@ -117,7 +117,7 @@ namespace Web.API.Controllers
 
         [Description("Delete File")]
         [HttpPost("activecode/DeleteFile")]
-        
+
         public BaseResponse DeleteFile([FromBody] FilesVM files)
         {
             try
@@ -154,7 +154,7 @@ namespace Web.API.Controllers
 
         [Description("Get Stroke Data By Id")]
         [HttpGet("stroke/GetStrokeDataById/{strokeId}")]
-       
+
         public BaseResponse GetStrokeDataById(int strokeId)
         {
             try
@@ -205,7 +205,7 @@ namespace Web.API.Controllers
 
         [Description("Update Group for Code Stroke")]
         [HttpPost("stroke/UpdateGroupForCodeStroke")]
-        
+
         public BaseResponse UpdateStrokeGroup([FromBody] CodeStrokeVM codeStroke)
         {
             try
@@ -277,7 +277,7 @@ namespace Web.API.Controllers
 
         [Description("Get Sepsis Data By Id")]
         [HttpGet("Sepsis/GetSepsisDataById/{SepsisId}")]
-        
+
         public BaseResponse GetSepsisDataById(int SepsisId)
         {
             try
@@ -295,7 +295,7 @@ namespace Web.API.Controllers
 
         [Description("Add Or Update Sepsis")]
         [HttpPost("Sepsis/AddOrUpdateSepsis")]
-       
+
         public BaseResponse AddOrUpdateSepsis([FromBody] CodeSepsisVM codeSepsis)
         {
             try
@@ -313,7 +313,7 @@ namespace Web.API.Controllers
 
         [Description("Create Group for Code Sepsis")]
         [HttpPost("Sepsis/createGroupForCodeSepsis")]
- 
+
         public BaseResponse CreateSepsisGroup([FromBody] CodeSepsisVM codeSepsis)
         {
             try
@@ -330,7 +330,7 @@ namespace Web.API.Controllers
 
         [Description("Update Group for Code Sepsis")]
         [HttpPost("Sepsis/UpdateGroupForCodeSepsis")]
-       
+
         public BaseResponse UpdateSepsisGroup([FromBody] CodeSepsisVM codeSepsis)
         {
             try
@@ -364,7 +364,7 @@ namespace Web.API.Controllers
 
         [Description("Active Or InActive Sepsis Data By Id")]
         [HttpGet("Sepsis/ActiveOrInActiveSepsisDataById/{SepsisId}/{status}")]
-       
+
         public BaseResponse ActiveOrInActiveSepsisDataById(int SepsisId, bool status)
         {
             try
@@ -402,7 +402,7 @@ namespace Web.API.Controllers
 
         [Description("Get STEMI Data By Id")]
         [HttpGet("STEMI/GetSTEMIDataById/{STEMIId}")]
-      
+
         public BaseResponse GetSTEMIDataById(int STEMIId)
         {
             try
@@ -420,7 +420,7 @@ namespace Web.API.Controllers
 
         [Description("Add Or Update STEMI")]
         [HttpPost("STEMI/AddOrUpdateSTEMI")]
-       
+
         public BaseResponse AddOrUpdateSTEMI([FromBody] CodeSTEMIVM codeSTEMI)
         {
             try
@@ -437,7 +437,7 @@ namespace Web.API.Controllers
 
         [Description("Create Group for Code STEMI")]
         [HttpPost("STEMI/createGroupForCodeSTEMI")]
-      
+
         public BaseResponse CreateSTEMIGroup([FromBody] CodeSTEMIVM codeSTEMI)
         {
             try
@@ -454,7 +454,7 @@ namespace Web.API.Controllers
 
         [Description("Update Group for Code STEMI")]
         [HttpPost("STEMI/UpdateGroupForCodeSTEMI")]
-       
+
         public BaseResponse UpdateSTEMIGroup([FromBody] CodeSTEMIVM codeSTEMI)
         {
             try
@@ -488,7 +488,7 @@ namespace Web.API.Controllers
 
         [Description("Active Or InActive STEMI Data By Id")]
         [HttpGet("STEMI/ActiveOrInActiveSTEMIDataById/{STEMIId}/{status}")]
-       
+
         public BaseResponse ActiveOrInActiveSTEMIDataById(int STEMIId, bool status)
         {
             try
@@ -525,7 +525,7 @@ namespace Web.API.Controllers
 
         [Description("Get Trauma Data By Id")]
         [HttpGet("Trauma/GetTraumaDataById/{TraumaId}")]
-      
+
         public BaseResponse GetTraumaDataById(int TraumaId)
         {
             try
@@ -543,7 +543,7 @@ namespace Web.API.Controllers
 
         [Description("Add Or Update Trauma")]
         [HttpPost("Trauma/AddOrUpdateTrauma")]
-       
+
         public BaseResponse AddOrUpdateTrauma([FromBody] CodeTrumaVM codeTrauma)
         {
             try
@@ -560,7 +560,7 @@ namespace Web.API.Controllers
 
         [Description("Create Group for Code Trauma")]
         [HttpPost("Trauma/createGroupForCodeTrauma")]
-     
+
         public BaseResponse CreateTraumaGroup([FromBody] CodeTrumaVM codeTrauma)
         {
             try
@@ -577,7 +577,7 @@ namespace Web.API.Controllers
 
         [Description("Update Group for Code Trauma")]
         [HttpPost("Trauma/UpdateGroupForCodeTrauma")]
-       
+
         public BaseResponse UpdateTrumaGroup([FromBody] CodeTrumaVM codeTruma)
         {
             try
@@ -611,7 +611,7 @@ namespace Web.API.Controllers
 
         [Description("Active/InActive Trauma Data By Id")]
         [HttpGet("Trauma/ActiveOrInActiveTraumaDataById/{TraumaId}/{status}")]
-     
+
         public BaseResponse ActiveOrInActiveTraumaDataById(int TraumaId, bool status)
         {
             try
@@ -632,7 +632,7 @@ namespace Web.API.Controllers
 
 
         [Description("Get All Blue Data")]
-        [HttpPost("blue/GetAllBlueData")] 
+        [HttpPost("blue/GetAllBlueData")]
         public BaseResponse GetAllBlueData([FromBody] ActiveCodeVM activeCode)
         {
             try
@@ -649,7 +649,7 @@ namespace Web.API.Controllers
 
         [Description("Get Blue Data By Id")]
         [HttpGet("blue/GetBlueDataById/{blueId}")]
-        
+
         public BaseResponse GetBlueDataById(int blueId)
         {
             try
@@ -683,7 +683,7 @@ namespace Web.API.Controllers
 
         [Description("Create Group for Code Blue")]
         [HttpPost("Blue/createGroupForCodeBlue")]
-      
+
         public BaseResponse CreateBlueGroup([FromBody] CodeBlueVM codeBlue)
         {
             try
@@ -700,7 +700,7 @@ namespace Web.API.Controllers
 
         [Description("Update Group for Code Blue")]
         [HttpPost("Blue/UpdateGroupForCodeBlue")]
-        
+
         public BaseResponse UpdateBlueGroup([FromBody] CodeBlueVM codeBlue)
         {
             try
@@ -734,7 +734,7 @@ namespace Web.API.Controllers
 
         [Description("Active Or InActive Blue Data By Id")]
         [HttpGet("blue/ActiveOrInActiveBlueDataById/{blueId}/{status}")]
-        
+
         public BaseResponse ActiveInActiveBlueDataById(int blueId, bool status)
         {
             try
@@ -793,7 +793,7 @@ namespace Web.API.Controllers
 
         [Description("Get All Inhouse Code Feilds")]
         [HttpGet("InhouseCode/GetInhouseCodeFeildsForOrg/{OrgId}/{codeName}")]
-      
+
         public BaseResponse GetInhouseCodeFeildsForOrg(int OrgId, string codeName)
         {
             try
@@ -829,7 +829,7 @@ namespace Web.API.Controllers
 
         [Description("Get All Inhouse Code Feilds")]
         [HttpPost("InhouseCode/AddOrUpdateOrgCodeStrokeFeilds")]
-        
+
         public BaseResponse AddOrUpdateOrgCodeStrokeFeilds([FromBody] List<OrgCodeStrokeFeildsVM> orgInhouseCodeFields)
         {
             try
@@ -846,7 +846,6 @@ namespace Web.API.Controllers
 
         [Description("Get All Inhouse Code Feilds")]
         [HttpPost("InhouseCode/AddOrUpdateOrgCodeSTEMIFeilds")]
-        [ValidateAntiForgeryToken]
         public BaseResponse AddOrUpdateOrgCodeSTEMIFeilds([FromBody] List<OrgCodeSTEMIFeildsVM> orgInhouseCodeFields)
         {
             try
@@ -863,7 +862,7 @@ namespace Web.API.Controllers
 
         [Description("Get All Inhouse Code Feilds")]
         [HttpPost("InhouseCode/AddOrUpdateOrgCodeSepsisFeilds")]
-        [ValidateAntiForgeryToken]
+
         public BaseResponse AddOrUpdateOrgCodeSepsisFeilds([FromBody] List<OrgCodeSepsisFeildsVM> orgInhouseCodeFields)
         {
             try
@@ -880,7 +879,7 @@ namespace Web.API.Controllers
 
         [Description("Get All Inhouse Code Feilds")]
         [HttpPost("InhouseCode/AddOrUpdateOrgCodeTraumaFeilds")]
-        [ValidateAntiForgeryToken]
+
         public BaseResponse AddOrUpdateOrgCodeTraumaFeilds([FromBody] List<OrgCodeTraumaFeildsVM> orgInhouseCodeFields)
         {
             try
@@ -897,7 +896,7 @@ namespace Web.API.Controllers
 
         [Description("Get All Inhouse Code Feilds")]
         [HttpPost("InhouseCode/AddOrUpdateOrgCodeBlueFeilds")]
-        [ValidateAntiForgeryToken]
+
         public BaseResponse AddOrUpdateOrgCodeBlueFeilds([FromBody] List<OrgCodeBlueFeildsVM> orgInhouseCodeFields)
         {
             try
@@ -914,7 +913,7 @@ namespace Web.API.Controllers
 
         [Description("Get All Inhouse Code Feilds")]
         [HttpGet("InhouseCode/GetInhouseCodeFormByOrgId/{OrgId}/{codeName}")]
-        
+
         public BaseResponse GetInhouseCodeFormByOrgId(int orgId, string codeName)
         {
             try
@@ -935,7 +934,7 @@ namespace Web.API.Controllers
         #region Map & Addresses
 
         [HttpGet("map/GetHospitalsOfStatesByCodeId/{codeId}/{coordinates}")]
-       
+
         public BaseResponse GetHospitalsOfStatesByCodeId(int codeId, string coordinates)
         {
             try
