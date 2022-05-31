@@ -256,7 +256,10 @@ namespace Web.Services.Helper
                         //var valueIsNotAString = value != null;//!(value is string && !string.IsNullOrWhiteSpace(value.ToString()));
                         if (value != null && propertyInfo.Name.ToLower() != "isdeleted" 
                         && propertyInfo.Name.ToLower() != "createddate" && propertyInfo.Name.ToLower() != "createdby"
-                        && propertyInfo.Name.ToLower() != "modifieddate" && propertyInfo.Name.ToLower() != "modifiedby")
+                        && propertyInfo.Name.ToLower() != "modifieddate" && propertyInfo.Name.ToLower() != "modifiedby"
+                         && propertyInfo.Name.ToLower() != "codestrokegroupmembers" && propertyInfo.Name.ToLower() != "iscompleted"
+                         && propertyInfo.Name.ToLower() != "capacity" && propertyInfo.Name.ToLower() != "organizationidfk"
+                         && (!propertyInfo.Name.ToLower().Contains("code") && !propertyInfo.Name.ToLower().Contains("id")))
                         {
                             returnClass.Add(propertyInfo.Name, value);
                         }
@@ -265,6 +268,30 @@ namespace Web.Services.Helper
                 return returnClass;
             }
             catch(Exception ex)
+            {
+                return obj;
+            }
+        }
+        public static object getChangedPropertyObject<T>(this T obj,string propertyName)
+        {
+            try
+            {
+                var type = obj.GetType();
+                var returnClass = new ExpandoObject() as IDictionary<string, object>;
+                var props = type.GetProperties();
+                foreach (var propertyInfo in props)
+                {
+                    var value = propertyInfo.GetValue(obj);
+                    //var valueIsNotAString = value != null;//!(value is string && !string.IsNullOrWhiteSpace(value.ToString()));
+                    if (value != null && propertyInfo.Name.ToLower() == propertyName.ToLower())
+                    {
+                        returnClass.Add(propertyInfo.Name, value);
+                    }
+                }
+
+                return returnClass;
+            }
+            catch (Exception ex)
             {
                 return obj;
             }

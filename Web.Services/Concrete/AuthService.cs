@@ -190,6 +190,7 @@ namespace Web.Services.Concrete
             {
                     new Claim(JwtRegisteredClaimNames.Sub, user.PrimaryEmail),
                     new Claim("UserId",user.UserId.ToString()),
+                    new Claim("UserFullName", $"{user.FirstName} {user.LastName}"),
                     new Claim("RoleIds",string.Join(",",UserRole.Select(x => x.RoleId).ToList())),
                     new Claim("isEMS", (UserRole.Where(x => x.RoleName == "EMS").Count() > 0).ToString()),
                     new Claim("isSuperAdmin",UserRole.Any(x =>x.IsSuperAdmin).ToString()),
@@ -209,7 +210,7 @@ namespace Web.Services.Concrete
                 tokenExpiryTime = settings.TokenExpiryTime > 0 ? DateTime.UtcNow.AddDays(settings.TokenExpiryTime.Value) : tokenExpiryTime;
             }
             ///////////////////////////////////////////////////////////////////////////////////////////////////
-            
+
             ////////////////////// Checking Verified for future or not ////////////////////////////////////////
             if (user.TwoFactorEnabled && user.IsTwoFactRememberChecked && DateTime.UtcNow <= user.TwoFactorExpiryDate)
             {
@@ -266,7 +267,7 @@ namespace Web.Services.Concrete
                 {
                     return new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "Password matches the previous password. Please update with new Password." };
                 }
-                user.IsRequirePasswordReset = false;                
+                user.IsRequirePasswordReset = false;
                 user.Password = modelUser.password;
                 user.PasswordExpiryDate = OrgSettings != null && OrgSettings.EnablePasswordAge.HasValue ? DateTime.UtcNow.AddDays(OrgSettings.EnablePasswordAge.Value) : user.PasswordExpiryDate.Value.AddMonths(1);
                 _userRepo.Update(user);
@@ -368,7 +369,7 @@ namespace Web.Services.Concrete
                     var existingUserRelation = this._userRelationRepo.Table.Where(x => x.UserIdFk == user.UserId).ToList();
                     this._userRelationRepo.DeleteRange(existingUserRelation);
                     /////////////////////////////////////////////////////////////////
-                    
+
 
                     /////////////// Add Super Admin Role /////////////////////////////
                     var superAdminRoleId = this._roleRepo.Table.Where(x => !x.IsDeleted && x.IsSuperAdmin).Select(x => x.RoleId).FirstOrDefault();
@@ -496,7 +497,7 @@ namespace Web.Services.Concrete
                             }
 
                         }
-                        else if (register.IsSuperAdmin) 
+                        else if (register.IsSuperAdmin)
                         {
                             var superAdminRoleId = this._roleRepo.Table.Where(x => !x.IsDeleted && x.IsSuperAdmin).Select(x => x.RoleId).FirstOrDefault();
                             var userRole = new UserRole() { UserIdFk = obj.UserId, RoleIdFk = superAdminRoleId };
