@@ -793,7 +793,7 @@ namespace Web.API.Controllers
 
         [Description("Get All Inhouse Code Feilds")]
         [HttpGet("InhouseCode/GetInhouseCodeFeildsForOrg/{OrgId}/{codeName}")]
-        [ValidateAntiForgeryToken]
+      
         public BaseResponse GetInhouseCodeFeildsForOrg(int OrgId, string codeName)
         {
             try
@@ -829,7 +829,7 @@ namespace Web.API.Controllers
 
         [Description("Get All Inhouse Code Feilds")]
         [HttpPost("InhouseCode/AddOrUpdateOrgCodeStrokeFeilds")]
-        [ValidateAntiForgeryToken]
+        
         public BaseResponse AddOrUpdateOrgCodeStrokeFeilds([FromBody] List<OrgCodeStrokeFeildsVM> orgInhouseCodeFields)
         {
             try
