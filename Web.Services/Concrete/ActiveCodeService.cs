@@ -572,7 +572,7 @@ namespace Web.Services.Concrete
 
                 _communicationService.pushNotification(notification);
             }
-            else if (files.CodeType == AuthorEnums.STEMI.ToString())
+            else if (files.CodeType == AuthorEnums.Stemi.ToString())
             {
                 var rootPath = this._codeSTEMIRepo.Table.Where(x => x.CodeStemiid == files.Id).Select($"new({files.Type},IsEms,OrganizationIdFk)").FirstOrDefault();
                 var pathval = rootPath.GetType().GetProperty(files.Type).GetValue(rootPath, null);
@@ -645,8 +645,8 @@ namespace Web.Services.Concrete
                     FieldDataType = "file",
                     FieldValue = fieldValue,
                     UserChannelSid = UserChannelSid.Distinct().ToList(),
-                    From = AuthorEnums.STEMI.ToString(),
-                    Msg = (rootPath.IsEms != null && rootPath.IsEms ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription()) + " STEMI From is Changed",
+                    From = AuthorEnums.Stemi.ToString(),
+                    Msg = (rootPath.IsEms != null && rootPath.IsEms ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription()) + " Stemi From is Changed",
                     RouteLink1 = RouteEnums.CodeSTEMIForm.ToDescription(),
                     RouteLink2 = RouteEnums.EMSForms.ToDescription(),
                 };
@@ -3425,7 +3425,7 @@ namespace Web.Services.Concrete
 
         public BaseResponse GetAllSTEMICode(ActiveCodeVM activeCode)
         {
-            var gridColumns = GetInhouseCodeTableFeilds(activeCode.OrganizationIdFk, UCLEnums.STEMI.ToString());
+            var gridColumns = GetInhouseCodeTableFeilds(activeCode.OrganizationIdFk, UCLEnums.Stemi.ToString());
             dynamic Fields = gridColumns.Body;
             if (Fields != null && Fields.FieldName != null)
             {
@@ -3433,7 +3433,7 @@ namespace Web.Services.Concrete
                 var objList = this._dbContext.LoadStoredProcedure("md_getAllActiveCodesOrEMS_Dynamic")
                                 .WithSqlParam("@status", activeCode.Status)
                                 .WithSqlParam("@colName", FieldNames)
-                                .WithSqlParam("@codeName", UCLEnums.STEMI.ToString())
+                                .WithSqlParam("@codeName", UCLEnums.Stemi.ToString())
                                 .WithSqlParam("@IsSuperAdmin", ApplicationSettings.isSuperAdmin)
                                 .WithSqlParam("@showAll", activeCode.showAllActiveCodes)
                                 .WithSqlParam("@userId", ApplicationSettings.UserId)
@@ -3513,11 +3513,11 @@ namespace Web.Services.Concrete
                     }
                 }
                 string Type = STEMIDataVM.IsEms.HasValue && STEMIDataVM.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription();
-                var serviceIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == STEMIData.OrganizationIdFk && x.CodeIdFk == UCLEnums.STEMI.ToInt() && x.Type == Type && x.IsActive.HasValue && x.IsActive.Value && !x.IsDeleted).Select(x => new { x.DefaultServiceLineTeam, x.ServiceLineTeam1, x.ServiceLineTeam2 }).FirstOrDefault();
+                var serviceIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == STEMIData.OrganizationIdFk && x.CodeIdFk == UCLEnums.Stemi.ToInt() && x.Type == Type && x.IsActive.HasValue && x.IsActive.Value && !x.IsDeleted).Select(x => new { x.DefaultServiceLineTeam, x.ServiceLineTeam1, x.ServiceLineTeam2 }).FirstOrDefault();
 
                 var serviceLineIds = (from x in this._codesServiceLinesMappingRepo.Table
-                                      where x.OrganizationIdFk == STEMIData.OrganizationIdFk && x.CodeIdFk == UCLEnums.STEMI.ToInt()
-                                      && x.ActiveCodeId == STEMIData.CodeStemiid && x.ActiveCodeName == UCLEnums.STEMI.ToString()
+                                      where x.OrganizationIdFk == STEMIData.OrganizationIdFk && x.CodeIdFk == UCLEnums.Stemi.ToInt()
+                                      && x.ActiveCodeId == STEMIData.CodeStemiid && x.ActiveCodeName == UCLEnums.Stemi.ToString()
                                       select new { x.DefaultServiceLineIdFk, x.ServiceLineId1Fk, x.ServiceLineId2Fk }).FirstOrDefault();
 
                 if (serviceIds != null)
@@ -3577,7 +3577,7 @@ namespace Web.Services.Concrete
                     fieldValue = codeSTEMI.GetPropertyValueByName(fieldName);
 
                     row = this._dbContext.LoadStoredProcedure("md_UpdateCodes")
-                                             .WithSqlParam("codeName", UCLEnums.STEMI.ToString())
+                                             .WithSqlParam("codeName", UCLEnums.Stemi.ToString())
                                              .WithSqlParam("fieldName", codeSTEMI.FieldName)
                                              .WithSqlParam("fieldValue", fieldValue)
                                              .WithSqlParam("codeId", codeSTEMI.CodeStemiid)
@@ -3602,8 +3602,8 @@ namespace Web.Services.Concrete
                         FieldDataType = codeSTEMI.FieldDataType,
                         FieldValue = fieldValue,
                         UserChannelSid = userUniqueIds.Distinct().ToList(),
-                        From = AuthorEnums.STEMI.ToString(),
-                        Msg = (row.IsEms != null && row.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription()) + " STEMI From is Changed",
+                        From = AuthorEnums.Stemi.ToString(),
+                        Msg = (row.IsEms != null && row.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription()) + " Stemi From is Changed",
                         RouteLink1 = RouteEnums.CodeSTEMIForm.ToDescription(), // "/Home/Inhouse%20Codes/code-strok-form",
                         RouteLink2 = RouteEnums.EMSForms.ToDescription(), // RouteEnums.EMSForms.ToDescription(),
                     };
@@ -3631,7 +3631,7 @@ namespace Web.Services.Concrete
                         {
                             Directory.CreateDirectory(FileRoot);
                         }
-                        FileRoot = Path.Combine(FileRoot, UCLEnums.STEMI.ToString());
+                        FileRoot = Path.Combine(FileRoot, UCLEnums.Stemi.ToString());
                         if (!Directory.Exists(FileRoot))
                         {
                             Directory.CreateDirectory(FileRoot);
@@ -3712,7 +3712,7 @@ namespace Web.Services.Concrete
                         {
                             Directory.CreateDirectory(FileRoot);
                         }
-                        FileRoot = Path.Combine(FileRoot, UCLEnums.STEMI.ToString());
+                        FileRoot = Path.Combine(FileRoot, UCLEnums.Stemi.ToString());
                         if (!Directory.Exists(FileRoot))
                         {
                             Directory.CreateDirectory(FileRoot);
@@ -3802,7 +3802,7 @@ namespace Web.Services.Concrete
                         {
                             Directory.CreateDirectory(FileRoot);
                         }
-                        FileRoot = Path.Combine(FileRoot, UCLEnums.STEMI.ToString());
+                        FileRoot = Path.Combine(FileRoot, UCLEnums.Stemi.ToString());
                         if (!Directory.Exists(FileRoot))
                         {
                             Directory.CreateDirectory(FileRoot);
@@ -3944,8 +3944,8 @@ namespace Web.Services.Concrete
                         FieldDataType = codeSTEMI.FieldDataType,
                         FieldValue = fieldValue,
                         UserChannelSid = userUniqueIds,
-                        From = AuthorEnums.STEMI.ToString(),
-                        Msg = (row.IsEms != null && row.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription()) + " STEMI From is Changed",
+                        From = AuthorEnums.Stemi.ToString(),
+                        Msg = (row.IsEms != null && row.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription()) + " Stemi From is Changed",
                         RouteLink1 = RouteEnums.CodeSTEMIForm.ToDescription(), // "/Home/Inhouse%20Codes/code-strok-form",
                         RouteLink2 = RouteEnums.EMSForms.ToDescription(), // RouteEnums.EMSForms.ToDescription(),
                     };
@@ -3960,7 +3960,7 @@ namespace Web.Services.Concrete
                 if (codeSTEMI.OrganizationIdFk > 0)
                 {
                     string IsEMS = codeSTEMI.IsEms.HasValue && codeSTEMI.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription();
-                    var DefaultServiceLineTeam = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeSTEMI.OrganizationIdFk && x.CodeIdFk == UCLEnums.STEMI.ToInt() && x.Type == IsEMS && x.IsActive.HasValue && x.IsActive.Value && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
+                    var DefaultServiceLineTeam = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeSTEMI.OrganizationIdFk && x.CodeIdFk == UCLEnums.Stemi.ToInt() && x.Type == IsEMS && x.IsActive.HasValue && x.IsActive.Value && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
                     if (DefaultServiceLineTeam != null && DefaultServiceLineTeam != "")
                     {
                         var DefaultServiceLineIds = DefaultServiceLineTeam.ToIntList();
@@ -3983,7 +3983,7 @@ namespace Web.Services.Concrete
                             {
                                 Directory.CreateDirectory(FileRoot);
                             }
-                            FileRoot = Path.Combine(FileRoot, UCLEnums.STEMI.ToString());
+                            FileRoot = Path.Combine(FileRoot, UCLEnums.Stemi.ToString());
                             if (!Directory.Exists(FileRoot))
                             {
                                 Directory.CreateDirectory(FileRoot);
@@ -4074,7 +4074,7 @@ namespace Web.Services.Concrete
                             {
                                 Directory.CreateDirectory(FileRoot);
                             }
-                            FileRoot = Path.Combine(FileRoot, UCLEnums.STEMI.ToString());
+                            FileRoot = Path.Combine(FileRoot, UCLEnums.Stemi.ToString());
                             if (!Directory.Exists(FileRoot))
                             {
                                 Directory.CreateDirectory(FileRoot);
@@ -4166,7 +4166,7 @@ namespace Web.Services.Concrete
                             {
                                 Directory.CreateDirectory(FileRoot);
                             }
-                            FileRoot = Path.Combine(FileRoot, UCLEnums.STEMI.ToString());
+                            FileRoot = Path.Combine(FileRoot, UCLEnums.Stemi.ToString());
                             if (!Directory.Exists(FileRoot))
                             {
                                 Directory.CreateDirectory(FileRoot);
@@ -4262,10 +4262,10 @@ namespace Web.Services.Concrete
                         var codeService = new CodesServiceLinesMapping()
                         {
                             OrganizationIdFk = STEMI.OrganizationIdFk,
-                            CodeIdFk = UCLEnums.STEMI.ToInt(),
+                            CodeIdFk = UCLEnums.Stemi.ToInt(),
                             DefaultServiceLineIdFk = DefaultServiceLineTeam,
                             ActiveCodeId = STEMI.CodeStemiid,
-                            ActiveCodeName = UCLEnums.STEMI.ToString()
+                            ActiveCodeName = UCLEnums.Stemi.ToString()
                         };
                         this._codesServiceLinesMappingRepo.Insert(codeService);
 
@@ -4303,7 +4303,7 @@ namespace Web.Services.Concrete
                         var services = this._serviceLineRepo.Table.Where(x => notExisted.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
                         foreach (var item in services)
                         {
-                            errorMsg += Environment.NewLine + "No OnCall user found in " + item.ServiceName;
+                            errorMsg += Environment.NewLine + "No On Call user found in " + item.ServiceName;
                         }
                     }
                 }
@@ -4312,7 +4312,7 @@ namespace Web.Services.Concrete
                     var services = this._serviceLineRepo.Table.Where(x => DefaultServiceLineIds.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
                     foreach (var item in services)
                     {
-                        errorMsg += Environment.NewLine + "No OnCall user found in " + item.ServiceName;
+                        errorMsg += Environment.NewLine + "No On Call user found in " + item.ServiceName;
                     }
                     DefaultServiceLineIds = new List<int>();
                 }
@@ -4322,10 +4322,10 @@ namespace Web.Services.Concrete
                     var codeService = new CodesServiceLinesMapping()
                     {
                         OrganizationIdFk = codeSTEMI.OrganizationIdFk,
-                        CodeIdFk = UCLEnums.STEMI.ToInt(),
+                        CodeIdFk = UCLEnums.Stemi.ToInt(),
                         DefaultServiceLineIdFk = string.Join(",", DefaultServiceLineIds),
                         ActiveCodeId = codeSTEMI.CodeStemiid,
-                        ActiveCodeName = UCLEnums.STEMI.ToString()
+                        ActiveCodeName = UCLEnums.Stemi.ToString()
                     };
                     this._codesServiceLinesMappingRepo.Insert(codeService);
                 }
@@ -4342,14 +4342,14 @@ namespace Web.Services.Concrete
             var conversationChannelAttributes = JsonConvert.SerializeObject(new Dictionary<string, Object>()
                                     {
                                         {ChannelAttributeEnums.ChannelType.ToString(), ChannelTypeEnums.EMS.ToString()},
-                                        {ChannelAttributeEnums.CodeType.ToString(), ChannelTypeEnums.STEMI.ToString()},
-                                        {ChannelAttributeEnums.STEMIId.ToString(), codeSTEMI.CodeStemiid}
+                                        {ChannelAttributeEnums.CodeType.ToString(), ChannelTypeEnums.Stemi.ToString()},
+                                        {ChannelAttributeEnums.StemiId.ToString(), codeSTEMI.CodeStemiid}
                                     }, Formatting.Indented);
             List<CodeStemigroupMember> ACodeGroupMembers = new List<CodeStemigroupMember>();
             if (UserChannelSid != null && UserChannelSid.Count > 0)
             {
                 string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
-                string friendlyName = codeSTEMI.IsEms.HasValue && codeSTEMI.IsEms.Value ? $"{UCLEnums.EMS.ToDescription()} {UCLEnums.STEMI.ToString()} {codeSTEMI.CodeStemiid}" : $"{UCLEnums.InhouseCode.ToDescription()} {UCLEnums.STEMI.ToString()} {codeSTEMI.CodeStemiid}";
+                string friendlyName = codeSTEMI.IsEms.HasValue && codeSTEMI.IsEms.Value ? $"{UCLEnums.EMS.ToDescription()} {UCLEnums.Stemi.ToString()} {codeSTEMI.CodeStemiid}" : $"{UCLEnums.InhouseCode.ToDescription()} {UCLEnums.Stemi.ToString()} {codeSTEMI.CodeStemiid}";
                 var channel = _communicationService.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
                 var STEMI = this._codeSTEMIRepo.Table.Where(x => x.CodeStemiid == codeSTEMI.CodeStemiid && x.IsActive == true && !x.IsDeleted).FirstOrDefault();
                 if (STEMI != null)
@@ -4385,7 +4385,7 @@ namespace Web.Services.Concrete
                 msg.channelSid = channel.Sid;
                 msg.author = "System";
                 msg.attributes = "";
-                msg.body = $"<strong> {(codeSTEMI.IsEms.HasValue && codeSTEMI.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription())} {UCLEnums.STEMI.ToString()} </strong></br></br>";
+                msg.body = $"<strong> {(codeSTEMI.IsEms.HasValue && codeSTEMI.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription())} {UCLEnums.Stemi.ToString()} </strong></br></br>";
                 if (codeSTEMI.PatientName != null && codeSTEMI.PatientName != "")
                     msg.body += $"<strong>Patient Name: </strong> {codeSTEMI.PatientName} </br>";
                 if (codeSTEMI.Dob != null)
@@ -4409,8 +4409,8 @@ namespace Web.Services.Concrete
                     Id = STEMI.CodeStemiid,
                     OrgId = STEMI.OrganizationIdFk,
                     UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).Distinct().ToList(),
-                    From = AuthorEnums.STEMI.ToString(),
-                    Msg = (codeSTEMI.IsEms.HasValue && codeSTEMI.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription()) + " STEMI is update",
+                    From = AuthorEnums.Stemi.ToString(),
+                    Msg = (codeSTEMI.IsEms.HasValue && codeSTEMI.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription()) + " Stemi is update",
                     RouteLink3 = RouteEnums.ActiveEMS.ToDescription(), // RouteEnums.ActiveEMS.ToDescription(),
                     RouteLink4 = RouteEnums.Dashboard.ToDescription(),
                     RouteLink5 = RouteEnums.InhouseCodeGrid.ToDescription(), // RouteEnums.InhouseCodeGrid.ToDescription()
@@ -4428,7 +4428,7 @@ namespace Web.Services.Concrete
             if (codeSTEMI.DefaultServiceLineIds == null || codeSTEMI.DefaultServiceLineIds == "")
             {
                 string IsEMS = codeSTEMI.IsEms.HasValue && codeSTEMI.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription();
-                codeSTEMI.DefaultServiceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeSTEMI.OrganizationIdFk && x.CodeIdFk == UCLEnums.STEMI.ToInt() && x.Type == IsEMS && x.IsActive.HasValue && x.IsActive.Value && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
+                codeSTEMI.DefaultServiceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeSTEMI.OrganizationIdFk && x.CodeIdFk == UCLEnums.Stemi.ToInt() && x.Type == IsEMS && x.IsActive.HasValue && x.IsActive.Value && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
             }
 
             if (codeSTEMI.DefaultServiceLineIds != null && codeSTEMI.DefaultServiceLineIds != "")
@@ -4446,7 +4446,7 @@ namespace Web.Services.Concrete
                                       where (DefaultServiceLineIds.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam1Ids.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam2Ids.Contains(us.ServiceLineIdFk.Value)) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
                                       select new { u.UserUniqueId, u.UserId, ServiceLineIdFk = us.ServiceLineIdFk.Value }).Distinct().ToList();
 
-                var codeServiceMapping = this._codesServiceLinesMappingRepo.Table.Where(x => x.OrganizationIdFk == codeSTEMI.OrganizationIdFk && x.CodeIdFk == UCLEnums.STEMI.ToInt() && x.ActiveCodeId == codeSTEMI.CodeStemiid).ToList();
+                var codeServiceMapping = this._codesServiceLinesMappingRepo.Table.Where(x => x.OrganizationIdFk == codeSTEMI.OrganizationIdFk && x.CodeIdFk == UCLEnums.Stemi.ToInt() && x.ActiveCodeId == codeSTEMI.CodeStemiid).ToList();
                 if (codeServiceMapping.Count > 0)
                     this._codesServiceLinesMappingRepo.DeleteRange(codeServiceMapping);
 
@@ -4533,12 +4533,12 @@ namespace Web.Services.Concrete
                         var codeService = new CodesServiceLinesMapping()
                         {
                             OrganizationIdFk = codeSTEMI.OrganizationIdFk,
-                            CodeIdFk = UCLEnums.STEMI.ToInt(),
+                            CodeIdFk = UCLEnums.Stemi.ToInt(),
                             DefaultServiceLineIdFk = DefaultServiceLineIds.Count > 0 ? string.Join(",", DefaultServiceLineIds) : null,
                             ServiceLineId1Fk = ServiceLineTeam1Ids.Count > 0 ? string.Join(",", ServiceLineTeam1Ids) : null,
                             ServiceLineId2Fk = ServiceLineTeam2Ids.Count > 0 ? string.Join(",", ServiceLineTeam2Ids) : null,
                             ActiveCodeId = codeSTEMI.CodeStemiid,
-                            ActiveCodeName = UCLEnums.STEMI.ToString()
+                            ActiveCodeName = UCLEnums.Stemi.ToString()
                         };
                         this._codesServiceLinesMappingRepo.Insert(codeService);
                     }
@@ -4597,8 +4597,8 @@ namespace Web.Services.Concrete
                     Id = codeSTEMI.CodeStemiid,
                     OrgId = codeSTEMI.OrganizationIdFk,
                     UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).Distinct().ToList(),
-                    From = AuthorEnums.STEMI.ToString(),
-                    Msg = (codeSTEMI.IsEms.HasValue && codeSTEMI.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription()) + " STEMI From is Changed",
+                    From = AuthorEnums.Stemi.ToString(),
+                    Msg = (codeSTEMI.IsEms.HasValue && codeSTEMI.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription()) + " Stemi From is Changed",
                     RouteLink1 = RouteEnums.CodeSTEMIForm.ToDescription(), // "/Home/Inhouse%20Codes/code-strok-form",
                     RouteLink2 = RouteEnums.EMSForms.ToDescription(), // RouteEnums.EMSForms.ToDescription(),
                 };
@@ -4621,7 +4621,7 @@ namespace Web.Services.Concrete
 
             var sql = "EXEC md_ActiveOrInActiveInHouseCodesOrEMS @Status, @CodeName, @CodeId, @UserId";
             var parameters = new List<SqlParameter>() { new SqlParameter { ParameterName = "@Status", Value = status },
-                                                        new SqlParameter { ParameterName = "@CodeName", Value = UCLEnums.STEMI.ToString() },
+                                                        new SqlParameter { ParameterName = "@CodeName", Value = UCLEnums.Stemi.ToString() },
                                                         new SqlParameter { ParameterName = "@CodeId", Value = STEMIId },
                                                         new SqlParameter { ParameterName = "@UserId", Value = ApplicationSettings.UserId }
                                                       };
@@ -4643,7 +4643,7 @@ namespace Web.Services.Concrete
 
             var sql = "EXEC md_ActiveOrInActiveInHouseCodesOrEMSDynamic @Status, @CodeName, @CodeId, @UserId";
             var parameters = new List<SqlParameter>() { new SqlParameter { ParameterName = "@Status", Value = status },
-                                                        new SqlParameter { ParameterName = "@CodeName", Value = UCLEnums.STEMI.ToString() },
+                                                        new SqlParameter { ParameterName = "@CodeName", Value = UCLEnums.Stemi.ToString() },
                                                         new SqlParameter { ParameterName = "@CodeId", Value = STEMIId },
                                                         new SqlParameter { ParameterName = "@UserId", Value = ApplicationSettings.UserId }
                                                       };
@@ -4654,7 +4654,7 @@ namespace Web.Services.Concrete
                 this._dbContext.Log(string.Empty, TableEnums.CodeSTEMIs.ToString(), STEMIId, status == false ? ActivityLogActionEnums.Inactive.ToInt() : ActivityLogActionEnums.Active.ToInt());
 
                 var userIds = this._dbContext.LoadStoredProcedure("md_getAllActiveCodesGroupUserIds")
-                                                .WithSqlParam("@codeName", UCLEnums.STEMI.ToString())
+                                                .WithSqlParam("@codeName", UCLEnums.Stemi.ToString())
                                                 .WithSqlParam("@codeId", STEMIId)
                                                 .ExecuteStoredProc<CodeStrokeVM>();
 
@@ -4666,8 +4666,8 @@ namespace Web.Services.Concrete
                     ChannelIsActive = status,
                     ChannelSid = userIds.Select(x => x.ChannelSid).FirstOrDefault(),
                     UserChannelSid = userIds.Select(x => x.UserUniqueId).Distinct().ToList(),
-                    From = UCLEnums.STEMI.ToString(),
-                    Msg = UCLEnums.STEMI.ToString() + " is " + (status ? "Activated" : "Inactivated"),
+                    From = UCLEnums.Stemi.ToString(),
+                    Msg = UCLEnums.Stemi.ToString() + " is " + (status ? "Activated" : "Inactivated"),
                     RouteLink3 = RouteEnums.ActiveEMS.ToDescription(),
                     RouteLink4 = RouteEnums.Dashboard.ToDescription(),
                     RouteLink5 = RouteEnums.InhouseCodeGrid.ToDescription()

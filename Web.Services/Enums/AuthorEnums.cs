@@ -5,7 +5,7 @@
         VideoCall,
         Call,
         Stroke,
-        STEMI,
+        Stemi,
         Sepsis,
         Trauma,
         Blue

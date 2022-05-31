@@ -8,7 +8,7 @@ namespace Web.Services.Enums
         Genders = 8,
         OrgType = 10,
         Stroke = 1101,
-        STEMI = 1102,
+        Stemi = 1102,
         Sepsis = 1105,
         Trauma = 1106,
         Blue = 1116,
@@ -28,21 +28,20 @@ namespace Web.Services.Enums
         [Description("/Home/Codes")]
         InhouseCodeGrid,
 
-        [Description("/Home/Codes/code-strok-form")]
+        [Description("/Home/Codes/Code%20Stroke")]
         CodeStrokeForm,
 
-        [Description("/Home/Codes/code-sepsis-form")]
+        [Description("/Home/Codes/Code%20Sepsis")]
         CodeSepsisForm,
 
-        [Description("/Home/Codes/code-STEMI-form")]
+        [Description("/Home/Codes/Code%20Stemi")]
         CodeSTEMIForm,
 
-        [Description("/Home/Codes/code-trauma-form")]
+        [Description("/Home/Codes/Code%20Trauma")]
         CodeTraumaForm,
 
-        [Description("/Home/Codes/code-blue-form")]
+        [Description("/Home/Codes/Code%20Blue")]
         CodeBlueForm,
-
 
         /// <summary>
         /// EMS Code Routes
