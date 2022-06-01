@@ -49,7 +49,7 @@ namespace Web.API.Controllers
 
         [Description("Add Or Update Stroke")]
         [HttpPost("activecode/MapActiveCodes")]
-        [ValidateAntiForgeryToken]
+        //[ValidateAntiForgeryToken]
         public BaseResponse MapActiveCodes([FromBody] List<ActiveCodeVM> activeCode)
         {
             try
@@ -66,7 +66,7 @@ namespace Web.API.Controllers
 
         [Description("Add Or Update Stroke")]
         [HttpGet("activecode/DetachActiveCodes/{activeCodeId}/{status}")]
-        [ValidateAntiForgeryToken]
+        //[ValidateAntiForgeryToken]
         public BaseResponse DetachActiveCodes(int activeCodeId, bool status)
         {
             try
@@ -437,7 +437,6 @@ namespace Web.API.Controllers
 
         [Description("Create Group for Code STEMI")]
         [HttpPost("STEMI/createGroupForCodeSTEMI")]
-      
         public BaseResponse CreateSTEMIGroup([FromBody] CodeSTEMIVM codeSTEMI)
         {
             try

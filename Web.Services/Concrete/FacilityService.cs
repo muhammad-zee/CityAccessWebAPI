@@ -220,7 +220,7 @@ namespace Web.Services.Concrete
             var departments = _departmentRepo.Table.Where(x => x.IsDeleted != true).ToList();
             var dpts = AutoMapperHelper.MapList<Department, DepartmentVM>(departments);
             var dptServices = (from s in this._serviceRepo.Table
-                                   //where dpts.Select(x => x.DepartmentId).Contains(ds.DepartmentIdFk) && s.IsDeleted != true
+                                where dpts.Select(x => x.DepartmentId).Contains(s.DepartmentIdFk) && s.IsDeleted != true && s.IsActive == true
                                select new ServiceLineVM()
                                {
                                    ServiceLineId = s.ServiceLineId,

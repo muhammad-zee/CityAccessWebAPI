@@ -94,7 +94,7 @@ namespace Web.Services.Concrete
                     .WithSqlParam("@userId", ApplicationSettings.UserId)
                     .WithSqlParam("@orgId", orgId)
                     .ExecuteStoredProc_ToDictionary();
-                    //.ExecuteStoredProc<RegisterCredentialVM>();
+            //.ExecuteStoredProc<RegisterCredentialVM>();
 
 
             //users.ForEach(x =>

@@ -5,7 +5,6 @@ using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Linq.Dynamic.Core;
@@ -829,7 +828,7 @@ namespace Web.Services.Concrete
 
             var gridColumns = GetInhouseCodeTableFeilds(activeCode.OrganizationIdFk, UCLEnums.Stroke.ToString());
             dynamic Fields = gridColumns.Body;
-            if (Fields != null && Fields.FieldName != null) 
+            if (Fields != null && Fields.FieldName != null)
             {
                 string FieldNames = Convert.ToString(Fields.FieldName);
                 var objList = this._dbContext.LoadStoredProcedure("md_getAllActiveCodesOrEMS_Dynamic")
@@ -972,7 +971,8 @@ namespace Web.Services.Concrete
                     {
                         fieldName = codeStroke.FieldName.ToCapitalize();
                     }
-                    else {
+                    else
+                    {
                         fieldName = codeStroke.FieldName;
                     }
 
@@ -993,7 +993,7 @@ namespace Web.Services.Concrete
                     userUniqueIds.AddRange(superAdmins);
                     var loggedUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => x.UserUniqueId).FirstOrDefault();
                     userUniqueIds.Add(loggedUser);
-                    if (codeStroke.FieldDataType == "date") 
+                    if (codeStroke.FieldDataType == "date")
                     {
                         fieldValue = codeStroke.GetPropertyValueByName(fieldName + "Str");
                     }
@@ -1006,7 +1006,7 @@ namespace Web.Services.Concrete
                         FieldValue = fieldValue,
                         UserChannelSid = userUniqueIds.Distinct().ToList(),
                         From = AuthorEnums.Stroke.ToString(),
-                        Msg = (row.IsEms !=null && row.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription()) + " Stroke From is Changed",
+                        Msg = (row.IsEms != null && row.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription()) + " Stroke From is Changed",
                         RouteLink1 = RouteEnums.CodeStrokeForm.ToDescription(), // "/Home/Inhouse%20Codes/code-strok-form",
                         RouteLink2 = RouteEnums.EMSForms.ToDescription(), // RouteEnums.EMSForms.ToDescription(),
                     };
@@ -1051,7 +1051,7 @@ namespace Web.Services.Concrete
                         {
                             Directory.CreateDirectory(FileRoot);
                         }
-                        
+
                         foreach (var item in codeStroke.Attachment)
                         {
                             if (!string.IsNullOrEmpty(item.Base64Str))
@@ -1289,7 +1289,7 @@ namespace Web.Services.Concrete
                     if (codeStroke.AttachmentsFolderRoot != null)
                     {
                         row.Attachments = codeStroke.AttachmentsFolderRoot;
-                        string path = this._RootPath + codeStroke.AttachmentsFolderRoot; 
+                        string path = this._RootPath + codeStroke.AttachmentsFolderRoot;
                         if (Directory.Exists(path))
                         {
                             DirectoryInfo AttachFiles = new DirectoryInfo(path);
@@ -1303,7 +1303,7 @@ namespace Web.Services.Concrete
                     if (codeStroke.VideoFolderRoot != null)
                     {
                         row.Video = codeStroke.VideoFolderRoot;
-                        var path = this._RootPath + codeStroke.VideoFolderRoot; 
+                        var path = this._RootPath + codeStroke.VideoFolderRoot;
                         if (Directory.Exists(path))
                         {
                             DirectoryInfo VideoFiles = new DirectoryInfo(path);
@@ -1357,7 +1357,7 @@ namespace Web.Services.Concrete
 
                     return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Updated Successfully" };
                 }
-               
+
             }
             else
             {
@@ -3315,7 +3315,7 @@ namespace Web.Services.Concrete
                 msg.channelSid = channel.Sid;
                 msg.author = "System";
                 msg.attributes = "";
-                msg.body = $"<strong> {( codeSepsis.IsEms ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription())} {UCLEnums.Sepsis.ToString()} </strong></br></br>";
+                msg.body = $"<strong> {(codeSepsis.IsEms ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription())} {UCLEnums.Sepsis.ToString()} </strong></br></br>";
                 if (codeSepsis.PatientName != null && codeSepsis.PatientName != "")
                     msg.body += $"<strong>Patient Name: </strong> {codeSepsis.PatientName} </br>";
                 if (codeSepsis.Dob != null)
@@ -7913,7 +7913,7 @@ namespace Web.Services.Concrete
 
         #region Apis For Mobile App
 
-        public BaseResponse GetAllCodesData(ActiveCodeVM activeCode) 
+        public BaseResponse GetAllCodesData(ActiveCodeVM activeCode)
         {
             var objList = this._dbContext.LoadStoredProcedure("md_getAllCodes")
                             .WithSqlParam("@status", activeCode.Status)
