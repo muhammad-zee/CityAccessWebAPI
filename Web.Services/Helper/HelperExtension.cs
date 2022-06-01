@@ -94,12 +94,12 @@ namespace Web.Services.Helper
                 //    AddActionList(node.children[i], source);
                 if (node.Actions == null)
                 {
-                    node.Actions = new List<object>();
+                    node.Actions = new List<string>();
                 }
                 foreach (var child in node.children)
                 {
 
-                    node.Actions.Add(new { ComponentId = child.ComponentId, ModuleName = child.ModuleName });
+                    node.Actions.Add(child.ModuleName);
                 }
             }
             else
