@@ -1015,7 +1015,7 @@ namespace Web.Services.Concrete
             consultAknow.ModifiedDate = DateTime.UtcNow;
 
             this._consultAcknowledgmentRepo.Update(consultAknow);
-
+            this._dbContext.Log(new { }, ActivityLogTableEnums.Consults.ToString(), consultId, ActivityLogActionEnums.Acknowledge.ToInt());
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Acknowledged Consult" };
         }
 

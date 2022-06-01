@@ -2028,7 +2028,7 @@ namespace Web.Services.Concrete
                                                       };
 
             var isDeleted = this._dbContext.Database.ExecuteSqlRaw(sql, parameters);
-            this._dbContext.Log(new List<dynamic>(), ActivityLogTableEnums.CodeStrokes.ToString(), strokeId, ActivityLogActionEnums.Delete.ToInt());
+            this._dbContext.Log(new { }, ActivityLogTableEnums.CodeStrokes.ToString(), strokeId, ActivityLogActionEnums.Delete.ToInt());
 
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Deleted" };
         }
@@ -2051,7 +2051,7 @@ namespace Web.Services.Concrete
             var rowsEffected = this._dbContext.Database.ExecuteSqlRaw(sql, parameters);
             if (rowsEffected > 0)
             {
-                this._dbContext.Log(new List<dynamic>(), ActivityLogTableEnums.CodeStrokes.ToString(), strokeId, status == false ? ActivityLogActionEnums.Inactive.ToInt() : ActivityLogActionEnums.Active.ToInt());
+                this._dbContext.Log(new { }, ActivityLogTableEnums.CodeStrokes.ToString(), strokeId, status == false ? ActivityLogActionEnums.Inactive.ToInt() : ActivityLogActionEnums.Active.ToInt());
                 var userIds = this._dbContext.LoadStoredProcedure("md_getAllActiveCodesGroupUserIds")
                                                 .WithSqlParam("@codeName", UCLEnums.Stroke.ToString())
                                                 .WithSqlParam("@codeId", strokeId)

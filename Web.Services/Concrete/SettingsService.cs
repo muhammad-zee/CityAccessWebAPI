@@ -34,6 +34,7 @@ namespace Web.Services.Concrete
                 action == ActivityLogActionEnums.Inactive.ToInt() ? "Deactivated" :
                 action == ActivityLogActionEnums.FileUpload.ToInt() ? "Uploaded File" :
                 action == ActivityLogActionEnums.FileDelete.ToInt() ? "Deleted File" :
+                action == ActivityLogActionEnums.Acknowledge.ToInt() ? "Acknowledged" :
                 action == ActivityLogActionEnums.Active.ToInt() ? "Activated" : "Action Performed";
 
             if (tableName == ActivityLogTableEnums.CodeStrokes.ToString() || tableName == ActivityLogTableEnums.CodeTraumas.ToString() || tableName == ActivityLogTableEnums.CodeBlues.ToString() ||
@@ -67,7 +68,12 @@ namespace Web.Services.Concrete
             }
             else if(tableName == ActivityLogTableEnums.Consults.ToString())
             {
+                if (action == ActivityLogActionEnums.Acknowledge.ToInt())
+                {
+
+                }
                 logDesc = $"{userFullName} {actionName} Record In {tableName}";
+
             }
             else
             {
@@ -206,6 +212,9 @@ namespace Web.Services.Concrete
         {
             var rec = this._dbContext.LoadStoredProcedure("md_getActivityLogReport")
                                 .WithSqlParam("@pUserId", filter.UserId)
+                                .WithSqlParam("@pModule", filter.ModuleId)
+                                .WithSqlParam("@pFromDate", filter.FromDate)
+                                .WithSqlParam("@pToDate", filter.ToDate)
                                 .ExecuteStoredProc<ActivityLogVm>().AsQueryable();
             if (rec != null)
             {
