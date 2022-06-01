@@ -87,7 +87,7 @@ namespace Web.Services.Concrete
                         user.UserUniqueId = randomString;
                         this._userRepo.Update(user);
                     }
-
+                    string encryptedPassword = login.password;
                     login.password = Encryption.decryptData(login.password, this._encryptionKey);
                     user.Password = Encryption.decryptData(user.Password, this._encryptionKey);
                     if (user.Password == login.password)
@@ -99,8 +99,9 @@ namespace Web.Services.Concrete
                             response.Body = AuthorizedUser;
                             response.Status = HttpStatusCode.OK;
                             response.Message = "User found";
-                            this._dbContext.Log(login, TableEnums.Users.ToString(), user.UserId, ActivityLogActionEnums.SignIn.ToInt());
-
+                            login.password = encryptedPassword;
+                            ApplicationSettings.UserFullName = user.FirstName + " " + user.LastName;
+                            this._dbContext.Log(new { }, ActivityLogTableEnums.Users.ToString(), user.UserId, ActivityLogActionEnums.SignIn.ToInt());
                         }
                         else
                         {

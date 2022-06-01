@@ -29,9 +29,9 @@ namespace Web.API.Helper
             ApplicationSettings.isSuperAdmin = isSuperAdmin == "True" ? true : false;
             ApplicationSettings.isEMS = isEMS == "True" ? true : false;
             ApplicationSettings.TimeZone = timeZone.ToString();
-
             base.OnActionExecuting(context);
         }
+ 
 
     }
 }

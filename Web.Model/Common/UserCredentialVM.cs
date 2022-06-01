@@ -4,6 +4,7 @@
     {
         public string username { get; set; }
         public string password { get; set; }
+        public string userFullName { get; set; }
         public bool? UserIsActive { get; set; }
         public bool? OrgIsActive { get; set; }
     }

@@ -474,7 +474,7 @@ namespace Web.Services.Concrete
                 }
 
                 fieldValue = new { videosPath = codeStroke.VideosPath, audiosPath = codeStroke.AudiosPath, attachmentsPath = codeStroke.AttachmentsPath };
-                this._dbContext.Log(new { }, TableEnums.CodeStrokes.ToString(), codeStroke.CodeStrokeId, ActivityLogActionEnums.FileDelete.ToInt());
+                this._dbContext.Log(new { }, ActivityLogTableEnums.CodeStrokes.ToString(), codeStroke.CodeStrokeId, ActivityLogActionEnums.FileDelete.ToInt());
                 var notification = new PushNotificationVM()
                 {
                     Id = files.Id,
@@ -555,7 +555,7 @@ namespace Web.Services.Concrete
                 }
 
                 fieldValue = new { videosPath = codeSepsis.VideosPath, audiosPath = codeSepsis.AudiosPath, attachmentsPath = codeSepsis.AttachmentsPath };
-                this._dbContext.Log(new { }, TableEnums.CodeSepsis.ToString(), codeSepsis.CodeSepsisId, ActivityLogActionEnums.FileDelete.ToInt());
+                this._dbContext.Log(new { }, ActivityLogTableEnums.CodeSepsis.ToString(), codeSepsis.CodeSepsisId, ActivityLogActionEnums.FileDelete.ToInt());
                 var notification = new PushNotificationVM()
                 {
                     Id = files.Id,
@@ -636,7 +636,7 @@ namespace Web.Services.Concrete
                 }
 
                 fieldValue = new { videosPath = codeSTEMI.VideosPath, audiosPath = codeSTEMI.AudiosPath, attachmentsPath = codeSTEMI.AttachmentsPath };
-                this._dbContext.Log(new { }, TableEnums.CodeSTEMIs.ToString(), codeSTEMI.CodeStemiid, ActivityLogActionEnums.FileDelete.ToInt());
+                this._dbContext.Log(new { }, ActivityLogTableEnums.CodeSTEMIs.ToString(), codeSTEMI.CodeStemiid, ActivityLogActionEnums.FileDelete.ToInt());
                 var notification = new PushNotificationVM()
                 {
                     Id = files.Id,
@@ -717,7 +717,7 @@ namespace Web.Services.Concrete
                 }
 
                 fieldValue = new { videosPath = codeTrauma.VideosPath, audiosPath = codeTrauma.AudiosPath, attachmentsPath = codeTrauma.AttachmentsPath };
-                this._dbContext.Log(new { }, TableEnums.CodeTraumas.ToString(), codeTrauma.CodeTraumaId, ActivityLogActionEnums.FileDelete.ToInt());
+                this._dbContext.Log(new { }, ActivityLogTableEnums.CodeTraumas.ToString(), codeTrauma.CodeTraumaId, ActivityLogActionEnums.FileDelete.ToInt());
                 var notification = new PushNotificationVM()
                 {
                     Id = files.Id,
@@ -798,7 +798,7 @@ namespace Web.Services.Concrete
                 }
 
                 fieldValue = new { videosPath = codeBlue.VideosPath, audiosPath = codeBlue.AudiosPath, attachmentsPath = codeBlue.AttachmentsPath };
-                this._dbContext.Log(new { }, TableEnums.CodeBlues.ToString(), codeBlue.CodeBlueId, ActivityLogActionEnums.FileDelete.ToInt());
+                this._dbContext.Log(new { }, ActivityLogTableEnums.CodeBlues.ToString(), codeBlue.CodeBlueId, ActivityLogActionEnums.FileDelete.ToInt());
                 var notification = new PushNotificationVM()
                 {
                     Id = files.Id,
@@ -986,7 +986,7 @@ namespace Web.Services.Concrete
                                              .WithSqlParam("codeId", codeStroke.CodeStrokeId)
                                              .WithSqlParam("modifiedBy", ApplicationSettings.UserId)
                                              .ExecuteStoredProc<CodeStroke>().FirstOrDefault();
-                    this._dbContext.Log(row.getChangedPropertyObject(codeStroke.FieldName), TableEnums.CodeStrokes.ToString(), row.CodeStrokeId, ActivityLogActionEnums.Update.ToInt());
+                    this._dbContext.Log(row.getChangedPropertyObject(codeStroke.FieldName), ActivityLogTableEnums.CodeStrokes.ToString(), row.CodeStrokeId, ActivityLogActionEnums.Update.ToInt());
                     var userIds = this._StrokeCodeGroupMembersRepo.Table.Where(x => x.StrokeCodeIdFk == row.CodeStrokeId).Select(x => x.UserIdFk).ToList();
                     var userUniqueIds = this._userRepo.Table.Where(x => userIds.Contains(x.UserId)).Select(x => x.UserUniqueId).Distinct().ToList();
                     var superAdmins = this._userRepo.Table.Where(x => x.IsInGroup && !x.IsDeleted).Select(x => x.UserUniqueId).ToList();
@@ -1331,7 +1331,7 @@ namespace Web.Services.Concrete
 
                     this._codeStrokeRepo.Update(row);
 
-                    this._dbContext.Log(row, TableEnums.CodeStrokes.ToString(), row.CodeStrokeId, ActivityLogActionEnums.FileUpload.ToInt());
+                    this._dbContext.Log(row, ActivityLogTableEnums.CodeStrokes.ToString(), row.CodeStrokeId, ActivityLogActionEnums.FileUpload.ToInt());
                     fieldValue = new { videosPath = codeStroke.VideosPath, audiosPath = codeStroke.AudiosPath, attachmentsPath = codeStroke.AttachmentsPath };
                     var userIds = this._StrokeCodeGroupMembersRepo.Table.Where(x => x.StrokeCodeIdFk == row.CodeStrokeId).Select(x => x.UserIdFk).ToList();
                     var userUniqueIds = this._userRepo.Table.Where(x => userIds.Contains(x.UserId)).Select(x => x.UserUniqueId).Distinct().ToList();
@@ -1667,7 +1667,7 @@ namespace Web.Services.Concrete
                         }
 
                         this._codeStrokeRepo.Insert(stroke);
-                        this._dbContext.Log(stroke, TableEnums.CodeStrokes.ToString(), stroke.CodeStrokeId, ActivityLogActionEnums.Create.ToInt());
+                        this._dbContext.Log(stroke, ActivityLogTableEnums.CodeStrokes.ToString(), stroke.CodeStrokeId, ActivityLogActionEnums.Create.ToInt());
 
 
                         return GetStrokeDataById(stroke.CodeStrokeId);
@@ -2029,7 +2029,7 @@ namespace Web.Services.Concrete
                                                       };
 
             var isDeleted = this._dbContext.Database.ExecuteSqlRaw(sql, parameters);
-            this._dbContext.Log(new List<dynamic>(), TableEnums.CodeStrokes.ToString(), strokeId, ActivityLogActionEnums.Delete.ToInt());
+            this._dbContext.Log(new List<dynamic>(), ActivityLogTableEnums.CodeStrokes.ToString(), strokeId, ActivityLogActionEnums.Delete.ToInt());
 
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Deleted" };
         }
@@ -2052,7 +2052,7 @@ namespace Web.Services.Concrete
             var rowsEffected = this._dbContext.Database.ExecuteSqlRaw(sql, parameters);
             if (rowsEffected > 0)
             {
-                this._dbContext.Log(new List<dynamic>(), TableEnums.CodeStrokes.ToString(), strokeId, status == false ? ActivityLogActionEnums.Inactive.ToInt() : ActivityLogActionEnums.Active.ToInt());
+                this._dbContext.Log(new List<dynamic>(), ActivityLogTableEnums.CodeStrokes.ToString(), strokeId, status == false ? ActivityLogActionEnums.Inactive.ToInt() : ActivityLogActionEnums.Active.ToInt());
                 var userIds = this._dbContext.LoadStoredProcedure("md_getAllActiveCodesGroupUserIds")
                                                 .WithSqlParam("@codeName", UCLEnums.Stroke.ToString())
                                                 .WithSqlParam("@codeId", strokeId)
@@ -2241,7 +2241,7 @@ namespace Web.Services.Concrete
                                              .WithSqlParam("codeId", codeSepsis.CodeSepsisId)
                                              .WithSqlParam("modifiedBy", ApplicationSettings.UserId)
                                              .ExecuteStoredProc<CodeSepsi>().FirstOrDefault();
-                    this._dbContext.Log(row.getChangedPropertyObject(fieldName), TableEnums.CodeSepsis.ToString(), row.CodeSepsisId, ActivityLogActionEnums.Update.ToInt());
+                    this._dbContext.Log(row.getChangedPropertyObject(fieldName), ActivityLogTableEnums.CodeSepsis.ToString(), row.CodeSepsisId, ActivityLogActionEnums.Update.ToInt());
 
                     var userIds = this._SepsisCodeGroupMembersRepo.Table.Where(x => x.SepsisCodeIdFk == row.CodeSepsisId).Select(x => x.UserIdFk).ToList();
                     var userUniqueIds = this._userRepo.Table.Where(x => userIds.Contains(x.UserId)).Select(x => x.UserUniqueId).Distinct().ToList();
@@ -2585,7 +2585,7 @@ namespace Web.Services.Concrete
                     }
 
                     this._codeSepsisRepo.Update(row);
-                    this._dbContext.Log(row, TableEnums.CodeSepsis.ToString(), row.CodeSepsisId, ActivityLogActionEnums.FileUpload.ToInt());
+                    this._dbContext.Log(row, ActivityLogTableEnums.CodeSepsis.ToString(), row.CodeSepsisId, ActivityLogActionEnums.FileUpload.ToInt());
 
                     fieldValue = new { videosPath = codeSepsis.VideosPath, audiosPath = codeSepsis.AudiosPath, attachmentsPath = codeSepsis.AttachmentsPath };
                     var userIds = this._SepsisCodeGroupMembersRepo.Table.Where(x => x.SepsisCodeIdFk == row.CodeSepsisId).Select(x => x.UserIdFk).ToList();
@@ -2918,7 +2918,7 @@ namespace Web.Services.Concrete
                             Sepsis.Audio = codeSepsis.AudioFolderRoot;
                         }
                         this._codeSepsisRepo.Insert(Sepsis);
-                        this._dbContext.Log(Sepsis, TableEnums.CodeSepsis.ToString(), Sepsis.CodeSepsisId, ActivityLogActionEnums.Create.ToInt());
+                        this._dbContext.Log(Sepsis, ActivityLogTableEnums.CodeSepsis.ToString(), Sepsis.CodeSepsisId, ActivityLogActionEnums.Create.ToInt());
 
                         var codeService = new CodesServiceLinesMapping()
                         {
@@ -3369,7 +3369,7 @@ namespace Web.Services.Concrete
                                                       };
 
             var isDeleted = this._dbContext.Database.ExecuteSqlRaw(sql, parameters);
-            this._dbContext.Log(new { }, TableEnums.CodeSepsis.ToString(), SepsisId, ActivityLogActionEnums.Delete.ToInt());
+            this._dbContext.Log(new { }, ActivityLogTableEnums.CodeSepsis.ToString(), SepsisId, ActivityLogActionEnums.Delete.ToInt());
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Deleted" };
         }
 
@@ -3391,7 +3391,7 @@ namespace Web.Services.Concrete
             var rowsEffected = this._dbContext.Database.ExecuteSqlRaw(sql, parameters);
             if (rowsEffected > 0)
             {
-                this._dbContext.Log(new { }, TableEnums.CodeSepsis.ToString(), SepsisId, status == false ? ActivityLogActionEnums.Inactive.ToInt() : ActivityLogActionEnums.Active.ToInt());
+                this._dbContext.Log(new { }, ActivityLogTableEnums.CodeSepsis.ToString(), SepsisId, status == false ? ActivityLogActionEnums.Inactive.ToInt() : ActivityLogActionEnums.Active.ToInt());
 
                 var userIds = this._dbContext.LoadStoredProcedure("md_getAllActiveCodesGroupUserIds")
                                                 .WithSqlParam("@codeName", UCLEnums.Sepsis.ToString())
@@ -3584,7 +3584,7 @@ namespace Web.Services.Concrete
                                              .WithSqlParam("codeId", codeSTEMI.CodeStemiid)
                                              .WithSqlParam("modifiedBy", ApplicationSettings.UserId)
                                              .ExecuteStoredProc<CodeStemi>().FirstOrDefault();
-                    this._dbContext.Log(row.getChangedPropertyObject(fieldName), TableEnums.CodeSTEMIs.ToString(), row.CodeStemiid, ActivityLogActionEnums.Update.ToInt());
+                    this._dbContext.Log(row.getChangedPropertyObject(fieldName), ActivityLogTableEnums.CodeSTEMIs.ToString(), row.CodeStemiid, ActivityLogActionEnums.Update.ToInt());
 
                     var userIds = this._STEMICodeGroupMembersRepo.Table.Where(x => x.StemicodeIdFk == row.CodeStemiid).Select(x => x.UserIdFk).ToList();
                     var userUniqueIds = this._userRepo.Table.Where(x => userIds.Contains(x.UserId)).Select(x => x.UserUniqueId).Distinct().ToList();
@@ -3928,7 +3928,7 @@ namespace Web.Services.Concrete
                     }
 
                     this._codeSTEMIRepo.Update(row);
-                    this._dbContext.Log(row, TableEnums.CodeSTEMIs.ToString(), row.CodeStemiid, ActivityLogActionEnums.FileUpload.ToInt());
+                    this._dbContext.Log(row, ActivityLogTableEnums.CodeSTEMIs.ToString(), row.CodeStemiid, ActivityLogActionEnums.FileUpload.ToInt());
 
                     fieldValue = new { videosPath = codeSTEMI.VideosPath, audiosPath = codeSTEMI.AudiosPath, attachmentsPath = codeSTEMI.AttachmentsPath };
                     var userIds = this._STEMICodeGroupMembersRepo.Table.Where(x => x.StemicodeIdFk == row.CodeStemiid).Select(x => x.UserIdFk).ToList();
@@ -4260,7 +4260,7 @@ namespace Web.Services.Concrete
                         }
 
                         this._codeSTEMIRepo.Insert(STEMI);
-                        this._dbContext.Log(STEMI, TableEnums.CodeSTEMIs.ToString(), STEMI.CodeStemiid, ActivityLogActionEnums.Create.ToInt());
+                        this._dbContext.Log(STEMI, ActivityLogTableEnums.CodeSTEMIs.ToString(), STEMI.CodeStemiid, ActivityLogActionEnums.Create.ToInt());
                         var codeService = new CodesServiceLinesMapping()
                         {
                             OrganizationIdFk = STEMI.OrganizationIdFk,
@@ -4629,7 +4629,7 @@ namespace Web.Services.Concrete
                                                       };
 
             var isDeleted = this._dbContext.Database.ExecuteSqlRaw(sql, parameters);
-            this._dbContext.Log(new { }, TableEnums.CodeSTEMIs.ToString(), STEMIId, ActivityLogActionEnums.Delete.ToInt());
+            this._dbContext.Log(new { }, ActivityLogTableEnums.CodeSTEMIs.ToString(), STEMIId, ActivityLogActionEnums.Delete.ToInt());
 
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Deleted" };
         }
@@ -4652,7 +4652,7 @@ namespace Web.Services.Concrete
             var rowsEffected = this._dbContext.Database.ExecuteSqlRaw(sql, parameters);
             if (rowsEffected > 0)
             {
-                this._dbContext.Log(new { }, TableEnums.CodeSTEMIs.ToString(), STEMIId, status == false ? ActivityLogActionEnums.Inactive.ToInt() : ActivityLogActionEnums.Active.ToInt());
+                this._dbContext.Log(new { }, ActivityLogTableEnums.CodeSTEMIs.ToString(), STEMIId, status == false ? ActivityLogActionEnums.Inactive.ToInt() : ActivityLogActionEnums.Active.ToInt());
 
                 var userIds = this._dbContext.LoadStoredProcedure("md_getAllActiveCodesGroupUserIds")
                                                 .WithSqlParam("@codeName", UCLEnums.Stemi.ToString())
@@ -4845,7 +4845,7 @@ namespace Web.Services.Concrete
                                              .WithSqlParam("codeId", codeTruma.CodeTraumaId)
                                              .WithSqlParam("modifiedBy", ApplicationSettings.UserId)
                                              .ExecuteStoredProc<CodeTrauma>().FirstOrDefault();
-                    this._dbContext.Log(row.getChangedPropertyObject(fieldName), TableEnums.CodeTraumas.ToString(), row.CodeTraumaId, ActivityLogActionEnums.Update.ToInt());
+                    this._dbContext.Log(row.getChangedPropertyObject(fieldName), ActivityLogTableEnums.CodeTraumas.ToString(), row.CodeTraumaId, ActivityLogActionEnums.Update.ToInt());
                     var userIds = this._TraumaCodeGroupMembersRepo.Table.Where(x => x.TraumaCodeIdFk == row.CodeTraumaId).Select(x => x.UserIdFk).ToList();
                     var userUniqueIds = this._userRepo.Table.Where(x => userIds.Contains(x.UserId)).Select(x => x.UserUniqueId).Distinct().ToList();
                     var superAdmins = this._userRepo.Table.Where(x => x.IsInGroup && !x.IsDeleted).Select(x => x.UserUniqueId).ToList();
@@ -5188,7 +5188,7 @@ namespace Web.Services.Concrete
                     }
 
                     this._codeTrumaRepo.Update(row);
-                    this._dbContext.Log(row, TableEnums.CodeTraumas.ToString(), row.CodeTraumaId, ActivityLogActionEnums.FileUpload.ToInt());
+                    this._dbContext.Log(row, ActivityLogTableEnums.CodeTraumas.ToString(), row.CodeTraumaId, ActivityLogActionEnums.FileUpload.ToInt());
                     fieldValue = new { videosPath = codeTruma.VideosPath, audiosPath = codeTruma.AudiosPath, attachmentsPath = codeTruma.AttachmentsPath };
                     var userIds = this._TraumaCodeGroupMembersRepo.Table.Where(x => x.TraumaCodeIdFk == row.CodeTraumaId).Select(x => x.UserIdFk).ToList();
                     var userUniqueIds = this._userRepo.Table.Where(x => userIds.Contains(x.UserId)).Select(x => x.UserUniqueId).Distinct().ToList();
@@ -5517,7 +5517,7 @@ namespace Web.Services.Concrete
                             Truma.Audio = codeTruma.AudioFolderRoot;
                         }
                         this._codeTrumaRepo.Insert(Truma);
-                        this._dbContext.Log(Truma, TableEnums.CodeTraumas.ToString(), Truma.CodeTraumaId, ActivityLogActionEnums.Create.ToInt());
+                        this._dbContext.Log(Truma, ActivityLogTableEnums.CodeTraumas.ToString(), Truma.CodeTraumaId, ActivityLogActionEnums.Create.ToInt());
 
                         var codeService = new CodesServiceLinesMapping()
                         {
@@ -5967,7 +5967,7 @@ namespace Web.Services.Concrete
                                                       };
 
             var isDeleted = this._dbContext.Database.ExecuteSqlRaw(sql, parameters);
-            this._dbContext.Log(new { }, TableEnums.CodeTraumas.ToString(), TrumaId, ActivityLogActionEnums.Delete.ToInt());
+            this._dbContext.Log(new { }, ActivityLogTableEnums.CodeTraumas.ToString(), TrumaId, ActivityLogActionEnums.Delete.ToInt());
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Deleted" };
         }
 
@@ -5989,7 +5989,7 @@ namespace Web.Services.Concrete
             var rowsEffected = this._dbContext.Database.ExecuteSqlRaw(sql, parameters);
             if (rowsEffected > 0)
             {
-                this._dbContext.Log(new { }, TableEnums.CodeTraumas.ToString(), TraumaId, status == false ? ActivityLogActionEnums.Inactive.ToInt() : ActivityLogActionEnums.Active.ToInt());
+                this._dbContext.Log(new { }, ActivityLogTableEnums.CodeTraumas.ToString(), TraumaId, status == false ? ActivityLogActionEnums.Inactive.ToInt() : ActivityLogActionEnums.Active.ToInt());
                 var userIds = this._dbContext.LoadStoredProcedure("md_getAllActiveCodesGroupUserIds")
                                                 .WithSqlParam("@codeName", UCLEnums.Trauma.ToString())
                                                 .WithSqlParam("@codeId", TraumaId)
@@ -6179,7 +6179,7 @@ namespace Web.Services.Concrete
                                              .WithSqlParam("codeId", codeBlue.CodeBlueId)
                                              .WithSqlParam("modifiedBy", ApplicationSettings.UserId)
                                              .ExecuteStoredProc<CodeBlue>().FirstOrDefault();
-                    this._dbContext.Log(row.getChangedPropertyObject(fieldName), TableEnums.CodeBlues.ToString(), row.CodeBlueId, ActivityLogActionEnums.Update.ToInt());
+                    this._dbContext.Log(row.getChangedPropertyObject(fieldName), ActivityLogTableEnums.CodeBlues.ToString(), row.CodeBlueId, ActivityLogActionEnums.Update.ToInt());
                     var userIds = this._BlueCodeGroupMembersRepo.Table.Where(x => x.BlueCodeIdFk == row.CodeBlueId).Select(x => x.UserIdFk).ToList();
                     var userUniqueIds = this._userRepo.Table.Where(x => userIds.Contains(x.UserId)).Select(x => x.UserUniqueId).Distinct().ToList();
                     var superAdmins = this._userRepo.Table.Where(x => x.IsInGroup && !x.IsDeleted).Select(x => x.UserUniqueId).ToList();
@@ -6522,7 +6522,7 @@ namespace Web.Services.Concrete
                     }
 
                     this._codeBlueRepo.Update(row);
-                    this._dbContext.Log(row, TableEnums.CodeBlues.ToString(), row.CodeBlueId, ActivityLogActionEnums.FileUpload.ToInt());
+                    this._dbContext.Log(row, ActivityLogTableEnums.CodeBlues.ToString(), row.CodeBlueId, ActivityLogActionEnums.FileUpload.ToInt());
                     fieldValue = new { videosPath = codeBlue.VideosPath, audiosPath = codeBlue.AudiosPath, attachmentsPath = codeBlue.AttachmentsPath };
                     var userIds = this._BlueCodeGroupMembersRepo.Table.Where(x => x.BlueCodeIdFk == row.CodeBlueId).Select(x => x.UserIdFk).ToList();
                     var userUniqueIds = this._userRepo.Table.Where(x => userIds.Contains(x.UserId)).Select(x => x.UserUniqueId).Distinct().ToList();
@@ -6855,7 +6855,7 @@ namespace Web.Services.Concrete
                         }
 
                         this._codeBlueRepo.Insert(blue);
-                        this._dbContext.Log(blue, TableEnums.CodeBlues.ToString(), blue.CodeBlueId, ActivityLogActionEnums.Create.ToInt());
+                        this._dbContext.Log(blue, ActivityLogTableEnums.CodeBlues.ToString(), blue.CodeBlueId, ActivityLogActionEnums.Create.ToInt());
                         var codeService = new CodesServiceLinesMapping()
                         {
                             OrganizationIdFk = blue.OrganizationIdFk,

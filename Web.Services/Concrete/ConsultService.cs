@@ -419,7 +419,7 @@ namespace Web.Services.Concrete
                 {
                     var consult = this._dbContext.LoadSQLQuery($"Select ConsultId from consults where consultNumber = { Consult_Counter.Counter_Value.ToInt()}").ExecuteStoredProc<Consult>().FirstOrDefault();
 
-                    this._dbContext.Log(keyValues, TableEnums.Consults.ToString(), consult.ConsultId.ToInt(), ActivityLogActionEnums.Create.ToInt());
+                    this._dbContext.Log(keyValues, ActivityLogTableEnums.Consults.ToString(), consult.ConsultId.ToInt(), ActivityLogActionEnums.Create.ToInt());
 
                     //    if (keys.Contains("ServiceLineIdFk") && keyValues["ServiceLineIdFk"].ToString() != "0")
                     //    {
@@ -674,7 +674,7 @@ namespace Web.Services.Concrete
                 int rowsEffect = this._dbContext.Database.ExecuteSqlRaw(query);
                 if (rowsEffect > 0)
                 {
-                    this._dbContext.Log(keyValues, TableEnums.Consults.ToString(), keyValues["ConsultId"].ToString().ToInt(), ActivityLogActionEnums.Update.ToInt());
+                    this._dbContext.Log(keyValues, ActivityLogTableEnums.Consults.ToString(), keyValues["ConsultId"].ToString().ToInt(), ActivityLogActionEnums.Update.ToInt());
                     return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Updated Successfully" };
                 }
                 else
@@ -930,7 +930,7 @@ namespace Web.Services.Concrete
             var rowsEffected = this._dbContext.Database.ExecuteSqlRaw(sql, parameters);
             if (rowsEffected > 0)
             {
-                this._dbContext.Log(string.Empty, TableEnums.Consults.ToString(), consultId, status == false ? ActivityLogActionEnums.Inactive.ToInt() : ActivityLogActionEnums.Active.ToInt());
+                this._dbContext.Log(new { }, ActivityLogTableEnums.Consults.ToString(), consultId, status == false ? ActivityLogActionEnums.Inactive.ToInt() : ActivityLogActionEnums.Active.ToInt());
 
                 var userIds = this._dbContext.LoadStoredProcedure("md_getConsultGroupUsersId")
                                              .WithSqlParam("@consultId", consultId)

@@ -24,7 +24,8 @@ namespace Web.Services.Concrete
         {
             var jobj = JObject.Parse(jsonString);
             string logDesc = "";
-            string userFullName = action == ActivityLogActionEnums.SignIn.ToInt() ? jobj["username"].ToString() : ApplicationSettings.UserFullName;
+            //string userFullName = action == ActivityLogActionEnums.SignIn.ToInt() ? jobj["userFullName"].ToString() : ApplicationSettings.UserFullName;
+            string userFullName = ApplicationSettings.UserFullName;
             string actionName = action == ActivityLogActionEnums.SignIn.ToInt() ? "Logged In" :
                 action == ActivityLogActionEnums.Logout.ToInt() ? "Logged Out" :
                 action == ActivityLogActionEnums.Create.ToInt() ? "Created" :
@@ -35,8 +36,8 @@ namespace Web.Services.Concrete
                 action == ActivityLogActionEnums.FileDelete.ToInt() ? "Deleted File" :
                 action == ActivityLogActionEnums.Active.ToInt() ? "Activated" : "Action Performed";
 
-            if (tableName == TableEnums.CodeStrokes.ToString() || tableName == TableEnums.CodeTraumas.ToString() || tableName == TableEnums.CodeBlues.ToString() ||
-                tableName == TableEnums.CodeSepsis.ToString() || tableName == TableEnums.CodeSTEMIs.ToString())
+            if (tableName == ActivityLogTableEnums.CodeStrokes.ToString() || tableName == ActivityLogTableEnums.CodeTraumas.ToString() || tableName == ActivityLogTableEnums.CodeBlues.ToString() ||
+                tableName == ActivityLogTableEnums.CodeSepsis.ToString() || tableName == ActivityLogTableEnums.CodeSTEMIs.ToString())
             {
                 if (action == ActivityLogActionEnums.Update.ToInt())
                 {
@@ -64,9 +65,13 @@ namespace Web.Services.Concrete
                 }
 
             }
+            else if(tableName == ActivityLogTableEnums.Consults.ToString())
+            {
+                logDesc = $"{userFullName} {actionName} Record In {tableName}";
+            }
             else
             {
-                logDesc = $"{userFullName} {actionName} In {tableName}";
+                    logDesc = $"{userFullName} {actionName}";
             }
 
             return logDesc;
