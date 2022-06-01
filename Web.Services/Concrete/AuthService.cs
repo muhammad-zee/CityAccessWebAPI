@@ -191,7 +191,6 @@ namespace Web.Services.Concrete
             {
                     new Claim(JwtRegisteredClaimNames.Sub, user.PrimaryEmail),
                     new Claim("UserId",user.UserId.ToString()),
-                    new Claim("UserAccess",JsonConvert.SerializeObject(UserAccess)),
                     new Claim("UserFullName", $"{user.FirstName} {user.LastName}"),
                     new Claim("RoleIds",string.Join(",",UserRole.Select(x => x.RoleId).ToList())),
                     new Claim("isEMS", (UserRole.Where(x => x.RoleName == "EMS").Count() > 0).ToString()),
