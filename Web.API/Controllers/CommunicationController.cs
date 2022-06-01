@@ -244,7 +244,7 @@ namespace Web.API.Controllers
         {
             try
             {
-                return this._communicaitonService.updateConversationUserSid(UserSid, userId);
+                return this._communicaitonService.updateConversationUserSid(UserSid,userId);
             }
             catch (Exception ex)
             {
@@ -297,7 +297,7 @@ namespace Web.API.Controllers
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
         }
-
+        
         [HttpPost("Conversation/UploadAttachment")]
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
         public BaseResponse UploadAttachment()

@@ -391,32 +391,31 @@ namespace Web.Services.Concrete
                 foreach (var p in model.Participants)
                 {
                     user = this._userRepo.Table.FirstOrDefault(u => u.IsDeleted != true && u.IsActive == true && u.UserUniqueId == p.UniqueName);
-                    if (user != null)
+                    if (user!=null) { 
+                    bool participantExists = this._conversationParticipantsRepo.Table.Count(cp => cp.IsDeleted != true && cp.UserIdFk == user.UserId && cp.ConversationChannelIdFk == channel.ConversationChannelId && cp.UniqueName == p.UniqueName) > 0;
+                    if (!participantExists)
                     {
-                        bool participantExists = this._conversationParticipantsRepo.Table.Count(cp => cp.IsDeleted != true && cp.UserIdFk == user.UserId && cp.ConversationChannelIdFk == channel.ConversationChannelId && cp.UniqueName == p.UniqueName) > 0;
-                        if (!participantExists)
+                        newParticipant = new ConversationParticipant()
                         {
-                            newParticipant = new ConversationParticipant()
-                            {
-                                FriendlyName = user.FirstName + " " + user.LastName,
-                                UniqueName = p.UniqueName,
-                                UserIdFk = user.UserId,
-                                ConversationChannelIdFk = channel.ConversationChannelId,
-                                IsAdmin = p.IsAdmin,
-                                CreatedBy = model.CreatedBy,
-                                CreatedDate = DateTime.UtcNow,
-                                IsDeleted = false
+                            FriendlyName = user.FirstName + " " + user.LastName,
+                            UniqueName = p.UniqueName,
+                            UserIdFk = user.UserId,
+                            ConversationChannelIdFk = channel.ConversationChannelId,
+                            IsAdmin = p.IsAdmin,
+                            CreatedBy = model.CreatedBy,
+                            CreatedDate = DateTime.UtcNow,
+                            IsDeleted = false
 
-                            };
+                        };
 
-                            channelParticipantsList.Add(newParticipant);
-                        }
+                        channelParticipantsList.Add(newParticipant);
+                    }
                     }
                 }
                 if (channelParticipantsList.Count() > 0)
                 {
-                    this._conversationParticipantsRepo.Insert(channelParticipantsList);
-                    this._activeCodeHelperService.MemberAddedToConversationChannel(channelParticipantsList, model.ChannelSid);
+                this._conversationParticipantsRepo.Insert(channelParticipantsList);
+                this._activeCodeHelperService.MemberAddedToConversationChannel(channelParticipantsList, model.ChannelSid);
                 }
 
 
@@ -579,7 +578,7 @@ namespace Web.Services.Concrete
             }
 
         }
-        public BaseResponse updateConversationUserSid(string UserSid, int userId)
+        public BaseResponse updateConversationUserSid(string UserSid,int userId)
         {
             BaseResponse response = new BaseResponse();
 
@@ -651,11 +650,11 @@ namespace Web.Services.Concrete
             try
             {
 
-                TwilioClient.Init(this.Twilio_AccountSid, this.Twilio_AuthToken);
-                var user = UserResource.Create(pathServiceSid: this.Twilio_ChatServiceSid, identity: Identity, friendlyName: FriendlyName);
-                return user;
+            TwilioClient.Init(this.Twilio_AccountSid, this.Twilio_AuthToken);
+            var user = UserResource.Create(pathServiceSid: this.Twilio_ChatServiceSid, identity: Identity, friendlyName: FriendlyName);
+            return user;
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 return null;
             }
@@ -690,7 +689,7 @@ namespace Web.Services.Concrete
                     var participant = new ConversationParticipant();
                     delete = MemberResource.Delete(pathServiceSid: this.Twilio_ChatServiceSid, pathChannelSid: ChannelSid, pathSid: item.Sid);
                     participant = this._conversationParticipantsRepo.Table.Where(x => x.ConversationChannelIdFk == channelId && !x.IsDeleted).FirstOrDefault();
-                    if (participant != null)
+                    if (participant != null) 
                     {
                         participant.IsDeleted = true;
                         participant.ModifiedBy = ApplicationSettings.UserId;
@@ -714,17 +713,17 @@ namespace Web.Services.Concrete
             List<ConversationUserStatus> statusList = new();
             if (!string.IsNullOrEmpty(UserSid))
             {
-                string[] userSidList = UserSid.Split(",");
-                var status = false;
-                foreach (var sid in userSidList)
+            string[] userSidList = UserSid.Split(",");
+            var status = false;
+            foreach (var sid in userSidList)
+            {
+                if (sid != "")
                 {
-                    if (sid != "")
-                    {
-                        status = conversationUserIsOnline(sid);
-                        statusList.Add(new ConversationUserStatus() { ConversationUserSid = sid, IsOnline = status });
-                    }
+                    status = conversationUserIsOnline(sid);
+                    statusList.Add(new ConversationUserStatus() { ConversationUserSid = sid, IsOnline = status });
                 }
-                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Chat users found", Body = statusList };
+            }
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Chat users found", Body = statusList };
             }
             else
             {
@@ -778,7 +777,7 @@ namespace Web.Services.Concrete
             if (row != null)
             {
                 status = HttpStatusCode.OK;
-                message = isAdmin ? $"{row.FriendlyName} is admin now." : $"{row.FriendlyName} is not an admin now.";
+                message = isAdmin ? $"{row.FriendlyName} is admin now.": $"{row.FriendlyName} is not an admin now." ;
                 row.IsAdmin = isAdmin;
                 row.ModifiedBy = ApplicationSettings.UserId;
                 row.ModifiedDate = DateTime.UtcNow;
@@ -1151,7 +1150,7 @@ namespace Web.Services.Concrete
                 }
                 if (usersToUpdate.Count() > 0)
                 {
-                    this._userRepo.Update(usersToUpdate);
+                this._userRepo.Update(usersToUpdate);
                 }
                 return new BaseResponse { Status = HttpStatusCode.OK, Message = "conversation users refreshed" };
             }
@@ -1167,18 +1166,18 @@ namespace Web.Services.Concrete
             {
                 var dbUsersList = this._userRepo.Table.Where(x => x.IsDeleted == false && x.IsActive == true && string.IsNullOrEmpty(x.ConversationUserSid)).ToList();
                 User dbUser = null;
-                List<User> usersToUpdate = new();
+                        List<User> usersToUpdate = new();
                 System.Net.ServicePointManager.SecurityProtocol = (System.Net.SecurityProtocolType)3072; //TLS 1.2
                 TwilioClient.Init(Twilio_AccountSid, Twilio_AuthToken);
 
                 var users = UserResource.Read(
                     pathServiceSid: Twilio_ChatServiceSid,
-                    limit: 1000
+                    limit:1000
                 );
                 foreach (var user in users)
                 {
                     dbUser = dbUsersList.FirstOrDefault(u => u.UserUniqueId == user.Identity);
-                    if (dbUser != null)
+                    if(dbUser!= null)
                     {
                         if (string.IsNullOrEmpty(dbUser.ConversationUserSid))
                         {
@@ -1189,12 +1188,12 @@ namespace Web.Services.Concrete
 
                     }
                 }
-                if (usersToUpdate.Count() > 0)
-                {
-                    this._userRepo.Update(usersToUpdate);
-                }
+                        if (usersToUpdate.Count() > 0)
+                        {
+                            this._userRepo.Update(usersToUpdate);
+                        }
 
-                return new BaseResponse { Status = HttpStatusCode.OK, Message = "User Sids Updated", Body = new { TwilioUsers = users.Count(), UpdatedUsers = usersToUpdate.Count() } };
+                return new BaseResponse { Status = HttpStatusCode.OK, Message = "User Sids Updated", Body = new { TwilioUsers=users.Count(),UpdatedUsers= usersToUpdate.Count() } };
             }
             else
             {
