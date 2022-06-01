@@ -1,4 +1,6 @@
-﻿namespace Web.Model.Common
+﻿using System.Collections.Generic;
+
+namespace Web.Model.Common
 {
     public class ChatUsersVM
     {

@@ -8,7 +8,7 @@ namespace Web.Model.Common
         public string ComponentId { get; set; }
         public string ModuleName { get; set; }
         public int? ParentComponentId { get; set; }
-        public List<object> Actions { get; set; }
+        public List<string> Actions { get; set; }
 
         [JsonIgnore]
         public List<ComponentAccessByRoleAndUserTreeVM> children { get; set; }
