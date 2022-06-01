@@ -217,6 +217,12 @@ namespace Web.Services.Concrete
             }
         }
 
+        public BaseResponse GetActivityLoggedOut()
+        {
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Found" };
+           
+        }
+
 
         #endregion
     }
