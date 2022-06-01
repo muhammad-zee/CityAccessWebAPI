@@ -34,7 +34,7 @@ namespace Web.API.Controllers
         #region Consult Fields
         [Description("Get All Consult Feilds")]
         [HttpGet("consult/GetAllConsultFields")]
-        [ValidateAntiForgeryToken]
+        //[ValidateAntiForgeryToken]
         public BaseResponse GetAllConsultFields()
         {
             try
@@ -51,7 +51,7 @@ namespace Web.API.Controllers
 
         [Description("Get Consult Feilds For Org")]
         [HttpGet("consult/GetConsultFeildsForOrg/{OrgId}")]
-        [ValidateAntiForgeryToken]
+        //[ValidateAntiForgeryToken]
         public BaseResponse GetConsultFeildsForOrg(int OrgId)
         {
             try
@@ -84,7 +84,7 @@ namespace Web.API.Controllers
 
         [Description("Get Consult Feilds For Org")]
         [HttpGet("consult/GetConsultFormFieldByOrgId/{OrgId}")]
-        [ValidateAntiForgeryToken]
+        //[ValidateAntiForgeryToken]
         public BaseResponse GetConsultFormFieldByOrgId(int OrgId)
         {
             try
@@ -101,7 +101,7 @@ namespace Web.API.Controllers
 
         [Description("Add Or Update Consult Feilds")]
         [HttpPost("consult/AddOrUpdateConsultFeilds")]
-        [ValidateAntiForgeryToken]
+        //[ValidateAntiForgeryToken]
         public BaseResponse AddOrUpdateConsultFeilds([FromBody] ConsultFieldsVM consultField)
         {
             try
@@ -122,7 +122,7 @@ namespace Web.API.Controllers
 
         [Description("Get Consult Feilds For Org")]
         [HttpPost("consult/AddOrUpdateOrgConsultFeilds")]
-        [ValidateAntiForgeryToken]
+        //[ValidateAntiForgeryToken]
         public BaseResponse AddOrUpdateOrgConsultFeilds([FromBody] List<OrgConsultFieldsVM> orgConsultFields)
         {
             try
@@ -161,7 +161,7 @@ namespace Web.API.Controllers
 
         [Description("Get All Consults")]
         [HttpGet("consult/GetAllConsults")]
-        [ValidateAntiForgeryToken]
+        //[ValidateAntiForgeryToken]
         public BaseResponse GetAllConsults()
         {
             try
@@ -228,7 +228,7 @@ namespace Web.API.Controllers
 
         [Description("create Consult group")]
         [HttpPost("consult/CreateConsultGroup")]
-        public BaseResponse CreateConsultGroup([FromBody]  IDictionary<string, object> keyValues)
+        public BaseResponse CreateConsultGroup([FromBody] IDictionary<string, object> keyValues)
         {
             try
             {
@@ -260,7 +260,7 @@ namespace Web.API.Controllers
 
         [Description("Delete Consult")]
         [HttpGet("consult/DeleteConsult/{consultId}/{status}")]
-        [ValidateAntiForgeryToken]
+        //[ValidateAntiForgeryToken]
         public BaseResponse DeleteConsult(int consultId, bool status)
         {
             try
@@ -281,7 +281,7 @@ namespace Web.API.Controllers
         #region Consult Acknowledgments
 
         [HttpGet("consult/GetAllConsultAcknowledgments")]
-        [ValidateAntiForgeryToken]
+        //[ValidateAntiForgeryToken]
         public BaseResponse GetAllConsultAcknowledgments()
         {
             try

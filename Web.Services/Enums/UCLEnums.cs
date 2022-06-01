@@ -12,15 +12,15 @@ namespace Web.Services.Enums
         Sepsis = 1105,
         Trauma = 1106,
         Blue = 1116,
-        
+
         [Description("EMS Code")]
         EMS,
         [Description("Code")]
         InhouseCode
     }
 
-    public enum RouteEnums 
-    { 
+    public enum RouteEnums
+    {
 
         /// <summary>
         /// Inhouse Codes Routes
@@ -58,6 +58,6 @@ namespace Web.Services.Enums
         /// </summary>
         [Description("/Home/Dashboard")]
         Dashboard,
-        
+
     }
 }
