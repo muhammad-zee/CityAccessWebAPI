@@ -16,7 +16,6 @@ using Web.Services.Interfaces;
 namespace Web.API.Controllers
 {
     [Authorize]
-    [RequestHandler]
     public class ScheduleController : Controller
     {
         private readonly IScheduleService _scheduleService;
@@ -75,7 +74,7 @@ namespace Web.API.Controllers
             }
         }
 
-
+        [RequestHandler]
         [Description("Get Schedule")]
         [Route("Schedule/GetScheduleList")]
         [HttpPost, DisableRequestSizeLimit]
@@ -99,7 +98,8 @@ namespace Web.API.Controllers
                 };
             }
         }
-
+       
+        [RequestHandler]
         [Description("Add Or Update Schedule")]
         [Route("Schedule/AddOrUpdateSchedule")]
         [HttpPost, DisableRequestSizeLimit]
@@ -123,7 +123,8 @@ namespace Web.API.Controllers
                 };
             }
         }
-
+        
+        [RequestHandler]
         [Description("Import Schedule")]
         [Route("Schedule/Upload")]
         [HttpPost, DisableRequestSizeLimit]
@@ -174,7 +175,7 @@ namespace Web.API.Controllers
             }
         }
 
-
+        [RequestHandler]
         [Description("Get Schedule Template")]
         [HttpGet("Schedule/GetScheduleTemplate/{serviceLineId}/{roleIds}")]
         public BaseResponse GetScheduleTemplate(int serviceLineId, string roleIds)
@@ -197,6 +198,7 @@ namespace Web.API.Controllers
             }
         }
 
+        [RequestHandler]
         [Description("Delete Schedule")]
         [HttpGet("Schedule/DeleteSchedule/{scheduleId}/{userId}")]
         public BaseResponse DeleteSchedule(int scheduleId, int userId)

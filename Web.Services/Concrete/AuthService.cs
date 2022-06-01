@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -186,11 +187,16 @@ namespace Web.Services.Concrete
             var settings = this._dbContext.LoadStoredProcedure("md_getSettingsByUserId")
                                 .WithSqlParam("@userId", user.UserId)
                                 .ExecuteStoredProc<SettingsVM>().FirstOrDefault();
+            var UserAccess = _dbContext.LoadStoredProcedure("md_getComponentIdsByUserAndRole")
+                                            .WithSqlParam("@pUserId", user.UserId)
+                                            .WithSqlParam("@pRoleId", UserRole.Select(x => x.RoleId).FirstOrDefault())
+                                            .ExecuteStoredProc<ComponentAccessByRoleAndUserVM>().Select(x => x.ComponentId).ToList();
 
             var claims = new[]
             {
                     new Claim(JwtRegisteredClaimNames.Sub, user.PrimaryEmail),
                     new Claim("UserId",user.UserId.ToString()),
+                    new Claim("UserAccess",JsonConvert.SerializeObject(UserAccess)),
                     new Claim("UserFullName", $"{user.FirstName} {user.LastName}"),
                     new Claim("RoleIds",string.Join(",",UserRole.Select(x => x.RoleId).ToList())),
                     new Claim("isEMS", (UserRole.Where(x => x.RoleName == "EMS").Count() > 0).ToString()),
@@ -205,7 +211,7 @@ namespace Web.Services.Concrete
             /////////////////  Set user Two Factor Settings According to Organization Setting /////////////////
             if (settings != null)
             {
-                user.TwoFactorEnabled = settings.TwoFactorEnable;
+                user.TwoFactorEnabled = settings.TwoFactorEnable == false ? false : user.TwoFactorEnabled;
                 user.IsTwoFactRememberChecked = settings.VerifyCodeForFutureDays > 0;
                 user.TwoFactorExpiryDate = settings.TwoFactorCodeExpiry > 0 ? DateTime.UtcNow.AddDays(settings.TwoFactorCodeExpiry.Value) : user.TwoFactorExpiryDate;
                 tokenExpiryTime = settings.TokenExpiryTime > 0 ? DateTime.UtcNow.AddDays(settings.TokenExpiryTime.Value) : tokenExpiryTime;
