@@ -14,6 +14,8 @@ namespace Web.Services.Enums
         Delete = 2135,
         Active = 2136,
         Inactive = 2137,
-        Logout = 2138
+        Logout = 2138,
+        FileUpload = 2139,
+        FileDelete = 2140
     }
 }

@@ -7,7 +7,7 @@
         ConsultId,
         StrokeId,
         SepsisId,
-        STEMIId,
+        StemiId,
         TraumaId,
         BlueId
     }
@@ -18,7 +18,7 @@
         Consult,
         EMS,
         Stroke,
-        STEMI,
+        Stemi,
         Sepsis,
         Trauma,
         Blue

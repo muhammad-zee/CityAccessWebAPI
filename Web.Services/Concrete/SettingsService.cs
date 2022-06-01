@@ -1,5 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Net;
@@ -7,6 +9,7 @@ using Web.Data.Models;
 using Web.DLL.Generic_Repository;
 using Web.Model;
 using Web.Model.Common;
+using Web.Services.Enums;
 using Web.Services.Extensions;
 using Web.Services.Helper;
 using Web.Services.Interfaces;
@@ -15,6 +18,60 @@ namespace Web.Services.Concrete
 {
     public class SettingsService : ISettingService
     {
+
+
+        public string generateLogDesc(string tableName, int action, string jsonString)
+        {
+            var jobj = JObject.Parse(jsonString);
+            string logDesc = "";
+            string userFullName = action == ActivityLogActionEnums.SignIn.ToInt() ? jobj["username"].ToString() : ApplicationSettings.UserFullName;
+            string actionName = action == ActivityLogActionEnums.SignIn.ToInt() ? "Logged In" :
+                action == ActivityLogActionEnums.Logout.ToInt() ? "Logged Out" :
+                action == ActivityLogActionEnums.Create.ToInt() ? "Created" :
+                action == ActivityLogActionEnums.Update.ToInt() ? "Updated" :
+                action == ActivityLogActionEnums.Delete.ToInt() ? "Deleted" :
+                action == ActivityLogActionEnums.Inactive.ToInt() ? "Deactivated" :
+                action == ActivityLogActionEnums.FileUpload.ToInt() ? "Uploaded File" :
+                action == ActivityLogActionEnums.FileDelete.ToInt() ? "Deleted File" :
+                action == ActivityLogActionEnums.Active.ToInt() ? "Activated" : "Action Performed";
+
+            if (tableName == TableEnums.CodeStrokes.ToString() || tableName == TableEnums.CodeTraumas.ToString() || tableName == TableEnums.CodeBlues.ToString() ||
+                tableName == TableEnums.CodeSepsis.ToString() || tableName == TableEnums.CodeSTEMIs.ToString())
+            {
+                if (action == ActivityLogActionEnums.Update.ToInt())
+                {
+                    var jobj1 = jobj.Properties().ToList();
+                    string updatedField = "";
+                    string updatedValue = "";
+                    foreach (var i in jobj)
+                    {
+                        if (i.Value != null)
+                        {
+                            updatedField = i.Key;
+                            updatedValue = i.Value.ToString();
+                        }
+                    }
+
+                    logDesc = $"{userFullName} {actionName} {updatedField} To {updatedValue} In {tableName}";
+                }
+                else if (action == ActivityLogActionEnums.FileUpload.ToInt() || action == ActivityLogActionEnums.FileDelete.ToInt())
+                {
+                    logDesc = $"{userFullName} {actionName} In {tableName}";
+                }
+                else
+                {
+                    logDesc = $"{userFullName} {actionName} {tableName}";
+                }
+
+            }
+            else
+            {
+                logDesc = $"{userFullName} {actionName} In {tableName}";
+            }
+
+            return logDesc;
+        }
+
         IConfiguration _config;
         private RAQ_DbContext _dbContext;
         private readonly IRepository<Setting> _settingRepo;
@@ -30,6 +87,7 @@ namespace Web.Services.Concrete
             this._settingRepo = settingsRepo;
             this._activityLogRepo = activityLogRepo;
         }
+
 
 
         public BaseResponse GetSettingsByOrgId(int OrgId)
@@ -154,7 +212,7 @@ namespace Web.Services.Concrete
             }
         }
 
-      
+
         #endregion
     }
 }

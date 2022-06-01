@@ -3,6 +3,7 @@
     public class ApplicationSettings
     {
         public static int UserId { get; set; }
+        public static string UserFullName { get; set; }
         public static int OrganizationId { get; set; }
         public static string RoleIds { get; set; }
         public static string UserName { get; set; }
