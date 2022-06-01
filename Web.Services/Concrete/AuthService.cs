@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -185,11 +186,16 @@ namespace Web.Services.Concrete
             var settings = this._dbContext.LoadStoredProcedure("md_getSettingsByUserId")
                                 .WithSqlParam("@userId", user.UserId)
                                 .ExecuteStoredProc<SettingsVM>().FirstOrDefault();
+            var UserAccess = _dbContext.LoadStoredProcedure("md_getComponentIdsByUserAndRole")
+                                            .WithSqlParam("@pUserId", user.UserId)
+                                            .WithSqlParam("@pRoleId", UserRole.Select(x => x.RoleId).FirstOrDefault())
+                                            .ExecuteStoredProc<ComponentAccessByRoleAndUserVM>().Select(x => x.ComponentId).ToList();
 
             var claims = new[]
             {
                     new Claim(JwtRegisteredClaimNames.Sub, user.PrimaryEmail),
                     new Claim("UserId",user.UserId.ToString()),
+                    new Claim("UserAccess",JsonConvert.SerializeObject(UserAccess)),
                     new Claim("UserFullName", $"{user.FirstName} {user.LastName}"),
                     new Claim("RoleIds",string.Join(",",UserRole.Select(x => x.RoleId).ToList())),
                     new Claim("isEMS", (UserRole.Where(x => x.RoleName == "EMS").Count() > 0).ToString()),
@@ -204,13 +210,13 @@ namespace Web.Services.Concrete
             /////////////////  Set user Two Factor Settings According to Organization Setting /////////////////
             if (settings != null)
             {
-                user.TwoFactorEnabled = settings.TwoFactorEnable;
+                user.TwoFactorEnabled = settings.TwoFactorEnable == false ? false : user.TwoFactorEnabled;
                 user.IsTwoFactRememberChecked = settings.VerifyCodeForFutureDays > 0;
                 user.TwoFactorExpiryDate = settings.TwoFactorCodeExpiry > 0 ? DateTime.UtcNow.AddDays(settings.TwoFactorCodeExpiry.Value) : user.TwoFactorExpiryDate;
                 tokenExpiryTime = settings.TokenExpiryTime > 0 ? DateTime.UtcNow.AddDays(settings.TokenExpiryTime.Value) : tokenExpiryTime;
             }
             ///////////////////////////////////////////////////////////////////////////////////////////////////
-            
+
             ////////////////////// Checking Verified for future or not ////////////////////////////////////////
             if (user.TwoFactorEnabled && user.IsTwoFactRememberChecked && DateTime.UtcNow <= user.TwoFactorExpiryDate)
             {
@@ -267,7 +273,7 @@ namespace Web.Services.Concrete
                 {
                     return new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "Password matches the previous password. Please update with new Password." };
                 }
-                user.IsRequirePasswordReset = false;                
+                user.IsRequirePasswordReset = false;
                 user.Password = modelUser.password;
                 user.PasswordExpiryDate = OrgSettings != null && OrgSettings.EnablePasswordAge.HasValue ? DateTime.UtcNow.AddDays(OrgSettings.EnablePasswordAge.Value) : user.PasswordExpiryDate.Value.AddMonths(1);
                 _userRepo.Update(user);
@@ -369,7 +375,7 @@ namespace Web.Services.Concrete
                     var existingUserRelation = this._userRelationRepo.Table.Where(x => x.UserIdFk == user.UserId).ToList();
                     this._userRelationRepo.DeleteRange(existingUserRelation);
                     /////////////////////////////////////////////////////////////////
-                    
+
 
                     /////////////// Add Super Admin Role /////////////////////////////
                     var superAdminRoleId = this._roleRepo.Table.Where(x => !x.IsDeleted && x.IsSuperAdmin).Select(x => x.RoleId).FirstOrDefault();
@@ -497,7 +503,7 @@ namespace Web.Services.Concrete
                             }
 
                         }
-                        else if (register.IsSuperAdmin) 
+                        else if (register.IsSuperAdmin)
                         {
                             var superAdminRoleId = this._roleRepo.Table.Where(x => !x.IsDeleted && x.IsSuperAdmin).Select(x => x.RoleId).FirstOrDefault();
                             var userRole = new UserRole() { UserIdFk = obj.UserId, RoleIdFk = superAdminRoleId };
