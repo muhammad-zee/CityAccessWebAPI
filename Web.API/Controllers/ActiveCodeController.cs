@@ -223,7 +223,7 @@ namespace Web.API.Controllers
 
         [Description("Delete Stroke Data By Id")]
         [HttpGet("stroke/DeleteStrokeDataById/{strokeId}/{status}")]
-        [ValidateAntiForgeryToken]
+        //[ValidateAntiForgeryToken]
         public BaseResponse DeleteStrokeDataById(int strokeId, bool status)
         {
             try
@@ -347,7 +347,7 @@ namespace Web.API.Controllers
 
         [Description("Delete Sepsis Data By Id")]
         [HttpGet("Sepsis/DeleteSepsisDataById/{SepsisId}/{status}")]
-        [ValidateAntiForgeryToken]
+       // [ValidateAntiForgeryToken]
         public BaseResponse DeleteSepsisDataById(int SepsisId, bool status)
         {
             try
@@ -470,7 +470,7 @@ namespace Web.API.Controllers
 
         [Description("Delete STEMI Data By Id")]
         [HttpGet("STEMI/DeleteSTEMIDataById/{STEMIId}/{status}")]
-        [ValidateAntiForgeryToken]
+        //[ValidateAntiForgeryToken]
         public BaseResponse DeleteSTEMIDataById(int STEMIId, bool status)
         {
             try
@@ -593,7 +593,7 @@ namespace Web.API.Controllers
 
         [Description("Delete Trauma Data By Id")]
         [HttpGet("Trauma/DeleteTraumaDataById/{TraumaId}/{status}")]
-        [ValidateAntiForgeryToken]
+       // [ValidateAntiForgeryToken]
         public BaseResponse DeleteTraumaDataById(int TraumaId, bool status)
         {
             try
@@ -716,7 +716,7 @@ namespace Web.API.Controllers
 
         [Description("Delete Blue Data By Id")]
         [HttpGet("blue/DeleteBlueDataById/{blueId}/{status}")]
-        [ValidateAntiForgeryToken]
+       // [ValidateAntiForgeryToken]
         public BaseResponse DeleteBlueDataById(int blueId, bool status)
         {
             try
@@ -775,7 +775,7 @@ namespace Web.API.Controllers
 
         [Description("Get All Inhouse Code Feilds")]
         [HttpGet("InhouseCode/GetAllInhouseCodeFeilds")]
-        [ValidateAntiForgeryToken]
+        //[ValidateAntiForgeryToken]
         public BaseResponse GetAllInhouseCodeFeilds()
         {
             try
@@ -955,7 +955,7 @@ namespace Web.API.Controllers
 
         [Description("Get All Codes Data")]
         [HttpPost("activecode/GetAllCodesData")]
-        [ValidateAntiForgeryToken]
+        //[ValidateAntiForgeryToken]
         public BaseResponse GetAllCodesData([FromBody] ActiveCodeVM activeCode)
         {
             try

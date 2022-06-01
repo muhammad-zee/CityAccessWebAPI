@@ -45,21 +45,21 @@ namespace Web.API
                     options.JsonSerializerOptions.IgnoreNullValues = true;
                     options.JsonSerializerOptions.Converters.Add(new DateTimeConverter());
                 });
-            //services.AddCors();
+            services.AddCors();
 
-            services.AddCors(options =>
-                           options.AddPolicy("MDRouteCorsPolicy", p => p.WithOrigins("http://localhost:4200", "https://mdroute.com")
-                                                                        .AllowAnyHeader()
-                                                                        .AllowAnyMethod()));
+            //services.AddCors(options =>
+            //               options.AddPolicy("MDRouteCorsPolicy", p => p.WithOrigins("http://localhost:4200", "https://mdroute.com")
+            //                                                            .AllowAnyHeader()
+            //                                                            .AllowAnyMethod()));
 
             // Security Headers
 
-            services.AddHsts(options =>
-            {
-                options.Preload = true;
-                options.IncludeSubDomains = true;
-                options.MaxAge = TimeSpan.FromDays(365);
-            });
+            //services.AddHsts(options =>
+            //{
+            //    options.Preload = true;
+            //    options.IncludeSubDomains = true;
+            //    options.MaxAge = TimeSpan.FromDays(365);
+            //});
 
             services.AddSwaggerGen(c =>
             {
@@ -147,14 +147,14 @@ namespace Web.API
 
             //Register Services Repositories
 
-            services.AddAntiforgery(options =>
-            {
-                options.HeaderName = "X-XSRF-TOKEN";
-                options.Cookie = new CookieBuilder()
-                {
-                    Name = "XSRF-TOKEN"
-                };
-            });
+            //services.AddAntiforgery(options =>
+            //{
+            //    options.HeaderName = "X-XSRF-TOKEN";
+            //    options.Cookie = new CookieBuilder()
+            //    {
+            //        Name = "XSRF-TOKEN"
+            //    };
+            //});
 
         }
 
@@ -181,33 +181,33 @@ namespace Web.API
             // Security Headers
 
 
-            app.Use(async (context, next) =>
-            {
-                context.Response.Headers.Add("Feature-Policy", "camera '*'; geolocation '*'; microphone '*'; fullscreen '*'; picture-in-picture '*'; sync-xhr '*'; encrypted-media '*'; oversized-images '*'");
-                await next();
-            });
+            //app.Use(async (context, next) =>
+            //{
+            //    context.Response.Headers.Add("Feature-Policy", "camera '*'; geolocation '*'; microphone '*'; fullscreen '*'; picture-in-picture '*'; sync-xhr '*'; encrypted-media '*'; oversized-images '*'");
+            //    await next();
+            //});
 
-            app.UseHsts();
+            //app.UseHsts();
             app.UseHttpsRedirection();
 
-            app.Use(async (context, next) =>
-            {
-                context.Response.Headers.Add("X-Frame-Options", "SAMEORIGIN");
-                await next();
-            });
+            //app.Use(async (context, next) =>
+            //{
+            //    context.Response.Headers.Add("X-Frame-Options", "SAMEORIGIN");
+            //    await next();
+            //});
 
-            app.Use(async (context, next) =>
-            {
-                context.Response.Headers.Add("X-Xss-Protection", "1; mode=block");
-                await next();
-            });
+            //app.Use(async (context, next) =>
+            //{
+            //    context.Response.Headers.Add("X-Xss-Protection", "1; mode=block");
+            //    await next();
+            //});
 
 
-            app.Use(async (ctx, next) =>
-            {
-                ctx.Response.Headers.Add("Content-Security-Policy", "script-src https 'unsafe-inline' 'unsafe-eval';style-src https 'unsafe-inline' 'unsafe-eval';img-src https: data:;font-src https: data:;");
-                await next();
-            });
+            //app.Use(async (ctx, next) =>
+            //{
+            //    ctx.Response.Headers.Add("Content-Security-Policy", "script-src https 'unsafe-inline' 'unsafe-eval';style-src https 'unsafe-inline' 'unsafe-eval';img-src https: data:;font-src https: data:;");
+            //    await next();
+            //});
 
             app.UseStaticFiles(new StaticFileOptions
             {
@@ -218,18 +218,18 @@ namespace Web.API
 
             app.UseRouting();
 
-            app.UseCors("MDRouteCorsPolicy");
-            //app.UseCors(x => x
-            //    //.SetIsOriginAllowed(origin => true)
-            //    .AllowAnyOrigin()
-            //    .AllowAnyMethod()
-            //    .AllowAnyHeader());
+            //app.UseCors("MDRouteCorsPolicy");
+            app.UseCors(x => x
+                //.SetIsOriginAllowed(origin => true)
+                .AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader());
 
             app.UseAuthentication();
 
             app.UseAuthorization();
 
-            app.UseAntiforgery();
+            //app.UseAntiforgery();
 
             //app.UseStaticFiles(new StaticFileOptions
             //{
