@@ -45,7 +45,7 @@ namespace Web.API
                     options.JsonSerializerOptions.IgnoreNullValues = true;
                     options.JsonSerializerOptions.Converters.Add(new DateTimeConverter());
                 });
-            //services.AddCors();
+            // services.AddCors();
 
             services.AddCors(options =>
                            options.AddPolicy("MDRouteCorsPolicy", p => p.WithOrigins("http://localhost:4200", "https://mdroute.com")
@@ -147,14 +147,14 @@ namespace Web.API
 
             //Register Services Repositories
 
-            services.AddAntiforgery(options =>
-            {
-                options.HeaderName = "X-XSRF-TOKEN";
-                options.Cookie = new CookieBuilder()
-                {
-                    Name = "XSRF-TOKEN"
-                };
-            });
+            //services.AddAntiforgery(options =>
+            //{
+            //    options.HeaderName = "X-XSRF-TOKEN";
+            //    options.Cookie = new CookieBuilder()
+            //    {
+            //        Name = "XSRF-TOKEN"
+            //    };
+            //});
 
         }
 
@@ -190,11 +190,11 @@ namespace Web.API
             app.UseHsts();
             app.UseHttpsRedirection();
 
-            app.Use(async (context, next) =>
-            {
-                context.Response.Headers.Add("X-Frame-Options", "SAMEORIGIN");
-                await next();
-            });
+            //app.Use(async (context, next) =>
+            //{
+            //    context.Response.Headers.Add("X-Frame-Options", "ALLOW-FROM http://localhost:60113/");
+            //    await next();
+            //});
 
             app.Use(async (context, next) =>
             {
@@ -202,10 +202,12 @@ namespace Web.API
                 await next();
             });
 
-
             app.Use(async (ctx, next) =>
             {
-                ctx.Response.Headers.Add("Content-Security-Policy", "script-src https 'unsafe-inline' 'unsafe-eval';style-src https 'unsafe-inline' 'unsafe-eval';img-src https: data:;font-src https: data:;");
+                ctx.Response.Headers.Add("Content-Security-Policy", "default-src 'self';" +
+                    "frame-src 'self' 'unsafe-inline' 'unsafe-eval' http://*/elm https://*/elm; " +
+                    "script-src 'self' 'unsafe-inline' 'unsafe-eval'  http://*/elm https://*/elm;" +
+                    "style-src 'self' 'unsafe-inline' 'unsafe-eval' http://*/elm https://*/elm");
                 await next();
             });
 
@@ -229,7 +231,7 @@ namespace Web.API
 
             app.UseAuthorization();
 
-            app.UseAntiforgery();
+            //app.UseAntiforgery();
 
             //app.UseStaticFiles(new StaticFileOptions
             //{
