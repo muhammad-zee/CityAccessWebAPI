@@ -25,7 +25,7 @@ namespace Web.Model.Common
     public class FilterActivityLogVM
     {
         public int CodeId { get; set; }
-        public int ModuleId { get; set; }
+        public string ModuleId { get; set; }
         public string UserId { get; set; }
         public DateTime FromDate { get; set; }
         public DateTime ToDate { get; set; }
