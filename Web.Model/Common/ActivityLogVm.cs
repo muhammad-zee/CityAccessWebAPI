@@ -26,7 +26,7 @@ namespace Web.Model.Common
     {
         public int CodeId { get; set; }
         public int ModuleId { get; set; }
-        public int UserId { get; set; }
+        public string UserId { get; set; }
         public DateTime FromDate { get; set; }
         public DateTime ToDate { get; set; }
     }
