@@ -226,7 +226,7 @@ namespace Web.Services.Concrete
             }
         }
 
-        public BaseResponse GetAllCodesByModuleId(FilterActivityLogVM filter)
+        public BaseResponse GetActivityLogPrimaryKeys(FilterActivityLogVM filter)
         {
             var rec = this._dbContext.LoadStoredProcedure("md_getActivityLogPrimaryKeys")
                                  .WithSqlParam("@pUserId", filter.UserId)
