@@ -329,7 +329,7 @@ namespace Web.Services.Concrete
             BaseResponse response = new BaseResponse();
             if (this._userRepo.Table.Count(u => u.IsDeleted == false && u.IsActive == true && u.UserUniqueId == channel.UniqueName) > 0)
             {
-
+                //if channel is user's notification channel and there is and other user in that channel or notification channel is somehow saved in db
                 var ch = ChannelResource.Fetch(pathServiceSid: this.Twilio_ChatServiceSid, pathSid: channel.ChannelSid);
                 var members = MemberResource.Read(pathServiceSid: this.Twilio_ChatServiceSid, pathChannelSid: channel.ChannelSid);
                 foreach (var m in members)
@@ -341,9 +341,13 @@ namespace Web.Services.Concrete
 
                 }
                 var dbChannel = this._conversationChannelsRepo.Table.FirstOrDefault(ch => ch.ChannelSid == channel.ChannelSid);
+                if (dbChannel != null)
+                {
                 var participants = this._conversationParticipantsRepo.Table.Where(p => p.ConversationChannelIdFk == dbChannel.ConversationChannelId);
                 this._conversationParticipantsRepo.DeleteRange(participants);
                 this._conversationChannelsRepo.Delete(dbChannel);
+                }
+                response.Status = HttpStatusCode.OK;
             }
             else
             {
