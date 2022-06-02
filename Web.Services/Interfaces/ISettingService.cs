@@ -9,6 +9,7 @@ namespace Web.Services.Interfaces
         BaseResponse AddOrUpdateOrgSettings(SettingsVM settings);
         BaseResponse GetSettingsChangePasswordByOrgId(SettingsVM settings);
         BaseResponse GetActivityLog(FilterActivityLogVM filter);
+        BaseResponse GetAllCodesByModuleId(FilterActivityLogVM filter);
         BaseResponse GetActivityLoggedOut();
     }
 }

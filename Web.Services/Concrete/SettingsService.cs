@@ -226,6 +226,24 @@ namespace Web.Services.Concrete
             }
         }
 
+        public BaseResponse GetAllCodesByModuleId(FilterActivityLogVM filter)
+        {
+            var rec = this._dbContext.LoadStoredProcedure("md_getActivityLogPrimaryKeys")
+                                 .WithSqlParam("@pUserId", filter.UserId)
+                                 .WithSqlParam("@pModule", filter.ModuleId)
+                                 .WithSqlParam("@pFromDate", filter.FromDate)
+                                 .WithSqlParam("@pToDate", filter.ToDate)
+                                 .ExecuteStoredProc<ActivityLogVm>().AsQueryable();
+            if (rec != null)
+            {
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Found", Body = rec };
+            }
+            else
+            {
+                return new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "Data Not Found" };
+            }
+        }
+
         public BaseResponse GetActivityLoggedOut()
         {
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Found" };

@@ -96,6 +96,22 @@ namespace Web.API.Controllers
             }
         }
 
+        [HttpPost("ActivityLog/GetAllCodesByModuleId")]
+        public BaseResponse GetAllCodesByModuleId([FromBody] FilterActivityLogVM filter)
+        {
+            var state = ModelState;
+            try
+            {
+                return _settingService.GetAllCodesByModuleId(filter);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
         [HttpGet("ActivityLog/ActivityLoggedOut")]
         public BaseResponse GetActivityLoggedOut()
         {
