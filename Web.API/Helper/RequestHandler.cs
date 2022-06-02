@@ -28,6 +28,8 @@ namespace Web.API.Helper
         public override void OnActionExecuting(ActionExecutingContext context)
         {
 
+
+            var userIP = context.HttpContext.Connection.RemoteIpAddress.ToString();
             var user = context.HttpContext.User;
             StringValues timeZone;
             StringValues componentObjHEX;
