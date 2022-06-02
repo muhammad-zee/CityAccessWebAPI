@@ -213,6 +213,7 @@ namespace Web.Services.Concrete
             var rec = this._dbContext.LoadStoredProcedure("md_getActivityLogReport")
                                 .WithSqlParam("@pUserId", filter.UserId)
                                 .WithSqlParam("@pModule", filter.ModuleId)
+                                .WithSqlParam("@pCodeId", filter.CodeId)
                                 .WithSqlParam("@pFromDate", filter.FromDate)
                                 .WithSqlParam("@pToDate", filter.ToDate)
                                 .ExecuteStoredProc<ActivityLogVm>().AsQueryable();
@@ -246,6 +247,7 @@ namespace Web.Services.Concrete
 
         public BaseResponse GetActivityLoggedOut()
         {
+            this._dbContext.Log(new { }, ActivityLogTableEnums.Users.ToString(), ApplicationSettings.UserId, ActivityLogActionEnums.Logout.ToInt());
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Found" };
            
         }
