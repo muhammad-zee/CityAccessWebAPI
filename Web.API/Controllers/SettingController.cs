@@ -96,13 +96,13 @@ namespace Web.API.Controllers
             }
         }
 
-        [HttpPost("ActivityLog/GetAllCodesByModuleId")]
-        public BaseResponse GetAllCodesByModuleId([FromBody] FilterActivityLogVM filter)
+        [HttpPost("ActivityLog/GetActivityLogPrimaryKeys")]
+        public BaseResponse GetActivityLogPrimaryKeys([FromBody] FilterActivityLogVM filter)
         {
             var state = ModelState;
             try
             {
-                return _settingService.GetAllCodesByModuleId(filter);
+                return _settingService.GetActivityLogPrimaryKeys(filter);
             }
             catch (Exception ex)
             {
