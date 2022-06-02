@@ -12,7 +12,6 @@ namespace Web.Model.Common
 
         [JsonIgnore]
         public List<ComponentAccessByRoleAndUserTreeVM> children { get; set; }
-        [JsonIgnore]
         public bool IsAction { get; set; }
 
     }
