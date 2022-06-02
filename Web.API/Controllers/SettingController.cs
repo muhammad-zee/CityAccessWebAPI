@@ -112,21 +112,7 @@ namespace Web.API.Controllers
             }
         }
 
-        [HttpGet("ActivityLog/ActivityLoggedOut")]
-        public BaseResponse GetActivityLoggedOut()
-        {
-            var state = ModelState;
-            try
-            {
-                return _settingService.GetActivityLoggedOut();
-            }
-            catch (Exception ex)
-            {
-                ElmahExtensions.RiseError(ex);
-                _logger.LogExceptions(ex);
-                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
-            }
-        }
+        
 
         #endregion
 

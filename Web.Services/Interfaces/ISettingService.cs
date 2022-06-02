@@ -10,6 +10,6 @@ namespace Web.Services.Interfaces
         BaseResponse GetSettingsChangePasswordByOrgId(SettingsVM settings);
         BaseResponse GetActivityLog(FilterActivityLogVM filter);
         BaseResponse GetActivityLogPrimaryKeys(FilterActivityLogVM filter);
-        BaseResponse GetActivityLoggedOut();
+        BaseResponse LogoutActivity();
     }
 }

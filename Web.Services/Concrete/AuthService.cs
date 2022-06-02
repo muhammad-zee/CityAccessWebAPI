@@ -35,6 +35,8 @@ namespace Web.Services.Concrete
         private IRepository<ControlListDetail> _controlListDetails;
         private readonly ICommunicationService _communicationService;
         private readonly IAdminService _adminService;
+        private readonly ISettingService _settingService;
+
         IConfiguration _config;
         private string _RootPath;
         private readonly UnitOfWork unitorWork;
@@ -51,7 +53,8 @@ namespace Web.Services.Concrete
             IRepository<Setting> settingRepo,
             IRepository<ControlListDetail> controlListDetails,
             ICommunicationService communicationService,
-            IAdminService adminService)
+            IAdminService adminService,
+            ISettingService settingService)
         {
             this._config = config;
             this._environment = environment;
@@ -64,6 +67,8 @@ namespace Web.Services.Concrete
             this._controlListDetails = controlListDetails;
             this._communicationService = communicationService;
             this._adminService = adminService;
+            this._settingService = settingService;
+
             this._encryptionKey = this._config["Encryption:key"].ToString();
             this._RootPath = this._config["FilePath:Path"].ToString();
             this._dbContext = dbContext;
@@ -157,6 +162,11 @@ namespace Web.Services.Concrete
                 }
             }
             return response;
+        }
+
+        public BaseResponse Logout()
+        {
+            return this._settingService.LogoutActivity();
         }
         public BaseResponse RefreshToken(int UserId)
         {

@@ -47,6 +47,24 @@ namespace Web.API.Controllers
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
         }
+        [Authorize]
+        [Description("User Logout")]
+        [HttpGet("auth/Logout")]
+        public BaseResponse Logout()
+        {
+            var state = ModelState;
+            try
+            {
+                return this._jwtAuth.Logout();
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
         [Description("Refresh Authenticaiton Token")]
         [HttpGet("auth/RefreshToken")]
         public BaseResponse RefreshToken(int UserId)
