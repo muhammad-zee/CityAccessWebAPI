@@ -153,6 +153,8 @@ namespace Web.Services.Concrete
                                 .WithSqlParam("@pCodeId", filter.CodeId)
                                 .WithSqlParam("@pFromDate", filter.FromDate)
                                 .WithSqlParam("@pToDate", filter.ToDate)
+                                .WithSqlParam("@pLastRecordId", filter.LastRecordId)
+                                .WithSqlParam("@pPageSize", filter.PageSize)
                                 .ExecuteStoredProc<ActivityLogVm>().AsQueryable();
             if (rec != null)
             {

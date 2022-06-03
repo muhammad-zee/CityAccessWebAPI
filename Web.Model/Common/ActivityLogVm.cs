@@ -8,7 +8,7 @@ namespace Web.Model.Common
 {
     public class ActivityLogVm
     {
-        public int ActiveLogId { get; set; }
+        public int ActivityLogId { get; set; }
         public long UserIdFk { get; set; }
         public string UserFullName { get; set; }
         public string TableName { get; set; }
@@ -29,5 +29,7 @@ namespace Web.Model.Common
         public string UserId { get; set; }
         public DateTime FromDate { get; set; }
         public DateTime ToDate { get; set; }
+        public int LastRecordId { get; set; }
+        public int PageSize { get; set; }
     }
 }
