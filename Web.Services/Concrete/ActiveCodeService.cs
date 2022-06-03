@@ -2316,197 +2316,187 @@ namespace Web.Services.Concrete
                 };
 
                 _communicationService.pushNotification(notification);
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = errorMsg, Body = new { channelSid = channel.Sid, serviceLineUsersFound = usersFound, DefaultServiceLineIds, ServiceLineTeam1Ids = new List<int>(), ServiceLineTeam2Ids = new List<int>() } };
             }
-
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = errorMsg, Body = new { serviceLineUsersFound = usersFound, DefaultServiceLineIds, ServiceLineTeam1Ids = new List<int>(), ServiceLineTeam2Ids = new List<int>() } };
+
         }
 
         public BaseResponse UpdateStrokeGroupMembers(CodeStrokeVM codeStroke)
         {
+            bool userNotFound = false;
 
-            if (codeStroke.DefaultServiceLineIds == null || codeStroke.DefaultServiceLineIds == "")
+            string msg = "";
+
+            var DefaultServiceLineIds = codeStroke.DefaultServiceLineIds.ToIntList();
+            var ServiceLineTeam1Ids = codeStroke.ServiceLineTeam1Ids.ToIntList();
+            var ServiceLineTeam2Ids = codeStroke.ServiceLineTeam2Ids.ToIntList();
+
+            var UserChannelSid = (from us in this._userSchedulesRepo.Table
+                                  join u in this._userRepo.Table on us.UserIdFk equals u.UserId
+                                  where (DefaultServiceLineIds.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam1Ids.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam2Ids.Contains(us.ServiceLineIdFk.Value)) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
+                                  select new { u.UserUniqueId, u.UserId, ServiceLineIdFk = us.ServiceLineIdFk.Value }).Distinct().ToList();
+
+            var codeServiceMapping = this._codesServiceLinesMappingRepo.Table.Where(x => x.OrganizationIdFk == codeStroke.OrganizationIdFk && x.CodeIdFk == UCLEnums.Stroke.ToInt() && x.ActiveCodeId == codeStroke.CodeStrokeId).ToList();
+            if (codeServiceMapping.Count > 0)
+                this._codesServiceLinesMappingRepo.DeleteRange(codeServiceMapping);
+
+            if (UserChannelSid.Count > 0)
             {
-                string IsEMS = codeStroke.IsEms.HasValue && codeStroke.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription();
-                codeStroke.DefaultServiceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeStroke.OrganizationIdFk && x.CodeIdFk == UCLEnums.Stroke.ToInt() && x.Type == IsEMS && x.IsActive.HasValue && x.IsActive.Value && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
-            }
-
-            if (codeStroke.DefaultServiceLineIds != null && codeStroke.DefaultServiceLineIds != "")
-            {
-                bool userNotFound = false;
-
-                string msg = "";
-
-                var DefaultServiceLineIds = codeStroke.DefaultServiceLineIds.ToIntList();
-                var ServiceLineTeam1Ids = codeStroke.ServiceLineTeam1Ids.ToIntList();
-                var ServiceLineTeam2Ids = codeStroke.ServiceLineTeam2Ids.ToIntList();
-
-                var UserChannelSid = (from us in this._userSchedulesRepo.Table
-                                      join u in this._userRepo.Table on us.UserIdFk equals u.UserId
-                                      where (DefaultServiceLineIds.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam1Ids.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam2Ids.Contains(us.ServiceLineIdFk.Value)) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
-                                      select new { u.UserUniqueId, u.UserId, ServiceLineIdFk = us.ServiceLineIdFk.Value }).Distinct().ToList();
-
-                var codeServiceMapping = this._codesServiceLinesMappingRepo.Table.Where(x => x.OrganizationIdFk == codeStroke.OrganizationIdFk && x.CodeIdFk == UCLEnums.Stroke.ToInt() && x.ActiveCodeId == codeStroke.CodeStrokeId).ToList();
-                if (codeServiceMapping.Count > 0)
-                    this._codesServiceLinesMappingRepo.DeleteRange(codeServiceMapping);
-
-                if (UserChannelSid.Count > 0)
+                userNotFound = true;
+                var defaultExist = DefaultServiceLineIds.Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
+                if (defaultExist.Count > 0)
                 {
-                    userNotFound = true;
-                    var defaultExist = DefaultServiceLineIds.Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
-                    if (defaultExist.Count > 0)
+                    if (!defaultExist.Select(x => x.IsExist).All(x => x == true))
                     {
-                        if (!defaultExist.Select(x => x.IsExist).All(x => x == true))
-                        {
-                            var notExisted = defaultExist.Where(x => !x.IsExist).Select(x => x.ServiceLineId).ToList();
-                            DefaultServiceLineIds.RemoveAll(d => notExisted.Contains(d));
-                            var services = this._serviceLineRepo.Table.Where(x => notExisted.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
-                            foreach (var item in services)
-                            {
-                                msg += Environment.NewLine + "No OnCall user found in " + item.ServiceName;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        var services = this._serviceLineRepo.Table.Where(x => DefaultServiceLineIds.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
+                        var notExisted = defaultExist.Where(x => !x.IsExist).Select(x => x.ServiceLineId).ToList();
+                        DefaultServiceLineIds.RemoveAll(d => notExisted.Contains(d));
+                        var services = this._serviceLineRepo.Table.Where(x => notExisted.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
                         foreach (var item in services)
                         {
                             msg += Environment.NewLine + "No OnCall user found in " + item.ServiceName;
                         }
-                        DefaultServiceLineIds = new List<int>();
-                    }
-
-                    var serviceLineTeam1Exist = ServiceLineTeam1Ids.Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
-                    if (serviceLineTeam1Exist.Count > 0)
-                    {
-                        if (!serviceLineTeam1Exist.Select(x => x.IsExist).All(x => x == true))
-                        {
-                            var notExisted = serviceLineTeam1Exist.Where(x => !x.IsExist).Select(x => x.ServiceLineId).ToList();
-                            ServiceLineTeam1Ids.RemoveAll(d => notExisted.Contains(d));
-                            var services = this._serviceLineRepo.Table.Where(x => notExisted.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
-                            foreach (var item in services)
-                            {
-                                msg += Environment.NewLine + "No OnCall user found in " + item.ServiceName;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        var services = this._serviceLineRepo.Table.Where(x => ServiceLineTeam1Ids.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
-                        foreach (var item in services)
-                        {
-                            msg += Environment.NewLine + "No OnCall user found in " + item.ServiceName;
-                        }
-                        ServiceLineTeam1Ids = new List<int>();
-                    }
-
-
-                    var serviceLineTeam2Exist = ServiceLineTeam2Ids.Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
-                    if (serviceLineTeam2Exist.Count > 0)
-                    {
-                        if (!serviceLineTeam2Exist.Select(x => x.IsExist).All(x => x == true))
-                        {
-                            var notExisted = serviceLineTeam2Exist.Where(x => !x.IsExist).Select(x => x.ServiceLineId).ToList();
-                            ServiceLineTeam2Ids.RemoveAll(d => notExisted.Contains(d));
-                            var services = this._serviceLineRepo.Table.Where(x => notExisted.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
-                            foreach (var item in services)
-                            {
-                                msg += Environment.NewLine + "No OnCall user found in " + item.ServiceName;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        var services = this._serviceLineRepo.Table.Where(x => ServiceLineTeam2Ids.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
-                        foreach (var item in services)
-                        {
-                            msg += Environment.NewLine + "No OnCall user found in " + item.ServiceName;
-                        }
-                        ServiceLineTeam2Ids = new List<int>();
-                    }
-
-
-
-                    if (DefaultServiceLineIds.Count > 0 || ServiceLineTeam1Ids.Count > 0 || ServiceLineTeam2Ids.Count > 0)
-                    {
-                        var codeService = new CodesServiceLinesMapping()
-                        {
-                            OrganizationIdFk = codeStroke.OrganizationIdFk,
-                            CodeIdFk = UCLEnums.Stroke.ToInt(),
-                            DefaultServiceLineIdFk = DefaultServiceLineIds.Count > 0 ? string.Join(",", DefaultServiceLineIds) : null,
-                            ServiceLineId1Fk = ServiceLineTeam1Ids.Count > 0 ? string.Join(",", ServiceLineTeam1Ids) : null,
-                            ServiceLineId2Fk = ServiceLineTeam2Ids.Count > 0 ? string.Join(",", ServiceLineTeam2Ids) : null,
-                            ActiveCodeId = codeStroke.CodeStrokeId,
-                            ActiveCodeName = UCLEnums.Stroke.ToString()
-                        };
-                        this._codesServiceLinesMappingRepo.Insert(codeService);
                     }
                 }
                 else
                 {
+                    var services = this._serviceLineRepo.Table.Where(x => DefaultServiceLineIds.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
+                    foreach (var item in services)
+                    {
+                        msg += Environment.NewLine + "No OnCall user found in " + item.ServiceName;
+                    }
                     DefaultServiceLineIds = new List<int>();
+                }
+
+                var serviceLineTeam1Exist = ServiceLineTeam1Ids.Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
+                if (serviceLineTeam1Exist.Count > 0)
+                {
+                    if (!serviceLineTeam1Exist.Select(x => x.IsExist).All(x => x == true))
+                    {
+                        var notExisted = serviceLineTeam1Exist.Where(x => !x.IsExist).Select(x => x.ServiceLineId).ToList();
+                        ServiceLineTeam1Ids.RemoveAll(d => notExisted.Contains(d));
+                        var services = this._serviceLineRepo.Table.Where(x => notExisted.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
+                        foreach (var item in services)
+                        {
+                            msg += Environment.NewLine + "No OnCall user found in " + item.ServiceName;
+                        }
+                    }
+                }
+                else
+                {
+                    var services = this._serviceLineRepo.Table.Where(x => ServiceLineTeam1Ids.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
+                    foreach (var item in services)
+                    {
+                        msg += Environment.NewLine + "No OnCall user found in " + item.ServiceName;
+                    }
                     ServiceLineTeam1Ids = new List<int>();
+                }
+
+
+                var serviceLineTeam2Exist = ServiceLineTeam2Ids.Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
+                if (serviceLineTeam2Exist.Count > 0)
+                {
+                    if (!serviceLineTeam2Exist.Select(x => x.IsExist).All(x => x == true))
+                    {
+                        var notExisted = serviceLineTeam2Exist.Where(x => !x.IsExist).Select(x => x.ServiceLineId).ToList();
+                        ServiceLineTeam2Ids.RemoveAll(d => notExisted.Contains(d));
+                        var services = this._serviceLineRepo.Table.Where(x => notExisted.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
+                        foreach (var item in services)
+                        {
+                            msg += Environment.NewLine + "No OnCall user found in " + item.ServiceName;
+                        }
+                    }
+                }
+                else
+                {
+                    var services = this._serviceLineRepo.Table.Where(x => ServiceLineTeam2Ids.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
+                    foreach (var item in services)
+                    {
+                        msg += Environment.NewLine + "No OnCall user found in " + item.ServiceName;
+                    }
                     ServiceLineTeam2Ids = new List<int>();
                 }
 
 
-                var superAdmins = this._userRepo.Table.Where(x => x.IsInGroup && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId, ServiceLineIdFk = 0 }).ToList();
-                UserChannelSid.AddRange(superAdmins);
-                var loggedInUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId, ServiceLineIdFk = 0 }).FirstOrDefault();
-                UserChannelSid.Add(loggedInUser);
 
-                if (codeStroke.ChannelSid != null && codeStroke.ChannelSid != "")
+                if (DefaultServiceLineIds.Count > 0 || ServiceLineTeam1Ids.Count > 0 || ServiceLineTeam2Ids.Count > 0)
                 {
-                    var channelSid = codeStroke.ChannelSid; //channel.Select(x => x.ChannelSid).FirstOrDefault();
-
-                    var groupMembers = this._StrokeCodeGroupMembersRepo.Table.Where(x => x.StrokeCodeIdFk == codeStroke.CodeStrokeId).ToList();
-                    this._StrokeCodeGroupMembersRepo.DeleteRange(groupMembers);
-                    //this._StrokeCodeGroupMembersRepo.DeleteRange(channel);
-                    bool isDeleted = _communicationService.DeleteUserToConversationChannel(channelSid);
-                    List<CodeStrokeGroupMember> ACodeGroupMembers = new List<CodeStrokeGroupMember>();
-                    foreach (var item in UserChannelSid.Distinct())
+                    var codeService = new CodesServiceLinesMapping()
                     {
-                        try
-                        {
-                            var codeGroupMember = new CodeStrokeGroupMember()
-                            {
-                                UserIdFk = item.UserId,
-                                StrokeCodeIdFk = codeStroke.CodeStrokeId,
-                                //ActiveCodeName = UCLEnums.Stroke.ToString(),
-                                IsAcknowledge = false,
-                                CreatedBy = ApplicationSettings.UserId,
-                                CreatedDate = DateTime.UtcNow,
-                                IsDeleted = false
-                            };
-                            ACodeGroupMembers.Add(codeGroupMember);
-                            _communicationService.addNewUserToConversationChannel(channelSid, item.UserUniqueId);
-                        }
-                        catch (Exception ex)
-                        {
-                            //ElmahExtensions.RiseError(ex);
-                        }
-                    }
-                    this._StrokeCodeGroupMembersRepo.Insert(ACodeGroupMembers);
-
+                        OrganizationIdFk = codeStroke.OrganizationIdFk,
+                        CodeIdFk = UCLEnums.Stroke.ToInt(),
+                        DefaultServiceLineIdFk = DefaultServiceLineIds.Count > 0 ? string.Join(",", DefaultServiceLineIds) : null,
+                        ServiceLineId1Fk = ServiceLineTeam1Ids.Count > 0 ? string.Join(",", ServiceLineTeam1Ids) : null,
+                        ServiceLineId2Fk = ServiceLineTeam2Ids.Count > 0 ? string.Join(",", ServiceLineTeam2Ids) : null,
+                        ActiveCodeId = codeStroke.CodeStrokeId,
+                        ActiveCodeName = UCLEnums.Stroke.ToString()
+                    };
+                    this._codesServiceLinesMappingRepo.Insert(codeService);
                 }
-
-
-                var notification = new PushNotificationVM()
-                {
-                    Id = codeStroke.CodeStrokeId,
-                    OrgId = codeStroke.OrganizationIdFk,
-                    UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).Distinct().ToList(),
-                    From = AuthorEnums.Stroke.ToString(),
-                    Msg = (codeStroke.IsEms.HasValue && codeStroke.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription()) + " Stroke From is Changed",
-                    RouteLink1 = RouteEnums.CodeStrokeForm.ToDescription(), // "/Home/Inhouse%20Codes/code-strok-form",
-                    RouteLink2 = RouteEnums.EMSForms.ToDescription(), // RouteEnums.EMSForms.ToDescription(),
-                };
-
-                _communicationService.pushNotification(notification);
-
-                return new BaseResponse() { Status = HttpStatusCode.OK, Message = msg, Body = new { serviceLineUsersFound = userNotFound, DefaultServiceLineIds, ServiceLineTeam1Ids, ServiceLineTeam2Ids } };
             }
-            return new BaseResponse() { Status = HttpStatusCode.NotModified, Message = "Default Service Lines Required" };
+            else
+            {
+                DefaultServiceLineIds = new List<int>();
+                ServiceLineTeam1Ids = new List<int>();
+                ServiceLineTeam2Ids = new List<int>();
+            }
+
+
+            var superAdmins = this._userRepo.Table.Where(x => x.IsInGroup && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId, ServiceLineIdFk = 0 }).ToList();
+            UserChannelSid.AddRange(superAdmins);
+            var loggedInUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId, ServiceLineIdFk = 0 }).FirstOrDefault();
+            UserChannelSid.Add(loggedInUser);
+
+            if (codeStroke.ChannelSid != null && codeStroke.ChannelSid != "")
+            {
+                var channelSid = codeStroke.ChannelSid; //channel.Select(x => x.ChannelSid).FirstOrDefault();
+
+                var groupMembers = this._StrokeCodeGroupMembersRepo.Table.Where(x => x.StrokeCodeIdFk == codeStroke.CodeStrokeId).ToList();
+                this._StrokeCodeGroupMembersRepo.DeleteRange(groupMembers);
+                //this._StrokeCodeGroupMembersRepo.DeleteRange(channel);
+                bool isDeleted = _communicationService.DeleteUserToConversationChannel(channelSid);
+                List<CodeStrokeGroupMember> ACodeGroupMembers = new List<CodeStrokeGroupMember>();
+                foreach (var item in UserChannelSid.Distinct())
+                {
+                    try
+                    {
+                        var codeGroupMember = new CodeStrokeGroupMember()
+                        {
+                            UserIdFk = item.UserId,
+                            StrokeCodeIdFk = codeStroke.CodeStrokeId,
+                            //ActiveCodeName = UCLEnums.Stroke.ToString(),
+                            IsAcknowledge = false,
+                            CreatedBy = ApplicationSettings.UserId,
+                            CreatedDate = DateTime.UtcNow,
+                            IsDeleted = false
+                        };
+                        ACodeGroupMembers.Add(codeGroupMember);
+                        _communicationService.addNewUserToConversationChannel(channelSid, item.UserUniqueId);
+                    }
+                    catch (Exception ex)
+                    {
+                        //ElmahExtensions.RiseError(ex);
+                    }
+                }
+                this._StrokeCodeGroupMembersRepo.Insert(ACodeGroupMembers);
+
+            }
+
+
+            var notification = new PushNotificationVM()
+            {
+                Id = codeStroke.CodeStrokeId,
+                OrgId = codeStroke.OrganizationIdFk,
+                UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).Distinct().ToList(),
+                From = AuthorEnums.Stroke.ToString(),
+                Msg = (codeStroke.IsEms.HasValue && codeStroke.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription()) + " Stroke From is Changed",
+                RouteLink1 = RouteEnums.CodeStrokeForm.ToDescription(), // "/Home/Inhouse%20Codes/code-strok-form",
+                RouteLink2 = RouteEnums.EMSForms.ToDescription(), // RouteEnums.EMSForms.ToDescription(),
+            };
+
+            _communicationService.pushNotification(notification);
+
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = msg, Body = new { serviceLineUsersFound = userNotFound, DefaultServiceLineIds, ServiceLineTeam1Ids, ServiceLineTeam2Ids } };
         }
 
         public BaseResponse DeleteStroke(int strokeId, bool status)
@@ -3518,190 +3508,179 @@ namespace Web.Services.Concrete
 
         public BaseResponse UpdateSepsisGroupMembers(CodeSepsisVM codeSepsis)
         {
+            bool userNotFound = false;
 
-            if (codeSepsis.DefaultServiceLineIds == null || codeSepsis.DefaultServiceLineIds == "")
+            string msg = "";
+
+            var DefaultServiceLineIds = codeSepsis.DefaultServiceLineIds.ToIntList();
+            var ServiceLineTeam1Ids = codeSepsis.ServiceLineTeam1Ids.ToIntList();
+            var ServiceLineTeam2Ids = codeSepsis.ServiceLineTeam2Ids.ToIntList();
+
+            var UserChannelSid = (from us in this._userSchedulesRepo.Table
+                                  join u in this._userRepo.Table on us.UserIdFk equals u.UserId
+                                  where (DefaultServiceLineIds.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam1Ids.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam2Ids.Contains(us.ServiceLineIdFk.Value)) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
+                                  select new { u.UserUniqueId, u.UserId, ServiceLineIdFk = us.ServiceLineIdFk.Value }).Distinct().ToList();
+
+            var codeServiceMapping = this._codesServiceLinesMappingRepo.Table.Where(x => x.OrganizationIdFk == codeSepsis.OrganizationIdFk && x.CodeIdFk == UCLEnums.Sepsis.ToInt() && x.ActiveCodeId == codeSepsis.CodeSepsisId).ToList();
+            if (codeServiceMapping.Count > 0)
+                this._codesServiceLinesMappingRepo.DeleteRange(codeServiceMapping);
+
+            if (UserChannelSid.Count > 0)
             {
-                string IsEMS = codeSepsis.IsEms ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription();
-                codeSepsis.DefaultServiceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeSepsis.OrganizationIdFk && x.CodeIdFk == UCLEnums.Sepsis.ToInt() && x.Type == IsEMS && x.IsActive.HasValue && x.IsActive.Value && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
-            }
-
-            if (codeSepsis.DefaultServiceLineIds != null && codeSepsis.DefaultServiceLineIds != "")
-            {
-                bool userNotFound = false;
-
-                string msg = "";
-
-                var DefaultServiceLineIds = codeSepsis.DefaultServiceLineIds.ToIntList();
-                var ServiceLineTeam1Ids = codeSepsis.ServiceLineTeam1Ids.ToIntList();
-                var ServiceLineTeam2Ids = codeSepsis.ServiceLineTeam2Ids.ToIntList();
-
-                var UserChannelSid = (from us in this._userSchedulesRepo.Table
-                                      join u in this._userRepo.Table on us.UserIdFk equals u.UserId
-                                      where (DefaultServiceLineIds.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam1Ids.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam2Ids.Contains(us.ServiceLineIdFk.Value)) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
-                                      select new { u.UserUniqueId, u.UserId, ServiceLineIdFk = us.ServiceLineIdFk.Value }).Distinct().ToList();
-
-                var codeServiceMapping = this._codesServiceLinesMappingRepo.Table.Where(x => x.OrganizationIdFk == codeSepsis.OrganizationIdFk && x.CodeIdFk == UCLEnums.Sepsis.ToInt() && x.ActiveCodeId == codeSepsis.CodeSepsisId).ToList();
-                if (codeServiceMapping.Count > 0)
-                    this._codesServiceLinesMappingRepo.DeleteRange(codeServiceMapping);
-
-                if (UserChannelSid.Count > 0)
+                userNotFound = true;
+                var defaultExist = DefaultServiceLineIds.Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
+                if (defaultExist.Count > 0)
                 {
-                    userNotFound = true;
-                    var defaultExist = DefaultServiceLineIds.Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
-                    if (defaultExist.Count > 0)
+                    if (!defaultExist.Select(x => x.IsExist).All(x => x == true))
                     {
-                        if (!defaultExist.Select(x => x.IsExist).All(x => x == true))
-                        {
-                            var notExisted = defaultExist.Where(x => !x.IsExist).Select(x => x.ServiceLineId).ToList();
-                            DefaultServiceLineIds.RemoveAll(d => notExisted.Contains(d));
-                            var services = this._serviceLineRepo.Table.Where(x => notExisted.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
-                            foreach (var item in services)
-                            {
-                                msg += Environment.NewLine + "No OnCall user found in " + item.ServiceName;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        var services = this._serviceLineRepo.Table.Where(x => DefaultServiceLineIds.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
+                        var notExisted = defaultExist.Where(x => !x.IsExist).Select(x => x.ServiceLineId).ToList();
+                        DefaultServiceLineIds.RemoveAll(d => notExisted.Contains(d));
+                        var services = this._serviceLineRepo.Table.Where(x => notExisted.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
                         foreach (var item in services)
                         {
                             msg += Environment.NewLine + "No OnCall user found in " + item.ServiceName;
                         }
-                        DefaultServiceLineIds = new List<int>();
-                    }
-
-                    var serviceLineTeam1Exist = ServiceLineTeam1Ids.Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
-                    if (serviceLineTeam1Exist.Count > 0)
-                    {
-                        if (!serviceLineTeam1Exist.Select(x => x.IsExist).All(x => x == true))
-                        {
-                            var notExisted = serviceLineTeam1Exist.Where(x => !x.IsExist).Select(x => x.ServiceLineId).ToList();
-                            ServiceLineTeam1Ids.RemoveAll(d => notExisted.Contains(d));
-                            var services = this._serviceLineRepo.Table.Where(x => notExisted.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
-                            foreach (var item in services)
-                            {
-                                msg += Environment.NewLine + "No OnCall user found in " + item.ServiceName;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        var services = this._serviceLineRepo.Table.Where(x => ServiceLineTeam1Ids.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
-                        foreach (var item in services)
-                        {
-                            msg += Environment.NewLine + "No OnCall user found in " + item.ServiceName;
-                        }
-                        ServiceLineTeam1Ids = new List<int>();
-                    }
-
-
-                    var serviceLineTeam2Exist = ServiceLineTeam2Ids.Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
-                    if (serviceLineTeam2Exist.Count > 0)
-                    {
-                        if (!serviceLineTeam2Exist.Select(x => x.IsExist).All(x => x == true))
-                        {
-                            var notExisted = serviceLineTeam2Exist.Where(x => !x.IsExist).Select(x => x.ServiceLineId).ToList();
-                            ServiceLineTeam2Ids.RemoveAll(d => notExisted.Contains(d));
-                            var services = this._serviceLineRepo.Table.Where(x => notExisted.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
-                            foreach (var item in services)
-                            {
-                                msg += Environment.NewLine + "No OnCall user found in " + item.ServiceName;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        var services = this._serviceLineRepo.Table.Where(x => ServiceLineTeam2Ids.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
-                        foreach (var item in services)
-                        {
-                            msg += Environment.NewLine + "No OnCall user found in " + item.ServiceName;
-                        }
-                        ServiceLineTeam2Ids = new List<int>();
-                    }
-
-
-
-                    if (DefaultServiceLineIds.Count > 0 || ServiceLineTeam1Ids.Count > 0 || ServiceLineTeam2Ids.Count > 0)
-                    {
-                        var codeService = new CodesServiceLinesMapping()
-                        {
-                            OrganizationIdFk = codeSepsis.OrganizationIdFk,
-                            CodeIdFk = UCLEnums.Sepsis.ToInt(),
-                            DefaultServiceLineIdFk = DefaultServiceLineIds.Count > 0 ? string.Join(",", DefaultServiceLineIds) : null,
-                            ServiceLineId1Fk = ServiceLineTeam1Ids.Count > 0 ? string.Join(",", ServiceLineTeam1Ids) : null,
-                            ServiceLineId2Fk = ServiceLineTeam2Ids.Count > 0 ? string.Join(",", ServiceLineTeam2Ids) : null,
-                            ActiveCodeId = codeSepsis.CodeSepsisId,
-                            ActiveCodeName = UCLEnums.Sepsis.ToString()
-                        };
-                        this._codesServiceLinesMappingRepo.Insert(codeService);
                     }
                 }
                 else
                 {
+                    var services = this._serviceLineRepo.Table.Where(x => DefaultServiceLineIds.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
+                    foreach (var item in services)
+                    {
+                        msg += Environment.NewLine + "No OnCall user found in " + item.ServiceName;
+                    }
                     DefaultServiceLineIds = new List<int>();
+                }
+
+                var serviceLineTeam1Exist = ServiceLineTeam1Ids.Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
+                if (serviceLineTeam1Exist.Count > 0)
+                {
+                    if (!serviceLineTeam1Exist.Select(x => x.IsExist).All(x => x == true))
+                    {
+                        var notExisted = serviceLineTeam1Exist.Where(x => !x.IsExist).Select(x => x.ServiceLineId).ToList();
+                        ServiceLineTeam1Ids.RemoveAll(d => notExisted.Contains(d));
+                        var services = this._serviceLineRepo.Table.Where(x => notExisted.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
+                        foreach (var item in services)
+                        {
+                            msg += Environment.NewLine + "No OnCall user found in " + item.ServiceName;
+                        }
+                    }
+                }
+                else
+                {
+                    var services = this._serviceLineRepo.Table.Where(x => ServiceLineTeam1Ids.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
+                    foreach (var item in services)
+                    {
+                        msg += Environment.NewLine + "No OnCall user found in " + item.ServiceName;
+                    }
                     ServiceLineTeam1Ids = new List<int>();
+                }
+
+
+                var serviceLineTeam2Exist = ServiceLineTeam2Ids.Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
+                if (serviceLineTeam2Exist.Count > 0)
+                {
+                    if (!serviceLineTeam2Exist.Select(x => x.IsExist).All(x => x == true))
+                    {
+                        var notExisted = serviceLineTeam2Exist.Where(x => !x.IsExist).Select(x => x.ServiceLineId).ToList();
+                        ServiceLineTeam2Ids.RemoveAll(d => notExisted.Contains(d));
+                        var services = this._serviceLineRepo.Table.Where(x => notExisted.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
+                        foreach (var item in services)
+                        {
+                            msg += Environment.NewLine + "No OnCall user found in " + item.ServiceName;
+                        }
+                    }
+                }
+                else
+                {
+                    var services = this._serviceLineRepo.Table.Where(x => ServiceLineTeam2Ids.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
+                    foreach (var item in services)
+                    {
+                        msg += Environment.NewLine + "No OnCall user found in " + item.ServiceName;
+                    }
                     ServiceLineTeam2Ids = new List<int>();
                 }
 
 
-                var superAdmins = this._userRepo.Table.Where(x => x.IsInGroup && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId, ServiceLineIdFk = 0 }).ToList();
-                UserChannelSid.AddRange(superAdmins);
-                var loggedInUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId, ServiceLineIdFk = 0 }).FirstOrDefault();
-                UserChannelSid.Add(loggedInUser);
 
-                if (codeSepsis.ChannelSid != null && codeSepsis.ChannelSid != "")
+                if (DefaultServiceLineIds.Count > 0 || ServiceLineTeam1Ids.Count > 0 || ServiceLineTeam2Ids.Count > 0)
                 {
-                    var channelSid = codeSepsis.ChannelSid; //channel.Select(x => x.ChannelSid).FirstOrDefault();
-
-                    var groupMembers = this._SepsisCodeGroupMembersRepo.Table.Where(x => x.SepsisCodeIdFk == codeSepsis.CodeSepsisId).ToList();
-                    this._SepsisCodeGroupMembersRepo.DeleteRange(groupMembers);
-                    //this._SepsisCodeGroupMembersRepo.DeleteRange(channel);
-                    bool isDeleted = _communicationService.DeleteUserToConversationChannel(channelSid);
-                    List<CodeSepsisGroupMember> ACodeGroupMembers = new List<CodeSepsisGroupMember>();
-                    foreach (var item in UserChannelSid.Distinct())
+                    var codeService = new CodesServiceLinesMapping()
                     {
-                        try
-                        {
-                            var codeGroupMember = new CodeSepsisGroupMember()
-                            {
-                                UserIdFk = item.UserId,
-                                SepsisCodeIdFk = codeSepsis.CodeSepsisId,
-                                //ActiveCodeName = UCLEnums.Sepsis.ToString(),
-                                IsAcknowledge = false,
-                                CreatedBy = ApplicationSettings.UserId,
-                                CreatedDate = DateTime.UtcNow,
-                                IsDeleted = false
-                            };
-                            ACodeGroupMembers.Add(codeGroupMember);
-                            _communicationService.addNewUserToConversationChannel(channelSid, item.UserUniqueId);
-                        }
-                        catch (Exception ex)
-                        {
-                            //ElmahExtensions.RiseError(ex);
-                        }
-                    }
-                    this._SepsisCodeGroupMembersRepo.Insert(ACodeGroupMembers);
-
+                        OrganizationIdFk = codeSepsis.OrganizationIdFk,
+                        CodeIdFk = UCLEnums.Sepsis.ToInt(),
+                        DefaultServiceLineIdFk = DefaultServiceLineIds.Count > 0 ? string.Join(",", DefaultServiceLineIds) : null,
+                        ServiceLineId1Fk = ServiceLineTeam1Ids.Count > 0 ? string.Join(",", ServiceLineTeam1Ids) : null,
+                        ServiceLineId2Fk = ServiceLineTeam2Ids.Count > 0 ? string.Join(",", ServiceLineTeam2Ids) : null,
+                        ActiveCodeId = codeSepsis.CodeSepsisId,
+                        ActiveCodeName = UCLEnums.Sepsis.ToString()
+                    };
+                    this._codesServiceLinesMappingRepo.Insert(codeService);
                 }
-
-
-                var notification = new PushNotificationVM()
-                {
-                    Id = codeSepsis.CodeSepsisId,
-                    OrgId = codeSepsis.OrganizationIdFk,
-                    UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).Distinct().ToList(),
-                    From = AuthorEnums.Sepsis.ToString(),
-                    Msg = (codeSepsis.IsEms ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription()) + " Sepsis From is Changed",
-                    RouteLink1 = RouteEnums.CodeSepsisForm.ToDescription(), // "/Home/Inhouse%20Codes/code-strok-form",
-                    RouteLink2 = RouteEnums.EMSForms.ToDescription(), // RouteEnums.EMSForms.ToDescription(),
-                };
-
-                _communicationService.pushNotification(notification);
-
-                return new BaseResponse() { Status = HttpStatusCode.OK, Message = msg, Body = new { serviceLineUsersFound = userNotFound, DefaultServiceLineIds, ServiceLineTeam1Ids, ServiceLineTeam2Ids } };
             }
-            return new BaseResponse() { Status = HttpStatusCode.NotModified, Message = "Default Service Lines Required" };
+            else
+            {
+                DefaultServiceLineIds = new List<int>();
+                ServiceLineTeam1Ids = new List<int>();
+                ServiceLineTeam2Ids = new List<int>();
+            }
+
+
+            var superAdmins = this._userRepo.Table.Where(x => x.IsInGroup && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId, ServiceLineIdFk = 0 }).ToList();
+            UserChannelSid.AddRange(superAdmins);
+            var loggedInUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId, ServiceLineIdFk = 0 }).FirstOrDefault();
+            UserChannelSid.Add(loggedInUser);
+
+            if (codeSepsis.ChannelSid != null && codeSepsis.ChannelSid != "")
+            {
+                var channelSid = codeSepsis.ChannelSid; //channel.Select(x => x.ChannelSid).FirstOrDefault();
+
+                var groupMembers = this._SepsisCodeGroupMembersRepo.Table.Where(x => x.SepsisCodeIdFk == codeSepsis.CodeSepsisId).ToList();
+                this._SepsisCodeGroupMembersRepo.DeleteRange(groupMembers);
+                //this._SepsisCodeGroupMembersRepo.DeleteRange(channel);
+                bool isDeleted = _communicationService.DeleteUserToConversationChannel(channelSid);
+                List<CodeSepsisGroupMember> ACodeGroupMembers = new List<CodeSepsisGroupMember>();
+                foreach (var item in UserChannelSid.Distinct())
+                {
+                    try
+                    {
+                        var codeGroupMember = new CodeSepsisGroupMember()
+                        {
+                            UserIdFk = item.UserId,
+                            SepsisCodeIdFk = codeSepsis.CodeSepsisId,
+                            //ActiveCodeName = UCLEnums.Sepsis.ToString(),
+                            IsAcknowledge = false,
+                            CreatedBy = ApplicationSettings.UserId,
+                            CreatedDate = DateTime.UtcNow,
+                            IsDeleted = false
+                        };
+                        ACodeGroupMembers.Add(codeGroupMember);
+                        _communicationService.addNewUserToConversationChannel(channelSid, item.UserUniqueId);
+                    }
+                    catch (Exception ex)
+                    {
+                        //ElmahExtensions.RiseError(ex);
+                    }
+                }
+                this._SepsisCodeGroupMembersRepo.Insert(ACodeGroupMembers);
+
+            }
+
+
+            var notification = new PushNotificationVM()
+            {
+                Id = codeSepsis.CodeSepsisId,
+                OrgId = codeSepsis.OrganizationIdFk,
+                UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).Distinct().ToList(),
+                From = AuthorEnums.Sepsis.ToString(),
+                Msg = (codeSepsis.IsEms ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription()) + " Sepsis From is Changed",
+                RouteLink1 = RouteEnums.CodeSepsisForm.ToDescription(), // "/Home/Inhouse%20Codes/code-strok-form",
+                RouteLink2 = RouteEnums.EMSForms.ToDescription(), // RouteEnums.EMSForms.ToDescription(),
+            };
+
+            _communicationService.pushNotification(notification);
+
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = msg, Body = new { serviceLineUsersFound = userNotFound, DefaultServiceLineIds, ServiceLineTeam1Ids, ServiceLineTeam2Ids } };
         }
 
         public BaseResponse CreateSepsisGroup(CodeSepsisVM codeSepsis)
@@ -3844,8 +3823,8 @@ namespace Web.Services.Concrete
                 };
 
                 _communicationService.pushNotification(notification);
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = errorMsg, Body = new { channelSid = channel.Sid, serviceLineUsersFound = usersFound, DefaultServiceLineIds, ServiceLineTeam1Ids = new List<int>(), ServiceLineTeam2Ids = new List<int>() } };
             }
-
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = errorMsg, Body = new { serviceLineUsersFound = usersFound, DefaultServiceLineIds, ServiceLineTeam1Ids = new List<int>(), ServiceLineTeam2Ids = new List<int>() } };
         }
 
@@ -4915,6 +4894,8 @@ namespace Web.Services.Concrete
                 };
 
                 _communicationService.pushNotification(notification);
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = errorMsg, Body = new { channelSid = channel.Sid, serviceLineUsersFound = usersFound, DefaultServiceLineIds, ServiceLineTeam1Ids = new List<int>(), ServiceLineTeam2Ids = new List<int>() } };
+
             }
 
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = errorMsg, Body = new { serviceLineUsersFound = usersFound, DefaultServiceLineIds, ServiceLineTeam1Ids = new List<int>(), ServiceLineTeam2Ids = new List<int>() } };
@@ -4923,189 +4904,179 @@ namespace Web.Services.Concrete
         public BaseResponse UpdateSTEMIGroupMembers(CodeSTEMIVM codeSTEMI)
         {
 
-            if (codeSTEMI.DefaultServiceLineIds == null || codeSTEMI.DefaultServiceLineIds == "")
+            bool userNotFound = false;
+
+            string msg = "";
+
+            var DefaultServiceLineIds = codeSTEMI.DefaultServiceLineIds.ToIntList();
+            var ServiceLineTeam1Ids = codeSTEMI.ServiceLineTeam1Ids.ToIntList();
+            var ServiceLineTeam2Ids = codeSTEMI.ServiceLineTeam2Ids.ToIntList();
+
+            var UserChannelSid = (from us in this._userSchedulesRepo.Table
+                                  join u in this._userRepo.Table on us.UserIdFk equals u.UserId
+                                  where (DefaultServiceLineIds.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam1Ids.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam2Ids.Contains(us.ServiceLineIdFk.Value)) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
+                                  select new { u.UserUniqueId, u.UserId, ServiceLineIdFk = us.ServiceLineIdFk.Value }).Distinct().ToList();
+
+            var codeServiceMapping = this._codesServiceLinesMappingRepo.Table.Where(x => x.OrganizationIdFk == codeSTEMI.OrganizationIdFk && x.CodeIdFk == UCLEnums.Stemi.ToInt() && x.ActiveCodeId == codeSTEMI.CodeStemiid).ToList();
+            if (codeServiceMapping.Count > 0)
+                this._codesServiceLinesMappingRepo.DeleteRange(codeServiceMapping);
+
+            if (UserChannelSid.Count > 0)
             {
-                string IsEMS = codeSTEMI.IsEms.HasValue && codeSTEMI.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription();
-                codeSTEMI.DefaultServiceLineIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeSTEMI.OrganizationIdFk && x.CodeIdFk == UCLEnums.Stemi.ToInt() && x.Type == IsEMS && x.IsActive.HasValue && x.IsActive.Value && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
-            }
-
-            if (codeSTEMI.DefaultServiceLineIds != null && codeSTEMI.DefaultServiceLineIds != "")
-            {
-                bool userNotFound = false;
-
-                string msg = "";
-
-                var DefaultServiceLineIds = codeSTEMI.DefaultServiceLineIds.ToIntList();
-                var ServiceLineTeam1Ids = codeSTEMI.ServiceLineTeam1Ids.ToIntList();
-                var ServiceLineTeam2Ids = codeSTEMI.ServiceLineTeam2Ids.ToIntList();
-
-                var UserChannelSid = (from us in this._userSchedulesRepo.Table
-                                      join u in this._userRepo.Table on us.UserIdFk equals u.UserId
-                                      where (DefaultServiceLineIds.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam1Ids.Contains(us.ServiceLineIdFk.Value) || ServiceLineTeam2Ids.Contains(us.ServiceLineIdFk.Value)) && us.ScheduleDateStart <= DateTime.UtcNow && us.ScheduleDateEnd >= DateTime.UtcNow && !us.IsDeleted && !u.IsDeleted
-                                      select new { u.UserUniqueId, u.UserId, ServiceLineIdFk = us.ServiceLineIdFk.Value }).Distinct().ToList();
-
-                var codeServiceMapping = this._codesServiceLinesMappingRepo.Table.Where(x => x.OrganizationIdFk == codeSTEMI.OrganizationIdFk && x.CodeIdFk == UCLEnums.Stemi.ToInt() && x.ActiveCodeId == codeSTEMI.CodeStemiid).ToList();
-                if (codeServiceMapping.Count > 0)
-                    this._codesServiceLinesMappingRepo.DeleteRange(codeServiceMapping);
-
-                if (UserChannelSid.Count > 0)
+                userNotFound = true;
+                var defaultExist = DefaultServiceLineIds.Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
+                if (defaultExist.Count > 0)
                 {
-                    userNotFound = true;
-                    var defaultExist = DefaultServiceLineIds.Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
-                    if (defaultExist.Count > 0)
+                    if (!defaultExist.Select(x => x.IsExist).All(x => x == true))
                     {
-                        if (!defaultExist.Select(x => x.IsExist).All(x => x == true))
-                        {
-                            var notExisted = defaultExist.Where(x => !x.IsExist).Select(x => x.ServiceLineId).ToList();
-                            DefaultServiceLineIds.RemoveAll(d => notExisted.Contains(d));
-                            var services = this._serviceLineRepo.Table.Where(x => notExisted.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
-                            foreach (var item in services)
-                            {
-                                msg += Environment.NewLine + "No OnCall user found in " + item.ServiceName;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        var services = this._serviceLineRepo.Table.Where(x => DefaultServiceLineIds.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
+                        var notExisted = defaultExist.Where(x => !x.IsExist).Select(x => x.ServiceLineId).ToList();
+                        DefaultServiceLineIds.RemoveAll(d => notExisted.Contains(d));
+                        var services = this._serviceLineRepo.Table.Where(x => notExisted.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
                         foreach (var item in services)
                         {
                             msg += Environment.NewLine + "No OnCall user found in " + item.ServiceName;
                         }
-                        DefaultServiceLineIds = new List<int>();
-                    }
-
-                    var serviceLineTeam1Exist = ServiceLineTeam1Ids.Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
-                    if (serviceLineTeam1Exist.Count > 0)
-                    {
-                        if (!serviceLineTeam1Exist.Select(x => x.IsExist).All(x => x == true))
-                        {
-                            var notExisted = serviceLineTeam1Exist.Where(x => !x.IsExist).Select(x => x.ServiceLineId).ToList();
-                            ServiceLineTeam1Ids.RemoveAll(d => notExisted.Contains(d));
-                            var services = this._serviceLineRepo.Table.Where(x => notExisted.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
-                            foreach (var item in services)
-                            {
-                                msg += Environment.NewLine + "No OnCall user found in " + item.ServiceName;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        var services = this._serviceLineRepo.Table.Where(x => ServiceLineTeam1Ids.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
-                        foreach (var item in services)
-                        {
-                            msg += Environment.NewLine + "No OnCall user found in " + item.ServiceName;
-                        }
-                        ServiceLineTeam1Ids = new List<int>();
-                    }
-
-
-                    var serviceLineTeam2Exist = ServiceLineTeam2Ids.Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
-                    if (serviceLineTeam2Exist.Count > 0)
-                    {
-                        if (!serviceLineTeam2Exist.Select(x => x.IsExist).All(x => x == true))
-                        {
-                            var notExisted = serviceLineTeam2Exist.Where(x => !x.IsExist).Select(x => x.ServiceLineId).ToList();
-                            ServiceLineTeam2Ids.RemoveAll(d => notExisted.Contains(d));
-                            var services = this._serviceLineRepo.Table.Where(x => notExisted.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
-                            foreach (var item in services)
-                            {
-                                msg += Environment.NewLine + "No OnCall user found in " + item.ServiceName;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        var services = this._serviceLineRepo.Table.Where(x => ServiceLineTeam2Ids.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
-                        foreach (var item in services)
-                        {
-                            msg += Environment.NewLine + "No OnCall user found in " + item.ServiceName;
-                        }
-                        ServiceLineTeam2Ids = new List<int>();
-                    }
-
-
-
-                    if (DefaultServiceLineIds.Count > 0 || ServiceLineTeam1Ids.Count > 0 || ServiceLineTeam2Ids.Count > 0)
-                    {
-                        var codeService = new CodesServiceLinesMapping()
-                        {
-                            OrganizationIdFk = codeSTEMI.OrganizationIdFk,
-                            CodeIdFk = UCLEnums.Stemi.ToInt(),
-                            DefaultServiceLineIdFk = DefaultServiceLineIds.Count > 0 ? string.Join(",", DefaultServiceLineIds) : null,
-                            ServiceLineId1Fk = ServiceLineTeam1Ids.Count > 0 ? string.Join(",", ServiceLineTeam1Ids) : null,
-                            ServiceLineId2Fk = ServiceLineTeam2Ids.Count > 0 ? string.Join(",", ServiceLineTeam2Ids) : null,
-                            ActiveCodeId = codeSTEMI.CodeStemiid,
-                            ActiveCodeName = UCLEnums.Stemi.ToString()
-                        };
-                        this._codesServiceLinesMappingRepo.Insert(codeService);
                     }
                 }
                 else
                 {
+                    var services = this._serviceLineRepo.Table.Where(x => DefaultServiceLineIds.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
+                    foreach (var item in services)
+                    {
+                        msg += Environment.NewLine + "No OnCall user found in " + item.ServiceName;
+                    }
                     DefaultServiceLineIds = new List<int>();
+                }
+
+                var serviceLineTeam1Exist = ServiceLineTeam1Ids.Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
+                if (serviceLineTeam1Exist.Count > 0)
+                {
+                    if (!serviceLineTeam1Exist.Select(x => x.IsExist).All(x => x == true))
+                    {
+                        var notExisted = serviceLineTeam1Exist.Where(x => !x.IsExist).Select(x => x.ServiceLineId).ToList();
+                        ServiceLineTeam1Ids.RemoveAll(d => notExisted.Contains(d));
+                        var services = this._serviceLineRepo.Table.Where(x => notExisted.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
+                        foreach (var item in services)
+                        {
+                            msg += Environment.NewLine + "No OnCall user found in " + item.ServiceName;
+                        }
+                    }
+                }
+                else
+                {
+                    var services = this._serviceLineRepo.Table.Where(x => ServiceLineTeam1Ids.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
+                    foreach (var item in services)
+                    {
+                        msg += Environment.NewLine + "No OnCall user found in " + item.ServiceName;
+                    }
                     ServiceLineTeam1Ids = new List<int>();
+                }
+
+
+                var serviceLineTeam2Exist = ServiceLineTeam2Ids.Select(d => new { ServiceLineId = d, IsExist = UserChannelSid.Select(x => x.ServiceLineIdFk).Contains(d) }).ToList();
+                if (serviceLineTeam2Exist.Count > 0)
+                {
+                    if (!serviceLineTeam2Exist.Select(x => x.IsExist).All(x => x == true))
+                    {
+                        var notExisted = serviceLineTeam2Exist.Where(x => !x.IsExist).Select(x => x.ServiceLineId).ToList();
+                        ServiceLineTeam2Ids.RemoveAll(d => notExisted.Contains(d));
+                        var services = this._serviceLineRepo.Table.Where(x => notExisted.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
+                        foreach (var item in services)
+                        {
+                            msg += Environment.NewLine + "No OnCall user found in " + item.ServiceName;
+                        }
+                    }
+                }
+                else
+                {
+                    var services = this._serviceLineRepo.Table.Where(x => ServiceLineTeam2Ids.Contains(x.ServiceLineId)).Select(x => new { x.ServiceLineId, x.ServiceName }).ToList();
+                    foreach (var item in services)
+                    {
+                        msg += Environment.NewLine + "No OnCall user found in " + item.ServiceName;
+                    }
                     ServiceLineTeam2Ids = new List<int>();
                 }
 
 
-                var superAdmins = this._userRepo.Table.Where(x => x.IsInGroup && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId, ServiceLineIdFk = 0 }).ToList();
-                UserChannelSid.AddRange(superAdmins);
-                var loggedInUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId, ServiceLineIdFk = 0 }).FirstOrDefault();
-                UserChannelSid.Add(loggedInUser);
 
-                if (codeSTEMI.ChannelSid != null && codeSTEMI.ChannelSid != "")
+                if (DefaultServiceLineIds.Count > 0 || ServiceLineTeam1Ids.Count > 0 || ServiceLineTeam2Ids.Count > 0)
                 {
-                    var channelSid = codeSTEMI.ChannelSid; //channel.Select(x => x.ChannelSid).FirstOrDefault();
-
-                    var groupMembers = this._STEMICodeGroupMembersRepo.Table.Where(x => x.StemicodeIdFk == codeSTEMI.CodeStemiid).ToList();
-                    this._STEMICodeGroupMembersRepo.DeleteRange(groupMembers);
-                    //this._STEMICodeGroupMembersRepo.DeleteRange(channel);
-                    bool isDeleted = _communicationService.DeleteUserToConversationChannel(channelSid);
-                    List<CodeStemigroupMember> ACodeGroupMembers = new List<CodeStemigroupMember>();
-                    foreach (var item in UserChannelSid.Distinct())
+                    var codeService = new CodesServiceLinesMapping()
                     {
-                        try
-                        {
-                            var codeGroupMember = new CodeStemigroupMember()
-                            {
-                                UserIdFk = item.UserId,
-                                StemicodeIdFk = codeSTEMI.CodeStemiid,
-                                //ActiveCodeName = UCLEnums.Stemi.ToString(),
-                                IsAcknowledge = false,
-                                CreatedBy = ApplicationSettings.UserId,
-                                CreatedDate = DateTime.UtcNow,
-                                IsDeleted = false
-                            };
-                            ACodeGroupMembers.Add(codeGroupMember);
-                            _communicationService.addNewUserToConversationChannel(channelSid, item.UserUniqueId);
-                        }
-                        catch (Exception ex)
-                        {
-                            //ElmahExtensions.RiseError(ex);
-                        }
-                    }
-                    this._STEMICodeGroupMembersRepo.Insert(ACodeGroupMembers);
-
+                        OrganizationIdFk = codeSTEMI.OrganizationIdFk,
+                        CodeIdFk = UCLEnums.Stemi.ToInt(),
+                        DefaultServiceLineIdFk = DefaultServiceLineIds.Count > 0 ? string.Join(",", DefaultServiceLineIds) : null,
+                        ServiceLineId1Fk = ServiceLineTeam1Ids.Count > 0 ? string.Join(",", ServiceLineTeam1Ids) : null,
+                        ServiceLineId2Fk = ServiceLineTeam2Ids.Count > 0 ? string.Join(",", ServiceLineTeam2Ids) : null,
+                        ActiveCodeId = codeSTEMI.CodeStemiid,
+                        ActiveCodeName = UCLEnums.Stemi.ToString()
+                    };
+                    this._codesServiceLinesMappingRepo.Insert(codeService);
                 }
-
-
-                var notification = new PushNotificationVM()
-                {
-                    Id = codeSTEMI.CodeStemiid,
-                    OrgId = codeSTEMI.OrganizationIdFk,
-                    UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).Distinct().ToList(),
-                    From = AuthorEnums.Stemi.ToString(),
-                    Msg = (codeSTEMI.IsEms.HasValue && codeSTEMI.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription()) + " STEMI From is Changed",
-                    RouteLink1 = RouteEnums.CodeStemiForm.ToDescription(), // "/Home/Inhouse%20Codes/code-strok-form",
-                    RouteLink2 = RouteEnums.EMSForms.ToDescription(), // RouteEnums.EMSForms.ToDescription(),
-                };
-
-                _communicationService.pushNotification(notification);
-
-                return new BaseResponse() { Status = HttpStatusCode.OK, Message = msg, Body = new { serviceLineUsersFound = userNotFound, DefaultServiceLineIds, ServiceLineTeam1Ids, ServiceLineTeam2Ids } };
             }
-            return new BaseResponse() { Status = HttpStatusCode.NotModified, Message = "Default Service Lines Required" };
+            else
+            {
+                DefaultServiceLineIds = new List<int>();
+                ServiceLineTeam1Ids = new List<int>();
+                ServiceLineTeam2Ids = new List<int>();
+            }
+
+
+            var superAdmins = this._userRepo.Table.Where(x => x.IsInGroup && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId, ServiceLineIdFk = 0 }).ToList();
+            UserChannelSid.AddRange(superAdmins);
+            var loggedInUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => new { x.UserUniqueId, x.UserId, ServiceLineIdFk = 0 }).FirstOrDefault();
+            UserChannelSid.Add(loggedInUser);
+
+            if (codeSTEMI.ChannelSid != null && codeSTEMI.ChannelSid != "")
+            {
+                var channelSid = codeSTEMI.ChannelSid; //channel.Select(x => x.ChannelSid).FirstOrDefault();
+
+                var groupMembers = this._STEMICodeGroupMembersRepo.Table.Where(x => x.StemicodeIdFk == codeSTEMI.CodeStemiid).ToList();
+                this._STEMICodeGroupMembersRepo.DeleteRange(groupMembers);
+                //this._STEMICodeGroupMembersRepo.DeleteRange(channel);
+                bool isDeleted = _communicationService.DeleteUserToConversationChannel(channelSid);
+                List<CodeStemigroupMember> ACodeGroupMembers = new List<CodeStemigroupMember>();
+                foreach (var item in UserChannelSid.Distinct())
+                {
+                    try
+                    {
+                        var codeGroupMember = new CodeStemigroupMember()
+                        {
+                            UserIdFk = item.UserId,
+                            StemicodeIdFk = codeSTEMI.CodeStemiid,
+                            //ActiveCodeName = UCLEnums.Stemi.ToString(),
+                            IsAcknowledge = false,
+                            CreatedBy = ApplicationSettings.UserId,
+                            CreatedDate = DateTime.UtcNow,
+                            IsDeleted = false
+                        };
+                        ACodeGroupMembers.Add(codeGroupMember);
+                        _communicationService.addNewUserToConversationChannel(channelSid, item.UserUniqueId);
+                    }
+                    catch (Exception ex)
+                    {
+                        //ElmahExtensions.RiseError(ex);
+                    }
+                }
+                this._STEMICodeGroupMembersRepo.Insert(ACodeGroupMembers);
+
+            }
+
+
+            var notification = new PushNotificationVM()
+            {
+                Id = codeSTEMI.CodeStemiid,
+                OrgId = codeSTEMI.OrganizationIdFk,
+                UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).Distinct().ToList(),
+                From = AuthorEnums.Stemi.ToString(),
+                Msg = (codeSTEMI.IsEms.HasValue && codeSTEMI.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription()) + " STEMI From is Changed",
+                RouteLink1 = RouteEnums.CodeStemiForm.ToDescription(), // "/Home/Inhouse%20Codes/code-strok-form",
+                RouteLink2 = RouteEnums.EMSForms.ToDescription(), // RouteEnums.EMSForms.ToDescription(),
+            };
+
+            _communicationService.pushNotification(notification);
+
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = msg, Body = new { serviceLineUsersFound = userNotFound, DefaultServiceLineIds, ServiceLineTeam1Ids, ServiceLineTeam2Ids } };
         }
 
 
@@ -6254,6 +6225,8 @@ namespace Web.Services.Concrete
                 };
 
                 _communicationService.pushNotification(notification);
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = errorMsg, Body = new { channelSid = channel.Sid, serviceLineUsersFound = usersFound, DefaultServiceLineIds, ServiceLineTeam1Ids = new List<int>(), ServiceLineTeam2Ids = new List<int>() } };
+
             }
 
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = errorMsg, Body = new { serviceLineUsersFound = usersFound, DefaultServiceLineIds, ServiceLineTeam1Ids = new List<int>(), ServiceLineTeam2Ids = new List<int>() } };
@@ -7591,6 +7564,8 @@ namespace Web.Services.Concrete
                 };
 
                 _communicationService.pushNotification(notification);
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = errorMsg, Body = new { channelSid = channel.Sid, serviceLineUsersFound = usersFound, DefaultServiceLineIds, ServiceLineTeam1Ids = new List<int>(), ServiceLineTeam2Ids = new List<int>() } };
+
             }
 
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = errorMsg, Body = new { serviceLineUsersFound = usersFound, DefaultServiceLineIds, ServiceLineTeam1Ids = new List<int>(), ServiceLineTeam2Ids = new List<int>() } };
