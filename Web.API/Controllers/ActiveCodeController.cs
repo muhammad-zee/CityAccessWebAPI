@@ -138,7 +138,7 @@ namespace Web.API.Controllers
 
         [Description("Update EMS Ambulance Data")]
         [HttpPost("EMS/UpdateEMSAmbulanceData")]
-        public BaseResponse UpdateEMSAmbulanceData(IDictionary<string, object> keyValues) 
+        public BaseResponse UpdateEMSAmbulanceData([FromBody] IDictionary<string, object> keyValues) 
         {
             try
             {

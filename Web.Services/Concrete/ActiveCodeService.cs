@@ -1366,8 +1366,10 @@ namespace Web.Services.Concrete
                         UserChannelSid = userUniqueIds.Distinct().ToList(),
                         From = codeName,
                         Msg = (row.IsEms != null && row.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription()) + $" {codeName} From is Changed",
-                        RouteLink1 = ($"Code{codeName}Form").GetEnumDescription<RouteEnums>(), //RouteEnums.CodeStrokeForm.ToDescription(), // "/Home/Inhouse%20Codes/code-strok-form",
-                        RouteLink2 = ($"EMSForms").GetEnumDescription<RouteEnums>() //RouteEnums.EMSForms.ToDescription(), // RouteEnums.EMSForms.ToDescription(),
+
+                        RouteLink2 = ($"EMSForms").GetEnumDescription<RouteEnums>(), //RouteEnums.EMSForms.ToDescription(), // RouteEnums.EMSForms.ToDescription(),
+                        RouteLink3 = RouteEnums.ActiveEMS.ToDescription(),
+                        RouteLink4 = RouteEnums.Dashboard.ToDescription()
                     };
 
                     _communicationService.pushNotification(notification);
