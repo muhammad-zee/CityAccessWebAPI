@@ -22,6 +22,7 @@ namespace Web.Services.Interfaces
         BaseResponse GetAllCodeData(ActiveCodeVM activeCode);
         BaseResponse GetCodeDataById(int codeId, string codeName);
         BaseResponse AddOrUpdateCodeData(IDictionary<string, object> codeData);
+        BaseResponse UpdateEMSAmbulanceData(IDictionary<string, object> keyValues);
 
         #endregion
 

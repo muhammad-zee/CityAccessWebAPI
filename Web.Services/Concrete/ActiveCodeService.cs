@@ -1315,6 +1315,66 @@ namespace Web.Services.Concrete
             return new BaseResponse();
         }
 
+        public BaseResponse UpdateEMSAmbulanceData(IDictionary<string,object> keyValues) 
+        {
+            if (keyValues.ContainsKey($"code{keyValues["codeName"].ToString()}Id") && keyValues[$"code{keyValues["codeName"].ToString()}Id"].ToString().ToInt() > 0) 
+            {
+                string codeName = keyValues["codeName"].ToString();
+                int codeId = keyValues[$"code{codeName}Id"].ToString().ToInt();
+                string tbl_Name = $"Code{(codeName != UCLEnums.Sepsis.ToString() ? codeName + "s" : codeName)}";
+                var keys = keyValues.Keys.ToList();
+                var values = keyValues.Values.ToList();
+
+                string query = $"UPDATE [dbo].[{tbl_Name}] SET ";
+
+                for (int i = 0; i < keys.Count; i++)
+                {
+                    if (keys[i] != $"code{keyValues["codeName"].ToString()}Id" && keys[i] != "destinationCoords")
+                    {
+                        query += $"[{keys[i]}] = '{values[i]}'";
+                        if (i < keys.Count)
+                        {
+                            query += ",";
+                        }
+                    }
+                }
+
+                query += $" [ModifiedBy] = '{ApplicationSettings.UserId}', ";
+                query += $" [ModifiedDate] = '{DateTime.UtcNow.ToString("MM-dd-yyyy hh:mm:ss")}'";
+                query += $" WHERE code{codeName}Id = '{codeId}'";
+
+                int rowsEffect = this._dbContext.Database.ExecuteSqlRaw(query);
+                if (rowsEffect > 0) 
+                {
+                    string qry = $"select OrganizationIdFk, Code{codeName}Id, IsEms from {tbl_Name} where Code{codeName}Id = '{codeId}'";
+                    var row = this._dbContext.LoadSQLQuery(qry).ExecuteStoredProc<CodeStroke>().FirstOrDefault();
+                    qry = $"Select UserIdFk From Code{codeName}GroupMembers where {codeName}CodeIdFk = {codeId}";
+                    var userIds = this._dbContext.LoadSQLQuery(qry).ExecuteStoredProc<CodeStrokeGroupMember>().Select(x => x.UserIdFk).ToList();
+
+                    var userUniqueIds = this._userRepo.Table.Where(x => userIds.Contains(x.UserId)).Select(x => x.UserUniqueId).Distinct().ToList();
+                    var superAdmins = this._userRepo.Table.Where(x => x.IsInGroup && !x.IsDeleted).Select(x => x.UserUniqueId).ToList();
+                    userUniqueIds.AddRange(superAdmins);
+                    var loggedUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => x.UserUniqueId).FirstOrDefault();
+                    userUniqueIds.Add(loggedUser);
+
+                    var notification = new PushNotificationVM()
+                    {
+                        Id = codeId,
+                        OrgId = row.OrganizationIdFk,
+                        FieldValue = keyValues,
+                        UserChannelSid = userUniqueIds.Distinct().ToList(),
+                        From = codeName,
+                        Msg = (row.IsEms != null && row.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription()) + $" {codeName} From is Changed",
+                        RouteLink1 = ($"Code{codeName}Form").GetEnumDescription<RouteEnums>(), //RouteEnums.CodeStrokeForm.ToDescription(), // "/Home/Inhouse%20Codes/code-strok-form",
+                        RouteLink2 = ($"EMSForms").GetEnumDescription<RouteEnums>() //RouteEnums.EMSForms.ToDescription(), // RouteEnums.EMSForms.ToDescription(),
+                    };
+
+                    _communicationService.pushNotification(notification);
+                }
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Updated", Body = keyValues };
+            }
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Code Id Not Found" };
+        }
 
         #endregion
 

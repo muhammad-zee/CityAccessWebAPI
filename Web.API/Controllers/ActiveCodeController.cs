@@ -133,7 +133,24 @@ namespace Web.API.Controllers
             }
         }
 
-        #endregion  
+        #endregion
+
+
+        [Description("Update EMS Ambulance Data")]
+        [HttpPost("EMS/UpdateEMSAmbulanceData")]
+        public BaseResponse UpdateEMSAmbulanceData(IDictionary<string, object> keyValues) 
+        {
+            try
+            {
+                return _activeCodesService.UpdateEMSAmbulanceData(keyValues);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
 
         #region Code Stroke
 
@@ -258,7 +275,6 @@ namespace Web.API.Controllers
 
         #endregion
 
-
         #region Code Sepsis
 
         [Description("Get All Sepsis Data")]
@@ -380,7 +396,6 @@ namespace Web.API.Controllers
         }
 
         #endregion
-
 
         #region Code STEMI
 
@@ -504,7 +519,6 @@ namespace Web.API.Controllers
         }
 
         #endregion
-
 
         #region Code Trauma
 
@@ -768,7 +782,6 @@ namespace Web.API.Controllers
 
         #endregion
 
-
         #region Inhouse Code Settings
 
         [Description("Get All Inhouse Code Feilds")]
@@ -927,7 +940,6 @@ namespace Web.API.Controllers
 
         #endregion
 
-
         #region Map & Addresses
 
         [HttpGet("map/GetHospitalsOfStatesByCodeId/{codeId}/{coordinates}")]
@@ -947,7 +959,6 @@ namespace Web.API.Controllers
         }
 
         #endregion
-
 
         #region Apis For Mobile App
 
