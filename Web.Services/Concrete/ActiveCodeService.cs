@@ -1362,6 +1362,7 @@ namespace Web.Services.Concrete
                         Id = codeId,
                         OrgId = row.OrganizationIdFk,
                         FieldValue = keyValues,
+                        ForEmsLocationUpdate = true,
                         UserChannelSid = userUniqueIds.Distinct().ToList(),
                         From = codeName,
                         Msg = (row.IsEms != null && row.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription()) + $" {codeName} From is Changed",

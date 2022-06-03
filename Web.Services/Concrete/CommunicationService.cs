@@ -922,6 +922,7 @@ namespace Web.Services.Concrete
                                         { "fieldValue", model.FieldValue },
                                         { "fieldDataType", model.FieldDataType },
                                         { "channelSid", model.ChannelSid},
+                                        { "forEmsLocationUpdate", model.ForEmsLocationUpdate },
                                         { "routerLink1", model.RouteLink1},
                                         { "routerLink2", model.RouteLink2 },
                                         { "routerLink3", model.RouteLink3 },
