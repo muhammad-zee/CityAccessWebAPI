@@ -143,7 +143,8 @@ namespace Web.API.Controllers
         {
             try
             {
-                return _activeCodesService.GetAllStrokeCode(activeCode);
+                activeCode.CodeName = UCLEnums.Stroke.ToString();
+                return _activeCodesService.GetAllCodeData(activeCode);
             }
             catch (Exception ex)
             {
@@ -266,7 +267,8 @@ namespace Web.API.Controllers
         {
             try
             {
-                return _activeCodesService.GetAllSepsisCode(activeCode);
+                activeCode.CodeName = UCLEnums.Sepsis.ToString();
+                return _activeCodesService.GetAllCodeData(activeCode);
             }
             catch (Exception ex)
             {
@@ -388,7 +390,8 @@ namespace Web.API.Controllers
         {
             try
             {
-                return _activeCodesService.GetAllSTEMICode(activeCode);
+                activeCode.CodeName = UCLEnums.Stemi.ToString();
+                return _activeCodesService.GetAllCodeData(activeCode);
             }
             catch (Exception ex)
             {
@@ -511,7 +514,8 @@ namespace Web.API.Controllers
         {
             try
             {
-                return _activeCodesService.GetAllTrumaCode(activeCode);
+                activeCode.CodeName = UCLEnums.Trauma.ToString();
+                return _activeCodesService.GetAllCodeData(activeCode);
             }
             catch (Exception ex)
             {
@@ -630,7 +634,8 @@ namespace Web.API.Controllers
         {
             try
             {
-                return _activeCodesService.GetAllBlueCode(activeCode);
+                activeCode.CodeName = UCLEnums.Blue.ToString();
+                return _activeCodesService.GetAllCodeData(activeCode);
             }
             catch (Exception ex)
             {

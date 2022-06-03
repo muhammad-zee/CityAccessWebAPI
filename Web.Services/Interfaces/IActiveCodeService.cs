@@ -18,8 +18,12 @@ namespace Web.Services.Interfaces
         BaseResponse DeleteFile(FilesVM files);
         #endregion
 
+        #region Generic Methods For Codes
+        BaseResponse GetAllCodeData(ActiveCodeVM activeCode);
         BaseResponse GetCodeDataById(int codeId, string codeName);
         BaseResponse AddOrUpdateCodeData(IDictionary<string, object> codeData);
+
+        #endregion
 
         #region Code Stroke
         BaseResponse GetAllStrokeCode(ActiveCodeVM activeCode);

@@ -41,5 +41,6 @@ namespace Web.Model.Common
         public string SortCol { get; set; }
         public string FilterCol { get; set; }
         public string FilterVal { get; set; }
+        public string CodeName { get; set; }
     }
 }

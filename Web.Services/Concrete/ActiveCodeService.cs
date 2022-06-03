@@ -825,6 +825,47 @@ namespace Web.Services.Concrete
 
         #region Generic Methods For Codes
 
+        public BaseResponse GetAllCodeData(ActiveCodeVM activeCode)
+        {
+
+            var gridColumns = GetInhouseCodeTableFeilds(activeCode.OrganizationIdFk, activeCode.CodeName);
+            dynamic Fields = gridColumns.Body;
+            if (Fields != null && Fields.FieldName != null)
+            {
+                string FieldNames = Convert.ToString(Fields.FieldName);
+                var objList = this._dbContext.LoadStoredProcedure("md_getAllActiveCodesOrEMS_Dynamic")
+                                .WithSqlParam("@status", activeCode.Status)
+                                .WithSqlParam("@colName", FieldNames)
+                                .WithSqlParam("@codeName", activeCode.CodeName)
+                                .WithSqlParam("@IsSuperAdmin", ApplicationSettings.isSuperAdmin)
+                                .WithSqlParam("@showAll", activeCode.showAllActiveCodes)
+                                .WithSqlParam("@userId", ApplicationSettings.UserId)
+                                .WithSqlParam("@organizationId", activeCode.OrganizationIdFk)
+                                .WithSqlParam("@page", activeCode.PageNumber)
+                                .WithSqlParam("@size", activeCode.Rows)
+                                .WithSqlParam("@sortOrder", activeCode.SortOrder)
+                                .WithSqlParam("@sortCol", activeCode.SortCol)
+                                .WithSqlParam("@filterVal", activeCode.FilterVal)
+                                .ExecuteStoredProc_ToDictionary();
+
+                objList.ForEach(x =>
+                {
+                    var bloodThinnerIds = x.ContainsKey("bloodThinners") && x["bloodThinners"] != null && x["bloodThinners"].ToString() != "" ? x["bloodThinners"].ToString().ToIntList() : new List<int>();
+                    var bloodThinners = _controlListDetailsRepo.Table.Where(b => bloodThinnerIds.Contains(b.ControlListDetailId)).Select(b => new { Id = b.ControlListDetailId, b.Title }).ToList();
+                    x.Add("bloodThinnersTitle", bloodThinners);
+                });
+
+                int totalRecords = 0;
+                if (objList.Count > 0)
+                {
+                    totalRecords = objList.FirstOrDefault()["totalRecords"].ToInt();
+                }
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = new { totalRecords, objList, fields = gridColumns.Body } };
+
+            }
+            return new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "Fields Name Not Found" };
+        }
+
         public BaseResponse GetCodeDataById(int codeId, string codeName)
         {
             string tbl_Name = $"Code{(codeName != UCLEnums.Sepsis.ToString() ? codeName + "s" : codeName)}";
