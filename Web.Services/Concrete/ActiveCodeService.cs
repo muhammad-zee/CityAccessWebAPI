@@ -830,7 +830,7 @@ namespace Web.Services.Concrete
             string tbl_Name = $"Code{(codeName != UCLEnums.Sepsis.ToString() ? codeName + "s" : codeName)}";
             var tableInfo = this._dbContext.LoadStoredProcedure("md_getTableInfoByTableName")
                                 .WithSqlParam("@tableName", tbl_Name)
-                                .ExecuteStoredProc_ToDictionary();
+                                .ExecuteStoredProc_ToDictionary().FirstOrDefault();
             var fieldNames = tableInfo["fieldName"].ToString().Split(",").ToList();
             var fieldDataTypes = tableInfo["fieldDataType"].ToString().Split(",").ToList();
 
@@ -842,7 +842,7 @@ namespace Web.Services.Concrete
             var codeDataVM = this._dbContext.LoadStoredProcedure("md_getCodeDataById")
                                  .WithSqlParam("@codeName", codeName)
                                  .WithSqlParam("@codeId", codeId)
-                                 .ExecuteStoredProc_ToDictionary();
+                                 .ExecuteStoredProc_ToDictionary().FirstOrDefault();
 
             if (codeDataVM != null && codeDataVM.Count() > 0)
             {
@@ -1206,7 +1206,7 @@ namespace Web.Services.Concrete
                         string tbl_Name = $"Code{(codeName != UCLEnums.Sepsis.ToString() ? codeName + "s" : codeName)}";
                         var tableInfo = this._dbContext.LoadStoredProcedure("md_getTableInfoByTableName")
                                             .WithSqlParam("@tableName", tbl_Name)
-                                            .ExecuteStoredProc_ToDictionary();
+                                            .ExecuteStoredProc_ToDictionary().FirstOrDefault();
                         var fieldNames = tableInfo["fieldName"].ToString().Split(",").ToList();
                         var fieldDataTypes = tableInfo["fieldDataType"].ToString().Split(",").ToList();
 
@@ -1268,7 +1268,7 @@ namespace Web.Services.Concrete
 
                         return GetCodeDataById(Id, codeName);
                     }
-                    return new BaseResponse() { Status = HttpStatusCode.NotAcceptable, Message = "There is no Service Line in this organization related to Code Stroke" };
+                    return new BaseResponse() { Status = HttpStatusCode.NotAcceptable, Message = $"There is no Service Line in this organization related to Code {codeName}" };
                 }
             }
             return new BaseResponse();
