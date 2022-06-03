@@ -319,10 +319,9 @@ namespace Web.Services.Concrete
                                     .WithSqlParam("@orgId", consult.OrganizationId)
                                     .ExecuteStoredProc<ConsultFieldsVM>().Select(x => new { x.FieldName, x.FieldDataType, x.FieldLabel }).FirstOrDefault();
 
-            var consultData = new List<object>();
             if (fields.FieldName != null && fields.FieldName != null)
             {
-                consultData = _dbContext.LoadStoredProcedure("md_getGetConsultsByServiceLineId_Daynamic")
+              var consultData = _dbContext.LoadStoredProcedure("md_getGetConsultsByServiceLineId_Daynamic")
                                         .WithSqlParam("@status", consult.Status)
                                         .WithSqlParam("@colName", fields.FieldName)
                                         .WithSqlParam("@organizationId", consult.OrganizationId)
@@ -339,9 +338,9 @@ namespace Web.Services.Concrete
                                         .WithSqlParam("@filterVal", consult.FilterVal)
                                         .ExecuteStoredProc_ToDictionary();
 
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = new { consultData, fields } };
             }
-
-            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = new { consultData, fields } };
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Fields Name Not Found", Body = new { consultData = new List<object>(), fields } };
         }
         public BaseResponse GetConsultById(int Id)
         {
@@ -359,7 +358,7 @@ namespace Web.Services.Concrete
             bool isConsultIdExist = keyValues.ContainsKey("ConsultId");
             if (isConsultIdExist && keyValues["ConsultId"].ToString() == "0")
             {
-                var Consult_Counter = _dbContext.LoadStoredProcedure("md_getMDRouteCounter").WithSqlParam("@C_Initails", "CC").ExecuteStoredProc<MDRoute_CounterVM>().FirstOrDefault();
+                var Consult_Counter = _dbContext.LoadStoredProcedure("md_getMDRouteCounter").WithSqlParam("@C_Name", "Consult_Counter").ExecuteStoredProc<MDRoute_CounterVM>().FirstOrDefault();
                 keyValues.Add("Consult_Counter", Consult_Counter.Counter_Value);
                 string query = "INSERT INTO [dbo].[Consults] (";
 

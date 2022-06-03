@@ -18,6 +18,9 @@ namespace Web.Services.Interfaces
         BaseResponse DeleteFile(FilesVM files);
         #endregion
 
+        BaseResponse GetCodeDataById(int codeId, string codeName);
+        BaseResponse AddOrUpdateCodeData(IDictionary<string, object> codeData);
+
         #region Code Stroke
         BaseResponse GetAllStrokeCode(ActiveCodeVM activeCode);
         BaseResponse GetStrokeDataById(int strokeId);
@@ -25,7 +28,6 @@ namespace Web.Services.Interfaces
         BaseResponse CreateStrokeGroup(CodeStrokeVM codeStroke);
         BaseResponse UpdateStrokeGroupMembers(CodeStrokeVM codeStroke);
         BaseResponse DeleteStroke(int strokeId, bool status);
-
         BaseResponse ActiveOrInActiveStroke(int strokeId, bool status);
         #endregion
 

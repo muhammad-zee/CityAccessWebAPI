@@ -3,6 +3,7 @@ using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -646,7 +647,7 @@ namespace Web.Services.Concrete
                     UserChannelSid = UserChannelSid.Distinct().ToList(),
                     From = AuthorEnums.Stemi.ToString(),
                     Msg = (rootPath.IsEms != null && rootPath.IsEms ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription()) + " STEMI From is Changed",
-                    RouteLink1 = RouteEnums.CodeSTEMIForm.ToDescription(),
+                    RouteLink1 = RouteEnums.CodeStemiForm.ToDescription(),
                     RouteLink2 = RouteEnums.EMSForms.ToDescription(),
                 };
 
@@ -820,6 +821,462 @@ namespace Web.Services.Concrete
         }
 
         #endregion
+
+
+        #region Generic Methods For Codes
+
+        public BaseResponse GetCodeDataById(int codeId, string codeName)
+        {
+            string tbl_Name = $"Code{(codeName != UCLEnums.Sepsis.ToString() ? codeName + "s" : codeName)}";
+            var tableInfo = this._dbContext.LoadStoredProcedure("md_getTableInfoByTableName")
+                                .WithSqlParam("@tableName", tbl_Name)
+                                .ExecuteStoredProc_ToDictionary();
+            var fieldNames = tableInfo["fieldName"].ToString().Split(",").ToList();
+            var fieldDataTypes = tableInfo["fieldDataType"].ToString().Split(",").ToList();
+
+            //string qry = $"Select * " +
+            //             $"from {tbl_Name} " +
+            //             $"WHERE Code{codeName}Id = {codeId} and IsDeleted = 0";
+            //var codeDataVM = this._dbContext.LoadSQLQuery(qry).ExecuteStoredProc_ToDictionary();
+
+            var codeDataVM = this._dbContext.LoadStoredProcedure("md_getCodeDataById")
+                                 .WithSqlParam("@codeName", codeName)
+                                 .WithSqlParam("@codeId", codeId)
+                                 .ExecuteStoredProc_ToDictionary();
+
+            if (codeDataVM != null && codeDataVM.Count() > 0)
+            {
+                if (codeName == UCLEnums.Stemi.ToString()) 
+                {
+                    int Id = codeDataVM["codeSTEMIId"].ToString().ToInt();
+                    codeDataVM.Remove("codeSTEMIId");
+                    codeDataVM.Add("codeStemiId", Id);
+                }
+
+                if (codeDataVM.ContainsKey("attachments") && codeDataVM["attachments"] != null && codeDataVM["attachments"].ToString() != "")
+                {
+                    string Attachments = codeDataVM["attachments"].ToString();
+                    if (!string.IsNullOrEmpty(Attachments) && !string.IsNullOrWhiteSpace(Attachments))
+                    {
+                        string path = this._RootPath + Attachments;
+                        List<string> FilesList = new();
+                        if (Directory.Exists(path))
+                        {
+                            DirectoryInfo AttachFiles = new DirectoryInfo(path);
+                            foreach (var item in AttachFiles.GetFiles())
+                            {
+                                FilesList.Add(Attachments + "/" + item.Name);
+                            }
+                            codeDataVM.Add("attachmentsPath", FilesList);
+                        }
+                    }
+                }
+
+                if (codeDataVM.ContainsKey("audio") && codeDataVM["audio"] != null && codeDataVM["audio"].ToString() != "")
+                {
+                    string audio = codeDataVM["audio"].ToString();
+                    if (!string.IsNullOrEmpty(audio) && !string.IsNullOrWhiteSpace(audio))
+                    {
+                        string path = this._RootPath + audio;
+                        List<string> FilesList = new();
+                        if (Directory.Exists(path))
+                        {
+                            DirectoryInfo AttachFiles = new DirectoryInfo(path);
+                            foreach (var item in AttachFiles.GetFiles())
+                            {
+                                FilesList.Add(audio + "/" + item.Name);
+                            }
+                            codeDataVM.Add("audiosPath", FilesList);
+                        }
+                    }
+                }
+
+                if (codeDataVM.ContainsKey("video") && codeDataVM["video"] != null && codeDataVM["video"].ToString() != "")
+                {
+                    string video = codeDataVM["video"].ToString();
+                    if (!string.IsNullOrEmpty(video) && !string.IsNullOrWhiteSpace(video))
+                    {
+                        string path = this._RootPath + video;
+                        List<string> FilesList = new();
+                        if (Directory.Exists(path))
+                        {
+                            DirectoryInfo AttachFiles = new DirectoryInfo(path);
+                            foreach (var item in AttachFiles.GetFiles())
+                            {
+                                FilesList.Add(video + "/" + item.Name);
+                            }
+                            codeDataVM.Add("videosPath", FilesList);
+                        }
+                    }
+                }
+
+                string Type = codeDataVM["isEMS"] != null && codeDataVM["isEMS"].ToString().ToBool() ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription();
+                
+                var serviceIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeDataVM["organizationIdFk"].ToString().ToInt() && x.CodeIdFk == codeName.GetActiveCodeId() && x.Type == Type && x.IsActive.HasValue && x.IsActive.Value && !x.IsDeleted).Select(x => new { x.DefaultServiceLineTeam, x.ServiceLineTeam1, x.ServiceLineTeam2 }).FirstOrDefault();
+                var serviceLineIds = (from x in this._codesServiceLinesMappingRepo.Table
+                                      where x.OrganizationIdFk == codeDataVM["organizationIdFk"].ToString().ToInt() && x.CodeIdFk == codeName.GetActiveCodeId()
+                                      && x.ActiveCodeId == codeId && x.ActiveCodeName == codeName
+                                      select new { x.DefaultServiceLineIdFk, x.ServiceLineId1Fk, x.ServiceLineId2Fk }).FirstOrDefault();
+
+                if (serviceIds != null)
+                {
+                    List<int> defaultIds = new();
+                    List<int> team1 = new();
+                    List<int> team2 = new();
+                    if (serviceLineIds != null)
+                    {
+                        defaultIds = serviceIds.DefaultServiceLineTeam.ToIntList().Where(x => serviceLineIds.DefaultServiceLineIdFk.ToIntList().Contains(x)).Distinct().ToList();
+                        team1 = serviceIds.ServiceLineTeam1.ToIntList().Where(x => serviceLineIds.ServiceLineId1Fk.ToIntList().Contains(x)).Distinct().ToList();
+                        team2 = serviceIds.ServiceLineTeam2.ToIntList().Where(x => serviceLineIds.ServiceLineId2Fk.ToIntList().Contains(x)).Distinct().ToList();
+                    }
+                    var DefaultServiceLineTeam = this._serviceLineRepo.Table.Where(x => serviceIds.DefaultServiceLineTeam.ToIntList().Distinct().Contains(x.ServiceLineId) && !x.IsDeleted).Select(x => new ServiceLineVM() { ServiceLineId = x.ServiceLineId, ServiceName = x.ServiceName, IsSelected = defaultIds.Contains(x.ServiceLineId) }).ToList();
+                    var ServiceLineTeam1 = this._serviceLineRepo.Table.Where(x => serviceIds.ServiceLineTeam1.ToIntList().Distinct().Contains(x.ServiceLineId) && !x.IsDeleted).Select(x => new ServiceLineVM() { ServiceLineId = x.ServiceLineId, ServiceName = x.ServiceName, IsSelected = team1.Contains(x.ServiceLineId) }).ToList();
+                    var ServiceLineTeam2 = this._serviceLineRepo.Table.Where(x => serviceIds.ServiceLineTeam2.ToIntList().Distinct().Contains(x.ServiceLineId) && !x.IsDeleted).Select(x => new ServiceLineVM() { ServiceLineId = x.ServiceLineId, ServiceName = x.ServiceName, IsSelected = team2.Contains(x.ServiceLineId) }).ToList();
+
+                    codeDataVM.Add("defaultServiceLineTeam", DefaultServiceLineTeam);
+                    codeDataVM.Add("serviceLineTeam1", ServiceLineTeam1);
+                    codeDataVM.Add("serviceLineTeam2", ServiceLineTeam2);
+                }
+
+
+                if (codeDataVM["isEMS"].ToString() != null && codeDataVM["isEMS"].ToString().ToBool())
+                    codeDataVM.Add("organizationData", GetHosplitalAddressObject(codeDataVM["organizationIdFk"].ToString().ToInt()));
+
+                var indeces = fieldDataTypes.Select((c, i) => new { character = c, index = i })
+                         .Where(list => list.character.Trim() == "datetime")
+                         .Select(x => x.index)
+                         .ToList();
+
+                foreach (var item in indeces)
+                {
+                    string field = fieldNames.ElementAt(item).ToCamelCase();
+                    var fieldVal = codeDataVM[field] != null && codeDataVM[field].ToString() != "" ? DateTime.Parse(codeDataVM[field].ToString()).ToTimezoneFromUtc("Eastern Standard Time").ToString("yyyy-MM-dd hh:mm:ss tt") : "";
+                    codeDataVM.Add(field + "Str", fieldVal);
+                }
+
+                var bloodThinnerIds = codeDataVM.ContainsKey("bloodThinners") && codeDataVM["bloodThinners"] != null && codeDataVM["bloodThinners"].ToString() != "" ? codeDataVM["bloodThinners"].ToString().ToIntList() : new List<int>();
+                var bloodThinners = _controlListDetailsRepo.Table.Where(b => bloodThinnerIds.Contains(b.ControlListDetailId)).Select(b => new { Id = b.ControlListDetailId, b.Title }).ToList();
+                codeDataVM.Add("bloodThinnersTitle", bloodThinners);
+
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Found", Body = codeDataVM };
+            }
+            return new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "Record Not Found" };
+        }
+        public BaseResponse AddOrUpdateCodeData(IDictionary<string, object> codeData)
+        {
+
+            if (codeData.ContainsKey($"code{codeData["codeName"].ToString()}Id") && codeData[$"code{codeData["codeName"].ToString()}Id"].ToString().ToInt() > 0)
+            {
+                string fieldName = codeData["fieldName"].ToString();
+                int codeId = codeData[$"code{codeData["codeName"]}Id"].ToString().ToInt();
+                string fieldDataType = codeData["fieldDataType"].ToString();
+                string codeName = codeData["codeName"].ToString();
+                var row = new CodeStroke();
+                object fieldValue = new();
+                if (fieldDataType != "file")
+                {
+                    if (fieldDataType == "date" || fieldDataType == "datetime")
+                    {
+                        if (codeData.ContainsKey(fieldName + "Str") && codeData[fieldName + "Str"].ToString() != null)
+                        {
+                            fieldValue = DateTime.Parse(codeData[fieldName + "Str"].ToString()).ToUniversalTimeZone();
+                        }
+                    }
+                    else
+                    if (codeData.ContainsKey(fieldName) && codeData[fieldName].ToString() != null)
+                    {
+                        fieldValue = codeData[fieldName].ToString();
+                    }
+
+
+                    row = this._dbContext.LoadStoredProcedure("md_UpdateCodes")
+                                             .WithSqlParam("codeName", codeName)
+                                             .WithSqlParam("fieldName", fieldName)
+                                             .WithSqlParam("fieldValue", fieldValue)
+                                             .WithSqlParam("codeId", codeId)
+                                             .WithSqlParam("modifiedBy", ApplicationSettings.UserId)
+                                             .ExecuteStoredProc<CodeStroke>().FirstOrDefault();
+
+                    //this._dbContext.Log(fieldName, TableEnums.CodeStrokes.ToString(), codeId, ActivityLogActionEnums.Update.ToInt());
+                    //var userIds = this._StrokeCodeGroupMembersRepo.Table.Where(x => x.StrokeCodeIdFk == codeId).Select(x => x.UserIdFk).ToList();
+
+                    string qry = $"Select UserIdFk From Code{codeName}GroupMembers where {codeName}CodeIdFk = {codeId}";
+                    var userIds = this._dbContext.LoadSQLQuery(qry).ExecuteStoredProc<CodeStrokeGroupMember>().Select(x => x.UserIdFk).ToList();
+
+                    var userUniqueIds = this._userRepo.Table.Where(x => userIds.Contains(x.UserId)).Select(x => x.UserUniqueId).Distinct().ToList();
+                    var superAdmins = this._userRepo.Table.Where(x => x.IsInGroup && !x.IsDeleted).Select(x => x.UserUniqueId).ToList();
+                    userUniqueIds.AddRange(superAdmins);
+                    var loggedUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => x.UserUniqueId).FirstOrDefault();
+                    userUniqueIds.Add(loggedUser);
+
+                    var notification = new PushNotificationVM()
+                    {
+                        Id = codeId,
+                        OrgId = row.OrganizationIdFk,
+                        FieldName = fieldName,
+                        FieldDataType = fieldDataType,
+                        FieldValue = fieldValue,
+                        UserChannelSid = userUniqueIds.Distinct().ToList(),
+                        From = codeName,
+                        Msg = (row.IsEms != null && row.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription()) + $" {codeName} From is Changed",
+                        RouteLink1 = ($"Code{codeName}Form").GetEnumDescription<RouteEnums>(), //RouteEnums.CodeStrokeForm.ToDescription(), // "/Home/Inhouse%20Codes/code-strok-form",
+                        RouteLink2 = ($"EMSForms").GetEnumDescription<RouteEnums>() //RouteEnums.EMSForms.ToDescription(), // RouteEnums.EMSForms.ToDescription(),
+                    };
+
+                    _communicationService.pushNotification(notification);
+
+                    return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Updated Successfully" };
+                }
+                else
+                {
+
+                    string Qry = $"Select OrganizationIdFk, IsEms From Code{(codeName != UCLEnums.Sepsis.ToString() ? codeName + "s" : codeName)} WHERE Code{codeName}Id = {codeId} and IsDeleted = 0";
+                    var code = this._dbContext.LoadSQLQuery(Qry).ExecuteStoredProc<CodeStroke>().FirstOrDefault();
+
+                    //row = this._codeStrokeRepo.Table.Where(x => x.CodeStrokeId == codeId && !x.IsDeleted).FirstOrDefault();
+
+                    //row.ModifiedBy = ApplicationSettings.UserId;
+                    //row.ModifiedDate = DateTime.UtcNow;
+                    //row.IsDeleted = false;
+                    fieldName = fieldName.ToCamelCase();
+                    string jobj = codeData[fieldName].ToString();
+                    fieldValue = JsonConvert.DeserializeObject<List<FilesVM>>(jobj);
+                    var filesList = (List<FilesVM>)fieldValue;
+                    string FolderRootPath = null;
+                    string fieldNameAltered = fieldName == "attachment" ? fieldName.ToTitleCase() + "s" : fieldName.Replace("s", "").ToTitleCase();
+                    if (filesList != null && filesList.Count > 0)
+                    {
+                        var RootPath = this._RootPath + "/Organizations"; //this._RootPath + "/Organizations";
+                        string FileRoot = null;
+                        List<string> Attachments = new();
+                        FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == code.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
+                        FileRoot = Path.Combine(RootPath, FileRoot);
+                        if (!Directory.Exists(FileRoot))
+                        {
+                            Directory.CreateDirectory(FileRoot);
+                        }
+                        FileRoot = Path.Combine(FileRoot, codeName);
+                        if (!Directory.Exists(FileRoot))
+                        {
+                            Directory.CreateDirectory(FileRoot);
+                        }
+                        FileRoot = Path.Combine(FileRoot, codeId.ToString());
+                        if (!Directory.Exists(FileRoot))
+                        {
+                            Directory.CreateDirectory(FileRoot);
+                        }
+                        FileRoot = Path.Combine(FileRoot, fieldNameAltered);
+
+                        if (!Directory.Exists(FileRoot))
+                        {
+                            Directory.CreateDirectory(FileRoot);
+                        }
+
+                        foreach (var item in filesList)
+                        {
+                            if (!string.IsNullOrEmpty(item.Base64Str))
+                            {
+
+                                var fileInfo = item.Base64Str.Split("base64,");
+                                string fileExtension = fileInfo[0].GetFileExtenstion();
+                                var ByteFile = Convert.FromBase64String(fileInfo[1]);
+                                string FilePath = Path.Combine(FileRoot, item.FileName);
+
+                                if (File.Exists(FilePath))
+                                {
+                                    long existingFileSize = 0;
+                                    long newFileSize = ByteFile.LongLength;
+                                    FileInfo ExistingfileInfo = new FileInfo(FilePath);
+                                    existingFileSize = ExistingfileInfo.Length;
+
+                                    if (existingFileSize > 0 && newFileSize != existingFileSize)
+                                    {
+                                        var alterFile = item.FileName.Split('.');
+                                        string extention = alterFile.LastOrDefault();
+                                        var alterFileName = alterFile.ToList();
+                                        alterFileName.RemoveAt(alterFileName.Count - 1);
+                                        string fileName = string.Join(".", alterFileName);
+                                        fileName = fileName + "_" + HelperExtension.CreateRandomString(7) + "." + extention;
+                                        FilePath = Path.Combine(FileRoot, fileName);
+                                        using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                        {
+                                            fs.Write(ByteFile);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                        {
+                                            fs.Write(ByteFile);
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                    {
+                                        fs.Write(ByteFile);
+                                    }
+                                }
+                            }
+                        }
+                        if (FileRoot != null && FileRoot != "")
+                        {
+                            code.GetType().GetProperty(fieldNameAltered).SetValue(code, FileRoot.Replace(this._RootPath, "").Replace("\\", "/"));
+                            FolderRootPath = FileRoot.Replace(this._RootPath, "").Replace("\\", "/");
+                        }
+                    }
+
+
+                    List<string> FilesPath = new();
+                    if (FolderRootPath != null)
+                    {
+                        string path = this._RootPath + FolderRootPath;
+                        if (Directory.Exists(path))
+                        {
+                            DirectoryInfo AttachFiles = new DirectoryInfo(path);
+                            FilesPath = new List<string>();
+                            foreach (var item in AttachFiles.GetFiles())
+                            {
+                                FilesPath.Add(FolderRootPath + "/" + item.Name);
+                            }
+                        }
+                    }
+
+                    //this._codeStrokeRepo.Update(row);
+
+                    Qry = $"Update Code{(codeName != UCLEnums.Sepsis.ToString() ? codeName + "s" : codeName)}" +
+                            $" Set ModifiedBy = {ApplicationSettings.UserId}," +
+                            $" ModifiedDate = '{DateTime.UtcNow}'," +
+                            $" IsDeleted = 0," +
+                            $" {fieldNameAltered} = '{code.GetPropertyValueByName(fieldNameAltered)}'" +
+                            $" WHERE Code{codeName}Id = {codeId}";
+
+                    int rowEffect = this._dbContext.Database.ExecuteSqlRaw(Qry);
+
+                    //this._dbContext.Log(row, TableEnums.CodeStrokes.ToString(), codeId, ActivityLogActionEnums.FileUpload.ToInt());
+
+                    var returnVal = new Dictionary<string, object>();
+                    returnVal.Add((fieldName == "attachment" ? fieldName + "s" : fieldName) + "Path", FilesPath);
+                    fieldValue = returnVal;
+
+
+                    //var userIds = this._StrokeCodeGroupMembersRepo.Table.Where(x => x.StrokeCodeIdFk == codeId).Select(x => x.UserIdFk).ToList();
+
+                    string qry = $"Select UserIdFk From Code{codeName}GroupMembers where {codeName}CodeIdFk = {codeId}";
+                    var userIds = this._dbContext.LoadSQLQuery(qry).ExecuteStoredProc<CodeStrokeGroupMember>().Select(x => x.UserIdFk).ToList();
+
+                    var userUniqueIds = this._userRepo.Table.Where(x => userIds.Contains(x.UserId)).Select(x => x.UserUniqueId).Distinct().ToList();
+                    var superAdmins = this._userRepo.Table.Where(x => x.IsInGroup && !x.IsDeleted).Select(x => x.UserUniqueId).ToList();
+                    userUniqueIds.AddRange(superAdmins);
+                    var loggedUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => x.UserUniqueId).FirstOrDefault();
+                    userUniqueIds.Add(loggedUser);
+
+                    var notification = new PushNotificationVM()
+                    {
+                        Id = codeId,
+                        OrgId = code.OrganizationIdFk,
+                        FieldName = fieldName,
+                        FieldDataType = fieldDataType,
+                        FieldValue = fieldValue,
+                        UserChannelSid = userUniqueIds,
+                        From = codeName,
+                        Msg = (row.IsEms != null && row.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription()) + $" {codeName} From is Changed",
+                        RouteLink1 = ($"Code{codeName}Form").GetEnumDescription<RouteEnums>(), //RouteEnums.CodeStrokeForm.ToDescription(), // "/Home/Inhouse%20Codes/code-strok-form",
+                        RouteLink2 = ($"EMSForms").GetEnumDescription<RouteEnums>() //RouteEnums.EMSForms.ToDescription(), // RouteEnums.EMSForms.ToDescription(),
+                    };
+
+                    _communicationService.pushNotification(notification);
+
+                    return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Updated Successfully" };
+                }
+
+            }
+            else
+            {
+                if (codeData.ContainsKey("organizationIdFk") && codeData["organizationIdFk"].ToString().ToInt() > 0)
+                {
+                    string codeName = codeData["codeName"].ToString();
+                    string IsEMS = codeData["IsEms"].ToString() != null && codeData["IsEms"].ToString().ToBool() ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription();
+                    var DefaultServiceLineTeam = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeData["organizationIdFk"].ToString().ToInt() && x.CodeIdFk == codeName.GetActiveCodeId() && x.Type == IsEMS && x.IsActive.HasValue && x.IsActive.Value && !x.IsDeleted).Select(x => x.DefaultServiceLineTeam).FirstOrDefault();
+                    if (DefaultServiceLineTeam != null && DefaultServiceLineTeam != "")
+                    {
+                        var DefaultServiceLineIds = DefaultServiceLineTeam.ToIntList();
+
+                        string tbl_Name = $"Code{(codeName != UCLEnums.Sepsis.ToString() ? codeName + "s" : codeName)}";
+                        var tableInfo = this._dbContext.LoadStoredProcedure("md_getTableInfoByTableName")
+                                            .WithSqlParam("@tableName", tbl_Name)
+                                            .ExecuteStoredProc_ToDictionary();
+                        var fieldNames = tableInfo["fieldName"].ToString().Split(",").ToList();
+                        var fieldDataTypes = tableInfo["fieldDataType"].ToString().Split(",").ToList();
+
+                        var indeces = fieldDataTypes.Select((c, i) => new { character = c, index = i })
+                                                   .Where(list => list.character.Trim() == "datetime")
+                                                   .Select(x => x.index)
+                                                   .ToList();
+
+                        foreach (var item in indeces)
+                        {
+                            string field = fieldNames.ElementAt(item).Trim();
+                            if (codeData.ContainsKey(field) && codeData[field] != null && codeData[field].ToString() != "") 
+                            {
+                                codeData[field] = DateTime.Parse(codeData[field].ToString()).ToUniversalTimeZone();
+                            }
+                        }
+                        var conterName = $"Code_{codeName}_Counter";
+                        var Counter = this._dbContext.LoadStoredProcedure("md_getMDRouteCounter").WithSqlParam("@C_Name", conterName).ExecuteStoredProc<MDRoute_CounterVM>().Select(x => x.Counter_Value).FirstOrDefault();
+                        string query = $"INSERT INTO [dbo].[{tbl_Name}] (";
+
+                        var keys = codeData.Keys.ToList();
+                        var values = codeData.Values.ToList();
+
+                        for (int i = 0; i < keys.Count(); i++)
+                        {
+                            if (keys[i] != $"code{codeName}Id" && keys[i] != "CreatedBy" && keys[i] != "CreatedDate" && keys[i] != "FamilyContactNumber" && keys[i] != "codeName")
+                            {
+                                query += $"[{keys[i]}],";
+                            }
+                        }
+
+                        query += codeData.ContainsKey("FamilyContactNumber") ? "[FamilyContactNumber]," : "";
+                        query += $"[Code{codeName}Number],";
+                        query += "[CreatedBy],";
+                        query += "[CreatedDate],";
+                        query += "[IsDeleted]";
+                        query += ")";
+                        query += " VALUES (";
+
+                        for (int i = 0; i < values.Count; i++)
+                        {
+                            if (keys[i] != $"code{codeName}Id" && keys[i] != "CreatedBy" && keys[i] != "CreatedDate" && keys[i] != "FamilyContactNumber" && keys[i] != "codeName")
+                            {
+                                query += $"'{values[i]}',";
+                            }
+                        }
+
+                        query += codeData.ContainsKey("FamilyContactNumber") && codeData["FamilyContactNumber"] != null ? (codeData["FamilyContactNumber"].ToString() != "(___) ___-____" ? "'" + codeData["FamilyContactNumber"] + "'," : "'',") : "";
+                        query += $"{Counter},";
+                        query += $"'{ApplicationSettings.UserId}',";
+                        query += $"'{DateTime.UtcNow}',";
+                        query += "'0'";
+                        query += ")";
+
+                        int Id = this._dbContext.ExecuteInsertQuery(query);
+
+                        //this._dbContext.Log(stroke, TableEnums.CodeStrokes.ToString(), stroke.CodeStrokeId, ActivityLogActionEnums.Create.ToInt());
+
+
+                        return GetCodeDataById(Id, codeName);
+                    }
+                    return new BaseResponse() { Status = HttpStatusCode.NotAcceptable, Message = "There is no Service Line in this organization related to Code Stroke" };
+                }
+            }
+            return new BaseResponse();
+        }
+
+
+        #endregion
+
 
         #region Code Stroke
 
@@ -1679,7 +2136,6 @@ namespace Web.Services.Concrete
 
         public BaseResponse CreateStrokeGroup(CodeStrokeVM codeStroke)
         {
-
             var DefaultServiceLineIds = codeStroke.DefaultServiceLineIds.ToIntList();
             bool usersFound = false;
             string errorMsg = "";
@@ -2196,8 +2652,8 @@ namespace Web.Services.Concrete
 
                 if (SepsisDataVM.IsEms)
                     SepsisDataVM.OrganizationData = GetHosplitalAddressObject(SepsisDataVM.OrganizationIdFk);
-                SepsisDataVM.LastKnownWellStr = SepsisDataVM.LastKnownWell.ToTimezoneFromUtc("Eastern Standard Time").ToString("yyyy-MM-dd hh:mm:ss tt");
-                SepsisDataVM.DobStr = SepsisDataVM.Dob.ToTimezoneFromUtc("Eastern Standard Time").ToString("yyyy-MM-dd hh:mm:ss tt");
+                SepsisDataVM.LastKnownWellStr = SepsisDataVM.LastKnownWell?.ToTimezoneFromUtc("Eastern Standard Time").ToString("yyyy-MM-dd hh:mm:ss tt");
+                SepsisDataVM.DobStr = SepsisDataVM.Dob?.ToTimezoneFromUtc("Eastern Standard Time").ToString("yyyy-MM-dd hh:mm:ss tt");
                 SepsisDataVM.GenderTitle = _controlListDetailsRepo.Table.Where(g => g.ControlListDetailId == SepsisDataVM.Gender).Select(g => g.Title).FirstOrDefault();
                 SepsisDataVM.BloodThinnersTitle.AddRange(_controlListDetailsRepo.Table.Where(b => SepsisDataVM.BloodThinners.ToIntList().Contains(b.ControlListDetailId)).Select(b => new { Id = b.ControlListDetailId, b.Title }).ToList());
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Found", Body = SepsisDataVM };
@@ -3605,7 +4061,7 @@ namespace Web.Services.Concrete
                         UserChannelSid = userUniqueIds.Distinct().ToList(),
                         From = AuthorEnums.Stemi.ToString(),
                         Msg = (row.IsEms != null && row.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription()) + " STEMI From is Changed",
-                        RouteLink1 = RouteEnums.CodeSTEMIForm.ToDescription(), // "/Home/Inhouse%20Codes/code-strok-form",
+                        RouteLink1 = RouteEnums.CodeStemiForm.ToDescription(), // "/Home/Inhouse%20Codes/code-strok-form",
                         RouteLink2 = RouteEnums.EMSForms.ToDescription(), // RouteEnums.EMSForms.ToDescription(),
                     };
 
@@ -3947,7 +4403,7 @@ namespace Web.Services.Concrete
                         UserChannelSid = userUniqueIds,
                         From = AuthorEnums.Stemi.ToString(),
                         Msg = (row.IsEms != null && row.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription()) + " STEMI From is Changed",
-                        RouteLink1 = RouteEnums.CodeSTEMIForm.ToDescription(), // "/Home/Inhouse%20Codes/code-strok-form",
+                        RouteLink1 = RouteEnums.CodeStemiForm.ToDescription(), // "/Home/Inhouse%20Codes/code-strok-form",
                         RouteLink2 = RouteEnums.EMSForms.ToDescription(), // RouteEnums.EMSForms.ToDescription(),
                     };
 
@@ -4600,7 +5056,7 @@ namespace Web.Services.Concrete
                     UserChannelSid = UserChannelSid.Select(x => x.UserUniqueId).Distinct().ToList(),
                     From = AuthorEnums.Stemi.ToString(),
                     Msg = (codeSTEMI.IsEms.HasValue && codeSTEMI.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription()) + " STEMI From is Changed",
-                    RouteLink1 = RouteEnums.CodeSTEMIForm.ToDescription(), // "/Home/Inhouse%20Codes/code-strok-form",
+                    RouteLink1 = RouteEnums.CodeStemiForm.ToDescription(), // "/Home/Inhouse%20Codes/code-strok-form",
                     RouteLink2 = RouteEnums.EMSForms.ToDescription(), // RouteEnums.EMSForms.ToDescription(),
                 };
 

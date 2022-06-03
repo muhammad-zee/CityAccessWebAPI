@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 #nullable disable
 
@@ -110,9 +112,7 @@ namespace Web.Data.Models
 
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");
 
-                entity.Property(e => e.Description)
-                    .HasMaxLength(400)
-                    .IsUnicode(false);
+                entity.Property(e => e.Description).IsUnicode(false);
 
                 entity.Property(e => e.IsActive)
                     .IsRequired()
@@ -609,8 +609,6 @@ namespace Web.Data.Models
                 entity.Property(e => e.ActiveCodeName)
                     .IsRequired()
                     .HasMaxLength(15);
-
-                entity.Property(e => e.DefaultServiceLineIdFk).IsRequired();
             });
 
             modelBuilder.Entity<CommunicationLog>(entity =>

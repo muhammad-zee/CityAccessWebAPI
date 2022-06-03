@@ -10,6 +10,7 @@ using System.Net;
 using Web.API.Helper;
 using Web.Model;
 using Web.Model.Common;
+using Web.Services.Enums;
 using Web.Services.Interfaces;
 
 namespace Web.API.Controllers
@@ -159,7 +160,7 @@ namespace Web.API.Controllers
         {
             try
             {
-                return _activeCodesService.GetStrokeDataById(strokeId);
+                return _activeCodesService.GetCodeDataById(strokeId, UCLEnums.Stroke.ToString());
             }
             catch (Exception ex)
             {
@@ -172,11 +173,11 @@ namespace Web.API.Controllers
 
         [Description("Add Or Update Stroke")]
         [HttpPost("stroke/AddOrUpdateStroke")]
-        public BaseResponse AddOrUpdateStroke([FromBody] CodeStrokeVM codeStroke)
+        public BaseResponse AddOrUpdateStroke([FromBody] IDictionary<string, object> codeStroke)
         {
             try
             {
-                return _activeCodesService.AddOrUpdateStrokeData(codeStroke);
+                return _activeCodesService.AddOrUpdateCodeData(codeStroke);
             }
             catch (Exception ex)
             {
@@ -277,12 +278,11 @@ namespace Web.API.Controllers
 
         [Description("Get Sepsis Data By Id")]
         [HttpGet("Sepsis/GetSepsisDataById/{SepsisId}")]
-
         public BaseResponse GetSepsisDataById(int SepsisId)
         {
             try
             {
-                return _activeCodesService.GetSepsisDataById(SepsisId);
+                return _activeCodesService.GetCodeDataById(SepsisId, UCLEnums.Sepsis.ToString());
             }
             catch (Exception ex)
             {
@@ -292,16 +292,14 @@ namespace Web.API.Controllers
             }
         }
 
-
         [Description("Add Or Update Sepsis")]
         [HttpPost("Sepsis/AddOrUpdateSepsis")]
-
-        public BaseResponse AddOrUpdateSepsis([FromBody] CodeSepsisVM codeSepsis)
+        public BaseResponse AddOrUpdateSepsis([FromBody] IDictionary<string, object> codeSepsis)
         {
             try
             {
                 var state = ModelState;
-                return _activeCodesService.AddOrUpdateSepsisData(codeSepsis);
+                return _activeCodesService.AddOrUpdateCodeData(codeSepsis);
             }
             catch (Exception ex)
             {
@@ -407,7 +405,7 @@ namespace Web.API.Controllers
         {
             try
             {
-                return _activeCodesService.GetSTEMIDataById(STEMIId);
+                return _activeCodesService.GetCodeDataById(STEMIId, UCLEnums.Stemi.ToString());
             }
             catch (Exception ex)
             {
@@ -421,11 +419,11 @@ namespace Web.API.Controllers
         [Description("Add Or Update STEMI")]
         [HttpPost("STEMI/AddOrUpdateSTEMI")]
 
-        public BaseResponse AddOrUpdateSTEMI([FromBody] CodeSTEMIVM codeSTEMI)
+        public BaseResponse AddOrUpdateSTEMI([FromBody] IDictionary<string, object> codeSTEMI)
         {
             try
             {
-                return _activeCodesService.AddOrUpdateSTEMIData(codeSTEMI);
+                return _activeCodesService.AddOrUpdateCodeData(codeSTEMI);
             }
             catch (Exception ex)
             {
@@ -524,12 +522,11 @@ namespace Web.API.Controllers
 
         [Description("Get Trauma Data By Id")]
         [HttpGet("Trauma/GetTraumaDataById/{TraumaId}")]
-
         public BaseResponse GetTraumaDataById(int TraumaId)
         {
             try
             {
-                return _activeCodesService.GetTrumaDataById(TraumaId);
+                return _activeCodesService.GetCodeDataById(TraumaId, UCLEnums.Trauma.ToString());
             }
             catch (Exception ex)
             {
@@ -539,15 +536,13 @@ namespace Web.API.Controllers
             }
         }
 
-
         [Description("Add Or Update Trauma")]
         [HttpPost("Trauma/AddOrUpdateTrauma")]
-
-        public BaseResponse AddOrUpdateTrauma([FromBody] CodeTrumaVM codeTrauma)
+        public BaseResponse AddOrUpdateTrauma([FromBody] IDictionary<string, object> codeTrauma)
         {
             try
             {
-                return _activeCodesService.AddOrUpdateTrumaData(codeTrauma);
+                return _activeCodesService.AddOrUpdateCodeData(codeTrauma);
             }
             catch (Exception ex)
             {
@@ -559,7 +554,6 @@ namespace Web.API.Controllers
 
         [Description("Create Group for Code Trauma")]
         [HttpPost("Trauma/createGroupForCodeTrauma")]
-
         public BaseResponse CreateTraumaGroup([FromBody] CodeTrumaVM codeTrauma)
         {
             try
@@ -648,12 +642,11 @@ namespace Web.API.Controllers
 
         [Description("Get Blue Data By Id")]
         [HttpGet("blue/GetBlueDataById/{blueId}")]
-
         public BaseResponse GetBlueDataById(int blueId)
         {
             try
             {
-                return _activeCodesService.GetBlueDataById(blueId);
+                return _activeCodesService.GetCodeDataById(blueId, UCLEnums.Blue.ToString());
             }
             catch (Exception ex)
             {
@@ -666,11 +659,11 @@ namespace Web.API.Controllers
 
         [Description("Add Or Update blue")]
         [HttpPost("blue/AddOrUpdateBlue")]
-        public BaseResponse AddOrUpdateBlue([FromBody] CodeBlueVM codeBlue)
+        public BaseResponse AddOrUpdateBlue([FromBody] IDictionary<string, object> codeBlue)
         {
             try
             {
-                return _activeCodesService.AddOrUpdateBlueData(codeBlue);
+                return _activeCodesService.AddOrUpdateCodeData(codeBlue);
             }
             catch (Exception ex)
             {

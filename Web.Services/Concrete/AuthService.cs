@@ -132,7 +132,7 @@ namespace Web.Services.Concrete
                                 {
                                     var AuthorizedUser = GenerateJSONWebToken(user);
                                     response.Body = AuthorizedUser;
-                                    response.Status = HttpStatusCode.OK;
+                                    response.Status = HttpStatusCode.NotFound;
                                     response.Message = "User found";
                                     this._dbContext.Log(login, "Users", user.UserId, ActivityLogActionEnums.SignIn.ToInt());
                                 }

@@ -26,7 +26,7 @@ namespace Web.Data.Models
         public int? ModifiedBy { get; set; }
         public DateTime? ModifiedDate { get; set; }
         public bool IsDeleted { get; set; }
-        public bool IsCompleted { get; set; }
+        public bool? IsCompleted { get; set; }
         public bool IsEms { get; set; }
         public bool? IsActive { get; set; }
         public string FamilyContactName { get; set; }

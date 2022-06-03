@@ -35,7 +35,7 @@ namespace Web.Services.Enums
         CodeSepsisForm,
 
         [Description("/Home/Codes/Code%20Stemi")]
-        CodeSTEMIForm,
+        CodeStemiForm,
 
         [Description("/Home/Codes/Code%20Trauma")]
         CodeTraumaForm,

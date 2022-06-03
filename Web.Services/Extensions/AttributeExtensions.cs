@@ -1,4 +1,5 @@
 ﻿using ElmahCore;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -234,6 +235,19 @@ namespace Web.Services.Extensions
             catch
             {
                 return 0;
+            }
+        }
+
+        public static string GetEnumDescription<T>(this string enumName) 
+        {
+            if (enumName != null && enumName != "")
+            {
+                var jobj = typeof(T).GetField(enumName).GetCustomAttributesData().FirstOrDefault().ConstructorArguments.FirstOrDefault().ToString();
+                return JsonConvert.DeserializeObject<string>(jobj);
+            }
+            else 
+            {
+                return null;
             }
         }
 

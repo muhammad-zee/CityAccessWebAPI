@@ -426,7 +426,7 @@ namespace Web.Services.Helper
         }
 
 
-        public static List<object> ExecuteStoredProc_ToDictionary(this SqlCommand command)
+        public static IDictionary<string, object> ExecuteStoredProc_ToDictionary(this SqlCommand command)
         {
             using (command)
             {
@@ -442,7 +442,7 @@ namespace Web.Services.Helper
 
                     if (ds.Tables[0].Rows.Count > 0)
                     {
-                        var objList = new List<object>();
+                        var objList = new Dictionary<string,object>();
                         var dr = ds.Tables[0];
                         var colMapping = dr.Columns.Cast<DataColumn>().ToDictionary(key => key.ColumnName);
 
@@ -451,30 +451,28 @@ namespace Web.Services.Helper
                             foreach (var rows in dr.Rows)
                             {
                                 var row = (DataRow)rows;
-                                var objRow = new Dictionary<string, Object>();
                                 foreach (var col in colMapping)
                                 {
                                     try
                                     {   //string colName = colMapping[prop.Name.ToLower()].ColumnName;
                                         var val = row[col.Key.ToLower()];
                                         if (val.ToString() != "")
-                                            objRow.Add(col.Key.ToCamelCase(), val);
+                                            objList.Add(col.Key.ToCamelCase(), val);
                                         else
-                                            objRow.Add(col.Key.ToCamelCase(), null);
+                                            objList.Add(col.Key.ToCamelCase(), null);
                                     }
                                     catch
                                     {
-                                        objRow.Add(col.Key, null);
+                                        objList.Add(col.Key, null);
                                     }
                                 }
-                                objList.Add(objRow);
                             }
                         }
                         return objList;
                     }
                     else
                     {
-                        return new List<object>();
+                        return new Dictionary<string, object>();
                     }
                 }
                 catch (Exception ex)
@@ -486,6 +484,23 @@ namespace Web.Services.Helper
                     command.Connection.Close();
                 }
             }
+        }
+
+        public static int ExecuteInsertQuery(
+          this DbContext context, string qry)
+        {
+            var cmd = (SqlCommand)context.Database.GetDbConnection().CreateCommand();
+            cmd.CommandText = qry+ "  SELECT SCOPE_IDENTITY()";
+            cmd.CommandType = CommandType.Text;
+            if (cmd.Connection.State == ConnectionState.Closed)
+                cmd.Connection.Open();
+
+            int Id = Convert.ToInt32(cmd.ExecuteScalar());
+
+            if (cmd.Connection.State == ConnectionState.Open)
+                cmd.Connection.Close();
+
+            return Id;
         }
 
         #endregion
