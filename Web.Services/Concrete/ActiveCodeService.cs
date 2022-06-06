@@ -7882,14 +7882,15 @@ namespace Web.Services.Concrete
 
         #region EMS
 
-        public BaseResponse GetActiveEMS(bool showAll, bool fromDashboard = false)
+        public BaseResponse GetActiveEMS(int orgId, bool showAll, bool fromDashboard = false)
         {
             var activeEMS = this._dbContext.LoadStoredProcedure("md_getActiveEMS")
-                            .WithSqlParam("@IsFromDashboard", fromDashboard)
-                            .WithSqlParam("@currentUserId", ApplicationSettings.UserId)
-                            .WithSqlParam("@isSuperAdmin", ApplicationSettings.isSuperAdmin)
-                            .WithSqlParam("@showAll", showAll)
-                            .ExecuteStoredProc<CodeStrokeVM>();
+                                            .WithSqlParam("@orgId", orgId)
+                                            .WithSqlParam("@IsFromDashboard", fromDashboard)
+                                            .WithSqlParam("@currentUserId", ApplicationSettings.UserId)
+                                            .WithSqlParam("@isSuperAdmin", ApplicationSettings.isSuperAdmin)
+                                            .WithSqlParam("@showAll", showAll)
+                                            .ExecuteStoredProc<CodeStrokeVM>();
 
             var orgDataList = new List<dynamic>();
             foreach (var item in activeEMS.Select(x => x.OrganizationIdFk).Distinct().ToList())

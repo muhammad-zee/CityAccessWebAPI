@@ -765,12 +765,12 @@ namespace Web.API.Controllers
         #region EMS
 
         [Description("Get All Active EMS")]
-        [HttpGet("EMS/GetActiveEMS/{showAll}/{fromDashbord}")]
-        public BaseResponse GetActiveEMS(bool showAll, bool fromDashbord = false)
+        [HttpGet("EMS/GetActiveEMS/{orgId}/{showAll}/{fromDashbord}")]
+        public BaseResponse GetActiveEMS(int orgId, bool showAll, bool fromDashbord = false)
         {
             try
             {
-                return _activeCodesService.GetActiveEMS(showAll, fromDashbord);
+                return _activeCodesService.GetActiveEMS(orgId, showAll, fromDashbord);
             }
             catch (Exception ex)
             {

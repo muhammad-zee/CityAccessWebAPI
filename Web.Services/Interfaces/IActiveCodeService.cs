@@ -85,7 +85,7 @@ namespace Web.Services.Interfaces
         #endregion
 
         #region EMS
-        BaseResponse GetActiveEMS(bool showAll, bool fromDashboard = false);
+        BaseResponse GetActiveEMS(int orgId, bool showAll, bool fromDashboard = false);
         #endregion
 
         #region Inhouse Code Settings
