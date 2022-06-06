@@ -1318,7 +1318,7 @@ namespace Web.Services.Concrete
                 string tbl_Name = $"Code{(codeName != UCLEnums.Sepsis.ToString() ? codeName + "s" : codeName)}";
                 var keys = keyValues.Keys.ToList();
                 var values = keyValues.Values.ToList();
-
+                var obj = new Dictionary<string, object>();
                 string query = $"UPDATE [dbo].[{tbl_Name}] SET ";
 
                 for (int i = 0; i < keys.Count; i++)
@@ -1331,6 +1331,7 @@ namespace Web.Services.Concrete
                             query += ",";
                         }
                     }
+                    obj.Add(keys[i], values[i].ToString());
                 }
 
                 query += $" [ModifiedBy] = '{ApplicationSettings.UserId}', ";
@@ -1348,14 +1349,14 @@ namespace Web.Services.Concrete
                     var userUniqueIds = this._userRepo.Table.Where(x => userIds.Contains(x.UserId)).Select(x => x.UserUniqueId).Distinct().ToList();
                     var superAdmins = this._userRepo.Table.Where(x => x.IsInGroup && !x.IsDeleted).Select(x => x.UserUniqueId).ToList();
                     userUniqueIds.AddRange(superAdmins);
-                    var loggedUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => x.UserUniqueId).FirstOrDefault();
-                    userUniqueIds.Add(loggedUser);
+                    //var loggedUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => x.UserUniqueId).FirstOrDefault();
+                    //userUniqueIds.Add(loggedUser);
 
                     var notification = new PushNotificationVM()
                     {
                         Id = codeId,
                         OrgId = row.OrganizationIdFk,
-                        FieldValue = keyValues,
+                        FieldValue = obj,
                         ForEmsLocationUpdate = true,
                         UserChannelSid = userUniqueIds.Distinct().ToList(),
                         From = codeName,
