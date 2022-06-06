@@ -1041,14 +1041,20 @@ namespace Web.Services.Concrete
                     //this._dbContext.Log(fieldName, TableEnums.CodeStrokes.ToString(), codeId, ActivityLogActionEnums.Update.ToInt());
                     //var userIds = this._StrokeCodeGroupMembersRepo.Table.Where(x => x.StrokeCodeIdFk == codeId).Select(x => x.UserIdFk).ToList();
 
-                    string qry = $"Select UserIdFk From Code{codeName}GroupMembers where {codeName}CodeIdFk = {codeId}";
-                    var userIds = this._dbContext.LoadSQLQuery(qry).ExecuteStoredProc<CodeStrokeGroupMember>().Select(x => x.UserIdFk).ToList();
+                    //string qry = $"Select UserIdFk From Code{codeName}GroupMembers where {codeName}CodeIdFk = {codeId}";
+                    //var userIds = this._dbContext.LoadSQLQuery(qry).ExecuteStoredProc<CodeStrokeGroupMember>().Select(x => x.UserIdFk).ToList();
 
-                    var userUniqueIds = this._userRepo.Table.Where(x => userIds.Contains(x.UserId)).Select(x => x.UserUniqueId).Distinct().ToList();
-                    var superAdmins = this._userRepo.Table.Where(x => x.IsInGroup && !x.IsDeleted).Select(x => x.UserUniqueId).ToList();
-                    userUniqueIds.AddRange(superAdmins);
-                    var loggedUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => x.UserUniqueId).FirstOrDefault();
-                    userUniqueIds.Add(loggedUser);
+                    //var userUniqueIds = this._userRepo.Table.Where(x => userIds.Contains(x.UserId)).Select(x => x.UserUniqueId).Distinct().ToList();
+                    //var superAdmins = this._userRepo.Table.Where(x => x.IsInGroup && !x.IsDeleted).Select(x => x.UserUniqueId).ToList();
+                    //userUniqueIds.AddRange(superAdmins);
+                    //var loggedUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => x.UserUniqueId).FirstOrDefault();
+                    //userUniqueIds.Add(loggedUser);
+
+                    var userUniqueIds = this._dbContext.LoadStoredProcedure("md_getUserUniqueIdsByCodeId")
+                                                        .WithSqlParam("@userId", ApplicationSettings.UserId)
+                                                        .WithSqlParam("@codeId", codeId)
+                                                        .WithSqlParam("@codeName", codeName)
+                                                        .ExecuteStoredProc<User>().Select(x => x.UserUniqueId).ToList();
 
                     var notification = new PushNotificationVM()
                     {
@@ -1194,17 +1200,11 @@ namespace Web.Services.Concrete
                     returnVal.Add((fieldName == "Attachments" ? fieldName.ToLower() : fieldName.ToLower() + "s") + "Path", FilesPath);
                     fieldValue = returnVal;
 
-
-                    //var userIds = this._StrokeCodeGroupMembersRepo.Table.Where(x => x.StrokeCodeIdFk == codeId).Select(x => x.UserIdFk).ToList();
-
-                    string qry = $"Select UserIdFk From Code{codeName}GroupMembers where {codeName}CodeIdFk = {codeId}";
-                    var userIds = this._dbContext.LoadSQLQuery(qry).ExecuteStoredProc<CodeStrokeGroupMember>().Select(x => x.UserIdFk).ToList();
-
-                    var userUniqueIds = this._userRepo.Table.Where(x => userIds.Contains(x.UserId)).Select(x => x.UserUniqueId).Distinct().ToList();
-                    var superAdmins = this._userRepo.Table.Where(x => x.IsInGroup && !x.IsDeleted).Select(x => x.UserUniqueId).ToList();
-                    userUniqueIds.AddRange(superAdmins);
-                    var loggedUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => x.UserUniqueId).FirstOrDefault();
-                    userUniqueIds.Add(loggedUser);
+                    var userUniqueIds = this._dbContext.LoadStoredProcedure("md_getUserUniqueIdsByCodeId")
+                                                                            .WithSqlParam("@userId", ApplicationSettings.UserId)
+                                                                            .WithSqlParam("@codeId", codeId)
+                                                                            .WithSqlParam("@codeName", codeName)
+                                                                            .ExecuteStoredProc<User>().Select(x => x.UserUniqueId).ToList();
 
                     var notification = new PushNotificationVM()
                     {
@@ -1349,8 +1349,8 @@ namespace Web.Services.Concrete
                     var userUniqueIds = this._userRepo.Table.Where(x => userIds.Contains(x.UserId)).Select(x => x.UserUniqueId).Distinct().ToList();
                     var superAdmins = this._userRepo.Table.Where(x => x.IsInGroup && !x.IsDeleted).Select(x => x.UserUniqueId).ToList();
                     userUniqueIds.AddRange(superAdmins);
-                    //var loggedUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => x.UserUniqueId).FirstOrDefault();
-                    //userUniqueIds.Add(loggedUser);
+                    var loggedUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => x.UserUniqueId).FirstOrDefault();
+                    userUniqueIds.RemoveAll(x => x == loggedUser);
 
                     var notification = new PushNotificationVM()
                     {
