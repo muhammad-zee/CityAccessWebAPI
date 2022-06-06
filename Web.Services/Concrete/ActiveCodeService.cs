@@ -1323,7 +1323,7 @@ namespace Web.Services.Concrete
 
                 for (int i = 0; i < keys.Count; i++)
                 {
-                    if (keys[i] != $"code{keyValues["codeName"].ToString()}Id" && keys[i] != "destinationCoords" && keys[i] != "codeName")
+                    if (keys[i] != $"code{keyValues["codeName"].ToString()}Id" && keys[i] != "destinationCoords" && keys[i] != "codeName" && keys[i] == "createdBy")
                     {
                         query += $"[{keys[i]}] = '{values[i]}'";
                         if (i < keys.Count)
@@ -1343,14 +1343,15 @@ namespace Web.Services.Concrete
                 {
                     string qry = $"select OrganizationIdFk, Code{codeName}Id, IsEms from {tbl_Name} where Code{codeName}Id = '{codeId}'";
                     var row = this._dbContext.LoadSQLQuery(qry).ExecuteStoredProc<CodeStroke>().FirstOrDefault();
-                    qry = $"Select UserIdFk From Code{codeName}GroupMembers where {codeName}CodeIdFk = {codeId}";
-                    var userIds = this._dbContext.LoadSQLQuery(qry).ExecuteStoredProc<CodeStrokeGroupMember>().Select(x => x.UserIdFk).ToList();
 
-                    var userUniqueIds = this._userRepo.Table.Where(x => userIds.Contains(x.UserId)).Select(x => x.UserUniqueId).Distinct().ToList();
-                    var superAdmins = this._userRepo.Table.Where(x => x.IsInGroup && !x.IsDeleted).Select(x => x.UserUniqueId).ToList();
-                    userUniqueIds.AddRange(superAdmins);
-                    var loggedUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => x.UserUniqueId).FirstOrDefault();
-                    userUniqueIds.RemoveAll(x => x == loggedUser);
+                    var userUniqueIds = this._dbContext.LoadStoredProcedure("md_getUserUniqueIdsByCodeId")
+                                                                            .WithSqlParam("@userId", ApplicationSettings.UserId)
+                                                                            .WithSqlParam("@codeId", codeId)
+                                                                            .WithSqlParam("@codeName", codeName)
+                                                                            .ExecuteStoredProc<User>().Select(x => x.UserUniqueId).ToList();
+
+                    var createdByUser = this._userRepo.Table.Where(x => x.UserId == keyValues["createdBy"].ToString().ToInt() && !x.IsDeleted).Select(x => x.UserUniqueId).FirstOrDefault();
+                    userUniqueIds.RemoveAll(x => x == createdByUser);
 
                     var notification = new PushNotificationVM()
                     {
