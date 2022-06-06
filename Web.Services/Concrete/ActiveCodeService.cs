@@ -1318,7 +1318,7 @@ namespace Web.Services.Concrete
                 string tbl_Name = $"Code{(codeName != UCLEnums.Sepsis.ToString() ? codeName + "s" : codeName)}";
                 var keys = keyValues.Keys.ToList();
                 var values = keyValues.Values.ToList();
-                var obj = new Dictionary<string, object>();
+                var obj = new Dictionary<string, string>();
                 string query = $"UPDATE [dbo].[{tbl_Name}] SET ";
 
                 for (int i = 0; i < keys.Count; i++)
