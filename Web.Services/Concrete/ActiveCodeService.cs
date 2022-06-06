@@ -1018,9 +1018,9 @@ namespace Web.Services.Concrete
                 {
                     if (fieldDataType == "date" || fieldDataType == "datetime")
                     {
-                        if (codeData.ContainsKey(fieldName + "Str") && codeData[fieldName + "Str"].ToString() != null)
+                        if (codeData.ContainsKey(fieldName) && codeData[fieldName].ToString() != null)
                         {
-                            fieldValue = DateTime.Parse(codeData[fieldName + "Str"].ToString()).ToUniversalTimeZone();
+                            fieldValue = DateTime.Parse(codeData[fieldName].ToString()).ToUniversalTimeZone();
                         }
                     }
                     else
@@ -1074,17 +1074,10 @@ namespace Web.Services.Concrete
                     string Qry = $"Select OrganizationIdFk, IsEms From Code{(codeName != UCLEnums.Sepsis.ToString() ? codeName + "s" : codeName)} WHERE Code{codeName}Id = {codeId} and IsDeleted = 0";
                     var code = this._dbContext.LoadSQLQuery(Qry).ExecuteStoredProc<CodeStroke>().FirstOrDefault();
 
-                    //row = this._codeStrokeRepo.Table.Where(x => x.CodeStrokeId == codeId && !x.IsDeleted).FirstOrDefault();
-
-                    //row.ModifiedBy = ApplicationSettings.UserId;
-                    //row.ModifiedDate = DateTime.UtcNow;
-                    //row.IsDeleted = false;
-                    fieldName = fieldName.ToCamelCase();
                     string jobj = codeData[fieldName].ToString();
                     fieldValue = JsonConvert.DeserializeObject<List<FilesVM>>(jobj);
                     var filesList = (List<FilesVM>)fieldValue;
                     string FolderRootPath = null;
-                    string fieldNameAltered = fieldName == "attachment" ? fieldName.ToTitleCase() + "s" : fieldName.Replace("s", "").ToTitleCase();
                     if (filesList != null && filesList.Count > 0)
                     {
                         var RootPath = this._RootPath + "/Organizations"; //this._RootPath + "/Organizations";
@@ -1106,7 +1099,7 @@ namespace Web.Services.Concrete
                         {
                             Directory.CreateDirectory(FileRoot);
                         }
-                        FileRoot = Path.Combine(FileRoot, fieldNameAltered);
+                        FileRoot = Path.Combine(FileRoot, fieldName);
 
                         if (!Directory.Exists(FileRoot))
                         {
@@ -1163,7 +1156,7 @@ namespace Web.Services.Concrete
                         }
                         if (FileRoot != null && FileRoot != "")
                         {
-                            code.GetType().GetProperty(fieldNameAltered).SetValue(code, FileRoot.Replace(this._RootPath, "").Replace("\\", "/"));
+                            code.GetType().GetProperty(fieldName).SetValue(code, FileRoot.Replace(this._RootPath, "").Replace("\\", "/"));
                             FolderRootPath = FileRoot.Replace(this._RootPath, "").Replace("\\", "/");
                         }
                     }
@@ -1190,7 +1183,7 @@ namespace Web.Services.Concrete
                             $" Set ModifiedBy = {ApplicationSettings.UserId}," +
                             $" ModifiedDate = '{DateTime.UtcNow}'," +
                             $" IsDeleted = 0," +
-                            $" {fieldNameAltered} = '{code.GetPropertyValueByName(fieldNameAltered)}'" +
+                            $" {fieldName} = '{code.GetPropertyValueByName(fieldName)}'" +
                             $" WHERE Code{codeName}Id = {codeId}";
 
                     int rowEffect = this._dbContext.Database.ExecuteSqlRaw(Qry);
@@ -1198,7 +1191,7 @@ namespace Web.Services.Concrete
                     //this._dbContext.Log(row, TableEnums.CodeStrokes.ToString(), codeId, ActivityLogActionEnums.FileUpload.ToInt());
 
                     var returnVal = new Dictionary<string, object>();
-                    returnVal.Add((fieldName == "attachment" ? fieldName + "s" : fieldName) + "Path", FilesPath);
+                    returnVal.Add((fieldName == "Attachments" ? fieldName.ToLower() : fieldName.ToLower() + "s") + "Path", FilesPath);
                     fieldValue = returnVal;
 
 
@@ -1220,7 +1213,7 @@ namespace Web.Services.Concrete
                         FieldName = fieldName,
                         FieldDataType = fieldDataType,
                         FieldValue = fieldValue,
-                        UserChannelSid = userUniqueIds,
+                        UserChannelSid = userUniqueIds.Distinct().ToList(),
                         From = codeName,
                         Msg = (row.IsEms != null && row.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription()) + $" {codeName} From is Changed",
                         RouteLink1 = ($"Code{codeName}Form").GetEnumDescription<RouteEnums>(), //RouteEnums.CodeStrokeForm.ToDescription(), // "/Home/Inhouse%20Codes/code-strok-form",
@@ -1311,8 +1304,9 @@ namespace Web.Services.Concrete
                     }
                     return new BaseResponse() { Status = HttpStatusCode.NotAcceptable, Message = $"There is no Service Line in this organization related to Code {codeName}" };
                 }
+                return new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "Organization Id not found" };
             }
-            return new BaseResponse();
+            
         }
 
         public BaseResponse UpdateEMSAmbulanceData(IDictionary<string,object> keyValues) 
