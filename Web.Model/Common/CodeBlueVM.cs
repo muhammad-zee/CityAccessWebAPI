@@ -7,6 +7,7 @@ namespace Web.Model.Common
     {
         public int Id { get; set; }
         public int CodeBlueId { get; set; }
+        public long CodeBlueNumber { get; set; }
         public string PatientName { get; set; }
         public DateTime? Dob { get; set; }
         public string DobStr { get; set; }
