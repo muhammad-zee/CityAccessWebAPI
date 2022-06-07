@@ -297,7 +297,7 @@ namespace Web.Services.Helper
                 object secondValue;
                 if (updatedRecordDic.TryGetValue(kv.Key, out secondValue))
                 {
-                    if (!object.Equals(kv.Value, secondValue) && kv.Key != "modifiedDate"&& kv.Key != "modifiedDateStr" && kv.Key != "modifiedBy")
+                    if (!object.Equals(kv.Value, secondValue) && kv.Key != "modifiedDate"&& kv.Key != "modifiedDateStr" && kv.Key != "modifiedBy"/* && !kv.Key.ToLower().Contains("team")*/)
                     {
                         compared.Add(kv.Key, secondValue);
                     }

@@ -418,7 +418,7 @@ namespace Web.Services.Concrete
                 {
                     var consult = this._dbContext.LoadSQLQuery($"Select ConsultId from consults where consultNumber = { Consult_Counter.Counter_Value.ToInt()}").ExecuteStoredProc<Consult>().FirstOrDefault();
 
-                    this._dbContext.Log(keyValues, ActivityLogTableEnums.Consults.ToString(), consult.ConsultId.ToInt(), ActivityLogActionEnums.Create.ToInt());
+                    this._dbContext.Log(keyValues, ActivityLogTableEnums.Consults.ToString(), Consult_Counter.Counter_Value.ToInt(), ActivityLogActionEnums.Create.ToInt());
 
                     //    if (keys.Contains("ServiceLineIdFk") && keyValues["ServiceLineIdFk"].ToString() != "0")
                     //    {
@@ -675,7 +675,7 @@ namespace Web.Services.Concrete
                 {
                     var updatedResult = this.GetConsultById(ConsultId.ToInt()).Body;
                     var differences = HelperExtension.GetDifferences(previousResult, updatedResult);
-                    this._dbContext.Log(differences.updatedRecord, ActivityLogTableEnums.Consults.ToString(), keyValues["ConsultId"].ToString().ToInt(), ActivityLogActionEnums.Update.ToInt(),differences.previousRecord);
+                    this._dbContext.Log(differences.updatedRecord, ActivityLogTableEnums.Consults.ToString(), keyValues["ConsultNumber"].ToString().ToInt(), ActivityLogActionEnums.Update.ToInt(),differences.previousRecord);
                     return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Updated Successfully" };
                 }
                 else

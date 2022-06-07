@@ -207,7 +207,7 @@ namespace Web.Services.Concrete
             model.TableName == ActivityLogTableEnums.CodeSTEMIs.ToString())
             {
                 recordName = "Code";
-                    }
+            }
             else if (model.TableName == ActivityLogTableEnums.Consults.ToString())
             {
                 recordName = "Consult";
@@ -219,38 +219,28 @@ namespace Web.Services.Concrete
             }
             else if (model.Action == ActivityLogActionEnums.Create.ToInt())
             {
-                logDesc = $"<b>{model.UserFullName}</b> {model.ActionName} <b>{recordName}: {model.TablePrimaryKey}</b> on {model.TableName}";
+                logDesc = $"<b>{model.UserFullName}</b> {model.ActionName} <b>{recordName}: {model.TablePrimaryKey}</b> in {model.TableName}";
 
             }
             else if (model.Action == ActivityLogActionEnums.Update.ToInt())
             {
                 string changedFields = "";
-                string updatedField = "";
-                string updatedValue = "";
-                string previousValue = "";
-                if(model.ActivityLogId == 374)
-                {
-
-                }
                 var jobj1 = JObject.Parse(model.PreviousValue);
                 var jobj2 = JObject.Parse(model.Changeset);
                 var jobj1Props = jobj1.Properties().ToList();
                 foreach (var p in jobj1Props)
                 {
-                    changedFields = changedFields != "" ? changedFields + "," : changedFields;
+                    var typeOfPrevObj = jobj1[p.Name].Type.ToString();
+                    var typeOfUpdatedObj = jobj2[p.Name].Type.ToString();
+                    if(typeOfPrevObj != "Array" && typeOfUpdatedObj != "Array")
+                    {
+                    changedFields = changedFields != "" ? changedFields + ", " : changedFields;
                     changedFields += $"{p.Name.SplitCamelCase()} {jobj1[p.Name]} to {jobj2[p.Name]}";
-                }
-                var jobj2Props = jobj2.Properties();
-                //foreach (var i in jobj)
-                //{
-                //    if (i.Value != null)
-                //    {
-                //        updatedField = i.Key;
-                //        updatedValue = i.Value.ToString();
-                //    }
-                //}
+                    }
 
-                logDesc = $"<b>{model.UserFullName}</b> {model.ActionName} {changedFields} of <b>{recordName}: {model.TablePrimaryKey}</b> In {model.TableName}";
+                }
+                changedFields = changedFields != "" ? changedFields + " of" : changedFields;
+                logDesc = $"<b>{model.UserFullName}</b> {model.ActionName} {changedFields} <b>{recordName}: {model.TablePrimaryKey}</b> In {model.TableName}";
             }
             else if (model.Action == ActivityLogActionEnums.Active.ToInt() || model.Action == ActivityLogActionEnums.Active.ToInt())
             {
@@ -261,14 +251,8 @@ namespace Web.Services.Concrete
             {
                 logDesc = $"<b>{model.UserFullName}</b> {model.ActionName} file in <b>{recordName}: {model.TablePrimaryKey}</b> {model.TableName}";
             }
-
-      
-
             return logDesc;
         }
-    
-
-       
 
         #endregion
     }
