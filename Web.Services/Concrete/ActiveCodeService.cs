@@ -1151,7 +1151,7 @@ namespace Web.Services.Concrete
                     int rowEffect = this._dbContext.Database.ExecuteSqlRaw(Qry);
 
 
-                    string codeNumberQuery = $"Select convert(int,isnull(Code{codeName}Number,0)) as [CodeNumber] From Code{codeName} where Code{codeName}Id = {codeId}";
+                    string codeNumberQuery = $"Select convert(int,isnull(Code{codeName}Number,0)) as [CodeNumber] From  Code{(codeName != UCLEnums.Sepsis.ToString() ? codeName + "s" : codeName)} where Code{codeName}Id = {codeId}";
                     var CodeNumber = this._dbContext.LoadSQLQuery(codeNumberQuery).ExecuteStoredProc<UpdatedCodeVM>().Select(x => x.CodeNumber).FirstOrDefault();
                     this._dbContext.Log(new { }, tbl_Name, CodeNumber, ActivityLogActionEnums.FileUpload.ToInt());
                     //this._dbContext.Log(row, TableEnums.CodeStrokes.ToString(), codeId, ActivityLogActionEnums.FileUpload.ToInt());
