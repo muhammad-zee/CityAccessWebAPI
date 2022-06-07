@@ -40,6 +40,7 @@ namespace Web.Data.Models
         public string Distance { get; set; }
         public string StartingPoint { get; set; }
         public string ChannelSid { get; set; }
+        public long CodeStemiNumber { get; set; }
 
         public virtual ICollection<CodeStemigroupMember> CodeStemigroupMembers { get; set; }
     }

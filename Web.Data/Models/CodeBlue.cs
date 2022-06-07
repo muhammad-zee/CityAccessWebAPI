@@ -40,6 +40,7 @@ namespace Web.Data.Models
         public string Distance { get; set; }
         public string StartingPoint { get; set; }
         public string ChannelSid { get; set; }
+        public long CodeBlueNumber { get; set; }
 
         public virtual ICollection<CodeBlueGroupMember> CodeBlueGroupMembers { get; set; }
     }

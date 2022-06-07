@@ -19,18 +19,24 @@ namespace Web.Services.Helper
     public static class ActivityLogService
     {
 
-        public static void Log<T>(this DbContext _dbContext, T? items, string tableName, int tablePrimayrKey, int action)
+        public static void Log<T>(this DbContext _dbContext, T? items, string tableName, int tablePrimayrKey, int action, dynamic? previousRecord =null )
         {
+            if(previousRecord == null)
+            {
+                previousRecord = new { };
+            }
             var json = JsonSerializer.Serialize(items);
+            var jsonNewRec = JsonSerializer.Serialize(previousRecord);
             string description = generateLogDesc(tableName, action, json);
 
             int rowsAffected;
-            string sql = "EXEC md_saveActivityLog " +
+            string sql = "EXEC md_saveActivityLog_new " +
                 "@pUserIdFk, " +
                 "@pTableName, " +
                 "@pTablePrimaryKey, " +
                 "@pAction, " +
                 "@pChangeset," +
+                "@pPreviousValue," +
                 "@pDescription";
             int userId = action == ActivityLogActionEnums.SignIn.ToInt() ? tablePrimayrKey : ApplicationSettings.UserId;
             List<SqlParameter> parms = new List<SqlParameter>
@@ -41,6 +47,7 @@ namespace Web.Services.Helper
                         new SqlParameter { ParameterName = "@pTablePrimaryKey", Value =tablePrimayrKey },
                         new SqlParameter { ParameterName = "@pAction", Value = action },
                         new SqlParameter { ParameterName = "@pChangeset", Value = json,Size=int.MaxValue},
+                        new SqlParameter { ParameterName = "@pPreviousValue", Value = jsonNewRec,Size=int.MaxValue},
                         new SqlParameter { ParameterName = "@pDescription", Value = description,Size=int.MaxValue }
                     };
 
@@ -53,7 +60,7 @@ namespace Web.Services.Helper
             var jobj = JObject.Parse(jsonString);
             string logDesc = "";
             //string userFullName = action == ActivityLogActionEnums.SignIn.ToInt() ? jobj["userFullName"].ToString() : ApplicationSettings.UserFullName;
-            string userFullName = ApplicationSettings.UserFullName;
+            string userFullName = "";//ApplicationSettings.UserFullName;
             string actionName = action == ActivityLogActionEnums.SignIn.ToInt() ? "Logged In" :
                 action == ActivityLogActionEnums.Logout.ToInt() ? "Logged Out" :
                 action == ActivityLogActionEnums.Create.ToInt() ? "Created" :
@@ -73,6 +80,8 @@ namespace Web.Services.Helper
                     var jobj1 = jobj.Properties().ToList();
                     string updatedField = "";
                     string updatedValue = "";
+
+                    string previousValue = "";
                     foreach (var i in jobj)
                     {
                         if (i.Value != null)

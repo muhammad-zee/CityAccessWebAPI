@@ -346,7 +346,7 @@ namespace Web.Services.Concrete
         {
             var consultData = _dbContext.LoadStoredProcedure("md_getConsultById")
                 .WithSqlParam("@consultId", Id)
-                .ExecuteStoredProc_ToDictionary();
+                .ExecuteStoredProc_ToDictionary().FirstOrDefault();
 
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = consultData };
         }
@@ -669,11 +669,13 @@ namespace Web.Services.Concrete
                 query += keyValues.ContainsKey("CallbackNumber") && keyValues["CallbackNumber"].ToString() != "(___) ___-____" ? " [CallbackNumber] ='" + keyValues["CallbackNumber"].ToString() + "'," : "";
                 query += $" [ModifiedBy] = '{ApplicationSettings.UserId}', [ModifiedDate] = '{DateTime.UtcNow.ToString("MM-dd-yyyy hh:mm:ss")}'";
                 query += $" WHERE ConsultId = '{ConsultId.ToInt()}'";
-
+                var previousResult = this.GetConsultById(ConsultId.ToInt()).Body;
                 int rowsEffect = this._dbContext.Database.ExecuteSqlRaw(query);
                 if (rowsEffect > 0)
                 {
-                    this._dbContext.Log(keyValues, ActivityLogTableEnums.Consults.ToString(), keyValues["ConsultId"].ToString().ToInt(), ActivityLogActionEnums.Update.ToInt());
+                    var updatedResult = this.GetConsultById(ConsultId.ToInt()).Body;
+                    var differences = HelperExtension.GetDifferences(previousResult, updatedResult);
+                    this._dbContext.Log(differences.updatedRecord, ActivityLogTableEnums.Consults.ToString(), keyValues["ConsultId"].ToString().ToInt(), ActivityLogActionEnums.Update.ToInt(),differences.previousRecord);
                     return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Updated Successfully" };
                 }
                 else

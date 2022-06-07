@@ -107,7 +107,7 @@ namespace Web.Services.Concrete
                             response.Message = "User found";
                             login.password = encryptedPassword;
                             ApplicationSettings.UserFullName = user.FirstName + " " + user.LastName;
-                            this._dbContext.Log(new { }, ActivityLogTableEnums.Users.ToString(), user.UserId, ActivityLogActionEnums.SignIn.ToInt());
+                            this._dbContext.Log(new { }, string.Empty, user.UserId, ActivityLogActionEnums.SignIn.ToInt());
                         }
                         else
                         {

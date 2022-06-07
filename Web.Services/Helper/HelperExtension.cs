@@ -18,7 +18,18 @@ namespace Web.Services.Helper
 {
     public static class HelperExtension
     {
-
+        public static string SplitCamelCase(this string str)
+        {
+            if (str != null && str != "")
+            {
+                var splittedString = Regex.Replace(Regex.Replace(str, @"(\P{Ll})(\P{Ll}\p{Ll})", "$1 $2"), @"(\p{Ll})(\P{Ll})", "$1 $2");
+                return splittedString.First().ToString().ToUpper() + String.Join("", splittedString.Skip(1));
+            }
+            else
+            {
+                return "";
+            }
+        }
         public static string CreateRandomString(int length = 15)
         {
             // Create a string of characters, numbers, special characters that allowed in the password  
@@ -272,12 +283,59 @@ namespace Web.Services.Helper
                 return obj;
             }
         }
+
+        public static ActivityLogRecordsEnum GetDifferences(object prevRecord,object updatedRecord)
+        {
+            ActivityLogRecordsEnum resposeObject = new(); 
+            var isDictionary = prevRecord.GetType().GetGenericTypeDefinition().IsAssignableFrom(typeof(Dictionary<,>));
+            if (isDictionary) {
+               var prevRecordDic = (Dictionary<string, object>)prevRecord;
+               var updatedRecordDic = (Dictionary<string, object>)updatedRecord;
+            var compared = new Dictionary<string, object>();
+            foreach (var kv in prevRecordDic)
+            {
+                object secondValue;
+                if (updatedRecordDic.TryGetValue(kv.Key, out secondValue))
+                {
+                    if (!object.Equals(kv.Value, secondValue) && kv.Key != "modifiedDate"&& kv.Key != "modifiedDateStr" && kv.Key != "modifiedBy")
+                    {
+                        compared.Add(kv.Key, secondValue);
+                    }
+                    else
+                    {
+                            prevRecordDic.Remove(kv.Key);
+                    }
+                }
+            };
+                
+                resposeObject.previousRecord = prevRecordDic;
+                resposeObject.updatedRecord= compared;
+
+                return resposeObject;
+            }
+            else
+            {
+
+            List<PropertyInfo> differences = new List<PropertyInfo>();
+            foreach (PropertyInfo property in prevRecord.GetType().GetProperties())
+            {
+                object value1 = property.GetValue(prevRecord, null);
+                object value2 = property.GetValue(updatedRecord, null);
+                if (!value1.Equals(value2))
+                {
+                    differences.Add(property);
+                }
+            }
+            //return differences;
+            }
+            return resposeObject;
+        }
         public static object getChangedPropertyObject<T>(this T obj,string propertyName)
         {
             try
             {
                 var type = obj.GetType();
-                var returnClass = new ExpandoObject() as IDictionary<string, object>;
+                var returnClass =new   Dictionary<string, object>();
                 var props = type.GetProperties();
                 foreach (var propertyInfo in props)
                 {

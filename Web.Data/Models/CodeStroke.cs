@@ -40,6 +40,7 @@ namespace Web.Data.Models
         public string Distance { get; set; }
         public string StartingPoint { get; set; }
         public string ChannelSid { get; set; }
+        public long CodeStrokeNumber { get; set; }
 
         public virtual ICollection<CodeStrokeGroupMember> CodeStrokeGroupMembers { get; set; }
     }

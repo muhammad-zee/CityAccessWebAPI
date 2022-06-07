@@ -43,4 +43,16 @@ namespace Web.Model.Common
         public string FilterVal { get; set; }
         public string CodeName { get; set; }
     }
+
+    public class UpdatedCodeVM
+    {
+        public int OrganizationIdFk { get; set; }
+        public int UserIdFk { get; set; }
+public int CodeId {get; set;}
+public int CodeNumber {get; set;}
+public bool? IsEms {get; set;}
+public string UpdatedValue { get; set;}
+public string PreviousValue { get; set;}
+
+    }
 }

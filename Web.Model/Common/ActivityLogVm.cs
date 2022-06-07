@@ -19,6 +19,7 @@ namespace Web.Model.Common
         public string PreviousValue { get; set; }
         public string Description { get; set; }
         public DateTime CreatedDate { get; set; }
+
     }
 
 
@@ -31,5 +32,12 @@ namespace Web.Model.Common
         public DateTime ToDate { get; set; }
         public int LastRecordId { get; set; }
         public int PageSize { get; set; }
+    }
+
+    public class ActivityLogRecordsEnum
+    {
+        public object previousRecord { get; set; } = new { };
+        public object updatedRecord { get; set; } = new { };
+
     }
 }

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Net;
+using System.Text.RegularExpressions;
 using Web.Data.Models;
 using Web.DLL.Generic_Repository;
 using Web.Model;
@@ -156,6 +157,11 @@ namespace Web.Services.Concrete
                                 .WithSqlParam("@pLastRecordId", filter.LastRecordId)
                                 .WithSqlParam("@pPageSize", filter.PageSize)
                                 .ExecuteStoredProc<ActivityLogVm>().AsQueryable();
+            foreach (var r in rec)
+            {
+                r.Description = generateLogDesc(r);
+
+            }
             if (rec != null)
             {
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Found", Body = rec };
@@ -174,6 +180,7 @@ namespace Web.Services.Concrete
                                  .WithSqlParam("@pFromDate", filter.FromDate)
                                  .WithSqlParam("@pToDate", filter.ToDate)
                                  .ExecuteStoredProc<ActivityLogVm>().AsQueryable();
+
             if (rec != null)
             {
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Found", Body = rec };
@@ -187,10 +194,81 @@ namespace Web.Services.Concrete
         public BaseResponse LogoutActivity()
         {
             this._dbContext.Log(new { }, ActivityLogTableEnums.Users.ToString(), ApplicationSettings.UserId, ActivityLogActionEnums.Logout.ToInt());
-                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Found" };
-           
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Found" };
+
         }
 
+        public string generateLogDesc(ActivityLogVm model)
+        {
+            string logDesc = "";
+            string recordName = "";
+            if (model.TableName == ActivityLogTableEnums.CodeStrokes.ToString() || model.TableName == ActivityLogTableEnums.CodeTraumas.ToString() ||
+            model.TableName == ActivityLogTableEnums.CodeBlues.ToString() || model.TableName == ActivityLogTableEnums.CodeSepsis.ToString() ||
+            model.TableName == ActivityLogTableEnums.CodeSTEMIs.ToString())
+            {
+                recordName = "Code";
+                    }
+            else if (model.TableName == ActivityLogTableEnums.Consults.ToString())
+            {
+                recordName = "Consult";
+            }
+
+            if (model.Action == ActivityLogActionEnums.SignIn.ToInt() || model.Action == ActivityLogActionEnums.SignIn.ToInt())
+            {
+                logDesc = $"<b>{model.UserFullName}</b> {model.ActionName}";
+            }
+            else if (model.Action == ActivityLogActionEnums.Create.ToInt())
+            {
+                logDesc = $"<b>{model.UserFullName}</b> {model.ActionName} <b>{recordName}: {model.TablePrimaryKey}</b> on {model.TableName}";
+
+            }
+            else if (model.Action == ActivityLogActionEnums.Update.ToInt())
+            {
+                string changedFields = "";
+                string updatedField = "";
+                string updatedValue = "";
+                string previousValue = "";
+                if(model.ActivityLogId == 374)
+                {
+
+                }
+                var jobj1 = JObject.Parse(model.PreviousValue);
+                var jobj2 = JObject.Parse(model.Changeset);
+                var jobj1Props = jobj1.Properties().ToList();
+                foreach (var p in jobj1Props)
+                {
+                    changedFields = changedFields != "" ? changedFields + "," : changedFields;
+                    changedFields += $"{p.Name.SplitCamelCase()} {jobj1[p.Name]} to {jobj2[p.Name]}";
+                }
+                var jobj2Props = jobj2.Properties();
+                //foreach (var i in jobj)
+                //{
+                //    if (i.Value != null)
+                //    {
+                //        updatedField = i.Key;
+                //        updatedValue = i.Value.ToString();
+                //    }
+                //}
+
+                logDesc = $"<b>{model.UserFullName}</b> {model.ActionName} {changedFields} of <b>{recordName}: {model.TablePrimaryKey}</b> In {model.TableName}";
+            }
+            else if (model.Action == ActivityLogActionEnums.Active.ToInt() || model.Action == ActivityLogActionEnums.Active.ToInt())
+            {
+
+                logDesc = $"<b>{model.UserFullName}</b> changed status of record: {model.TablePrimaryKey} to {model.ActionName}";
+            }
+            else if (model.Action == ActivityLogActionEnums.FileUpload.ToInt() || model.Action == ActivityLogActionEnums.FileDelete.ToInt())
+            {
+                logDesc = $"<b>{model.UserFullName}</b> {model.ActionName} file in <b>{recordName}: {model.TablePrimaryKey}</b> {model.TableName}";
+            }
+
+      
+
+            return logDesc;
+        }
+    
+
+       
 
         #endregion
     }

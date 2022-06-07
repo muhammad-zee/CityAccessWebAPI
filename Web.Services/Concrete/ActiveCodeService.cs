@@ -963,7 +963,8 @@ namespace Web.Services.Concrete
                 int codeId = codeData[$"code{codeData["codeName"]}Id"].ToString().ToInt();
                 string fieldDataType = codeData["fieldDataType"].ToString();
                 string codeName = codeData["codeName"].ToString();
-                var row = new CodeStroke();
+                string tbl_Name = $"Code{(codeName != UCLEnums.Sepsis.ToString() ? codeName + "s" : codeName)}";
+                var row = new UpdatedCodeVM();
                 object fieldValue = new();
                 if (fieldDataType != "file")
                 {
@@ -980,16 +981,20 @@ namespace Web.Services.Concrete
                         fieldValue = codeData[fieldName].ToString();
                     }
 
-
+                    var prevRecord =this.GetCodeDataById(codeId, codeName).Body;
                     row = this._dbContext.LoadStoredProcedure("md_UpdateCodes")
                                              .WithSqlParam("codeName", codeName)
                                              .WithSqlParam("fieldName", fieldName)
                                              .WithSqlParam("fieldValue", fieldValue)
                                              .WithSqlParam("codeId", codeId)
                                              .WithSqlParam("modifiedBy", ApplicationSettings.UserId)
-                                             .ExecuteStoredProc<CodeStroke>().FirstOrDefault();
+                                             .ExecuteStoredProc<UpdatedCodeVM>().FirstOrDefault();
+                    var updatedRecord =this.GetCodeDataById(codeId, codeName).Body;
+                    var checkDifference = HelperExtension.GetDifferences(prevRecord, updatedRecord);
 
-                    //this._dbContext.Log(fieldName, TableEnums.CodeStrokes.ToString(), codeId, ActivityLogActionEnums.Update.ToInt());
+
+
+                    this._dbContext.Log(checkDifference.updatedRecord, tbl_Name, row.CodeNumber, ActivityLogActionEnums.Update.ToInt(), checkDifference.previousRecord);
                     //var userIds = this._StrokeCodeGroupMembersRepo.Table.Where(x => x.StrokeCodeIdFk == codeId).Select(x => x.UserIdFk).ToList();
 
                     //string qry = $"Select UserIdFk From Code{codeName}GroupMembers where {codeName}CodeIdFk = {codeId}";
@@ -1016,7 +1021,7 @@ namespace Web.Services.Concrete
                         FieldValue = fieldValue,
                         UserChannelSid = userUniqueIds.Distinct().ToList(),
                         From = codeName,
-                        Msg = (row.IsEms != null && row.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription()) + $" {codeName} From is Changed",
+                        Msg = (row.IsEms != null && row.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription()) + $" {codeName} Form is Changed",
                         RouteLink1 = ($"Code{codeName}Form").GetEnumDescription<RouteEnums>(), //RouteEnums.CodeStrokeForm.ToDescription(), // "/Home/Inhouse%20Codes/code-strok-form",
                         RouteLink2 = ($"EMSForms").GetEnumDescription<RouteEnums>() //RouteEnums.EMSForms.ToDescription(), // RouteEnums.EMSForms.ToDescription(),
                     };
@@ -1145,7 +1150,13 @@ namespace Web.Services.Concrete
 
                     int rowEffect = this._dbContext.Database.ExecuteSqlRaw(Qry);
 
+
+                    string codeNumberQuery = $"Select convert(int,isnull(Code{codeName}Number,0)) as [CodeNumber] From Code{codeName} where Code{codeName}Id = {codeId}";
+                    var CodeNumber = this._dbContext.LoadSQLQuery(codeNumberQuery).ExecuteStoredProc<UpdatedCodeVM>().Select(x => x.CodeNumber).FirstOrDefault();
+                    this._dbContext.Log(new { }, tbl_Name, CodeNumber, ActivityLogActionEnums.FileUpload.ToInt());
                     //this._dbContext.Log(row, TableEnums.CodeStrokes.ToString(), codeId, ActivityLogActionEnums.FileUpload.ToInt());
+
+
 
                     var returnVal = new Dictionary<string, object>();
                     returnVal.Add((fieldName == "Attachments" ? fieldName.ToLower() : fieldName.ToLower() + "s") + "Path", FilesPath);
@@ -1248,10 +1259,15 @@ namespace Web.Services.Concrete
 
                         int Id = this._dbContext.ExecuteInsertQuery(query);
 
+
                         //this._dbContext.Log(stroke, TableEnums.CodeStrokes.ToString(), stroke.CodeStrokeId, ActivityLogActionEnums.Create.ToInt());
 
 
-                        return GetCodeDataById(Id, codeName);
+                        var returnData = GetCodeDataById(Id, codeName);
+                        var insertedData = returnData.Body;
+                        this._dbContext.Log(insertedData, tbl_Name, Counter.ToInt(), ActivityLogActionEnums.Create.ToInt());
+                        return returnData;
+
                     }
                     return new BaseResponse() { Status = HttpStatusCode.NotAcceptable, Message = $"There is no Service Line in this organization related to Code {codeName}" };
                 }
