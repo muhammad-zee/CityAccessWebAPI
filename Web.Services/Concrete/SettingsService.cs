@@ -200,6 +200,7 @@ namespace Web.Services.Concrete
 
         public string generateLogDesc(ActivityLogVm model)
         {
+
             string logDesc = "";
             string recordName = "";
             if (model.TableName == ActivityLogTableEnums.CodeStrokes.ToString() || model.TableName == ActivityLogTableEnums.CodeTraumas.ToString() ||
@@ -242,10 +243,10 @@ namespace Web.Services.Concrete
                 changedFields = changedFields != "" ? changedFields + " of" : changedFields;
                 logDesc = $"<b>{model.UserFullName}</b> {model.ActionName} {changedFields} <b>{recordName}: {model.TablePrimaryKey}</b> In {model.TableName}";
             }
-            else if (model.Action == ActivityLogActionEnums.Active.ToInt() || model.Action == ActivityLogActionEnums.Active.ToInt())
+            else if (model.Action == ActivityLogActionEnums.Active.ToInt() || model.Action == ActivityLogActionEnums.Inactive.ToInt())
             {
 
-                logDesc = $"<b>{model.UserFullName}</b> changed status of record: {model.TablePrimaryKey} to {model.ActionName}";
+                logDesc = $"<b>{model.UserFullName}</b> changed status of  <b>{recordName}: {model.TablePrimaryKey}</b> to {model.ActionName}";
             }
             else if (model.Action == ActivityLogActionEnums.FileUpload.ToInt() || model.Action == ActivityLogActionEnums.FileDelete.ToInt())
             {
