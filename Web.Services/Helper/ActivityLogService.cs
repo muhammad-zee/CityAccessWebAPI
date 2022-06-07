@@ -30,7 +30,7 @@ namespace Web.Services.Helper
             string description = generateLogDesc(tableName, action, json);
 
             int rowsAffected;
-            string sql = "EXEC md_saveActivityLog_new " +
+            string sql = "EXEC md_saveActivityLog " +
                 "@pUserIdFk, " +
                 "@pTableName, " +
                 "@pTablePrimaryKey, " +
