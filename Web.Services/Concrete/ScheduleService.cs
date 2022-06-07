@@ -414,8 +414,11 @@ namespace Web.Services.Concrete
                 if (row != null)
                 {
 
-                    if (!_scheduleRepo.Table.Any(x => x.ScheduleDate.Value.Date == schedule.FromDate.Date && x.ServiceLineIdFk == row.ServiceLineIdFk && x.RoleIdFk == row.RoleIdFk && x.UserIdFk == row.UserIdFk && !x.IsDeleted && schedule.ScheduleId != x.UsersScheduleId))
+                    if (this._scheduleRepo.Table.Any(x => x.UserIdFk == row.UserIdFk && x.ServiceLineIdFk == row.ServiceLineIdFk && x.RoleIdFk ==row.RoleIdFk && !x.IsDeleted
+                        && ((x.ScheduleDateStart <= row.ScheduleDateStart && x.ScheduleDateEnd >= row.ScheduleDateStart) || (x.ScheduleDateStart <=row.ScheduleDateEnd && x.ScheduleDateEnd >= row.ScheduleDateEnd))))
                     {
+                    //    if (!_scheduleRepo.Table.Any(x => x.ScheduleDate.Value.Date == schedule.FromDate.Date && x.ServiceLineIdFk == row.ServiceLineIdFk && x.RoleIdFk == row.RoleIdFk && x.UserIdFk == row.UserIdFk && !x.IsDeleted && schedule.ScheduleId != x.UsersScheduleId))
+                    //{
                         string startDateTimeStr = schedule.FromDate.ToString("MM-dd-yyyy") + " " + schedule.StartTime.ToString("hh:mm:ss tt");
                         string endDateTimeStr = schedule.ToDate.ToString("MM-dd-yyyy") + " " + schedule.EndTime.ToString("hh:mm:ss tt");
 

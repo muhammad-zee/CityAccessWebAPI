@@ -219,6 +219,8 @@ namespace Web.Services.Concrete
                 recordName = "Schedule";
                 dynamicDesc = false;
             }
+
+            model.TableName = model.TableName.SplitCamelCase();
             if (!dynamicDesc)
             {
                 logDesc = $"<b>{model.UserFullName}</b> {model.ActionName} {model.Description}";
