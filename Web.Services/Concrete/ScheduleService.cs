@@ -12,6 +12,7 @@ using Web.DLL;
 using Web.DLL.Generic_Repository;
 using Web.Model;
 using Web.Model.Common;
+using Web.Services.Enums;
 using Web.Services.Extensions;
 using Web.Services.Helper;
 using Web.Services.Interfaces;
@@ -323,7 +324,11 @@ namespace Web.Services.Concrete
                                     IsDeleted = false
                                 }).ToList();
                 this._scheduleRepo.Insert(scheduleList);
-
+                //this._dbContext.Log()
+                foreach(var inserttedRecord in scheduleList)
+                {
+                    saveScheduleLog(inserttedRecord, ActivityLogActionEnums.Create.ToInt());
+                }
                 response.Status = HttpStatusCode.OK;
                 response.Message = "Schedule Saved";
                 response.Body = scheduleList;
@@ -353,6 +358,8 @@ namespace Web.Services.Concrete
                     schedule.IsDeleted = false;
                     this._scheduleRepo.Update(schedule);
 
+                    saveScheduleLog(schedule, ActivityLogActionEnums.Update.ToInt());
+
                     response.Status = HttpStatusCode.OK;
                     response.Message = "Schedule Updated";
                     response.Body = schedule;
@@ -377,6 +384,7 @@ namespace Web.Services.Concrete
                     schedule.IsDeleted = true;
                     this._scheduleRepo.Update(schedule);
 
+                    saveScheduleLog(schedule, ActivityLogActionEnums.Delete.ToInt());
                     response.Status = HttpStatusCode.OK;
                     response.Message = "Schedule Deleted";
                     response.Body = schedule;
@@ -428,6 +436,7 @@ namespace Web.Services.Concrete
 
                         _scheduleRepo.Update(row);
 
+                        saveScheduleLog(row, ActivityLogActionEnums.Update.ToInt());
                         return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Schedule Updated" };
                     }
                     else
@@ -804,6 +813,12 @@ namespace Web.Services.Concrete
                 if (usersSchedules.Count > 0)
                 {
                     _scheduleRepo.Insert(usersSchedules);
+
+                       var serviceName = this._serviceRepo.Table.Where(s => s.ServiceLineId == schedule.ServiceLineIdFk).Select(s => s.ServiceName).FirstOrDefault();
+                    var users = this._userRepo.Table.Where(u => usersSchedules.Select(s => s.UserIdFk).Contains(u.UserId)).Select(u=>$"{u.FirstName} {u.LastName}").ToArray().Aggregate((a, b) => a+ ", " +b);
+
+                    var logDesc = $"schedule of {users} for {serviceName}";
+                    this._dbContext.Log(new { }, ActivityLogTableEnums.UsersSchedule.ToString(), 0, ActivityLogActionEnums.Create.ToInt(), null, logDesc);
                     return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Schedule Created" };
                 }
                 else
@@ -824,13 +839,21 @@ namespace Web.Services.Concrete
                 schedule.ModifiedDate = DateTime.UtcNow;
 
                 _scheduleRepo.Update(schedule);
-
+                saveScheduleLog(schedule, ActivityLogActionEnums.Delete.ToInt());
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Deleted." };
             }
             else
             {
                 return new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "No Schedule Found" };
             }
+        }
+
+        public void saveScheduleLog(UsersSchedule schedule,int action)
+        {
+            var selectedUserFullName = this._userRepo.Table.Where(u => u.UserId == schedule.UserIdFk).Select(u => $"{u.FirstName} {u.LastName}").FirstOrDefault();
+             var serviceName = this._serviceRepo.Table.Where(s => s.ServiceLineId == schedule.ServiceLineIdFk).Select(s => s.ServiceName).FirstOrDefault();
+            var logDesc = $"schedule of {selectedUserFullName} for {serviceName} from {schedule.ScheduleDateStart.ToString()} to {schedule.ScheduleDateStart.ToString()}";
+            this._dbContext.Log(schedule, ActivityLogTableEnums.UsersSchedule.ToString(), schedule.UsersScheduleId, action, null, logDesc);
         }
     }
 }

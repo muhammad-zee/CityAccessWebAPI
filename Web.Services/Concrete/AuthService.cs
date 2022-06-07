@@ -134,6 +134,7 @@ namespace Web.Services.Concrete
                                     response.Body = AuthorizedUser;
                                     response.Status = HttpStatusCode.OK;
                                     response.Message = "User found";
+                            ApplicationSettings.UserFullName = user.FirstName + " " + user.LastName;
                                     this._dbContext.Log(login, "Users", user.UserId, ActivityLogActionEnums.SignIn.ToInt());
                                 }
                             }

@@ -48,6 +48,7 @@ namespace Web.API.Helper
                 userAccess = JsonConvert.DeserializeObject<List<int>>(userAccessObj);
             }
             var userId = Convert.ToInt32(user.Claims.Where(x => x.Type == "UserId").Select(x => x.Value).FirstOrDefault());
+            var UserFullName = Convert.ToString(user.Claims.Where(x => x.Type == "UserFullName").Select(x => x.Value).FirstOrDefault());
             var orgId = Convert.ToInt32(user.Claims.Where(x => x.Type == "organizationId").Select(x => x.Value).FirstOrDefault());
             var userName = user.Claims.Where(x => x.Type.Contains("nameidentifier")).Select(x => x.Value).FirstOrDefault();
             var roleId = user.Claims.Where(x => x.Type == "RoleIds").Select(x => x.Value).FirstOrDefault(); ;
@@ -56,6 +57,7 @@ namespace Web.API.Helper
             //////////////////////// Set Values in ApplicationSettings Class ///////////////////////////////////////////
 
             ApplicationSettings.UserId = userId;
+            ApplicationSettings.UserFullName = UserFullName;
             ApplicationSettings.OrganizationId = orgId;
             ApplicationSettings.UserName = userName;
             ApplicationSettings.RoleIds = roleId;

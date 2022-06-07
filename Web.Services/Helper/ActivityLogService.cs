@@ -19,7 +19,7 @@ namespace Web.Services.Helper
     public static class ActivityLogService
     {
 
-        public static void Log<T>(this DbContext _dbContext, T? items, string tableName, int tablePrimayrKey, int action, dynamic? previousRecord =null )
+        public static void Log<T>(this DbContext _dbContext, T? items, string tableName, int tablePrimayrKey, int action, dynamic? previousRecord =null,string? description="" )
         {
             if(previousRecord == null)
             {
@@ -27,7 +27,11 @@ namespace Web.Services.Helper
             }
             var json = JsonSerializer.Serialize(items);
             var jsonNewRec = JsonSerializer.Serialize(previousRecord);
-            string description = generateLogDesc(tableName, action, json);
+            if (string.IsNullOrEmpty(description))
+            {
+             description = generateLogDesc(tableName, action, json);
+            }
+
 
             int rowsAffected;
             string sql = "EXEC md_saveActivityLog " +

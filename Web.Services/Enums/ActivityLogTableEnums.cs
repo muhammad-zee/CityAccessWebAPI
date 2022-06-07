@@ -15,6 +15,7 @@ namespace Web.Services.Enums
         CodeBlues,
         CodeTraumas,
         Users,
+        UsersSchedule,
 
         //CodeBlueGroupMembers,
         //InhouseCodesFields,
@@ -32,7 +33,6 @@ namespace Web.Services.Enums
         //ConsultAcknowledgments,
         //OrganizationCodeStrokeFields,
         //MDRoute_Counter,
-        //UsersSchedule,
         //ChatSettings,
         //OrganizationCodeSTEMIFields,
         //OrganizationCodeBlueFields,

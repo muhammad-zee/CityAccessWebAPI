@@ -203,6 +203,7 @@ namespace Web.Services.Concrete
 
             string logDesc = "";
             string recordName = "";
+            bool dynamicDesc = true;
             if (model.TableName == ActivityLogTableEnums.CodeStrokes.ToString() || model.TableName == ActivityLogTableEnums.CodeTraumas.ToString() ||
             model.TableName == ActivityLogTableEnums.CodeBlues.ToString() || model.TableName == ActivityLogTableEnums.CodeSepsis.ToString() ||
             model.TableName == ActivityLogTableEnums.CodeSTEMIs.ToString())
@@ -213,7 +214,16 @@ namespace Web.Services.Concrete
             {
                 recordName = "Consult";
             }
-
+            else if (model.TableName == ActivityLogTableEnums.UsersSchedule.ToString())
+            {
+                recordName = "Schedule";
+                dynamicDesc = false;
+            }
+            if (!dynamicDesc)
+            {
+                logDesc = $"<b>{model.UserFullName}</b> {model.ActionName} {model.Description}";
+            }
+            if (dynamicDesc) { 
             if (model.Action == ActivityLogActionEnums.SignIn.ToInt() || model.Action == ActivityLogActionEnums.SignIn.ToInt())
             {
                 logDesc = $"<b>{model.UserFullName}</b> {model.ActionName}";
@@ -233,10 +243,10 @@ namespace Web.Services.Concrete
                 {
                     var typeOfPrevObj = jobj1[p.Name].Type.ToString();
                     var typeOfUpdatedObj = jobj2[p.Name].Type.ToString();
-                    if(typeOfPrevObj != "Array" && typeOfUpdatedObj != "Array")
+                    if (typeOfPrevObj != "Array" && typeOfUpdatedObj != "Array")
                     {
-                    changedFields = changedFields != "" ? changedFields + ", " : changedFields;
-                    changedFields += $"{p.Name.SplitCamelCase()} {jobj1[p.Name]} to {jobj2[p.Name]}";
+                        changedFields = changedFields != "" ? changedFields + ", " : changedFields;
+                        changedFields += $"{p.Name.SplitCamelCase()} {jobj1[p.Name]} to {jobj2[p.Name]}";
                     }
 
                 }
@@ -251,6 +261,7 @@ namespace Web.Services.Concrete
             else if (model.Action == ActivityLogActionEnums.FileUpload.ToInt() || model.Action == ActivityLogActionEnums.FileDelete.ToInt())
             {
                 logDesc = $"<b>{model.UserFullName}</b> {model.ActionName} file in <b>{recordName}: {model.TablePrimaryKey}</b> {model.TableName}";
+            }
             }
             return logDesc;
         }
