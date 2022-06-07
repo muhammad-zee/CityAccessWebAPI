@@ -1290,7 +1290,7 @@ namespace Web.Services.Concrete
 
                 for (int i = 0; i < keys.Count; i++)
                 {
-                    if (keys[i] != $"code{keyValues["codeName"].ToString()}Id" && keys[i] != "destinationCoords" && keys[i] != "codeName" && keys[i] == "createdBy")
+                    if (keys[i] != $"code{keyValues["codeName"].ToString()}Id" && keys[i] != "destinationCoords" && keys[i] != "codeName" && keys[i] != "createdBy")
                     {
                         query += $"[{keys[i]}] = '{values[i]}'";
                         if (i < keys.Count)
