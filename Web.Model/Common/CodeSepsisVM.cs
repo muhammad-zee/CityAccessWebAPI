@@ -6,6 +6,7 @@ namespace Web.Model.Common
     public class CodeSepsisVM
     {
         public int CodeSepsisId { get; set; }
+        public long CodeSepsisNumber { get; set; }
         public string PatientName { get; set; }
         public DateTime? Dob { get; set; }
         public string DobStr { get; set; }

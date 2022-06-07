@@ -777,6 +777,7 @@ namespace Web.Services.Concrete
                             msg.author = "System";
                             msg.attributes = "";
                             msg.body = $"<strong> {consultType} {ServiceName} Consult</strong></br></br>";
+                            msg.body += $"<strong> Consult Number: </strong> {Consult_Counter} </br>";
                             if (keyValues.ContainsKey("PatientFirstName") && keyValues.ContainsKey("PatientLastName"))
                             {
                                 msg.body += $"<strong>Patient Name:</strong> {keyValues["PatientFirstName"].ToString()} {keyValues["PatientLastName"].ToString()} </br>";
@@ -869,6 +870,7 @@ namespace Web.Services.Concrete
                     msg.author = "System";
                     msg.attributes = "";
                     msg.body = $"<strong>{consultType} {ServiceName} Consult </strong> </br></br>";
+                    msg.body += $"<strong> Consult Number: </strong> {Consult_Counter} </br>";
                     if (keyValues.ContainsKey("PatientFirstName") && keyValues.ContainsKey("PatientLastName"))
                     {
                         msg.body += $"<strong>Patient Name:</strong> {keyValues["PatientFirstName"].ToString()} {keyValues["PatientLastName"].ToString()} </br>";

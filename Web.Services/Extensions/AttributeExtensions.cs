@@ -214,7 +214,7 @@ namespace Web.Services.Extensions
 
         public static List<int> ToIntList(this string commaSepratedString)
         {
-            if (!string.IsNullOrEmpty(commaSepratedString))
+            if (!string.IsNullOrEmpty(commaSepratedString) && !string.IsNullOrWhiteSpace(commaSepratedString))
             {
                 return commaSepratedString.Split(',').Select(int.Parse).ToList();
             }

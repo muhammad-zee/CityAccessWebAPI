@@ -6,6 +6,7 @@ namespace Web.Model.Common
     public class CodeSTEMIVM
     {
         public int CodeStemiid { get; set; }
+        public long CodeStemiNumber { get; set; }
         public string PatientName { get; set; }
         public string DobStr { get; set; }
         public DateTime? Dob { get; set; }

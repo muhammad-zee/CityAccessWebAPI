@@ -2279,7 +2279,7 @@ namespace Web.Services.Concrete
             if (UserChannelSid != null && UserChannelSid.Count > 0)
             {
                 string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
-                string friendlyName = codeStroke.IsEms.HasValue && codeStroke.IsEms.Value ? $"{UCLEnums.EMS.ToDescription()} {UCLEnums.Stroke.ToString()} {codeStroke.CodeStrokeId}" : $"{UCLEnums.InhouseCode.ToDescription()} {UCLEnums.Stroke.ToString()} {codeStroke.CodeStrokeId}";
+                string friendlyName = codeStroke.IsEms.HasValue && codeStroke.IsEms.Value ? $"{UCLEnums.EMS.ToDescription()} {UCLEnums.Stroke.ToString()} {codeStroke.CodeStrokeNumber}" : $"{UCLEnums.InhouseCode.ToDescription()} {UCLEnums.Stroke.ToString()} {codeStroke.CodeStrokeNumber}";
                 var channel = this._communicationService.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
                 var stroke = this._codeStrokeRepo.Table.Where(x => x.CodeStrokeId == codeStroke.CodeStrokeId && x.IsActive == true && !x.IsDeleted).FirstOrDefault();
                 if (stroke != null)
@@ -2317,6 +2317,7 @@ namespace Web.Services.Concrete
                 msg.author = "System";
                 msg.attributes = "";
                 msg.body = $"<strong> {(codeStroke.IsEms.HasValue && codeStroke.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription())} {UCLEnums.Stroke.ToString()} </strong></br></br>";
+                msg.body += $"<strong> Code Number: </strong> {codeStroke.CodeStrokeNumber} </br>";
                 if (codeStroke.PatientName != null && codeStroke.PatientName != "")
                     msg.body += $"<strong>Patient Name: </strong> {codeStroke.PatientName} </br>";
                 if (codeStroke.Dob != null)
@@ -3807,7 +3808,7 @@ namespace Web.Services.Concrete
             if (UserChannelSid != null && UserChannelSid.Count > 0)
             {
                 string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
-                string friendlyName = codeSepsis.IsEms ? $"{UCLEnums.EMS.ToDescription()} {UCLEnums.Sepsis.ToString()} {codeSepsis.CodeSepsisId}" : $"{UCLEnums.InhouseCode.ToDescription()} {UCLEnums.Sepsis.ToString()} {codeSepsis.CodeSepsisId}";
+                string friendlyName = codeSepsis.IsEms ? $"{UCLEnums.EMS.ToDescription()} {UCLEnums.Sepsis.ToString()} {codeSepsis.CodeSepsisNumber}" : $"{UCLEnums.InhouseCode.ToDescription()} {UCLEnums.Sepsis.ToString()} {codeSepsis.CodeSepsisNumber}";
                 var channel = _communicationService.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
                 var Sepsis = this._codeSepsisRepo.Table.Where(x => x.CodeSepsisId == codeSepsis.CodeSepsisId && x.IsActive == true && !x.IsDeleted).FirstOrDefault();
                 if (Sepsis != null)
@@ -3844,6 +3845,7 @@ namespace Web.Services.Concrete
                 msg.author = "System";
                 msg.attributes = "";
                 msg.body = $"<strong> {(codeSepsis.IsEms ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription())} {UCLEnums.Sepsis.ToString()} </strong></br></br>";
+                msg.body += $"<strong> Code Number: {codeSepsis.CodeSepsisNumber} </br>";
                 if (codeSepsis.PatientName != null && codeSepsis.PatientName != "")
                     msg.body += $"<strong>Patient Name: </strong> {codeSepsis.PatientName} </br>";
                 if (codeSepsis.Dob != null)
@@ -4884,7 +4886,7 @@ namespace Web.Services.Concrete
             if (UserChannelSid != null && UserChannelSid.Count > 0)
             {
                 string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
-                string friendlyName = codeSTEMI.IsEms.HasValue && codeSTEMI.IsEms.Value ? $"{UCLEnums.EMS.ToDescription()} {UCLEnums.Stemi.ToString()} {codeSTEMI.CodeStemiid}" : $"{UCLEnums.InhouseCode.ToDescription()} {UCLEnums.Stemi.ToString()} {codeSTEMI.CodeStemiid}";
+                string friendlyName = codeSTEMI.IsEms.HasValue && codeSTEMI.IsEms.Value ? $"{UCLEnums.EMS.ToDescription()} {UCLEnums.Stemi.ToString()} {codeSTEMI.CodeStemiNumber}" : $"{UCLEnums.InhouseCode.ToDescription()} {UCLEnums.Stemi.ToString()} {codeSTEMI.CodeStemiNumber}";
                 var channel = _communicationService.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
                 var STEMI = this._codeSTEMIRepo.Table.Where(x => x.CodeStemiid == codeSTEMI.CodeStemiid && x.IsActive == true && !x.IsDeleted).FirstOrDefault();
                 if (STEMI != null)
@@ -4921,6 +4923,7 @@ namespace Web.Services.Concrete
                 msg.author = "System";
                 msg.attributes = "";
                 msg.body = $"<strong> {(codeSTEMI.IsEms.HasValue && codeSTEMI.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription())} {UCLEnums.Stemi.ToString()} </strong></br></br>";
+                msg.body += $"<strong> Code Number: </Strong> {codeSTEMI.CodeStemiNumber} </br>";
                 if (codeSTEMI.PatientName != null && codeSTEMI.PatientName != "")
                     msg.body += $"<strong>Patient Name: </strong> {codeSTEMI.PatientName} </br>";
                 if (codeSTEMI.Dob != null)
@@ -6228,7 +6231,7 @@ namespace Web.Services.Concrete
             if (UserChannelSid != null && UserChannelSid.Count > 0)
             {
                 string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
-                string friendlyName = codeTruma.IsEms.HasValue && codeTruma.IsEms.Value ? $"{UCLEnums.EMS.ToDescription()} {UCLEnums.Trauma.ToString()} {codeTruma.CodeTraumaId}" : $"{UCLEnums.InhouseCode.ToDescription()} {UCLEnums.Trauma.ToString()} {codeTruma.CodeTraumaId}";
+                string friendlyName = codeTruma.IsEms.HasValue && codeTruma.IsEms.Value ? $"{UCLEnums.EMS.ToDescription()} {UCLEnums.Trauma.ToString()} {codeTruma.CodeTraumaNumber}" : $"{UCLEnums.InhouseCode.ToDescription()} {UCLEnums.Trauma.ToString()} {codeTruma.CodeTraumaNumber}";
                 var channel = _communicationService.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
                 var Truma = this._codeTrumaRepo.Table.Where(x => x.CodeTraumaId == codeTruma.CodeTraumaId && x.IsActive == true && !x.IsDeleted).FirstOrDefault();
                 if (Truma != null)
@@ -6265,6 +6268,7 @@ namespace Web.Services.Concrete
                 msg.author = "System";
                 msg.attributes = "";
                 msg.body = $"<strong> {(codeTruma.IsEms.HasValue && codeTruma.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription())} {UCLEnums.Trauma.ToString()} </strong></br></br>";
+                msg.body += $"<strong> Code Number: </strong> {codeTruma.CodeTraumaNumber} </br>";
                 if (codeTruma.PatientName != null && codeTruma.PatientName != "")
                     msg.body += $"<strong>Patient Name: </strong> {codeTruma.PatientName} </br>";
                 if (codeTruma.Dob != null)
@@ -7570,7 +7574,7 @@ namespace Web.Services.Concrete
             if (UserChannelSid != null && UserChannelSid.Count > 0)
             {
                 string uniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ApplicationSettings.UserId.ToString();
-                string friendlyName = codeBlue.IsEms.HasValue && codeBlue.IsEms.Value ? $"{UCLEnums.EMS.ToDescription()} {UCLEnums.Blue.ToString()} {codeBlue.CodeBlueId}" : $"{UCLEnums.InhouseCode.ToDescription()} {UCLEnums.Blue.ToString()} {codeBlue.CodeBlueId}";
+                string friendlyName = codeBlue.IsEms.HasValue && codeBlue.IsEms.Value ? $"{UCLEnums.EMS.ToDescription()} {UCLEnums.Blue.ToString()} {codeBlue.CodeBlueNumber}" : $"{UCLEnums.InhouseCode.ToDescription()} {UCLEnums.Blue.ToString()} {codeBlue.CodeBlueNumber}";
                 var channel = _communicationService.createConversationChannel(friendlyName, uniqueName, conversationChannelAttributes);
                 var Blue = this._codeBlueRepo.Table.Where(x => x.CodeBlueId == codeBlue.CodeBlueId && x.IsActive == true && !x.IsDeleted).FirstOrDefault();
                 if (Blue != null)
@@ -7607,6 +7611,7 @@ namespace Web.Services.Concrete
                 msg.author = "System";
                 msg.attributes = "";
                 msg.body = $"<strong> {(codeBlue.IsEms.HasValue && codeBlue.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription())} {UCLEnums.Blue.ToString()} </strong></br></br>";
+                msg.body += $"<strong> Code Number: </strong> {codeBlue.CodeBlueNumber} </br>";
                 if (codeBlue.PatientName != null && codeBlue.PatientName != "")
                     msg.body += $"<strong>Patient Name: </strong> {codeBlue.PatientName} </br>";
                 if (codeBlue.Dob != null)
