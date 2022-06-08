@@ -984,8 +984,8 @@ namespace Web.Data.Models
                     .HasDefaultValueSql("((1))");
 
                 entity.Property(e => e.LandlineNumber)
-                    .IsRequired()
-                    .HasMaxLength(50);
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
 
