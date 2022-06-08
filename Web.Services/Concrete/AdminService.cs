@@ -440,7 +440,7 @@ namespace Web.Services.Concrete
         }
         public IQueryable<Role> getScheduleRoleListByOrganizationId(int OrganizationId)
         {
-            var rolesList = this._role.Table.Where(item => item.OrganizationIdFk == OrganizationId && !item.IsDeleted && !item.IsSuperAdmin && item.IsScheduleRequired);
+            var rolesList = this._role.Table.Where(item => item.OrganizationIdFk == OrganizationId && item.IsActive == true && !item.IsDeleted && !item.IsSuperAdmin && item.IsScheduleRequired);
             //if (ApplicationSettings.isSuperAdmin)
             //{
             //    var superAdminRole = this._role.GetList().Where(item => item.RoleId == userRoleId);
@@ -454,7 +454,7 @@ namespace Web.Services.Concrete
             var ids = OrganizationIds.ToIntList();
             var roleList = (from r in this._role.Table
                             join org in this._organizationRepo.Table on r.OrganizationIdFk equals org.OrganizationId
-                            where ids.Contains(org.OrganizationId) && r.IsDeleted != true && org.IsDeleted != true
+                            where ids.Contains(org.OrganizationId) && r.IsDeleted != true && org.IsDeleted != true && r.IsActive == true && org.IsActive == true
                             select new Role()
                             {
                                 RoleId = r.RoleId,
@@ -478,7 +478,7 @@ namespace Web.Services.Concrete
         {
             var userRoles = (from ur in this._userRole.Table
                              join r in this._role.Table on ur.RoleIdFk equals r.RoleId
-                             where ur.UserIdFk == UserId && !r.IsDeleted
+                             where ur.UserIdFk == UserId && !r.IsDeleted && r.IsActive == true
                              select new UserRoleVM
                              {
                                  //UserRoleId = ur.UserRoleId,
