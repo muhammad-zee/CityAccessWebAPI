@@ -740,8 +740,8 @@ namespace Web.Services.Concrete
                     {
                         return new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "Old password and new password could not be same. Please update with new Password." };
                     }
-                    user.TwoFactorEnabled = OrgSettings.TwoFactorEnable;
-                    user.TwoFactorExpiryDate = OrgSettings.TwoFactorAuthenticationExpiryMinutes > 0 ? DateTime.UtcNow.AddMinutes(OrgSettings.TwoFactorAuthenticationExpiryMinutes) : user.TwoFactorExpiryDate;
+                    //user.TwoFactorEnabled = OrgSettings.TwoFactorEnable;
+                    //user.TwoFactorExpiryDate = OrgSettings.TwoFactorAuthenticationExpiryMinutes > 0 ? DateTime.UtcNow.AddMinutes(OrgSettings.TwoFactorAuthenticationExpiryMinutes) : user.TwoFactorExpiryDate;
                     user.PasswordExpiryDate = passwordExpiryDate;
                     user.Password = changePassword.NewPassword;
                     user.ModifiedBy = ApplicationSettings.UserId;
@@ -756,8 +756,8 @@ namespace Web.Services.Concrete
             }
             else
             {
-                user.TwoFactorEnabled = OrgSettings.TwoFactorEnable;
-                user.TwoFactorExpiryDate = OrgSettings.TwoFactorAuthenticationExpiryMinutes > 0 ? DateTime.UtcNow.AddMinutes(OrgSettings.TwoFactorAuthenticationExpiryMinutes) : user.TwoFactorExpiryDate;
+                //user.TwoFactorEnabled = OrgSettings.TwoFactorEnable;
+                //user.TwoFactorExpiryDate = OrgSettings.TwoFactorAuthenticationExpiryMinutes > 0 ? DateTime.UtcNow.AddMinutes(OrgSettings.TwoFactorAuthenticationExpiryMinutes) : user.TwoFactorExpiryDate;
                 user.PasswordExpiryDate = passwordExpiryDate;
                 user.IsRequirePasswordReset = true;
                 user.Password = changePassword.NewPassword;
