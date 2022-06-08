@@ -462,7 +462,7 @@ namespace Web.Services.Concrete
             if (key == "qw4hddqcrg")
             {
                 TwilioClient.Init(this.Twilio_AccountSid, this.Twilio_AuthToken);
-                var channels = ChannelResource.Read(pathServiceSid: this.Twilio_ChatServiceSid);
+                var channels = ChannelResource.Read(pathServiceSid: this.Twilio_ChatServiceSid,pageSize:50);
                 foreach (var ch in channels)
                 {
                     var delete = ChannelResource.Delete(pathServiceSid: this.Twilio_ChatServiceSid, pathSid: ch.Sid);
