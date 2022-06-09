@@ -325,7 +325,7 @@ namespace Web.Services.Concrete
                                 }).ToList();
                 this._scheduleRepo.Insert(scheduleList);
                 //this._dbContext.Log()
-                foreach(var inserttedRecord in scheduleList)
+                foreach (var inserttedRecord in scheduleList)
                 {
                     saveScheduleLog(inserttedRecord, ActivityLogActionEnums.Create.ToInt());
                 }
@@ -414,11 +414,9 @@ namespace Web.Services.Concrete
                 if (row != null)
                 {
 
-                    if (this._scheduleRepo.Table.Any(x => x.UserIdFk == row.UserIdFk && x.ServiceLineIdFk == row.ServiceLineIdFk && x.RoleIdFk ==row.RoleIdFk && !x.IsDeleted
-                        && ((x.ScheduleDateStart <= row.ScheduleDateStart && x.ScheduleDateEnd >= row.ScheduleDateStart) || (x.ScheduleDateStart <=row.ScheduleDateEnd && x.ScheduleDateEnd >= row.ScheduleDateEnd))))
+                    if (this._scheduleRepo.Table.Any(x => x.UserIdFk == row.UserIdFk && x.ServiceLineIdFk == row.ServiceLineIdFk && x.RoleIdFk == row.RoleIdFk && !x.IsDeleted
+                        && ((x.ScheduleDateStart <= row.ScheduleDateStart && x.ScheduleDateEnd >= row.ScheduleDateStart) || (x.ScheduleDateStart <= row.ScheduleDateEnd && x.ScheduleDateEnd >= row.ScheduleDateEnd))))
                     {
-                    //    if (!_scheduleRepo.Table.Any(x => x.ScheduleDate.Value.Date == schedule.FromDate.Date && x.ServiceLineIdFk == row.ServiceLineIdFk && x.RoleIdFk == row.RoleIdFk && x.UserIdFk == row.UserIdFk && !x.IsDeleted && schedule.ScheduleId != x.UsersScheduleId))
-                    //{
                         string startDateTimeStr = schedule.FromDate.ToString("MM-dd-yyyy") + " " + schedule.StartTime.ToString("hh:mm:ss tt");
                         string endDateTimeStr = schedule.ToDate.ToString("MM-dd-yyyy") + " " + schedule.EndTime.ToString("hh:mm:ss tt");
 
@@ -455,8 +453,10 @@ namespace Web.Services.Concrete
             else
             {
                 List<UsersSchedule> usersSchedules = new();
+                string errorMsg = string.Empty;
                 var userIds = schedule.UserIdFk.ToIntList();
                 var roleIds = schedule.RoleIdFk.ToIntList();
+                var usersList = this._userRepo.Table.Where(u => userIds.Contains(u.UserId)).Select(u => new { u.UserId, Name = $"{u.FirstName} {u.LastName}" }).ToList();
                 int count = 0;
                 var weekDays = schedule.WeekDays.Split(",");
                 if (schedule.DateRangeId == 2)  // For Daily
@@ -493,12 +493,16 @@ namespace Web.Services.Concrete
                             {
                                 foreach (var role in roleIds)
                                 {
-                                    var alreadyExist = _scheduleRepo.Table.Where(x => x.UserIdFk == user && x.RoleIdFk == role && x.ServiceLineIdFk == schedule.ServiceLineIdFk && x.ScheduleDate.Value.Date == StartDateTime.Value.Date && !x.IsDeleted).ToList();
+                                    var alreadyExist = _scheduleRepo.Table.Where(x => x.UserIdFk == user && x.RoleIdFk == role && x.ServiceLineIdFk == schedule.ServiceLineIdFk && ((x.ScheduleDateStart <= StartDateTime && x.ScheduleDateEnd >= StartDateTime) || (x.ScheduleDateStart <= EndDateTime && x.ScheduleDateEnd >= EndDateTime)) && !x.IsDeleted).ToList();
                                     if (alreadyExist.Count > 0)
                                     {
-                                        alreadyExist.ForEach(x => { x.IsDeleted = true; x.ModifiedBy = schedule.CreatedBy; x.ModifiedDate = DateTime.UtcNow; });
-                                        _scheduleRepo.Update(alreadyExist);
+                                        //alreadyExist.ForEach(x => { x.IsDeleted = true; x.ModifiedBy = schedule.CreatedBy; x.ModifiedDate = DateTime.UtcNow; });
+                                        //_scheduleRepo.Update(alreadyExist);
+                                        string name = usersList.Where(x => x.UserId == user).Select(x => x.Name).FirstOrDefault();
+                                        errorMsg += Environment.NewLine + $"Schedule of {name} is already exist on " + StartDateTime.Value.Date.ToString("MM-dd-yyyy");
+                                        //usersList.RemoveAll(x => x.UserId == user);
                                     }
+                                    else
                                     if (_userRelationRepo.Table.Any(x => x.UserIdFk == user && x.ServiceLineIdFk == schedule.ServiceLineIdFk) && _userRoleRepo.Table.Any(x => x.UserIdFk == user && x.RoleIdFk == role))
                                     {
                                         var userSchedule = new UsersSchedule()
@@ -565,13 +569,16 @@ namespace Web.Services.Concrete
                                 {
                                     foreach (var role in roleIds)
                                     {
-                                        var alreadyExist = _scheduleRepo.Table.Where(x => x.UserIdFk == user && x.RoleIdFk == role && x.ServiceLineIdFk == schedule.ServiceLineIdFk && x.ScheduleDate.Value.Date == StartDateTime.Value.Date && !x.IsDeleted).ToList();
+                                        var alreadyExist = _scheduleRepo.Table.Where(x => x.UserIdFk == user && x.RoleIdFk == role && x.ServiceLineIdFk == schedule.ServiceLineIdFk && ((x.ScheduleDateStart <= StartDateTime && x.ScheduleDateEnd >= StartDateTime) || (x.ScheduleDateStart <= EndDateTime && x.ScheduleDateEnd >= EndDateTime)) && !x.IsDeleted).ToList();
                                         if (alreadyExist.Count > 0)
                                         {
-                                            alreadyExist.ForEach(x => { x.IsDeleted = true; x.ModifiedBy = schedule.CreatedBy; x.ModifiedDate = DateTime.UtcNow; });
-                                            _scheduleRepo.Update(alreadyExist);
+                                            //alreadyExist.ForEach(x => { x.IsDeleted = true; x.ModifiedBy = schedule.CreatedBy; x.ModifiedDate = DateTime.UtcNow; });
+                                            //_scheduleRepo.Update(alreadyExist);
+                                            string name = usersList.Where(x => x.UserId == user).Select(x => x.Name).FirstOrDefault();
+                                            errorMsg += Environment.NewLine + $"Schedule of {name} is already exist on " + StartDateTime.Value.Date.ToString("MM-dd-yyyy");
+                                            usersList.RemoveAll(x => x.UserId == user);
                                         }
-
+                                        else
                                         if (_userRelationRepo.Table.Any(x => x.UserIdFk == user && x.ServiceLineIdFk == schedule.ServiceLineIdFk) && _userRoleRepo.Table.Any(x => x.UserIdFk == user && x.RoleIdFk == role))
                                         {
                                             var userSchedule = new UsersSchedule()
@@ -622,12 +629,16 @@ namespace Web.Services.Concrete
                             {
                                 foreach (var role in roleIds)
                                 {
-                                    var alreadyExist = _scheduleRepo.Table.Where(x => x.UserIdFk == user && x.RoleIdFk == role && x.ServiceLineIdFk == schedule.ServiceLineIdFk && x.ScheduleDate.Value.Date == StartDateTime.Value.Date && !x.IsDeleted).ToList();
+                                    var alreadyExist = _scheduleRepo.Table.Where(x => x.UserIdFk == user && x.RoleIdFk == role && x.ServiceLineIdFk == schedule.ServiceLineIdFk && ((x.ScheduleDateStart <= StartDateTime && x.ScheduleDateEnd >= StartDateTime) || (x.ScheduleDateStart <= EndDateTime && x.ScheduleDateEnd >= EndDateTime)) && !x.IsDeleted).ToList();
                                     if (alreadyExist.Count > 0)
                                     {
-                                        alreadyExist.ForEach(x => { x.IsDeleted = true; x.ModifiedBy = schedule.CreatedBy; x.ModifiedDate = DateTime.UtcNow; });
-                                        _scheduleRepo.Update(alreadyExist);
+                                        //alreadyExist.ForEach(x => { x.IsDeleted = true; x.ModifiedBy = schedule.CreatedBy; x.ModifiedDate = DateTime.UtcNow; });
+                                        //_scheduleRepo.Update(alreadyExist);
+                                        string name = usersList.Where(x => x.UserId == user).Select(x => x.Name).FirstOrDefault();
+                                        errorMsg += Environment.NewLine + $"Schedule of {name} is already exist on " + StartDateTime.Value.Date.ToString("MM-dd-yyyy");
+                                        usersList.RemoveAll(x => x.UserId == user);
                                     }
+                                    else
                                     if (_userRelationRepo.Table.Any(x => x.UserIdFk == user && x.ServiceLineIdFk == schedule.ServiceLineIdFk) && _userRoleRepo.Table.Any(x => x.UserIdFk == user && x.RoleIdFk == role))
                                     {
                                         var userSchedule = new UsersSchedule()
@@ -733,12 +744,16 @@ namespace Web.Services.Concrete
                             {
                                 foreach (var role in roleIds)
                                 {
-                                    var alreadyExist = _scheduleRepo.Table.Where(x => x.UserIdFk == user && x.RoleIdFk == role && x.ServiceLineIdFk == schedule.ServiceLineIdFk && x.ScheduleDate.Value.Date == StartDateTime.Value.Date && !x.IsDeleted).ToList();
+                                    var alreadyExist = _scheduleRepo.Table.Where(x => x.UserIdFk == user && x.RoleIdFk == role && x.ServiceLineIdFk == schedule.ServiceLineIdFk && ((x.ScheduleDateStart <= StartDateTime && x.ScheduleDateEnd >= StartDateTime) || (x.ScheduleDateStart <= EndDateTime && x.ScheduleDateEnd >= EndDateTime)) && !x.IsDeleted).ToList();
                                     if (alreadyExist.Count > 0)
                                     {
-                                        alreadyExist.ForEach(x => { x.IsDeleted = true; x.ModifiedBy = schedule.CreatedBy; x.ModifiedDate = DateTime.UtcNow; });
-                                        _scheduleRepo.Update(alreadyExist);
+                                        //alreadyExist.ForEach(x => { x.IsDeleted = true; x.ModifiedBy = schedule.CreatedBy; x.ModifiedDate = DateTime.UtcNow; });
+                                        //_scheduleRepo.Update(alreadyExist);
+                                        string name = usersList.Where(x => x.UserId == user).Select(x => x.Name).FirstOrDefault();
+                                        errorMsg += Environment.NewLine + $"Schedule of {name} is already exist on " + StartDateTime.Value.Date.ToString("MM-dd-yyyy");
+                                        usersList.RemoveAll(x => x.UserId == user);
                                     }
+                                    else
                                     if (_userRelationRepo.Table.Any(x => x.UserIdFk == user && x.ServiceLineIdFk == schedule.ServiceLineIdFk) && _userRoleRepo.Table.Any(x => x.UserIdFk == user && x.RoleIdFk == role))
                                     {
                                         var userSchedule = new UsersSchedule()
@@ -781,16 +796,21 @@ namespace Web.Services.Concrete
                     {
                         EndDateTime = EndDateTime.Value.AddDays(1);
                     }
+
                     foreach (var user in userIds)
                     {
                         foreach (var role in roleIds)
                         {
-                            var alreadyExist = _scheduleRepo.Table.Where(x => x.UserIdFk == user && x.RoleIdFk == role && x.ServiceLineIdFk == schedule.ServiceLineIdFk && x.ScheduleDate.Value.Date == StartDateTime.Value.Date && !x.IsDeleted).ToList();
+                            var alreadyExist = _scheduleRepo.Table.Where(x => x.UserIdFk == user && x.RoleIdFk == role && x.ServiceLineIdFk == schedule.ServiceLineIdFk && ((x.ScheduleDateStart <= StartDateTime && x.ScheduleDateEnd >= StartDateTime) || (x.ScheduleDateStart <= EndDateTime && x.ScheduleDateEnd >= EndDateTime)) && !x.IsDeleted).ToList();
                             if (alreadyExist.Count > 0)
                             {
-                                alreadyExist.ForEach(x => { x.IsDeleted = true; x.ModifiedBy = schedule.CreatedBy; x.ModifiedDate = DateTime.UtcNow; });
-                                _scheduleRepo.Update(alreadyExist);
+                                //alreadyExist.ForEach(x => { x.IsDeleted = true; x.ModifiedBy = schedule.CreatedBy; x.ModifiedDate = DateTime.UtcNow; });
+                                //_scheduleRepo.Update(alreadyExist);
+                                string name = usersList.Where(x => x.UserId == user).Select(x => x.Name).FirstOrDefault();
+                                errorMsg += Environment.NewLine + $"Schedule of {name} is already exist on " + StartDateTime.Value.Date.ToString("MM-dd-yyyy");
+                                usersList.RemoveAll(x => x.UserId == user);
                             }
+                            else
                             if (_userRelationRepo.Table.Any(x => x.UserIdFk == user && x.ServiceLineIdFk == schedule.ServiceLineIdFk) && _userRoleRepo.Table.Any(x => x.UserIdFk == user && x.RoleIdFk == role))
                             {
                                 var userSchedule = new UsersSchedule()
@@ -817,16 +837,23 @@ namespace Web.Services.Concrete
                 {
                     _scheduleRepo.Insert(usersSchedules);
 
-                       var serviceName = this._serviceRepo.Table.Where(s => s.ServiceLineId == schedule.ServiceLineIdFk).Select(s => s.ServiceName).FirstOrDefault();
-                    var users = this._userRepo.Table.Where(u => usersSchedules.Select(s => s.UserIdFk).Contains(u.UserId)).Select(u=>$"{u.FirstName} {u.LastName}").ToArray().Aggregate((a, b) => a+ ", " +b);
+                    var serviceName = this._serviceRepo.Table.Where(s => s.ServiceLineId == schedule.ServiceLineIdFk).Select(s => s.ServiceName).FirstOrDefault();
+                    var users = this._userRepo.Table.Where(u => usersSchedules.Select(x => x.UserIdFk).Contains(u.UserId)).Select(u => $"{u.FirstName} {u.LastName}").ToArray().Aggregate((a, b) => a + ", " + b);
 
                     var logDesc = $"schedule of {users} for {serviceName}";
                     this._dbContext.Log(new { }, ActivityLogTableEnums.UsersSchedule.ToString(), 0, ActivityLogActionEnums.Create.ToInt(), null, logDesc);
-                    return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Schedule Created" };
+
+                    if (!string.IsNullOrEmpty(errorMsg) && !string.IsNullOrWhiteSpace(errorMsg))
+                        return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = errorMsg };
+                    else
+                        return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Schedule Created" };
                 }
                 else
                 {
-                    return new BaseResponse() { Status = HttpStatusCode.NotModified, Message = "Schedule Not Created" };
+                    if (!string.IsNullOrEmpty(errorMsg) && !string.IsNullOrWhiteSpace(errorMsg))
+                        return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = errorMsg };
+                    else
+                        return new BaseResponse() { Status = HttpStatusCode.NotModified, Message = "Schedule Not Created" };
                 }
             }
 
@@ -851,10 +878,10 @@ namespace Web.Services.Concrete
             }
         }
 
-        public void saveScheduleLog(UsersSchedule schedule,int action)
+        public void saveScheduleLog(UsersSchedule schedule, int action)
         {
             var selectedUserFullName = this._userRepo.Table.Where(u => u.UserId == schedule.UserIdFk).Select(u => $"{u.FirstName} {u.LastName}").FirstOrDefault();
-             var serviceName = this._serviceRepo.Table.Where(s => s.ServiceLineId == schedule.ServiceLineIdFk).Select(s => s.ServiceName).FirstOrDefault();
+            var serviceName = this._serviceRepo.Table.Where(s => s.ServiceLineId == schedule.ServiceLineIdFk).Select(s => s.ServiceName).FirstOrDefault();
             var logDesc = $"schedule of {selectedUserFullName} for {serviceName} from {schedule.ScheduleDateStart.ToString()} to {schedule.ScheduleDateStart.ToString()}";
             this._dbContext.Log(schedule, ActivityLogTableEnums.UsersSchedule.ToString(), schedule.UsersScheduleId, action, null, logDesc);
         }
