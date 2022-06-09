@@ -499,7 +499,7 @@ namespace Web.Services.Concrete
                                         //alreadyExist.ForEach(x => { x.IsDeleted = true; x.ModifiedBy = schedule.CreatedBy; x.ModifiedDate = DateTime.UtcNow; });
                                         //_scheduleRepo.Update(alreadyExist);
                                         string name = usersList.Where(x => x.UserId == user).Select(x => x.Name).FirstOrDefault();
-                                        errorMsg += Environment.NewLine + $"Schedule of {name} is already exist on " + StartDateTime.Value.Date.ToString("MM-dd-yyyy");
+                                        errorMsg += $"Schedule of {name} is already exist on " + StartDateTime.Value.Date.ToString("MM-dd-yyyy") + Environment.NewLine;
                                         //usersList.RemoveAll(x => x.UserId == user);
                                     }
                                     else
@@ -575,7 +575,7 @@ namespace Web.Services.Concrete
                                             //alreadyExist.ForEach(x => { x.IsDeleted = true; x.ModifiedBy = schedule.CreatedBy; x.ModifiedDate = DateTime.UtcNow; });
                                             //_scheduleRepo.Update(alreadyExist);
                                             string name = usersList.Where(x => x.UserId == user).Select(x => x.Name).FirstOrDefault();
-                                            errorMsg += Environment.NewLine + $"Schedule of {name} is already exist on " + StartDateTime.Value.Date.ToString("MM-dd-yyyy");
+                                            errorMsg += $"Schedule of {name} is already exist on " + StartDateTime.Value.Date.ToString("MM-dd-yyyy") + Environment.NewLine;
                                             usersList.RemoveAll(x => x.UserId == user);
                                         }
                                         else
@@ -635,7 +635,7 @@ namespace Web.Services.Concrete
                                         //alreadyExist.ForEach(x => { x.IsDeleted = true; x.ModifiedBy = schedule.CreatedBy; x.ModifiedDate = DateTime.UtcNow; });
                                         //_scheduleRepo.Update(alreadyExist);
                                         string name = usersList.Where(x => x.UserId == user).Select(x => x.Name).FirstOrDefault();
-                                        errorMsg += Environment.NewLine + $"Schedule of {name} is already exist on " + StartDateTime.Value.Date.ToString("MM-dd-yyyy");
+                                        errorMsg += $"Schedule of {name} is already exist on " + StartDateTime.Value.Date.ToString("MM-dd-yyyy") + Environment.NewLine;
                                         usersList.RemoveAll(x => x.UserId == user);
                                     }
                                     else
@@ -750,7 +750,7 @@ namespace Web.Services.Concrete
                                         //alreadyExist.ForEach(x => { x.IsDeleted = true; x.ModifiedBy = schedule.CreatedBy; x.ModifiedDate = DateTime.UtcNow; });
                                         //_scheduleRepo.Update(alreadyExist);
                                         string name = usersList.Where(x => x.UserId == user).Select(x => x.Name).FirstOrDefault();
-                                        errorMsg += Environment.NewLine + $"Schedule of {name} is already exist on " + StartDateTime.Value.Date.ToString("MM-dd-yyyy");
+                                        errorMsg += $"Schedule of {name} is already exist on " + StartDateTime.Value.Date.ToString("MM-dd-yyyy") + Environment.NewLine;
                                         usersList.RemoveAll(x => x.UserId == user);
                                     }
                                     else
@@ -807,7 +807,7 @@ namespace Web.Services.Concrete
                                 //alreadyExist.ForEach(x => { x.IsDeleted = true; x.ModifiedBy = schedule.CreatedBy; x.ModifiedDate = DateTime.UtcNow; });
                                 //_scheduleRepo.Update(alreadyExist);
                                 string name = usersList.Where(x => x.UserId == user).Select(x => x.Name).FirstOrDefault();
-                                errorMsg += Environment.NewLine + $"Schedule of {name} is already exist on " + StartDateTime.Value.Date.ToString("MM-dd-yyyy");
+                                errorMsg += $"Schedule of {name} is already exist on " + StartDateTime.Value.Date.ToString("MM-dd-yyyy") + Environment.NewLine;
                                 usersList.RemoveAll(x => x.UserId == user);
                             }
                             else
