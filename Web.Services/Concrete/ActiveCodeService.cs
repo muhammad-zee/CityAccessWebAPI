@@ -995,22 +995,24 @@ namespace Web.Services.Concrete
 
 
                     this._dbContext.Log(checkDifference.updatedRecord, tbl_Name, row.CodeNumber, ActivityLogActionEnums.Update.ToInt(), checkDifference.previousRecord);
-                    //var userIds = this._StrokeCodeGroupMembersRepo.Table.Where(x => x.StrokeCodeIdFk == codeId).Select(x => x.UserIdFk).ToList();
-
-                    //string qry = $"Select UserIdFk From Code{codeName}GroupMembers where {codeName}CodeIdFk = {codeId}";
-                    //var userIds = this._dbContext.LoadSQLQuery(qry).ExecuteStoredProc<CodeStrokeGroupMember>().Select(x => x.UserIdFk).ToList();
-
-                    //var userUniqueIds = this._userRepo.Table.Where(x => userIds.Contains(x.UserId)).Select(x => x.UserUniqueId).Distinct().ToList();
-                    //var superAdmins = this._userRepo.Table.Where(x => x.IsInGroup && !x.IsDeleted).Select(x => x.UserUniqueId).ToList();
-                    //userUniqueIds.AddRange(superAdmins);
-                    //var loggedUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => x.UserUniqueId).FirstOrDefault();
-                    //userUniqueIds.Add(loggedUser);
-
+                  
                     var userUniqueIds = this._dbContext.LoadStoredProcedure("md_getUserUniqueIdsByCodeId")
                                                         .WithSqlParam("@userId", ApplicationSettings.UserId)
                                                         .WithSqlParam("@codeId", codeId)
                                                         .WithSqlParam("@codeName", codeName)
                                                         .ExecuteStoredProc<User>().Select(x => x.UserUniqueId).ToList();
+
+                    if (codeData.ContainsKey("IsComplete") && codeData["IsCompleted"].ToString().ToBool()) 
+                    {
+                        var msg = new ConversationMessageVM()
+                        {
+                            channelSid = row.ChannelSid,
+                            author = "System",
+                            attributes = "",
+                            body = "EMS has been reached"
+                        };
+                        var channel = _communicationService.sendPushNotification(msg);
+                    }
 
                     var notification = new PushNotificationVM()
                     {
@@ -1275,7 +1277,6 @@ namespace Web.Services.Concrete
             }
 
         }
-
         public BaseResponse UpdateEMSAmbulanceData(IDictionary<string, object> keyValues)
         {
             if (keyValues.ContainsKey($"code{keyValues["codeName"].ToString()}Id") && keyValues[$"code{keyValues["codeName"].ToString()}Id"].ToString().ToInt() > 0)

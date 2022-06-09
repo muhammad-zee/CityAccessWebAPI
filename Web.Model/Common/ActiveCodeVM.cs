@@ -48,11 +48,12 @@ namespace Web.Model.Common
     {
         public int OrganizationIdFk { get; set; }
         public int UserIdFk { get; set; }
-public int CodeId {get; set;}
-public int CodeNumber {get; set;}
-public bool? IsEms {get; set;}
-public string UpdatedValue { get; set;}
-public string PreviousValue { get; set;}
+        public int CodeId { get; set; }
+        public int CodeNumber { get; set; }
+        public bool? IsEms { get; set; }
+        public string ChannelSid { get; set; }
+        public string UpdatedValue { get; set; }
+        public string PreviousValue { get; set; }
 
     }
 }
