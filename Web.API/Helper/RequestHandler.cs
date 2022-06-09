@@ -27,8 +27,6 @@ namespace Web.API.Helper
 
         public override void OnActionExecuting(ActionExecutingContext context)
         {
-
-
             var userIP = context.HttpContext.Connection.RemoteIpAddress.ToString();
             var user = context.HttpContext.User;
             StringValues timeZone;
@@ -69,29 +67,38 @@ namespace Web.API.Helper
 
             ///////////////////////// Check for Components Access //////////////////////////////////////////////////////
 
-            var authorized = context.Controller.GetType().GetCustomAttributes<AuthorizeAttribute>().Any();
+            var controllerAuthorized = context.Controller.GetType().GetCustomAttributes<AuthorizeAttribute>().Any();
+            var methodAuthorized = context.ActionDescriptor.GetType().GetCustomAttributes(typeof(AuthorizeAttribute), true).Any();
             var componentSerializeObj = Encryption.decryptData(componentObjHEX.ToString(), key);
-            if (!ApplicationSettings.isSuperAdmin && authorized)
+            if (!ApplicationSettings.isSuperAdmin && controllerAuthorized)
             {
-                if (componentSerializeObj != null)
+                if (!methodAuthorized)
                 {
-                    var jobj = JObject.Parse(componentSerializeObj);
-                    var componentId = jobj["componentId"].ToString().ToInt();
-                    var bypassAccessCheck = jobj["bypassAccessCheck"].ToString().ToBool();
-                    if (!bypassAccessCheck)
-                    {
-                        if (!userAccess.Any(x => x == componentId))
-                        {
-                            context.HttpContext.Response.StatusCode = 401;
-                            context.Result = new UnauthorizedResult();
-                        }
-                    }
+                    base.OnActionExecuting(context);
                 }
                 else
                 {
-                    context.HttpContext.Response.StatusCode = 401;
-                    context.Result = new UnauthorizedResult();
+                    if (componentSerializeObj != null)
+                    {
+                        var jobj = JObject.Parse(componentSerializeObj);
+                        var componentId = jobj["componentId"].ToString().ToInt();
+                        var bypassAccessCheck = jobj["bypassAccessCheck"].ToString().ToBool();
+                        if (!bypassAccessCheck)
+                        {
+                            if (!userAccess.Any(x => x == componentId))
+                            {
+                                context.HttpContext.Response.StatusCode = 401;
+                                context.Result = new UnauthorizedResult();
+                            }
+                        }
+                    }
+                    else
+                    {
+                        context.HttpContext.Response.StatusCode = 401;
+                        context.Result = new UnauthorizedResult();
+                    }
                 }
+
             }
             else
             {
@@ -102,4 +109,5 @@ namespace Web.API.Helper
         }
 
     }
+
 }
