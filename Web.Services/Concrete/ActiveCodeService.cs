@@ -1002,8 +1002,24 @@ namespace Web.Services.Concrete
                                                         .WithSqlParam("@codeName", codeName)
                                                         .ExecuteStoredProc<User>().Select(x => x.UserUniqueId).ToList();
 
-                    if (codeData.ContainsKey("IsComplete") && codeData["IsCompleted"].ToString().ToBool()) 
+                    if (codeData.ContainsKey("IsComplete") && codeData["IsCompleted"].ToString().ToBool())
                     {
+                        var notification = new PushNotificationVM()
+                        {
+                            Id = codeId,
+                            OrgId = row.OrganizationIdFk,
+                            FieldName = fieldName,
+                            FieldDataType = fieldDataType,
+                            FieldValue = new { IsCompleted = fieldValue, Msg = $"EMS of {row.PatientName} has been reached" },
+                            UserChannelSid = userUniqueIds.Distinct().ToList(),
+                            From = codeName,
+                            Msg = (row.IsEms != null && row.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription()) + $" {codeName} Form is Changed",
+                            RouteLink1 = ($"Code{codeName}Form").GetEnumDescription<RouteEnums>(),
+                            RouteLink2 = ($"EMSForms").GetEnumDescription<RouteEnums>()
+                        };
+
+                        _communicationService.pushNotification(notification);
+
                         var msg = new ConversationMessageVM()
                         {
                             channelSid = row.ChannelSid,
@@ -1013,23 +1029,23 @@ namespace Web.Services.Concrete
                         };
                         var channel = _communicationService.sendPushNotification(msg);
                     }
+                    else {
+                        var notification = new PushNotificationVM()
+                        {
+                            Id = codeId,
+                            OrgId = row.OrganizationIdFk,
+                            FieldName = fieldName,
+                            FieldDataType = fieldDataType,
+                            FieldValue = fieldValue,
+                            UserChannelSid = userUniqueIds.Distinct().ToList(),
+                            From = codeName,
+                            Msg = (row.IsEms != null && row.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription()) + $" {codeName} Form is Changed",
+                            RouteLink1 = ($"Code{codeName}Form").GetEnumDescription<RouteEnums>(), //RouteEnums.CodeStrokeForm.ToDescription(), // "/Home/Inhouse%20Codes/code-strok-form",
+                            RouteLink2 = ($"EMSForms").GetEnumDescription<RouteEnums>() //RouteEnums.EMSForms.ToDescription(), // RouteEnums.EMSForms.ToDescription(),
+                        };
 
-                    var notification = new PushNotificationVM()
-                    {
-                        Id = codeId,
-                        OrgId = row.OrganizationIdFk,
-                        FieldName = fieldName,
-                        FieldDataType = fieldDataType,
-                        FieldValue = fieldValue,
-                        UserChannelSid = userUniqueIds.Distinct().ToList(),
-                        From = codeName,
-                        Msg = (row.IsEms != null && row.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription()) + $" {codeName} Form is Changed",
-                        RouteLink1 = ($"Code{codeName}Form").GetEnumDescription<RouteEnums>(), //RouteEnums.CodeStrokeForm.ToDescription(), // "/Home/Inhouse%20Codes/code-strok-form",
-                        RouteLink2 = ($"EMSForms").GetEnumDescription<RouteEnums>() //RouteEnums.EMSForms.ToDescription(), // RouteEnums.EMSForms.ToDescription(),
-                    };
-
-                    _communicationService.pushNotification(notification);
-
+                        _communicationService.pushNotification(notification);
+                    }
                     return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Updated Successfully" };
                 }
                 else

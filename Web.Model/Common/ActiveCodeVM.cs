@@ -52,6 +52,7 @@ namespace Web.Model.Common
         public int CodeNumber { get; set; }
         public bool? IsEms { get; set; }
         public string ChannelSid { get; set; }
+        public string PatientName { get; set; }
         public string UpdatedValue { get; set; }
         public string PreviousValue { get; set; }
 
