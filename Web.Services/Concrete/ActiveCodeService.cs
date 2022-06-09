@@ -1010,7 +1010,7 @@ namespace Web.Services.Concrete
                             OrgId = row.OrganizationIdFk,
                             FieldName = fieldName,
                             FieldDataType = fieldDataType,
-                            FieldValue = new { IsCompleted = fieldValue, Msg = $"EMS of {row.PatientName} has been reached" },
+                            FieldValue = new { IsCompleted = fieldValue, Msg = $"EMS of {row.PatientName}-{row.CodeNumber} has been reached" },
                             UserChannelSid = userUniqueIds.Distinct().ToList(),
                             From = codeName,
                             Msg = (row.IsEms != null && row.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription()) + $" {codeName} Form is Changed",

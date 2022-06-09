@@ -321,22 +321,22 @@ namespace Web.Services.Concrete
 
             if (fields.FieldName != null && fields.FieldName != null)
             {
-              var consultData = _dbContext.LoadStoredProcedure("md_getGetConsultsByServiceLineId_Daynamic")
-                                        .WithSqlParam("@status", consult.Status)
-                                        .WithSqlParam("@colName", fields.FieldName)
-                                        .WithSqlParam("@organizationId", consult.OrganizationId)
-                                        .WithSqlParam("@departmentIds", consult.DepartmentIds)
-                                        .WithSqlParam("@serviceLineIds", consult.ServiceLineIds)
-                                        .WithSqlParam("@userId", ApplicationSettings.UserId)
-                                        .WithSqlParam("@showAllConsults", consult.showAllConsults)
-                                        .WithSqlParam("@isFromDashboard", consult.IsFromDashboard)
+                var consultData = _dbContext.LoadStoredProcedure("md_getGetConsultsByServiceLineId_Daynamic")
+                                          .WithSqlParam("@status", consult.Status)
+                                          .WithSqlParam("@colName", fields.FieldName)
+                                          .WithSqlParam("@organizationId", consult.OrganizationId)
+                                          .WithSqlParam("@departmentIds", consult.DepartmentIds)
+                                          .WithSqlParam("@serviceLineIds", consult.ServiceLineIds)
+                                          .WithSqlParam("@userId", ApplicationSettings.UserId)
+                                          .WithSqlParam("@showAllConsults", consult.showAllConsults)
+                                          .WithSqlParam("@isFromDashboard", consult.IsFromDashboard)
 
-                                        .WithSqlParam("@page", consult.PageNumber)
-                                        .WithSqlParam("@size", consult.Rows)
-                                        .WithSqlParam("@sortOrder", consult.sortOrder)
-                                        .WithSqlParam("@sortCol", consult.SortCol)
-                                        .WithSqlParam("@filterVal", consult.FilterVal)
-                                        .ExecuteStoredProc_ToDictionary();
+                                          .WithSqlParam("@page", consult.PageNumber)
+                                          .WithSqlParam("@size", consult.Rows)
+                                          .WithSqlParam("@sortOrder", consult.sortOrder)
+                                          .WithSqlParam("@sortCol", consult.SortCol)
+                                          .WithSqlParam("@filterVal", consult.FilterVal)
+                                          .ExecuteStoredProc_ToDictionary();
 
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = new { consultData, fields } };
             }
@@ -360,6 +360,30 @@ namespace Web.Services.Concrete
             {
                 var Consult_Counter = _dbContext.LoadStoredProcedure("md_getMDRouteCounter").WithSqlParam("@C_Name", "Consult_Counter").ExecuteStoredProc<MDRoute_CounterVM>().FirstOrDefault();
                 keyValues.Add("Consult_Counter", Consult_Counter.Counter_Value);
+
+                //var tableInfo = this._dbContext.LoadStoredProcedure("md_getTableInfoByTableName")
+                //                            .WithSqlParam("@tableName", ActivityLogTableEnums.Consults.ToString())
+                //                            .ExecuteStoredProc_ToDictionary().FirstOrDefault();
+                //var fieldNames = tableInfo["fieldName"].ToString().Split(",").ToList();
+                //var fieldDataTypes = tableInfo["fieldDataType"].ToString().Split(",").ToList();
+
+                //var indeces = fieldDataTypes.Select((c, i) => new { character = c, index = i })
+                //                                   .Where(list => list.character.Trim() == "datetime")
+                //                                   .Select(x => x.index)
+                //                                   .ToList();
+
+                //foreach (var item in indeces)
+                //{
+                //    string field = fieldNames.ElementAt(item).Trim();
+                //    if (keyValues.ContainsKey(field) && keyValues[field] != null && keyValues[field].ToString() != "")
+                //    {
+                //        keyValues[field] = DateTime.Parse(keyValues[field].ToString()).ToUniversalTimeZone();
+                //    }
+                //    else {
+                //        keyValues[field] = null;
+                //    }
+                //}
+
                 string query = "INSERT INTO [dbo].[Consults] (";
 
                 for (int i = 0; i < keys.Count(); i++)
@@ -391,7 +415,14 @@ namespace Web.Services.Concrete
                 {
                     if (keys[i] != "ConsultId" && keys[i] != "CreatedBy" && keys[i] != "CreatedDate" && keys[i] != "CallbackNumber")
                     {
-                        query += $"'{values[i]}'";
+                        if (values[i] != null && values[i].ToString() != "")
+                        {
+                            query += $"'{values[i]}'";
+                        }
+                        else
+                        {
+                            query += $"NULL";
+                        }
                         if ((i + 1) == values.Count)
                         {
                             //if (keyValues.ContainsKey("DateOfBirth")) 
@@ -399,7 +430,7 @@ namespace Web.Services.Concrete
                             //    var dob = DateTime.Parse(keyValues["DateOfBirth"].ToString()).ToString("MM-dd-yyyy hh:mm:ss");
                             //    query += $",'{dob}'";
                             //}
-                            query += keyValues.ContainsKey("CallbackNumber") && keyValues["CallbackNumber"] != null && keyValues["CallbackNumber"].ToString() != "(___) ___-____" ? ",'" + keyValues["CallbackNumber"] + "'" : ",''";
+                            query += keyValues.ContainsKey("CallbackNumber") && keyValues["CallbackNumber"] != null ? keyValues["CallbackNumber"].ToString() != "(___) ___-____" ? ",'" + keyValues["CallbackNumber"] + "'" : ",''" : "";
                             query += $",'{Consult_Counter.Counter_Value}'";
                             query += $",'{ApplicationSettings.UserId}'";
                             query += $",'{DateTime.UtcNow}'";
@@ -675,7 +706,7 @@ namespace Web.Services.Concrete
                 {
                     var updatedResult = this.GetConsultById(ConsultId.ToInt()).Body;
                     var differences = HelperExtension.GetDifferences(previousResult, updatedResult);
-                    this._dbContext.Log(differences.updatedRecord, ActivityLogTableEnums.Consults.ToString(), keyValues["ConsultNumber"].ToString().ToInt(), ActivityLogActionEnums.Update.ToInt(),differences.previousRecord);
+                    this._dbContext.Log(differences.updatedRecord, ActivityLogTableEnums.Consults.ToString(), keyValues["ConsultNumber"].ToString().ToInt(), ActivityLogActionEnums.Update.ToInt(), differences.previousRecord);
                     return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Updated Successfully" };
                 }
                 else
@@ -886,7 +917,7 @@ namespace Web.Services.Concrete
                             msg.body += $"<strong>Patient Name:</strong> {keyValues["PatientLastName"].ToString()} </br>";
                         }
                     }
-                    if (keyValues.ContainsKey("DateOfBirth"))
+                    if (keyValues.ContainsKey("DateOfBirth") && keyValues["DateOfBirth"] != null)
                     {
                         DateTime dob = DateTime.Parse(keyValues["DateOfBirth"].ToString());
                         msg.body += $"<strong>Dob:</strong> {dob:MM-dd-yyyy} </br>";
