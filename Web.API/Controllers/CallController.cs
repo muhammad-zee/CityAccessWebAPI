@@ -83,17 +83,17 @@ namespace Web.API.Controllers
 
         [AllowAnonymous]
         [HttpGet("Call/Call")]
-        public CallResource Call()
+        public BaseResponse Call()
         {
             try
             {
-                return this._callService.Call();
+                return new BaseResponse { Status = HttpStatusCode.OK, Message = "Calling", Body = this._callService.Call() };
             }
             catch (Exception ex)
             {
                 ElmahExtensions.RiseError(ex);
                 _logger.LogExceptions(ex);
-                throw ex;
+                return new BaseResponse { Status = HttpStatusCode.InternalServerError, Message = "Error Occured", Body = ex };
             }
 
         }

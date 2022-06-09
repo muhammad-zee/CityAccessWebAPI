@@ -451,7 +451,7 @@ namespace Web.Services.Concrete
             }
 
             CallLogVM callRec = new();
-            if (Direction == "inbound")
+            if (Direction == "inbound" || Direction=="outbound-dial")
             {
                 callRec.CallSid = Request["CallSid"].ToString();
 
