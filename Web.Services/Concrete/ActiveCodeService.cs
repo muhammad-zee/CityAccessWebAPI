@@ -1002,7 +1002,7 @@ namespace Web.Services.Concrete
                                                         .WithSqlParam("@codeName", codeName)
                                                         .ExecuteStoredProc<User>().Select(x => x.UserUniqueId).ToList();
 
-                    if (codeData.ContainsKey("IsComplete") && codeData["IsCompleted"].ToString().ToBool())
+                    if (codeData.ContainsKey("IsCompleted") && codeData["IsCompleted"].ToString().ToBool())
                     {
                         var notification = new PushNotificationVM()
                         {
