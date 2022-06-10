@@ -650,6 +650,15 @@ namespace Web.Services.Concrete
             return channel;
         }
 
+        public ChannelResource createNotificationChannel(string FriendlyName, string userUniqueId)
+        {
+            ServicePointManager.SecurityProtocol = (SecurityProtocolType)3072; //TLS 1.2
+            TwilioClient.Init(this.Twilio_AccountSid, this.Twilio_AuthToken);
+            var channel = ChannelResource.Create(pathServiceSid: this.Twilio_ChatServiceSid, friendlyName: FriendlyName, uniqueName: userUniqueId, type: ChannelTypeEnum.Private);
+            //var channel = Twilio.Rest.Conversations.V1.ConversationResource.Create(servives: this.Twilio_ChatServiceSid, friendlyName: FriendlyName, uniqueName: UniqueName);
+            return channel;
+        }
+
         public UserResource createConversationUser(string Identity, string FriendlyName)
         {
             try
@@ -1307,8 +1316,17 @@ namespace Web.Services.Concrete
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "CommunicationLog Data", Body = communicationLog };
         }
 
-
-
+        public ChannelResource getConversationChannelBySid(string channelSid)
+        {
+            try
+            {
+            var channel = ChannelResource.Fetch(pathServiceSid: this.Twilio_ChatServiceSid, pathSid: channelSid);
+                return channel;
+            }
+            catch (Exception e){
+                return null;
+            }
+        }
     }
 
 

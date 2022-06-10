@@ -98,10 +98,15 @@ namespace Web.Services.Concrete
                     user.Password = Encryption.decryptData(user.Password, this._encryptionKey);
                     if (user.Password == login.password)
                     {
-
+                        var notificationChannelSid = this.checkIfNotificationChannelNotExists(user);
+                        if (!string.IsNullOrEmpty(notificationChannelSid))
+                        {
+                            user.UserChannelSid = notificationChannelSid;
+                            this._userRepo.Update(user);
+                        }
                         if (this._adminService.getRoleListByUserId(user.UserId).ToList().Any(x => x.IsSuperAdmin))
                         {
-                            var AuthorizedUser = GenerateJSONWebToken(user);
+                            var AuthorizedUser = this.GenerateJSONWebToken(user);
                             response.Body = AuthorizedUser;
                             response.Status = HttpStatusCode.OK;
                             response.Message = "User found";
@@ -163,6 +168,17 @@ namespace Web.Services.Concrete
                 }
             }
             return response;
+        }
+
+        private string checkIfNotificationChannelNotExists(User user)
+        {
+         var channel=   this._communicationService.getConversationChannelBySid(user.UserChannelSid);
+            if(channel == null)
+            {
+                var newChannel = this._communicationService.createNotificationChannel($"{user.FirstName} {user.LastName}", user.UserUniqueId);
+                    return newChannel.Sid;
+            }
+            return "";
         }
 
         public BaseResponse Logout()

@@ -30,6 +30,7 @@ namespace Web.Services.Interfaces
         BaseResponse GetCurrentConversationParticipants(string channelSid);
         bool conversationUserIsOnline(string UserSid);
         ChannelResource createConversationChannel(string FriendlyName, string UniqueName, string Attributes);
+        ChannelResource createNotificationChannel(string FriendlyName, string userUniqueId);
         UserResource createConversationUser(string Identity, string FriendlyName);
         MemberResource addNewUserToConversationChannel(string ChannelSid, string ParticipantUniqueName);
         BaseResponse createOrRemoveGroupMemberAsAdmin(bool isAdmin, string uniqueName, string channleSid);
@@ -66,6 +67,7 @@ namespace Web.Services.Interfaces
 
         BaseResponse GetAllCommunicationlog(int orgId, string departmentIds, string serviceLineIds, bool showAllVoicemails);
         BaseResponse GetCallLog(int orgId, bool showAllCalls);
+        ChannelResource getConversationChannelBySid(string channelSid);
 
         #endregion
     }
