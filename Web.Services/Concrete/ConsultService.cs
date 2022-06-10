@@ -273,7 +273,7 @@ namespace Web.Services.Concrete
                     this._orgConsultRepo.Update(deletedOnes);
                 }
 
-                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Saved Successfully" };
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Changes Saved Successfully" };
             }
         }
 
@@ -395,7 +395,7 @@ namespace Web.Services.Concrete
                         {
                             //if (keyValues.ContainsKey("DateOfBirth"))
                             //    query += ",[DateOfBirth]";
-                            
+
                             query += ",[ConsultNumber]";
                             query += ",[CreatedBy]";
                             query += ",[CreatedDate]";
@@ -674,7 +674,7 @@ namespace Web.Services.Concrete
                     //        }
                     //    }
 
-                    return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Added Successfully", Body = keyValues };
+                    return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Consult added successfully", Body = keyValues };
                 }
                 else
                 {
@@ -707,14 +707,13 @@ namespace Web.Services.Concrete
                     var updatedResult = this.GetConsultById(ConsultId.ToInt()).Body;
                     var differences = HelperExtension.GetDifferences(previousResult, updatedResult);
                     this._dbContext.Log(differences.updatedRecord, ActivityLogTableEnums.Consults.ToString(), keyValues["ConsultNumber"].ToString().ToInt(), ActivityLogActionEnums.Update.ToInt(), differences.previousRecord);
-                    return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Updated Successfully" };
+                    return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Consult updated successfully" };
                 }
                 else
                 {
                     return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = "No Record Updated" };
                 }
             }
-
 
             return new BaseResponse() { Status = HttpStatusCode.NotModified, Message = "Consult Id Column is not exist" };
         }
@@ -986,7 +985,7 @@ namespace Web.Services.Concrete
 
                 _communicationService.pushNotification(notification);
 
-                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Consult Deleted" };
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = $"Consult {(status ? "Activated" : "Inactivated")}" };
             }
             else
             {

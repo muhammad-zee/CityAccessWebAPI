@@ -413,7 +413,7 @@ namespace Web.API.Controllers
                 }
                 else /*if (saveResponse == StatusEnums.Success.ToString())*/
                 {
-                    return new BaseResponse { Status = HttpStatusCode.OK, Message = "Roles List Returned" };
+                    return new BaseResponse { Status = HttpStatusCode.OK, Message = "Changes saved successfully" };
                 }
             }
             catch (Exception ex)

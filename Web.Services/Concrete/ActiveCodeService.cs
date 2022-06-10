@@ -978,7 +978,7 @@ namespace Web.Services.Concrete
                     else
                     if (codeData.ContainsKey(fieldName) && codeData[fieldName].ToString() != null)
                     {
-                        fieldValue = codeData[fieldName] != null ? (codeData[fieldName].ToString() != "(___) ___-____" ? "'" + codeData[fieldName].ToString() + "'" : "NULL") : "NULL";
+                        fieldValue = codeData[fieldName] != null ? (codeData[fieldName].ToString() != "(___) ___-____" ? codeData[fieldName].ToString() : "NULL") : "NULL";
                     }
 
                     var prevRecord =this.GetCodeDataById(codeId, codeName).Body;
@@ -1046,7 +1046,7 @@ namespace Web.Services.Concrete
 
                         _communicationService.pushNotification(notification);
                     }
-                    return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Updated Successfully" };
+                    return new BaseResponse() { Status = HttpStatusCode.OK, Message = (row.IsEms != null && row.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription()) + $" {codeName} updated successfully." };
                 }
                 else
                 {
@@ -1202,7 +1202,7 @@ namespace Web.Services.Concrete
 
                     _communicationService.pushNotification(notification);
 
-                    return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Updated Successfully" };
+                    return new BaseResponse() { Status = HttpStatusCode.OK, Message = (row.IsEms != null && row.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription()) + $" {codeName} updated successfully." };
                 }
 
             }
