@@ -462,24 +462,45 @@ namespace Web.Services.Concrete
             if (key == "qw4hddqcrg")
             {
                 TwilioClient.Init(this.Twilio_AccountSid, this.Twilio_AuthToken);
-                var channels = ChannelResource.Read(pathServiceSid: this.Twilio_ChatServiceSid,pageSize:50);
-                foreach (var ch in channels)
+                var channels = ChannelResource.Read(pathServiceSid: this.Twilio_ChatServiceSid, pageSize: 50);
+                var totalChannels = channels.Count();
+                if (totalChannels > 0)
                 {
-                    var delete = ChannelResource.Delete(pathServiceSid: this.Twilio_ChatServiceSid, pathSid: ch.Sid);
-                    var dbChannel = this._conversationChannelsRepo.Table.FirstOrDefault(c => c.ChannelSid == ch.Sid);
-                    if (dbChannel != null)
+
+                    foreach (var ch in channels)
                     {
-                        //dbChannel.IsDeleted = true;
-                        var channelParticipants = this._conversationParticipantsRepo.Table.Where(p => p.ConversationChannelIdFk == dbChannel.ConversationChannelId);
-                        //foreach (var p in channelParticipants)
-                        //{
-                        //    p.IsDeleted = true;
-                        //}
-                        this._conversationParticipantsRepo.DeleteRange(channelParticipants);
-                        this._conversationChannelsRepo.Delete(dbChannel);
+                        var delete = ChannelResource.Delete(pathServiceSid: this.Twilio_ChatServiceSid, pathSid: ch.Sid);
+                        var dbChannel = this._conversationChannelsRepo.Table.FirstOrDefault(c => c.ChannelSid == ch.Sid);
+                        if (dbChannel != null)
+                        {
+                            //dbChannel.IsDeleted = true;
+                            var channelParticipants = this._conversationParticipantsRepo.Table.Where(p => p.ConversationChannelIdFk == dbChannel.ConversationChannelId);
+                            //foreach (var p in channelParticipants)
+                            //{
+                            //    p.IsDeleted = true;
+                            //}
+                            this._conversationParticipantsRepo.DeleteRange(channelParticipants);
+                            this._conversationChannelsRepo.Delete(dbChannel);
+                        }
                     }
                 }
-                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Channels deleted" };
+                else
+                {
+                    var convParticipantTable = this._conversationParticipantsRepo.Table.AsEnumerable();
+                    if (convParticipantTable.Count() > 0)
+                    {
+                        this._conversationParticipantsRepo.DeleteRange(convParticipantTable);
+                    }
+                    var convTable = this._conversationChannelsRepo.Table.AsEnumerable();
+                    if (convTable.Count() > 0)
+                    {
+                        this._conversationChannelsRepo.DeleteRange(convTable);
+                    }
+
+                    
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Conversations channels deleted completely from Twilio Server & Database" };
+                }
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Hit API Again to delete All channels" };
             }
             else
             {
