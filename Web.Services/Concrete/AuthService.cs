@@ -176,7 +176,8 @@ namespace Web.Services.Concrete
             if(channel == null)
             {
                 var newChannel = this._communicationService.createNotificationChannel($"{user.FirstName} {user.LastName}", user.UserUniqueId);
-                    return newChannel.Sid;
+
+                    return newChannel==null ? "":newChannel.Sid;
             }
             return "";
         }

@@ -101,6 +101,21 @@ namespace Web.API.Controllers
                 _logger.LogExceptions(ex);
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
             }
+        }  
+        
+        [HttpGet("Conversation/deleteConflictedConversationChannel/{channelSid}")]
+        public BaseResponse deleteConflictedConversationChannel(string channelSid)
+        {
+            try
+            {
+                return this._communicaitonService.deleteConflictedConversationChannel(channelSid);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
         }
 
 

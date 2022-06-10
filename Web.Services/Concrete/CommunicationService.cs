@@ -508,8 +508,30 @@ namespace Web.Services.Concrete
             }
 
         }
+        public BaseResponse deleteConflictedConversationChannel(string channelSid)
+        {
 
-        public BaseResponse deleteConversationChannel(string ChannelSid, int UserId)
+            var dbChannel = this._conversationChannelsRepo.Table.FirstOrDefault(c => c.ChannelSid == channelSid);
+            if (dbChannel != null)
+            {
+                //dbChannel.IsDeleted = true;
+                var channelParticipants = this._conversationParticipantsRepo.Table.Where(p => p.ConversationChannelIdFk == dbChannel.ConversationChannelId);
+                //foreach (var p in channelParticipants)
+                //{
+                //    p.IsDeleted = true;
+                //}
+                this._conversationParticipantsRepo.DeleteRange(channelParticipants);
+                this._conversationChannelsRepo.Delete(dbChannel);
+            }
+
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Hit API Again to delete All channels" };
+
+        }
+
+
+    
+
+    public BaseResponse deleteConversationChannel(string ChannelSid, int UserId)
         {
             var dbChannel = this._conversationChannelsRepo.Table.FirstOrDefault(c => c.ChannelSid == ChannelSid && c.IsDeleted != true);
             if (dbChannel != null)
@@ -673,11 +695,20 @@ namespace Web.Services.Concrete
 
         public ChannelResource createNotificationChannel(string FriendlyName, string userUniqueId)
         {
+            try
+            {
+
             ServicePointManager.SecurityProtocol = (SecurityProtocolType)3072; //TLS 1.2
             TwilioClient.Init(this.Twilio_AccountSid, this.Twilio_AuthToken);
             var channel = ChannelResource.Create(pathServiceSid: this.Twilio_ChatServiceSid, friendlyName: FriendlyName, uniqueName: userUniqueId, type: ChannelTypeEnum.Private);
             //var channel = Twilio.Rest.Conversations.V1.ConversationResource.Create(servives: this.Twilio_ChatServiceSid, friendlyName: FriendlyName, uniqueName: UniqueName);
             return channel;
+            }
+            catch(Exception e)
+            {
+            return null;
+            }
+
         }
 
         public UserResource createConversationUser(string Identity, string FriendlyName)
