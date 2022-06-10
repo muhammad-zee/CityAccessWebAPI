@@ -430,7 +430,6 @@ namespace Web.Services.Concrete
                             //    var dob = DateTime.Parse(keyValues["DateOfBirth"].ToString()).ToString("MM-dd-yyyy hh:mm:ss");
                             //    query += $",'{dob}'";
                             //}
-                            query += keyValues.ContainsKey("CallbackNumber") && keyValues["CallbackNumber"] != null ? keyValues["CallbackNumber"].ToString() != "(___) ___-____" ? ",'" + keyValues["CallbackNumber"] + "'" : ",''" : "";
                             query += $",'{Consult_Counter.Counter_Value}'";
                             query += $",'{ApplicationSettings.UserId}'";
                             query += $",'{DateTime.UtcNow}'";
@@ -690,7 +689,7 @@ namespace Web.Services.Concrete
                 {
                     if (keys[i] != "ConsultId" && keys[i] != "ModifiedBy" && keys[i] != "ModifiedDate")
                     {
-                        query += $"[{keys[i]}] = {(keyValues["CallbackNumber"] != null && keyValues["CallbackNumber"].ToString() != "(___) ___ - ____" ? "[CallbackNumber] = '" + keyValues["CallbackNumber"].ToString() + "'" : "NULL")}";
+                        query += $"[{keys[i]}] = {(values[i] != null && values[i].ToString() != "(___) ___ - ____" ? $"'{values[i].ToString()}'" : "NULL")}";
                         if (i < keys.Count)
                         {
                             query += ",";
