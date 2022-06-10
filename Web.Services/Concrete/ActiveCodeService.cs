@@ -978,7 +978,7 @@ namespace Web.Services.Concrete
                     else
                     if (codeData.ContainsKey(fieldName) && codeData[fieldName].ToString() != null)
                     {
-                        fieldValue = codeData[fieldName].ToString();
+                        fieldValue = codeData[fieldName] != null ? (codeData[fieldName].ToString() != "(___) ___-____" ? "'" + codeData[fieldName].ToString() + "'" : "NULL") : "NULL";
                     }
 
                     var prevRecord =this.GetCodeDataById(codeId, codeName).Body;
@@ -1246,13 +1246,12 @@ namespace Web.Services.Concrete
 
                         for (int i = 0; i < keys.Count(); i++)
                         {
-                            if (keys[i] != $"code{codeName}Id" && keys[i] != "CreatedBy" && keys[i] != "CreatedDate" && keys[i] != "FamilyContactNumber" && keys[i] != "codeName")
+                            if (keys[i] != $"code{codeName}Id" && keys[i] != "CreatedBy" && keys[i] != "CreatedDate" && keys[i] != "codeName")
                             {
                                 query += $"[{keys[i]}],";
                             }
                         }
 
-                        query += codeData.ContainsKey("FamilyContactNumber") ? "[FamilyContactNumber]," : "";
                         query += $"[Code{codeName}Number],";
                         query += "[CreatedBy],";
                         query += "[CreatedDate],";
@@ -1262,13 +1261,12 @@ namespace Web.Services.Concrete
 
                         for (int i = 0; i < values.Count; i++)
                         {
-                            if (keys[i] != $"code{codeName}Id" && keys[i] != "CreatedBy" && keys[i] != "CreatedDate" && keys[i] != "FamilyContactNumber" && keys[i] != "codeName")
+                            if (keys[i] != $"code{codeName}Id" && keys[i] != "CreatedBy" && keys[i] != "CreatedDate" && keys[i] != "codeName")
                             {
-                                query += $"'{values[i]}',";
+                                query += values[i] != null ? (values[i].ToString() != "(___) ___-____" ? "'" + values[i] + "'," : "'',") : "NULL,";
                             }
                         }
 
-                        query += codeData.ContainsKey("FamilyContactNumber") && codeData["FamilyContactNumber"] != null ? (codeData["FamilyContactNumber"].ToString() != "(___) ___-____" ? "'" + codeData["FamilyContactNumber"] + "'," : "'',") : "";
                         query += $"{Counter},";
                         query += $"'{ApplicationSettings.UserId}',";
                         query += $"'{DateTime.UtcNow}',";

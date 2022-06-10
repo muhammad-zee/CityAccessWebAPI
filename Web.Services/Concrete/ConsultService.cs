@@ -388,14 +388,14 @@ namespace Web.Services.Concrete
 
                 for (int i = 0; i < keys.Count(); i++)
                 {
-                    if (keys[i] != "ConsultId" && keys[i] != "CreatedBy" && keys[i] != "CreatedDate" && keys[i] != "CallbackNumber")
+                    if (keys[i] != "ConsultId" && keys[i] != "CreatedBy" && keys[i] != "CreatedDate")
                     {
                         query += $"[{keys[i]}]";
                         if ((i + 1) == keys.Count)
                         {
                             //if (keyValues.ContainsKey("DateOfBirth"))
                             //    query += ",[DateOfBirth]";
-                            query += keyValues.ContainsKey("CallbackNumber") ? ",[CallbackNumber]" : "";
+                            
                             query += ",[ConsultNumber]";
                             query += ",[CreatedBy]";
                             query += ",[CreatedDate]";
@@ -413,11 +413,11 @@ namespace Web.Services.Concrete
 
                 for (int i = 0; i < values.Count; i++)
                 {
-                    if (keys[i] != "ConsultId" && keys[i] != "CreatedBy" && keys[i] != "CreatedDate" && keys[i] != "CallbackNumber")
+                    if (keys[i] != "ConsultId" && keys[i] != "CreatedBy" && keys[i] != "CreatedDate")
                     {
                         if (values[i] != null && values[i].ToString() != "")
                         {
-                            query += $"'{values[i]}'";
+                            query += $"{(values[i].ToString() != "(___) ___ - ____" ? "'" + values[i] + "'" : "NULL")}";
                         }
                         else
                         {
@@ -688,16 +688,16 @@ namespace Web.Services.Concrete
 
                 for (int i = 0; i < keys.Count; i++)
                 {
-                    if (keys[i] != "ConsultId" && keys[i] != "ModifiedBy" && keys[i] != "ModifiedDate" && keys[i] != "CallbackNumber")
+                    if (keys[i] != "ConsultId" && keys[i] != "ModifiedBy" && keys[i] != "ModifiedDate")
                     {
-                        query += $"[{keys[i]}] = '{values[i]}'";
+                        query += $"[{keys[i]}] = {(keyValues["CallbackNumber"] != null && keyValues["CallbackNumber"].ToString() != "(___) ___ - ____" ? "[CallbackNumber] = '" + keyValues["CallbackNumber"].ToString() + "'" : "NULL")}";
                         if (i < keys.Count)
                         {
                             query += ",";
                         }
                     }
                 }
-                query += keyValues.ContainsKey("CallbackNumber") && keyValues["CallbackNumber"].ToString() != "(___) ___-____" ? " [CallbackNumber] ='" + keyValues["CallbackNumber"].ToString() + "'," : "";
+                //query += keyValues.ContainsKey("CallbackNumber") && keyValues["CallbackNumber"] != null && keyValues["CallbackNumber"].ToString() != "(___) ___-____" ? " [CallbackNumber] ='" + keyValues["CallbackNumber"].ToString() + "'," : "";
                 query += $" [ModifiedBy] = '{ApplicationSettings.UserId}', [ModifiedDate] = '{DateTime.UtcNow.ToString("MM-dd-yyyy hh:mm:ss")}'";
                 query += $" WHERE ConsultId = '{ConsultId.ToInt()}'";
                 var previousResult = this.GetConsultById(ConsultId.ToInt()).Body;
