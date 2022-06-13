@@ -283,21 +283,10 @@ namespace Web.Services.Concrete
                                 .WithSqlParam("@pOrganizationId", orgId)
                                 .ExecuteStoredProc<ConsultFieldsVM>();
 
-            //(from c in this._consultFieldRepo.Table
-            //                 join oc in this._orgConsultRepo.Table on c.ConsultFieldId equals oc.ConsultFieldIdFk
-            //                 where oc.OrganizationIdFk == orgId && !c.IsDeleted && !oc.IsDeleted
-            //                 select new ConsultFieldsVM()
-            //                 {
-            //                     ConsultFieldId = c.ConsultFieldId,
-            //                     FieldLabel = c.FieldLabel,
-            //                     FieldName = c.FieldName,
-            //                     FieldType = c.FieldType,
-            //                     FieldData = c.FieldData,
-            //                     FieldDataType = c.FieldDataType,
-            //                     FieldDataLength = c.FieldDataLength,
-            //                     SortOrder = oc.SortOrder,
-            //                     IsRequired = c.IsRequired
-            //                 }).Distinct().OrderBy(x => x.SortOrder).ToList();
+
+            var NonSortedFields = consultFields.Where(x => x.SortOrder == 0).ToList();
+            consultFields.RemoveAll(x => x.SortOrder == 0);
+            consultFields.AddRange(NonSortedFields);
 
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = consultFields };
         }

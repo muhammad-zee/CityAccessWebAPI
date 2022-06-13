@@ -19,9 +19,9 @@ namespace Web.Services.Helper
     public static class ActivityLogService
     {
 
-        public static void Log<T>(this DbContext _dbContext, T? items, string tableName, int tablePrimayrKey, int action, dynamic? previousRecord =null,string? description="" )
+        public static void Log<T>(this DbContext _dbContext, T? items, string tableName, int tablePrimayrKey, int action, dynamic? previousRecord = null, string? description = "")
         {
-            if(previousRecord == null)
+            if (previousRecord == null)
             {
                 previousRecord = new { };
             }
@@ -29,7 +29,7 @@ namespace Web.Services.Helper
             var jsonNewRec = JsonSerializer.Serialize(previousRecord);
             if (string.IsNullOrEmpty(description))
             {
-             description = generateLogDesc(tableName, action, json);
+                description = generateLogDesc(tableName, action, json);
             }
 
 

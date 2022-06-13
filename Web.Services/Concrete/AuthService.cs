@@ -98,12 +98,12 @@ namespace Web.Services.Concrete
                     user.Password = Encryption.decryptData(user.Password, this._encryptionKey);
                     if (user.Password == login.password)
                     {
-                        var notificationChannelSid = this.checkIfNotificationChannelNotExists(user);
-                        if (!string.IsNullOrEmpty(notificationChannelSid))
-                        {
-                            user.UserChannelSid = notificationChannelSid;
-                            this._userRepo.Update(user);
-                        }
+                        //var notificationChannelSid = this.checkIfNotificationChannelNotExists(user);
+                        //if (!string.IsNullOrEmpty(notificationChannelSid))
+                        //{
+                        //    user.UserChannelSid = notificationChannelSid;
+                        //    this._userRepo.Update(user);
+                        //}
                         if (this._adminService.getRoleListByUserId(user.UserId).ToList().Any(x => x.IsSuperAdmin))
                         {
                             var AuthorizedUser = this.GenerateJSONWebToken(user);
@@ -139,7 +139,7 @@ namespace Web.Services.Concrete
                                     response.Body = AuthorizedUser;
                                     response.Status = HttpStatusCode.OK;
                                     response.Message = "User found";
-                            ApplicationSettings.UserFullName = user.FirstName + " " + user.LastName;
+                                    ApplicationSettings.UserFullName = user.FirstName + " " + user.LastName;
                                     this._dbContext.Log(login, "Users", user.UserId, ActivityLogActionEnums.SignIn.ToInt());
                                 }
                             }
@@ -172,12 +172,12 @@ namespace Web.Services.Concrete
 
         private string checkIfNotificationChannelNotExists(User user)
         {
-         var channel=   this._communicationService.getConversationChannelBySid(user.UserChannelSid);
-            if(channel == null)
+            var channel = this._communicationService.getConversationChannelBySid(user.UserChannelSid);
+            if (channel == null)
             {
                 var newChannel = this._communicationService.createNotificationChannel($"{user.FirstName} {user.LastName}", user.UserUniqueId);
 
-                    return newChannel==null ? "":newChannel.Sid;
+                return newChannel == null ? "" : newChannel.Sid;
             }
             return "";
         }
@@ -845,8 +845,12 @@ namespace Web.Services.Concrete
                 {
                     //var hashPswd = HelperExtension.Encrypt(credential.password);
                     //var hashPswd = Encryption.encryptData(credential.password, this._encryptionKey);
+                    user.ModifiedBy = user.UserId;
+                    user.ModifiedDate = DateTime.UtcNow;
                     user.Password = credential.password;
                     _userRepo.Update(user);
+                    string desc = $"{user.FirstName} {user.LastName} update password from forget password";
+                    this._dbContext.Log(user.getChangedPropertyObject<User>("Password"), ActivityLogTableEnums.Users.ToString(), user.UserId, ActivityLogActionEnums.Update.ToInt(), null, desc);
                     return StatusEnums.Success.ToString();
                 }
             }
