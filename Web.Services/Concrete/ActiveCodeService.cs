@@ -944,7 +944,7 @@ namespace Web.Services.Concrete
                 foreach (var item in indeces)
                 {
                     string field = fieldNames.ElementAt(item).ToCamelCase();
-                    var fieldVal = codeDataVM[field] != null && codeDataVM[field].ToString() != "" ? DateTime.Parse(codeDataVM[field].ToString()).ToTimezoneFromUtc("Eastern Standard Time").ToString("yyyy-MM-dd hh:mm:ss tt") : "";
+                    var fieldVal = codeDataVM[field] != null && codeDataVM[field].ToString() != "" ? DateTime.Parse(codeDataVM[field].ToString()).ToTimezoneFromUtc("Eastern Standard Time").ToString("yyyy-MM-dd hh:mm:ss tt") : null;
                     codeDataVM.Add(field + "Str", fieldVal);
                 }
 
@@ -972,15 +972,22 @@ namespace Web.Services.Concrete
                 {
                     if (fieldDataType == "date" || fieldDataType == "datetime")
                     {
-                        if (codeData.ContainsKey(fieldName) && codeData[fieldName].ToString() != null)
+                        if (codeData.ContainsKey(fieldName) && codeData[fieldName] != null && codeData[fieldName].ToString() != "")
                         {
                             fieldValue = DateTime.Parse(codeData[fieldName].ToString()).ToUniversalTimeZone();
                         }
+                        else {
+                            fieldValue = null;
+                        }
                     }
                     else
-                    if (codeData.ContainsKey(fieldName) && codeData[fieldName].ToString() != null)
+                    if (codeData.ContainsKey(fieldName) && codeData[fieldName] != null && codeData[fieldName].ToString() != "")
                     {
                         fieldValue = codeData[fieldName] != null ? (codeData[fieldName].ToString() != "(___) ___-____" ? codeData[fieldName].ToString() : "NULL") : "NULL";
+                    }
+                    else
+                    {
+                        fieldValue = null;
                     }
 
                     var prevRecord =this.GetCodeDataById(codeId, codeName).Body;
