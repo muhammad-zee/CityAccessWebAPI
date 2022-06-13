@@ -328,7 +328,7 @@ namespace Web.Services.Concrete
                         return new BaseResponse()
                         {
                             Status = HttpStatusCode.OK,
-                            Message = "AlreadyExist",
+                            Message = "User already exist",
                         };
                     }
                 }
@@ -435,7 +435,7 @@ namespace Web.Services.Concrete
                 return new BaseResponse()
                 {
                     Status = HttpStatusCode.OK,
-                    Message = "Updated",
+                    Message = "User updated",
                     Body = user.UserId,
                 };
             }
@@ -578,7 +578,7 @@ namespace Web.Services.Concrete
                         return new BaseResponse()
                         {
                             Status = HttpStatusCode.OK,
-                            Message = "Created",
+                            Message = "User Created",
                             Body = obj.UserId,
                         };
 
@@ -604,7 +604,7 @@ namespace Web.Services.Concrete
                         return new BaseResponse()
                         {
                             Status = HttpStatusCode.OK,
-                            Message = "AlreadyExist",
+                            Message = "User already exist",
                         };
                     }
                 }
@@ -666,7 +666,7 @@ namespace Web.Services.Concrete
             return new BaseResponse()
             {
                 Status = HttpStatusCode.OK,
-                Message = "Saved",
+                Message = "User association saved",
             };
         }
 
@@ -718,7 +718,7 @@ namespace Web.Services.Concrete
                 return new BaseResponse()
                 {
                     Status = HttpStatusCode.OK,
-                    Message = "Saved",
+                    Message = "Favourite Team saved",
                 };
             }
 

@@ -226,10 +226,12 @@ namespace Web.Services.Concrete
             if (update.Count > 0)
             {
                 this._activeCodeRepo.Update(update);
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Updated" };
             }
             if (insert.Count > 0)
             {
                 this._activeCodeRepo.Insert(insert);
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record(s) Added" };
             }
 
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Saved" };
