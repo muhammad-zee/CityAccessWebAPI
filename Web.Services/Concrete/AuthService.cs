@@ -98,12 +98,12 @@ namespace Web.Services.Concrete
                     user.Password = Encryption.decryptData(user.Password, this._encryptionKey);
                     if (user.Password == login.password)
                     {
-                        //var notificationChannelSid = this.checkIfNotificationChannelNotExists(user);
-                        //if (!string.IsNullOrEmpty(notificationChannelSid))
-                        //{
-                        //    user.UserChannelSid = notificationChannelSid;
-                        //    this._userRepo.Update(user);
-                        //}
+                        var notificationChannelSid = this.checkIfNotificationChannelNotExists(user);
+                        if (!string.IsNullOrEmpty(notificationChannelSid))
+                        {
+                            user.UserChannelSid = notificationChannelSid;
+                            this._userRepo.Update(user);
+                        }
                         if (this._adminService.getRoleListByUserId(user.UserId).ToList().Any(x => x.IsSuperAdmin))
                         {
                             var AuthorizedUser = this.GenerateJSONWebToken(user);
@@ -177,6 +177,7 @@ namespace Web.Services.Concrete
             {
                 var newChannel = this._communicationService.createNotificationChannel($"{user.FirstName} {user.LastName}", user.UserUniqueId);
 
+                var addUser = this._communicationService.addNewUserToConversationChannel(newChannel.Sid, user.UserUniqueId);
                 return newChannel == null ? "" : newChannel.Sid;
             }
             return "";
