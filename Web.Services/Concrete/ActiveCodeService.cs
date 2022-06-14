@@ -8410,7 +8410,14 @@ namespace Web.Services.Concrete
                             var location = geometry["location"];
                             var longLat = new List<double> { Convert.ToDouble(location.lat), Convert.ToDouble(location.lng) };
 
-                            objList.Add(new { OrganizationId = item.OrganizationId, Address = formatted_address, lat = longLat[0], lng = longLat[1], title = item.OrganizationName });
+                            url = "https://maps.googleapis.com/maps/api/distancematrix/json?destinations=" + (location.lat + "," + location.lng) + "&origins=" + latlng + "&units=imperial&key=" + this._GoogleApiKey;
+                            var distanceMatrixApi = this._httpClient.GetAsync(url).Result;
+                            dynamic distanceMatrixApiResult = distanceMatrixApi["rows"];
+                            var element = distanceMatrixApiResult[0]["elements"];
+                            var distance = element[0]["distance"].text;
+                            var duration = element[0]["duration"].text;
+
+                            objList.Add(new { OrganizationId = item.OrganizationId, Address = formatted_address, lat = longLat[0], lng = longLat[1], title = item.OrganizationName, distance = Convert.ToString(distance), duration = Convert.ToString(duration) });
                         }
                         return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Addresses Returned", Body = objList };
                     }

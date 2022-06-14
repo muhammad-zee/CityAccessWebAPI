@@ -343,9 +343,9 @@ namespace Web.Services.Concrete
                 var dbChannel = this._conversationChannelsRepo.Table.FirstOrDefault(ch => ch.ChannelSid == channel.ChannelSid);
                 if (dbChannel != null)
                 {
-                var participants = this._conversationParticipantsRepo.Table.Where(p => p.ConversationChannelIdFk == dbChannel.ConversationChannelId);
-                this._conversationParticipantsRepo.DeleteRange(participants);
-                this._conversationChannelsRepo.Delete(dbChannel);
+                    var participants = this._conversationParticipantsRepo.Table.Where(p => p.ConversationChannelIdFk == dbChannel.ConversationChannelId);
+                    this._conversationParticipantsRepo.DeleteRange(participants);
+                    this._conversationChannelsRepo.Delete(dbChannel);
                 }
                 response.Status = HttpStatusCode.OK;
             }
@@ -497,8 +497,8 @@ namespace Web.Services.Concrete
                         this._conversationChannelsRepo.DeleteRange(convTable);
                     }
 
-                    
-                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Conversations channels deleted completely from Twilio Server & Database" };
+
+                    return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Conversations channels deleted completely from Twilio Server & Database" };
                 }
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Hit API Again to delete All channels" };
             }
@@ -524,14 +524,14 @@ namespace Web.Services.Concrete
                 this._conversationChannelsRepo.Delete(dbChannel);
             }
 
-                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Hit API Again to delete All channels" };
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Hit API Again to delete All channels" };
 
         }
 
 
-    
 
-    public BaseResponse deleteConversationChannel(string ChannelSid, int UserId)
+
+        public BaseResponse deleteConversationChannel(string ChannelSid, int UserId)
         {
             var dbChannel = this._conversationChannelsRepo.Table.FirstOrDefault(c => c.ChannelSid == ChannelSid && c.IsDeleted != true);
             if (dbChannel != null)
@@ -698,15 +698,15 @@ namespace Web.Services.Concrete
             try
             {
 
-            ServicePointManager.SecurityProtocol = (SecurityProtocolType)3072; //TLS 1.2
-            TwilioClient.Init(this.Twilio_AccountSid, this.Twilio_AuthToken);
-            var channel = ChannelResource.Create(pathServiceSid: this.Twilio_ChatServiceSid, friendlyName: FriendlyName, uniqueName: userUniqueId, type: ChannelTypeEnum.Private);
-            //var channel = Twilio.Rest.Conversations.V1.ConversationResource.Create(servives: this.Twilio_ChatServiceSid, friendlyName: FriendlyName, uniqueName: UniqueName);
-            return channel;
+                ServicePointManager.SecurityProtocol = (SecurityProtocolType)3072; //TLS 1.2
+                TwilioClient.Init(this.Twilio_AccountSid, this.Twilio_AuthToken);
+                var channel = ChannelResource.Create(pathServiceSid: this.Twilio_ChatServiceSid, friendlyName: FriendlyName, uniqueName: userUniqueId, type: ChannelTypeEnum.Private);
+                //var channel = Twilio.Rest.Conversations.V1.ConversationResource.Create(servives: this.Twilio_ChatServiceSid, friendlyName: FriendlyName, uniqueName: UniqueName);
+                return channel;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
-            return null;
+                return null;
             }
 
         }
@@ -1372,10 +1372,11 @@ namespace Web.Services.Concrete
         {
             try
             {
-            var channel = ChannelResource.Fetch(pathServiceSid: this.Twilio_ChatServiceSid, pathSid: channelSid);
+                var channel = ChannelResource.Fetch(pathServiceSid: this.Twilio_ChatServiceSid, pathSid: channelSid);
                 return channel;
             }
-            catch (Exception e){
+            catch (Exception e)
+            {
                 return null;
             }
         }
