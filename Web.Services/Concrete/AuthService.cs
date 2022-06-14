@@ -102,6 +102,7 @@ namespace Web.Services.Concrete
                         if (!string.IsNullOrEmpty(notificationChannelSid))
                         {
                             user.UserChannelSid = notificationChannelSid;
+                            user.Password = encryptedPassword;
                             this._userRepo.Update(user);
                         }
                         if (this._adminService.getRoleListByUserId(user.UserId).ToList().Any(x => x.IsSuperAdmin))
