@@ -956,6 +956,156 @@ namespace Web.Services.Concrete
             }
             return new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "Record Not Found" };
         }
+        public BaseResponse GetCodeColumnDataById(int codeId, string codeName,string fieldName)
+        {
+            string tbl_Name = $"Code{(codeName != UCLEnums.Sepsis.ToString() ? codeName + "s" : codeName)}";
+            var tableInfo = this._dbContext.LoadStoredProcedure("md_getTableInfoByTableName")
+                                .WithSqlParam("@tableName", tbl_Name)
+                                .ExecuteStoredProc_ToDictionary().FirstOrDefault();
+            var fieldNames = tableInfo["fieldName"].ToString().Split(",").ToList();
+            var fieldDataTypes = tableInfo["fieldDataType"].ToString().Split(",").ToList();
+
+            //string qry = $"Select * " +
+            //             $"from {tbl_Name} " +
+            //             $"WHERE Code{codeName}Id = {codeId} and IsDeleted = 0";
+            //var codeDataVM = this._dbContext.LoadSQLQuery(qry).ExecuteStoredProc_ToDictionary();
+
+            var codeDataVM = this._dbContext.LoadStoredProcedure("md_getCodeColumnDataById")
+                                 .WithSqlParam("@codeName", codeName)
+                                 .WithSqlParam("@columnName", fieldName)
+                                 .WithSqlParam("@codeId", codeId)
+                                 .ExecuteStoredProc_ToDictionary().FirstOrDefault();
+
+            if (codeDataVM != null && codeDataVM.Count() > 0)
+            {
+                if (codeName == UCLEnums.Stemi.ToString())
+                {
+                    int Id = codeDataVM["codeSTEMIId"].ToString().ToInt();
+                    codeDataVM.Remove("codeSTEMIId");
+                    codeDataVM.Add("codeStemiId", Id);
+                }
+
+                if (codeDataVM.ContainsKey("attachments") && codeDataVM["attachments"] != null && codeDataVM["attachments"].ToString() != "")
+                {
+                    string Attachments = codeDataVM["attachments"].ToString();
+                    if (!string.IsNullOrEmpty(Attachments) && !string.IsNullOrWhiteSpace(Attachments))
+                    {
+                        string path = this._RootPath + Attachments;
+                        List<string> FilesList = new();
+                        if (Directory.Exists(path))
+                        {
+                            DirectoryInfo AttachFiles = new DirectoryInfo(path);
+                            foreach (var item in AttachFiles.GetFiles())
+                            {
+                                FilesList.Add(Attachments + "/" + item.Name);
+                            }
+                            codeDataVM.Add("attachmentsPath", FilesList);
+                        }
+                    }
+                }
+
+                if (codeDataVM.ContainsKey("audio") && codeDataVM["audio"] != null && codeDataVM["audio"].ToString() != "")
+                {
+                    string audio = codeDataVM["audio"].ToString();
+                    if (!string.IsNullOrEmpty(audio) && !string.IsNullOrWhiteSpace(audio))
+                    {
+                        string path = this._RootPath + audio;
+                        List<string> FilesList = new();
+                        if (Directory.Exists(path))
+                        {
+                            DirectoryInfo AttachFiles = new DirectoryInfo(path);
+                            foreach (var item in AttachFiles.GetFiles())
+                            {
+                                FilesList.Add(audio + "/" + item.Name);
+                            }
+                            codeDataVM.Add("audiosPath", FilesList);
+                        }
+                    }
+                }
+
+                if (codeDataVM.ContainsKey("video") && codeDataVM["video"] != null && codeDataVM["video"].ToString() != "")
+                {
+                    string video = codeDataVM["video"].ToString();
+                    if (!string.IsNullOrEmpty(video) && !string.IsNullOrWhiteSpace(video))
+                    {
+                        string path = this._RootPath + video;
+                        List<string> FilesList = new();
+                        if (Directory.Exists(path))
+                        {
+                            DirectoryInfo AttachFiles = new DirectoryInfo(path);
+                            foreach (var item in AttachFiles.GetFiles())
+                            {
+                                FilesList.Add(video + "/" + item.Name);
+                            }
+                            codeDataVM.Add("videosPath", FilesList);
+                        }
+                    }
+                }
+
+                //string Type = codeDataVM["isEMS"] != null && codeDataVM["isEMS"].ToString().ToBool() ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription();
+
+                //var serviceIds = this._activeCodeRepo.Table.Where(x => x.OrganizationIdFk == codeDataVM["organizationIdFk"].ToString().ToInt() && x.CodeIdFk == codeName.GetActiveCodeId() && x.Type == Type && x.IsActive.HasValue && x.IsActive.Value && !x.IsDeleted).Select(x => new { x.DefaultServiceLineTeam, x.ServiceLineTeam1, x.ServiceLineTeam2 }).FirstOrDefault();
+                //var serviceLineIds = (from x in this._codesServiceLinesMappingRepo.Table
+                //                      where x.OrganizationIdFk == codeDataVM["organizationIdFk"].ToString().ToInt() && x.CodeIdFk == codeName.GetActiveCodeId()
+                //                      && x.ActiveCodeId == codeId && x.ActiveCodeName == codeName
+                //                      select new { x.DefaultServiceLineIdFk, x.ServiceLineId1Fk, x.ServiceLineId2Fk }).FirstOrDefault();
+
+                //if (serviceIds != null)
+                //{
+                //    List<int> defaultIds = new();
+                //    List<int> team1 = new();
+                //    List<int> team2 = new();
+                //    if (serviceLineIds != null)
+                //    {
+                //        defaultIds = serviceIds.DefaultServiceLineTeam.ToIntList().Where(x => serviceLineIds.DefaultServiceLineIdFk.ToIntList().Contains(x)).Distinct().ToList();
+                //        team1 = serviceIds.ServiceLineTeam1.ToIntList().Where(x => serviceLineIds.ServiceLineId1Fk.ToIntList().Contains(x)).Distinct().ToList();
+                //        team2 = serviceIds.ServiceLineTeam2.ToIntList().Where(x => serviceLineIds.ServiceLineId2Fk.ToIntList().Contains(x)).Distinct().ToList();
+                //    }
+                //    var DefaultServiceLineTeam = this._serviceLineRepo.Table.Where(x => serviceIds.DefaultServiceLineTeam.ToIntList().Distinct().Contains(x.ServiceLineId) && !x.IsDeleted).Select(x => new ServiceLineVM() { ServiceLineId = x.ServiceLineId, ServiceName = x.ServiceName, IsSelected = defaultIds.Contains(x.ServiceLineId) }).ToList();
+                //    var ServiceLineTeam1 = this._serviceLineRepo.Table.Where(x => serviceIds.ServiceLineTeam1.ToIntList().Distinct().Contains(x.ServiceLineId) && !x.IsDeleted).Select(x => new ServiceLineVM() { ServiceLineId = x.ServiceLineId, ServiceName = x.ServiceName, IsSelected = team1.Contains(x.ServiceLineId) }).ToList();
+                //    var ServiceLineTeam2 = this._serviceLineRepo.Table.Where(x => serviceIds.ServiceLineTeam2.ToIntList().Distinct().Contains(x.ServiceLineId) && !x.IsDeleted).Select(x => new ServiceLineVM() { ServiceLineId = x.ServiceLineId, ServiceName = x.ServiceName, IsSelected = team2.Contains(x.ServiceLineId) }).ToList();
+
+                //    codeDataVM.Add("defaultServiceLineTeam", DefaultServiceLineTeam);
+                //    codeDataVM.Add("serviceLineTeam1", ServiceLineTeam1);
+                //    codeDataVM.Add("serviceLineTeam2", ServiceLineTeam2);
+                //}
+
+
+                //if (codeDataVM["isEMS"].ToString() != null && codeDataVM["isEMS"].ToString().ToBool())
+                //    codeDataVM.Add("organizationData", GetHosplitalAddressObject(codeDataVM["organizationIdFk"].ToString().ToInt()));
+
+                //var indeces = fieldDataTypes.Select((c, i) => new { character = c, index = i })
+                //         .Where(list => list.character.Trim() == "datetime")
+                //         .Select(x => x.index)
+                //         .ToList();
+
+                //foreach (var item in indeces)
+                //{
+                //    string field = fieldNames.ElementAt(item).ToCamelCase();
+                //    var fieldVal = codeDataVM[field] != null && codeDataVM[field].ToString() != "" ? DateTime.Parse(codeDataVM[field].ToString()).ToTimezoneFromUtc("Eastern Standard Time").ToString("yyyy-MM-dd hh:mm:ss tt") : null;
+                //    codeDataVM.Add(field + "Str", fieldVal);
+                //}
+                if (codeDataVM.ContainsKey("gender"))
+                {
+                    codeDataVM.Remove("gender");
+                }
+                var bloodThinnerIds = codeDataVM.ContainsKey("bloodThinners") && codeDataVM["bloodThinners"] != null && codeDataVM["bloodThinners"].ToString() != "" ? codeDataVM["bloodThinners"].ToString().ToIntList() : new List<int>();
+                var bloodThinners = _controlListDetailsRepo.Table.Where(b => bloodThinnerIds.Contains(b.ControlListDetailId)).Select(b => new { Id = b.ControlListDetailId, b.Title }).ToList();
+                string bloodThinnersTitles = "";
+                foreach(var bt in bloodThinners)
+                {
+                    bloodThinnersTitles += !string.IsNullOrEmpty(bloodThinnersTitles) ? ", " + bt.Title : bt.Title;
+                }
+                if (bloodThinners.Count() > 0)
+                {
+                    codeDataVM.Add("bloodThinnersTitle", bloodThinnersTitles);
+                    codeDataVM.Remove("bloodThinners");
+                }
+
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Found", Body = codeDataVM };
+            }
+            return new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "Record Not Found" };
+        }
         public BaseResponse AddOrUpdateCodeData(IDictionary<string, object> codeData)
         {
 
@@ -990,7 +1140,7 @@ namespace Web.Services.Concrete
                         fieldValue = null;
                     }
 
-                    var prevRecord =this.GetCodeDataById(codeId, codeName).Body;
+                    var prevRecord =this.GetCodeColumnDataById(codeId, codeName, fieldName).Body;
                     row = this._dbContext.LoadStoredProcedure("md_UpdateCodes")
                                              .WithSqlParam("codeName", codeName)
                                              .WithSqlParam("fieldName", fieldName)
@@ -998,7 +1148,7 @@ namespace Web.Services.Concrete
                                              .WithSqlParam("codeId", codeId)
                                              .WithSqlParam("modifiedBy", ApplicationSettings.UserId)
                                              .ExecuteStoredProc<UpdatedCodeVM>().FirstOrDefault();
-                    var updatedRecord =this.GetCodeDataById(codeId, codeName).Body;
+                    var updatedRecord =this.GetCodeColumnDataById(codeId, codeName, fieldName).Body;
                     var checkDifference = HelperExtension.GetDifferences(prevRecord, updatedRecord);
 
 

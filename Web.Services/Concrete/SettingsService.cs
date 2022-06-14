@@ -242,8 +242,16 @@ namespace Web.Services.Concrete
                 var jobj2 = JObject.Parse(model.Changeset);
                 var jobj1Props = jobj1.Properties().ToList();
                 foreach (var p in jobj1Props)
-                {
-                    var typeOfPrevObj = jobj1[p.Name].Type.ToString();
+                    {
+                        if (jobj1[p.Name] == null || jobj1[p.Name].ToString() == "")
+                        {
+                            jobj1[p.Name] = "null";
+                        }
+                        if (jobj2[p.Name] == null || jobj2[p.Name].ToString() == "")
+                        {
+                            jobj2[p.Name] = "null";
+                        }
+                        var typeOfPrevObj = jobj1[p.Name].Type.ToString();
                     var typeOfUpdatedObj = jobj2[p.Name].Type.ToString();
                     if (typeOfPrevObj != "Array" && typeOfUpdatedObj != "Array")
                     {
