@@ -586,13 +586,13 @@ namespace Web.Services.Concrete
                                     msg.body += $"<strong>Patient Name:</strong> {keyValues["PatientLastName"].ToString()} </br>";
                                 }
                             }
-                            if (keyValues.ContainsKey("DateOfBirth"))
+                            if (keyValues.ContainsKey("DateOfBirth") && keyValues["DateOfBirth"] != null)
                             {
                                 DateTime dob = DateTime.Parse(keyValues["DateOfBirth"].ToString());
                                 msg.body += $"<strong>Dob:</strong> {dob:MM-dd-yyyy} </br>";
                             }
-                            msg.body += keyValues.ContainsKey("MedicalRecordNumber") ? $"<strong>Medical Record Number:</strong> {keyValues["MedicalRecordNumber"].ToString()} </br>" : "";
-                            msg.body += keyValues.ContainsKey("CallbackNumber") && keyValues["CallbackNumber"].ToString() != "(___) ___-____" ? $"<strong>Callback Number:</strong> {keyValues["CallbackNumber"].ToString()} </br>" : "";
+                            msg.body += keyValues.ContainsKey("MedicalRecordNumber") && keyValues["MedicalRecordNumber"] != null ? $"<strong>Medical Record Number:</strong> {keyValues["MedicalRecordNumber"].ToString()} </br>" : "";
+                            msg.body += keyValues.ContainsKey("CallbackNumber") && keyValues["CallbackNumber"] != null ? (keyValues["CallbackNumber"].ToString() != "(___) ___-____" ? $"<strong>Callback Number:</strong> {keyValues["CallbackNumber"].ToString()} </br>" : "") : "";
                             _communicationService.sendPushNotification(msg);
 
                             var orgByServiceId = _dptRepo.Table.Where(x => !x.IsDeleted && x.DepartmentId == _serviceLineRepo.Table.Where(x => !x.IsDeleted && x.ServiceLineId == serviceLineId).Select(x => x.DepartmentIdFk).FirstOrDefault()).Select(x => x.OrganizationIdFk).FirstOrDefault();
@@ -684,8 +684,8 @@ namespace Web.Services.Concrete
                         DateTime dob = DateTime.Parse(keyValues["DateOfBirth"].ToString());
                         msg.body += $"<strong>Dob:</strong> {dob:MM-dd-yyyy} </br>";
                     }
-                    msg.body += keyValues.ContainsKey("MedicalRecordNumber") ? $"<strong>Medical Record Number:</strong> {keyValues["MedicalRecordNumber"].ToString()} </br>" : "";
-                    msg.body += keyValues.ContainsKey("CallbackNumber") && keyValues["CallbackNumber"].ToString() != "(___) ___-____" ? $"<strong>Callback Number:</strong> {keyValues["CallbackNumber"].ToString()} </br>" : "";
+                    msg.body += keyValues.ContainsKey("MedicalRecordNumber") && keyValues["MedicalRecordNumber"] != null ? $"<strong>Medical Record Number:</strong> {keyValues["MedicalRecordNumber"].ToString()} </br>" : "";
+                    msg.body += keyValues.ContainsKey("CallbackNumber") && keyValues["CallbackNumber"] != null ? (keyValues["CallbackNumber"].ToString() != "(___) ___-____" ? $"<strong>Callback Number:</strong> {keyValues["CallbackNumber"].ToString()} </br>" : "") : "";
                     msg.channelSid = channel.Sid;
 
                     var sendMsg = _communicationService.sendPushNotification(msg);
@@ -699,7 +699,7 @@ namespace Web.Services.Concrete
                     distinctUsers = users.Select(x => new { x.UserUniqueId, x.UserId }).Distinct().ToList();
                     var notification = new PushNotificationVM()
                     {
-                        Id = keyValues["CallbackNumber"].ToString().ToInt(),
+                        Id = Consult_Counter.ToInt(),
                         OrgId = orgByServiceId.Value,
                         UserChannelSid = distinctUsers.Select(x => x.UserUniqueId).Distinct().ToList(),
                         From = "Consult",

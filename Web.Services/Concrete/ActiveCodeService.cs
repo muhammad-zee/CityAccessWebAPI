@@ -4019,7 +4019,7 @@ namespace Web.Services.Concrete
                 msg.author = "System";
                 msg.attributes = "";
                 msg.body = $"<strong> {(codeSepsis.IsEms ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription())} {UCLEnums.Sepsis.ToString()} </strong></br></br>";
-                msg.body += $"<strong> Code Number: {codeSepsis.CodeSepsisNumber} </br>";
+                msg.body += $"<strong> Code Number: </strong> {codeSepsis.CodeSepsisNumber} </br>";
                 if (codeSepsis.PatientName != null && codeSepsis.PatientName != "")
                     msg.body += $"<strong>Patient Name: </strong> {codeSepsis.PatientName} </br>";
                 if (codeSepsis.Dob != null)
