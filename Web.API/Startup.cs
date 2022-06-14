@@ -66,7 +66,7 @@ namespace Web.API
                 c.SwaggerDoc("v1", new OpenApiInfo
                 {
                     Version = "v1",
-                    Title = "Routing And Queueing API",
+                    Title = "MD Route API",
                     // Description = "API with ASP.NET Core",
                     //Contact = new OpenApiContact()
                     //{

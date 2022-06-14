@@ -902,7 +902,7 @@ namespace Web.Services.Concrete
             try
             {
                 string Two_Factor_Authentication_Code = GenerateTwoFactorAuthenticationCode();
-                string Message_Body = "Routing and Queueing Two Factor Authentication Code: " + Two_Factor_Authentication_Code;
+                string Message_Body = "MD Route Two Factor Authentication Code: " + Two_Factor_Authentication_Code;
                 bool Code_Sent = false;
                 if (Authentication.SendCodeOn.Equals(TwoFactorAuthenticationEnums.S.ToString()))
                 {
