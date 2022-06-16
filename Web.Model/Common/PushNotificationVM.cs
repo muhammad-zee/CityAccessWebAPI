@@ -22,6 +22,7 @@ namespace Web.Model.Common
         public string FieldName { get; set; }
         public object FieldValue { get; set; }
         public string FieldDataType { get; set; }
+        public object RefreshModules { get; set; }
 
     }
 }

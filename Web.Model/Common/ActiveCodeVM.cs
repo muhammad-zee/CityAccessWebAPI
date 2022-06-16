@@ -50,8 +50,10 @@ namespace Web.Model.Common
         public int UserIdFk { get; set; }
         public int CodeId { get; set; }
         public int CodeNumber { get; set; }
+        public string CodeName { get; set; }
         public bool? IsEms { get; set; }
         public string ChannelSid { get; set; }
+        public string UserUniqueId { get; set; }
         public string PatientName { get; set; }
         public string UpdatedValue { get; set; }
         public string PreviousValue { get; set; }

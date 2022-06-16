@@ -252,7 +252,7 @@ namespace Web.Services.Concrete
             var activeCodesData = this._dbContext.LoadStoredProcedure("md_getActiveCodesForDashboard")
                                     .WithSqlParam("@organizationId", orgId)
                                     .ExecuteStoredProc<CodeStrokeVM>();
-            
+
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = activeCodesData };
         }
 
@@ -706,7 +706,7 @@ namespace Web.Services.Concrete
                                                        .ExecuteStoredProc<User>().Select(x => x.UserUniqueId).ToList();
 
                 var codeBlue = new CodeBlueVM();
-                codeBlue.CodeBlueNumber= files.CodeNumber;
+                codeBlue.CodeBlueNumber = files.CodeNumber;
                 object fieldValue = new();
 
                 if (files.Type == "Video")
@@ -961,7 +961,7 @@ namespace Web.Services.Concrete
             }
             return new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "Record Not Found" };
         }
-        public BaseResponse GetCodeColumnDataById(int codeId, string codeName,string fieldName)
+        public BaseResponse GetCodeColumnDataById(int codeId, string codeName, string fieldName)
         {
             string tbl_Name = $"Code{(codeName != UCLEnums.Sepsis.ToString() ? codeName + "s" : codeName)}";
             var tableInfo = this._dbContext.LoadStoredProcedure("md_getTableInfoByTableName")
@@ -1097,7 +1097,7 @@ namespace Web.Services.Concrete
                 var bloodThinnerIds = codeDataVM.ContainsKey("bloodThinners") && codeDataVM["bloodThinners"] != null && codeDataVM["bloodThinners"].ToString() != "" ? codeDataVM["bloodThinners"].ToString().ToIntList() : new List<int>();
                 var bloodThinners = _controlListDetailsRepo.Table.Where(b => bloodThinnerIds.Contains(b.ControlListDetailId)).Select(b => new { Id = b.ControlListDetailId, b.Title }).ToList();
                 string bloodThinnersTitles = "";
-                foreach(var bt in bloodThinners)
+                foreach (var bt in bloodThinners)
                 {
                     bloodThinnersTitles += !string.IsNullOrEmpty(bloodThinnersTitles) ? ", " + bt.Title : bt.Title;
                 }
@@ -1131,7 +1131,8 @@ namespace Web.Services.Concrete
                         {
                             fieldValue = DateTime.Parse(codeData[fieldName].ToString()).ToUniversalTimeZone();
                         }
-                        else {
+                        else
+                        {
                             fieldValue = null;
                         }
                     }
@@ -1145,7 +1146,7 @@ namespace Web.Services.Concrete
                         fieldValue = null;
                     }
 
-                    var prevRecord =this.GetCodeColumnDataById(codeId, codeName, fieldName).Body;
+                    var prevRecord = this.GetCodeColumnDataById(codeId, codeName, fieldName).Body;
                     row = this._dbContext.LoadStoredProcedure("md_UpdateCodes")
                                              .WithSqlParam("codeName", codeName)
                                              .WithSqlParam("fieldName", fieldName)
@@ -1153,13 +1154,13 @@ namespace Web.Services.Concrete
                                              .WithSqlParam("codeId", codeId)
                                              .WithSqlParam("modifiedBy", ApplicationSettings.UserId)
                                              .ExecuteStoredProc<UpdatedCodeVM>().FirstOrDefault();
-                    var updatedRecord =this.GetCodeColumnDataById(codeId, codeName, fieldName).Body;
+                    var updatedRecord = this.GetCodeColumnDataById(codeId, codeName, fieldName).Body;
                     var checkDifference = HelperExtension.GetDifferences(prevRecord, updatedRecord, ObjectTypeEnums.Dictionary.ToInt());
 
 
 
                     this._dbContext.Log(checkDifference.updatedRecord, tbl_Name, row.CodeNumber, ActivityLogActionEnums.Update.ToInt(), checkDifference.previousRecord);
-                  
+
                     var userUniqueIds = this._dbContext.LoadStoredProcedure("md_getUserUniqueIdsByCodeId")
                                                         .WithSqlParam("@userId", ApplicationSettings.UserId)
                                                         .WithSqlParam("@codeId", codeId)
@@ -1193,7 +1194,8 @@ namespace Web.Services.Concrete
                         };
                         var channel = _communicationService.sendPushNotification(msg);
                     }
-                    else {
+                    else
+                    {
                         var notification = new PushNotificationVM()
                         {
                             Id = codeId,
@@ -1403,6 +1405,53 @@ namespace Web.Services.Concrete
                         }
                         var conterName = $"Code_{codeName}_Counter";
                         var Counter = this._dbContext.LoadStoredProcedure("md_getMDRouteCounter").WithSqlParam("@C_Name", conterName).ExecuteStoredProc<MDRoute_CounterVM>().Select(x => x.Counter_Value).FirstOrDefault();
+
+                        if (codeData.ContainsKey("removePrevEMS") && codeData["removePrevEMS"] != null && codeData["removePrevEMS"].ToString().ToBool())
+                        {
+                            var userIds = this._dbContext.LoadStoredProcedure("md_getAllCodesGroupUserIds")
+                                                              .WithSqlParam("@userId", ApplicationSettings.UserId)
+                                                              .ExecuteStoredProc<UpdatedCodeVM>();
+
+
+                            var deletedRows = this._dbContext.LoadStoredProcedure("md_DeleteAllActiveEMSByUserId")
+                                                              .WithSqlParam("@userId", ApplicationSettings.UserId)
+                                                              .ExecuteStoredProc_ToDictionary().FirstOrDefault();
+                            var IsDeleted = deletedRows["isDeleted"].ToString().ToBool();
+                            if (IsDeleted)
+                            {
+                                foreach (var item in userIds.Select(x => new { x.CodeNumber, x.CodeName }).Distinct().ToList())
+                                {
+                                    string tbl = $"Code{(item.CodeName != UCLEnums.Sepsis.ToString() ? item.CodeName + "s" : item.CodeName)}";
+                                    this._dbContext.Log(new { }, tbl, item.CodeNumber, ActivityLogActionEnums.Delete.ToInt());
+                                }
+
+
+                                var channelSids = userIds.Select(x => x.ChannelSid).Distinct().ToList();
+
+                                var channelDeleted = this.DeleteCodesChannels(channelSids);
+                                var userData = userIds.DistinctBy(x => x.UserUniqueId).ToList();
+                                foreach (var item in userData)
+                                {
+                                    var notification = new PushNotificationVM()
+                                    {
+                                        Id = item.CodeId,
+                                        OrgId = userIds.Select(x => x.OrganizationIdFk).FirstOrDefault(),
+                                        Type = "ChannelStatusChanged",
+                                        ChannelIsActive = false,
+                                        ChannelSid = userIds.Select(x => x.ChannelSid).FirstOrDefault(),
+                                        UserChannelSid = userIds.Select(x => x.UserUniqueId).Distinct().ToList(),
+                                        From = UCLEnums.Stemi.ToString(),
+                                        RouteLink3 = RouteEnums.ActiveEMS.ToDescription(),
+                                        RouteLink4 = RouteEnums.Dashboard.ToDescription(),
+                                        RouteLink5 = RouteEnums.InhouseCodeGrid.ToDescription(),
+                                        RefreshModules = new List<string>() { UCLEnums.EMS.ToDescription(), UCLEnums.InhouseCode.ToDescription(), RouteEnums.Dashboard.ToString() }
+                                    };
+
+                                    _communicationService.pushNotification(notification);
+                                }
+                            }
+                        }
+
                         string query = $"INSERT INTO [dbo].[{tbl_Name}] (";
 
                         var keys = codeData.Keys.ToList();
@@ -1410,7 +1459,7 @@ namespace Web.Services.Concrete
 
                         for (int i = 0; i < keys.Count(); i++)
                         {
-                            if (keys[i] != $"code{codeName}Id" && keys[i] != "CreatedBy" && keys[i] != "CreatedDate" && keys[i] != "codeName")
+                            if (keys[i] != $"code{codeName}Id" && keys[i] != "CreatedBy" && keys[i] != "CreatedDate" && keys[i] != "codeName" && keys[i] != "removePrevEMS")
                             {
                                 query += $"[{keys[i]}],";
                             }
@@ -1425,7 +1474,7 @@ namespace Web.Services.Concrete
 
                         for (int i = 0; i < values.Count; i++)
                         {
-                            if (keys[i] != $"code{codeName}Id" && keys[i] != "CreatedBy" && keys[i] != "CreatedDate" && keys[i] != "codeName")
+                            if (keys[i] != $"code{codeName}Id" && keys[i] != "CreatedBy" && keys[i] != "CreatedDate" && keys[i] != "codeName" && keys[i] != "removePrevEMS")
                             {
                                 query += values[i] != null ? (values[i].ToString() != "(___) ___-____" ? "'" + values[i] + "'," : "'',") : "NULL,";
                             }
@@ -2525,6 +2574,7 @@ namespace Web.Services.Concrete
                     RouteLink3 = RouteEnums.ActiveEMS.ToDescription(), // RouteEnums.ActiveEMS.ToDescription(),
                     RouteLink4 = RouteEnums.Dashboard.ToDescription(),
                     RouteLink5 = RouteEnums.InhouseCodeGrid.ToDescription(), // RouteEnums.InhouseCodeGrid.ToDescription()
+                    RefreshModules = new List<string>() { UCLEnums.EMS.ToDescription(), UCLEnums.InhouseCode.ToDescription(), RouteEnums.Dashboard.ToString() }
                 };
 
                 _communicationService.pushNotification(notification);
@@ -2776,6 +2826,7 @@ namespace Web.Services.Concrete
                     RouteLink3 = RouteEnums.ActiveEMS.ToDescription(), // RouteEnums.ActiveEMS.ToDescription(),
                     RouteLink4 = RouteEnums.Dashboard.ToDescription(), // RouteEnums.Dashboard.ToDescription(),
                     RouteLink5 = RouteEnums.InhouseCodeGrid.ToDescription(), // RouteEnums.InhouseCodeGrid.ToDescription()
+                    RefreshModules = new List<string>() { UCLEnums.EMS.ToDescription(), UCLEnums.InhouseCode.ToDescription(), RouteEnums.Dashboard.ToString() }
                 };
 
                 _communicationService.pushNotification(notification);
@@ -4053,6 +4104,7 @@ namespace Web.Services.Concrete
                     RouteLink3 = RouteEnums.ActiveEMS.ToDescription(), // RouteEnums.ActiveEMS.ToDescription(),
                     RouteLink4 = RouteEnums.Dashboard.ToDescription(),
                     RouteLink5 = RouteEnums.InhouseCodeGrid.ToDescription(), // RouteEnums.InhouseCodeGrid.ToDescription()
+                    RefreshModules = new List<string>() { UCLEnums.EMS.ToDescription(), UCLEnums.InhouseCode.ToDescription(), RouteEnums.Dashboard.ToString() }
                 };
 
                 _communicationService.pushNotification(notification);
@@ -4118,7 +4170,8 @@ namespace Web.Services.Concrete
                     Msg = UCLEnums.Sepsis.ToString() + " is " + (status ? "Activated" : "Inactivated"),
                     RouteLink3 = RouteEnums.ActiveEMS.ToDescription(),
                     RouteLink4 = RouteEnums.Dashboard.ToDescription(),
-                    RouteLink5 = RouteEnums.InhouseCodeGrid.ToDescription()
+                    RouteLink5 = RouteEnums.InhouseCodeGrid.ToDescription(),
+                    RefreshModules = new List<string>() { UCLEnums.EMS.ToDescription(), UCLEnums.InhouseCode.ToDescription(), RouteEnums.Dashboard.ToString() }
                 };
 
                 _communicationService.pushNotification(notification);
@@ -5131,6 +5184,7 @@ namespace Web.Services.Concrete
                     RouteLink3 = RouteEnums.ActiveEMS.ToDescription(), // RouteEnums.ActiveEMS.ToDescription(),
                     RouteLink4 = RouteEnums.Dashboard.ToDescription(),
                     RouteLink5 = RouteEnums.InhouseCodeGrid.ToDescription(), // RouteEnums.InhouseCodeGrid.ToDescription()
+                    RefreshModules = new List<string>() { UCLEnums.EMS.ToDescription(), UCLEnums.InhouseCode.ToDescription(), RouteEnums.Dashboard.ToString() }
                 };
 
                 _communicationService.pushNotification(notification);
@@ -5385,7 +5439,8 @@ namespace Web.Services.Concrete
                     Msg = UCLEnums.Stemi.ToString() + " is " + (status ? "Activated" : "Inactivated"),
                     RouteLink3 = RouteEnums.ActiveEMS.ToDescription(),
                     RouteLink4 = RouteEnums.Dashboard.ToDescription(),
-                    RouteLink5 = RouteEnums.InhouseCodeGrid.ToDescription()
+                    RouteLink5 = RouteEnums.InhouseCodeGrid.ToDescription(),
+                    RefreshModules = new List<string>() { UCLEnums.EMS.ToDescription(), UCLEnums.InhouseCode.ToDescription(), RouteEnums.Dashboard.ToString() }
                 };
 
                 _communicationService.pushNotification(notification);
@@ -6476,6 +6531,7 @@ namespace Web.Services.Concrete
                     RouteLink3 = RouteEnums.ActiveEMS.ToDescription(), // RouteEnums.ActiveEMS.ToDescription(),
                     RouteLink4 = RouteEnums.Dashboard.ToDescription(),
                     RouteLink5 = RouteEnums.InhouseCodeGrid.ToDescription(), // RouteEnums.InhouseCodeGrid.ToDescription()
+                    RefreshModules = new List<string>() { UCLEnums.EMS.ToDescription(), UCLEnums.InhouseCode.ToDescription(), RouteEnums.Dashboard.ToString() }
                 };
 
                 _communicationService.pushNotification(notification);
@@ -6727,7 +6783,8 @@ namespace Web.Services.Concrete
                     Msg = UCLEnums.Trauma.ToString() + " is " + (status ? "Activated" : "Inactivated"),
                     RouteLink3 = RouteEnums.ActiveEMS.ToDescription(),
                     RouteLink4 = RouteEnums.Dashboard.ToDescription(),
-                    RouteLink5 = RouteEnums.InhouseCodeGrid.ToDescription()
+                    RouteLink5 = RouteEnums.InhouseCodeGrid.ToDescription(),
+                    RefreshModules = new List<string>() { UCLEnums.EMS.ToDescription(), UCLEnums.InhouseCode.ToDescription(), RouteEnums.Dashboard.ToString() }
                 };
 
                 _communicationService.pushNotification(notification);
@@ -7819,6 +7876,7 @@ namespace Web.Services.Concrete
                     RouteLink3 = RouteEnums.ActiveEMS.ToDescription(), // RouteEnums.ActiveEMS.ToDescription(),
                     RouteLink4 = RouteEnums.Dashboard.ToDescription(),
                     RouteLink5 = RouteEnums.InhouseCodeGrid.ToDescription(), // RouteEnums.InhouseCodeGrid.ToDescription()
+                    RefreshModules = new List<string>() { UCLEnums.EMS.ToDescription(), UCLEnums.InhouseCode.ToDescription(), RouteEnums.Dashboard.ToString() }
                 };
 
                 _communicationService.pushNotification(notification);
@@ -8069,7 +8127,8 @@ namespace Web.Services.Concrete
                     Msg = UCLEnums.Blue.ToString() + " is " + (status ? "Activated" : "Inactivated"),
                     RouteLink3 = RouteEnums.ActiveEMS.ToDescription(),
                     RouteLink4 = RouteEnums.Dashboard.ToDescription(),
-                    RouteLink5 = RouteEnums.InhouseCodeGrid.ToDescription()
+                    RouteLink5 = RouteEnums.InhouseCodeGrid.ToDescription(),
+                    RefreshModules = new List<string>() { UCLEnums.EMS.ToDescription(), UCLEnums.InhouseCode.ToDescription(), RouteEnums.Dashboard.ToString() }
                 };
 
                 _communicationService.pushNotification(notification);
@@ -8615,6 +8674,19 @@ namespace Web.Services.Concrete
         }
 
         #endregion
+
+        public bool DeleteCodesChannels(List<string> ChannelSids, int index = 0)
+        {
+            if (index < ChannelSids.Count)
+            {
+                var res = this._communicationService.deleteConversationChannel(ChannelSids.ElementAt(index), ApplicationSettings.UserId);
+                if (res.Status == HttpStatusCode.OK)
+                {
+                    this.DeleteCodesChannels(ChannelSids, ++index);
+                }
+            }
+            return true;
+        }
 
     }
 }
