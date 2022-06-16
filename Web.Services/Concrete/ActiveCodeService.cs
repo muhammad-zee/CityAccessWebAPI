@@ -406,7 +406,8 @@ namespace Web.Services.Concrete
                 {
                     Id = files.Id,
                     OrgId = rootPath.OrganizationIdFk,
-                    FieldName = (files.Type == "Video" || files.Type == "Audio" ? (files.Type + "s").ToLower() : (files.Type.Replace("s", "")).ToLower()),
+                    FieldName = files.Type,                    
+                    //(files.Type == "Video" || files.Type == "Audio" ? (files.Type + "s").ToLower() : (files.Type.Replace("s", "")).ToLower()),
                     FieldDataType = "file",
                     FieldValue = fieldValue,
                     UserChannelSid = userUniqueIds.Distinct().ToList(),
@@ -494,7 +495,8 @@ namespace Web.Services.Concrete
                 {
                     Id = files.Id,
                     OrgId = rootPath.OrganizationIdFk,
-                    FieldName = (files.Type == "Video" || files.Type == "Audio" ? (files.Type + "s").ToLower() : (files.Type.Replace("s", "")).ToLower()),
+                    FieldName = files.Type,                    
+                    //(files.Type == "Video" || files.Type == "Audio" ? (files.Type + "s").ToLower() : (files.Type.Replace("s", "")).ToLower()),
                     FieldDataType = "file",
                     FieldValue = fieldValue,
                     UserChannelSid = userUniqueIds.Distinct().ToList(),
@@ -583,7 +585,8 @@ namespace Web.Services.Concrete
                 {
                     Id = files.Id,
                     OrgId = rootPath.OrganizationIdFk,
-                    FieldName = (files.Type == "Video" || files.Type == "Audio" ? (files.Type + "s").ToLower() : (files.Type.Replace("s", "")).ToLower()),
+                    FieldName = files.Type,
+                    //(files.Type == "Video" || files.Type == "Audio" ? (files.Type + "s").ToLower() : (files.Type.Replace("s", "")).ToLower()),
                     FieldDataType = "file",
                     FieldValue = fieldValue,
                     UserChannelSid = userUniqueIds.Distinct().ToList(),
@@ -672,7 +675,8 @@ namespace Web.Services.Concrete
                 {
                     Id = files.Id,
                     OrgId = rootPath.OrganizationIdFk,
-                    FieldName = (files.Type == "Video" || files.Type == "Audio" ? (files.Type + "s").ToLower() : (files.Type.Replace("s", "")).ToLower()),
+                    FieldName =  files.Type,
+                    //(files.Type == "Video" || files.Type == "Audio" ? (files.Type + "s").ToLower() : (files.Type.Replace("s", "")).ToLower()),
                     FieldDataType = "file",
                     FieldValue = fieldValue,
                     UserChannelSid = userUniqueIds.Distinct().ToList(),
@@ -761,7 +765,8 @@ namespace Web.Services.Concrete
                 {
                     Id = files.Id,
                     OrgId = rootPath.OrganizationIdFk,
-                    FieldName = (files.Type == "Video" || files.Type == "Audio" ? (files.Type + "s").ToLower() : (files.Type.Replace("s", "")).ToLower()),
+                    FieldName = files.Type, 
+                    //== "Video" || files.Type == "Audio" ? (files.Type + "s").ToLower() : (files.Type.Replace("s", "")).ToLower()),
                     FieldDataType = "file",
                     FieldValue = fieldValue,
                     UserChannelSid = userUniqueIds.Distinct().ToList(),
