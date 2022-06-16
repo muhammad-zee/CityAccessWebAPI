@@ -163,7 +163,6 @@ namespace Web.Services.Concrete
                         var updatedResult = service;
                         var differences = HelperExtension.GetDifferences(previousResult, updatedResult, ObjectTypeEnums.Model.ToInt());
                         this._dbContext.Log(differences.updatedRecord, ActivityLogTableEnums.ServiceLine.ToString(), service.ServiceLineId, ActivityLogActionEnums.Update.ToInt(), differences.previousRecord);
-
                         response = new BaseResponse() { Status = HttpStatusCode.OK, Message = "Successfully Updated", Body = serviceLine };
                     }
                     else
@@ -184,8 +183,8 @@ namespace Web.Services.Concrete
 
             if (newService.Count > 0)
             {
-                string newServiceNames = string.Join(",", newService.Select(d => d.ServiceName).ToArray());
-                this._dbContext.Log(new { ServiceLine = newServiceNames }, ActivityLogTableEnums.ServiceLine.ToString(), 0, ActivityLogActionEnums.Create.ToInt());
+                string newServiceNames = string.Join(", ", newService.Select(d => d.ServiceName).ToArray());
+                this._dbContext.Log(new { Name = newServiceNames }, ActivityLogTableEnums.ServiceLine.ToString(), 0, ActivityLogActionEnums.Create.ToInt());
 
 
             }
@@ -202,7 +201,7 @@ namespace Web.Services.Concrete
                 service.ModifiedBy = userId;
                 service.ModifiedDate = DateTime.UtcNow;
                 _serviceRepo.Update(service);
-                this._dbContext.Log(new { }, ActivityLogTableEnums.ServiceLine.ToString(), serviceLineId, status == false ? ActivityLogActionEnums.Inactive.ToInt() : ActivityLogActionEnums.Active.ToInt());
+                this._dbContext.Log(new { Name = service.ServiceName }, ActivityLogTableEnums.ServiceLine.ToString(), serviceLineId, status == false ? ActivityLogActionEnums.Inactive.ToInt() : ActivityLogActionEnums.Active.ToInt());
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = (status ? "Activate" : "InAvtivate") + " Successfully" };
             }
             else
@@ -378,8 +377,8 @@ namespace Web.Services.Concrete
             }
             if (newDepts.Count > 0)
             {
-                string newDepartmentNames = string.Join(",", newDepts.Select(d => d.DepartmentName).ToArray());
-                    this._dbContext.Log(new { Departments=newDepartmentNames }, ActivityLogTableEnums.Departments.ToString(), 0, ActivityLogActionEnums.Create.ToInt());
+                string newDepartmentNames = string.Join(", ", newDepts.Select(d => d.DepartmentName).ToArray());
+                    this._dbContext.Log(new { Name=newDepartmentNames }, ActivityLogTableEnums.Departments.ToString(), 0, ActivityLogActionEnums.Create.ToInt());
 
             }
             return response;
@@ -417,7 +416,7 @@ namespace Web.Services.Concrete
                 dpt.ModifiedDate = DateTime.UtcNow;
                 _departmentRepo.Update(dpt);
                 //this._organizationDepartmentRepo.Delete(deptOrgRelation);
-                this._dbContext.Log(new { }, ActivityLogTableEnums.Departments.ToString(), departmentId, status == false ? ActivityLogActionEnums.Inactive.ToInt() : ActivityLogActionEnums.Active.ToInt());
+                this._dbContext.Log(new { Name = dpt.DepartmentName }, ActivityLogTableEnums.Departments.ToString(), departmentId, status == false ? ActivityLogActionEnums.Inactive.ToInt() : ActivityLogActionEnums.Active.ToInt());
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = (status ? "Active" : "Inactive") + "Successfully" };
             }
             else
@@ -487,7 +486,7 @@ namespace Web.Services.Concrete
             var organization = new List<Organization>();
             if (ApplicationSettings.isSuperAdmin)
             {
-                organization = _organizationRepo.Table.Where(x => x.IsActive && x.IsDeleted == false && x.OrganizationType == UCLEnums.OutPatient.ToInt()).ToList();
+                organization = _organizationRepo.Table.Where(x => x.IsActive && x.IsDeleted == false && (x.OrganizationType == UCLEnums.OutPatient.ToInt() || x.OrganizationType == UCLEnums.InPatientAndOutPatient.ToInt())).ToList();
             }
             else
             {
@@ -720,7 +719,7 @@ namespace Web.Services.Concrete
                 var org = AutoMapperHelper.MapSingleRow<OrganizationVM, Organization>(organization);
                 org.CreatedDate = DateTime.UtcNow;
                 _organizationRepo.Insert(org);
-                this._dbContext.Log(org, ActivityLogTableEnums.Organizations.ToString(), org.OrganizationId, ActivityLogActionEnums.Create.ToInt());
+                this._dbContext.Log(new { Name=org.OrganizationName}, ActivityLogTableEnums.Organizations.ToString(), org.OrganizationId, ActivityLogActionEnums.Create.ToInt());
                 response = new BaseResponse() { Status = HttpStatusCode.OK, Message = "Successfully Created", Body = organization };
             }
             return response;
@@ -737,7 +736,7 @@ namespace Web.Services.Concrete
                 org.ModifiedDate = DateTime.UtcNow;
                 _organizationRepo.Update(org);
 
-                this._dbContext.Log(new { }, ActivityLogTableEnums.Organizations.ToString(), OrganizationId, status == false ? ActivityLogActionEnums.Inactive.ToInt() : ActivityLogActionEnums.Active.ToInt());
+                this._dbContext.Log(new { Name = org.OrganizationName}, ActivityLogTableEnums.Organizations.ToString(), OrganizationId, status == false ? ActivityLogActionEnums.Inactive.ToInt() : ActivityLogActionEnums.Active.ToInt());
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Deleted Successfully" };
             }
             else
@@ -756,7 +755,7 @@ namespace Web.Services.Concrete
                 org.ModifiedBy = ApplicationSettings.UserId;
                 org.ModifiedDate = DateTime.UtcNow;
                 _organizationRepo.Update(org);
-                this._dbContext.Log(new { }, ActivityLogTableEnums.Organizations.ToString(), OrganizationId, status == false ? ActivityLogActionEnums.Inactive.ToInt() : ActivityLogActionEnums.Active.ToInt());
+                this._dbContext.Log(new { Name = org.OrganizationName }, ActivityLogTableEnums.Organizations.ToString(), OrganizationId, status == false ? ActivityLogActionEnums.Inactive.ToInt() : ActivityLogActionEnums.Active.ToInt());
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Deleted Successfully" };
             }
             else
@@ -944,7 +943,7 @@ namespace Web.Services.Concrete
                         chour.IsDeleted = false;
                         this._clinicalHourRepo.Insert(chour);
 
-                        this._dbContext.Log(chour, ActivityLogTableEnums.ClinicalHours.ToString(), chour.ClinicalHourId, ActivityLogActionEnums.Create.ToInt());
+                        this._dbContext.Log(new { }, ActivityLogTableEnums.ClinicalHours.ToString(), chour.ClinicalHourId, ActivityLogActionEnums.Create.ToInt());
                     }
                 }
 

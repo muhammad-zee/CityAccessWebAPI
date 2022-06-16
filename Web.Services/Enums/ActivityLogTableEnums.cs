@@ -22,6 +22,9 @@ namespace Web.Services.Enums
         ClinicalHours,
         ClinicalHoliday,
         ComponentAccess,
+        InteractiveVoiceResponse,
+        IVRSettings,
+        Roles,
 
         //CodeBlueGroupMembers,
         //InhouseCodesFields,
@@ -57,10 +60,7 @@ namespace Web.Services.Enums
         //ConsultFields,
         //States,
         //CallLog,
-        //InteractiveVoiceResponse,
         //OrganizationConsultFields,
-        //Roles,
-        //IVRSettings,
 
         //FavouriteTeam,
         //Components,

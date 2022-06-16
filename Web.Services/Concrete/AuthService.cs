@@ -527,7 +527,7 @@ namespace Web.Services.Concrete
                             IsDiscoveredByOtherOrganization = register.IsDiscoveredByOtherOrganization
                         };
                         _userRepo.Insert(obj);
-                        this._dbContext.Log(obj, ActivityLogTableEnums.Users.ToString(), obj.UserId, ActivityLogActionEnums.Create.ToInt());
+                        this._dbContext.Log(new { Name = $"{obj.FirstName} {obj.LastName}" }, ActivityLogTableEnums.Users.ToString(), obj.UserId, ActivityLogActionEnums.Create.ToInt());
                         if (register.IsEMS)
                         {
                             try

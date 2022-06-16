@@ -791,6 +791,8 @@ namespace Web.Services.Concrete
             if (model.IvrSettingsId > 0)
             {
                 ivrNode = this._ivrSettingsRepo.Table.Where(i => i.IvrSettingsId == model.IvrSettingsId && !i.IsDeleted).FirstOrDefault();
+                var previousResult = AutoMapperHelper.MapSingleRow<Ivrsetting, Ivrsetting>(ivrNode);
+
                 if (ivrNode != null)
                 {
                     ivrNode.IvrIdFk = model.IvrIdFk;
@@ -805,6 +807,11 @@ namespace Web.Services.Concrete
                     ivrNode.Icon = model.Icon;
                     ivrNode.IsDeleted = false;
                     this._ivrSettingsRepo.Update(ivrNode);
+
+                    var updatedResult = ivrNode;
+                    var differences = HelperExtension.GetDifferences(previousResult, updatedResult, ObjectTypeEnums.Model.ToInt());
+                    this._dbContext.Log(differences.updatedRecord, ActivityLogTableEnums.IVRSettings.ToString(), ivrNode.IvrSettingsId, ActivityLogActionEnums.Update.ToInt(), differences.previousRecord);
+
                 }
 
             }
@@ -823,6 +830,8 @@ namespace Web.Services.Concrete
                 ivrNode.CreatedDate = DateTime.UtcNow;
                 ivrNode.IsDeleted = false;
                 this._ivrSettingsRepo.Insert(ivrNode);
+                this._dbContext.Log(new { Name = ivrNode.Name }, ActivityLogTableEnums.IVRSettings.ToString(), ivrNode.IvrSettingsId, ActivityLogActionEnums.Create.ToInt());
+
             }
             return new BaseResponse()
             {
@@ -992,6 +1001,7 @@ namespace Web.Services.Concrete
             if (model.IvrId > 0)
             {
                 ivr = this._IVRRepo.Table.Where(i => i.IvrId == model.IvrId && !i.IsDeleted).FirstOrDefault();
+                var previousResult = AutoMapperHelper.MapSingleRow<InteractiveVoiceResponse, InteractiveVoiceResponse>(ivr);
                 if (ivr != null)
                 {
                     ivr.OrganizationIdFk = model.OrganizationIdFk;
@@ -1004,6 +1014,9 @@ namespace Web.Services.Concrete
                     ivr.IsDeleted = false;
                     this._IVRRepo.Update(ivr);
                 }
+                var updatedResult = ivr;
+                var differences = HelperExtension.GetDifferences(previousResult, updatedResult, ObjectTypeEnums.Model.ToInt());
+                this._dbContext.Log(differences.updatedRecord, ActivityLogTableEnums.InteractiveVoiceResponse.ToString(), ivr.IvrId, ActivityLogActionEnums.Update.ToInt(), differences.previousRecord);
 
             }
             else
@@ -1019,7 +1032,7 @@ namespace Web.Services.Concrete
                 ivr.IsDeleted = false;
                 this._IVRRepo.Insert(ivr);
 
-
+                this._dbContext.Log(new { Name = ivr.Name }, ActivityLogTableEnums.InteractiveVoiceResponse.ToString(), ivr.IvrId, ActivityLogActionEnums.Create.ToInt());
                 var saveRootNodes = this.addIvrParentNodes(ivr.IvrId);
             }
             return new BaseResponse()
@@ -1031,13 +1044,14 @@ namespace Web.Services.Concrete
 
         public BaseResponse DeleteIVR(int Id)
         {
-            var IVRNode = this._IVRRepo.Table.Where(x => x.IvrId == Id && x.IsDeleted != true).FirstOrDefault();
-            if (IVRNode != null)
+            var ivr = this._IVRRepo.Table.Where(x => x.IvrId == Id && x.IsDeleted != true).FirstOrDefault();
+            if (ivr != null)
             {
-                IVRNode.IsDeleted = true;
-                IVRNode.ModifiedBy = ApplicationSettings.UserId;
-                IVRNode.ModifiedDate = DateTime.UtcNow;
-                this._IVRRepo.Update(IVRNode);
+                ivr.IsDeleted = true;
+                ivr.ModifiedBy = ApplicationSettings.UserId;
+                ivr.ModifiedDate = DateTime.UtcNow;
+                this._IVRRepo.Update(ivr);
+                this._dbContext.Log(new { }, ActivityLogTableEnums.InteractiveVoiceResponse.ToString(), ivr.IvrId.ToInt(), ActivityLogActionEnums.Delete.ToInt());
 
                 var childNodes = _ivrSettingsRepo.Table.Where(x => x.IvrIdFk == Id && x.IsDeleted != true).ToList();
                 childNodes.ForEach(x => { x.IsDeleted = true; x.ModifiedBy = ApplicationSettings.UserId; x.ModifiedDate = DateTime.UtcNow; });
@@ -1055,13 +1069,14 @@ namespace Web.Services.Concrete
 
         public BaseResponse ActiveOrInActiveIVR(int Id, bool status)
         {
-            var IVRNode = this._IVRRepo.Table.Where(x => x.IvrId == Id && x.IsDeleted != true).FirstOrDefault();
-            if (IVRNode != null)
+            var ivr = this._IVRRepo.Table.Where(x => x.IvrId == Id && x.IsDeleted != true).FirstOrDefault();
+            if (ivr != null)
             {
-                IVRNode.IsActive = status;
-                IVRNode.ModifiedBy = ApplicationSettings.UserId;
-                IVRNode.ModifiedDate = DateTime.UtcNow;
-                this._IVRRepo.Update(IVRNode);
+                ivr.IsActive = status;
+                ivr.ModifiedBy = ApplicationSettings.UserId;
+                ivr.ModifiedDate = DateTime.UtcNow;
+                this._dbContext.Log(new {Name=ivr.Name }, ActivityLogTableEnums.InteractiveVoiceResponse.ToString(), Id, status == false ? ActivityLogActionEnums.Inactive.ToInt() : ActivityLogActionEnums.Active.ToInt());
+                this._IVRRepo.Update(ivr);
 
                 var childNodes = _ivrSettingsRepo.Table.Where(x => x.IvrIdFk == Id && x.IsDeleted != true).ToList();
                 childNodes.ForEach(x => { x.IsDeleted = true; x.ModifiedBy = ApplicationSettings.UserId; x.ModifiedDate = DateTime.UtcNow; });

@@ -499,15 +499,16 @@ namespace Web.Services.Concrete
         public string SaveRole(List<RoleVM> roles)
         {
             string response = string.Empty;
-
+            List<Role> newRoles = new();
             foreach (var role in roles)
             {
                 if (role.RoleId == 0)
                 {
-                    var newRole = AutoMapperHelper.MapSingleRow<RoleVM, Role>(role);
-                    if (_role.Table.Count(r => r.RoleName == role.RoleName && r.OrganizationIdFk == role.OrganizationIdFk && !r.IsDeleted) == 0)
+                    if (this._role.Table.Count(r => r.RoleName == role.RoleName && r.OrganizationIdFk == role.OrganizationIdFk && !r.IsDeleted) == 0)
                     {
-                        _role.Insert(newRole);
+                        var newRole = AutoMapperHelper.MapSingleRow<RoleVM, Role>(role);
+                        this._role.Insert(newRole);
+                        newRoles.Add(newRole);
                         response = StatusEnums.Success.ToString();
                     }
                     else
@@ -518,7 +519,10 @@ namespace Web.Services.Concrete
                 }
                 else
                 {
+                
+
                     var newRole = _role.Table.Where(r => r.RoleId == role.RoleId && !r.IsDeleted).FirstOrDefault();
+                    var previousResult = AutoMapperHelper.MapSingleRow<Role, Role>(newRole);
                     newRole.RoleName = role.RoleName;
                     newRole.RoleDescription = role.RoleDescription;
                     newRole.RoleDiscrimination = role.RoleDiscrimination;
@@ -526,13 +530,23 @@ namespace Web.Services.Concrete
                     newRole.OrganizationIdFk = role.OrganizationIdFk;
                     newRole.ModifiedDate = DateTime.UtcNow;
                     newRole.ModifiedBy = role.ModifiedBy;
-
                     _role.Update(newRole);
+
+                    var updatedResult = newRole;
+                    var differences = HelperExtension.GetDifferences(previousResult, updatedResult, ObjectTypeEnums.Model.ToInt());
+                    this._dbContext.Log(differences.updatedRecord, ActivityLogTableEnums.Roles.ToString(), newRole.RoleId, ActivityLogActionEnums.Update.ToInt(), differences.previousRecord);
                     response = StatusEnums.Success.ToString();
                 }
 
             }
 
+            if (newRoles.Count > 0)
+            {
+                string newRoleNames = string.Join(", ", newRoles.Select(d => d.RoleName).ToArray());
+                this._dbContext.Log(new { Name = newRoleNames }, ActivityLogTableEnums.Roles.ToString(), 0, ActivityLogActionEnums.Create.ToInt());
+
+
+            }
             return response;
         }
 
@@ -555,6 +569,7 @@ namespace Web.Services.Concrete
             {
                 Role.IsDeleted = true;
                 _role.Update(Role);
+                this._dbContext.Log(new { }, ActivityLogTableEnums.Roles.ToString(), Id, ActivityLogActionEnums.Delete.ToInt());
                 return new BaseResponse { Status = HttpStatusCode.OK, Message = "Role Deleted" };
             }
             else
@@ -570,6 +585,8 @@ namespace Web.Services.Concrete
             {
                 Role.IsActive = status;
                 _role.Update(Role);
+                this._dbContext.Log(new { Name = Role.RoleName }, ActivityLogTableEnums.Roles.ToString(), Id, status == false ? ActivityLogActionEnums.Inactive.ToInt() : ActivityLogActionEnums.Active.ToInt());
+
                 return new BaseResponse { Status = HttpStatusCode.OK, Message = "Role" };
             }
             else
@@ -928,7 +945,9 @@ namespace Web.Services.Concrete
                     CreatedBy = componentAccess.LoggedInUserId,
                     CreatedDate = DateTime.UtcNow,
                 }).ToList();
-
+                string roleName = this._role.Table.Where(r => r.RoleId == componentAccess.RoleId).Select(r => r.RoleName).FirstOrDefault();
+                string userFullName = this._user.Table.Where(e => e.UserId == componentAccess.UserId).Select(u => u.FirstName + " " + u.LastName).FirstOrDefault();
+                this._dbContext.Log(new { Role = roleName }, ActivityLogTableEnums.ComponentAccess.ToString(), 0, ActivityLogActionEnums.Update.ToInt(), null, $"{userFullName} - {roleName}'s user access");
                 _userAccess.Insert(comps);
 
                 /////////// Get Components which Allowed to Role but NotAllowed to User /////////
@@ -1005,7 +1024,7 @@ namespace Web.Services.Concrete
 
                 _componentAccess.Insert(comps);
                 string roleName = this._role.Table.Where(r => r.RoleId == componentAccess.RoleId).Select(r => r.RoleName).FirstOrDefault();
-                this._dbContext.Log(new { Role= roleName }, ActivityLogTableEnums.ComponentAccess.ToString(), 0, ActivityLogActionEnums.Update.ToInt());
+                this._dbContext.Log(new { Role= roleName }, ActivityLogTableEnums.ComponentAccess.ToString(), 0, ActivityLogActionEnums.Update.ToInt(),null,$"{roleName}'s role access");
 
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Access saved successfully" };
             }

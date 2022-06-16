@@ -230,6 +230,8 @@ namespace Web.Services.Concrete
             {
                 recordName = "Organization";
                 showRecordId = false;
+                showNewFields = true;
+
             }
             else if (model.TableName == ActivityLogTableEnums.Departments.ToString())
             {
@@ -257,12 +259,39 @@ namespace Web.Services.Concrete
             {
                 recordName = "User";
                 showRecordId = false;
+                showNewFields = true;
+
             }
             else if (model.TableName == ActivityLogTableEnums.ComponentAccess.ToString())
             {
                 recordName = "Component Access";
                 showRecordId = false;
+                dynamicDesc = false;
             }
+            else if (model.TableName == ActivityLogTableEnums.InteractiveVoiceResponse.ToString())
+            {
+                recordName = "IVR";
+                showRecordId = false;
+                showNewFields = true;
+            }
+            else if (model.TableName == ActivityLogTableEnums.IVRSettings.ToString())
+            {
+                recordName = "IVR Setting";
+                showRecordId = false;
+                showNewFields = true;
+            }
+            else if (model.TableName == ActivityLogTableEnums.Roles.ToString())
+            {
+                recordName = "Role";
+                showRecordId = false;
+                showNewFields = true;
+            }
+            else
+            {
+                recordName = model.TableName;
+                showRecordId = false;
+            }
+
 
             if (showRecordId)
             {
@@ -297,12 +326,12 @@ namespace Web.Services.Concrete
                             var typeOfPrevObj = jobj1[p.Name].Type.ToString();
                             if (typeOfPrevObj != "Array")
                             {
-                                changedFields = changedFields != "" ? changedFields + ", " : changedFields;
+                                changedFields = changedFields != "" ? changedFields + ", " : ": " + changedFields;
                                 changedFields += $"{jobj1[p.Name]}";
                             }
 
                         }
-                        logDesc = $"<b>{model.UserFullName}</b> {model.ActionName} <b>{recordName}</b> {changedFields} in {model.TableName}";
+                        logDesc = $"<b>{model.UserFullName}</b> {model.ActionName} <b>{recordName}</b>{changedFields} in {model.TableName}";
                     }
                     else
                     {
@@ -334,7 +363,6 @@ namespace Web.Services.Concrete
                             changedFields = changedFields != "" ? changedFields + ", " : changedFields;
                             changedFields += $"{p.Name.SplitCamelCase()} {jobj1[p.Name]} to {jobj2[p.Name]}";
                         }
-
                     }
                     changedFields = changedFields != "" ? changedFields + " of" : changedFields;
                     logDesc = $"<b>{model.UserFullName}</b> {model.ActionName} {changedFields} <b>{recordName}{recordId}</b> In {model.TableName}";
@@ -342,9 +370,41 @@ namespace Web.Services.Concrete
                 else if (model.Action == ActivityLogActionEnums.Active.ToInt() || model.Action == ActivityLogActionEnums.Inactive.ToInt())
                 {
 
-                    logDesc = $"<b>{model.UserFullName}</b> changed status of  <b>{recordName}{recordId}</b> to {model.ActionName}";
+                    if (showNewFields)
+                    {
+                        string changedFields = "";
+                        var jobj1 = JObject.Parse(model.Changeset);
+                        var jobj1Props = jobj1.Properties().ToList();
+                        foreach (var p in jobj1Props)
+                        {
+                            if (jobj1[p.Name] == null || jobj1[p.Name].ToString() == "")
+                            {
+                                jobj1[p.Name] = "null";
+                            }
+                            var typeOfPrevObj = jobj1[p.Name].Type.ToString();
+                            if (typeOfPrevObj != "Array")
+                            {
+                                changedFields = changedFields != "" ? changedFields + ", " : ": " + changedFields;
+                                changedFields += $"{jobj1[p.Name]}";
+                            }
+
+                        }
+                        logDesc = $"<b>{model.UserFullName}</b> changed status of <b>{recordName}</b>{changedFields} to {model.ActionName}";
+                    }
+                    else
+                    {
+                        logDesc = $"<b>{model.UserFullName}</b> changed status of  <b>{recordName}{recordId}</b> to {model.ActionName}";
+
+                    }
+
+                
+                
                 }
                 else if (model.Action == ActivityLogActionEnums.FileUpload.ToInt() || model.Action == ActivityLogActionEnums.FileDelete.ToInt())
+                {
+                    logDesc = $"<b>{model.UserFullName}</b> {model.ActionName} in <b>{recordName}{recordId}</b> {model.TableName}";
+                }
+                else if (model.Action == ActivityLogActionEnums.Acknowledge.ToInt() )
                 {
                     logDesc = $"<b>{model.UserFullName}</b> {model.ActionName} in <b>{recordName}{recordId}</b> {model.TableName}";
                 }
