@@ -16,6 +16,12 @@ namespace Web.Services.Enums
         CodeTraumas,
         Users,
         UsersSchedule,
+        Organizations,
+        Departments,
+        ServiceLine,
+        ClinicalHours,
+        ClinicalHoliday,
+        ComponentAccess,
 
         //CodeBlueGroupMembers,
         //InhouseCodesFields,
@@ -36,7 +42,6 @@ namespace Web.Services.Enums
         //ChatSettings,
         //OrganizationCodeSTEMIFields,
         //OrganizationCodeBlueFields,
-        //Organizations,
         //OrganizationCodeTraumaFields,
 
         //ControlListDetail,
@@ -56,12 +61,11 @@ namespace Web.Services.Enums
         //OrganizationConsultFields,
         //Roles,
         //IVRSettings,
-        //ClinicalHours,
+
         //FavouriteTeam,
         //Components,
         //UserAccess,
-        //ClinicalHoliday,
-        //ComponentAccess,
+
         //ActiveCodes,
         //ConversationChannels,
     }

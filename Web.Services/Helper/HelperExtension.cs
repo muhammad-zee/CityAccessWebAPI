@@ -12,12 +12,14 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Web.Data.Models;
 using Web.Model.Common;
-
+using Web.Services.Enums;
+using Web.Services.Extensions;
 
 namespace Web.Services.Helper
 {
     public static class HelperExtension
     {
+
         public static string SplitCamelCase(this string str)
         {
             if (str != null && str != "")
@@ -283,12 +285,13 @@ namespace Web.Services.Helper
                 return obj;
             }
         }
-
-        public static ActivityLogRecordsEnum GetDifferences(object prevRecord,object updatedRecord)
+   
+        public static ActivityLogRecordsEnum GetDifferences(object prevRecord,object updatedRecord,int? entityType)
         {
-            ActivityLogRecordsEnum resposeObject = new(); 
-            var isDictionary = prevRecord.GetType().GetGenericTypeDefinition().IsAssignableFrom(typeof(Dictionary<,>));
-            if (isDictionary) {
+            ActivityLogRecordsEnum resposeObject = new();
+
+            if (entityType == ObjectTypeEnums.Dictionary.ToInt())
+            {
                var prevRecordDic = (Dictionary<string, object>)prevRecord;
                var updatedRecordDic = (Dictionary<string, object>)updatedRecord;
             var compared = new Dictionary<string, object>();
@@ -316,17 +319,37 @@ namespace Web.Services.Helper
             else
             {
 
-            List<PropertyInfo> differences = new List<PropertyInfo>();
-            foreach (PropertyInfo property in prevRecord.GetType().GetProperties())
-            {
-                object value1 = property.GetValue(prevRecord, null);
-                object value2 = property.GetValue(updatedRecord, null);
-                if (!value1.Equals(value2))
+                List<PropertyInfo> differences = new List<PropertyInfo>();
+                var updatedValue = new ExpandoObject() as IDictionary<string, object>;
+                var previousValue = new ExpandoObject() as IDictionary<string, object>;
+
+
+                var props = prevRecord.GetType().GetProperties();
+                foreach (PropertyInfo property in props)
                 {
-                    differences.Add(property);
+                    
+                        var propDataType = property.PropertyType.Name;
+                    if (property.Name.ToLower() != "modifieddate" && property.Name.ToLower() != "modifieddatestr" && property.Name.ToLower() != "modifiedby")
+                    {
+                        try
+                        {
+                            dynamic prevValue = property.GetValue(prevRecord, null);
+                            dynamic newValue = property.GetValue(updatedRecord, null);
+                            if (prevValue != newValue)
+                            {
+                                updatedValue.Add(property.Name, property.GetValue(updatedRecord, null));
+                                previousValue.Add(property.Name, property.GetValue(prevRecord, null));
+                            }
+                        }
+                        catch(Exception e)
+                        {
+
+                        }
+                        
+                    }
                 }
-            }
-            //return differences;
+                resposeObject.previousRecord = previousValue;
+                resposeObject.updatedRecord = updatedValue;
             }
             return resposeObject;
         }

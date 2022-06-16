@@ -16,7 +16,11 @@ namespace Web.Services.Enums
         [Description("EMS Code")]
         EMS,
         [Description("Code")]
-        InhouseCode
+        InhouseCode,
+
+        InPatient=81,
+        OutPatient = 82,
+        InPatientAndOutPatient = 83
     }
 
     public enum RouteEnums

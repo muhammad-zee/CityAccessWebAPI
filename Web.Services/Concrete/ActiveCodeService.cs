@@ -352,6 +352,7 @@ namespace Web.Services.Concrete
                                                         .WithSqlParam("@codeName", AuthorEnums.Stroke.ToString())
                                                         .ExecuteStoredProc<User>().Select(x => x.UserUniqueId).ToList();
                 var codeStroke = new CodeStrokeVM();
+                codeStroke.CodeStrokeNumber = files.CodeNumber;
                 object fieldValue = new();
 
                 if (files.Type == "Video")
@@ -400,7 +401,7 @@ namespace Web.Services.Concrete
                 }
 
                 fieldValue = new { videosPath = codeStroke.VideosPath, audiosPath = codeStroke.AudiosPath, attachmentsPath = codeStroke.AttachmentsPath };
-                this._dbContext.Log(new { }, ActivityLogTableEnums.CodeStrokes.ToString(), codeStroke.CodeStrokeId, ActivityLogActionEnums.FileDelete.ToInt());
+                this._dbContext.Log(new { }, ActivityLogTableEnums.CodeStrokes.ToString(), codeStroke.CodeStrokeNumber.ToInt(), ActivityLogActionEnums.FileDelete.ToInt());
                 var notification = new PushNotificationVM()
                 {
                     Id = files.Id,
@@ -439,6 +440,7 @@ namespace Web.Services.Concrete
                                                        .WithSqlParam("@codeName", AuthorEnums.Sepsis.ToString())
                                                        .ExecuteStoredProc<User>().Select(x => x.UserUniqueId).ToList();
                 var codeSepsis = new CodeSepsisVM();
+                codeSepsis.CodeSepsisNumber = files.CodeNumber;
                 object fieldValue = new();
 
                 if (files.Type == "Video")
@@ -487,7 +489,7 @@ namespace Web.Services.Concrete
                 }
 
                 fieldValue = new { videosPath = codeSepsis.VideosPath, audiosPath = codeSepsis.AudiosPath, attachmentsPath = codeSepsis.AttachmentsPath };
-                this._dbContext.Log(new { }, ActivityLogTableEnums.CodeSepsis.ToString(), codeSepsis.CodeSepsisId, ActivityLogActionEnums.FileDelete.ToInt());
+                this._dbContext.Log(new { }, ActivityLogTableEnums.CodeSepsis.ToString(), codeSepsis.CodeSepsisNumber.ToInt(), ActivityLogActionEnums.FileDelete.ToInt());
                 var notification = new PushNotificationVM()
                 {
                     Id = files.Id,
@@ -506,7 +508,7 @@ namespace Web.Services.Concrete
             }
             else if (files.CodeType == AuthorEnums.Stemi.ToString())
             {
-                var rootPath = this._codeSTEMIRepo.Table.Where(x => x.CodeStemiid == files.Id).Select($"new({files.Type},IsEms,OrganizationIdFk)").FirstOrDefault();
+                var rootPath = this._codeSTEMIRepo.Table.Where(x => x.CodeStemiNumber == files.CodeNumber).Select($"new({files.Type},IsEms,OrganizationIdFk)").FirstOrDefault();
                 var pathval = rootPath.GetType().GetProperty(files.Type).GetValue(rootPath, null);
                 string path = _environment.WebRootFileProvider.GetFileInfo(pathval + '/' + files.FileName)?.PhysicalPath;
                 File.Delete(path);
@@ -527,6 +529,7 @@ namespace Web.Services.Concrete
                                                        .ExecuteStoredProc<User>().Select(x => x.UserUniqueId).ToList();
 
                 var codeSTEMI = new CodeSTEMIVM();
+                codeSTEMI.CodeStemiNumber = files.CodeNumber;
                 object fieldValue = new();
 
                 if (files.Type == "Video")
@@ -575,7 +578,7 @@ namespace Web.Services.Concrete
                 }
 
                 fieldValue = new { videosPath = codeSTEMI.VideosPath, audiosPath = codeSTEMI.AudiosPath, attachmentsPath = codeSTEMI.AttachmentsPath };
-                this._dbContext.Log(new { }, ActivityLogTableEnums.CodeSTEMIs.ToString(), codeSTEMI.CodeStemiid, ActivityLogActionEnums.FileDelete.ToInt());
+                this._dbContext.Log(new { }, ActivityLogTableEnums.CodeSTEMIs.ToString(), codeSTEMI.CodeStemiNumber.ToInt(), ActivityLogActionEnums.FileDelete.ToInt());
                 var notification = new PushNotificationVM()
                 {
                     Id = files.Id,
@@ -615,6 +618,7 @@ namespace Web.Services.Concrete
                                                        .ExecuteStoredProc<User>().Select(x => x.UserUniqueId).ToList();
 
                 var codeTrauma = new CodeTrumaVM();
+                codeTrauma.CodeTraumaNumber = files.CodeNumber;
                 object fieldValue = new();
 
                 if (files.Type == "Video")
@@ -663,7 +667,7 @@ namespace Web.Services.Concrete
                 }
 
                 fieldValue = new { videosPath = codeTrauma.VideosPath, audiosPath = codeTrauma.AudiosPath, attachmentsPath = codeTrauma.AttachmentsPath };
-                this._dbContext.Log(new { }, ActivityLogTableEnums.CodeTraumas.ToString(), codeTrauma.CodeTraumaId, ActivityLogActionEnums.FileDelete.ToInt());
+                this._dbContext.Log(new { }, ActivityLogTableEnums.CodeTraumas.ToString(), codeTrauma.CodeTraumaNumber.ToInt(), ActivityLogActionEnums.FileDelete.ToInt());
                 var notification = new PushNotificationVM()
                 {
                     Id = files.Id,
@@ -703,6 +707,7 @@ namespace Web.Services.Concrete
                                                        .ExecuteStoredProc<User>().Select(x => x.UserUniqueId).ToList();
 
                 var codeBlue = new CodeBlueVM();
+                codeBlue.CodeBlueNumber= files.CodeNumber;
                 object fieldValue = new();
 
                 if (files.Type == "Video")
@@ -751,7 +756,7 @@ namespace Web.Services.Concrete
                 }
 
                 fieldValue = new { videosPath = codeBlue.VideosPath, audiosPath = codeBlue.AudiosPath, attachmentsPath = codeBlue.AttachmentsPath };
-                this._dbContext.Log(new { }, ActivityLogTableEnums.CodeBlues.ToString(), codeBlue.CodeBlueId, ActivityLogActionEnums.FileDelete.ToInt());
+                this._dbContext.Log(new { }, ActivityLogTableEnums.CodeBlues.ToString(), codeBlue.CodeBlueNumber.ToInt(), ActivityLogActionEnums.FileDelete.ToInt());
                 var notification = new PushNotificationVM()
                 {
                     Id = files.Id,
@@ -1149,7 +1154,7 @@ namespace Web.Services.Concrete
                                              .WithSqlParam("modifiedBy", ApplicationSettings.UserId)
                                              .ExecuteStoredProc<UpdatedCodeVM>().FirstOrDefault();
                     var updatedRecord =this.GetCodeColumnDataById(codeId, codeName, fieldName).Body;
-                    var checkDifference = HelperExtension.GetDifferences(prevRecord, updatedRecord);
+                    var checkDifference = HelperExtension.GetDifferences(prevRecord, updatedRecord, ObjectTypeEnums.Dictionary.ToInt());
 
 
 

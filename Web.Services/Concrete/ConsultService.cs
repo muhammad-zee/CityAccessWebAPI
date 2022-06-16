@@ -468,7 +468,7 @@ namespace Web.Services.Concrete
                 if (rowsEffect > 0)
                 {
                     var updatedResult = this.GetConsultById(ConsultId.ToInt()).Body;
-                    var differences = HelperExtension.GetDifferences(previousResult, updatedResult);
+                    var differences = HelperExtension.GetDifferences(previousResult, updatedResult, ObjectTypeEnums.Dictionary.ToInt());
                     this._dbContext.Log(differences.updatedRecord, ActivityLogTableEnums.Consults.ToString(), keyValues["ConsultNumber"].ToString().ToInt(), ActivityLogActionEnums.Update.ToInt(), differences.previousRecord);
                     return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Consult updated successfully" };
                 }

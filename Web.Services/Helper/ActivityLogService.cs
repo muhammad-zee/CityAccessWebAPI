@@ -77,7 +77,7 @@ namespace Web.Services.Helper
                 action == ActivityLogActionEnums.Active.ToInt() ? "Activated" : "Action Performed";
 
             if (tableName == ActivityLogTableEnums.CodeStrokes.ToString() || tableName == ActivityLogTableEnums.CodeTraumas.ToString() || tableName == ActivityLogTableEnums.CodeBlues.ToString() ||
-                tableName == ActivityLogTableEnums.CodeSepsis.ToString() || tableName == ActivityLogTableEnums.CodeSTEMIs.ToString())
+                tableName == ActivityLogTableEnums.CodeSepsis.ToString() || tableName.ToLower() == ActivityLogTableEnums.CodeSTEMIs.ToString().ToLower())
             {
                 if (action == ActivityLogActionEnums.Update.ToInt())
                 {

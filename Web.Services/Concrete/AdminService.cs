@@ -1004,6 +1004,9 @@ namespace Web.Services.Concrete
                 }).ToList();
 
                 _componentAccess.Insert(comps);
+                string roleName = this._role.Table.Where(r => r.RoleId == componentAccess.RoleId).Select(r => r.RoleName).FirstOrDefault();
+                this._dbContext.Log(new { Role= roleName }, ActivityLogTableEnums.ComponentAccess.ToString(), 0, ActivityLogActionEnums.Update.ToInt());
+
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Access saved successfully" };
             }
 

@@ -336,7 +336,7 @@ namespace Web.Services.Concrete
                         };
                     }
                 }
-
+                var previousResult = AutoMapperHelper.MapSingleRow<User, User>(user);
                 if (register.DobStr != null)
                 {
                     register.Dob = DateTime.Parse(register.DobStr);
@@ -381,6 +381,10 @@ namespace Web.Services.Concrete
                     user.UserImage = targetPath.Replace(RootPath, "").Replace("\\", "/");
                 }
                 _userRepo.Update(user);
+                
+                var updatedResult = user;
+                var differences = HelperExtension.GetDifferences(previousResult, updatedResult, ObjectTypeEnums.Model.ToInt());
+                this._dbContext.Log(differences.updatedRecord, ActivityLogTableEnums.Users.ToString(), user.UserId, ActivityLogActionEnums.Update.ToInt(), differences.previousRecord);
 
 
                 if (user.IsEms)
@@ -523,6 +527,7 @@ namespace Web.Services.Concrete
                             IsDiscoveredByOtherOrganization = register.IsDiscoveredByOtherOrganization
                         };
                         _userRepo.Insert(obj);
+                        this._dbContext.Log(obj, ActivityLogTableEnums.Users.ToString(), obj.UserId, ActivityLogActionEnums.Create.ToInt());
                         if (register.IsEMS)
                         {
                             try

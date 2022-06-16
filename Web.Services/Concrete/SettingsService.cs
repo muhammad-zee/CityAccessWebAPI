@@ -204,11 +204,18 @@ namespace Web.Services.Concrete
             string logDesc = "";
             string recordName = "";
             bool dynamicDesc = true;
+            bool showRecordId = true;
+            bool showNewFields = false;
+            string recordId = "";
             if (model.TableName == ActivityLogTableEnums.CodeStrokes.ToString() || model.TableName == ActivityLogTableEnums.CodeTraumas.ToString() ||
             model.TableName == ActivityLogTableEnums.CodeBlues.ToString() || model.TableName == ActivityLogTableEnums.CodeSepsis.ToString() ||
-            model.TableName == ActivityLogTableEnums.CodeSTEMIs.ToString())
+            model.TableName.ToLower() == ActivityLogTableEnums.CodeSTEMIs.ToString().ToLower())
             {
                 recordName = "Code";
+                if (model.TableName.ToLower() == ActivityLogTableEnums.CodeSTEMIs.ToString().ToLower())
+                {
+                    model.TableName = "CodeStemis";
+                }
             }
             else if (model.TableName == ActivityLogTableEnums.Consults.ToString())
             {
@@ -219,29 +226,98 @@ namespace Web.Services.Concrete
                 recordName = "Schedule";
                 dynamicDesc = false;
             }
+            else if (model.TableName == ActivityLogTableEnums.Organizations.ToString())
+            {
+                recordName = "Organization";
+                showRecordId = false;
+            }
+            else if (model.TableName == ActivityLogTableEnums.Departments.ToString())
+            {
+                recordName = "Department";
+                showRecordId = false;
+                showNewFields = true;
+            }
+            else if (model.TableName == ActivityLogTableEnums.ServiceLine.ToString())
+            {
+                recordName = "Serviceline";
+                showRecordId = false;
+                showNewFields = true;
+            }
+            else if (model.TableName == ActivityLogTableEnums.ClinicalHours.ToString())
+            {
+                recordName = "Clinical Hour";
+                showRecordId = false;
+            }
+            else if (model.TableName == ActivityLogTableEnums.ClinicalHoliday.ToString())
+            {
+                recordName = "Clinical Holiday";
+                showRecordId = false;
+            }
+            else if (model.TableName == ActivityLogTableEnums.Users.ToString())
+            {
+                recordName = "User";
+                showRecordId = false;
+            }
+            else if (model.TableName == ActivityLogTableEnums.ComponentAccess.ToString())
+            {
+                recordName = "Component Access";
+                showRecordId = false;
+            }
+
+            if (showRecordId)
+            {
+                recordId = ": " + Convert.ToString(model.TablePrimaryKey);
+            }
+
 
             model.TableName = model.TableName.SplitCamelCase();
             if (!dynamicDesc)
             {
                 logDesc = $"<b>{model.UserFullName}</b> {model.ActionName} {model.Description}";
             }
-            if (dynamicDesc) { 
-            if (model.Action == ActivityLogActionEnums.SignIn.ToInt() || model.Action == ActivityLogActionEnums.SignIn.ToInt())
+            if (dynamicDesc)
             {
-                logDesc = $"<b>{model.UserFullName}</b> {model.ActionName}";
-            }
-            else if (model.Action == ActivityLogActionEnums.Create.ToInt())
-            {
-                logDesc = $"<b>{model.UserFullName}</b> {model.ActionName} <b>{recordName}: {model.TablePrimaryKey}</b> in {model.TableName}";
+                if (model.Action == ActivityLogActionEnums.SignIn.ToInt() || model.Action == ActivityLogActionEnums.Logout.ToInt())
+                {
+                    logDesc = $"<b>{model.UserFullName}</b> {model.ActionName}";
+                }
+                else if (model.Action == ActivityLogActionEnums.Create.ToInt())
+                {
+                    if (showNewFields)
+                    {
+                        string changedFields = "";
+                        var jobj1 = JObject.Parse(model.Changeset);
+                        var jobj1Props = jobj1.Properties().ToList();
+                        foreach (var p in jobj1Props)
+                        {
+                            if (jobj1[p.Name] == null || jobj1[p.Name].ToString() == "")
+                            {
+                                jobj1[p.Name] = "null";
+                            }
+                            var typeOfPrevObj = jobj1[p.Name].Type.ToString();
+                            if (typeOfPrevObj != "Array")
+                            {
+                                changedFields = changedFields != "" ? changedFields + ", " : changedFields;
+                                changedFields += $"{jobj1[p.Name]}";
+                            }
 
-            }
-            else if (model.Action == ActivityLogActionEnums.Update.ToInt())
-            {
-                string changedFields = "";
-                var jobj1 = JObject.Parse(model.PreviousValue);
-                var jobj2 = JObject.Parse(model.Changeset);
-                var jobj1Props = jobj1.Properties().ToList();
-                foreach (var p in jobj1Props)
+                        }
+                        logDesc = $"<b>{model.UserFullName}</b> {model.ActionName} <b>{recordName}</b> {changedFields} in {model.TableName}";
+                    }
+                    else
+                    {
+                        logDesc = $"<b>{model.UserFullName}</b> {model.ActionName} <b>{recordName}{recordId}</b> in {model.TableName}";
+
+                    }
+
+                }
+                else if (model.Action == ActivityLogActionEnums.Update.ToInt())
+                {
+                    string changedFields = "";
+                    var jobj1 = JObject.Parse(model.PreviousValue);
+                    var jobj2 = JObject.Parse(model.Changeset);
+                    var jobj1Props = jobj1.Properties().ToList();
+                    foreach (var p in jobj1Props)
                     {
                         if (jobj1[p.Name] == null || jobj1[p.Name].ToString() == "")
                         {
@@ -252,26 +328,26 @@ namespace Web.Services.Concrete
                             jobj2[p.Name] = "null";
                         }
                         var typeOfPrevObj = jobj1[p.Name].Type.ToString();
-                    var typeOfUpdatedObj = jobj2[p.Name].Type.ToString();
-                    if (typeOfPrevObj != "Array" && typeOfUpdatedObj != "Array")
-                    {
-                        changedFields = changedFields != "" ? changedFields + ", " : changedFields;
-                        changedFields += $"{p.Name.SplitCamelCase()} {jobj1[p.Name]} to {jobj2[p.Name]}";
+                        var typeOfUpdatedObj = jobj2[p.Name].Type.ToString();
+                        if (typeOfPrevObj != "Array" && typeOfUpdatedObj != "Array")
+                        {
+                            changedFields = changedFields != "" ? changedFields + ", " : changedFields;
+                            changedFields += $"{p.Name.SplitCamelCase()} {jobj1[p.Name]} to {jobj2[p.Name]}";
+                        }
+
                     }
-
+                    changedFields = changedFields != "" ? changedFields + " of" : changedFields;
+                    logDesc = $"<b>{model.UserFullName}</b> {model.ActionName} {changedFields} <b>{recordName}{recordId}</b> In {model.TableName}";
                 }
-                changedFields = changedFields != "" ? changedFields + " of" : changedFields;
-                logDesc = $"<b>{model.UserFullName}</b> {model.ActionName} {changedFields} <b>{recordName}: {model.TablePrimaryKey}</b> In {model.TableName}";
-            }
-            else if (model.Action == ActivityLogActionEnums.Active.ToInt() || model.Action == ActivityLogActionEnums.Inactive.ToInt())
-            {
+                else if (model.Action == ActivityLogActionEnums.Active.ToInt() || model.Action == ActivityLogActionEnums.Inactive.ToInt())
+                {
 
-                logDesc = $"<b>{model.UserFullName}</b> changed status of  <b>{recordName}: {model.TablePrimaryKey}</b> to {model.ActionName}";
-            }
-            else if (model.Action == ActivityLogActionEnums.FileUpload.ToInt() || model.Action == ActivityLogActionEnums.FileDelete.ToInt())
-            {
-                logDesc = $"<b>{model.UserFullName}</b> {model.ActionName} file in <b>{recordName}: {model.TablePrimaryKey}</b> {model.TableName}";
-            }
+                    logDesc = $"<b>{model.UserFullName}</b> changed status of  <b>{recordName}{recordId}</b> to {model.ActionName}";
+                }
+                else if (model.Action == ActivityLogActionEnums.FileUpload.ToInt() || model.Action == ActivityLogActionEnums.FileDelete.ToInt())
+                {
+                    logDesc = $"<b>{model.UserFullName}</b> {model.ActionName} in <b>{recordName}{recordId}</b> {model.TableName}";
+                }
             }
             return logDesc;
         }
