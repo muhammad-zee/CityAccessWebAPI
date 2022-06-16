@@ -571,17 +571,17 @@ namespace Web.Services.Concrete
                             msg.attributes = "";
                             msg.body = $"<strong> {consultType} {ServiceName} Consult</strong></br></br>";
                             msg.body += $"<strong> Consult Number: </strong> {Consult_Counter} </br>";
-                            if (keyValues.ContainsKey("PatientFirstName") && keyValues.ContainsKey("PatientLastName"))
+                            if (keyValues.ContainsKey("PatientFirstName") && keyValues["PatientFirstName"] != null && keyValues.ContainsKey("PatientLastName") && keyValues["PatientLastName"] != null)
                             {
                                 msg.body += $"<strong>Patient Name:</strong> {keyValues["PatientFirstName"].ToString()} {keyValues["PatientLastName"].ToString()} </br>";
                             }
                             else
                             {
-                                if (keyValues.ContainsKey("PatientFirstName"))
+                                if (keyValues.ContainsKey("PatientFirstName") && keyValues["PatientFirstName"] != null)
                                 {
                                     msg.body += $"<strong>Patient Name:</strong> {keyValues["PatientFirstName"].ToString()} </br>";
                                 }
-                                if (keyValues.ContainsKey("PatientLastName"))
+                                if (keyValues.ContainsKey("PatientLastName") && keyValues["PatientLastName"] != null)
                                 {
                                     msg.body += $"<strong>Patient Name:</strong> {keyValues["PatientLastName"].ToString()} </br>";
                                 }
@@ -664,17 +664,17 @@ namespace Web.Services.Concrete
                     msg.attributes = "";
                     msg.body = $"<strong>{consultType} {ServiceName} Consult </strong> </br></br>";
                     msg.body += $"<strong> Consult Number: </strong> {Consult_Counter} </br>";
-                    if (keyValues.ContainsKey("PatientFirstName") && keyValues.ContainsKey("PatientLastName"))
+                    if (keyValues.ContainsKey("PatientFirstName") && keyValues["PatientFirstName"] != null && keyValues.ContainsKey("PatientLastName") && keyValues["PatientLastName"] != null)
                     {
                         msg.body += $"<strong>Patient Name:</strong> {keyValues["PatientFirstName"].ToString()} {keyValues["PatientLastName"].ToString()} </br>";
                     }
                     else
                     {
-                        if (keyValues.ContainsKey("PatientFirstName"))
+                        if (keyValues.ContainsKey("PatientFirstName") && keyValues["PatientFirstName"] != null)
                         {
                             msg.body += $"<strong>Patient Name:</strong> {keyValues["PatientFirstName"].ToString()} </br>";
                         }
-                        if (keyValues.ContainsKey("PatientLastName"))
+                        if (keyValues.ContainsKey("PatientLastName") && keyValues["PatientLastName"] != null)
                         {
                             msg.body += $"<strong>Patient Name:</strong> {keyValues["PatientLastName"].ToString()} </br>";
                         }
