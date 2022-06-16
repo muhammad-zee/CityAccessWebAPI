@@ -985,8 +985,8 @@ namespace Web.Services.Concrete
             {
                 if (codeName == UCLEnums.Stemi.ToString())
                 {
-                    int Id = codeDataVM["codeSTEMIId"].ToString().ToInt();
-                    codeDataVM.Remove("codeSTEMIId");
+                    int Id = codeDataVM["codeStemiId"].ToString().ToInt();
+                    codeDataVM.Remove("codeStemiId");
                     codeDataVM.Add("codeStemiId", Id);
                 }
 
