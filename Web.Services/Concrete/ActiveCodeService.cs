@@ -510,19 +510,14 @@ namespace Web.Services.Concrete
             }
             else if (files.CodeType == AuthorEnums.Stemi.ToString())
             {
-                var rootPath = this._codeSTEMIRepo.Table.Where(x => x.CodeStemiNumber == files.CodeNumber).Select($"new({files.Type},IsEms,OrganizationIdFk)").FirstOrDefault();
+                var rootPath = this._codeSTEMIRepo.Table.Where(x => x.CodeStemiNumber == files.Id).Select($"new({files.Type},IsEms,OrganizationIdFk)").FirstOrDefault();
                 var pathval = rootPath.GetType().GetProperty(files.Type).GetValue(rootPath, null);
                 string path = _environment.WebRootFileProvider.GetFileInfo(pathval + '/' + files.FileName)?.PhysicalPath;
-                File.Delete(path);
+                if(File.Exists(path))
+                {
+                    File.Delete(path);
+                }                
 
-                //var UserChannelSid = (from u in this._userRepo.Table
-                //                      join gm in this._STEMICodeGroupMembersRepo.Table on u.UserId equals gm.UserIdFk
-                //                      where gm.StemicodeIdFk == files.Id && !u.IsDeleted
-                //                      select u.UserUniqueId).Distinct().ToList();
-                //var superAdmins = this._userRepo.Table.Where(x => x.IsInGroup && !x.IsDeleted).Select(x => x.UserUniqueId).ToList();
-                //UserChannelSid.AddRange(superAdmins);
-                //var loggedUser = this._userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && !x.IsDeleted).Select(x => x.UserUniqueId).FirstOrDefault();
-                //UserChannelSid.Add(loggedUser);
 
                 var userUniqueIds = this._dbContext.LoadStoredProcedure("md_getUserUniqueIdsByCodeId")
                                                        .WithSqlParam("@userId", ApplicationSettings.UserId)
