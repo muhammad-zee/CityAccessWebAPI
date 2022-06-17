@@ -1181,7 +1181,7 @@ namespace Web.Services.Concrete
                 //holiday.CreatedDate = DateTime.UtcNow;
                 //holiday.IsDeleted = false;
                 //this._clinicalHolidayRepo.Insert(holiday);
-                response = new BaseResponse() { Status = HttpStatusCode.OK, Message = "Saved Successfully", Body = "" };
+                response = new BaseResponse() { Status = HttpStatusCode.OK, Message = "Holiday saved successfully.", Body = "" };
             }
             return response;
         }

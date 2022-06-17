@@ -273,7 +273,7 @@ namespace Web.Services.Concrete
                     this._orgConsultRepo.Update(deletedOnes);
                 }
 
-                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Changes Saved Successfully" };
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Changes saved Successfully." };
             }
         }
 

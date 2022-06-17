@@ -320,7 +320,7 @@ namespace Web.Services.Concrete
                 this._userRepo.Update(user);
             }
             response.Status = HttpStatusCode.OK;
-            response.Message = "Notificaiton Channel Saved Successfully";
+            response.Message = "Notificaiton channel saved successfully.";
             response.Body = new { UserId = UserId, UserChannelSid = ChannelSid };
             return response;
         }
@@ -370,7 +370,7 @@ namespace Web.Services.Concrete
                     };
                     this._conversationChannelsRepo.Insert(newChannel);
                     response.Status = HttpStatusCode.OK;
-                    response.Message = "Notificaiton Channel Saved Successfully";
+                    response.Message = "Notificaiton channel saved successfully.";
                     response.Body = newChannel;
                 }
                 else
@@ -655,7 +655,7 @@ namespace Web.Services.Concrete
                 }
             }
             response.Status = HttpStatusCode.OK;
-            response.Message = "User Sid Saved Successfully";
+            response.Message = "User sid saved successfully.";
             response.Body = new { UserId = ApplicationSettings.UserId, UserChannelSid = UserSid };
             return response;
 
@@ -1117,7 +1117,7 @@ namespace Web.Services.Concrete
                     newChannel.Wallpaper = targetPath.Replace(RootPath, "").Replace("\\", "/");
                 }
                 this._chatSettingRepo.Insert(newChannel);
-                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Chat Setting Saved Successfully", Body = newChannel };
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Chat settings saved successfully.", Body = newChannel };
             }
             else
             {
@@ -1293,7 +1293,7 @@ namespace Web.Services.Concrete
                     IsDelete = false
                 };
                 this._communicationLog.Insert(newLog);
-                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Communication Log Saved Successfully", Body = newLog };
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Communication log saved successfully.", Body = newLog };
             }
             else
             {

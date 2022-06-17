@@ -977,7 +977,7 @@ namespace Web.Services.Concrete
                 var extras = _userAccess.Table.Where(x => x.IsActive == false && x.UserIdFk == componentAccess.UserId && x.RoleIdFk == componentAccess.RoleId && !_componentAccess.Table.Where(r => r.RoleIdFk == componentAccess.RoleId).Select(x => x.ComponentIdFk).Contains(x.ComponentIdFk)).ToList();
                 _userAccess.DeleteRange(extras);
 
-                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Component Access saved successfully" };
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "User access saved successfully." };
 
             }
             else if (componentAccess.RoleId > 0)
@@ -1026,7 +1026,7 @@ namespace Web.Services.Concrete
                 string roleName = this._role.Table.Where(r => r.RoleId == componentAccess.RoleId).Select(r => r.RoleName).FirstOrDefault();
                 this._dbContext.Log(new { Role= roleName }, ActivityLogTableEnums.ComponentAccess.ToString(), 0, ActivityLogActionEnums.Update.ToInt(),null,$"{roleName}'s role access");
 
-                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Access saved successfully" };
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Role access saved successfully" };
             }
 
             return new BaseResponse() { Status = HttpStatusCode.NotFound, Message = "Please select a role." };

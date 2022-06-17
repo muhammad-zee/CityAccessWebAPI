@@ -409,11 +409,11 @@ namespace Web.API.Controllers
                 string saveResponse = _adminService.SaveRole(role);
                 if (saveResponse == StatusEnums.AlreadyExist.ToString())
                 {
-                    return new BaseResponse { Status = HttpStatusCode.BadRequest, Message = "Role already exists" };
+                    return new BaseResponse { Status = HttpStatusCode.BadRequest, Message = "Role already exists." };
                 }
                 else /*if (saveResponse == StatusEnums.Success.ToString())*/
                 {
-                    return new BaseResponse { Status = HttpStatusCode.OK, Message = "Changes saved successfully" };
+                    return new BaseResponse { Status = HttpStatusCode.OK, Message = "Changes saved successfully." };
                 }
             }
             catch (Exception ex)

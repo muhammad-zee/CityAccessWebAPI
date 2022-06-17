@@ -8286,7 +8286,7 @@ namespace Web.Services.Concrete
                     this._orgCodeStrokeFeilds.Update(deletedOnes);
                 }
 
-                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Saved Successfully" };
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Stroke Code fields saved successfully." };
             }
         }
 
@@ -8341,7 +8341,7 @@ namespace Web.Services.Concrete
                     this._orgCodeSTEMIFeilds.Update(deletedOnes);
                 }
 
-                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Saved Successfully" };
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Stemi Code fields saved successfully." };
             }
         }
 
@@ -8396,7 +8396,7 @@ namespace Web.Services.Concrete
                     this._orgCodeSepsisFeilds.Update(deletedOnes);
                 }
 
-                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Saved Successfully" };
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Sepsis Code fields saved successfully." };
             }
         }
 
@@ -8451,7 +8451,7 @@ namespace Web.Services.Concrete
                     this._orgCodeTraumaFeilds.Update(deletedOnes);
                 }
 
-                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Saved Successfully" };
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Trauma Code fields saved successfully." };
             }
         }
 
@@ -8506,7 +8506,7 @@ namespace Web.Services.Concrete
                     this._orgCodeBlueFeilds.Update(deletedOnes);
                 }
 
-                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Saved Successfully" };
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Blue Code fields saved successfully." };
             }
         }
 

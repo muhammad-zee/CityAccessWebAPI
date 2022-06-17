@@ -140,7 +140,7 @@ namespace Web.Services.Concrete
                 this._settingRepo.Insert(setting);
             }
 
-            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Saved Successfully" };
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Seetings saved successfully." };
         }
 
 
