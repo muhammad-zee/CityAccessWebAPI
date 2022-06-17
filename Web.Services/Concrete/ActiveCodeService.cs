@@ -510,7 +510,7 @@ namespace Web.Services.Concrete
             }
             else if (files.CodeType == AuthorEnums.Stemi.ToString())
             {
-                var rootPath = this._codeSTEMIRepo.Table.Where(x => x.CodeStemiNumber == files.Id).Select($"new({files.Type},IsEms,OrganizationIdFk)").FirstOrDefault();
+                var rootPath = this._codeSTEMIRepo.Table.Where(x => x.CodeStemiid == files.Id).Select($"new({files.Type},IsEms,OrganizationIdFk)").FirstOrDefault();
                 var pathval = rootPath.GetType().GetProperty(files.Type).GetValue(rootPath, null);
                 string path = _environment.WebRootFileProvider.GetFileInfo(pathval + '/' + files.FileName)?.PhysicalPath;
                 if(File.Exists(path))
