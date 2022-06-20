@@ -265,20 +265,43 @@ namespace Web.Services.Concrete
 
             return new BaseResponse { Status = HttpStatusCode.OK, Message = "Users List Returned", Body = users };
         }
+
+        public BaseResponse GetAllSuperAdmins() 
+        {
+            if (ApplicationSettings.isSuperAdmin) 
+            {
+                var superAdmins = this._dbContext.LoadStoredProcedure("md_getAllSuperAdmins")
+                                                .ExecuteStoredProc_ToDictionary();
+                return new BaseResponse { Status = HttpStatusCode.OK, Message = "SuperAdmins Users List Returned", Body = superAdmins };
+            }
+            return new BaseResponse { Status = HttpStatusCode.NotFound, Message = "Current user is not a super admin" };
+        }
+
+        public BaseResponse GetNonAssociatedUsers() 
+        {
+            if (ApplicationSettings.isSuperAdmin) 
+            {
+                var superAdmins = this._dbContext.LoadStoredProcedure("md_getAllNonAssociatedUsers")
+                                                   .ExecuteStoredProc_ToDictionary();
+                return new BaseResponse { Status = HttpStatusCode.OK, Message = "Non Associated Users List Returned", Body = superAdmins };
+            }
+            return new BaseResponse { Status = HttpStatusCode.NotFound, Message = "Current user is not a super admin" };
+        }
+
         public BaseResponse GetAllEMSUsers(bool status)
         {
             if (ApplicationSettings.isSuperAdmin)
             {
                 var usersEMS = this._dbContext.LoadStoredProcedure("md_GetAllEMSUsers")
                     .WithSqlParam("@pstatus", status)
-                                .ExecuteStoredProc<RegisterCredentialVM>();
-                var genders = _controlListDetails.Table.Where(x => x.ControlListIdFk == UCLEnums.Genders.ToInt()).Select(x => new { x.ControlListDetailId, x.Title });
-                foreach (var item in usersEMS)
-                {
-                    item.UserRole = getRoleListByUserId(item.UserId).ToList();
-                    item.GenderId = Convert.ToInt32(item.Gender);
-                    item.Gender = genders.Where(x => x.ControlListDetailId == item.GenderId).Select(x => x.Title).FirstOrDefault();
-                }
+                                .ExecuteStoredProc_ToDictionary();
+                //var genders = _controlListDetails.Table.Where(x => x.ControlListIdFk == UCLEnums.Genders.ToInt()).Select(x => new { x.ControlListDetailId, x.Title });
+                //foreach (var item in usersEMS)
+                //{
+                //    item.UserRole = getRoleListByUserId(item.UserId).ToList();
+                //    item.GenderId = Convert.ToInt32(item.Gender);
+                //    item.Gender = genders.Where(x => x.ControlListDetailId == item.GenderId).Select(x => x.Title).FirstOrDefault();
+                //}
                 return new BaseResponse { Status = HttpStatusCode.OK, Message = "EMS Users List Returned", Body = usersEMS };
             }
             return new BaseResponse { Status = HttpStatusCode.NotFound, Message = "Current user is not a super admin" };

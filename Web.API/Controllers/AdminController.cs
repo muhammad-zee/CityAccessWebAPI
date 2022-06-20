@@ -183,6 +183,38 @@ namespace Web.API.Controllers
             }
         }
 
+        [Description("Get NonAssociated Users List")]
+        [HttpGet("admin/GetNonAssociatedUsers")]
+        public BaseResponse GetNonAssociatedUsers()
+        {
+            try
+            {
+                return _adminService.GetNonAssociatedUsers();
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
+        [Description("Get Super Admin Users List")]
+        [HttpGet("admin/GetAllSuperAdmins")]
+        public BaseResponse GetAllSuperAdmins()
+        {
+            try
+            {
+                return _adminService.GetAllSuperAdmins();
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.ToString() };
+            }
+        }
+
         [Description("Get EMS Users List")]
         [HttpGet("admin/GetAllEMSUsers")]
         public BaseResponse GetAllEMSUsers(bool status)
