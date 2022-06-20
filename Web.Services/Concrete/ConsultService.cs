@@ -435,8 +435,8 @@ namespace Web.Services.Concrete
                 int rowsEffect = this._dbContext.Database.ExecuteSqlRaw(query);
                 if (rowsEffect > 0)
                 {
-                    var firstName = keyValues["PatientFirstName"]!= null? keyValues["PatientFirstName"].ToString():"";
-                    var lastName = keyValues["PatientLastName"]!= null? keyValues["PatientLastName"].ToString():"";
+                    var firstName = keyValues.ContainsKey("PatientFirstName") && keyValues["PatientFirstName"] != null ? keyValues["PatientFirstName"].ToString() : "";
+                    var lastName = keyValues.ContainsKey("PatientLastName") && keyValues["PatientLastName"] != null ? keyValues["PatientLastName"].ToString() : "";
                     this._dbContext.Log(new { Name= $"{firstName} {lastName}"}, ActivityLogTableEnums.Consults.ToString(), Consult_Counter.Counter_Value.ToInt(), ActivityLogActionEnums.Create.ToInt());
 
                     return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Consult added successfully", Body = keyValues };
