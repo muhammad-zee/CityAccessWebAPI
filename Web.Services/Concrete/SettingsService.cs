@@ -268,15 +268,15 @@ namespace Web.Services.Concrete
                 showRecordId = false;
                 dynamicDesc = false;
             }
-            else if (model.TableName == ActivityLogTableEnums.InteractiveVoiceResponse.ToString())
+            else if (model.TableName == ActivityLogTableEnums.IVR.ToString())
             {
                 recordName = "IVR";
                 showRecordId = false;
                 showNewFields = true;
             }
-            else if (model.TableName == ActivityLogTableEnums.IVRSettings.ToString())
+            else if (model.TableName == ActivityLogTableEnums.IvrSettings.ToString())
             {
-                recordName = "IVR Setting";
+                recordName = "IVR Node";
                 showRecordId = false;
                 showNewFields = true;
             }
@@ -397,16 +397,50 @@ namespace Web.Services.Concrete
 
                     }
 
-                
-                
+
+
                 }
                 else if (model.Action == ActivityLogActionEnums.FileUpload.ToInt() || model.Action == ActivityLogActionEnums.FileDelete.ToInt())
                 {
                     logDesc = $"<b>{model.UserFullName}</b> {model.ActionName} in <b>{recordName}{recordId}</b> {model.TableName}";
                 }
-                else if (model.Action == ActivityLogActionEnums.Acknowledge.ToInt() )
+                else if (model.Action == ActivityLogActionEnums.Acknowledge.ToInt())
                 {
                     logDesc = $"<b>{model.UserFullName}</b> {model.ActionName} in <b>{recordName}{recordId}</b> {model.TableName}";
+                }
+                else if (model.Action == ActivityLogActionEnums.Delete.ToInt())
+                {
+                    logDesc = $"<b>{model.UserFullName}</b> {model.ActionName} in <b>{recordName}{recordId}</b> {model.TableName}";
+                }
+                else if (model.Action == ActivityLogActionEnums.Copy.ToInt())
+                {
+                    if (showNewFields)
+                    {
+                        string changedFields = "";
+                        var jobj1 = JObject.Parse(model.Changeset);
+                        var jobj1Props = jobj1.Properties().ToList();
+                        foreach (var p in jobj1Props)
+                        {
+                            if (jobj1[p.Name] == null || jobj1[p.Name].ToString() == "")
+                            {
+                                jobj1[p.Name] = "null";
+                            }
+                            var typeOfPrevObj = jobj1[p.Name].Type.ToString();
+                            if (typeOfPrevObj != "Array")
+                            {
+                                changedFields = changedFields != "" ? changedFields + " to " : "" + changedFields;
+                                changedFields += $"{jobj1[p.Name]}";
+                            }
+
+                        }
+                        logDesc = $"<b>{model.UserFullName}</b> {model.ActionName} <b>IVR Settings</b> from serviceline {changedFields}";
+                    }
+                    else
+                    {
+                        logDesc = $"<b>{model.UserFullName}</b> {model.ActionName} <b>{recordName}{recordId}</b> in {model.TableName}";
+
+                    }
+
                 }
             }
             return logDesc;

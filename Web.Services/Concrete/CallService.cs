@@ -37,6 +37,7 @@ namespace Web.Services.Concrete
         private readonly IRepository<ControlListDetail> _controlListDetailsRepo;
         private readonly IRepository<CallLog> _callLogRepo;
         private readonly IRepository<User> _userRepo;
+        private readonly IRepository<ServiceLine> _serviceLineRepo;
 
 
 
@@ -58,7 +59,8 @@ namespace Web.Services.Concrete
             IRepository<InteractiveVoiceResponse> IVR,
             IRepository<ControlListDetail> controlListDetails,
             IRepository<CallLog> callLog,
-            IRepository<User> userRepo)
+            IRepository<User> userRepo,
+            IRepository<ServiceLine> serviceLineRepo)
         {
 
             this._dbContext = dbContext;
@@ -69,6 +71,8 @@ namespace Web.Services.Concrete
             this._controlListDetailsRepo = controlListDetails;
             this._callLogRepo = callLog;
             this._userRepo = userRepo;
+            this._serviceLineRepo = serviceLineRepo;
+
             this.origin = this._config["Twilio:CallbackDomain"].ToString();
 
             //Twilio Credentials
@@ -810,7 +814,7 @@ namespace Web.Services.Concrete
 
                     var updatedResult = ivrNode;
                     var differences = HelperExtension.GetDifferences(previousResult, updatedResult, ObjectTypeEnums.Model.ToInt());
-                    this._dbContext.Log(differences.updatedRecord, ActivityLogTableEnums.IVRSettings.ToString(), ivrNode.IvrSettingsId, ActivityLogActionEnums.Update.ToInt(), differences.previousRecord);
+                    this._dbContext.Log(differences.updatedRecord, ActivityLogTableEnums.IvrSettings.ToString(), ivrNode.IvrSettingsId, ActivityLogActionEnums.Update.ToInt(), differences.previousRecord);
 
                 }
 
@@ -830,7 +834,7 @@ namespace Web.Services.Concrete
                 ivrNode.CreatedDate = DateTime.UtcNow;
                 ivrNode.IsDeleted = false;
                 this._ivrSettingsRepo.Insert(ivrNode);
-                this._dbContext.Log(new { Name = ivrNode.Name }, ActivityLogTableEnums.IVRSettings.ToString(), ivrNode.IvrSettingsId, ActivityLogActionEnums.Create.ToInt());
+                this._dbContext.Log(new { Name = ivrNode.Name }, ActivityLogTableEnums.IvrSettings.ToString(), ivrNode.IvrSettingsId, ActivityLogActionEnums.Create.ToInt());
 
             }
             return new BaseResponse()
@@ -851,7 +855,7 @@ namespace Web.Services.Concrete
                 IVRNode.ModifiedDate = DateTime.UtcNow;
                 this._ivrSettingsRepo.Update(IVRNode);
                 this.deleteNodeChildren(Id);
-
+                this._dbContext.Log(new { Name = IVRNode.Name }, ActivityLogTableEnums.IvrSettings.ToString(), IVRNode.IvrSettingsId.ToInt(), ActivityLogActionEnums.Delete.ToInt());
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Record Successfully Deleted" };
             }
             else
@@ -944,6 +948,10 @@ namespace Web.Services.Concrete
                 "@pCopyToServiceLineId, " +
                 "@pCreatedBy ";
 
+            string copyFromServiceLineName=  this._serviceLineRepo.Table.Where(s => s.ServiceLineId == copyFromServiceLineId).Select(s => s.ServiceName).FirstOrDefault();
+            string copyToServicelineName = this._serviceLineRepo.Table.Where(s => s.ServiceLineId == copyToServicelineId).Select(s => s.ServiceName).FirstOrDefault();
+            var logObj = new { FromName = copyFromServiceLineName, ToName = copyToServicelineName };
+            this._dbContext.Log(logObj, ActivityLogTableEnums.IVR.ToString(), 0, ActivityLogActionEnums.Copy.ToInt());
             List<SqlParameter> parms = new List<SqlParameter>
             {
                 new SqlParameter { ParameterName = "@pCopyFromServiceLineId", Value = copyFromServiceLineId },
@@ -1016,7 +1024,7 @@ namespace Web.Services.Concrete
                 }
                 var updatedResult = ivr;
                 var differences = HelperExtension.GetDifferences(previousResult, updatedResult, ObjectTypeEnums.Model.ToInt());
-                this._dbContext.Log(differences.updatedRecord, ActivityLogTableEnums.InteractiveVoiceResponse.ToString(), ivr.IvrId, ActivityLogActionEnums.Update.ToInt(), differences.previousRecord);
+                this._dbContext.Log(differences.updatedRecord, ActivityLogTableEnums.IVR.ToString(), ivr.IvrId, ActivityLogActionEnums.Update.ToInt(), differences.previousRecord);
 
             }
             else
@@ -1032,7 +1040,7 @@ namespace Web.Services.Concrete
                 ivr.IsDeleted = false;
                 this._IVRRepo.Insert(ivr);
 
-                this._dbContext.Log(new { Name = ivr.Name }, ActivityLogTableEnums.InteractiveVoiceResponse.ToString(), ivr.IvrId, ActivityLogActionEnums.Create.ToInt());
+                this._dbContext.Log(new { Name = ivr.Name }, ActivityLogTableEnums.IVR.ToString(), ivr.IvrId, ActivityLogActionEnums.Create.ToInt());
                 var saveRootNodes = this.addIvrParentNodes(ivr.IvrId);
             }
             return new BaseResponse()
@@ -1051,7 +1059,7 @@ namespace Web.Services.Concrete
                 ivr.ModifiedBy = ApplicationSettings.UserId;
                 ivr.ModifiedDate = DateTime.UtcNow;
                 this._IVRRepo.Update(ivr);
-                this._dbContext.Log(new { }, ActivityLogTableEnums.InteractiveVoiceResponse.ToString(), ivr.IvrId.ToInt(), ActivityLogActionEnums.Delete.ToInt());
+                this._dbContext.Log(new { }, ActivityLogTableEnums.IVR.ToString(), ivr.IvrId.ToInt(), ActivityLogActionEnums.Delete.ToInt());
 
                 var childNodes = _ivrSettingsRepo.Table.Where(x => x.IvrIdFk == Id && x.IsDeleted != true).ToList();
                 childNodes.ForEach(x => { x.IsDeleted = true; x.ModifiedBy = ApplicationSettings.UserId; x.ModifiedDate = DateTime.UtcNow; });
@@ -1075,7 +1083,7 @@ namespace Web.Services.Concrete
                 ivr.IsActive = status;
                 ivr.ModifiedBy = ApplicationSettings.UserId;
                 ivr.ModifiedDate = DateTime.UtcNow;
-                this._dbContext.Log(new {Name=ivr.Name }, ActivityLogTableEnums.InteractiveVoiceResponse.ToString(), Id, status == false ? ActivityLogActionEnums.Inactive.ToInt() : ActivityLogActionEnums.Active.ToInt());
+                this._dbContext.Log(new {Name=ivr.Name }, ActivityLogTableEnums.IVR.ToString(), Id, status == false ? ActivityLogActionEnums.Inactive.ToInt() : ActivityLogActionEnums.Active.ToInt());
                 this._IVRRepo.Update(ivr);
 
                 var childNodes = _ivrSettingsRepo.Table.Where(x => x.IvrIdFk == Id && x.IsDeleted != true).ToList();

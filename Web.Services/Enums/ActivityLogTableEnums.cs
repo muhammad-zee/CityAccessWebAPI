@@ -22,8 +22,8 @@ namespace Web.Services.Enums
         ClinicalHours,
         ClinicalHoliday,
         ComponentAccess,
-        InteractiveVoiceResponse,
-        IVRSettings,
+        IVR,
+        IvrSettings,
         Roles,
 
         //CodeBlueGroupMembers,
