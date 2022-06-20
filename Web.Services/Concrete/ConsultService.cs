@@ -432,14 +432,14 @@ namespace Web.Services.Concrete
                     }
                 }
 
-                int rowsEffect = this._dbContext.Database.ExecuteSqlRaw(query);
-                if (rowsEffect > 0)
+                int newId = this._dbContext.ExecuteInsertQuery(query);
+                if (newId > 0)
                 {
                     var firstName = keyValues.ContainsKey("PatientFirstName") && keyValues["PatientFirstName"] != null ? keyValues["PatientFirstName"].ToString() : "";
                     var lastName = keyValues.ContainsKey("PatientLastName") && keyValues["PatientLastName"] != null ? keyValues["PatientLastName"].ToString() : "";
                     this._dbContext.Log(new { Name= $"{firstName} {lastName}"}, ActivityLogTableEnums.Consults.ToString(), Consult_Counter.Counter_Value.ToInt(), ActivityLogActionEnums.Create.ToInt());
-
-                    return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Consult added successfully", Body = keyValues };
+                    var data = GetConsultById(newId);
+                    return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Consult added successfully", Body = data.Body };
                 }
                 else
                 {
@@ -488,17 +488,17 @@ namespace Web.Services.Concrete
             var keys = keyValues.Keys.ToList();
             var values = keyValues.Values.ToList();
             bool usersFound = false;
-            var Consult_Counter = keyValues["Consult_Counter"].ToString().ToLong();
-            if (keys.Contains("ServiceLineIdFk") && keyValues["ServiceLineIdFk"].ToString() != "0")
+            var Consult_Counter = keyValues["consultNumber"].ToString().ToLong();
+            if (keys.Contains("serviceLineIdFk") && keyValues["serviceLineIdFk"].ToString() != "0")
             {
-                var serviceLineId = keyValues["ServiceLineIdFk"].ToString().ToInt();
+                var serviceLineId = keyValues["serviceLineIdFk"].ToString().ToInt();
 
                 var users = _dbContext.LoadStoredProcedure("md_getAvailableUserOnSchedule")
                             .WithSqlParam("@servicelineIdFk", serviceLineId)
                             .WithSqlParam("@dayOfWeek", DateTime.UtcNow.DayOfWeek.ToString())
                             .ExecuteStoredProc<RegisterCredentialVM>();
                 usersFound = users.Count() > 0;
-                var consultType = _controlListDetailsRepo.Table.Where(x => x.ControlListDetailId == keyValues["ConsultType"].ToString().ToInt()).Select(x => x.Title).FirstOrDefault();
+                var consultType = _controlListDetailsRepo.Table.Where(x => x.ControlListDetailId == keyValues["consultType"].ToString().ToInt()).Select(x => x.Title).FirstOrDefault();
 
                 var conversationChannelAttributes = JsonConvert.SerializeObject(new Dictionary<string, Object>()
                                     {
@@ -519,7 +519,7 @@ namespace Web.Services.Concrete
 
                 if (users != null && users.Count > 0 && users.FirstOrDefault().IsAfterHours == true)
                 {
-                    if (keys.Contains("ConsultType") && keyValues["ConsultType"].ToString() != null && keyValues["ConsultType"].ToString() != "")
+                    if (keys.Contains("consultType") && keyValues["consultType"].ToString() != null && keyValues["consultType"].ToString() != "")
                     {
 
                         if (consultType != null && consultType == "Urgent")
@@ -532,7 +532,7 @@ namespace Web.Services.Concrete
 
                             ////////////// Update Consult For ChannelSid ////////////////////////////
 
-                            string ConsultId = keyValues["ConsultId"].ToString();
+                            //string ConsultId = keyValues["consultId"].ToString();
                             string qry = $"UPDATE [dbo].[Consults] SET [ChannelSid] = '{channel.Sid}'";
 
                             qry += $" WHERE ConsultNumber = '{Consult_Counter}'";
@@ -573,28 +573,28 @@ namespace Web.Services.Concrete
                             msg.attributes = "";
                             msg.body = $"<strong> {consultType} {ServiceName} Consult</strong></br></br>";
                             msg.body += $"<strong> Consult Number: </strong> {Consult_Counter} </br>";
-                            if (keyValues.ContainsKey("PatientFirstName") && keyValues["PatientFirstName"] != null && keyValues.ContainsKey("PatientLastName") && keyValues["PatientLastName"] != null)
+                            if (keyValues.ContainsKey("patientFirstName") && keyValues["patientFirstName"] != null && keyValues.ContainsKey("patientLastName") && keyValues["patientLastName"] != null)
                             {
-                                msg.body += $"<strong>Patient Name:</strong> {keyValues["PatientFirstName"].ToString()} {keyValues["PatientLastName"].ToString()} </br>";
+                                msg.body += $"<strong>Patient Name:</strong> {keyValues["patientFirstName"].ToString()} {keyValues["patientLastName"].ToString()} </br>";
                             }
                             else
                             {
-                                if (keyValues.ContainsKey("PatientFirstName") && keyValues["PatientFirstName"] != null)
+                                if (keyValues.ContainsKey("patientFirstName") && keyValues["patientFirstName"] != null)
                                 {
-                                    msg.body += $"<strong>Patient Name:</strong> {keyValues["PatientFirstName"].ToString()} </br>";
+                                    msg.body += $"<strong>Patient Name:</strong> {keyValues["patientFirstName"].ToString()} </br>";
                                 }
-                                if (keyValues.ContainsKey("PatientLastName") && keyValues["PatientLastName"] != null)
+                                if (keyValues.ContainsKey("patientLastName") && keyValues["patientLastName"] != null)
                                 {
-                                    msg.body += $"<strong>Patient Name:</strong> {keyValues["PatientLastName"].ToString()} </br>";
+                                    msg.body += $"<strong>Patient Name:</strong> {keyValues["patientLastName"].ToString()} </br>";
                                 }
                             }
-                            if (keyValues.ContainsKey("DateOfBirth") && keyValues["DateOfBirth"] != null)
+                            if (keyValues.ContainsKey("dateOfBirth") && keyValues["dateOfBirth"] != null)
                             {
-                                DateTime dob = DateTime.Parse(keyValues["DateOfBirth"].ToString());
+                                DateTime dob = DateTime.Parse(keyValues["dateOfBirth"].ToString());
                                 msg.body += $"<strong>Dob:</strong> {dob:MM-dd-yyyy} </br>";
                             }
-                            msg.body += keyValues.ContainsKey("MedicalRecordNumber") && keyValues["MedicalRecordNumber"] != null ? $"<strong>Medical Record Number:</strong> {keyValues["MedicalRecordNumber"].ToString()} </br>" : "";
-                            msg.body += keyValues.ContainsKey("CallbackNumber") && keyValues["CallbackNumber"] != null ? (keyValues["CallbackNumber"].ToString() != "(___) ___-____" ? $"<strong>Callback Number:</strong> {keyValues["CallbackNumber"].ToString()} </br>" : "") : "";
+                            msg.body += keyValues.ContainsKey("medicalRecordNumber") && keyValues["medicalRecordNumber"] != null ? $"<strong>Medical Record Number:</strong> {keyValues["medicalRecordNumber"].ToString()} </br>" : "";
+                            msg.body += keyValues.ContainsKey("callbackNumber") && keyValues["callbackNumber"] != null ? (keyValues["callbackNumber"].ToString() != "(___) ___-____" ? $"<strong>Callback Number:</strong> {keyValues["callbackNumber"].ToString()} </br>" : "") : "";
                             _communicationService.sendPushNotification(msg);
 
                             var orgByServiceId = _dptRepo.Table.Where(x => !x.IsDeleted && x.DepartmentId == _serviceLineRepo.Table.Where(x => !x.IsDeleted && x.ServiceLineId == serviceLineId).Select(x => x.DepartmentIdFk).FirstOrDefault()).Select(x => x.OrganizationIdFk).FirstOrDefault();
@@ -606,7 +606,7 @@ namespace Web.Services.Concrete
                             distinctUsers = users.Select(x => new { x.UserUniqueId, x.UserId }).Distinct().ToList();
                             var notification = new PushNotificationVM()
                             {
-                                Id = keyValues["CallbackNumber"].ToString().ToInt(),
+                                Id = keyValues["callbackNumber"].ToString().ToInt(),
                                 OrgId = orgByServiceId.Value,
                                 UserChannelSid = users.Select(x => x.UserUniqueId).Distinct().ToList(),
                                 From = "Consult",
@@ -629,7 +629,7 @@ namespace Web.Services.Concrete
 
                     ////////////// Update Consult For ChannelSid ////////////////////////////
 
-                    string ConsultId = keyValues["ConsultId"].ToString();
+                    //string ConsultId = keyValues["ConsultId"].ToString();
                     string qry = $"UPDATE [dbo].[Consults] SET [ChannelSid] = '{channel.Sid}'";
 
                     qry += $" WHERE ConsultNumber = '{Consult_Counter}'";
@@ -666,28 +666,28 @@ namespace Web.Services.Concrete
                     msg.attributes = "";
                     msg.body = $"<strong>{consultType} {ServiceName} Consult </strong> </br></br>";
                     msg.body += $"<strong> Consult Number: </strong> {Consult_Counter} </br>";
-                    if (keyValues.ContainsKey("PatientFirstName") && keyValues["PatientFirstName"] != null && keyValues.ContainsKey("PatientLastName") && keyValues["PatientLastName"] != null)
+                    if (keyValues.ContainsKey("patientFirstName") && keyValues["patientFirstName"] != null && keyValues.ContainsKey("patientLastName") && keyValues["patientLastName"] != null)
                     {
-                        msg.body += $"<strong>Patient Name:</strong> {keyValues["PatientFirstName"].ToString()} {keyValues["PatientLastName"].ToString()} </br>";
+                        msg.body += $"<strong>Patient Name:</strong> {keyValues["patientFirstName"].ToString()} {keyValues["patientLastName"].ToString()} </br>";
                     }
                     else
                     {
-                        if (keyValues.ContainsKey("PatientFirstName") && keyValues["PatientFirstName"] != null)
+                        if (keyValues.ContainsKey("patientFirstName") && keyValues["patientFirstName"] != null)
                         {
-                            msg.body += $"<strong>Patient Name:</strong> {keyValues["PatientFirstName"].ToString()} </br>";
+                            msg.body += $"<strong>Patient Name:</strong> {keyValues["patientFirstName"].ToString()} </br>";
                         }
-                        if (keyValues.ContainsKey("PatientLastName") && keyValues["PatientLastName"] != null)
+                        if (keyValues.ContainsKey("patientLastName") && keyValues["patientLastName"] != null)
                         {
-                            msg.body += $"<strong>Patient Name:</strong> {keyValues["PatientLastName"].ToString()} </br>";
+                            msg.body += $"<strong>Patient Name:</strong> {keyValues["patientLastName"].ToString()} </br>";
                         }
                     }
-                    if (keyValues.ContainsKey("DateOfBirth") && keyValues["DateOfBirth"] != null)
+                    if (keyValues.ContainsKey("dateOfBirth") && keyValues["dateOfBirth"] != null)
                     {
-                        DateTime dob = DateTime.Parse(keyValues["DateOfBirth"].ToString());
+                        DateTime dob = DateTime.Parse(keyValues["dateOfBirth"].ToString());
                         msg.body += $"<strong>Dob:</strong> {dob:MM-dd-yyyy} </br>";
                     }
-                    msg.body += keyValues.ContainsKey("MedicalRecordNumber") && keyValues["MedicalRecordNumber"] != null ? $"<strong>Medical Record Number:</strong> {keyValues["MedicalRecordNumber"].ToString()} </br>" : "";
-                    msg.body += keyValues.ContainsKey("CallbackNumber") && keyValues["CallbackNumber"] != null ? (keyValues["CallbackNumber"].ToString() != "(___) ___-____" ? $"<strong>Callback Number:</strong> {keyValues["CallbackNumber"].ToString()} </br>" : "") : "";
+                    msg.body += keyValues.ContainsKey("medicalRecordNumber") && keyValues["medicalRecordNumber"] != null ? $"<strong>Medical Record Number:</strong> {keyValues["medicalRecordNumber"].ToString()} </br>" : "";
+                    msg.body += keyValues.ContainsKey("callbackNumber") && keyValues["callbackNumber"] != null ? (keyValues["callbackNumber"].ToString() != "(___) ___-____" ? $"<strong>Callback Number:</strong> {keyValues["callbackNumber"].ToString()} </br>" : "") : "";
                     msg.channelSid = channel.Sid;
 
                     var sendMsg = _communicationService.sendPushNotification(msg);
