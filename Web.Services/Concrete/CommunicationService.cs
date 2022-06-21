@@ -872,7 +872,7 @@ namespace Web.Services.Concrete
         {
             if (file.Count() > 0)
             {
-                RegionEndpoint regionEndpoint = RegionEndpoint.USEast1;
+                RegionEndpoint regionEndpoint = RegionEndpoint.USEast2;
                 var s3Client = new AmazonS3Client(awsAccessKeyId: this.s3accessKey, awsSecretAccessKey: s3secretKey, region: regionEndpoint);
                 var fileTransferUtility = new TransferUtility(s3Client);
 
