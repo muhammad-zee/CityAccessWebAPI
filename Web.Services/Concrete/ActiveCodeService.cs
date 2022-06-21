@@ -2574,7 +2574,7 @@ namespace Web.Services.Concrete
                     RouteLink3 = RouteEnums.ActiveEMS.ToDescription(), // RouteEnums.ActiveEMS.ToDescription(),
                     RouteLink4 = RouteEnums.Dashboard.ToDescription(),
                     RouteLink5 = RouteEnums.InhouseCodeGrid.ToDescription(), // RouteEnums.InhouseCodeGrid.ToDescription()
-                    RefreshModules = new List<string>() { UCLEnums.EMS.ToDescription(), UCLEnums.InhouseCode.ToDescription(), RouteEnums.Dashboard.ToString() }
+                    RefreshModules = new List<string>() { UCLEnums.EMS.ToDescription() + "s", UCLEnums.InhouseCode.ToDescription() + "s", RouteEnums.Dashboard.ToString() }
                 };
 
                 _communicationService.pushNotification(notification);
@@ -2826,7 +2826,7 @@ namespace Web.Services.Concrete
                     RouteLink3 = RouteEnums.ActiveEMS.ToDescription(), // RouteEnums.ActiveEMS.ToDescription(),
                     RouteLink4 = RouteEnums.Dashboard.ToDescription(), // RouteEnums.Dashboard.ToDescription(),
                     RouteLink5 = RouteEnums.InhouseCodeGrid.ToDescription(), // RouteEnums.InhouseCodeGrid.ToDescription()
-                    RefreshModules = new List<string>() { UCLEnums.EMS.ToDescription(), UCLEnums.InhouseCode.ToDescription(), RouteEnums.Dashboard.ToString() }
+                    RefreshModules = new List<string>() { UCLEnums.EMS.ToDescription() + "s", UCLEnums.InhouseCode.ToDescription() + "s", RouteEnums.Dashboard.ToString() }
                 };
 
                 _communicationService.pushNotification(notification);
@@ -4104,7 +4104,7 @@ namespace Web.Services.Concrete
                     RouteLink3 = RouteEnums.ActiveEMS.ToDescription(), // RouteEnums.ActiveEMS.ToDescription(),
                     RouteLink4 = RouteEnums.Dashboard.ToDescription(),
                     RouteLink5 = RouteEnums.InhouseCodeGrid.ToDescription(), // RouteEnums.InhouseCodeGrid.ToDescription()
-                    RefreshModules = new List<string>() { UCLEnums.EMS.ToDescription(), UCLEnums.InhouseCode.ToDescription(), RouteEnums.Dashboard.ToString() }
+                    RefreshModules = new List<string>() { UCLEnums.EMS.ToDescription() + "s", UCLEnums.InhouseCode.ToDescription() + "s", RouteEnums.Dashboard.ToString() }
                 };
 
                 _communicationService.pushNotification(notification);
@@ -4171,7 +4171,7 @@ namespace Web.Services.Concrete
                     RouteLink3 = RouteEnums.ActiveEMS.ToDescription(),
                     RouteLink4 = RouteEnums.Dashboard.ToDescription(),
                     RouteLink5 = RouteEnums.InhouseCodeGrid.ToDescription(),
-                    RefreshModules = new List<string>() { UCLEnums.EMS.ToDescription(), UCLEnums.InhouseCode.ToDescription(), RouteEnums.Dashboard.ToString() }
+                    RefreshModules = new List<string>() { UCLEnums.EMS.ToDescription() + "s", UCLEnums.InhouseCode.ToDescription() + "s", RouteEnums.Dashboard.ToString() }
                 };
 
                 _communicationService.pushNotification(notification);
@@ -5184,7 +5184,7 @@ namespace Web.Services.Concrete
                     RouteLink3 = RouteEnums.ActiveEMS.ToDescription(), // RouteEnums.ActiveEMS.ToDescription(),
                     RouteLink4 = RouteEnums.Dashboard.ToDescription(),
                     RouteLink5 = RouteEnums.InhouseCodeGrid.ToDescription(), // RouteEnums.InhouseCodeGrid.ToDescription()
-                    RefreshModules = new List<string>() { UCLEnums.EMS.ToDescription(), UCLEnums.InhouseCode.ToDescription(), RouteEnums.Dashboard.ToString() }
+                    RefreshModules = new List<string>() { UCLEnums.EMS.ToDescription() + "s", UCLEnums.InhouseCode.ToDescription() + "s", RouteEnums.Dashboard.ToString() }
                 };
 
                 _communicationService.pushNotification(notification);
@@ -5440,7 +5440,7 @@ namespace Web.Services.Concrete
                     RouteLink3 = RouteEnums.ActiveEMS.ToDescription(),
                     RouteLink4 = RouteEnums.Dashboard.ToDescription(),
                     RouteLink5 = RouteEnums.InhouseCodeGrid.ToDescription(),
-                    RefreshModules = new List<string>() { UCLEnums.EMS.ToDescription(), UCLEnums.InhouseCode.ToDescription(), RouteEnums.Dashboard.ToString() }
+                    RefreshModules = new List<string>() { UCLEnums.EMS.ToDescription() + "s", UCLEnums.InhouseCode.ToDescription() + "s", RouteEnums.Dashboard.ToString() }
                 };
 
                 _communicationService.pushNotification(notification);
@@ -6531,7 +6531,7 @@ namespace Web.Services.Concrete
                     RouteLink3 = RouteEnums.ActiveEMS.ToDescription(), // RouteEnums.ActiveEMS.ToDescription(),
                     RouteLink4 = RouteEnums.Dashboard.ToDescription(),
                     RouteLink5 = RouteEnums.InhouseCodeGrid.ToDescription(), // RouteEnums.InhouseCodeGrid.ToDescription()
-                    RefreshModules = new List<string>() { UCLEnums.EMS.ToDescription(), UCLEnums.InhouseCode.ToDescription(), RouteEnums.Dashboard.ToString() }
+                    RefreshModules = new List<string>() { UCLEnums.EMS.ToDescription() + "s", UCLEnums.InhouseCode.ToDescription() + "s", RouteEnums.Dashboard.ToString() }
                 };
 
                 _communicationService.pushNotification(notification);
@@ -6784,7 +6784,7 @@ namespace Web.Services.Concrete
                     RouteLink3 = RouteEnums.ActiveEMS.ToDescription(),
                     RouteLink4 = RouteEnums.Dashboard.ToDescription(),
                     RouteLink5 = RouteEnums.InhouseCodeGrid.ToDescription(),
-                    RefreshModules = new List<string>() { UCLEnums.EMS.ToDescription(), UCLEnums.InhouseCode.ToDescription(), RouteEnums.Dashboard.ToString() }
+                    RefreshModules = new List<string>() { UCLEnums.EMS.ToDescription() + "s", UCLEnums.InhouseCode.ToDescription() + "s", RouteEnums.Dashboard.ToString() }
                 };
 
                 _communicationService.pushNotification(notification);
@@ -7876,7 +7876,7 @@ namespace Web.Services.Concrete
                     RouteLink3 = RouteEnums.ActiveEMS.ToDescription(), // RouteEnums.ActiveEMS.ToDescription(),
                     RouteLink4 = RouteEnums.Dashboard.ToDescription(),
                     RouteLink5 = RouteEnums.InhouseCodeGrid.ToDescription(), // RouteEnums.InhouseCodeGrid.ToDescription()
-                    RefreshModules = new List<string>() { UCLEnums.EMS.ToDescription(), UCLEnums.InhouseCode.ToDescription(), RouteEnums.Dashboard.ToString() }
+                    RefreshModules = new List<string>() { UCLEnums.EMS.ToDescription() + "s", UCLEnums.InhouseCode.ToDescription() + "s", RouteEnums.Dashboard.ToString() }
                 };
 
                 _communicationService.pushNotification(notification);
@@ -8128,7 +8128,7 @@ namespace Web.Services.Concrete
                     RouteLink3 = RouteEnums.ActiveEMS.ToDescription(),
                     RouteLink4 = RouteEnums.Dashboard.ToDescription(),
                     RouteLink5 = RouteEnums.InhouseCodeGrid.ToDescription(),
-                    RefreshModules = new List<string>() { UCLEnums.EMS.ToDescription(), UCLEnums.InhouseCode.ToDescription(), RouteEnums.Dashboard.ToString() }
+                    RefreshModules = new List<string>() { UCLEnums.EMS.ToDescription() + "s", UCLEnums.InhouseCode.ToDescription() + "s", RouteEnums.Dashboard.ToString() }
                 };
 
                 _communicationService.pushNotification(notification);
