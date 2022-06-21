@@ -906,7 +906,7 @@ namespace Web.Services.Concrete
                 {
                     var fileTransferUtilityRequest = new TransferUtilityUploadRequest
                     {
-                        BucketName = this.s3BucketName,
+                        BucketName = this.s3BucketName + "/" + FilePath,
                         FilePath = targetPath,
                         StorageClass = S3StorageClass.StandardInfrequentAccess,
                         PartSize = 6291456, // 6 MB.  
@@ -927,7 +927,7 @@ namespace Web.Services.Concrete
             //
                 //origin = origin.Contains("ngrok.io") ? "http://localhost:60113" : origin;
                 //var MediaUrl = $"{origin}/{FilePath}/{fileUniqueName}";
-                 var MediaUrl = $"https://{s3BucketName}.s3.amazonaws.com/{fileUniqueName}";
+                 var MediaUrl = $"https://{s3BucketName}.s3.amazonaws.com/{FilePath}/{fileUniqueName}";
                 //string extension = Path.GetExtension(ImageFile.FileName);
 
                 ////ImageFile.SaveAs(path + filename);
