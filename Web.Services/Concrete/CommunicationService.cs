@@ -984,6 +984,7 @@ namespace Web.Services.Concrete
                                         { "fieldDataType", model.FieldDataType },
                                         { "channelSid", model.ChannelSid},
                                         { "forEmsLocationUpdate", model.ForEmsLocationUpdate },
+                                        { "refreshModules", model.RefreshModules },
                                         { "routerLink1", model.RouteLink1},
                                         { "routerLink2", model.RouteLink2 },
                                         { "routerLink3", model.RouteLink3 },
