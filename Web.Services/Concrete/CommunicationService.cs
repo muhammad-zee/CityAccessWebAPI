@@ -1,4 +1,7 @@
-﻿using ElmahCore;
+﻿using Amazon;
+using Amazon.S3;
+using Amazon.S3.Transfer;
+using ElmahCore;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
@@ -31,16 +34,21 @@ namespace Web.Services.Concrete
 
     public class CommunicationService : ICommunicationService
     {
-        private string Twilio_AccountSid;
-        private string Twilio_AuthToken;
+        private readonly string Twilio_AccountSid;
+        private readonly string Twilio_AuthToken;
 
-        private string SendGrid_ApiKey;
-        private string FromEmail;
+        private readonly string SendGrid_ApiKey;
+        private readonly string FromEmail;
 
-        private string Twilio_ChatServiceSid;
-        private string Twilio_ChatPushCredentialSid;
-        private string Twilio_ChatApiKey;
-        private string Twilio_ChatApiKeySecret;
+        private readonly string Twilio_ChatServiceSid;
+        private readonly string Twilio_ChatPushCredentialSid;
+        private readonly string Twilio_ChatApiKey;
+        private readonly string Twilio_ChatApiKeySecret;
+
+        private readonly string s3accessKey;
+        private readonly string s3secretKey;
+        private readonly string s3BucketName;
+
 
         private string origin = "";
 
@@ -99,6 +107,12 @@ namespace Web.Services.Concrete
             this.Twilio_ChatPushCredentialSid = this._config["Twilio:PushCredentialSid"].ToString();
             this.Twilio_ChatApiKey = this._config["Twilio:ChatApiKey"].ToString();
             this.Twilio_ChatApiKeySecret = this._config["Twilio:ChatApiKeySecret"].ToString();
+
+            this.s3accessKey = this._config["AmazonS3:AccessKey"].ToString();
+            this.s3secretKey = this._config["AmazonS3:SecretKey"].ToString();
+            this.s3BucketName = this._config["AmazonS3:s3BucketName"].ToString();
+
+
             this._RootPath = this._config["FilePath:Path"].ToString();
 
             this.origin = this._config["Twilio:CallbackDomain"].ToString();
@@ -858,6 +872,11 @@ namespace Web.Services.Concrete
         {
             if (file.Count() > 0)
             {
+                RegionEndpoint regionEndpoint = RegionEndpoint.USEast1;
+                var s3Client = new AmazonS3Client(awsAccessKeyId: this.s3accessKey, awsSecretAccessKey: s3secretKey, region: regionEndpoint);
+                var fileTransferUtility = new TransferUtility(s3Client);
+
+
                 var attachment = file.FirstOrDefault();
                 var extension = Path.GetExtension(attachment.FileName);
                 string fileActualName = attachment.FileName;
@@ -883,11 +902,32 @@ namespace Web.Services.Concrete
                         fs.Write(fileBytes);
                     }
                 }
+                try
+                {
+                    var fileTransferUtilityRequest = new TransferUtilityUploadRequest
+                    {
+                        BucketName = this.s3BucketName,
+                        FilePath = targetPath,
+                        StorageClass = S3StorageClass.StandardInfrequentAccess,
+                        PartSize = 6291456, // 6 MB.  
+                        Key = fileUniqueName,//filename which u want to save in bucket
+                        CannedACL = S3CannedACL.PublicRead,
+                        //InputStream = fs,
+                    };
+                    fileTransferUtility.UploadAsync(fileTransferUtilityRequest).GetAwaiter().GetResult();
+                    File.Delete(targetPath);
+                    //To upload without asynchronous
+                    //fileTransferUtility.Upload(filePath, bucketName, "SampleAudio.wav");
+                    //fileTransferUtility.Dispose();
+                }
+                catch (AmazonS3Exception ex)
+                {
 
-
-
-                origin = origin.Contains("ngrok.io") ? "http://localhost:60113" : origin;
-                var MediaUrl = $"{origin}/{FilePath}/{fileUniqueName}";
+                }
+            //
+                //origin = origin.Contains("ngrok.io") ? "http://localhost:60113" : origin;
+                //var MediaUrl = $"{origin}/{FilePath}/{fileUniqueName}";
+                 var MediaUrl = $"https://{s3BucketName}.s3.amazonaws.com/{fileUniqueName}";
                 //string extension = Path.GetExtension(ImageFile.FileName);
 
                 ////ImageFile.SaveAs(path + filename);
