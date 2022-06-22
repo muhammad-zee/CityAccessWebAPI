@@ -1,5 +1,6 @@
 ﻿using Amazon;
 using Amazon.S3;
+using Amazon.S3.Model;
 using Amazon.S3.Transfer;
 using ElmahCore;
 using Microsoft.AspNetCore.Http;
@@ -882,56 +883,16 @@ namespace Web.Services.Concrete
                 string fileActualName = attachment.FileName;
                 string contentType = attachment.ContentType;
                 string fileUniqueName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + "-" + ApplicationSettings.UserId + extension;
-
-
-                var RootPath = this._RootPath;
                 string FilePath = "conversationAttachments";
-                var targetPath = Path.Combine(RootPath, FilePath);
-
-                if (!Directory.Exists(targetPath))
-                {
-                    Directory.CreateDirectory(targetPath);
-                }
-                targetPath += "/" + $"{fileUniqueName}";
+                string MediaUrl = string.Empty;
                 using (var ms = new MemoryStream())
                 {
                     attachment.CopyTo(ms);
                     var fileBytes = ms.ToArray();
-                    using (FileStream fs = new FileStream(targetPath, FileMode.Create, FileAccess.Write))
-                    {
-                        fs.Write(fileBytes);
-                    }
+                    MediaUrl = this.UploadAttachmentToS3Bucket(fileBytes, FilePath, fileUniqueName);
                 }
-                try
-                {
-                    var fileTransferUtilityRequest = new TransferUtilityUploadRequest
-                    {
-                        BucketName = this.s3BucketName + "/" + FilePath,
-                        FilePath = targetPath,
-                        StorageClass = S3StorageClass.StandardInfrequentAccess,
-                        PartSize = 6291456, // 6 MB.  
-                        Key = fileUniqueName,//filename which u want to save in bucket
-                        CannedACL = S3CannedACL.PublicRead,
-                        //InputStream = fs,
-                    };
-                    fileTransferUtility.UploadAsync(fileTransferUtilityRequest).GetAwaiter().GetResult();
-                    File.Delete(targetPath);
-                    //To upload without asynchronous
-                    //fileTransferUtility.Upload(filePath, bucketName, "SampleAudio.wav");
-                    //fileTransferUtility.Dispose();
-                }
-                catch (AmazonS3Exception ex)
-                {
 
-                }
-            //
-                //origin = origin.Contains("ngrok.io") ? "http://localhost:60113" : origin;
-                //var MediaUrl = $"{origin}/{FilePath}/{fileUniqueName}";
-                 var MediaUrl = $"https://{s3BucketName}.s3.amazonaws.com/{FilePath}/{fileUniqueName}";
-                //string extension = Path.GetExtension(ImageFile.FileName);
 
-                ////ImageFile.SaveAs(path + filename);
-                ///       
                 return new BaseResponse
                 {
                     Status = HttpStatusCode.OK,
@@ -953,6 +914,106 @@ namespace Web.Services.Concrete
         }
 
 
+        public string UploadAttachmentToS3Bucket(byte[] fileBytes, string FilePath, string fileUniqueName)
+        {
+
+            RegionEndpoint regionEndpoint = RegionEndpoint.USEast2;
+            var s3Client = new AmazonS3Client(awsAccessKeyId: this.s3accessKey, awsSecretAccessKey: s3secretKey, region: regionEndpoint);
+            var fileTransferUtility = new TransferUtility(s3Client);
+            var RootPath = this._RootPath;
+            var targetPath = Path.Combine(RootPath, FilePath);
+
+            if (!Directory.Exists(targetPath))
+            {
+                Directory.CreateDirectory(targetPath);
+            }
+            targetPath += "/" + $"{fileUniqueName}";
+            using (FileStream fs = new FileStream(targetPath, FileMode.Create, FileAccess.Write))
+            {
+                fs.Write(fileBytes);
+            }
+            try
+            {
+                var fileTransferUtilityRequest = new TransferUtilityUploadRequest
+                {
+                    BucketName = this.s3BucketName + "/" + FilePath,
+                    FilePath = targetPath,
+                    StorageClass = S3StorageClass.StandardInfrequentAccess,
+                    //PartSize = 6291456, // 6 MB.  
+                    Key = fileUniqueName,//filename which u want to save in bucket
+                    CannedACL = S3CannedACL.PublicRead,
+                    //InputStream = fs,
+                };
+                fileTransferUtility.UploadAsync(fileTransferUtilityRequest).GetAwaiter().GetResult();
+                
+                File.Delete(targetPath);
+                //To upload without asynchronous
+                //fileTransferUtility.Upload(filePath, bucketName, "SampleAudio.wav");
+                //fileTransferUtility.Dispose();
+            }
+            catch (AmazonS3Exception ex)
+            {
+                throw ex;
+            }
+            var MediaUrl = $"https://{s3BucketName}.s3.amazonaws.com/{FilePath}/{fileUniqueName}";
+            return MediaUrl;
+
+
+
+
+        }
+        public List<string> LoadAttachmentFromS3Bucket(string folderPath)
+        {
+
+            List<string> pathList = new();
+            RegionEndpoint regionEndpoint = RegionEndpoint.USEast2;
+            var s3Client = new AmazonS3Client(awsAccessKeyId: this.s3accessKey, awsSecretAccessKey: s3secretKey, region: regionEndpoint);
+            try
+            {
+
+                ListObjectsRequest listRequest = new ListObjectsRequest
+                {
+                    BucketName = this.s3BucketName,
+                    Prefix = folderPath
+                };
+                var listResponse = s3Client.ListObjectsAsync(listRequest).Result;
+                foreach (S3Object obj in listResponse.S3Objects)
+                {
+                    pathList.Add($"https://{this.s3BucketName}.s3.amazonaws.com/{obj.Key}");
+                }
+            }
+            catch (AmazonS3Exception ex)
+            {
+                throw ex;
+            }
+            return pathList;
+
+        }
+
+        public List<string> DeleteAttachmentFromS3Bucket(string filePath)
+        {
+
+
+            List<string> pathList = new();
+            RegionEndpoint regionEndpoint = RegionEndpoint.USEast2;
+            var s3Client = new AmazonS3Client(awsAccessKeyId: this.s3accessKey, awsSecretAccessKey: s3secretKey, region: regionEndpoint);
+            try
+            {
+
+                DeleteObjectRequest deleteRequest = new DeleteObjectRequest
+                {
+                    BucketName = this.s3BucketName,
+                    Key = filePath
+                };
+                var listResponse = s3Client.DeleteObjectAsync(deleteRequest).Result;
+            }
+            catch (AmazonS3Exception ex)
+            {
+                throw ex;
+            }
+            return pathList;
+            
+        }
         #endregion
 
 
@@ -1387,12 +1448,12 @@ namespace Web.Services.Concrete
         public BaseResponse GetAllCommunicationlog(int orgId, string departmentIds, string serviceLineIds, bool showAllVoicemails)
         {
             var communicationLog = this._dbContext.LoadStoredProcedure("md_getCommunicationLog")
-            .WithSqlParam("@pOrganizationId", orgId)
-            .WithSqlParam("@pDepartmentIds", departmentIds)
-            .WithSqlParam("@pServiceLineIds", serviceLineIds)
-            .WithSqlParam("@pShowAllVoicemails", showAllVoicemails)
-            .WithSqlParam("@pUserId", ApplicationSettings.UserId)
-            .ExecuteStoredProc<CommunicationLogVM>();
+                .WithSqlParam("@pOrganizationId", orgId)
+                .WithSqlParam("@pDepartmentIds", departmentIds)
+                .WithSqlParam("@pServiceLineIds", serviceLineIds)
+                .WithSqlParam("@pShowAllVoicemails", showAllVoicemails)
+                .WithSqlParam("@pUserId", ApplicationSettings.UserId)
+                .ExecuteStoredProc<CommunicationLogVM>();
 
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "CommunicationLog Data", Body = communicationLog };
         }
@@ -1401,8 +1462,8 @@ namespace Web.Services.Concrete
         public BaseResponse GetCallLog(int orgId, bool showAllCalls)
         {
             var communicationLog = this._dbContext.LoadStoredProcedure("md_getCallLog")
-            .WithSqlParam("@pOrganizationId", orgId)
-            .WithSqlParam("@pUserId", ApplicationSettings.UserId)
+                .WithSqlParam("@pOrganizationId", orgId)
+                .WithSqlParam("@pUserId", ApplicationSettings.UserId)
             .WithSqlParam("@pShowAllCalls", showAllCalls)
             .ExecuteStoredProc<CallLogVM>();
 
@@ -1421,10 +1482,8 @@ namespace Web.Services.Concrete
                 return null;
             }
         }
+
+
     }
-
-
-
-
 
 }

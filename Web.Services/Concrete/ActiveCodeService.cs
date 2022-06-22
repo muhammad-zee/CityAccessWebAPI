@@ -343,8 +343,9 @@ namespace Web.Services.Concrete
             {
                 var rootPath = this._codeStrokeRepo.Table.Where(x => x.CodeStrokeId == files.Id).Select($"new({files.Type},IsEms,OrganizationIdFk)").FirstOrDefault();
                 var pathval = rootPath.GetType().GetProperty(files.Type).GetValue(rootPath, null);
-                string path = _environment.WebRootFileProvider.GetFileInfo(pathval + '/' + files.FileName)?.PhysicalPath;
-                File.Delete(path);
+                var deleteFile = this._communicationService.DeleteAttachmentFromS3Bucket($"{pathval}/{files.FileName}");
+                //string path = _environment.WebRootFileProvider.GetFileInfo(pathval + '/' + files.FileName)?.PhysicalPath;
+                //File.Delete(path);
 
                 var userUniqueIds = this._dbContext.LoadStoredProcedure("md_getUserUniqueIdsByCodeId")
                                                         .WithSqlParam("@userId", ApplicationSettings.UserId)
@@ -358,46 +359,46 @@ namespace Web.Services.Concrete
                 if (files.Type == "Video")
                 {
                     codeStroke.VideoFolderRoot = pathval;
-                    string VideoPath = this._RootPath + codeStroke.VideoFolderRoot;
-                    if (Directory.Exists(VideoPath))
-                    {
-                        DirectoryInfo AttachFiles = new DirectoryInfo(VideoPath);
-                        codeStroke.VideosPath = new List<string>();
-                        foreach (var item in AttachFiles.GetFiles())
-                        {
-                            codeStroke.VideosPath.Add(codeStroke.VideoFolderRoot + "/" + item.Name);
-                        }
-                    }
+                    //string VideoPath = this._RootPath + codeStroke.VideoFolderRoot;
+                    //if (Directory.Exists(VideoPath))
+                    //{
+                    //    DirectoryInfo AttachFiles = new DirectoryInfo(VideoPath);
+                    codeStroke.VideosPath = new List<string>();
+                    //foreach (var item in AttachFiles.GetFiles())
+                    //{
+                    codeStroke.VideosPath.AddRange(this._communicationService.LoadAttachmentFromS3Bucket(pathval));
+                    //}
+                    //}
                 }
 
                 if (files.Type == "Audio")
                 {
                     codeStroke.AudioFolderRoot = pathval;
-                    string AudioPath = this._RootPath + codeStroke.AudioFolderRoot;
-                    if (Directory.Exists(AudioPath))
-                    {
-                        DirectoryInfo AttachFiles = new DirectoryInfo(AudioPath);
-                        codeStroke.AudiosPath = new List<string>();
-                        foreach (var item in AttachFiles.GetFiles())
-                        {
-                            codeStroke.AudiosPath.Add(codeStroke.AudioFolderRoot + "/" + item.Name);
-                        }
-                    }
+                    //string AudioPath = this._RootPath + codeStroke.AudioFolderRoot;
+                    //if (Directory.Exists(AudioPath))
+                    //{
+                    //    DirectoryInfo AttachFiles = new DirectoryInfo(AudioPath);
+                    codeStroke.AudiosPath = new List<string>();
+                    //    foreach (var item in AttachFiles.GetFiles())
+                    //    {
+                    codeStroke.AudiosPath.AddRange(this._communicationService.LoadAttachmentFromS3Bucket(pathval));
+                    //    }
+                    //}
                 }
 
                 if (files.Type == "Attachments")
                 {
                     codeStroke.AttachmentsFolderRoot = pathval;
-                    string AttachmentsPath = this._RootPath + codeStroke.AttachmentsFolderRoot;
-                    if (Directory.Exists(AttachmentsPath))
-                    {
-                        DirectoryInfo AttachFiles = new DirectoryInfo(AttachmentsPath);
-                        codeStroke.AttachmentsPath = new List<string>();
-                        foreach (var item in AttachFiles.GetFiles())
-                        {
-                            codeStroke.AttachmentsPath.Add(codeStroke.AttachmentsFolderRoot + "/" + item.Name);
-                        }
-                    }
+                    //string AttachmentsPath = this._RootPath + codeStroke.AttachmentsFolderRoot;
+                    //if (Directory.Exists(AttachmentsPath))
+                    //{
+                    //    DirectoryInfo AttachFiles = new DirectoryInfo(AttachmentsPath);
+                    codeStroke.AttachmentsPath = new List<string>();
+                    //foreach (var item in AttachFiles.GetFiles())
+                    //{
+                    codeStroke.AttachmentsPath.AddRange(this._communicationService.LoadAttachmentFromS3Bucket(pathval));
+                    //}
+                    //}
                 }
 
                 fieldValue = new { videosPath = codeStroke.VideosPath, audiosPath = codeStroke.AudiosPath, attachmentsPath = codeStroke.AttachmentsPath };
@@ -406,7 +407,7 @@ namespace Web.Services.Concrete
                 {
                     Id = files.Id,
                     OrgId = rootPath.OrganizationIdFk,
-                    FieldName = files.Type,                    
+                    FieldName = files.Type,
                     //(files.Type == "Video" || files.Type == "Audio" ? (files.Type + "s").ToLower() : (files.Type.Replace("s", "")).ToLower()),
                     FieldDataType = "file",
                     FieldValue = fieldValue,
@@ -423,6 +424,7 @@ namespace Web.Services.Concrete
             {
                 var rootPath = this._codeSepsisRepo.Table.Where(x => x.CodeSepsisId == files.Id).Select($"new({files.Type},IsEms,OrganizationIdFk)").FirstOrDefault();
                 var pathval = rootPath.GetType().GetProperty(files.Type).GetValue(rootPath, null);
+                var deleteFile = this._communicationService.DeleteAttachmentFromS3Bucket($"{pathval}/{files.FileName}");
                 string path = _environment.WebRootFileProvider.GetFileInfo(pathval + '/' + files.FileName)?.PhysicalPath;
                 File.Delete(path);
 
@@ -447,46 +449,46 @@ namespace Web.Services.Concrete
                 if (files.Type == "Video")
                 {
                     codeSepsis.VideoFolderRoot = pathval;
-                    string VideoPath = this._RootPath + codeSepsis.VideoFolderRoot;
-                    if (Directory.Exists(VideoPath))
-                    {
-                        DirectoryInfo AttachFiles = new DirectoryInfo(VideoPath);
-                        codeSepsis.VideosPath = new List<string>();
-                        foreach (var item in AttachFiles.GetFiles())
-                        {
-                            codeSepsis.VideosPath.Add(codeSepsis.VideoFolderRoot + "/" + item.Name);
-                        }
-                    }
+                    //string VideoPath = this._RootPath + codeSepsis.VideoFolderRoot;
+                    //if (Directory.Exists(VideoPath))
+                    //{
+                    //DirectoryInfo AttachFiles = new DirectoryInfo(VideoPath);
+                    codeSepsis.VideosPath = new List<string>();
+                    //foreach (var item in AttachFiles.GetFiles())
+                    //{
+                    codeSepsis.VideosPath.AddRange(this._communicationService.LoadAttachmentFromS3Bucket(pathval));
+                    //}
+                    //}
                 }
 
                 if (files.Type == "Audio")
                 {
                     codeSepsis.AudioFolderRoot = pathval;
-                    string AudioPath = this._RootPath + codeSepsis.AudioFolderRoot;
-                    if (Directory.Exists(AudioPath))
-                    {
-                        DirectoryInfo AttachFiles = new DirectoryInfo(AudioPath);
-                        codeSepsis.AudiosPath = new List<string>();
-                        foreach (var item in AttachFiles.GetFiles())
-                        {
-                            codeSepsis.AudiosPath.Add(codeSepsis.AudioFolderRoot + "/" + item.Name);
-                        }
-                    }
+                    //string AudioPath = this._RootPath + codeSepsis.AudioFolderRoot;
+                    //if (Directory.Exists(AudioPath))
+                    //{
+                    //    DirectoryInfo AttachFiles = new DirectoryInfo(AudioPath);
+                    codeSepsis.AudiosPath = new List<string>();
+                    //foreach (var item in AttachFiles.GetFiles())
+                    //{
+                    codeSepsis.AudiosPath.AddRange(this._communicationService.LoadAttachmentFromS3Bucket(pathval));
+                    //}
+                    //}
                 }
 
                 if (files.Type == "Attachments")
                 {
                     codeSepsis.AttachmentsFolderRoot = pathval;
-                    string AttachmentsPath = this._RootPath + codeSepsis.AttachmentsFolderRoot;
-                    if (Directory.Exists(AttachmentsPath))
-                    {
-                        DirectoryInfo AttachFiles = new DirectoryInfo(AttachmentsPath);
-                        codeSepsis.AttachmentsPath = new List<string>();
-                        foreach (var item in AttachFiles.GetFiles())
-                        {
-                            codeSepsis.AttachmentsPath.Add(codeSepsis.AttachmentsFolderRoot + "/" + item.Name);
-                        }
-                    }
+                    //string AttachmentsPath = this._RootPath + codeSepsis.AttachmentsFolderRoot;
+                    //if (Directory.Exists(AttachmentsPath))
+                    //{
+                    //    DirectoryInfo AttachFiles = new DirectoryInfo(AttachmentsPath);
+                    codeSepsis.AttachmentsPath = new List<string>();
+                    //foreach (var item in AttachFiles.GetFiles())
+                    //{
+                    codeSepsis.AttachmentsPath.AddRange(this._communicationService.LoadAttachmentFromS3Bucket(pathval));
+                    //    }
+                    //}
                 }
 
                 fieldValue = new { videosPath = codeSepsis.VideosPath, audiosPath = codeSepsis.AudiosPath, attachmentsPath = codeSepsis.AttachmentsPath };
@@ -495,7 +497,7 @@ namespace Web.Services.Concrete
                 {
                     Id = files.Id,
                     OrgId = rootPath.OrganizationIdFk,
-                    FieldName = files.Type,                    
+                    FieldName = files.Type,
                     //(files.Type == "Video" || files.Type == "Audio" ? (files.Type + "s").ToLower() : (files.Type.Replace("s", "")).ToLower()),
                     FieldDataType = "file",
                     FieldValue = fieldValue,
@@ -512,11 +514,12 @@ namespace Web.Services.Concrete
             {
                 var rootPath = this._codeSTEMIRepo.Table.Where(x => x.CodeStemiid == files.Id).Select($"new({files.Type},IsEms,OrganizationIdFk)").FirstOrDefault();
                 var pathval = rootPath.GetType().GetProperty(files.Type).GetValue(rootPath, null);
+                var deleteFile = this._communicationService.DeleteAttachmentFromS3Bucket($"{pathval}/{files.FileName}");
                 string path = _environment.WebRootFileProvider.GetFileInfo(pathval + '/' + files.FileName)?.PhysicalPath;
-                if(File.Exists(path))
+                if (File.Exists(path))
                 {
                     File.Delete(path);
-                }                
+                }
 
 
                 var userUniqueIds = this._dbContext.LoadStoredProcedure("md_getUserUniqueIdsByCodeId")
@@ -532,46 +535,46 @@ namespace Web.Services.Concrete
                 if (files.Type == "Video")
                 {
                     codeSTEMI.VideoFolderRoot = pathval;
-                    string VideoPath = this._RootPath + codeSTEMI.VideoFolderRoot;
-                    if (Directory.Exists(VideoPath))
-                    {
-                        DirectoryInfo AttachFiles = new DirectoryInfo(VideoPath);
-                        codeSTEMI.VideosPath = new List<string>();
-                        foreach (var item in AttachFiles.GetFiles())
-                        {
-                            codeSTEMI.VideosPath.Add(codeSTEMI.VideoFolderRoot + "/" + item.Name);
-                        }
-                    }
+                    //string VideoPath = this._RootPath + codeSTEMI.VideoFolderRoot;
+                    //if (Directory.Exists(VideoPath))
+                    //{
+                    //    DirectoryInfo AttachFiles = new DirectoryInfo(VideoPath);
+                    codeSTEMI.VideosPath = new List<string>();
+                    //foreach (var item in AttachFiles.GetFiles())
+                    //{
+                    codeSTEMI.VideosPath.AddRange(this._communicationService.LoadAttachmentFromS3Bucket(pathval));
+                    //    }
+                    //}
                 }
 
                 if (files.Type == "Audio")
                 {
                     codeSTEMI.AudioFolderRoot = pathval;
-                    string AudioPath = this._RootPath + codeSTEMI.AudioFolderRoot;
-                    if (Directory.Exists(AudioPath))
-                    {
-                        DirectoryInfo AttachFiles = new DirectoryInfo(AudioPath);
-                        codeSTEMI.AudiosPath = new List<string>();
-                        foreach (var item in AttachFiles.GetFiles())
-                        {
-                            codeSTEMI.AudiosPath.Add(codeSTEMI.AudioFolderRoot + "/" + item.Name);
-                        }
-                    }
+                    //string AudioPath = this._RootPath + codeSTEMI.AudioFolderRoot;
+                    //if (Directory.Exists(AudioPath))
+                    //{
+                    //    DirectoryInfo AttachFiles = new DirectoryInfo(AudioPath);
+                    codeSTEMI.AudiosPath = new List<string>();
+                    //foreach (var item in AttachFiles.GetFiles())
+                    //{
+                    codeSTEMI.AudiosPath.AddRange(this._communicationService.LoadAttachmentFromS3Bucket(pathval));
+                    //    }
+                    //}
                 }
 
                 if (files.Type == "Attachments")
                 {
                     codeSTEMI.AttachmentsFolderRoot = pathval;
-                    string AttachmentsPath = this._RootPath + codeSTEMI.AttachmentsFolderRoot;
-                    if (Directory.Exists(AttachmentsPath))
-                    {
-                        DirectoryInfo AttachFiles = new DirectoryInfo(AttachmentsPath);
-                        codeSTEMI.AttachmentsPath = new List<string>();
-                        foreach (var item in AttachFiles.GetFiles())
-                        {
-                            codeSTEMI.AttachmentsPath.Add(codeSTEMI.AttachmentsFolderRoot + "/" + item.Name);
-                        }
-                    }
+                    //string AttachmentsPath = this._RootPath + codeSTEMI.AttachmentsFolderRoot;
+                    //if (Directory.Exists(AttachmentsPath))
+                    //{
+                    //    DirectoryInfo AttachFiles = new DirectoryInfo(AttachmentsPath);
+                    codeSTEMI.AttachmentsPath = new List<string>();
+                    //foreach (var item in AttachFiles.GetFiles())
+                    //{
+                    codeSTEMI.AttachmentsPath.AddRange(this._communicationService.LoadAttachmentFromS3Bucket(pathval));
+                    //    }
+                    //}
                 }
 
                 fieldValue = new { videosPath = codeSTEMI.VideosPath, audiosPath = codeSTEMI.AudiosPath, attachmentsPath = codeSTEMI.AttachmentsPath };
@@ -597,6 +600,7 @@ namespace Web.Services.Concrete
             {
                 var rootPath = this._codeTrumaRepo.Table.Where(x => x.CodeTraumaId == files.Id).Select($"new({files.Type},IsEms,OrganizationIdFk)").FirstOrDefault();
                 var pathval = rootPath.GetType().GetProperty(files.Type).GetValue(rootPath, null);
+                var deleteFile = this._communicationService.DeleteAttachmentFromS3Bucket($"{pathval}/{files.FileName}");
                 string path = _environment.WebRootFileProvider.GetFileInfo(pathval + '/' + files.FileName)?.PhysicalPath;
                 File.Delete(path);
 
@@ -622,46 +626,46 @@ namespace Web.Services.Concrete
                 if (files.Type == "Video")
                 {
                     codeTrauma.VideoFolderRoot = pathval;
-                    string VideoPath = this._RootPath + codeTrauma.VideoFolderRoot;
-                    if (Directory.Exists(VideoPath))
-                    {
-                        DirectoryInfo AttachFiles = new DirectoryInfo(VideoPath);
-                        codeTrauma.VideosPath = new List<string>();
-                        foreach (var item in AttachFiles.GetFiles())
-                        {
-                            codeTrauma.VideosPath.Add(codeTrauma.VideoFolderRoot + "/" + item.Name);
-                        }
-                    }
+                    //string VideoPath = this._RootPath + codeTrauma.VideoFolderRoot;
+                    //if (Directory.Exists(VideoPath))
+                    //{
+                    //    DirectoryInfo AttachFiles = new DirectoryInfo(VideoPath);
+                    codeTrauma.VideosPath = new List<string>();
+                    //foreach (var item in AttachFiles.GetFiles())
+                    //{
+                    codeTrauma.VideosPath.AddRange(this._communicationService.LoadAttachmentFromS3Bucket(pathval));
+                    //    }
+                    //}
                 }
 
                 if (files.Type == "Audio")
                 {
                     codeTrauma.AudioFolderRoot = pathval;
-                    string AudioPath = this._RootPath + codeTrauma.AudioFolderRoot;
-                    if (Directory.Exists(AudioPath))
-                    {
-                        DirectoryInfo AttachFiles = new DirectoryInfo(AudioPath);
-                        codeTrauma.AudiosPath = new List<string>();
-                        foreach (var item in AttachFiles.GetFiles())
-                        {
-                            codeTrauma.AudiosPath.Add(codeTrauma.AudioFolderRoot + "/" + item.Name);
-                        }
-                    }
+                    //string AudioPath = this._RootPath + codeTrauma.AudioFolderRoot;
+                    //if (Directory.Exists(AudioPath))
+                    //{
+                    //    DirectoryInfo AttachFiles = new DirectoryInfo(AudioPath);
+                    codeTrauma.AudiosPath = new List<string>();
+                    //foreach (var item in AttachFiles.GetFiles())
+                    //{
+                    codeTrauma.AudiosPath.AddRange(this._communicationService.LoadAttachmentFromS3Bucket(pathval));
+                    //    }
+                    //}
                 }
 
                 if (files.Type == "Attachments")
                 {
                     codeTrauma.AttachmentsFolderRoot = pathval;
-                    string AttachmentsPath = this._RootPath + codeTrauma.AttachmentsFolderRoot;
-                    if (Directory.Exists(AttachmentsPath))
-                    {
-                        DirectoryInfo AttachFiles = new DirectoryInfo(AttachmentsPath);
-                        codeTrauma.AttachmentsPath = new List<string>();
-                        foreach (var item in AttachFiles.GetFiles())
-                        {
-                            codeTrauma.AttachmentsPath.Add(codeTrauma.AttachmentsFolderRoot + "/" + item.Name);
-                        }
-                    }
+                    //string AttachmentsPath = this._RootPath + codeTrauma.AttachmentsFolderRoot;
+                    //if (Directory.Exists(AttachmentsPath))
+                    //{
+                    //    DirectoryInfo AttachFiles = new DirectoryInfo(AttachmentsPath);
+                    codeTrauma.AttachmentsPath = new List<string>();
+                    //foreach (var item in AttachFiles.GetFiles())
+                    //{
+                    codeTrauma.AttachmentsPath.AddRange(this._communicationService.LoadAttachmentFromS3Bucket(pathval));
+                    //    }
+                    //}
                 }
 
                 fieldValue = new { videosPath = codeTrauma.VideosPath, audiosPath = codeTrauma.AudiosPath, attachmentsPath = codeTrauma.AttachmentsPath };
@@ -670,7 +674,7 @@ namespace Web.Services.Concrete
                 {
                     Id = files.Id,
                     OrgId = rootPath.OrganizationIdFk,
-                    FieldName =  files.Type,
+                    FieldName = files.Type,
                     //(files.Type == "Video" || files.Type == "Audio" ? (files.Type + "s").ToLower() : (files.Type.Replace("s", "")).ToLower()),
                     FieldDataType = "file",
                     FieldValue = fieldValue,
@@ -687,6 +691,7 @@ namespace Web.Services.Concrete
             {
                 var rootPath = this._codeBlueRepo.Table.Where(x => x.CodeBlueId == files.Id).Select($"new({files.Type},IsEms,OrganizationIdFk)").FirstOrDefault();
                 var pathval = rootPath.GetType().GetProperty(files.Type).GetValue(rootPath, null);
+                var deleteFile = this._communicationService.DeleteAttachmentFromS3Bucket($"{pathval}/{files.FileName}");
                 string path = _environment.WebRootFileProvider.GetFileInfo(pathval + '/' + files.FileName)?.PhysicalPath;
                 File.Delete(path);
 
@@ -712,46 +717,46 @@ namespace Web.Services.Concrete
                 if (files.Type == "Video")
                 {
                     codeBlue.VideoFolderRoot = pathval;
-                    string VideoPath = this._RootPath + codeBlue.VideoFolderRoot;
-                    if (Directory.Exists(VideoPath))
-                    {
-                        DirectoryInfo AttachFiles = new DirectoryInfo(VideoPath);
-                        codeBlue.VideosPath = new List<string>();
-                        foreach (var item in AttachFiles.GetFiles())
-                        {
-                            codeBlue.VideosPath.Add(codeBlue.VideoFolderRoot + "/" + item.Name);
-                        }
-                    }
+                    //string VideoPath = this._RootPath + codeBlue.VideoFolderRoot;
+                    //if (Directory.Exists(VideoPath))
+                    //{
+                    //    DirectoryInfo AttachFiles = new DirectoryInfo(VideoPath);
+                    codeBlue.VideosPath = new List<string>();
+                    //foreach (var item in AttachFiles.GetFiles())
+                    //{
+                    codeBlue.VideosPath.AddRange(this._communicationService.LoadAttachmentFromS3Bucket(pathval));
+                    //    }
+                    //}
                 }
 
                 if (files.Type == "Audio")
                 {
                     codeBlue.AudioFolderRoot = pathval;
-                    string AudioPath = this._RootPath + codeBlue.AudioFolderRoot;
-                    if (Directory.Exists(AudioPath))
-                    {
-                        DirectoryInfo AttachFiles = new DirectoryInfo(AudioPath);
-                        codeBlue.AudiosPath = new List<string>();
-                        foreach (var item in AttachFiles.GetFiles())
-                        {
-                            codeBlue.AudiosPath.Add(codeBlue.AudioFolderRoot + "/" + item.Name);
-                        }
-                    }
+                    //string AudioPath = this._RootPath + codeBlue.AudioFolderRoot;
+                    //if (Directory.Exists(AudioPath))
+                    //{
+                    //    DirectoryInfo AttachFiles = new DirectoryInfo(AudioPath);
+                    codeBlue.AudiosPath = new List<string>();
+                    //foreach (var item in AttachFiles.GetFiles())
+                    //{
+                    codeBlue.AudiosPath.AddRange(this._communicationService.LoadAttachmentFromS3Bucket(pathval));
+                    //    }
+                    //}
                 }
 
                 if (files.Type == "Attachments")
                 {
                     codeBlue.AttachmentsFolderRoot = pathval;
-                    string AttachmentsPath = this._RootPath + codeBlue.AttachmentsFolderRoot;
-                    if (Directory.Exists(AttachmentsPath))
-                    {
-                        DirectoryInfo AttachFiles = new DirectoryInfo(AttachmentsPath);
-                        codeBlue.AttachmentsPath = new List<string>();
-                        foreach (var item in AttachFiles.GetFiles())
-                        {
-                            codeBlue.AttachmentsPath.Add(codeBlue.AttachmentsFolderRoot + "/" + item.Name);
-                        }
-                    }
+                    //string AttachmentsPath = this._RootPath + codeBlue.AttachmentsFolderRoot;
+                    //if (Directory.Exists(AttachmentsPath))
+                    //{
+                    //    DirectoryInfo AttachFiles = new DirectoryInfo(AttachmentsPath);
+                    codeBlue.AttachmentsPath = new List<string>();
+                    //foreach (var item in AttachFiles.GetFiles())
+                    //{
+                    codeBlue.AttachmentsPath.AddRange(this._communicationService.LoadAttachmentFromS3Bucket(pathval));
+                    //    }
+                    //}
                 }
 
                 fieldValue = new { videosPath = codeBlue.VideosPath, audiosPath = codeBlue.AudiosPath, attachmentsPath = codeBlue.AttachmentsPath };
@@ -760,7 +765,7 @@ namespace Web.Services.Concrete
                 {
                     Id = files.Id,
                     OrgId = rootPath.OrganizationIdFk,
-                    FieldName = files.Type, 
+                    FieldName = files.Type,
                     //== "Video" || files.Type == "Audio" ? (files.Type + "s").ToLower() : (files.Type.Replace("s", "")).ToLower()),
                     FieldDataType = "file",
                     FieldValue = fieldValue,
@@ -857,17 +862,18 @@ namespace Web.Services.Concrete
                     string Attachments = codeDataVM["attachments"].ToString();
                     if (!string.IsNullOrEmpty(Attachments) && !string.IsNullOrWhiteSpace(Attachments))
                     {
-                        string path = this._RootPath + Attachments;
+                        //string path = this._RootPath + Attachments;
                         List<string> FilesList = new();
-                        if (Directory.Exists(path))
-                        {
-                            DirectoryInfo AttachFiles = new DirectoryInfo(path);
-                            foreach (var item in AttachFiles.GetFiles())
-                            {
-                                FilesList.Add(Attachments + "/" + item.Name);
-                            }
-                            codeDataVM.Add("attachmentsPath", FilesList);
-                        }
+                        FilesList = this._communicationService.LoadAttachmentFromS3Bucket(Attachments);
+                        //if (Directory.Exists(path))
+                        //{
+                        //DirectoryInfo AttachFiles = new DirectoryInfo(path);
+                        //foreach (var item in AttachFiles.GetFiles())
+                        //{
+                        //    FilesList.Add(Attachments + "/" + item.Name);
+                        //}
+                        codeDataVM.Add("attachmentsPath", FilesList);
+                        //}
                     }
                 }
 
@@ -876,17 +882,18 @@ namespace Web.Services.Concrete
                     string audio = codeDataVM["audio"].ToString();
                     if (!string.IsNullOrEmpty(audio) && !string.IsNullOrWhiteSpace(audio))
                     {
-                        string path = this._RootPath + audio;
+                        //string path = this._RootPath + audio;
                         List<string> FilesList = new();
-                        if (Directory.Exists(path))
-                        {
-                            DirectoryInfo AttachFiles = new DirectoryInfo(path);
-                            foreach (var item in AttachFiles.GetFiles())
-                            {
-                                FilesList.Add(audio + "/" + item.Name);
-                            }
-                            codeDataVM.Add("audiosPath", FilesList);
-                        }
+                        FilesList = this._communicationService.LoadAttachmentFromS3Bucket(audio);
+                        //if (Directory.Exists(path))
+                        //{
+                        //    DirectoryInfo AttachFiles = new DirectoryInfo(path);
+                        //    foreach (var item in AttachFiles.GetFiles())
+                        //    {
+                        //        FilesList.Add(audio + "/" + item.Name);
+                        //    }
+                        codeDataVM.Add("audiosPath", FilesList);
+                        //}
                     }
                 }
 
@@ -895,17 +902,18 @@ namespace Web.Services.Concrete
                     string video = codeDataVM["video"].ToString();
                     if (!string.IsNullOrEmpty(video) && !string.IsNullOrWhiteSpace(video))
                     {
-                        string path = this._RootPath + video;
+                        //string path = this._RootPath + video;
                         List<string> FilesList = new();
-                        if (Directory.Exists(path))
-                        {
-                            DirectoryInfo AttachFiles = new DirectoryInfo(path);
-                            foreach (var item in AttachFiles.GetFiles())
-                            {
-                                FilesList.Add(video + "/" + item.Name);
-                            }
-                            codeDataVM.Add("videosPath", FilesList);
-                        }
+                        FilesList = this._communicationService.LoadAttachmentFromS3Bucket(video);
+                        //if (Directory.Exists(path))
+                        //{
+                        //    DirectoryInfo AttachFiles = new DirectoryInfo(path);
+                        //    foreach (var item in AttachFiles.GetFiles())
+                        //    {
+                        //        FilesList.Add(video + "/" + item.Name);
+                        //    }
+                        codeDataVM.Add("videosPath", FilesList);
+                        //}
                     }
                 }
 
@@ -1226,7 +1234,7 @@ namespace Web.Services.Concrete
                     string FolderRootPath = null;
                     if (filesList != null && filesList.Count > 0)
                     {
-                        var RootPath = this._RootPath + "/Organizations"; //this._RootPath + "/Organizations";
+                        var RootPath = /*this._RootPath + */"Organizations"; //this._RootPath + "/Organizations";
                         string FileRoot = null;
                         List<string> Attachments = new();
                         FileRoot = this._orgRepo.Table.Where(x => x.OrganizationId == code.OrganizationIdFk && !x.IsDeleted).Select(x => x.OrganizationName).FirstOrDefault();
@@ -1252,6 +1260,7 @@ namespace Web.Services.Concrete
                             Directory.CreateDirectory(FileRoot);
                         }
 
+                        FileRoot = FileRoot.Replace("\\", "/");
                         foreach (var item in filesList)
                         {
                             if (!string.IsNullOrEmpty(item.Base64Str))
@@ -1260,44 +1269,47 @@ namespace Web.Services.Concrete
                                 var fileInfo = item.Base64Str.Split("base64,");
                                 string fileExtension = fileInfo[0].GetFileExtenstion();
                                 var ByteFile = Convert.FromBase64String(fileInfo[1]);
-                                string FilePath = Path.Combine(FileRoot, item.FileName);
+                                //string FilePath = Path.Combine(FileRoot, item.FileName);
 
-                                if (File.Exists(FilePath))
-                                {
-                                    long existingFileSize = 0;
-                                    long newFileSize = ByteFile.LongLength;
-                                    FileInfo ExistingfileInfo = new FileInfo(FilePath);
-                                    existingFileSize = ExistingfileInfo.Length;
+                                //if (File.Exists(FilePath))
+                                //{
+                                //    long existingFileSize = 0;
+                                //    long newFileSize = ByteFile.LongLength;
+                                //    FileInfo ExistingfileInfo = new FileInfo(FilePath);
+                                //    existingFileSize = ExistingfileInfo.Length;
 
-                                    if (existingFileSize > 0 && newFileSize != existingFileSize)
-                                    {
-                                        var alterFile = item.FileName.Split('.');
-                                        string extention = alterFile.LastOrDefault();
-                                        var alterFileName = alterFile.ToList();
-                                        alterFileName.RemoveAt(alterFileName.Count - 1);
-                                        string fileName = string.Join(".", alterFileName);
-                                        fileName = fileName + "_" + HelperExtension.CreateRandomString(7) + "." + extention;
-                                        FilePath = Path.Combine(FileRoot, fileName);
-                                        using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
-                                        {
-                                            fs.Write(ByteFile);
-                                        }
-                                    }
-                                    else
-                                    {
-                                        using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
-                                        {
-                                            fs.Write(ByteFile);
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
-                                    {
-                                        fs.Write(ByteFile);
-                                    }
-                                }
+                                //    if (existingFileSize > 0 && newFileSize != existingFileSize)
+                                //    {
+                                //        var alterFile = item.FileName.Split('.');
+                                //        string extention = alterFile.LastOrDefault();
+                                //        var alterFileName = alterFile.ToList();
+                                //        alterFileName.RemoveAt(alterFileName.Count - 1);
+                                //        string fileName = string.Join(".", alterFileName);
+                                //        fileName = fileName + "_" + HelperExtension.CreateRandomString(7) + "." + extention;
+                                //        FilePath = Path.Combine(FileRoot, fileName);
+                                //        this._communicationService.UploadAttachmentToS3Bucket(ByteFile, FileRoot, fileName);
+                                //        //using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                //        //{
+                                //        //    fs.Write(ByteFile);
+                                //        //}
+                                //    }
+                                //    else
+                                //    {
+                                //        using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                //        {
+                                //            fs.Write(ByteFile);
+                                //        }
+                                //    }
+                                //}
+                                //else
+                                //{
+                                //FilePath = Path.Combine(FileRoot, item.FileName);
+                                this._communicationService.UploadAttachmentToS3Bucket(ByteFile, FileRoot, item.FileName);
+                                //using (FileStream fs = new(FilePath, FileMode.Create, FileAccess.Write))
+                                //{
+                                //    fs.Write(ByteFile);
+                                //}
+                                //}
                             }
                         }
                         if (FileRoot != null && FileRoot != "")
@@ -1311,26 +1323,27 @@ namespace Web.Services.Concrete
                     List<string> FilesPath = new();
                     if (FolderRootPath != null)
                     {
-                        string path = this._RootPath + FolderRootPath;
-                        if (Directory.Exists(path))
-                        {
-                            DirectoryInfo AttachFiles = new DirectoryInfo(path);
-                            FilesPath = new List<string>();
-                            foreach (var item in AttachFiles.GetFiles())
-                            {
-                                FilesPath.Add(FolderRootPath + "/" + item.Name);
-                            }
-                        }
+                        FilesPath = this._communicationService.LoadAttachmentFromS3Bucket(FolderRootPath);
+                        //    string path = this._RootPath + FolderRootPath;
+                        //    if (Directory.Exists(path))
+                        //    {
+                        //        DirectoryInfo AttachFiles = new DirectoryInfo(path);
+                        //        FilesPath = new List<string>();
+                        //        foreach (var item in AttachFiles.GetFiles())
+                        //        {
+                        //            FilesPath.Add(FolderRootPath + "/" + item.Name);
+                        //        }
+                        //    }
                     }
 
                     //this._codeStrokeRepo.Update(row);
 
                     Qry = $"Update Code{(codeName != UCLEnums.Sepsis.ToString() ? codeName + "s" : codeName)}" +
-                            $" Set ModifiedBy = {ApplicationSettings.UserId}," +
-                            $" ModifiedDate = '{DateTime.UtcNow}'," +
-                            $" IsDeleted = 0," +
-                            $" {fieldName} = '{code.GetPropertyValueByName(fieldName)}'" +
-                            $" WHERE Code{codeName}Id = {codeId}";
+                                $" Set ModifiedBy = {ApplicationSettings.UserId}," +
+                                $" ModifiedDate = '{DateTime.UtcNow}'," +
+                                $" IsDeleted = 0," +
+                                $" {fieldName} = '{code.GetPropertyValueByName(fieldName)}'" +
+                                $" WHERE Code{codeName}Id = {codeId}";
 
                     int rowEffect = this._dbContext.Database.ExecuteSqlRaw(Qry);
 

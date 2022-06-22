@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using System.Collections.Generic;
 using Twilio.Rest.Chat.V2.Service;
 using Twilio.Rest.Chat.V2.Service.Channel;
 using Web.Model;
@@ -54,9 +55,10 @@ namespace Web.Services.Interfaces
         #region Chat Settings
         BaseResponse GetTone(int Id);
         BaseResponse GetChatSetting(int UserId);
+        public BaseResponse addChatSettings(AddChatSettingVM channel);
         #endregion
 
-        public BaseResponse addChatSettings(AddChatSettingVM channel);
+
 
 
         #region Communication Log
@@ -70,6 +72,13 @@ namespace Web.Services.Interfaces
         BaseResponse GetCallLog(int orgId, bool showAllCalls);
         ChannelResource getConversationChannelBySid(string channelSid);
 
+        #endregion
+
+
+        #region [S3 Bucket Implementation]
+        string UploadAttachmentToS3Bucket(byte[] fileBytes, string FilePath, string fileUniqueName);
+        List<string> LoadAttachmentFromS3Bucket(string folderPath);
+        int DeleteAttachmentFromS3Bucket(string filePath);
         #endregion
     }
 }
