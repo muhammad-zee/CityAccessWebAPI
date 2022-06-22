@@ -876,6 +876,7 @@ namespace Web.Services.Concrete
                 var s3Client = new AmazonS3Client(awsAccessKeyId: this.s3accessKey, awsSecretAccessKey: s3secretKey, region: regionEndpoint);
                 var fileTransferUtility = new TransferUtility(s3Client);
 
+
                 var attachment = file.FirstOrDefault();
                 var extension = Path.GetExtension(attachment.FileName);
                 string fileActualName = attachment.FileName;
@@ -898,7 +899,7 @@ namespace Web.Services.Concrete
                     var fileBytes = ms.ToArray();
                     using (FileStream fs = new FileStream(targetPath, FileMode.Create, FileAccess.Write))
                     {
-                        fs.Write(fileBytes)
+                        fs.Write(fileBytes);
                     }
                 }
                 try
@@ -908,19 +909,29 @@ namespace Web.Services.Concrete
                         BucketName = this.s3BucketName + "/" + FilePath,
                         FilePath = targetPath,
                         StorageClass = S3StorageClass.StandardInfrequentAccess,
-                        //PartSize = 6291456, // 6 MB.  
+                        PartSize = 6291456, // 6 MB.  
                         Key = fileUniqueName,//filename which u want to save in bucket
                         CannedACL = S3CannedACL.PublicRead,
+                        //InputStream = fs,
                     };
                     fileTransferUtility.UploadAsync(fileTransferUtilityRequest).GetAwaiter().GetResult();
                     File.Delete(targetPath);
+                    //To upload without asynchronous
+                    //fileTransferUtility.Upload(filePath, bucketName, "SampleAudio.wav");
+                    //fileTransferUtility.Dispose();
                 }
                 catch (AmazonS3Exception ex)
                 {
 
                 }
+            //
+                //origin = origin.Contains("ngrok.io") ? "http://localhost:60113" : origin;
+                //var MediaUrl = $"{origin}/{FilePath}/{fileUniqueName}";
+                 var MediaUrl = $"https://{s3BucketName}.s3.amazonaws.com/{FilePath}/{fileUniqueName}";
+                //string extension = Path.GetExtension(ImageFile.FileName);
 
-                var MediaUrl = $"https://{s3BucketName}.s3.amazonaws.com/{FilePath}/{fileUniqueName}";
+                ////ImageFile.SaveAs(path + filename);
+                ///       
                 return new BaseResponse
                 {
                     Status = HttpStatusCode.OK,
@@ -936,7 +947,11 @@ namespace Web.Services.Concrete
                 Status = HttpStatusCode.BadRequest,
                 Message = "File Not Uploaded...!",
             };
+
+
+
         }
+
 
         #endregion
 
