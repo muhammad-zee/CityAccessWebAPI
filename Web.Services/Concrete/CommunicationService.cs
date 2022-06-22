@@ -990,11 +990,8 @@ namespace Web.Services.Concrete
 
         }
 
-        public List<string> DeleteAttachmentFromS3Bucket(string filePath)
+        public int DeleteAttachmentFromS3Bucket(string filePath)
         {
-
-
-            List<string> pathList = new();
             RegionEndpoint regionEndpoint = RegionEndpoint.USEast2;
             var s3Client = new AmazonS3Client(awsAccessKeyId: this.s3accessKey, awsSecretAccessKey: s3secretKey, region: regionEndpoint);
             try
@@ -1006,12 +1003,16 @@ namespace Web.Services.Concrete
                     Key = filePath
                 };
                 var listResponse = s3Client.DeleteObjectAsync(deleteRequest).Result;
+                if (listResponse.DeleteMarker == "true")
+                {
+                    return 1;
+                }
             }
             catch (AmazonS3Exception ex)
             {
                 throw ex;
             }
-            return pathList;
+            return 0;
             
         }
         #endregion
