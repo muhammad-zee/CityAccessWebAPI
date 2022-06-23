@@ -323,6 +323,9 @@ namespace Web.API.Controllers
         {
             try
             {
+                Exception er = new Exception();
+                throw er;
+
                 return this._callService.copyIvrSettings(copyFromIvrId, copyToIvrId);
             }
             catch (Exception ex)

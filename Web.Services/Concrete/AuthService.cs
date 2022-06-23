@@ -363,22 +363,14 @@ namespace Web.Services.Concrete
 
                 if (!string.IsNullOrEmpty(register.UserImage))
                 {
-                    //var outPath = Directory.GetCurrentDirectory();
-                    var RootPath = this._RootPath; //this._environment.WebRootPath;
+                    var RootPath = this._RootPath; 
                     string FilePath = "UserProfiles";
                     var targetPath = Path.Combine(RootPath, FilePath);
-
-                    if (!Directory.Exists(targetPath))
-                    {
-                        Directory.CreateDirectory(targetPath);
-                    }
                     register.UserImageByte = Convert.FromBase64String(register.UserImage.Split("base64,")[1]);
-                    targetPath += "/" + $"{user.FirstName}-{user.LastName}_{user.UserId}.png";
-                    using (FileStream fs = new FileStream(targetPath, FileMode.Create, FileAccess.Write))
-                    {
-                        fs.Write(register.UserImageByte);
-                    }
+                    string fileName= $"{user.FirstName}-{user.LastName}_{user.UserId}.png";
+                    targetPath += $"/{fileName}.png";
                     user.UserImage = targetPath.Replace(RootPath, "").Replace("\\", "/");
+                    var saveImage = this._communicationService.UploadAttachmentToS3Bucket(register.UserImageByte, FilePath, fileName);
                 }
                 _userRepo.Update(user);
                 

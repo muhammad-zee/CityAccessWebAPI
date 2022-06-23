@@ -79,6 +79,7 @@ namespace Web.Services.Interfaces
         string UploadAttachmentToS3Bucket(byte[] fileBytes, string FilePath, string fileUniqueName);
         List<string> LoadAttachmentFromS3Bucket(string folderPath);
         int DeleteAttachmentFromS3Bucket(string filePath);
+        int DeleteAllAttachmentInFolderFromS3Bucket(string filePath);
         #endregion
     }
 }

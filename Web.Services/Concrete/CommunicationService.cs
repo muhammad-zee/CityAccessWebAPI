@@ -690,7 +690,7 @@ namespace Web.Services.Concrete
         {
 
             //var chatusers = this._userrepo.table.where(u => u.isdeleted != true && u.isactive == true && !string.isnullorempty(u.userchannelsid));
-            var chatUsers = this._dbContext.LoadStoredProcedure("md_getAllUsersByOrganizationIdforchat")
+            var chatUsers = this._dbContext.LoadStoredProcedure("md_getAllConversationUsersByOrganizationId")
              .WithSqlParam("@pOrganizationId", orgid)
              .WithSqlParam("@pIsSuperAdmin", ApplicationSettings.isSuperAdmin)
              .ExecuteStoredProc<ChatUsersVM>();
@@ -1014,6 +1014,45 @@ namespace Web.Services.Concrete
             }
             return 0;
             
+        }
+
+        public int DeleteAllAttachmentInFolderFromS3Bucket(string folderName)
+        {
+            RegionEndpoint regionEndpoint = RegionEndpoint.USEast2;
+            var s3Client = new AmazonS3Client(awsAccessKeyId: this.s3accessKey, awsSecretAccessKey: s3secretKey, region: regionEndpoint);
+            try
+            {
+                ListObjectsRequest request = new ListObjectsRequest
+                {
+                    BucketName = this.s3BucketName,
+                    Prefix = folderName
+
+                };
+                DeleteObjectsRequest deleteRequest = new DeleteObjectsRequest
+                {
+                    BucketName = this.s3BucketName
+                };
+
+                ListObjectsResponse response = s3Client.ListObjectsAsync(request).Result;
+                // Process response.
+                foreach (S3Object entry in response.S3Objects)
+                {
+
+                    deleteRequest.AddKey(entry.Key);
+                }
+
+                var listResponse = s3Client.DeleteObjectsAsync(deleteRequest).Result;
+                if (listResponse.DeletedObjects.All(x => x.DeleteMarker == true))
+                {
+                    return 1;
+                }
+            }
+            catch (AmazonS3Exception ex)
+            {
+                throw ex;
+            }
+            return 0;
+
         }
         #endregion
 

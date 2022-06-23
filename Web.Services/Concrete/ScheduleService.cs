@@ -34,6 +34,7 @@ namespace Web.Services.Concrete
         private readonly IRepository<ServiceLine> _serviceRepo;
         private readonly IRepository<Role> _roleRepo;
 
+        private readonly ICommunicationService _communicationService;
         public ScheduleService(RAQ_DbContext dbContext,
             IConfiguration configuration,
             IHostingEnvironment environment,
@@ -42,7 +43,8 @@ namespace Web.Services.Concrete
             IRepository<Role> roleRepo,
             IRepository<UserRole> userRoleRepo,
             IRepository<UsersRelation> userRelationRepo,
-            IRepository<ServiceLine> serviceRepo)
+            IRepository<ServiceLine> serviceRepo,
+            ICommunicationService communicationService)
         {
             this._dbContext = dbContext;
             this._config = configuration;
@@ -56,6 +58,7 @@ namespace Web.Services.Concrete
             this._userRoleRepo = userRoleRepo;
             this._userRelationRepo = userRelationRepo;
             this._serviceRepo = serviceRepo;
+            this._communicationService = communicationService;
         }
 
         public BaseResponse getSchedule(EditParams param)
@@ -261,6 +264,7 @@ namespace Web.Services.Concrete
 
                 var folderName = Path.Combine("ScheduleTemplates");
                 var pathToSave = Path.Combine(this._RootPath, folderName);
+                var fileName = $"Schedule Template For {serviceLineUsers.FirstOrDefault().ServiceName}.csv"; //ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
                 if (!Directory.Exists(pathToSave))
                 {
                     Directory.CreateDirectory(pathToSave);
@@ -273,12 +277,16 @@ namespace Web.Services.Concrete
                         fi.Delete();
                     }
                 }
-                var fileName = $"Schedule Template For {serviceLineUsers.FirstOrDefault().ServiceName}.csv"; //ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
+                var deletePrevTempFile = this._communicationService.DeleteAllAttachmentInFolderFromS3Bucket($"{folderName}");
                 var fullPath = Path.Combine(pathToSave, fileName);
                 new CSVReader().WriteDataTableAsCSV(tbl, fullPath);
+                DirectoryInfo dir1 = new DirectoryInfo(pathToSave);
+                var fInfo = dir1.GetFiles();
+                var fileCsv = fInfo.FirstOrDefault();
+                byte[] FileBytes = File.ReadAllBytes(fileCsv.FullName);
+                var saveFile = this._communicationService.UploadAttachmentToS3Bucket(FileBytes, folderName, fileName);
 
-
-                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Template ready", Body = new { path = fullPath.Replace(this._RootPath, ""), fileName = fileName } };
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Template ready", Body = new { path = $"{folderName}/{fileName}", fileName = fileName } };
             }
             else
             {
