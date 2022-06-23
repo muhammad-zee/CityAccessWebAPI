@@ -77,7 +77,7 @@ namespace Web.Services.Interfaces
 
         #region [S3 Bucket Implementation]
         string UploadAttachmentToS3Bucket(byte[] fileBytes, string FilePath, string fileUniqueName);
-        List<string> LoadAttachmentFromS3Bucket(string folderPath);
+        List<string> LoadAttachmentFromS3Bucket(string folderPath,bool? returnFullUrl = true);
         int DeleteAttachmentFromS3Bucket(string filePath);
         int DeleteAllAttachmentInFolderFromS3Bucket(string filePath);
         #endregion

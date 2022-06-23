@@ -945,7 +945,7 @@ namespace Web.Services.Concrete
                     //InputStream = fs,
                 };
                 fileTransferUtility.UploadAsync(fileTransferUtilityRequest).GetAwaiter().GetResult();
-                
+
                 File.Delete(targetPath);
                 //To upload without asynchronous
                 //fileTransferUtility.Upload(filePath, bucketName, "SampleAudio.wav");
@@ -962,7 +962,7 @@ namespace Web.Services.Concrete
 
 
         }
-        public List<string> LoadAttachmentFromS3Bucket(string folderPath)
+        public List<string> LoadAttachmentFromS3Bucket(string folderPath, bool? returnFullUrl = true)
         {
 
             List<string> pathList = new();
@@ -979,7 +979,15 @@ namespace Web.Services.Concrete
                 var listResponse = s3Client.ListObjectsAsync(listRequest).Result;
                 foreach (S3Object obj in listResponse.S3Objects)
                 {
-                    pathList.Add($"https://{this.s3BucketName}.s3.amazonaws.com/{obj.Key}");
+                    if (returnFullUrl.Value)
+                    {
+                        pathList.Add($"https://{this.s3BucketName}.s3.amazonaws.com/{obj.Key}");
+                    }
+                    else
+                    {
+                        pathList.Add($"{obj.Key}");
+                    }
+
                 }
             }
             catch (AmazonS3Exception ex)
@@ -1013,7 +1021,7 @@ namespace Web.Services.Concrete
                 throw ex;
             }
             return 0;
-            
+
         }
 
         public int DeleteAllAttachmentInFolderFromS3Bucket(string folderName)
@@ -1028,24 +1036,27 @@ namespace Web.Services.Concrete
                     Prefix = folderName
 
                 };
-                DeleteObjectsRequest deleteRequest = new DeleteObjectsRequest
-                {
-                    BucketName = this.s3BucketName
-                };
-
                 ListObjectsResponse response = s3Client.ListObjectsAsync(request).Result;
                 // Process response.
-                foreach (S3Object entry in response.S3Objects)
+                if (response.S3Objects.Count > 0)
                 {
+                    DeleteObjectsRequest deleteRequest = new DeleteObjectsRequest
+                    {
+                        BucketName = this.s3BucketName
+                    };
+                    foreach (S3Object entry in response.S3Objects)
+                    {
 
-                    deleteRequest.AddKey(entry.Key);
+                        deleteRequest.AddKey(entry.Key);
+                    }
+
+                    var listResponse = s3Client.DeleteObjectsAsync(deleteRequest).Result;
+                    if (listResponse.DeletedObjects.All(x => x.DeleteMarker == true))
+                    {
+                        return 1;
+                    }
                 }
 
-                var listResponse = s3Client.DeleteObjectsAsync(deleteRequest).Result;
-                if (listResponse.DeletedObjects.All(x => x.DeleteMarker == true))
-                {
-                    return 1;
-                }
             }
             catch (AmazonS3Exception ex)
             {
@@ -1196,18 +1207,27 @@ namespace Web.Services.Concrete
             var returnObj = new Dictionary<string, object>();
             foreach (var item in UCLDetails)
             {
+                var filePaths = this.LoadAttachmentFromS3Bucket(item.ImageHtml, false);
                 var paths = new List<object>();
-                string path = this._RootPath + item.ImageHtml;
-                if (Directory.Exists(path))
+                foreach (var filePath in filePaths)
                 {
-                    DirectoryInfo AttachFiles = new DirectoryInfo(path);
-                    foreach (var itemfile in AttachFiles.GetFiles())
-                    {
-                        paths.Add(new { path = path.Replace(this._RootPath, "") + '/' + itemfile.Name, name = itemfile.Name.Split(".")[0] });
-                    }
-
-                    returnObj.Add(item.Title.Replace(" ", ""), paths);
+                    var fileParts = filePath.Split("/");
+                    int fileNameIndex = fileParts.Length - 1;
+                    var fileName = fileParts[fileNameIndex].Split(".")[0];
+                    paths.Add(new { path = filePath, name = fileName });
                 }
+                returnObj.Add(item.Title.Replace(" ", ""), paths);
+                //string path = this._RootPath + item.ImageHtml;
+                //if (Directory.Exists(path))
+                //{
+                //    DirectoryInfo AttachFiles = new DirectoryInfo(path);
+                //    foreach (var itemfile in AttachFiles.GetFiles())
+                //    {
+                //        paths.Add(new { path = path.Replace(this._RootPath, "") + '/' + itemfile.Name, name = itemfile.Name.Split(".")[0] });
+                //    }
+
+                //    returnObj.Add(item.Title.Replace(" ", ""), paths);
+                //}
             }
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = returnObj };
         }
@@ -1217,7 +1237,6 @@ namespace Web.Services.Concrete
             var chatData = this._chatSettingRepo.Table.FirstOrDefault(x => x.UserIdFk == ApplicationSettings.UserId && x.IsDeleted != true);
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Chat data", Body = chatData };
         }
-        #endregion
 
         public BaseResponse addChatSettings(AddChatSettingVM channel)
         {
@@ -1240,23 +1259,14 @@ namespace Web.Services.Concrete
                 };
                 if (channel.WallpaperObj != null && !string.IsNullOrEmpty(channel.WallpaperObj.Base64Str))
                 {
-                    var GetUserInfo = _userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && x.IsDeleted == false).Select(x => new { x.UserId, x.FirstName, x.LastName }).FirstOrDefault();
-                    //var outPath = Directory.GetCurrentDirectory();
-                    var RootPath = this._RootPath;
-                    string FilePath = "Wallpapers";
-                    var targetPath = Path.Combine(RootPath, FilePath);
-
-                    if (!Directory.Exists(targetPath))
-                    {
-                        Directory.CreateDirectory(targetPath);
-                    }
+                    //var GetUserInfo = _userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && x.IsDeleted == false).Select(x => new { x.UserId, x.FirstName, x.LastName }).FirstOrDefault();
+                    //string fileName =  $"{GetUserInfo.FirstName}-{GetUserInfo.LastName}_{GetUserInfo.UserId}_{DateTime.UtcNow.ToString("yyyyMMddHHmmssffff")}.png";
+                    string FilePath = $"ChatWallpapers/{channelSetting.UserIdFk}";
+                    string fileName = $"{DateTime.UtcNow.ToString("yyyyMMddHHmmssffff")}.png";
+                    this.DeleteAllAttachmentInFolderFromS3Bucket(FilePath);
                     var UserImageByte = Convert.FromBase64String(channel.WallpaperObj.Base64Str.Split("base64,")[1]);
-                    targetPath += "/" + $"{GetUserInfo.FirstName}-{GetUserInfo.LastName}_{GetUserInfo.UserId}_{DateTime.UtcNow.ToString("yyyyMMddHHmmssffff")}.png";
-                    using (FileStream fs = new FileStream(targetPath, FileMode.Create, FileAccess.Write))
-                    {
-                        fs.Write(UserImageByte);
-                    }
-                    newChannel.Wallpaper = targetPath.Replace(RootPath, "").Replace("\\", "/");
+                    this.UploadAttachmentToS3Bucket(UserImageByte, FilePath, fileName);
+                    channelSetting.Wallpaper = FilePath + "/" + fileName;
                 }
                 this._chatSettingRepo.Insert(newChannel);
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Chat settings saved successfully.", Body = newChannel };
@@ -1275,38 +1285,21 @@ namespace Web.Services.Concrete
                 channelSetting.IsDeleted = false;
                 if (channel.WallpaperObj != null && !string.IsNullOrEmpty(channel.WallpaperObj.Base64Str))
                 {
-                    var GetUserInfo = _userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && x.IsDeleted == false).Select(x => new { x.UserId, x.FirstName, x.LastName }).FirstOrDefault();
-                    //var outPath = Directory.GetCurrentDirectory();
-                    var RootPath = this._RootPath;
-                    string FilePath = "Wallpapers";
-                    var targetPath = Path.Combine(RootPath, FilePath);
-
-                    if (!Directory.Exists(targetPath))
-                    {
-                        Directory.CreateDirectory(targetPath);
-                    }
-                    else
-                    {
-                        var allFiles = new DirectoryInfo(targetPath).GetFiles();
-                        var existingWallpaper = allFiles.Where(i => i.FullName.Contains($"{GetUserInfo.FirstName}-{GetUserInfo.LastName}_{GetUserInfo.UserId}"));
-                        foreach (var file in existingWallpaper)
-                        {
-                            file.Delete();
-                        }
-
-                    }
+                    //var GetUserInfo = _userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && x.IsDeleted == false).Select(x => new { x.UserId, x.FirstName, x.LastName }).FirstOrDefault();
+                    //string fileName =  $"{GetUserInfo.FirstName}-{GetUserInfo.LastName}_{GetUserInfo.UserId}_{DateTime.UtcNow.ToString("yyyyMMddHHmmssffff")}.png";
+                    string FilePath = $"ChatWallpapers/{channelSetting.UserIdFk}";
+                    string fileName = $"{DateTime.UtcNow.ToString("yyyyMMddHHmmssffff")}.png";
+                    this.DeleteAllAttachmentInFolderFromS3Bucket(FilePath);
                     var UserImageByte = Convert.FromBase64String(channel.WallpaperObj.Base64Str.Split("base64,")[1]);
-                    targetPath += "/" + $"{GetUserInfo.FirstName}-{GetUserInfo.LastName}_{GetUserInfo.UserId}_{DateTime.UtcNow.ToString("yyyyMMddHHmmssffff")}.png";
-                    using (FileStream fs = new FileStream(targetPath, FileMode.Create, FileAccess.Write))
-                    {
-                        fs.Write(UserImageByte);
-                    }
-                    channelSetting.Wallpaper = targetPath.Replace(RootPath, "").Replace("\\", "/");
+                    this.UploadAttachmentToS3Bucket(UserImageByte, FilePath, fileName);
+                    channelSetting.Wallpaper = FilePath + "/" + fileName;
                 }
                 this._chatSettingRepo.Update(channelSetting);
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Chat Setting Updated Successfully", Body = channelSetting };
             }
         }
+
+        #endregion
 
 
         public BaseResponse refreshConsversationUsers(string key)
