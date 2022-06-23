@@ -11,6 +11,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Web.Data", "Web.Data\Web.Da
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Web.Model", "Web.Model\Web.Model.csproj", "{69A071A6-6D00-4E79-BAF6-9A7E1C29D303}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Processes", "Processes", "{D7873B14-A261-42B4-8C82-D0952737869A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MDRoute.TwilioAutomationService", "MDRoute.TwilioAutomationService\MDRoute.TwilioAutomationService.csproj", "{A945D8E8-2C3E-4EE2-A1ED-9C288B325FCB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,9 +37,16 @@ Global
 		{69A071A6-6D00-4E79-BAF6-9A7E1C29D303}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{69A071A6-6D00-4E79-BAF6-9A7E1C29D303}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{69A071A6-6D00-4E79-BAF6-9A7E1C29D303}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A945D8E8-2C3E-4EE2-A1ED-9C288B325FCB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A945D8E8-2C3E-4EE2-A1ED-9C288B325FCB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A945D8E8-2C3E-4EE2-A1ED-9C288B325FCB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A945D8E8-2C3E-4EE2-A1ED-9C288B325FCB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{A945D8E8-2C3E-4EE2-A1ED-9C288B325FCB} = {D7873B14-A261-42B4-8C82-D0952737869A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {ACFDD5FD-39A5-45DB-A07B-0AF8E1524E98}
