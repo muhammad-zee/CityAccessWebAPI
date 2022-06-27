@@ -442,6 +442,37 @@ namespace Web.Services.Concrete
                     }
 
                 }
+                else if (model.Action == ActivityLogActionEnums.Assosiation.ToInt() || model.Action == ActivityLogActionEnums.FavouriteTeam.ToInt())
+                {
+                    if (showNewFields)
+                    {
+                        string changedFields = "";
+                        var jobj1 = JObject.Parse(model.Changeset);
+                        var jobj1Props = jobj1.Properties().ToList();
+                        foreach (var p in jobj1Props)
+                        {
+                            if (jobj1[p.Name] == null || jobj1[p.Name].ToString() == "")
+                            {
+                                jobj1[p.Name] = "null";
+                            }
+                            var typeOfPrevObj = jobj1[p.Name].Type.ToString();
+                            if (typeOfPrevObj != "Array")
+                            {
+                                changedFields = changedFields != "" ? changedFields : "" + changedFields;
+                                changedFields += $"{jobj1[p.Name]}";
+                            }
+
+                        }
+                        logDesc = $"<b>{model.UserFullName}</b> {model.ActionName} of {changedFields}";
+                    }
+                    else
+                    {
+                        logDesc = $"<b>{model.UserFullName}</b> {model.ActionName} <b>{recordName}{recordId}</b> in {model.TableName}";
+
+                    }
+
+                }
+
             }
             return logDesc;
         }

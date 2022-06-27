@@ -18,6 +18,8 @@ namespace Web.Services.Enums
         FileUpload = 3132,
         FileDelete = 3133,
         Acknowledge = 3137,
-        Copy = 4132
+        Copy = 4132,
+        Assosiation = 4135,
+        FavouriteTeam = 4136
     }
 }

@@ -615,26 +615,8 @@ namespace Web.Services.Concrete
             //var orgIds = associate.orgIds.ToIntList();
             //var dptIds = associate.dptIds.ToIntList();
             var serviceLineIds = associate.serviceIds.ToIntList();
-
+            var User = this._userRepo.Table.Where(u => u.UserId == associate.UserId).FirstOrDefault();
             List<UsersRelation> userRelations = new List<UsersRelation>();
-
-            //if (!string.IsNullOrEmpty(associate.RoleIds))
-            //{
-            //    var roleIds = associate.RoleIds.ToIntList();
-            //    var userRoles = _userRoleRepo.Table.Where(x => x.UserIdFk == associate.UserId).ToList();
-            //    _userRoleRepo.DeleteRange(userRoles);
-
-            //    if (roleIds.Count() > 0)
-            //    {
-            //        List<UserRole> userRoleList = new List<UserRole>();
-            //        foreach (var item in roleIds)
-            //        {
-            //            userRoleList.Add(new UserRole() { UserIdFk = associate.UserId, RoleIdFk = item });
-            //        }
-            //        _userRoleRepo.Insert(userRoleList);
-            //    }
-
-            //}
 
             var relation = _userRelationRepo.Table.Where(x => x.UserIdFk == associate.UserId && x.IsDeleted != true).ToList();
             if (relation.Count() > 0)
@@ -654,7 +636,9 @@ namespace Web.Services.Concrete
                 };
 
                 userRelations.Add(userRelation);
+
             }
+                this._dbContext.Log(new { Name = $"{User.FirstName} {User.LastName}" }, ActivityLogTableEnums.Users.ToString(), User.UserId, ActivityLogActionEnums.Assosiation.ToInt());
 
             if (userRelations.Count > 0)
             {
@@ -671,7 +655,7 @@ namespace Web.Services.Concrete
         public BaseResponse AddOrUpdateFavouriteTeam(RegisterCredentialVM FavTeam)
         {
             var serviceLineIds = FavTeam.serviceIds.ToIntList();
-
+            var User = this._userRepo.Table.Where(u => u.UserId == FavTeam.UserId).FirstOrDefault();
             List<FavouriteTeam> favTeam = new List<FavouriteTeam>();
 
             var relation = _userFavouriteTeamRepo.Table.Where(x => x.UserIdFk == FavTeam.UserId && x.IsDeleted != true).ToList();
@@ -697,6 +681,8 @@ namespace Web.Services.Concrete
             if (favTeam.Count > 0)
             {
                 _userFavouriteTeamRepo.Insert(favTeam);
+                this._dbContext.Log(new { Name = $"{User.FirstName} {User.LastName}" }, ActivityLogTableEnums.Users.ToString(), User.UserId, ActivityLogActionEnums.FavouriteTeam.ToInt());
+
                 //var showAllAccessUsers = this._dbContext.LoadStoredProcedure("md_getUsersOfComponentAccess")
                 //                       .WithSqlParam("@componentName", "Favourite Teams")
                 //                       .WithSqlParam("@orgId", FavTeam.OrganizationId)

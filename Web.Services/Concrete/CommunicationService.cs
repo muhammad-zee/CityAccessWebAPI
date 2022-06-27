@@ -1518,6 +1518,27 @@ namespace Web.Services.Concrete
         }
 
 
+
+
+    #region [Automation]
+    public BaseResponse DeleteConversationMessagesAsPerHippaComplaint()
+        {
+            var channels = this._dbContext.LoadStoredProcedure("md_getConversationChannelsByOrganizationId")
+            .WithSqlParam("@pOrganizationId", 0)
+            .ExecuteStoredProc<ConversationChannelsListVM>();
+            foreach(var channel in channels)
+            {
+                TwilioClient.Init(this.Twilio_AccountSid, this.Twilio_AuthToken);
+                var channelMessages = MessageResource.Read(this.Twilio_ChatServiceSid, channel.ChannelSid);
+                foreach(var message in channelMessages)
+                {
+                    MessageResource.Delete(this.Twilio_ChatServiceSid, channel.ChannelSid, message.Sid);
+                }
+            }
+            return new BaseResponse { Status = HttpStatusCode.OK, Message = "job done!" };
+        }
+    #endregion
     }
+
 
 }

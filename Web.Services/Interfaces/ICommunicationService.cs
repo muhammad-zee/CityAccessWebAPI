@@ -81,5 +81,11 @@ namespace Web.Services.Interfaces
         int DeleteAttachmentFromS3Bucket(string filePath);
         int DeleteAllAttachmentInFolderFromS3Bucket(string filePath);
         #endregion
+
+
+
+        #region [Automation]
+        BaseResponse DeleteConversationMessagesAsPerHippaComplaint();
+        #endregion
     }
 }
