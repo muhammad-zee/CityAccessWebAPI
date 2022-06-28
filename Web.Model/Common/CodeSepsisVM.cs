@@ -10,7 +10,7 @@ namespace Web.Model.Common
         public string PatientName { get; set; }
         public DateTime? Dob { get; set; }
         public string DobStr { get; set; }
-        public int Gender { get; set; }
+        public int? Gender { get; set; }
         public string GenderTitle { get; set; }
         public string ChiefComplant { get; set; }
         public DateTime? LastKnownWell { get; set; }
