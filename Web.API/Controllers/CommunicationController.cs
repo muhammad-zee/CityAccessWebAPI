@@ -559,11 +559,11 @@ namespace Web.API.Controllers
         #region [Automation]
         [AllowAnonymous]
         [HttpPost("Conversation/DeleteConversationMessagesAsPerHippaComplaint")]
-        public BaseResponse DeleteConversationMessagesAsPerHippaComplaint()
+        public BaseResponse DeleteConversationMessagesAsPerHippaComplaint([FromBody] DeleteChannelsFilterVM filter)
         {
             try
             {
-                return this._communicaitonService.DeleteConversationMessagesAsPerHippaComplaint();
+                return this._communicaitonService.DeleteConversationMessagesAsPerHippaComplaint(filter);
             }
             catch (Exception ex)
             {

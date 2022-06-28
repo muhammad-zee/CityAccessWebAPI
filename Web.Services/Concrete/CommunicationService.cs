@@ -1520,24 +1520,71 @@ namespace Web.Services.Concrete
 
 
 
-    #region [Automation]
-    public BaseResponse DeleteConversationMessagesAsPerHippaComplaint()
+        #region [Automation]
+        public BaseResponse DeleteConversationMessagesAsPerHippaComplaint(DeleteChannelsFilterVM filter)
         {
+            string channelType = filter.GroupConversations && !filter.SingleConversations ? "group" : !filter.GroupConversations && filter.SingleConversations ? "single" :
+                filter.GroupConversations && filter.SingleConversations ? "all":"none" ;
+
             var channels = this._dbContext.LoadStoredProcedure("md_getConversationChannelsByOrganizationId")
-            .WithSqlParam("@pOrganizationId", 0)
+            .WithSqlParam("@pOrganizationId", filter.OrganizationIds)
+            .WithSqlParam("@pUserIds", filter.UserIds)
+            .WithSqlParam("@pChannelType", filter.UserIds)
             .ExecuteStoredProc<ConversationChannelsListVM>();
-            foreach(var channel in channels)
+            foreach (var channel in channels)
             {
-                TwilioClient.Init(this.Twilio_AccountSid, this.Twilio_AuthToken);
-                var channelMessages = MessageResource.Read(this.Twilio_ChatServiceSid, channel.ChannelSid);
-                foreach(var message in channelMessages)
+                if (channel.ChannelFriendlyName == "S_1016_1")
                 {
-                    MessageResource.Delete(this.Twilio_ChatServiceSid, channel.ChannelSid, message.Sid);
+
+                }
+                TwilioClient.Init(this.Twilio_AccountSid, this.Twilio_AuthToken);
+                try
+                {
+                    var channelRes = ChannelResource.Fetch(pathServiceSid: this.Twilio_ChatServiceSid, pathSid: channel.ChannelSid);
+                    var channelMessages = MessageResource.Read(this.Twilio_ChatServiceSid, channel.ChannelSid);
+                    var daysCount = -90;
+                    var totalMessageCount = channelMessages.Count();
+                    if (channelMessages.Count() > 0)
+                    {
+                        IEnumerable<MessageResource> messagesToDelete = null;
+                        if (filter.CustomDateRange)
+                        {
+                            messagesToDelete = channelMessages.AsEnumerable().Where(c => Convert.ToDateTime(c.DateCreated).Date >= filter.DateFrom.Date && Convert.ToDateTime(c.DateCreated).Date <= filter.DateTo.Date);
+                        }
+                        else
+                        {
+                            var asdsd = DateTime.UtcNow.AddDays(daysCount).Date;
+                            messagesToDelete = channelMessages.AsEnumerable().Where(c => Convert.ToDateTime(c.DateCreated).Date <= DateTime.UtcNow.AddDays(daysCount).Date);
+                        }
+                        foreach (var message in messagesToDelete)
+                        {
+                            MessageResource.Delete(this.Twilio_ChatServiceSid, channel.ChannelSid, message.Sid);
+                        }
+                        channelMessages = MessageResource.Read(this.Twilio_ChatServiceSid, channel.ChannelSid);
+                        if (channelMessages.Count() == 0)
+                        {
+                            if (Convert.ToDateTime(channelRes.DateCreated).Date <= DateTime.UtcNow.AddDays(daysCount).Date)
+                            {
+                                ChannelResource.Delete(pathServiceSid: this.Twilio_ChatServiceSid, pathSid: channel.ChannelSid);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (Convert.ToDateTime(channelRes.DateCreated).Date <= DateTime.UtcNow.AddDays(daysCount).Date)
+                        {
+                            ChannelResource.Delete(pathServiceSid: this.Twilio_ChatServiceSid, pathSid: channel.ChannelSid);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+
                 }
             }
             return new BaseResponse { Status = HttpStatusCode.OK, Message = "job done!" };
         }
-    #endregion
+        #endregion
     }
 
 

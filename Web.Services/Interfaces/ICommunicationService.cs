@@ -85,7 +85,7 @@ namespace Web.Services.Interfaces
 
 
         #region [Automation]
-        BaseResponse DeleteConversationMessagesAsPerHippaComplaint();
+        BaseResponse DeleteConversationMessagesAsPerHippaComplaint(DeleteChannelsFilterVM filter);
         #endregion
     }
 }
