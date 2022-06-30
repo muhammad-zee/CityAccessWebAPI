@@ -969,7 +969,7 @@ namespace Web.Services.Concrete
 
                         _communicationService.pushNotification(notification);
                     }
-                    return new BaseResponse() { Status = HttpStatusCode.OK, Message = (row.IsEms != null && row.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription()) + $" {codeName} updated successfully." };
+                    return new BaseResponse() { Status = HttpStatusCode.OK, Message = (row.IsEms != null && row.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription()) + $" {codeName} updated successfully.", Body = codeData };
                 }
                 else
                 {
@@ -1082,7 +1082,7 @@ namespace Web.Services.Concrete
 
                     _communicationService.pushNotification(notification);
 
-                    return new BaseResponse() { Status = HttpStatusCode.OK, Message = (row.IsEms != null && row.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription()) + $" {codeName} updated successfully." };
+                    return new BaseResponse() { Status = HttpStatusCode.OK, Message = (row.IsEms != null && row.IsEms.Value ? UCLEnums.EMS.ToDescription() : UCLEnums.InhouseCode.ToDescription()) + $" {codeName} updated successfully.", Body = codeData };
                 }
 
             }
