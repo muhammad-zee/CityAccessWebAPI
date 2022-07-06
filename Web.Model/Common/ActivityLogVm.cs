@@ -11,6 +11,7 @@ namespace Web.Model.Common
         public int ActivityLogId { get; set; }
         public long UserIdFk { get; set; }
         public string UserFullName { get; set; }
+        public string UserImage { get; set; }
         public string TableName { get; set; }
         public int TablePrimaryKey { get; set; }
         public int Action { get; set; }
