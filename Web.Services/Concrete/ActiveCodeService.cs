@@ -8393,7 +8393,7 @@ namespace Web.Services.Concrete
         {
             if (index < ChannelSids.Count)
             {
-                var res = this._communicationService.deleteConversationChannel(ChannelSids.ElementAt(index), ApplicationSettings.UserId);
+                var res = this._communicationService.deactivateConversationChannel(ChannelSids.ElementAt(index), ApplicationSettings.UserId);
                 if (res.Status == HttpStatusCode.OK)
                 {
                     this.DeleteCodesChannels(ChannelSids, ++index);

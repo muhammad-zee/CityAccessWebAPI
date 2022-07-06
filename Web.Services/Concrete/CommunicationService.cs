@@ -545,8 +545,6 @@ namespace Web.Services.Concrete
         }
 
 
-
-
         public BaseResponse deleteConversationChannel(string ChannelSid, int UserId)
         {
             var dbChannel = this._conversationChannelsRepo.Table.FirstOrDefault(c => c.ChannelSid == ChannelSid);
@@ -567,6 +565,27 @@ namespace Web.Services.Concrete
                 this._conversationParticipantsRepo.Update(channelParticipants);
                 //this._conversationParticipantsRepo.DeleteRange(channelParticipants);
                 //this._conversationChannelsRepo.Delete(dbChannel);
+            }
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Conversation Deleted" };
+        }
+        public BaseResponse deactivateConversationChannel(string ChannelSid, int UserId)
+        {
+            var dbChannel = this._conversationChannelsRepo.Table.FirstOrDefault(c => c.ChannelSid == ChannelSid);
+            if (dbChannel != null)
+            {
+                dbChannel.IsDeleted = true;
+                dbChannel.ModifiedBy = UserId;
+                dbChannel.ModifiedDate = DateTime.UtcNow;
+
+                this._conversationChannelsRepo.Update(dbChannel);
+                var channelParticipants = this._conversationParticipantsRepo.Table.Where(p => p.ConversationChannelIdFk == dbChannel.ConversationChannelId);
+                foreach (var p in channelParticipants)
+                {
+                    p.IsDeleted = true;
+                    p.ModifiedBy = UserId;
+                    p.ModifiedDate = DateTime.UtcNow;
+                }
+                this._conversationParticipantsRepo.Update(channelParticipants);
             }
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Conversation Deleted" };
         }
