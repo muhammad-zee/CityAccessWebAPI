@@ -1281,12 +1281,12 @@ namespace Web.Services.Concrete
                 {
                     //var GetUserInfo = _userRepo.Table.Where(x => x.UserId == ApplicationSettings.UserId && x.IsDeleted == false).Select(x => new { x.UserId, x.FirstName, x.LastName }).FirstOrDefault();
                     //string fileName =  $"{GetUserInfo.FirstName}-{GetUserInfo.LastName}_{GetUserInfo.UserId}_{DateTime.UtcNow.ToString("yyyyMMddHHmmssffff")}.png";
-                    string FilePath = $"ChatWallpapers/{channelSetting.UserIdFk}";
+                    string FilePath = $"ChatWallpapers/{channel.UserIdFk}";
                     string fileName = $"{DateTime.UtcNow.ToString("yyyyMMddHHmmssffff")}.png";
                     this.DeleteAllAttachmentInFolderFromS3Bucket(FilePath);
                     var UserImageByte = Convert.FromBase64String(channel.WallpaperObj.Base64Str.Split("base64,")[1]);
                     this.UploadAttachmentToS3Bucket(UserImageByte, FilePath, fileName);
-                    channelSetting.Wallpaper = FilePath + "/" + fileName;
+                    newChannel.Wallpaper = FilePath + "/" + fileName;
                 }
                 this._chatSettingRepo.Insert(newChannel);
                 return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Chat settings saved successfully.", Body = newChannel };
