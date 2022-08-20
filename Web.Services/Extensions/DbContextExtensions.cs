@@ -7,7 +7,7 @@ namespace Web.Services.Extensions
 {
     public static class DbContextExtensions
     {
-        //public static List<Dictionary<string, object>> SqlToList(this RAQ_DbContext context, string sqlQuery, DbTransaction transaction, string includeColumns = "")
+        //public static List<Dictionary<string, object>> SqlToList(this CityAccess_DbContext context, string sqlQuery, DbTransaction transaction, string includeColumns = "")
         //{
         //    using (var cmd = context.Database.Connection.CreateCommand())
         //    {

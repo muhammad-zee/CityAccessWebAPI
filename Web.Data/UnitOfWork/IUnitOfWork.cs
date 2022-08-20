@@ -7,8 +7,8 @@ namespace Web.Data
 {
     public interface IUnitOfWork : IDisposable
     {
-        IRepository<T> GetRepository<T>() where T : BaseEntity;
-        RAQ_DbContext Context { get; }
+        IGenericRepository<T> GetRepository<T>() where T : BaseEntity;
+        CityAccess_DbContext Context { get; }
         int Commit();
     }
 }

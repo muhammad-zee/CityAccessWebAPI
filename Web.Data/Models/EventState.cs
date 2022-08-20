@@ -5,15 +5,15 @@ using System.Collections.Generic;
 
 namespace Web.Data.Models
 {
-    public partial class State
+    public partial class EventState
     {
-        public State()
+        public EventState()
         {
-            Requests = new HashSet<Request>();
+            Events = new HashSet<Event>();
         }
 
         public string Id { get; set; }
 
-        public virtual ICollection<Request> Requests { get; set; }
+        public virtual ICollection<Event> Events { get; set; }
     }
 }

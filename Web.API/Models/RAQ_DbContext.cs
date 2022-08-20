@@ -6,13 +6,13 @@ using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace Web.API.Models
 {
-    public partial class RAQ_DbContext : DbContext
+    public partial class CityAccess_DbContext : DbContext
     {
-        public RAQ_DbContext()
+        public CityAccess_DbContext()
         {
         }
 
-        public RAQ_DbContext(DbContextOptions<RAQ_DbContext> options)
+        public CityAccess_DbContext(DbContextOptions<CityAccess_DbContext> options)
             : base(options)
         {
         }

@@ -9,60 +9,35 @@ namespace Web.Data.Models
     {
         public User()
         {
-            ChatSettings = new HashSet<ChatSetting>();
-            ConversationParticipants = new HashSet<ConversationParticipant>();
-            FavouriteTeams = new HashSet<FavouriteTeam>();
-            UserAccesses = new HashSet<UserAccess>();
-            UserRoles = new HashSet<UserRole>();
-            UsersRelations = new HashSet<UsersRelation>();
-            UsersSchedules = new HashSet<UsersSchedule>();
+            AgreementLogs = new HashSet<AgreementLog>();
+            ErrorLogs = new HashSet<ErrorLog>();
+            RequestBookers = new HashSet<Request>();
+            RequestLogs = new HashSet<RequestLog>();
+            RequestResponsibles = new HashSet<Request>();
+            UserLogEditors = new HashSet<UserLog>();
+            UserLogUsers = new HashSet<UserLog>();
         }
 
-        public int UserId { get; set; }
-        public string UserName { get; set; }
-        public string FirstName { get; set; }
-        public string MiddleName { get; set; }
-        public string LastName { get; set; }
-        public string Initials { get; set; }
-        public string PrimaryEmail { get; set; }
-        public string SecondaryEmail { get; set; }
+        public int Id { get; set; }
+        public Guid? UserIcalLink { get; set; }
+        public string Username { get; set; }
+        public string FullName { get; set; }
         public string Password { get; set; }
-        public string OfficePhoneNumber { get; set; }
-        public string PersonalMobileNumber { get; set; }
-        public DateTime? Dob { get; set; }
-        public string Gender { get; set; }
-        public string OfficeAddress { get; set; }
-        public string HomeAddress { get; set; }
-        public int CreatedBy { get; set; }
-        public DateTime CreatedDate { get; set; }
-        public int? ModifiedBy { get; set; }
-        public DateTime? ModifiedDate { get; set; }
-        public bool IsDeleted { get; set; }
-        public string City { get; set; }
-        public int? StateKey { get; set; }
-        public string Zip { get; set; }
-        public string UserImage { get; set; }
-        public bool TwoFactorEnabled { get; set; }
-        public string TwoFactorCode { get; set; }
-        public DateTime? CodeExpiryTime { get; set; }
-        public bool IsTwoFactRememberChecked { get; set; }
-        public DateTime? TwoFactorExpiryDate { get; set; }
-        public DateTime? PasswordExpiryDate { get; set; }
-        public bool IsRequirePasswordReset { get; set; }
+        public string Email { get; set; }
+        public string Phone { get; set; }
+        public DateTime? LastLoginDate { get; set; }
+        public int PartnerId { get; set; }
         public bool? IsActive { get; set; }
-        public string UserChannelSid { get; set; }
-        public string UserUniqueId { get; set; }
-        public string ConversationUserSid { get; set; }
-        public bool IsEms { get; set; }
-        public bool IsInGroup { get; set; }
-        public bool IsDiscoveredByOtherOrganization { get; set; }
+        public bool? EmailConfirmed { get; set; }
+        public bool? IsAdmin { get; set; }
 
-        public virtual ICollection<ChatSetting> ChatSettings { get; set; }
-        public virtual ICollection<ConversationParticipant> ConversationParticipants { get; set; }
-        public virtual ICollection<FavouriteTeam> FavouriteTeams { get; set; }
-        public virtual ICollection<UserAccess> UserAccesses { get; set; }
-        public virtual ICollection<UserRole> UserRoles { get; set; }
-        public virtual ICollection<UsersRelation> UsersRelations { get; set; }
-        public virtual ICollection<UsersSchedule> UsersSchedules { get; set; }
+        public virtual Partner Partner { get; set; }
+        public virtual ICollection<AgreementLog> AgreementLogs { get; set; }
+        public virtual ICollection<ErrorLog> ErrorLogs { get; set; }
+        public virtual ICollection<Request> RequestBookers { get; set; }
+        public virtual ICollection<RequestLog> RequestLogs { get; set; }
+        public virtual ICollection<Request> RequestResponsibles { get; set; }
+        public virtual ICollection<UserLog> UserLogEditors { get; set; }
+        public virtual ICollection<UserLog> UserLogUsers { get; set; }
     }
 }

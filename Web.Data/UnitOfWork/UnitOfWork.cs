@@ -9,13 +9,13 @@ namespace Web.DLL
 {
     public class UnitOfWork : IUnitOfWork
     {
-        private RAQ_DbContext _context;
-        public UnitOfWork(RAQ_DbContext context)
+        private CityAccess_DbContext _context;
+        public UnitOfWork(CityAccess_DbContext context)
         {
             _context = context;
         }
 
-        public RAQ_DbContext Context
+        public CityAccess_DbContext Context
         {
             get
             {
@@ -41,7 +41,7 @@ namespace Web.DLL
         #region Repositories
 
         Dictionary<Type, object> _repo = null;
-        public IRepository<T> GetRepository<T>() where T : BaseEntity
+        public IGenericRepository<T> GetRepository<T>() where T : BaseEntity
         {
             if (this._repo == null)
                 this._repo = new Dictionary<Type, object>();
@@ -49,7 +49,7 @@ namespace Web.DLL
             if (!this._repo.ContainsKey(typeof(T)))
                 this._repo.Add(typeof(T), new GenericRepository<T>(this));
 
-            return (IRepository<T>)this._repo[typeof(T)];
+            return (IGenericRepository<T>)this._repo[typeof(T)];
         }
 
         #endregion
