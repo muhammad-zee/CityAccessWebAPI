@@ -8,8 +8,11 @@
   <ItemGroup>
     <PackageReference Include="ElmahCore" Version="2.0.7" />
     <PackageReference Include="ElmahCore.Sql" Version="2.0.7" />
+    <PackageReference Include="Microsoft.AspNet.WebPages" Version="3.2.8" />
+    <PackageReference Include="Microsoft.AspNet.WebApi.Core" Version="5.2.8" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.10" />
+    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="5.0.12" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="5.0.10">
       <PrivateAssets>all</PrivateAssets>
@@ -26,6 +29,10 @@
     <ProjectReference Include="..\Web.Data\Web.Data.csproj" />
     <ProjectReference Include="..\Web.Model\Web.Model.csproj" />
     <ProjectReference Include="..\Web.Services\Web.Services.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\Logs\" />
   </ItemGroup>
 
 </Project>

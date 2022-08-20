@@ -7,14 +7,14 @@ using Web.Data.Models;
 
 namespace Web.DLL.Generic_Repository
 {
-    public class GenericRepository<T> : IRepository<T> where T : class
+    public class GenericRepository<T> : IGenericRepository<T> where T : class
     {
-        private readonly RAQ_DbContext _appContext;
+        private readonly CityAccess_DbContext _appContext;
         private DbSet<T> _entities;
         private UnitOfWork _unitOfWork;
 
         #region CTOR
-        public GenericRepository(RAQ_DbContext appContext)
+        public GenericRepository(CityAccess_DbContext appContext)
         {
             _appContext = appContext;
         }

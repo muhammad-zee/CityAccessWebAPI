@@ -3,19 +3,35 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Dynamic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
+using Web.Data.Models;
 using Web.Model.Common;
-
+using Web.Services.Enums;
+using Web.Services.Extensions;
 
 namespace Web.Services.Helper
 {
     public static class HelperExtension
     {
 
+        public static string SplitCamelCase(this string str)
+        {
+            if (str != null && str != "")
+            {
+                var splittedString = Regex.Replace(Regex.Replace(str, @"(\P{Ll})(\P{Ll}\p{Ll})", "$1 $2"), @"(\p{Ll})(\P{Ll})", "$1 $2");
+                return splittedString.First().ToString().ToUpper() + String.Join("", splittedString.Skip(1));
+            }
+            else
+            {
+                return "";
+            }
+        }
         public static string CreateRandomString(int length = 15)
         {
             // Create a string of characters, numbers, special characters that allowed in the password  
@@ -32,189 +48,6 @@ namespace Web.Services.Helper
             }
             return new string(chars);
         }
-
-
-        public static IList<TreeviewItemVM> BuildTree(this IEnumerable<TreeviewItemVM> source)
-        {
-            var groups = source.GroupBy(i => i.ParentKey);
-
-            var roots = groups.FirstOrDefault(g => g.Key.HasValue == false).ToList();
-
-            if (roots.Count > 0)
-            {
-                var dict = groups.Where(g => g.Key.HasValue).ToDictionary(g => g.Key.Value.ToString(), g => g.ToList());
-                for (int i = 0; i < roots.Count; i++)
-                    AddChildren(roots[i], dict);
-            }
-
-            return roots;
-        }
-
-        private static void AddChildren(TreeviewItemVM node, IDictionary<string, List<TreeviewItemVM>> source)
-        {
-            if (source.ContainsKey(node.key))
-            {
-                node.children = source[node.key];
-                node.expanded = false;
-                for (int i = 0; i < node.children.Count; i++)
-                    AddChildren(node.children[i], source);
-            }
-            else
-            {
-                node.children = new List<TreeviewItemVM>();
-                node.expanded = false;
-            }
-        }
-
-
-        public static IList<ComponentAccessByRoleAndUserTreeVM> BuildComponentAccessTree(this IEnumerable<ComponentAccessByRoleAndUserTreeVM> source)
-        {
-            var groups = source.GroupBy(i => i.ParentComponentId);
-
-            //var roots = groups.FirstOrDefault(g => g.Key.HasValue == false).ToList();
-            var roots = source.Where(s => !s.IsAction).ToList();
-            if (roots.Count > 0)
-            {
-                var dict = groups.Where(g => g.Key.HasValue).ToDictionary(g => g.Key.Value.ToString(), g => g.ToList());
-                for (int i = 0; i < roots.Count; i++)
-                    AddActionList(roots[i], dict);
-            }
-            return roots;
-        }
-
-        private static void AddActionList(ComponentAccessByRoleAndUserTreeVM node, IDictionary<string, List<ComponentAccessByRoleAndUserTreeVM>> source)
-        {
-            if (source.ContainsKey(node.ComponentId))
-            {
-                node.children = source[node.ComponentId];
-                //for (int i = 0; i < node.children.Count; i++)
-                //    AddActionList(node.children[i], source);
-                if (node.Actions == null)
-                {
-                    node.Actions = new List<string>();
-                }
-                foreach (var child in node.children)
-                {
-
-                    node.Actions.Add(child.ModuleName);
-                }
-            }
-            else
-            {
-                node.children = new List<ComponentAccessByRoleAndUserTreeVM>();
-            }
-        }
-
-        public static IList<IvrTreeVM> BuildIvrTree(this IEnumerable<IvrTreeVM> source)
-        {
-            var groups = source.GroupBy(i => i.ParentKey);
-
-            var roots = groups.FirstOrDefault(g => g.Key.HasValue == false).ToList();
-
-            if (roots.Count > 0)
-            {
-                var dict = groups.Where(g => g.Key.HasValue).ToDictionary(g => g.Key.Value.ToString(), g => g.ToList());
-                for (int i = 0; i < roots.Count; i++)
-                    AddIvrTreeChildren(roots[i], dict);
-            }
-
-            return roots;
-        }
-
-        private static void AddIvrTreeChildren(IvrTreeVM node, IDictionary<string, List<IvrTreeVM>> source)
-        {
-            if (source.ContainsKey(node.key))
-            {
-                node.children = source[node.key];
-                for (int i = 0; i < node.children.Count; i++)
-                    AddIvrTreeChildren(node.children[i], source);
-            }
-            else
-            {
-                node.expanded = false;
-                node.children = new List<IvrTreeVM>();
-            }
-        }
-
-        //public static DbCommand LoadStoredProc(
-        //   this DbContext context, string storedProcName)
-        //{
-        //    var cmd = context.Database.GetDbConnection().CreateCommand();
-        //    cmd.CommandText = storedProcName;
-        //    cmd.CommandType = System.Data.CommandType.StoredProcedure;
-        //    return cmd;
-        //}
-
-        //public static DbCommand WithSqlParam(
-        //    this DbCommand cmd, string paramName, object paramValue)
-        //{
-        //    if (string.IsNullOrEmpty(cmd.CommandText))
-        //        throw new InvalidOperationException(
-        //          "Call LoadStoredProc before using this method");
-        //    var param = cmd.CreateParameter();
-        //    param.ParameterName = paramName;
-        //    param.Value = paramValue;
-        //    cmd.Parameters.Add(param);
-        //    return cmd;
-        //}
-
-        //private static List<T> MapToList<T>(this DbDataReader dr)
-        //{
-        //    var objList = new List<T>();
-        //    var props = typeof(T).GetRuntimeProperties();
-
-        //    var colMapping = dr.GetColumnSchema()
-        //      .Where(x => props.Any(y => y.Name.ToLower() == x.ColumnName.ToLower()))
-        //      .ToDictionary(key => key.ColumnName.ToLower());
-
-        //    if (dr.HasRows)
-        //    {
-        //        while (dr.Read())
-        //        {
-        //            T obj = Activator.CreateInstance<T>();
-        //            foreach (var prop in props)
-        //            {
-        //                try
-        //                {
-        //                    var columnName = colMapping[prop.Name.ToLower()];
-        //                    var val =
-        //                      dr.GetValue(colMapping[prop.Name.ToLower()].ColumnOrdinal.Value);
-        //                    prop.SetValue(obj, val == DBNull.Value ? null : val);
-        //                }
-        //                catch
-        //                {
-        //                    prop.SetValue(obj, null);
-        //                }
-        //            }
-        //            objList.Add(obj);
-        //        }
-        //    }
-        //    return objList;
-        //}
-
-        //public static async Task<List<T>> ExecuteStoredProc<T>(this DbCommand command)
-        //{
-        //    using (command)
-        //    {
-        //        if (command.Connection.State == System.Data.ConnectionState.Closed)
-        //            command.Connection.Open();
-        //        try
-        //        {
-        //            using (var reader = await command.ExecuteReaderAsync())
-        //            {
-        //                return reader.MapToList<T>();
-        //            }
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            throw (ex);
-        //        }
-        //        finally
-        //        {
-        //            command.Connection.Close();
-        //        }
-        //    }
-        //}
 
 
         public static string Encrypt(string clearText)
@@ -239,6 +72,61 @@ namespace Web.Services.Helper
             return clearText;
         }
 
+        public static object RemoveNullValues<T>(this T obj)
+        {
+            try
+            {
+               
+                    var type = obj.GetType();
+                    var returnClass = new ExpandoObject() as IDictionary<string, object>;
+                    var props = type.GetProperties();
+                    foreach (var propertyInfo in props)
+                    {
+                        var value = propertyInfo.GetValue(obj);
+                        //var valueIsNotAString = value != null;//!(value is string && !string.IsNullOrWhiteSpace(value.ToString()));
+                        if (value != null && propertyInfo.Name.ToLower() != "isdeleted" 
+                        && propertyInfo.Name.ToLower() != "createddate" && propertyInfo.Name.ToLower() != "createdby"
+                        && propertyInfo.Name.ToLower() != "modifieddate" && propertyInfo.Name.ToLower() != "modifiedby"
+                         && propertyInfo.Name.ToLower() != "codestrokegroupmembers" && propertyInfo.Name.ToLower() != "iscompleted"
+                         && propertyInfo.Name.ToLower() != "capacity" && propertyInfo.Name.ToLower() != "organizationidfk"
+                         && (!propertyInfo.Name.ToLower().Contains("code") && !propertyInfo.Name.ToLower().Contains("id")))
+                        {
+                            returnClass.Add(propertyInfo.Name, value);
+                        }
+                    }
+                    
+                return returnClass;
+            }
+            catch(Exception ex)
+            {
+                return obj;
+            }
+        }
+   
+        public static object getChangedPropertyObject<T>(this T obj,string propertyName)
+        {
+            try
+            {
+                var type = obj.GetType();
+                var returnClass =new   Dictionary<string, object>();
+                var props = type.GetProperties();
+                foreach (var propertyInfo in props)
+                {
+                    var value = propertyInfo.GetValue(obj);
+                    //var valueIsNotAString = value != null;//!(value is string && !string.IsNullOrWhiteSpace(value.ToString()));
+                    if (value != null && propertyInfo.Name.ToLower() == propertyName.ToLower())
+                    {
+                        returnClass.Add(propertyInfo.Name, value);
+                    }
+                }
+
+                return returnClass;
+            }
+            catch (Exception ex)
+            {
+                return obj;
+            }
+        }
         public static string Decrypt(string cipherText)
         {
             string EncryptionKey = "WebApi1122";
@@ -273,6 +161,15 @@ namespace Web.Services.Helper
             return cmd;
         }
 
+        public static SqlCommand LoadSQLQuery(
+          this DbContext context, string qry)
+        {
+            var cmd = (SqlCommand)context.Database.GetDbConnection().CreateCommand();
+            cmd.CommandText = qry;
+            cmd.CommandType = CommandType.Text;
+            return cmd;
+        }
+
         public static SqlCommand WithSqlParam(
            this SqlCommand cmd, string paramName, object paramValue)
         {
@@ -300,7 +197,7 @@ namespace Web.Services.Helper
 
                     da.Fill(ds);
 
-                    if (ds.Tables[0].Rows.Count > 0)
+                    if (ds != null && ds.Tables[0].Rows.Count > 0)
                     {
                         return ds.MapToList<T>();
                     }
@@ -360,7 +257,7 @@ namespace Web.Services.Helper
         }
 
 
-        public static List<object> ExecuteStoredProc_ToDictionary(this SqlCommand command)
+        public static List<Dictionary<string, object>> ExecuteStoredProc_ToDictionary(this SqlCommand command)
         {
             using (command)
             {
@@ -376,39 +273,39 @@ namespace Web.Services.Helper
 
                     if (ds.Tables[0].Rows.Count > 0)
                     {
-                        var objList = new List<object>();
+                        var objList = new List<Dictionary<string, object>>();
                         var dr = ds.Tables[0];
-                        var colMapping = dr.Columns.Cast<DataColumn>().ToDictionary(key => key.ColumnName.ToLower());
+                        var colMapping = dr.Columns.Cast<DataColumn>().ToDictionary(key => key.ColumnName);
 
                         if (dr.Rows.Count > 0)
                         {
                             foreach (var rows in dr.Rows)
                             {
                                 var row = (DataRow)rows;
-                                var objRow = new Dictionary<string, Object>();
+                                var obj = new Dictionary<string, object>();
                                 foreach (var col in colMapping)
                                 {
                                     try
-                                    {                                                                                                                  //string colName = colMapping[prop.Name.ToLower()].ColumnName;
-                                        var val = row[col.Key];
+                                    {   //string colName = colMapping[prop.Name.ToLower()].ColumnName;
+                                        var val = row[col.Key.ToLower()];
                                         if (val.ToString() != "")
-                                            objRow.Add(col.Key, val);
+                                            obj.Add(col.Key.ToCamelCase(), val);
                                         else
-                                            objRow.Add(col.Key, null);
+                                            obj.Add(col.Key.ToCamelCase(), null);
                                     }
                                     catch
                                     {
-                                        objRow.Add(col.Key, null);
+                                        obj.Add(col.Key, null);
                                     }
                                 }
-                                objList.Add(objRow);
+                                objList.Add(obj);
                             }
                         }
                         return objList;
                     }
                     else
                     {
-                        return new List<object>();
+                        return new List<Dictionary<string, object>>();
                     }
                 }
                 catch (Exception ex)
@@ -422,8 +319,40 @@ namespace Web.Services.Helper
             }
         }
 
+        public static int ExecuteInsertQuery(
+          this DbContext context, string qry)
+        {
+            var cmd = (SqlCommand)context.Database.GetDbConnection().CreateCommand();
+            cmd.CommandText = qry+ "  SELECT SCOPE_IDENTITY()";
+            cmd.CommandType = CommandType.Text;
+            if (cmd.Connection.State == ConnectionState.Closed)
+                cmd.Connection.Open();
+
+            int Id = Convert.ToInt32(cmd.ExecuteScalar());
+
+            if (cmd.Connection.State == ConnectionState.Open)
+                cmd.Connection.Close();
+
+            return Id;
+        }
+
         #endregion
 
+        public static string ToCamelCase(this string str)
+        {
+            var words = str.Split(new[] { "_", " " }, StringSplitOptions.RemoveEmptyEntries);
+            var leadWord = Regex.Replace(words[0], @"([A-Z])([A-Z]+|[a-z0-9]+)($|[A-Z]\w*)",
+                m =>
+                {
+                    return m.Groups[1].Value.ToLower() + m.Groups[2].Value.ToLower() + m.Groups[3].Value;
+                });
+            var tailWords = words.Skip(1)
+                .Select(word => char.ToUpper(word[0]) + word.Substring(1))
+                .ToArray();
+            return $"{leadWord}{string.Join(string.Empty, tailWords)}";
+        }
+
+       
 
     }
 }

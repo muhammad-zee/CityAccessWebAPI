@@ -1,8 +1,11 @@
 ﻿using ElmahCore;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
+using Web.Services.Enums;
 
 namespace Web.Services.Extensions
 {
@@ -44,6 +47,7 @@ namespace Web.Services.Extensions
         public static DateTime ToUniversalTimeZone(this DateTime dateTime, string currentTimeZone = "Eastern Standard Time")
         {
             TimeZoneInfo easternZone = TimeZoneInfo.FindSystemTimeZoneById(currentTimeZone);
+            //dateTime = TimeZoneInfo.Local.IsDaylightSavingTime(dateTime) ? dateTime.AddHours(1) : dateTime;
             return TimeZoneInfo.ConvertTimeToUtc(dateTime, easternZone);
         }
         public static DateTime ToEST(this DateTime dateTime)
@@ -86,6 +90,22 @@ namespace Web.Services.Extensions
             {
                 ElmahExtensions.RiseError(ex);
                 return 0;
+            }
+        }
+        public static string NormalizeCellNumber(this string number)
+        {
+            try
+            {
+                if (number != null)
+                {
+                    return number.Replace("(", "").Replace(")", "").Replace("-", "").Replace(" ", "");
+                }
+                return "";
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                return number;
             }
         }
         public static long ToLong(this object obj)
@@ -194,7 +214,7 @@ namespace Web.Services.Extensions
 
         public static List<int> ToIntList(this string commaSepratedString)
         {
-            if (!string.IsNullOrEmpty(commaSepratedString))
+            if (!string.IsNullOrEmpty(commaSepratedString) && !string.IsNullOrWhiteSpace(commaSepratedString))
             {
                 return commaSepratedString.Split(',').Select(int.Parse).ToList();
             }
@@ -203,6 +223,34 @@ namespace Web.Services.Extensions
                 return new List<int>();
             }
         }
+
+        public static int GetActiveCodeId(this string codeName)
+        {
+            var val = typeof(UCLEnums).GetField(codeName).GetRawConstantValue();
+            try
+            {
+                int codeId = val.ToInt();
+                return codeId;
+            }
+            catch
+            {
+                return 0;
+            }
+        }
+
+        public static string GetEnumDescription<T>(this string enumName) 
+        {
+            if (enumName != null && enumName != "")
+            {
+                var jobj = typeof(T).GetField(enumName).GetCustomAttributesData().FirstOrDefault().ConstructorArguments.FirstOrDefault().ToString();
+                return JsonConvert.DeserializeObject<string>(jobj);
+            }
+            else 
+            {
+                return null;
+            }
+        }
+
         public static string GetAbbreviation(this string inputString)
         {
 
@@ -214,5 +262,37 @@ namespace Web.Services.Extensions
             }
             return result;
         }
+
+        public static object GetPropertyValueByName(this object obj, string propertyName)
+        {
+            if (obj.GetType().GetProperty(propertyName) != null)
+            {
+                return obj.GetType().GetProperty(propertyName).GetValue(obj, null);
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        public static string ToCapitalize(this string str)
+        {
+            if (str != null)
+            {
+                return char.ToUpper(str[0]) + str.Substring(1).ToLower();
+            }
+            return null;
+        }
+
+        public static string ToTitleCase(this string str)
+        {
+            if (str != null)
+            {
+                var textinfo = new CultureInfo("en-US", false).TextInfo;
+                return textinfo.ToTitleCase(str);
+            }
+            return null;
+        }
+
     }
 }

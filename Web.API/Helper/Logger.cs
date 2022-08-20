@@ -36,19 +36,20 @@ namespace Web.API.Helper
 
         public void configure()
         {
-            string logFile = _hostEnvironment.ContentRootPath + "\\log4net.config";// System.Web.HttpContext.Current.Server.MapPath("~/log4net.config");
+             string logFile = _hostEnvironment.ContentRootPath + "\\log4net.config";// System.Web.HttpContext.Current.Server.MapPath("~/log4net.config");
             if (System.IO.File.Exists(logFile))
             {
                 FileInfo logFileInfo = new FileInfo(logFile);
                 //FileAppender fileAppender = new FileAppender();
                 var RootPath = this._RootPath; //this._hostEnvironment.WebRootPath;
-                RootPath = Path.Combine(RootPath, "Logs");
+                var folderName = "Logs";
+                RootPath = Path.Combine(RootPath, folderName);
                 if (!Directory.Exists(RootPath))
                 {
                     Directory.CreateDirectory(RootPath);
                 }
-                string FilePath = $"log4net_{DateTime.UtcNow.ToString("dd-MM-yyyy")}.txt";
-                var targetPath = Path.Combine(RootPath, FilePath);
+                string FileName = $"log4net_{DateTime.UtcNow.ToString("dd-MM-yyyy")}.txt";
+                var targetPath = Path.Combine(RootPath, FileName);
                 //fileAppender.File = targetPath;
                 if (!File.Exists(targetPath))
                 {
@@ -56,6 +57,8 @@ namespace Web.API.Helper
                 }
                 log4net.GlobalContext.Properties["LogFileName"] = targetPath;
                 log4net.Config.XmlConfigurator.ConfigureAndWatch(logFileInfo);
+                //targetPath = Path.GetFullPath(targetPath);
+                //var filePath = File.ReadAllBytes(targetPath);
             }
         }
 
@@ -64,7 +67,7 @@ namespace Web.API.Helper
         {
             try
             {
-                configure();
+                //configure();
                 log.Info(entry);
             }
             catch (Exception exp)
@@ -77,7 +80,7 @@ namespace Web.API.Helper
         {
             try
             {
-                configure();
+                //configure();
                 log.Error(entry);
             }
             catch (Exception exp)
