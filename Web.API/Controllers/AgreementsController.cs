@@ -16,6 +16,7 @@ using Web.Services.Interfaces;
 namespace Web.API.Controllers
 {
     //[Authorize]
+    [RequestHandler]
     public class AgreementsController : Controller
     {
         private readonly Logger _logger;
@@ -30,12 +31,12 @@ namespace Web.API.Controllers
             this._logger = new Logger(_hostEnvironment, config);
             this._agreementsService = agreementsService;
         }
-        [HttpGet("agreements/GetServicesByPartnerId")]
-        public BaseResponse GetServicesByPartnerId(int partnerId)
+        [HttpGet("agreements/GetServices")]
+        public BaseResponse GetServices()
         {
             try
             {
-                return this._agreementsService.GetServicesByPartnerId(partnerId);
+                return this._agreementsService.GetServices();
             }
             catch (Exception ex)
             {
@@ -44,12 +45,12 @@ namespace Web.API.Controllers
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.Message.ToString(), Body = ex.ToString() };
             }
         }
-        [HttpGet("agreements/GetAgreementsByPartnerId")]
-        public BaseResponse GetAgreementsByPartnerId(int partnerId)
+        [HttpPost("agreements/GetAgreements")]
+        public BaseResponse GetAgreements([FromBody]AgreementsFilterVM filter)
         {
             try
             {
-                return this._agreementsService.GetAgreementsByPartnerId(partnerId);
+                return this._agreementsService.GetAgreements(filter);
             }
             catch (Exception ex)
             {

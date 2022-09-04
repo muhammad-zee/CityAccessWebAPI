@@ -97,6 +97,7 @@ namespace Web.Services.Concrete
                     new Claim(JwtRegisteredClaimNames.Sub, user.Email),
                     new Claim("UserId",user.Id.ToString()),
                     new Claim("UserFullName", $"{user.FullName}"),
+                    new Claim("PartnerId", $"{user.PartnerId}"),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
 
             };

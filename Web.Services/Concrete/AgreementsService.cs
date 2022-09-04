@@ -47,16 +47,17 @@ namespace Web.Services.Concrete
             this._partnerLogosRepo = partnerLogosRepo;
             this._dynamicFieldAlternativeRepo = dynamicFieldAlternativeRepo;
         }
-        public BaseResponse GetServicesByPartnerId(int partnerId)
+        public BaseResponse GetServices()
         {
             var Services = (from ag in this._agreementsRepo.Table
                             join serv in this._servicesRepo.Table on ag.ServiceId equals serv.Id
-                            where serv.OperatorId == partnerId || ag.PartnerId == null || ag.PartnerId == partnerId
+                            where serv.OperatorId == ApplicationSettings.PartnerId || ag.PartnerId == null || ag.PartnerId == ApplicationSettings.PartnerId
                             select serv).Distinct();
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = Services };
         }
-        public BaseResponse GetAgreementsByPartnerId(int partnerId)
+        public BaseResponse GetAgreements(AgreementsFilterVM filter)
         {
+            int partnerId = ApplicationSettings.PartnerId;
             Partner partner = this._partnersRepo.Table.Where(p => p.Id == partnerId && p.IsActive != false).FirstOrDefault();
             IQueryable<Agr_Partn_Comm> queryable = null;
             var agreements = queryable;
@@ -213,6 +214,33 @@ namespace Web.Services.Concrete
                 }
             }
 
+            //if (filter.Agent != null && filter.Agent != "")
+            //{
+            //    agreements = agreements.Where(x => x.Agreement.Partner.TradeName == filter.Agent);
+            //}
+            //if (filter.Operator1 != null && filter.Operator1 != "")
+            //{
+            //    agreements = agreements.Where(x => x.Partner.TradeName == filter.Operator1);
+            //}
+            //if (filter.agr == true)
+            //{
+            //    agreements = agreements.Where(x => x.Agreement.IsConfirmed == false || x.Agreement.IsConfirmed == null);
+            //}
+            //else
+            //{
+            //    agreements = agreements.Where(x => x.Agreement.IsConfirmed == true);
+            //}
+
+
+            //if (!String.IsNullOrEmpty(filter.SearchString))
+            //{
+            //    agreements = agreements.Where(s => s.Agreement.Label.Contains(filter.SearchString) || s.Agreement.Description.Contains(filter.SearchString));
+            //}
+
+            //if (!String.IsNullOrEmpty(filter.Service))
+            //{
+            //    agreements = agreements.Where(x => x.Agreement.Service.Name == filter.Service);
+            //}
 
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = agreements };
         }

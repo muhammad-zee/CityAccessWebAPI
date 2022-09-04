@@ -29,81 +29,63 @@ namespace Web.API.Helper
         {
             var userIP = context.HttpContext.Connection.RemoteIpAddress.ToString();
             var user = context.HttpContext.User;
-            StringValues timeZone;
-            StringValues componentObjHEX;
-
             ///////////////////////// Get Values from Custom Headers and token ///////////////////////////////////////
 
-            context.HttpContext.Request.Headers.TryGetValue("TimeZone", out timeZone);
-            context.HttpContext.Request.Headers.TryGetValue("Module-Access-Control", out componentObjHEX);
 
-            string isSuperAdmin = user.Claims.Where(x => x.Type == "isSuperAdmin").Select(x => x.Value).FirstOrDefault();
-            string isEMS = user.Claims.Where(x => x.Type == "isEMS").Select(x => x.Value).FirstOrDefault();
-            var userAccessObj = user.Claims.Where(x => x.Type == "UserAccess").Select(x => x.Value).FirstOrDefault();
-            var userAccess = new List<int>();
-            if (userAccessObj != null) 
-            {
-                userAccess = JsonConvert.DeserializeObject<List<int>>(userAccessObj);
-            }
             var userId = Convert.ToInt32(user.Claims.Where(x => x.Type == "UserId").Select(x => x.Value).FirstOrDefault());
             var UserFullName = Convert.ToString(user.Claims.Where(x => x.Type == "UserFullName").Select(x => x.Value).FirstOrDefault());
-            var orgId = Convert.ToInt32(user.Claims.Where(x => x.Type == "organizationId").Select(x => x.Value).FirstOrDefault());
-            var userName = user.Claims.Where(x => x.Type.Contains("nameidentifier")).Select(x => x.Value).FirstOrDefault();
-            var roleId = user.Claims.Where(x => x.Type == "RoleIds").Select(x => x.Value).FirstOrDefault(); ;
+            var partnerId = Convert.ToInt32(user.Claims.Where(x => x.Type == "PartnerId").Select(x => x.Value).FirstOrDefault());
+          
             ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
             //////////////////////// Set Values in ApplicationSettings Class ///////////////////////////////////////////
 
             ApplicationSettings.UserId = userId;
             ApplicationSettings.UserFullName = UserFullName;
-            ApplicationSettings.OrganizationId = orgId;
-            ApplicationSettings.UserName = userName;
-            ApplicationSettings.RoleIds = roleId;
-            ApplicationSettings.isSuperAdmin = isSuperAdmin == "True" ? true : false;
-            ApplicationSettings.isEMS = isEMS == "True" ? true : false;
-            ApplicationSettings.TimeZone = timeZone.ToString();
+            ApplicationSettings.PartnerId = partnerId;
+           
 
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
             ///////////////////////// Check for Components Access //////////////////////////////////////////////////////
 
-            var controllerAuthorized = context.Controller.GetType().GetCustomAttributes<AuthorizeAttribute>().Any();
-            var methodAuthorized = context.ActionDescriptor.GetType().GetCustomAttributes(typeof(AuthorizeAttribute), true).Any();
-            var componentSerializeObj = Encryption.decryptData(componentObjHEX.ToString(), key);
-            if (!ApplicationSettings.isSuperAdmin && controllerAuthorized)
-            {
-                if (!methodAuthorized)
-                {
-                    base.OnActionExecuting(context);
-                }
-                else
-                {
-                    if (componentSerializeObj != null)
-                    {
-                        var jobj = JObject.Parse(componentSerializeObj);
-                        var componentId = jobj["componentId"].ToString().ToInt();
-                        var bypassAccessCheck = jobj["bypassAccessCheck"].ToString().ToBool();
-                        if (!bypassAccessCheck)
-                        {
-                            if (!userAccess.Any(x => x == componentId))
-                            {
-                                context.HttpContext.Response.StatusCode = 401;
-                                context.Result = new UnauthorizedResult();
-                            }
-                        }
-                    }
-                    else
-                    {
-                        context.HttpContext.Response.StatusCode = 401;
-                        context.Result = new UnauthorizedResult();
-                    }
-                }
+            //var controllerAuthorized = context.Controller.GetType().GetCustomAttributes<AuthorizeAttribute>().Any();
+            //var methodAuthorized = context.ActionDescriptor.GetType().GetCustomAttributes(typeof(AuthorizeAttribute), true).Any();
+            //var componentSerializeObj = Encryption.decryptData(componentObjHEX.ToString(), key);
+            //if (!ApplicationSettings.isSuperAdmin && controllerAuthorized)
+            //{
+            //    if (!methodAuthorized)
+            //    {
+            //        base.OnActionExecuting(context);
+            //    }
+            //    else
+            //    {
+            //        if (componentSerializeObj != null)
+            //        {
+            //            var jobj = JObject.Parse(componentSerializeObj);
+            //            var componentId = jobj["componentId"].ToString().ToInt();
+            //            var bypassAccessCheck = jobj["bypassAccessCheck"].ToString().ToBool();
+            //            if (!bypassAccessCheck)
+            //            {
+            //                if (!userAccess.Any(x => x == componentId))
+            //                {
+            //                    context.HttpContext.Response.StatusCode = 401;
+            //                    context.Result = new UnauthorizedResult();
+            //                }
+            //            }
+            //        }
+            //        else
+            //        {
+            //            context.HttpContext.Response.StatusCode = 401;
+            //            context.Result = new UnauthorizedResult();
+            //        }
+            //    }
 
-            }
-            else
-            {
-                base.OnActionExecuting(context);
-            }
+            //}
+            //else
+            //{
+            //    base.OnActionExecuting(context);
+            //}
 
             ///////////////////////////////////////////////////////////////////////////////////////////////////////////
         }

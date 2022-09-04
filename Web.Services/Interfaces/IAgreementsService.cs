@@ -11,8 +11,8 @@ namespace Web.Services.Interfaces
 {
     public interface IAgreementsService
     {
-        BaseResponse GetServicesByPartnerId(int partnerId);
-        BaseResponse GetAgreementsByPartnerId(int partnerId);
+        BaseResponse GetServices();
+        BaseResponse GetAgreements(AgreementsFilterVM filter);
         BaseResponse GetAgreementDetailsByAgreementId(int agreementId);
         BaseResponse SaveAgreement(AgreementVM agreement);
     }
