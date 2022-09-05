@@ -15,7 +15,7 @@ using Web.Services.Interfaces;
 
 namespace Web.API.Controllers
 {
-    //[Authorize]
+    [Authorize]
     [RequestHandler]
     public class AgreementsController : Controller
     {
