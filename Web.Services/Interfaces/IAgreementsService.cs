@@ -14,6 +14,6 @@ namespace Web.Services.Interfaces
         BaseResponse GetServices();
         BaseResponse GetAgreements(AgreementsFilterVM filter);
         BaseResponse GetAgreementDetailsByAgreementId(int agreementId);
-        BaseResponse SaveAgreement(AgreementVM agreement);
+        BaseResponse SaveAgreementBooking(AgreementVM agreement);
     }
 }

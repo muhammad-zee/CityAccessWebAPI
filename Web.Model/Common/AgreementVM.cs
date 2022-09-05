@@ -10,7 +10,11 @@ namespace Web.Model.Common
     {
         public int Id { get; set; }
         public int? PartnerId { get; set; }
+        public string PartnerTradeName { get; set; }
+        public string PartnerLogo { get; set; }
         public int ServiceId { get; set; }
+        public string ServiceName { get; set; }
+        public decimal? ServicePrice { get; set; }
         public string Label { get; set; }
         public string Description { get; set; }
         public bool? IsActive { get; set; }
@@ -28,5 +32,6 @@ namespace Web.Model.Common
         public int? PriceType { get; set; }
         public int? TypeCommission { get; set; }
         public bool? IsConfirmed { get; set; }
+        public byte[] ServiceImage { get; set; }
     }
 }
