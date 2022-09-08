@@ -74,11 +74,11 @@ namespace Web.API.Controllers
             }
         }
         [HttpPost("agreements/SaveAgreement")]
-        public BaseResponse SaveAgreementBooking([FromBody] AgreementVM agreement)
+        public BaseResponse SaveAgreemen([FromBody] AgreementVM agreement)
         {
             try
             {
-                return this._agreementsService.SaveAgreementBooking(agreement);
+                return this._agreementsService.SaveAgreement(agreement);
             }
             catch (Exception ex)
             {
