@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Web.Model.Common
 {
-    class RequestsFilterVM
+    public class RequestsFilterVM
     {
             public int Dwn { get; set; }
             public string Partner { get; set; }

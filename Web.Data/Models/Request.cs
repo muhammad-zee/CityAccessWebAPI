@@ -58,5 +58,6 @@ namespace Web.Data.Models
         public virtual User Responsible { get; set; }
         public virtual State State { get; set; }
         public virtual ICollection<RequestLog> RequestLogs { get; set; }
+        public object UserId { get; set; }
     }
 }

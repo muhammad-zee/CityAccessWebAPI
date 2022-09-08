@@ -1,53 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
-using Web.Data.Models;
-using Web.DLL.Generic_Repository;
-using Web.Model;
-using Web.Model.Common;
-using Web.Services.CommonVM;
-using Web.Services.Interfaces;
-
-namespace Web.Services.Concrete
+﻿namespace Web.Services.Concrete
 {
-    public class RequestsService : IRequestsService
+    public class RequestsServiceBase1
     {
-
-
-        private readonly IGenericRepository<Partner> _partnersRepo;
-        private readonly IGenericRepository<Agreement> _agreementsRepo;
-        private readonly IGenericRepository<Request> _requestsRepo;
-        private readonly IGenericRepository<User> _usersRepo;
-        private readonly IGenericRepository<Service> _servicesRepo;
-        private readonly IGenericRepository<ServiceType> _servicetypesRepo;
-        private readonly IGenericRepository<Event> _eventsRepo;
-        
-        public RequestsService(IGenericRepository<Partner> partnersRepo,
-            IGenericRepository<Agreement> agreementsRepo,
-            IGenericRepository<Request> requestsRepo, IGenericRepository<User> usersRepo,
-            IGenericRepository<Service> servicesRepo,IGenericRepository<ServiceType> servicetypesRepo,
-            IGenericRepository<Event> eventsRepo)
-            
-        {
-            this._partnersRepo = partnersRepo;
-            this._agreementsRepo = agreementsRepo;
-            this._requestsRepo = requestsRepo;
-            this._usersRepo = usersRepo;
-            this._servicesRepo = servicesRepo;
-            this._servicetypesRepo = servicetypesRepo;
-            this._eventsRepo = eventsRepo;
-        }
 
         public BaseResponse GetServices(RequestsFilterVM filter)
         {
 
-       
+
             Partner part;
             int partnerID = ApplicationSettings.PartnerId;
-
 
             //if (Session["admin"] == null)
             //{
@@ -60,11 +21,11 @@ namespace Web.Services.Concrete
             //else
             //{
             Partner partner = this._partnersRepo.Table.Where(p => p.Id == partnerID && p.IsActive != false).FirstOrDefault();
-            
+
 
             IQueryable<Req_Partner> queryable = null;
             var requests = queryable;
-         
+
 
             var requests1 =
                   from requ in this._requestsRepo.Table
@@ -112,50 +73,49 @@ namespace Web.Services.Concrete
                       ServiceType = serTyp
                   });
 
-
             //filtering part
-           // if (bookingFilters.Agent != null)
-           // {
+            // if (bookingFilters.Agent != null)
+            // {
             //    requests1 = requests1.Where(a => a.Partner.tradeName == bookingFilters.Agent);
-           // }
-           // if (bookingFilters.ServTitle != null)
-          //  {
-          //      requests1 = requests1.Where(a => a.Agreement.Service.name == bookingFilters.ServTitle);
-           // }
-           // if (bookingFilters.Date != null)
-           // {
+            // }
+            // if (bookingFilters.ServTitle != null)
+            //  {
+            //      requests1 = requests1.Where(a => a.Agreement.Service.name == bookingFilters.ServTitle);
+            // }
+            // if (bookingFilters.Date != null)
+            // {
             //    requests1 = requests1.Where(a => a.req_ForTransfer.EventDate >= bookingFilters.Date);
-           // }
-           // if (bookingFilters.Date != null && bookingFilters.Date2 != null)
-           // {
-           //     requests1 = requests1.Where(a => a.req_ForTransfer.EventDate >= bookingFilters.Date && a.req_ForTransfer.EventDate <= bookingFilters.Date2);
-           // }
-           // if (bookingFilters.BookingDate != null)
-           // {
-           //     requests1 = requests1.Where(a => a.req_ForTransfer.BookingDate >= bookingFilters.BookingDate);
-           // }
-           // if (bookingFilters.BookingDate != null && bookingFilters.BookingDate2 != null)
-           // {
-           //     requests1 = requests1.Where(a => a.req_ForTransfer.BookingDate >= bookingFilters.BookingDate && a.req_ForTransfer.BookingDate <= bookingFilters.BookingDate2);
-           // }
+            // }
+            // if (bookingFilters.Date != null && bookingFilters.Date2 != null)
+            // {
+            //     requests1 = requests1.Where(a => a.req_ForTransfer.EventDate >= bookingFilters.Date && a.req_ForTransfer.EventDate <= bookingFilters.Date2);
+            // }
+            // if (bookingFilters.BookingDate != null)
+            // {
+            //     requests1 = requests1.Where(a => a.req_ForTransfer.BookingDate >= bookingFilters.BookingDate);
+            // }
+            // if (bookingFilters.BookingDate != null && bookingFilters.BookingDate2 != null)
+            // {
+            //     requests1 = requests1.Where(a => a.req_ForTransfer.BookingDate >= bookingFilters.BookingDate && a.req_ForTransfer.BookingDate <= bookingFilters.BookingDate2);
+            // }
 
-           // if (bookingFilters.Status == null)
-           // {
-               // requests1 = requests1.Where(b => b.req_ForTransfer.StateID == "Submitted" || b.req_ForTransfer.StateID == "Approved");
-              //  requests1 = requests1.Where(a => a.req_ForTransfer.EventDate >= System.DateTime.Today);
-           // }
-           // else
-           // {
-             //   if (bookingFilters.Status != "All")
-             //   {
-              //      requests1 = requests1.Where(b => b.req_ForTransfer.StateID == bookingFilters.Status);
-              //  }
-              //  else
-               // {
-               //     requests1 = requests1.Where(b => b.req_ForTransfer.StateID != "Site Approval" && b.req_ForTransfer.StateID != "Site Canceled");
-              //  }
-           // }
-           requests1 = requests1.Where(a => a.Agreement.Service.operatorID == partnerID);
+            // if (bookingFilters.Status == null)
+            // {
+            // requests1 = requests1.Where(b => b.req_ForTransfer.StateID == "Submitted" || b.req_ForTransfer.StateID == "Approved");
+            //  requests1 = requests1.Where(a => a.req_ForTransfer.EventDate >= System.DateTime.Today);
+            // }
+            // else
+            // {
+            //   if (bookingFilters.Status != "All")
+            //   {
+            //      requests1 = requests1.Where(b => b.req_ForTransfer.StateID == bookingFilters.Status);
+            //  }
+            //  else
+            // {
+            //     requests1 = requests1.Where(b => b.req_ForTransfer.StateID != "Site Approval" && b.req_ForTransfer.StateID != "Site Canceled");
+            //  }
+            // }
+            requests1 = requests1.Where(a => a.Agreement.Service.operatorID == partnerID);
             requests1 = requests1.OrderBy(a => a.req_ForTransfer.EventDate + " " + a.req_ForTransfer.EventTime);
 
             var requests2 =
@@ -205,48 +165,48 @@ namespace Web.Services.Concrete
                   };
 
             //filtering part
-           // requests2 = requests2.Where(a => a.req_ForTransfer.EventDate != null);
+            // requests2 = requests2.Where(a => a.req_ForTransfer.EventDate != null);
 
-           // if (bookingFilters.Agent != null)
-           // {
-           //     requests2 = requests2.Where(a => a.Partner.tradeName == bookingFilters.Agent);
-           // }
-           // if (bookingFilters.ServTitle != null)
-           // {
-           //     requests2 = requests2.Where(a => a.Agreement.Service.name == bookingFilters.ServTitle);
-           // }
-           // if (bookingFilters.Date != null)
-           // {
-           //     requests2 = requests2.Where(a => a.req_ForTransfer.EventDate >= bookingFilters.Date);
-           // }
-           // if (bookingFilters.Date != null && bookingFilters.Date2 != null)
-           // {
-           //     requests2 = requests2.Where(a => a.req_ForTransfer.EventDate >= bookingFilters.Date && a.req_ForTransfer.EventDate <= bookingFilters.Date2);
-          //  }
-          //  if (bookingFilters.BookingDate != null)
-           // {
-           //     requests2 = requests2.Where(a => a.req_ForTransfer.BookingDate >= bookingFilters.BookingDate);
-           // }
-           // if (bookingFilters.BookingDate != null && bookingFilters.BookingDate2 != null)
-           // {
-          //      requests2 = requests2.Where(a => a.req_ForTransfer.BookingDate >= bookingFilters.BookingDate && a.req_ForTransfer.BookingDate <= bookingFilters.BookingDate2);
-          //  }
-          //  if (bookingFilters.Status == null)
-          //  {
-           //     requests2 = requests2.Where(b => b.req_ForTransfer.StateID == "Submitted" || b.req_ForTransfer.StateID == "Approved");
-           //     requests2 = requests2.Where(a => a.req_ForTransfer.EventDate >= System.DateTime.Today);
-           // }
-          //  else
-          //  {
-           //     if (bookingFilters.Status != "All")
-           //     {
-           //         requests2 = requests2.Where(b => b.req_ForTransfer.StateID == bookingFilters.Status);
-           //     }
-           //     else
-           //     {
-           //         requests2 = requests2.Where(b => b.req_ForTransfer.StateID != "Site Approval" && b.req_ForTransfer.StateID != "Site Canceled");
-           //     }
-           // }
+            // if (bookingFilters.Agent != null)
+            // {
+            //     requests2 = requests2.Where(a => a.Partner.tradeName == bookingFilters.Agent);
+            // }
+            // if (bookingFilters.ServTitle != null)
+            // {
+            //     requests2 = requests2.Where(a => a.Agreement.Service.name == bookingFilters.ServTitle);
+            // }
+            // if (bookingFilters.Date != null)
+            // {
+            //     requests2 = requests2.Where(a => a.req_ForTransfer.EventDate >= bookingFilters.Date);
+            // }
+            // if (bookingFilters.Date != null && bookingFilters.Date2 != null)
+            // {
+            //     requests2 = requests2.Where(a => a.req_ForTransfer.EventDate >= bookingFilters.Date && a.req_ForTransfer.EventDate <= bookingFilters.Date2);
+            //  }
+            //  if (bookingFilters.BookingDate != null)
+            // {
+            //     requests2 = requests2.Where(a => a.req_ForTransfer.BookingDate >= bookingFilters.BookingDate);
+            // }
+            // if (bookingFilters.BookingDate != null && bookingFilters.BookingDate2 != null)
+            // {
+            //      requests2 = requests2.Where(a => a.req_ForTransfer.BookingDate >= bookingFilters.BookingDate && a.req_ForTransfer.BookingDate <= bookingFilters.BookingDate2);
+            //  }
+            //  if (bookingFilters.Status == null)
+            //  {
+            //     requests2 = requests2.Where(b => b.req_ForTransfer.StateID == "Submitted" || b.req_ForTransfer.StateID == "Approved");
+            //     requests2 = requests2.Where(a => a.req_ForTransfer.EventDate >= System.DateTime.Today);
+            // }
+            //  else
+            //  {
+            //     if (bookingFilters.Status != "All")
+            //     {
+            //         requests2 = requests2.Where(b => b.req_ForTransfer.StateID == bookingFilters.Status);
+            //     }
+            //     else
+            //     {
+            //         requests2 = requests2.Where(b => b.req_ForTransfer.StateID != "Site Approval" && b.req_ForTransfer.StateID != "Site Canceled");
+            //     }
+            // }
             requests2 = requests2.Where(a => a.Agreement.Service.operatorID == partnerID);
             requests2 = requests2.OrderBy(a => a.req_ForTransfer.EventDate + " " + a.req_ForTransfer.EventTime);
 
@@ -299,15 +259,15 @@ namespace Web.Services.Concrete
             }
 
 
-            // ViewBag.agent = (from ag in this._agreementsRepo.Table
-            //     join serv in this._servicetypesRepo.Table on ag.ServiceId equals serv.Id
-            //     join partn in this._partnersRepo.Table on ag.PartnerId equals partn.Id
-            //                 where partnerID == serv.operatorID
-            //                 select partn).Distinct();
+            ViewBag.agent = (from ag in this._agreementsRepo.Table
+                             join serv in this._servicetypesRepo.Table on ag.ServiceId equals serv.Id
+                             join partn in this._partnersRepo.Table on ag.PartnerId equals partn.Id
+                             where partnerID == serv.operatorID
+                             select partn).Distinct();
 
-            //ViewBag.Service = (from serv in this._servicesRepo.Table
-            //                   where partnerID == serv.operatorID
-            //                   select serv).Distinct();
+            ViewBag.Service = (from serv in this._servicesRepo.Table
+                               where partnerID == serv.operatorID
+                               select serv).Distinct();
 
 
 
@@ -412,9 +372,7 @@ namespace Web.Services.Concrete
             //     ModelState.Clear(); // temporary solution for state changes that change dropdown value 
             // }
             //  return View(bookingFilters1);
-            return new BaseResponse { Status = HttpStatusCode.OK, Message = "dataretrund", Body = reqs };
 
         }
-
     }
 }
