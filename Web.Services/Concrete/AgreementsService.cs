@@ -10,6 +10,7 @@ using Web.DLL.Generic_Repository;
 using Web.Model;
 using Web.Model.Common;
 using Web.Services.CommonVM;
+using Web.Services.Enums;
 using Web.Services.Interfaces;
 
 namespace Web.Services.Concrete
@@ -26,6 +27,8 @@ namespace Web.Services.Concrete
         private readonly IGenericRepository<ServiceImage> _serviceImagesRepo;
         private readonly IGenericRepository<PartnerLogo> _partnerLogosRepo;
         private readonly IGenericRepository<DynamicFieldAlternative> _dynamicFieldAlternativeRepo;
+        private readonly IGenericRepository<Request> _requestsRepo;
+        private readonly IGenericRepository<RequestLog> _requestLogsRepo;
         public AgreementsService(IConfiguration config,
             CityAccess_DbContext dbContext,
             IEmailService emailService,
@@ -34,7 +37,9 @@ namespace Web.Services.Concrete
             IGenericRepository<Partner> partnersRepo,
             IGenericRepository<ServiceImage> serviceImagesRepo,
             IGenericRepository<PartnerLogo> partnerLogosRepo,
-            IGenericRepository<DynamicFieldAlternative> dynamicFieldAlternativeRepo)
+            IGenericRepository<DynamicFieldAlternative> dynamicFieldAlternativeRepo,
+            IGenericRepository<Request> requestsRepo,
+            IGenericRepository<RequestLog> requestLogsRepo)
         {
             this._config = config;
             this._dbContext = dbContext;
@@ -46,6 +51,8 @@ namespace Web.Services.Concrete
             this._serviceImagesRepo = serviceImagesRepo;
             this._partnerLogosRepo = partnerLogosRepo;
             this._dynamicFieldAlternativeRepo = dynamicFieldAlternativeRepo;
+            this._requestsRepo = requestsRepo;
+            this._requestLogsRepo = requestLogsRepo;
         }
         public BaseResponse GetServices()
         {
@@ -122,14 +129,14 @@ namespace Web.Services.Concrete
                                   where ag.PartnerId == partnerId || (value == null ? ag.PartnerId == null : ag.PartnerId == value)
 
                                   //select new Agr_Partn_Comm { Agreement = ag, Partner = partn, BaseService = baseService, serviceImage = servImg }).AsQueryable();                                  
-                                  select new AgreementVM 
+                                  select new AgreementVM
                                   {
                                       Id = ag.Id,
-                                      Label= ag.Label,
+                                      Label = ag.Label,
                                       PartnerId = partn.Id,
-                                      PartnerTradeName = partn.TradeName, 
-                                      ServiceId = serv.Id, 
-                                      ServiceName = serv.Name, 
+                                      PartnerTradeName = partn.TradeName,
+                                      ServiceId = serv.Id,
+                                      ServiceName = serv.Name,
                                       ServiceImage = servImg.Image,
                                       ServicePrice = serv.Price,
                                       Price = ag.Price
@@ -384,7 +391,7 @@ namespace Web.Services.Concrete
         }
         public BaseResponse GetAgreementDetailsByAgreementId(int agreementId)
         {
-            Agreement ag = this._agreementsRepo.Table.FirstOrDefault(a=>a.Id == agreementId && a.IsActive!=false);
+            Agreement ag = this._agreementsRepo.Table.FirstOrDefault(a => a.Id == agreementId && a.IsActive != false);
             if (ag != null)
             {
                 var serv = this._servicesRepo.Table.Where(x => x.Id == ag.ServiceId).FirstOrDefault();
@@ -406,7 +413,7 @@ namespace Web.Services.Concrete
             }
             else
             {
-                return new BaseResponse { Status = HttpStatusCode.NotFound, Message = "Data not found"};
+                return new BaseResponse { Status = HttpStatusCode.NotFound, Message = "Data not found" };
 
             }
         }
@@ -429,7 +436,7 @@ namespace Web.Services.Concrete
 
             if (ag.PriceType == null)
             {
-                dFA = this._dynamicFieldAlternativeRepo.Table.FirstOrDefault(x=>x.Id == serv.PriceType);
+                dFA = this._dynamicFieldAlternativeRepo.Table.FirstOrDefault(x => x.Id == serv.PriceType);
                 req_User.PriceType = dFA.Label;
             }
             else
@@ -489,7 +496,7 @@ namespace Web.Services.Concrete
             return req_User;
         }
 
-        public BaseResponse SaveAgreementBooking(AgreementVM agreement)
+        public BaseResponse SaveAgreement(AgreementVM agreement)
         {
             BaseResponse response = new BaseResponse();
             if (agreement.Id == 0)
@@ -520,30 +527,30 @@ namespace Web.Services.Concrete
 
                 //sending agreement creation email
                 this.SendAgreementCreationEmail(ag);
-                    response.Status = HttpStatusCode.OK;
-                    response.Message = "Agreement created successfully";
+                response.Status = HttpStatusCode.OK;
+                response.Message = "Agreement created successfully";
             }
             else
             {
                 Agreement ag = this._agreementsRepo.Table.FirstOrDefault(a => a.Id == agreement.Id);
                 ag.PartnerId = agreement.PartnerId;
-                    ag.Label = agreement.Label;
-                    ag.Description = agreement.Description;
-                    ag.IsActive = agreement.IsActive;
-                    ag.MessageTemplate = agreement.MessageTemplate;
-                    ag.AgentInstructions = agreement.AgentInstructions;
-                    ag.CancellationPolicy = agreement.CancellationPolicy;
-                    ag.NeedsApproval = agreement.NeedsApproval;
-                    ag.Price = agreement.Price;
-                    ag.CommissionType = agreement.CommissionType;
-                    ag.CommissionValue = agreement.CommissionValue;
-                    ag.Override1 = agreement.Override1;
-                    ag.PaymentAgent = agreement.PaymentAgent;
-                    ag.EmailToCustomer = agreement.EmailToCustomer;
-                    ag.PaymentAgentType = agreement.PaymentAgentType;
-                    ag.PriceType = agreement.PriceType;
-                    ag.TypeCommission = agreement.TypeCommission;
-                    ag.IsConfirmed = agreement.IsConfirmed;
+                ag.Label = agreement.Label;
+                ag.Description = agreement.Description;
+                ag.IsActive = agreement.IsActive;
+                ag.MessageTemplate = agreement.MessageTemplate;
+                ag.AgentInstructions = agreement.AgentInstructions;
+                ag.CancellationPolicy = agreement.CancellationPolicy;
+                ag.NeedsApproval = agreement.NeedsApproval;
+                ag.Price = agreement.Price;
+                ag.CommissionType = agreement.CommissionType;
+                ag.CommissionValue = agreement.CommissionValue;
+                ag.Override1 = agreement.Override1;
+                ag.PaymentAgent = agreement.PaymentAgent;
+                ag.EmailToCustomer = agreement.EmailToCustomer;
+                ag.PaymentAgentType = agreement.PaymentAgentType;
+                ag.PriceType = agreement.PriceType;
+                ag.TypeCommission = agreement.TypeCommission;
+                ag.IsConfirmed = agreement.IsConfirmed;
                 this._agreementsRepo.Update(ag);
                 response.Status = HttpStatusCode.OK;
                 response.Message = "Agreement updated successfully";
@@ -555,7 +562,7 @@ namespace Web.Services.Concrete
         public void SendAgreementCreationEmail(Agreement ag)
         {
 
-            Partner agent =this._partnersRepo.Table.Where(a => a.Id == ag.PartnerId).FirstOrDefault();
+            Partner agent = this._partnersRepo.Table.Where(a => a.Id == ag.PartnerId).FirstOrDefault();
             Service serv = this._servicesRepo.Table.Where(x => x.Id == ag.ServiceId).FirstOrDefault();
             Partner operator1 = this._partnersRepo.Table.Where(a => a.Id == serv.OperatorId).FirstOrDefault();
 
@@ -586,6 +593,250 @@ namespace Web.Services.Concrete
 
 
             this._emailService.Email_to_send(agent.Email, url1, content, subject);
+
+        }
+
+        public BaseResponse SaveAgreementBooking(RequestVM requestParam, bool? FromPartnerSite)
+        {
+            BaseResponse response = new BaseResponse();
+            Request request = new Request
+            {
+                ContactName = requestParam.ContactName,
+                ContactEmail = requestParam.ContactEmail,
+                ContactPhone = requestParam.ContactPhone,
+                EventDate = requestParam.EventDate,
+                EventTime = requestParam.EventTime,
+                NrPersons = requestParam.NrPersons,
+                Price = requestParam.Price,
+                Reference = requestParam.Reference,
+                Notes = requestParam.Notes,
+                //IsTransfer=requestParam.IsTransfer,
+                PickupLocation = requestParam.PickupLocation,
+                DropoffLocation = requestParam.DropoffLocation,
+                FlightNr = requestParam.FlightNr,
+                //HasReturn=requestParam.hasreturn,
+                ReturnDate = requestParam.returnDate,
+                ReturnTime = requestParam.returnTime,
+                ReturnFlight = requestParam.ReturnFlight,
+                ReturnPickup = requestParam.ReturnPickup,
+                ReturnDropoff = requestParam.ReturnDropoff,
+                ExtraDate1 = requestParam.ExtraDate1,
+                ExtraDate2 = requestParam.ExtraDate2,
+                ExtraTime1 = requestParam.ExtraTime1,
+                ExtraText1 = requestParam.ExtraText1,
+                ExtraMultiText1 = requestParam.ExtraMultiText1,
+                ClientNotes = requestParam.ClientNotes,
+                BookDate = requestParam.BookDate,
+                BookTime = requestParam.BookTime
+            };
+            request.AgreementId = requestParam.AgreementID;
+            request.BookDate = System.DateTime.Now;
+
+            DateTime midnigth = new DateTime(request.BookDate.Value.Year, request.BookDate.Value.Month, request.BookDate.Value.Day, 0, 0, 0);
+
+            request.BookTime = request.BookDate - midnigth;
+
+            var ag = this._agreementsRepo.Table.Where(z => z.Id == request.AgreementId).FirstOrDefault();
+            var serv = this._servicesRepo.Table.Where(p => p.Id == ag.ServiceId).FirstOrDefault();
+            var opr = this._partnersRepo.Table.Where(a => a.Id == serv.OperatorId).FirstOrDefault();
+            var part = new Partner();
+            if (FromPartnerSite == true)
+            {
+                request.BookerId = 1;
+                request.StateId = Constants.StateTransitions.SiteApproval;
+            }
+            else
+            {
+                request.BookerId = ApplicationSettings.UserId;
+                part = this._partnersRepo.Table.FirstOrDefault(p => p.Id == ApplicationSettings.PartnerId);
+                if (ag.NeedsApproval == true)
+                {
+                    request.StateId = Constants.StateTransitions.Submitted;
+                }
+                else
+                {
+                    request.StateId = Constants.StateTransitions.Approved;
+                }
+            }
+            this._requestsRepo.Insert(request);
+
+            Request req = request;
+            int requestID = req.Id;
+
+            RequestLog reqLog = new RequestLog();
+            reqLog.Date = DateTime.Now;
+            reqLog.Time = DateTime.Now.ToString("HH:mm");
+            reqLog.RequestId = requestID;
+            reqLog.UserId = ApplicationSettings.UserId;
+            reqLog.Notes = FromPartnerSite==true? "Booking created by site request!" : "Booking created!";
+            this._requestLogsRepo.Insert(reqLog);
+
+            //Set up and forwarding e - mail to operator
+            this.SendServiceBookedEmail(req, part, ag, serv, opr,FromPartnerSite);
+            response.Status = HttpStatusCode.OK;
+            response.Message = "Service booked successfully";
+            return response;
+        }
+        public void SendServiceBookedEmail(Request request,Partner part,Agreement ag, Service serv,Partner opr,bool? FromPartnerSite)
+        {
+
+            string og = " " + request.EventDate.ToString("dd-MM-yyyy");
+            string date = og.Replace("12:00:00 AM", " ");
+            var link = "";//Request.Url.AbsoluteUri.Replace(Request.Url.PathAndQuery, "/");
+            string url = "ServicesRequested/Details/" + request.Id;
+            url = link + url;
+            string subject = string.Empty;
+            string content = string.Empty;
+            if (FromPartnerSite == null || FromPartnerSite == false)
+            {
+                if (ag.NeedsApproval == true)
+                {
+                    subject = "New request#" + request.Id + " " + ag.Label + "-" + part.TradeName + "-" + date + "-" + request.NrPersons + "-needs approval";
+                }
+                else
+                {
+                    subject = "New request#" + request.Id + " " + ag.Label + "-" + part.TradeName + "-" + date + "-" + request.NrPersons + "-approved";
+                }
+
+                 content = "New request from " + part.TradeName + ":<br> ";
+                if (request.ReturnDate == null)
+                {
+
+                    content = content + "<table cellpadding='4' border='1' style='line-height:1.5;font-size:12px;border-style:groove;border-color:rgb(63, 150, 170);border-width:1px;border-collapse:collapse;'><thead style ='background-color:rgb(63,150,170);color:white;'>" +
+                        "<tr><th>Field</th><th>Value</th></tr></thead><tbody><tr><td>Service</td><td>" + ag.Label + "</td></tr>"
+                        + "<tr><td> Operator </td><td> " + opr.TradeName + " </td></tr>"
+                        + "<tr><td> Agent </td><td> " + ag.Partner.TradeName + " </td></tr>"
+                        + "<tr><td> Date </td><td> " + og + " </td></tr>" +
+                        "<tr><td>Time</td><td>" + request.EventTime + "</td></tr>" +
+                        "<tr><td>Client name</td><td>" + request.ContactName + "</td></tr>" +
+                        "<tr><td>Client e-mail</td><td>" + request.ContactEmail + "</td></tr>" +
+                        "<tr><td>Client phone</td><td>" + request.ContactPhone + "</td></tr>" +
+                        "<tr><td>Nº of persons</td><td>" + request.NrPersons + "</td></tr>" +
+                        "<tr><td>Price</td><td>" + request.Price + "</td></tr>";
+                    if (request.PickupLocation != null)
+                    {
+                        content = content +
+                        "<tr><td>Pick up location</td><td>" + request.PickupLocation + "</td></tr>";
+                    }
+                    if (request.DropoffLocation != null)
+                    {
+                        content = content +
+                        "<tr><td>Dropoff location</td><td>" + request.DropoffLocation + "</td></tr>";
+                    }
+                    if (request.FlightNr != null)
+                    {
+                        content = content +
+                        "<tr><td>Flight number</td><td>" + request.FlightNr + "</td></tr>";
+                    }
+                    content = content +
+                        "<tr><td>Notes</td><td>" + request.Notes + "</td></tr>" +
+                        "<tr><td>Operator notes</td><td>" + request.OperatorNotes + "</td></tr></tbody></table>";
+                }
+                else
+                {
+                    og = " " + request.ReturnDate;
+                    string returnDate = " " + request.ReturnDate?.ToString("dd-MM-yyyy");
+
+                    content = content + "<br/><br><table cellpadding='4' border='1' style='line-height:1.5;font-size:12px;border-style:groove;border-color:rgb(63, 150, 170);border-width:1px;border-collapse:collapse;'><thead style ='background-color:rgb(63,150,170);color:white;'>"
+                         + "<tr><th>Field</th><th>Value</th></tr></thead><tbody><tr><td>Service</td><td>" + serv.Name + "</td></tr>"
+                         + "<tr><td> Operator </td><td> " + opr.TradeName + " </td></tr>"
+                         + "<tr><td> Agent </td><td> " + ag.Partner.TradeName + " </td></tr>"
+                         + "<tr><td> Date </td><td> " + og + " </td></tr>" +
+                         "<tr><td>Time</td><td>" + request.EventTime + "</td></tr>" +
+                         "<tr><td>Client name</td><td>" + request.ContactName + "</td></tr>" +
+                         "<tr><td>Client e-mail</td><td>" + request.ContactEmail + "</td></tr>" +
+                         "<tr><td>Client phone</td><td>" + request.ContactPhone + "</td></tr>" +
+                         "<tr><td>Nº of persons</td><td>" + request.NrPersons + "</td></tr>" +
+                         "<tr><td>Price</td><td>" + request.Price + "</td></tr>" +
+                         "<tr><td>Pick up location</td><td>" + request.PickupLocation + "</td></tr>" +
+                         "<tr><td>Dropoff location</td><td>" + request.DropoffLocation + "</td></tr>" +
+                         "<tr><td>Flight number</td><td>" + request.FlightNr + "</td></tr>" +
+                         "<tr><td>Return Date</td><td>" + returnDate + "</td></tr>" +
+                         "<tr><td>Return Time</td><td>" + request.ReturnTime + "</td></tr>" +
+                         "<tr><td>Return flight number</td><td>" + request.ReturnFlight + "</td></tr>" +
+                         "<tr><td>Return pickup</td><td>" + request.ReturnPickup + "</td></tr>" +
+                         "<tr><td>Return dropoff</td><td>" + request.ReturnDropoff + "</td></tr>" +
+                         "<tr><td>Notes</td><td>" + request.Notes + "</td></tr>" +
+                         "<tr><td>Operator notes</td><td>" + request.OperatorNotes + "</td></tr></tbody></table>";
+                }
+                this._emailService.Email_to_send(opr.Email, url, content, subject);
+            }
+            else
+            {
+                if (ag.NeedsApproval == true)
+                {
+                    subject = "New request#" + request.Id + " " + ag.Label + "-from client " + request.ContactName + "-" + date + "-" + request.NrPersons + "-needs approval";
+                }
+                else
+                {
+                    subject = "New request#" + request.Id + " " + ag.Label + "-from client" + request.ContactName + "-" + date + "-" + request.NrPersons + "-approved";
+                }
+
+                content = "New request from " + request.ContactName + ":<br> ";
+
+                if (request.ReturnDate == null)
+                {
+
+                    content = content + "<table cellpadding='4' border='1' style='line-height:1.5;font-size:12px;border-style:groove;border-color:rgb(63, 150, 170);border-width:1px;border-collapse:collapse;'><thead style ='background-color:rgb(63,150,170);color:white;'>" +
+                        "<tr><th>Field</th><th>Value</th></tr></thead><tbody><tr><td>Service</td><td>" + ag.Label + "</td></tr>"
+                        + "<tr><td> Operator </td><td> " + opr.TradeName + " </td></tr>"
+                        + "<tr><td> Agent </td><td> " + ag.Partner.TradeName + " </td></tr>"
+                        + "<tr><td> Date </td><td> " + og + " </td></tr>" +
+                        "<tr><td>Time</td><td>" + request.EventTime + "</td></tr>" +
+                        "<tr><td>Client name</td><td>" + request.ContactName + "</td></tr>" +
+                        "<tr><td>Client e-mail</td><td>" + request.ContactEmail + "</td></tr>" +
+                        "<tr><td>Client phone</td><td>" + request.ContactPhone + "</td></tr>" +
+                        "<tr><td>Nº of persons</td><td>" + request.NrPersons + "</td></tr>" +
+                        "<tr><td>Price</td><td>" + request.Price + "</td></tr>";
+                    if (request.PickupLocation != null)
+                    {
+                        content = content +
+                        "<tr><td>Pick up location</td><td>" + request.PickupLocation + "</td></tr>";
+                    }
+                    if (request.DropoffLocation != null)
+                    {
+                        content = content +
+                        "<tr><td>Dropoff location</td><td>" + request.DropoffLocation + "</td></tr>";
+                    }
+                    if (request.FlightNr != null)
+                    {
+                        content = content +
+                        "<tr><td>Flight number</td><td>" + request.FlightNr + "</td></tr>";
+                    }
+                    content = content +
+                        "<tr><td>Notes</td><td>" + request.Notes + "</td></tr>" +
+                        "<tr><td>Operator notes</td><td>" + request.OperatorNotes + "</td></tr></tbody></table>";
+                }
+                else
+                {
+                    og = " " + request.ReturnDate;
+                    string returnDate = " " + request.ReturnDate?.ToString("dd-MM-yyyy");
+
+                    content = content + "<br/><br><table cellpadding='4' border='1' style='line-height:1.5;font-size:12px;border-style:groove;border-color:rgb(63, 150, 170);border-width:1px;border-collapse:collapse;'><thead style ='background-color:rgb(63,150,170);color:white;'>"
+                         + "<tr><th>Field</th><th>Value</th></tr></thead><tbody><tr><td>Service</td><td>" + serv.Name + "</td></tr>"
+                         + "<tr><td> Operator </td><td> " + opr.TradeName + " </td></tr>"
+                         + "<tr><td> Agent </td><td> " + ag.Partner.TradeName + " </td></tr>"
+                         + "<tr><td> Date </td><td> " + og + " </td></tr>" +
+                         "<tr><td>Time</td><td>" + request.EventTime + "</td></tr>" +
+                         "<tr><td>Client name</td><td>" + request.ContactName + "</td></tr>" +
+                         "<tr><td>Client e-mail</td><td>" + request.ContactEmail + "</td></tr>" +
+                         "<tr><td>Client phone</td><td>" + request.ContactPhone + "</td></tr>" +
+                         "<tr><td>Nº of persons</td><td>" + request.NrPersons + "</td></tr>" +
+                         "<tr><td>Price</td><td>" + request.Price + "</td></tr>" +
+                         "<tr><td>Pick up location</td><td>" + request.PickupLocation + "</td></tr>" +
+                         "<tr><td>Dropoff location</td><td>" + request.DropoffLocation + "</td></tr>" +
+                         "<tr><td>Flight number</td><td>" + request.FlightNr + "</td></tr>" +
+                         "<tr><td>Return Date</td><td>" + returnDate + "</td></tr>" +
+                         "<tr><td>Return Time</td><td>" + request.ReturnTime + "</td></tr>" +
+                         "<tr><td>Return flight number</td><td>" + request.ReturnFlight + "</td></tr>" +
+                         "<tr><td>Return pickup</td><td>" + request.ReturnPickup + "</td></tr>" +
+                         "<tr><td>Return dropoff</td><td>" + request.ReturnDropoff + "</td></tr>" +
+                         "<tr><td>Notes</td><td>" + request.Notes + "</td></tr>" +
+                         "<tr><td>Operator notes</td><td>" + request.OperatorNotes + "</td></tr></tbody></table>";
+                }
+            this._emailService.Email_to_send(part.Email, url, content, subject);
+            }
+
 
         }
     }
