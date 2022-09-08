@@ -74,7 +74,7 @@ namespace Web.API.Controllers
             }
         }
         [HttpPost("agreements/SaveAgreement")]
-        public BaseResponse SaveAgreement([FromBody] AgreementVM agreement)
+        public BaseResponse SaveAgreemen([FromBody] AgreementVM agreement)
         {
             try
             {
