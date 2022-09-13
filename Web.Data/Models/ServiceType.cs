@@ -7,8 +7,6 @@ namespace Web.Data.Models
 {
     public partial class ServiceType
     {
-        public int operatorID;
-
         public ServiceType()
         {
             Services = new HashSet<Service>();
