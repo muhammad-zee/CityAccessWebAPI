@@ -112,5 +112,6 @@ namespace Web.Model.Common
         [DataType(DataType.MultilineText)]
         public string ExtraMultiText1 { get; set; }
         public string ExtraText1 { get; set; }
+        public bool? FromPartnerSite { get; set; } = null;
     }
 }
