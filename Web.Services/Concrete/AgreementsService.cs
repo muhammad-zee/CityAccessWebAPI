@@ -122,14 +122,14 @@ namespace Web.Services.Concrete
                                   where ag.PartnerId == partnerId || (value == null ? ag.PartnerId == null : ag.PartnerId == value)
 
                                   //select new Agr_Partn_Comm { Agreement = ag, Partner = partn, BaseService = baseService, serviceImage = servImg }).AsQueryable();                                  
-                                  select new AgreementVM 
+                                  select new AgreementVM
                                   {
                                       Id = ag.Id,
-                                      Label= ag.Label,
+                                      Label = ag.Label,
                                       PartnerId = partn.Id,
-                                      PartnerTradeName = partn.TradeName, 
-                                      ServiceId = serv.Id, 
-                                      ServiceName = serv.Name, 
+                                      PartnerTradeName = partn.TradeName,
+                                      ServiceId = serv.Id,
+                                      ServiceName = serv.Name,
                                       ServiceImage = servImg.Image,
                                       ServicePrice = serv.Price,
                                       Price = ag.Price
@@ -384,7 +384,7 @@ namespace Web.Services.Concrete
         }
         public BaseResponse GetAgreementDetailsByAgreementId(int agreementId)
         {
-            Agreement ag = this._agreementsRepo.Table.FirstOrDefault(a=>a.Id == agreementId && a.IsActive!=false);
+            Agreement ag = this._agreementsRepo.Table.FirstOrDefault(a => a.Id == agreementId && a.IsActive != false);
             if (ag != null)
             {
                 var serv = this._servicesRepo.Table.Where(x => x.Id == ag.ServiceId).FirstOrDefault();
@@ -406,7 +406,7 @@ namespace Web.Services.Concrete
             }
             else
             {
-                return new BaseResponse { Status = HttpStatusCode.NotFound, Message = "Data not found"};
+                return new BaseResponse { Status = HttpStatusCode.NotFound, Message = "Data not found" };
 
             }
         }
@@ -429,7 +429,7 @@ namespace Web.Services.Concrete
 
             if (ag.PriceType == null)
             {
-                dFA = this._dynamicFieldAlternativeRepo.Table.FirstOrDefault(x=>x.Id == serv.PriceType);
+                dFA = this._dynamicFieldAlternativeRepo.Table.FirstOrDefault(x => x.Id == serv.PriceType);
                 req_User.PriceType = dFA.Label;
             }
             else
@@ -520,30 +520,30 @@ namespace Web.Services.Concrete
 
                 //sending agreement creation email
                 this.SendAgreementCreationEmail(ag);
-                    response.Status = HttpStatusCode.OK;
-                    response.Message = "Agreement created successfully";
+                response.Status = HttpStatusCode.OK;
+                response.Message = "Agreement created successfully";
             }
             else
             {
                 Agreement ag = this._agreementsRepo.Table.FirstOrDefault(a => a.Id == agreement.Id);
                 ag.PartnerId = agreement.PartnerId;
-                    ag.Label = agreement.Label;
-                    ag.Description = agreement.Description;
-                    ag.IsActive = agreement.IsActive;
-                    ag.MessageTemplate = agreement.MessageTemplate;
-                    ag.AgentInstructions = agreement.AgentInstructions;
-                    ag.CancellationPolicy = agreement.CancellationPolicy;
-                    ag.NeedsApproval = agreement.NeedsApproval;
-                    ag.Price = agreement.Price;
-                    ag.CommissionType = agreement.CommissionType;
-                    ag.CommissionValue = agreement.CommissionValue;
-                    ag.Override1 = agreement.Override1;
-                    ag.PaymentAgent = agreement.PaymentAgent;
-                    ag.EmailToCustomer = agreement.EmailToCustomer;
-                    ag.PaymentAgentType = agreement.PaymentAgentType;
-                    ag.PriceType = agreement.PriceType;
-                    ag.TypeCommission = agreement.TypeCommission;
-                    ag.IsConfirmed = agreement.IsConfirmed;
+                ag.Label = agreement.Label;
+                ag.Description = agreement.Description;
+                ag.IsActive = agreement.IsActive;
+                ag.MessageTemplate = agreement.MessageTemplate;
+                ag.AgentInstructions = agreement.AgentInstructions;
+                ag.CancellationPolicy = agreement.CancellationPolicy;
+                ag.NeedsApproval = agreement.NeedsApproval;
+                ag.Price = agreement.Price;
+                ag.CommissionType = agreement.CommissionType;
+                ag.CommissionValue = agreement.CommissionValue;
+                ag.Override1 = agreement.Override1;
+                ag.PaymentAgent = agreement.PaymentAgent;
+                ag.EmailToCustomer = agreement.EmailToCustomer;
+                ag.PaymentAgentType = agreement.PaymentAgentType;
+                ag.PriceType = agreement.PriceType;
+                ag.TypeCommission = agreement.TypeCommission;
+                ag.IsConfirmed = agreement.IsConfirmed;
                 this._agreementsRepo.Update(ag);
                 response.Status = HttpStatusCode.OK;
                 response.Message = "Agreement updated successfully";
@@ -555,7 +555,7 @@ namespace Web.Services.Concrete
         public void SendAgreementCreationEmail(Agreement ag)
         {
 
-            Partner agent =this._partnersRepo.Table.Where(a => a.Id == ag.PartnerId).FirstOrDefault();
+            Partner agent = this._partnersRepo.Table.Where(a => a.Id == ag.PartnerId).FirstOrDefault();
             Service serv = this._servicesRepo.Table.Where(x => x.Id == ag.ServiceId).FirstOrDefault();
             Partner operator1 = this._partnersRepo.Table.Where(a => a.Id == serv.OperatorId).FirstOrDefault();
 

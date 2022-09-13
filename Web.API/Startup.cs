@@ -137,7 +137,7 @@ namespace Web.API
             services.AddTransient(typeof(IEmailService), typeof(EmailService));
             services.AddTransient(typeof(IAgreementsService), typeof(AgreementsService));
             services.AddTransient(typeof(IRequestsService), typeof(RequestsService));
-
+            services.AddTransient(typeof(IUsersService), typeof(UsersService));
             //Register Services Repositories
 
             //services.AddAntiforgery(options =>
