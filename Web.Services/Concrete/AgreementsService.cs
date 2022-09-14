@@ -10,6 +10,7 @@ using Web.DLL.Generic_Repository;
 using Web.Model;
 using Web.Model.Common;
 using Web.Services.CommonVM;
+using Web.Services.Enums;
 using Web.Services.Interfaces;
 
 namespace Web.Services.Concrete
@@ -26,6 +27,7 @@ namespace Web.Services.Concrete
         private readonly IGenericRepository<ServiceImage> _serviceImagesRepo;
         private readonly IGenericRepository<PartnerLogo> _partnerLogosRepo;
         private readonly IGenericRepository<DynamicFieldAlternative> _dynamicFieldAlternativeRepo;
+  
         public AgreementsService(IConfiguration config,
             CityAccess_DbContext dbContext,
             IEmailService emailService,
@@ -34,7 +36,9 @@ namespace Web.Services.Concrete
             IGenericRepository<Partner> partnersRepo,
             IGenericRepository<ServiceImage> serviceImagesRepo,
             IGenericRepository<PartnerLogo> partnerLogosRepo,
-            IGenericRepository<DynamicFieldAlternative> dynamicFieldAlternativeRepo)
+            IGenericRepository<DynamicFieldAlternative> dynamicFieldAlternativeRepo,
+            IGenericRepository<Request> requestsRepo,
+            IGenericRepository<RequestLog> requestLogsRepo)
         {
             this._config = config;
             this._dbContext = dbContext;
@@ -489,7 +493,7 @@ namespace Web.Services.Concrete
             return req_User;
         }
 
-        public BaseResponse SaveAgreementBooking(AgreementVM agreement)
+        public BaseResponse SaveAgreement(AgreementVM agreement)
         {
             BaseResponse response = new BaseResponse();
             if (agreement.Id == 0)
@@ -588,5 +592,6 @@ namespace Web.Services.Concrete
             this._emailService.Email_to_send(agent.Email, url1, content, subject);
 
         }
+
     }
 }

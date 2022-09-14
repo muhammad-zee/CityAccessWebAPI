@@ -6,6 +6,8 @@ namespace Web.Services.CommonVM
 {
     public class Req_Partner
     {
+        internal ServiceType ServiceType;
+
         public Req_forTransfer req_ForTransfer { get; set; }
         public Request Request { get; set; }
         public Partner Partner { get; set; }
