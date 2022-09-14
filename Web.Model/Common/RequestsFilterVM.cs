@@ -30,6 +30,5 @@ namespace Web.Model.Common
             [DataType(DataType.Date)]
             [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = @"{0:yyyy-MM-dd}")]
             public Nullable<System.DateTime> BookingEndDate { get; set; }
-
     }
 }
