@@ -12,8 +12,9 @@ namespace Web.Services.Interfaces
     {
         BaseResponse GetUserDetails(int UserId);
 
-        BaseResponse UpdateUser(UserVM user);
+        BaseResponse SaveUser(UserVM user);
 
         BaseResponse UpdatePassword(UserVM password);
+        BaseResponse CheckIfUsernameAvailable(string Username);
     }
 }

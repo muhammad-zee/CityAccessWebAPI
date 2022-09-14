@@ -18,52 +18,82 @@ namespace Web.Services.Concrete
     {
         private readonly IGenericRepository<User> _usersRepo;
 
-
         public UsersService(IGenericRepository<User> usersRepo)
-
-
         {
-
             this._usersRepo = usersRepo;
-
         }
         public BaseResponse GetUserDetails(int UserId)
         {
             var user = this._usersRepo.Table.Where(x => x.Id == UserId && x.IsActive != false).FirstOrDefault();
             return new BaseResponse { Status = HttpStatusCode.OK, Message = "Data returned", Body = user };
         }
-        public BaseResponse UpdateUser(UserVM user)
+        public BaseResponse SaveUser(UserVM user)
         {
-            var dbUser = this._usersRepo.Table.Where(x => x.Id == user.Id && x.IsActive != false).FirstOrDefault();
-            if(dbUser.Password == user.ConfirmPassword)
+            if (user.Id > 0)
             {
+                var dbUser = this._usersRepo.Table.Where(x => x.Id == user.Id && x.IsActive != false).FirstOrDefault();
+                if (dbUser.Password == user.ConfirmPassword)
+                {
 
-            dbUser.Username = user.UserName;
-            dbUser.FullName = user.FullName;
-            dbUser.Email = user.Email;
-            dbUser.Phone = user.Phone;
-                this._usersRepo.Update(dbUser);
-                return new BaseResponse { Status = HttpStatusCode.OK, Message = "User's data updated successfully" };
+                    dbUser.Username = user.UserName;
+                    dbUser.FullName = user.FullName;
+                    dbUser.Email = user.Email;
+                    dbUser.Phone = user.Phone;
+                    this._usersRepo.Update(dbUser);
+                    return new BaseResponse { Status = HttpStatusCode.OK, Message = "User's data updated successfully" };
+                }
+                else
+                {
+                    return new BaseResponse { Status = HttpStatusCode.BadRequest, Message = "Password incorrect" };
+
+                }
             }
             else
             {
-                return new BaseResponse { Status = HttpStatusCode.BadRequest, Message = "Password incorrect" };
+                User newUser = new User
+                {
 
+                    UserIcalLink = Guid.NewGuid(),
+                    Username = user.UserName,
+                    FullName = user.FullName,
+                    Password = user.NewPassword,
+                    Email = user.Email,
+                    Phone = user.Phone,
+                    //PartnerId = user.
+                    IsActive = true,
+                    EmailConfirmed = false,
+                    IsAdmin = true
+                };
+                this._usersRepo.Insert(newUser);
+                return new BaseResponse { Status = HttpStatusCode.OK, Message = "User created successfully" };
             }
-          
         }
+
         public BaseResponse UpdatePassword(UserVM password)
         {
             var dbUser = this._usersRepo.Table.Where(x => x.Id == password.Id && x.IsActive != false).FirstOrDefault();
             if (dbUser.Password == password.OldPassword)
             {
-                dbUser.Password = password.ConfirmPassword;
+                dbUser.Password = password.NewPassword;
                 this._usersRepo.Update(dbUser);
                 return new BaseResponse { Status = HttpStatusCode.OK, Message = "Password change successfully" };
-             }
+            }
             else
             {
                 return new BaseResponse { Status = HttpStatusCode.BadRequest, Message = "Password not same" };
+            }
+        }
+        public BaseResponse CheckIfUsernameAvailable(string Username)
+        {
+            var usernameCount= this._usersRepo.Table.Count(x => x.Username == Username);
+            if (usernameCount > 0)
+            {
+                return new BaseResponse { Status = HttpStatusCode.OK, Message = "Username already exists",Body=new { usernameAvailable=false,message= "Username already exists" } };
+            }
+            else
+            {
+                return new BaseResponse { Status = HttpStatusCode.OK, Message = "Username available", Body = new { usernameAvailable = true, message = "Username available" } };
+
             }
         }
 

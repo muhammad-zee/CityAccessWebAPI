@@ -44,11 +44,12 @@ namespace Web.API.Controllers
             }
            
         }
-        public BaseResponse UpdateUser(UserVM user)
+        [HttpPost("user/SaveUser")]
+        public BaseResponse SaveUser(UserVM user)
         {
             try
             {
-                return this._usersService.UpdateUser(user);
+                return this._usersService.SaveUser(user);
             }
             catch (Exception ex)
             {
@@ -57,12 +58,26 @@ namespace Web.API.Controllers
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.Message.ToString(), Body = ex.ToString() };
             }
         }
-
+        [HttpPost("user/UpdatePassword")]
         public BaseResponse UpdatePassword(UserVM password)
         {
             try
             {
                 return this._usersService.UpdatePassword(password);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.Message.ToString(), Body = ex.ToString() };
+            }
+        }
+        [HttpGet("user/CheckIfUsernameAvailable")]
+        public BaseResponse CheckIfUsernameAvailable(string Username)
+        {
+            try
+            {
+                return this._usersService.CheckIfUsernameAvailable(Username);
             }
             catch (Exception ex)
             {
