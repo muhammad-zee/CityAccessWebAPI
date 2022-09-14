@@ -1,5 +1,6 @@
 
 using ElmahCore;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -15,6 +16,8 @@ using Web.Services.Interfaces;
 
 namespace Web.API.Controllers
 {
+    [Authorize]
+    [RequestHandler]
     public class UsersController : Controller
     {
         private readonly Logger _logger;
