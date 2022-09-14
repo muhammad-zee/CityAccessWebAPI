@@ -98,6 +98,7 @@ namespace Web.Services.Concrete
                     new Claim("UserId",user.Id.ToString()),
                     new Claim("UserFullName", $"{user.FullName}"),
                     new Claim("PartnerId", $"{user.PartnerId}"),
+                    new Claim("IsAdmin", $"{user.IsAdmin}"),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
 
             };

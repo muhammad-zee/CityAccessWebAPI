@@ -1,5 +1,5 @@
-﻿using ElmahCore;
-using Microsoft.AspNetCore.Authorization;
+
+using ElmahCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -15,28 +15,41 @@ using Web.Services.Interfaces;
 
 namespace Web.API.Controllers
 {
-    [Authorize]
-    [RequestHandler]
-    public class AgreementsController : Controller
+    public class UsersController : Controller
     {
         private readonly Logger _logger;
         private readonly IConfiguration _config;
         private readonly IWebHostEnvironment _hostEnvironment;
 
-        private IAgreementsService _agreementsService;
-        public AgreementsController(IConfiguration config, IWebHostEnvironment environment, IAgreementsService agreementsService)
+        private IUsersService _usersService;
+        public UsersController(IConfiguration config, IWebHostEnvironment environment, IUsersService usersService)
         {
             this._config = config;
             this._hostEnvironment = environment;
             this._logger = new Logger(_hostEnvironment, config);
-            this._agreementsService = agreementsService;
+            this._usersService = usersService;
         }
-        [HttpGet("agreements/GetServices")]
-        public BaseResponse GetServices()
+        [HttpGet("user/GetUserDetails")]
+        public BaseResponse GetUserDetails(int UserId)
         {
             try
             {
-                return this._agreementsService.GetServices();
+                return this._usersService.GetUserDetails(UserId);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.Message.ToString(), Body = ex.ToString() };
+            }
+           
+        }
+        [HttpPost("user/SaveUser")]
+        public BaseResponse SaveUser(UserVM user)
+        {
+            try
+            {
+                return this._usersService.SaveUser(user);
             }
             catch (Exception ex)
             {
@@ -45,12 +58,12 @@ namespace Web.API.Controllers
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.Message.ToString(), Body = ex.ToString() };
             }
         }
-        [HttpPost("agreements/GetAgreements")]
-        public BaseResponse GetAgreements([FromBody]AgreementsFilterVM filter)
+        [HttpPost("user/UpdatePassword")]
+        public BaseResponse UpdatePassword(UserVM password)
         {
             try
             {
-                return this._agreementsService.GetAgreements(filter);
+                return this._usersService.UpdatePassword(password);
             }
             catch (Exception ex)
             {
@@ -59,12 +72,12 @@ namespace Web.API.Controllers
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.Message.ToString(), Body = ex.ToString() };
             }
         }
-        [HttpGet("agreements/GetAgreementDetailsByAgreementId")]
-        public BaseResponse GetAgreementDetailsByAgreementId(int agreementId)
+        [HttpGet("user/CheckIfUsernameAvailable")]
+        public BaseResponse CheckIfUsernameAvailable(string Username)
         {
             try
             {
-                return this._agreementsService.GetAgreementDetailsByAgreementId(agreementId);
+                return this._usersService.CheckIfUsernameAvailable(Username);
             }
             catch (Exception ex)
             {
@@ -73,19 +86,6 @@ namespace Web.API.Controllers
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.Message.ToString(), Body = ex.ToString() };
             }
         }
-        [HttpPost("agreements/SaveAgreement")]
-        public BaseResponse SaveAgreemen([FromBody] AgreementVM agreement)
-        {
-            try
-            {
-                return this._agreementsService.SaveAgreement(agreement);
-            }
-            catch (Exception ex)
-            {
-                ElmahExtensions.RiseError(ex);
-                _logger.LogExceptions(ex);
-                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.Message.ToString(),Body=ex.ToString() };
-            }
-        }
+
     }
 }
