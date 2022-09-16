@@ -48,7 +48,7 @@ namespace Web.API.Controllers
            
         }
         [HttpPost("user/SaveUser")]
-        public BaseResponse SaveUser(UserVM user)
+        public BaseResponse SaveUser([FromBody]UserVM user)
         {
             try
             {
@@ -62,7 +62,7 @@ namespace Web.API.Controllers
             }
         }
         [HttpPost("user/UpdatePassword")]
-        public BaseResponse UpdatePassword(UserVM password)
+        public BaseResponse UpdatePassword([FromBody]UserVM password)
         {
             try
             {

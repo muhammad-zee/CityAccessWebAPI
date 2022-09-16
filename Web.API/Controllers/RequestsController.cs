@@ -32,12 +32,12 @@ namespace Web.API.Controllers
             this._requestsService = requestsService;
         }
 
-        [HttpPost("request/GetBookedServices")]
-        public BaseResponse GetBookedServices([FromBody]RequestsFilterVM filter)
+        [HttpPost("request/GetRequestsToUs")]
+        public BaseResponse GetRequestsToUs([FromBody]RequestsFilterVM filter)
         {
             try
             {
-                return this._requestsService.GetBookedServices(filter);
+                return this._requestsService.GetRequestsToUs(filter);
             }
             catch (Exception ex)
             {

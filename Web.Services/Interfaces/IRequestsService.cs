@@ -10,7 +10,8 @@ namespace Web.Services.Interfaces
 {
     public interface IRequestsService
     {
-        BaseResponse GetBookedServices(RequestsFilterVM filter);
+        BaseResponse GetRequestsToUs(RequestsFilterVM filter);
+        BaseResponse UpdateRequestStatus(int requestId, string stateId);
         BaseResponse SaveBookingRequest(RequestVM req);
     }
 }

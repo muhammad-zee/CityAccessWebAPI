@@ -10,6 +10,7 @@ using Web.Model;
 using Web.Model.Common;
 using Web.Services.CommonVM;
 using Web.Services.Enums;
+using Web.Services.Helper;
 using Web.Services.Interfaces;
 
 namespace Web.Services.Concrete
@@ -17,7 +18,7 @@ namespace Web.Services.Concrete
     public class RequestsService : IRequestsService
     {
 
-
+        private readonly CityAccess_DbContext _dbContext;
         private readonly IGenericRepository<Partner> _partnersRepo;
         private readonly IGenericRepository<Agreement> _agreementsRepo;
         private readonly IGenericRepository<Request> _requestsRepo;
@@ -28,16 +29,18 @@ namespace Web.Services.Concrete
         private readonly IGenericRepository<Event> _eventsRepo;
         private readonly IEmailService _emailService;
 
-        public RequestsService(IGenericRepository<Partner> partnersRepo,
+        public RequestsService(CityAccess_DbContext dbContext,
+            IGenericRepository<Partner> partnersRepo,
             IGenericRepository<Agreement> agreementsRepo,
-            IGenericRepository<Request> requestsRepo, 
-            IGenericRepository<RequestLog> requestLogsRepo, 
+            IGenericRepository<Request> requestsRepo,
+            IGenericRepository<RequestLog> requestLogsRepo,
             IGenericRepository<User> usersRepo,
-            IGenericRepository<Service> servicesRepo,IGenericRepository<ServiceType> servicetypesRepo,
+            IGenericRepository<Service> servicesRepo, IGenericRepository<ServiceType> servicetypesRepo,
             IGenericRepository<Event> eventsRepo,
             IEmailService emailService)
-            
+
         {
+            this._dbContext = dbContext;
             this._partnersRepo = partnersRepo;
             this._agreementsRepo = agreementsRepo;
             this._requestsRepo = requestsRepo;
@@ -49,230 +52,70 @@ namespace Web.Services.Concrete
             this._emailService = emailService;
         }
 
-        public BaseResponse GetBookedServices(RequestsFilterVM filter)
+        public BaseResponse GetRequestsToUs(RequestsFilterVM filter)
         {
 
-       
+
             int partnerID = ApplicationSettings.PartnerId;
             //Partner partner = this._partnersRepo.Table.Where(p => p.Id == partnerID && p.IsActive != false).FirstOrDefault();
-            
 
-            IQueryable<Req_Partner> queryable = null;
+
+            IQueryable<RequestVM> queryable = null;
             var requests = queryable;
-         
 
-            var requests1 =
-                  from requ in this._requestsRepo.Table
-                  join ag in this._agreementsRepo.Table on requ.AgreementId equals ag.Id
-                  join us in this._usersRepo.Table on requ.BookerId equals us.Id
-                  join serv in this._servicesRepo.Table on ag.ServiceId equals serv.Id
-                  join serTyp in this._servicetypesRepo.Table on serv.TypeId equals serTyp.Id
-                  join ev in this._eventsRepo.Table on requ.EventId equals ev.Id
-                  into evnt
-                  from ev in evnt.DefaultIfEmpty()
-                  join partn in this._partnersRepo.Table on ag.Partner.Id equals partn.Id
-                  into part1
-                  from partn in part1.DefaultIfEmpty()
-                  select (new Req_Partner
-                  {
-                      req_ForTransfer = new Req_forTransfer
-                      {
-                          ID = requ.Id,
-                          AgreementID = requ.AgreementId,
-                          BookerId = requ.BookerId,
-                          ContactName = requ.ContactName,
-                          ContactEmail = requ.ContactEmail,
-                          ContactPhone = requ.ContactPhone,
-                          EventDate = requ.EventDate,
-                          EventTime = requ.EventTime,
-                          NrPersons = requ.NrPersons,
-                          Price = requ.Price,
-                          Reference = requ.Reference,
-                          Notes = requ.Notes,
-                          PickupLocation = requ.PickupLocation,
-                          DropoffLocation = requ.DropoffLocation,
-                          FlightNr = requ.FlightNr,
-                          StateID = requ.StateId,
-                          BookingDate = requ.BookDate,
-                          OperatorNotes = requ.OperatorNotes,
-                          eventID = requ.EventId,
-                          EventNotes = ev.Notes,
-                          Leg = 1
-                      },
-                      //Partner = partn != null ? partn : null,
-                      Partner = partn,
-                      Agreement = ag,
-                      ServiceType = serTyp
-                  });
 
+            var requests1 = this._dbContext.LoadStoredProcedure("ca_getRequestsToUsByPartnerId")
+                            .WithSqlParam("@pPartnerId", partnerID)
+                            //.WithSqlParam("@pOperatorId", filter.OperatorId)
+                            //.WithSqlParam("@pServiceId", filter.ServiceId)
+                            //.WithSqlParam("@pServiceStartDate", filter.ServiceStartDate)
+                            //.WithSqlParam("@pServiceEndDate", filter.ServiceEndDate)
+                            //.WithSqlParam("@pBookingStartDate", filter.BookingStartDate)
+                            //.WithSqlParam("@pBookingEndDate", filter.BookingEndDate)
+                            .ExecuteStoredProc<RequestVM>();
 
             //filtering part
-           // if (bookingFilters.Agent != null)
-           // {
+            // if (bookingFilters.Agent != null)
+            // {
             //    requests1 = requests1.Where(a => a.Partner.tradeName == bookingFilters.Agent);
-           // }
-           // if (bookingFilters.ServTitle != null)
-          //  {
-          //      requests1 = requests1.Where(a => a.Agreement.Service.name == bookingFilters.ServTitle);
-           // }
-           // if (bookingFilters.Date != null)
-           // {
+            // }
+            // if (bookingFilters.ServTitle != null)
+            //  {
+            //      requests1 = requests1.Where(a => a.Agreement.Service.name == bookingFilters.ServTitle);
+            // }
+            // if (bookingFilters.Date != null)
+            // {
             //    requests1 = requests1.Where(a => a.req_ForTransfer.EventDate >= bookingFilters.Date);
-           // }
-           // if (bookingFilters.Date != null && bookingFilters.Date2 != null)
-           // {
-           //     requests1 = requests1.Where(a => a.req_ForTransfer.EventDate >= bookingFilters.Date && a.req_ForTransfer.EventDate <= bookingFilters.Date2);
-           // }
-           // if (bookingFilters.BookingDate != null)
-           // {
-           //     requests1 = requests1.Where(a => a.req_ForTransfer.BookingDate >= bookingFilters.BookingDate);
-           // }
-           // if (bookingFilters.BookingDate != null && bookingFilters.BookingDate2 != null)
-           // {
-           //     requests1 = requests1.Where(a => a.req_ForTransfer.BookingDate >= bookingFilters.BookingDate && a.req_ForTransfer.BookingDate <= bookingFilters.BookingDate2);
-           // }
+            // }
+            // if (bookingFilters.Date != null && bookingFilters.Date2 != null)
+            // {
+            //     requests1 = requests1.Where(a => a.req_ForTransfer.EventDate >= bookingFilters.Date && a.req_ForTransfer.EventDate <= bookingFilters.Date2);
+            // }
+            // if (bookingFilters.BookingDate != null)
+            // {
+            //     requests1 = requests1.Where(a => a.req_ForTransfer.BookingDate >= bookingFilters.BookingDate);
+            // }
+            // if (bookingFilters.BookingDate != null && bookingFilters.BookingDate2 != null)
+            // {
+            //     requests1 = requests1.Where(a => a.req_ForTransfer.BookingDate >= bookingFilters.BookingDate && a.req_ForTransfer.BookingDate <= bookingFilters.BookingDate2);
+            // }
 
-           // if (bookingFilters.Status == null)
-           // {
-               // requests1 = requests1.Where(b => b.req_ForTransfer.StateID == "Submitted" || b.req_ForTransfer.StateID == "Approved");
-              //  requests1 = requests1.Where(a => a.req_ForTransfer.EventDate >= System.DateTime.Today);
-           // }
-           // else
-           // {
-             //   if (bookingFilters.Status != "All")
-             //   {
-              //      requests1 = requests1.Where(b => b.req_ForTransfer.StateID == bookingFilters.Status);
-              //  }
-              //  else
-               // {
-               //     requests1 = requests1.Where(b => b.req_ForTransfer.StateID != "Site Approval" && b.req_ForTransfer.StateID != "Site Canceled");
-              //  }
-           // }
-           requests1 = requests1.Where(a => a.Agreement.Service.OperatorId == partnerID);
-            requests1 = requests1.OrderBy(a => a.req_ForTransfer.EventDate + " " + a.req_ForTransfer.EventTime);
-
-            var requests2 =
-                  from requ in this._requestsRepo.Table
-                  join ag in this._agreementsRepo.Table on requ.AgreementId equals ag.Id
-                  join us in this._usersRepo.Table on requ.BookerId equals us.Id
-                  join serv in this._servicesRepo.Table on ag.ServiceId equals serv.Id
-                  join serTyp in this._servicetypesRepo.Table on serv.TypeId equals serTyp.Id
-
-                  join ev in this._eventsRepo.Table on requ.EventId equals ev.Id
-                  into evnt
-                  from ev in evnt.DefaultIfEmpty()
-
-                  join partn in this._partnersRepo.Table on ag.Partner.Id equals partn.Id
-                  into part1
-                  from partn in part1.DefaultIfEmpty()
-                  select new Req_Partner
-                  {
-                      req_ForTransfer = new Req_forTransfer
-                      {
-                          ID = requ.Id,
-                          AgreementID = requ.AgreementId,
-                          BookerId = requ.BookerId,
-                          ContactName = requ.ContactName,
-                          ContactEmail = requ.ContactEmail,
-                          ContactPhone = requ.ContactPhone,
-                          EventDate = requ.ReturnDate,
-                          EventTime = requ.ReturnTime,
-                          NrPersons = requ.NrPersons,
-                          Price = new decimal(),
-                          Reference = requ.Reference,
-                          Notes = requ.Notes,
-                          PickupLocation = requ.ReturnPickup,
-                          DropoffLocation = requ.ReturnDropoff,
-                          FlightNr = requ.ReturnFlight,
-                          StateID = requ.StateId,
-                          BookingDate = requ.BookDate,
-                          OperatorNotes = requ.OperatorNotes,
-                          eventID = requ.EventId,
-                          EventNotes = ev.Notes,
-                          Leg = 2
-                      },
-                      //Partner = partn != null ? partn: null,
-                      Partner = partn,
-                      Agreement = ag,
-                      ServiceType = serTyp
-                  };
-
-            //filtering part
-           // requests2 = requests2.Where(a => a.req_ForTransfer.EventDate != null);
-
-           // if (bookingFilters.Agent != null)
-           // {
-           //     requests2 = requests2.Where(a => a.Partner.tradeName == bookingFilters.Agent);
-           // }
-           // if (bookingFilters.ServTitle != null)
-           // {
-           //     requests2 = requests2.Where(a => a.Agreement.Service.name == bookingFilters.ServTitle);
-           // }
-           // if (bookingFilters.Date != null)
-           // {
-           //     requests2 = requests2.Where(a => a.req_ForTransfer.EventDate >= bookingFilters.Date);
-           // }
-           // if (bookingFilters.Date != null && bookingFilters.Date2 != null)
-           // {
-           //     requests2 = requests2.Where(a => a.req_ForTransfer.EventDate >= bookingFilters.Date && a.req_ForTransfer.EventDate <= bookingFilters.Date2);
-          //  }
-          //  if (bookingFilters.BookingDate != null)
-           // {
-           //     requests2 = requests2.Where(a => a.req_ForTransfer.BookingDate >= bookingFilters.BookingDate);
-           // }
-           // if (bookingFilters.BookingDate != null && bookingFilters.BookingDate2 != null)
-           // {
-          //      requests2 = requests2.Where(a => a.req_ForTransfer.BookingDate >= bookingFilters.BookingDate && a.req_ForTransfer.BookingDate <= bookingFilters.BookingDate2);
-          //  }
-          //  if (bookingFilters.Status == null)
-          //  {
-           //     requests2 = requests2.Where(b => b.req_ForTransfer.StateID == "Submitted" || b.req_ForTransfer.StateID == "Approved");
-           //     requests2 = requests2.Where(a => a.req_ForTransfer.EventDate >= System.DateTime.Today);
-           // }
-          //  else
-          //  {
-           //     if (bookingFilters.Status != "All")
-           //     {
-           //         requests2 = requests2.Where(b => b.req_ForTransfer.StateID == bookingFilters.Status);
-           //     }
-           //     else
-           //     {
-           //         requests2 = requests2.Where(b => b.req_ForTransfer.StateID != "Site Approval" && b.req_ForTransfer.StateID != "Site Canceled");
-           //     }
-           // }
-            requests2 = requests2.Where(a => a.Agreement.Service.OperatorId == partnerID);
-            requests2 = requests2.OrderBy(a => a.req_ForTransfer.EventDate + " " + a.req_ForTransfer.EventTime);
-
-            requests = requests1.AsEnumerable().Union(requests2.AsEnumerable()).AsQueryable();//.OrderBy(x => x.req_ForTransfer.EventDate + " " + x.req_ForTransfer.EventTime);
-            //requests = requests1.Union(requests2).OrderBy(x => x.req_ForTransfer.EventDate + " " + x.req_ForTransfer.EventTime);
-
-            //List<Req_Partner> reqs = requests.ToList();
-            //decimal TotalPrice = 0;
-            //int eventID = 0;
-            //int TotalPersons = 0;
-            //int limit = reqs.Count();
-
-            //for (int i = 0; i < limit; i++)
-            //{
-            //    if (reqs.Skip(i).First().req_ForTransfer.eventID == eventID)
-            //    {
-            //        reqs.Skip(i).First().req_ForTransfer.TotalPrice = TotalPrice;
-            //        reqs.Skip(i).First().req_ForTransfer.TotalNrPersons = TotalPersons;
-            //    }
-            //}
-
-
-            // ViewBag.agent = (from ag in this._agreementsRepo.Table
-            //     join serv in this._servicetypesRepo.Table on ag.ServiceId equals serv.Id
-            //     join partn in this._partnersRepo.Table on ag.PartnerId equals partn.Id
-            //                 where partnerID == serv.operatorID
-            //                 select partn).Distinct();
-
-            //ViewBag.Service = (from serv in this._servicesRepo.Table
-            //                   where partnerID == serv.operatorID
-            //                   select serv).Distinct();
-
-
+            // if (bookingFilters.Status == null)
+            // {
+            // requests1 = requests1.Where(b => b.req_ForTransfer.StateID == "Submitted" || b.req_ForTransfer.StateID == "Approved");
+            //  requests1 = requests1.Where(a => a.req_ForTransfer.EventDate >= System.DateTime.Today);
+            // }
+            // else
+            // {
+            //   if (bookingFilters.Status != "All")
+            //   {
+            //      requests1 = requests1.Where(b => b.req_ForTransfer.StateID == bookingFilters.Status);
+            //  }
+            //  else
+            // {
+            //     requests1 = requests1.Where(b => b.req_ForTransfer.StateID != "Site Approval" && b.req_ForTransfer.StateID != "Site Canceled");
+            //  }
+            // }
 
 
             // List<SelectListItem> items = new List<SelectListItem>();
@@ -289,16 +132,11 @@ namespace Web.Services.Concrete
             // ViewBag.partners = db.Partners;
 
 
-           
+
 
             // BookingFilters bookingFilters1 = new BookingFilters { Req_PartnerList = reqs, StatusFilters = items, Status = bookingFilters.Status };
 
-            // if (request.Notes != null)
-            // {
-            //     ModelState.Clear(); 
-            // temporary solution for state changes that change dropdown value 
-            // }
-            //  return View(bookingFilters1);
+
             return new BaseResponse { Status = HttpStatusCode.OK, Message = "dataretrund", Body = requests };
 
         }
@@ -626,5 +464,136 @@ namespace Web.Services.Concrete
 
         }
 
+
+        public BaseResponse UpdateRequestStatus(int requestId, string stateId)
+        {
+
+            Request req = this._requestsRepo.Table.FirstOrDefault(r => r.Id == requestId);
+            var ag = this._agreementsRepo.Table.Where(z => z.Id == req.AgreementId).FirstOrDefault();
+            var serv = this._servicesRepo.Table.Where(p => p.Id == ag.ServiceId).FirstOrDefault();
+            var opr = this._partnersRepo.Table.Where(a => a.Id == serv.OperatorId).FirstOrDefault();
+            var part = this._partnersRepo.Table.Where(p => p.Id == ApplicationSettings.PartnerId).FirstOrDefault();
+            var user = this._usersRepo.Table.Where(u => u.Id == ApplicationSettings.UserId).FirstOrDefault();
+            string Changes = "-Status  from " + req.StateId + " to " + stateId + "\n";
+            req.StateId = stateId;
+
+            this._requestsRepo.Update(req);
+            //DB data needed for the e-mail
+            var agentUser = this._usersRepo.Table.FirstOrDefault(x => x.Id == req.BookerId);
+
+            RequestLog reqLog = new RequestLog();
+            reqLog.Date = System.DateTime.Now;
+            reqLog.Time = System.DateTime.Now.ToString("HH:mm");
+            reqLog.RequestId = req.Id;
+            reqLog.UserId = ApplicationSettings.UserId;
+            reqLog.Notes = Changes;
+            this._requestLogsRepo.Insert(reqLog);
+
+
+            //general info about the request
+            string reqDetails = String.Empty;
+
+            string og = " " + req.EventDate.ToString("dd-MM-yyyy");
+            string date = og.Replace("12:00:00 AM", " ");
+
+            Changes = "<table cellpadding='4' border='1' style='line-height:1.5;font-size:12px;border-style:groove;border-color:rgb(63, 150, 170);border-width:1px;border-collapse:collapse;'><thead style ='background-color:rgb(63,150,170);color:white;'>"
+                + "<tr><th>Field</th><th>Old value</th><th>New value</th></tr></thead><tbody><tr><td>Status</td><td>" + req.Notes + "</td><td>" + req.StateId + "</td></tr></tbody></table>";
+
+            reqDetails = "<br/><br><p></p>Request general details:<br/><br> ";
+
+            if (req.ReturnDate == null)
+            {
+
+                reqDetails = reqDetails + "<table cellpadding='4' border='1' style='line-height:1.5;font-size:12px;border-style:groove;border-color:rgb(63, 150, 170);border-width:1px;border-collapse:collapse;'><thead style ='background-color:rgb(63,150,170);color:white;'>"
+                    + "<tr><th>Field</th><th>Value</th></tr></thead><tbody><tr><td>Service</td><td>" + serv.Name + "</td></tr>"
+                    + "<tr><td> Operator </td><td> " + part.TradeName + " </td></tr>"
+                    + "<tr><td> Agent </td><td> " + agentUser.Partner.TradeName + " </td></tr>"
+                    + "<tr><td> Date </td><td> " + og + " </td></tr>" +
+                    "<tr><td>Time</td><td>" + req.EventTime + "</td></tr>" +
+                    "<tr><td>Client name</td><td>" + req.ContactName + "</td></tr>" +
+                    "<tr><td>Client e-mail</td><td>" + req.ContactEmail + "</td></tr>" +
+                    "<tr><td>Client phone</td><td>" + req.ContactPhone + "</td></tr>" +
+                    "<tr><td>Nº of persons</td><td>" + req.NrPersons + "</td></tr>" +
+                    "<tr><td>Price</td><td>" + req.Price + "</td></tr>";
+                if (req.PickupLocation != null)
+                {
+                    reqDetails = reqDetails +
+                    "<tr><td>Pick up location</td><td>" + req.PickupLocation + "</td></tr>";
+                }
+                if (req.DropoffLocation != null)
+                {
+                    reqDetails = reqDetails +
+                    "<tr><td>Dropoff location</td><td>" + req.DropoffLocation + "</td></tr>";
+                }
+                if (req.FlightNr != null)
+                {
+                    reqDetails = reqDetails +
+                    "<tr><td>Flight number</td><td>" + req.FlightNr + "</td></tr>";
+                }
+
+                reqDetails = reqDetails +
+                    "<tr><td>Client Notes</td><td>" + req.ClientNotes + "</td></tr>" +
+                    "<tr><td>Notes</td><td>" + req.Notes + "</td></tr>" +
+                    "<tr><td>Operator notes</td><td>" + req.OperatorNotes + "</td></tr></tbody></table>";
+            }
+            else
+            {
+                //og = " " + req.returnDate;
+                string returnDate = " " + req.ReturnDate?.ToString("dd-MM-yyyy");
+
+                reqDetails = reqDetails + "<table cellpadding='4' border='1' style='line-height:1.5;font-size:12px;border-style:groove;border-color:rgb(63, 150, 170);border-width:1px;border-collapse:collapse;'><thead style ='background-color:rgb(63,150,170);color:white;'>"
+                     + "<tr><th>Field</th><th>Value</th></tr></thead><tbody><tr><td>Service</td><td>" + serv.Name + "</td></tr>"
+                     + "<tr><td> Operator </td><td> " + part.TradeName + " </td></tr>"
+                     + "<tr><td> Agent </td><td> " + agentUser.Partner.TradeName + " </td></tr>"
+                     + "<tr><td> Date </td><td> " + og + " </td></tr>" +
+                     "<tr><td>Time</td><td>" + req.EventTime + "</td></tr>" +
+                     "<tr><td>Client name</td><td>" + req.ContactName + "</td></tr>" +
+                     "<tr><td>Client e-mail</td><td>" + req.ContactEmail + "</td></tr>" +
+                     "<tr><td>Client phone</td><td>" + req.ContactPhone + "</td></tr>" +
+                     "<tr><td>Nº of persons</td><td>" + req.NrPersons + "</td></tr>" +
+                     "<tr><td>Price</td><td>" + req.Price + "</td></tr>" +
+                     "<tr><td>Pick up location</td><td>" + req.PickupLocation + "</td></tr>" +
+                     "<tr><td>Dropoff location</td><td>" + req.DropoffLocation + "</td></tr>" +
+                     "<tr><td>Flight number</td><td>" + req.FlightNr + "</td></tr>" +
+                     "<tr><td>Return Date</td><td>" + returnDate + "</td></tr>" +
+                     "<tr><td>Return Time</td><td>" + req.ReturnTime + "</td></tr>" +
+                     "<tr><td>Return flight number</td><td>" + req.ReturnFlight + "</td></tr>" +
+                     "<tr><td>Return pickup</td><td>" + req.ReturnPickup + "</td></tr>" +
+                     "<tr><td>Return dropoff</td><td>" + req.ReturnDropoff + "</td></tr>" +
+                     "<tr><td>Client Notes</td><td>" + req.ClientNotes + "</td></tr>" +
+                     "<tr><td>Notes</td><td>" + req.Notes + "</td></tr>" +
+                     "<tr><td>Operator notes</td><td>" + req.OperatorNotes + "</td></tr></tbody></table>";
+            }
+
+            //Set up and forwarding e-mails
+            string time = System.DateTime.Now.ToString("HH:mm");
+            var link = "";// Request.Url.AbsoluteUri.Replace(Request.Url.PathAndQuery, "/");
+
+            string url = "ServicesBooked/Edit/" + req.Id;
+            url = link + url;
+
+            string subject = "Booking " + req.Agreement.Label + "#" + req.Id + "-" + part.TradeName + " was changed.";
+
+
+            Changes = "<br/><br>" + Changes;
+            string content = this._emailService.AgentContent(user.FullName, time) + Changes + reqDetails;
+
+            this._emailService.Email_to_send(agentUser.Partner.Email, url, content, subject);
+
+            url = "ServicesRequested/Details/" + req.Id;
+            url = link + url;
+
+            subject = "Request " + req.Agreement.Label + "#" + req.Id + "-" + agentUser.Partner.TradeName + " was changed.";
+
+            content = this._emailService.OperatorEditorContent(part.TradeName, time) + Changes + reqDetails;
+
+            this._emailService.Email_to_send(part.Email, url, content, subject);
+
+            return new BaseResponse
+            {
+                Status = HttpStatusCode.OK,
+                Message = "Request status updated"
+            };
+        }
     }
 }
