@@ -35,7 +35,7 @@ namespace Web.API.Helper
             var userId = Convert.ToInt32(user.Claims.Where(x => x.Type == "UserId").Select(x => x.Value).FirstOrDefault());
             var UserFullName = Convert.ToString(user.Claims.Where(x => x.Type == "UserFullName").Select(x => x.Value).FirstOrDefault());
             var partnerId = Convert.ToInt32(user.Claims.Where(x => x.Type == "PartnerId").Select(x => x.Value).FirstOrDefault());
-          
+            var partnerTradeName = Convert.ToString(user.Claims.Where(x => x.Type == "PartnerTradeName").Select(x => x.Value).FirstOrDefault());
             ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
             //////////////////////// Set Values in ApplicationSettings Class ///////////////////////////////////////////
@@ -43,7 +43,8 @@ namespace Web.API.Helper
             ApplicationSettings.UserId = userId;
             ApplicationSettings.UserFullName = UserFullName;
             ApplicationSettings.PartnerId = partnerId;
-           
+            ApplicationSettings.PartnerTradeName = partnerTradeName;
+
 
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
