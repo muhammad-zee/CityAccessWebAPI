@@ -46,6 +46,36 @@ namespace Web.API.Controllers
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.Message.ToString(), Body = ex.ToString() };
             }
         }
+        
+        [HttpPost("request/GetRequestsToUsForCalendar")]
+        public BaseResponse GetRequestsToUsForCalendar([FromBody]RequestsFilterVM filter)
+        {
+            try
+            {
+                return this._requestsService.GetRequestsToUsForCalendar(filter);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.Message.ToString(), Body = ex.ToString() };
+            }
+        }
+        
+        [HttpGet("request/GetRequestDetail")]
+        public BaseResponse GetRequestDetail(int requestId)
+        {
+            try
+            {
+                return this._requestsService.GetRequestDetail(requestId);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.Message.ToString(), Body = ex.ToString() };
+            }
+        }
 
         [HttpPost("request/SaveBookingRequest")]
         public BaseResponse SaveBookingRequest([FromBody]RequestVM req)
@@ -54,6 +84,22 @@ namespace Web.API.Controllers
             {
                 var state = ModelState;
                 return this._requestsService.SaveBookingRequest(req);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.Message.ToString(), Body = ex.ToString() };
+            }
+        }
+
+        [HttpGet("request/UpdateRequestStatus")]
+        public BaseResponse UpdateRequestStatus(int requestId, string stateId)
+        {
+            try
+            {
+                var state = ModelState;
+                return this._requestsService.UpdateRequestStatus(requestId, stateId);
             }
             catch (Exception ex)
             {

@@ -54,69 +54,19 @@ namespace Web.Services.Concrete
 
         public BaseResponse GetRequestsToUs(RequestsFilterVM filter)
         {
-
-
             int partnerID = ApplicationSettings.PartnerId;
             //Partner partner = this._partnersRepo.Table.Where(p => p.Id == partnerID && p.IsActive != false).FirstOrDefault();
 
-
-            IQueryable<RequestVM> queryable = null;
-            var requests = queryable;
-
-
-            var requests1 = this._dbContext.LoadStoredProcedure("ca_getRequestsToUsByPartnerId")
+            var requests = this._dbContext.LoadStoredProcedure("ca_getRequestsToUsByPartnerId")
                             .WithSqlParam("@pPartnerId", partnerID)
-                            //.WithSqlParam("@pOperatorId", filter.OperatorId)
-                            //.WithSqlParam("@pServiceId", filter.ServiceId)
-                            //.WithSqlParam("@pServiceStartDate", filter.ServiceStartDate)
-                            //.WithSqlParam("@pServiceEndDate", filter.ServiceEndDate)
-                            //.WithSqlParam("@pBookingStartDate", filter.BookingStartDate)
-                            //.WithSqlParam("@pBookingEndDate", filter.BookingEndDate)
+                            .WithSqlParam("@pOperatorId", filter.OperatorId)
+                            .WithSqlParam("@pServiceId", filter.ServiceId)
+                            .WithSqlParam("@pStatus", filter.Status)
+                            .WithSqlParam("@pServiceStartDate", filter.ServiceStartDate)
+                            .WithSqlParam("@pServiceEndDate", filter.ServiceEndDate)
+                            .WithSqlParam("@pBookingStartDate", filter.BookingStartDate)
+                            .WithSqlParam("@pBookingEndDate", filter.BookingEndDate)
                             .ExecuteStoredProc<RequestVM>();
-
-            //filtering part
-            // if (bookingFilters.Agent != null)
-            // {
-            //    requests1 = requests1.Where(a => a.Partner.tradeName == bookingFilters.Agent);
-            // }
-            // if (bookingFilters.ServTitle != null)
-            //  {
-            //      requests1 = requests1.Where(a => a.Agreement.Service.name == bookingFilters.ServTitle);
-            // }
-            // if (bookingFilters.Date != null)
-            // {
-            //    requests1 = requests1.Where(a => a.req_ForTransfer.EventDate >= bookingFilters.Date);
-            // }
-            // if (bookingFilters.Date != null && bookingFilters.Date2 != null)
-            // {
-            //     requests1 = requests1.Where(a => a.req_ForTransfer.EventDate >= bookingFilters.Date && a.req_ForTransfer.EventDate <= bookingFilters.Date2);
-            // }
-            // if (bookingFilters.BookingDate != null)
-            // {
-            //     requests1 = requests1.Where(a => a.req_ForTransfer.BookingDate >= bookingFilters.BookingDate);
-            // }
-            // if (bookingFilters.BookingDate != null && bookingFilters.BookingDate2 != null)
-            // {
-            //     requests1 = requests1.Where(a => a.req_ForTransfer.BookingDate >= bookingFilters.BookingDate && a.req_ForTransfer.BookingDate <= bookingFilters.BookingDate2);
-            // }
-
-            // if (bookingFilters.Status == null)
-            // {
-            // requests1 = requests1.Where(b => b.req_ForTransfer.StateID == "Submitted" || b.req_ForTransfer.StateID == "Approved");
-            //  requests1 = requests1.Where(a => a.req_ForTransfer.EventDate >= System.DateTime.Today);
-            // }
-            // else
-            // {
-            //   if (bookingFilters.Status != "All")
-            //   {
-            //      requests1 = requests1.Where(b => b.req_ForTransfer.StateID == bookingFilters.Status);
-            //  }
-            //  else
-            // {
-            //     requests1 = requests1.Where(b => b.req_ForTransfer.StateID != "Site Approval" && b.req_ForTransfer.StateID != "Site Canceled");
-            //  }
-            // }
-
 
             // List<SelectListItem> items = new List<SelectListItem>();
             // items.Add(new SelectListItem() { Text = "Submitted", Value = "Submitted" });
@@ -137,11 +87,67 @@ namespace Web.Services.Concrete
             // BookingFilters bookingFilters1 = new BookingFilters { Req_PartnerList = reqs, StatusFilters = items, Status = bookingFilters.Status };
 
 
-            return new BaseResponse { Status = HttpStatusCode.OK, Message = "dataretrund", Body = requests };
+            return new BaseResponse { Status = HttpStatusCode.OK, Message = "Data returned", Body = requests };
 
         }
+        public BaseResponse GetRequestsToUsForCalendar(RequestsFilterVM filter)
+        {
+            int partnerID = ApplicationSettings.PartnerId;
+            //Partner partner = this._partnersRepo.Table.Where(p => p.Id == partnerID && p.IsActive != false).FirstOrDefault();
+            var requests = this._dbContext.LoadStoredProcedure("ca_getRequestsToUsByPartnerId")
+                            .WithSqlParam("@pPartnerId", partnerID)
+                            .WithSqlParam("@pOperatorId", filter.OperatorId)
+                            .WithSqlParam("@pServiceId", filter.ServiceId)
+                            .WithSqlParam("@pStatus", filter.Status)
+                            .WithSqlParam("@pServiceStartDate", filter.ServiceStartDate)
+                            .WithSqlParam("@pServiceEndDate", filter.ServiceEndDate)
+                            .WithSqlParam("@pBookingStartDate", filter.BookingStartDate)
+                            .WithSqlParam("@pBookingEndDate", filter.BookingEndDate)
+                            .ExecuteStoredProc<RequestVM>();
+            var requestsCalendarView = BuildTree(requests);
 
-        public void exportServicesToExcelSheet()
+
+            return new BaseResponse { Status = HttpStatusCode.OK, Message = "dataretrund", Body = requestsCalendarView };
+
+        }
+        private IList<RequestsCalendarViewVM> BuildTree(IEnumerable<RequestVM> reqList)
+        {
+            List<RequestsCalendarViewVM> calendarView = new();
+            List<RequestsTimeSlots> timeSlots = null;
+            var dateList = reqList.Select(r => r.EventDate).Distinct();
+            foreach (var date in dateList)
+            {
+                timeSlots = new();
+                var timeList = reqList.Where(r=>r.EventDate==date).Select(r => r.EventTime).Distinct();
+                foreach (var time in timeList)
+                {
+                    var requests = reqList.Where(r => r.EventTime == time).ToList();
+                    var slot = new RequestsTimeSlots
+                    {
+                        Time = time,
+                        Requests = requests
+                    };
+                    timeSlots.Add(slot);
+                }
+                calendarView.Add(new RequestsCalendarViewVM
+                {
+                    Date = date,
+                    Slotes = timeSlots
+                });
+            }
+            return calendarView;
+        }
+        public BaseResponse GetRequestDetail(int requestId)
+        {
+            var request = this._requestsRepo.Table.FirstOrDefault(r => r.Id == requestId);
+            return new BaseResponse
+            {
+                Status = HttpStatusCode.OK,
+                Message = "Request detail returned",
+                Body = request
+            };
+        }
+        private void exportServicesToExcelSheet()
         {
 
             //StringWriter sw = new StringWriter();
@@ -301,7 +307,7 @@ namespace Web.Services.Concrete
             response.Message = "Service booked successfully";
             return response;
         }
-        public void SendServiceBookedEmail(Request request, Partner part, Agreement ag, Service serv, Partner opr, bool? FromPartnerSite)
+        private void SendServiceBookedEmail(Request request, Partner part, Agreement ag, Service serv, Partner opr, bool? FromPartnerSite)
         {
 
             string og = " " + request.EventDate.ToString("dd-MM-yyyy");
@@ -595,5 +601,6 @@ namespace Web.Services.Concrete
                 Message = "Request status updated"
             };
         }
+
     }
 }

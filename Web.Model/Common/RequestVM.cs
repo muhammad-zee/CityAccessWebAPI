@@ -93,5 +93,6 @@ namespace Web.Model.Common
         public string ExtraText1 { get; set; }
         public bool? FromPartnerSite { get; set; } = null;
         public string PartnerName { get; set; }
+        public string ServiceImage { get; set; }
     }
 }

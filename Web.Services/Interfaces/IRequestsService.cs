@@ -11,6 +11,8 @@ namespace Web.Services.Interfaces
     public interface IRequestsService
     {
         BaseResponse GetRequestsToUs(RequestsFilterVM filter);
+        BaseResponse GetRequestsToUsForCalendar(RequestsFilterVM filter);
+        BaseResponse GetRequestDetail(int requestId);
         BaseResponse UpdateRequestStatus(int requestId, string stateId);
         BaseResponse SaveBookingRequest(RequestVM req);
     }
