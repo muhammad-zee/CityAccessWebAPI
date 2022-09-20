@@ -69,18 +69,18 @@ namespace Web.Services.Concrete
             }
         }
 
-        public BaseResponse UpdatePassword(UserVM password)
+        public BaseResponse UpdatePassword(UserVM user)
         {
-            var dbUser = this._usersRepo.Table.Where(x => x.Id == password.Id && x.IsActive != false).FirstOrDefault();
-            if (dbUser.Password == password.OldPassword)
+            var dbUser = this._usersRepo.Table.Where(x => x.Id == user.Id && x.IsActive != false).FirstOrDefault();
+            if (dbUser.Password == user.OldPassword)
             {
-                dbUser.Password = password.NewPassword;
+                dbUser.Password = user.NewPassword;
                 this._usersRepo.Update(dbUser);
-                return new BaseResponse { Status = HttpStatusCode.OK, Message = "Password change successfully" };
+                return new BaseResponse { Status = HttpStatusCode.OK, Message = "Password changed successfully" };
             }
             else
             {
-                return new BaseResponse { Status = HttpStatusCode.BadRequest, Message = "Password not same" };
+                return new BaseResponse { Status = HttpStatusCode.BadRequest, Message = "Password incorrect" };
             }
         }
         public BaseResponse CheckIfUsernameAvailable(string Username)

@@ -60,13 +60,12 @@ namespace Web.Services.Concrete
                     ContactPhone = param.ContactPhone,
                     Email = param.NotificationEmail,
                     InvoiceName = param.InvoiceName,
-                    // VatNumber = partner.VatNumber,
                     InvoiceAddress = param.InvoiceAddress,
                     IsAgent = param.IsAgent,
                     IsOperator = param.IsOperator,
                     IsActive = param.IsActive,
                     IsPublic = param.IsPublic,
-                    // Country = partner.Country,
+                    CountryId = param.Country,
                     //  Logo = partner.Logo,
                 };
                 this._partnersRepo.Insert(pa);
@@ -98,17 +97,16 @@ namespace Web.Services.Concrete
             }
             return response;
         }
-        public BaseResponse PartnerSuccess(Partner x)
+        private void PartnerSuccess(Partner x)
         {
 
             string subject = "Your City Access partner account creation was successfull.";
             string content = "<br/><br> After your successfull partner registration follow the link below to register your admin user.";
 
-            var verifyUrl = "/Register/Index?inv=" + x;
+            var verifyUrl = "/Register/Index?inv=" + x.Id;
             //var link = Request.Url.AbsoluteUri.Replace(Request.Url.PathAndQuery, verifyUrl);
 
             this._emailService.Email_to_send(x.ContactEmail, verifyUrl, content, subject);
-            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Account successfully create" };
         }
 
         public BaseResponse GetAllPartner()

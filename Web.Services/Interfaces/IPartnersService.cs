@@ -13,7 +13,6 @@ namespace Web.Services.Interfaces
     {
         BaseResponse InvitePartner(PartnerInvitationVM partner);
         BaseResponse CreatePartner(PartnerVM partner);
-        BaseResponse PartnerSuccess(Partner partID);
         BaseResponse GetAllPartner();
     }
 }

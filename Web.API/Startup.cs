@@ -138,6 +138,7 @@ namespace Web.API
             services.AddTransient(typeof(IAgreementsService), typeof(AgreementsService));
             services.AddTransient(typeof(IRequestsService), typeof(RequestsService));
             services.AddTransient(typeof(IUsersService), typeof(UsersService));
+            services.AddTransient(typeof(IPartnersService), typeof(PartnersService));
             //Register Services Repositories
 
             //services.AddAntiforgery(options =>
