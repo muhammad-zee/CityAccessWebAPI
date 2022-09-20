@@ -10,6 +10,7 @@ using Web.Data.Models;
 using Web.Services.CommonVM;
 using Web.Model.Common;
 using System.Net;
+using Web.Services.Helper;
 
 namespace Web.Services.Concrete
 {
@@ -69,12 +70,13 @@ namespace Web.Services.Concrete
             }
         }
 
-        public BaseResponse UpdatePassword(UserVM password)
+        public BaseResponse UpdatePassword(UserVM user)
         {
-            var dbUser = this._usersRepo.Table.Where(x => x.Id == password.Id && x.IsActive != false).FirstOrDefault();
-            if (dbUser.Password == password.OldPassword)
+            var dbUser = this._usersRepo.Table.Where(x => x.Id == user.Id && x.IsActive != false).FirstOrDefault();
+            user.OldPassword = Encryption.MD5Hash(user.OldPassword);
+            if (dbUser.Password == user.OldPassword)
             {
-                dbUser.Password = password.NewPassword;
+                dbUser.Password = Encryption.MD5Hash(user.NewPassword);
                 this._usersRepo.Update(dbUser);
                 return new BaseResponse { Status = HttpStatusCode.OK, Message = "Password change successfully" };
             }
