@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -647,7 +648,7 @@ namespace Web.Services.Concrete
                 Message = "Request status updated"
             };
         }
-        public BaseResponse Details( int requestId, String stateID, String operatorNotes, String content1, String Subject, String Cc, String ResponsibleID)
+        public BaseResponse UpdateRequestAssignee(int requestId, string stateID, string operatorNotes,string ResponsibleID)
         {
 
 
@@ -699,14 +700,15 @@ namespace Web.Services.Concrete
 
                 string NewResponsible = "no value";
 
-                if (req.User1 != null)
+                if (req != null)
                 {
-                    oldResponsible = req.User1.fullName;
+                    var User1 = this._usersRepo.Table.FirstOrDefault(x => x.Id == req.BookerId);
+                    oldResponsible = User1.FullName;
                 }
 
                 if (newResponsible != null)
                 {
-                    NewResponsible = newResponsible.fullName;
+                    NewResponsible = newResponsible.FullName;
                 }
 
                 Changes = Changes + "- Assigned from " + oldResponsible + " to " + NewResponsible + "\n";
@@ -723,31 +725,29 @@ namespace Web.Services.Concrete
             Changes1 = Changes1 + "</tbody></table>";
 
             //DB data needed for the e-mail
-            var agentUser = db.Users.Where(x => x.ID == req.bookerId).Include(x => x.Partner).FirstOrDefault();
+            var agentUser = this._usersRepo.Table.Where(x => x.Id == req.BookerId).FirstOrDefault();
+            agentUser.Partner = this._partnersRepo.Table.FirstOrDefault(x => x.Id == agentUser.PartnerId && x.IsActive == true);
 
-            try
-            {
                 if (Changes != string.Empty)
                 {
-                    db.Entry(req).State = EntityState.Modified;
+                    _requestsRepo.Update(req);
 
                     RequestLog reqLog = new RequestLog();
                     reqLog.Date = System.DateTime.Now;
                     reqLog.Time = System.DateTime.Now.ToString("HH:mm");
-                    reqLog.requestID = req.ID;
-                    reqLog.userID = (int)Session["userID"];
-                    reqLog.notes = Changes;
-                    db.RequestLogs.Add(reqLog);
-                    db.SaveChanges();
+                    reqLog.RequestId = req.Id;
+                    reqLog.UserId = ApplicationSettings.UserId;
+                    reqLog.Notes = Changes;
+                    this._requestLogsRepo.Insert(reqLog);
 
                     //Set up and forwarding e-mails
 
-                    var link = Request.Url.AbsoluteUri.Replace(Request.Url.PathAndQuery, "/");
+                    //var link = Request.url.AbsoluteUri.Replace(Request.url.PathAndQuery, "/");
 
-                    string url = "ServicesBooked/Edit/" + req.ID;
-                    url = link + url;
+                    string url = "ServicesBooked/Edit/" + req.Id;
+                    //url = link + url;
 
-                    string subject = "Booking " + req.Agreement.label + "#" + req.ID + "-" + part.tradeName + " was changed.";
+                    string subject = "Booking " + req.Agreement.Label + "#" + req.Id + "-" + part.TradeName + " was changed.";
 
                     Changes = "<br/><br>" + Changes1;
 
@@ -755,108 +755,107 @@ namespace Web.Services.Concrete
                     //general info about the request
                     string reqDetails = String.Empty;
 
-                    string og = " " + req.eventDate.ToString("dd-MM-yyyy");
+                    string og = " " + req.EventDate.ToString("dd-MM-yyyy");
                     string date = og.Replace("12:00:00 AM", " ");
 
                     reqDetails = "<br/><br><p></p>Request general details:<br/><br> ";
 
-                    if (req.returnDate == null)
+                    if (req.ReturnDate == null)
                     {
 
                         reqDetails = reqDetails + "<table cellpadding='4' border='1' style='line-height:1.5;font-size:12px;border-style:groove;border-color:rgb(63, 150, 170);border-width:1px;border-collapse:collapse;'><thead style ='background-color:rgb(63,150,170);color:white;'>"
                             + "<tr><th>Field</th><th>Value</th></tr></thead>" +
                             "<tbody style='line-height: 1.5;font-size: 12px;'>" +
-                            "<tr><td>Service</td><td>" + serv.name + "</td></tr>"
-                            + "<tr><td> Operator </td><td> " + part.tradeName + " </td></tr>"
-                            + "<tr><td> Agent </td><td> " + agentUser.Partner.tradeName + " </td></tr>"
+                            "<tr><td>Service</td><td>" + serv.Name + "</td></tr>"
+                            + "<tr><td> Operator </td><td> " + part.TradeName + " </td></tr>"
+                            + "<tr><td> Agent </td><td> " + agentUser.FullName + " </td></tr>"
                             + "<tr><td> Date </td><td> " + og + " </td></tr>" +
-                            "<tr><td>Time</td><td>" + req.eventTime + "</td></tr>" +
-                            "<tr><td>Client name</td><td>" + req.contactName + "</td></tr>" +
-                            "<tr><td>Client e-mail</td><td>" + req.contactEmail + "</td></tr>" +
-                            "<tr><td>Client phone</td><td>" + req.contactPhone + "</td></tr>" +
-                            "<tr><td>Nº of persons</td><td>" + req.nrPersons + "</td></tr>" +
-                            "<tr><td>Price</td><td>" + req.price + "</td></tr>";
-                        if (req.pickupLocation != null)
+                            "<tr><td>Time</td><td>" + req.EventTime + "</td></tr>" +
+                            "<tr><td>Client name</td><td>" + req.ContactName + "</td></tr>" +
+                            "<tr><td>Client e-mail</td><td>" + req.ContactEmail + "</td></tr>" +
+                            "<tr><td>Client phone</td><td>" + req.ContactPhone + "</td></tr>" +
+                            "<tr><td>Nº of persons</td><td>" + req.NrPersons + "</td></tr>" +
+                            "<tr><td>Price</td><td>" + req.Price + "</td></tr>";
+                        if (req.PickupLocation != null)
                         {
                             reqDetails = reqDetails +
-                            "<tr><td>Pick up location</td><td>" + req.pickupLocation + "</td></tr>";
+                            "<tr><td>Pick up location</td><td>" + req.PickupLocation + "</td></tr>";
                         }
-                        if (req.dropoffLocation != null)
+                        if (req.DropoffLocation != null)
                         {
                             reqDetails = reqDetails +
-                            "<tr><td>Dropoff location</td><td>" + req.dropoffLocation + "</td></tr>";
+                            "<tr><td>Dropoff location</td><td>" + req.DropoffLocation + "</td></tr>";
                         }
-                        if (req.flightNr != null)
+                        if (req.FlightNr != null)
                         {
                             reqDetails = reqDetails +
-                            "<tr><td>Flight number</td><td>" + req.flightNr + "</td></tr>";
+                            "<tr><td>Flight number</td><td>" + req.FlightNr + "</td></tr>";
                         }
                         reqDetails = reqDetails +
                             "<tr><td>Client notes</td><td>" + req.ClientNotes + "</td></tr>" +
-                            "<tr><td>Notes</td><td>" + req.notes + "</td></tr>" +
+                            "<tr><td>Notes</td><td>" + req.Notes + "</td></tr>" +
                             "<tr><td>Operator notes</td><td>" + req.OperatorNotes + "</td></tr></tbody></table>";
                     }
                     else
                     {
                         //og = " " + req.returnDate;
-                        string returnDate = " " + req.returnDate?.ToString("dd-MM-yyyy");
+                        string returnDate = " " + req.ReturnDate?.ToString("dd-MM-yyyy");
 
                         reqDetails = reqDetails + "<table cellpadding='4' border='1' style='line-height:1.5;font-size:12px;border-style:groove;border-color:rgb(63, 150, 170);border-width:1px;border-collapse:collapse;'><thead style ='background-color:rgb(63,150,170);color:white;'>" +
                             "<tr><th>Field</th><th>Value</th></tr></thead>" +
                             "<tbody  style='line-height: 2;font-size: 12px;'>" +
-                            "<tr><td>Service</td><td>" + serv.name + "</td></tr>"
-                            + "<tr><td> Operator </td><td> " + part.tradeName + " </td></tr>"
-                             + "<tr><td> Agent </td><td> " + agentUser.Partner.tradeName + " </td></tr>"
+                            "<tr><td>Service</td><td>" + serv.Name + "</td></tr>"
+                            + "<tr><td> Operator </td><td> " + part.TradeName + " </td></tr>"
+                             + "<tr><td> Agent </td><td> " + agentUser.Partner.TradeName + " </td></tr>"
                              + "<tr><td> Date </td><td> " + og + " </td></tr>" +
-                             "<tr><td>Time</td><td>" + req.eventTime + "</td></tr>" +
-                             "<tr><td>Client name</td><td>" + req.contactName + "</td></tr>" +
-                             "<tr><td>Client e-mail</td><td>" + req.contactEmail + "</td></tr>" +
-                             "<tr><td>Client phone</td><td>" + req.contactPhone + "</td></tr>" +
-                             "<tr><td>Nº of persons</td><td>" + req.nrPersons + "</td></tr>" +
-                             "<tr><td>Price</td><td>" + req.price + "</td></tr>" +
-                             "<tr><td>Pick up location</td><td>" + req.pickupLocation + "</td></tr>" +
-                             "<tr><td>Dropoff location</td><td>" + req.dropoffLocation + "</td></tr>" +
-                             "<tr><td>Flight number</td><td>" + req.flightNr + "</td></tr>" +
+                             "<tr><td>Time</td><td>" + req.EventTime + "</td></tr>" +
+                             "<tr><td>Client name</td><td>" + req.ContactName + "</td></tr>" +
+                             "<tr><td>Client e-mail</td><td>" + req.ContactEmail + "</td></tr>" +
+                             "<tr><td>Client phone</td><td>" + req.ContactPhone + "</td></tr>" +
+                             "<tr><td>Nº of persons</td><td>" + req.NrPersons + "</td></tr>" +
+                             "<tr><td>Price</td><td>" + req.Price + "</td></tr>" +
+                             "<tr><td>Pick up location</td><td>" + req.PickupLocation + "</td></tr>" +
+                             "<tr><td>Dropoff location</td><td>" + req.DropoffLocation + "</td></tr>" +
+                             "<tr><td>Flight number</td><td>" + req.FlightNr + "</td></tr>" +
                              "<tr><td>Return Date</td><td>" + returnDate + "</td></tr>" +
-                             "<tr><td>Return Time</td><td>" + req.returnTime + "</td></tr>" +
-                             "<tr><td>Return flight number</td><td>" + req.returnFlight + "</td></tr>" +
-                             "<tr><td>Return pickup</td><td>" + req.returnPickup + "</td></tr>" +
-                             "<tr><td>Return dropoff</td><td>" + req.returnDropoff + "</td></tr>" +
+                             "<tr><td>Return Time</td><td>" + req.ReturnTime + "</td></tr>" +
+                             "<tr><td>Return flight number</td><td>" + req.ReturnFlight + "</td></tr>" +
+                             "<tr><td>Return pickup</td><td>" + req.ReturnPickup + "</td></tr>" +
+                             "<tr><td>Return dropoff</td><td>" + req.ReturnDropoff + "</td></tr>" +
                              "<tr><td>Client notes</td><td>" + req.ClientNotes + "</td></tr>" +
-                             "<tr><td>Notes</td><td>" + req.notes + "</td></tr>" +
+                             "<tr><td>Notes</td><td>" + req.Notes + "</td></tr>" +
                              "<tr><td>Operator notes</td><td>" + req.OperatorNotes + "</td></tr></tbody></table>";
                     }
 
 
                     string time = System.DateTime.Now.ToString("HH:mm");
-                    string content = email.AgentContent(user.fullName, time) + Changes + reqDetails;
+                    string content = this._emailService.AgentContent(user.FullName, time) + Changes + reqDetails;
 
-                    email.Email_to_send(agentUser.Partner.email, url, content, subject);
+                    this._emailService.Email_to_send(agentUser.Partner.Email, url, content, subject);
 
-                    url = "ServicesRequested/Details/" + req.ID;
-                    url = link + url;
+                    url = "ServicesRequested/Details/" + req.Id;
+                    //url = link + url;
 
-                    subject = "Request " + req.Agreement.label + "#" + req.ID + "-" + agentUser.Partner.tradeName + " was changed.";
+                    subject = "Request " + req.Agreement.Label + "#" + req.Id + "-" + agentUser.Partner.TradeName + " was changed.";
 
 
-                    content = email.OperatorEditorContent(part.tradeName, time) + Changes + reqDetails;
-                    email.Email_to_send(part.email, url, content, subject);
+                    content = this._emailService.OperatorEditorContent(part.TradeName, time) + Changes + reqDetails;
+                    this._emailService.Email_to_send(part.Email, url, content, subject);
 
-                    //content = email.OperatorEditorContent() + Changes;
-                    //email.Email_to_send(user.email, url, content, subject);
+                //content = email.OperatorEditorContent() + Changes;
+                //email.Email_to_send(user.email, url, content, subject);
+               
 
                 }
-            }
-            catch (DbEntityValidationException dbEx)
-            {
-                var url = "ServicesRequested/Details";
-                var userID = (int)Session["userID"];
 
-                auxMethods.ErrorHandling(dbEx, url, userID);
+                return new BaseResponse()
+                {
+                Status = HttpStatusCode.OK,
+                Message = "Request status Assign"
+                };
 
-                return RedirectToAction("Index", "Error");
-            }
-            return RedirectToAction("Index", "ServicesRequested");
+
+
         }
 
     }

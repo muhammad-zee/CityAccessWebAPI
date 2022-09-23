@@ -15,5 +15,6 @@ namespace Web.Services.Interfaces
         BaseResponse GetRequestDetail(int requestId);
         BaseResponse UpdateRequestStatus(int requestId, string stateId);
         BaseResponse SaveBookingRequest(RequestVM req);
+        BaseResponse UpdateRequestAssignee(int requestId, string stateID, string operatorNotes, string ResponsibleID);
     }
 }
