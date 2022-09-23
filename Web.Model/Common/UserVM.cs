@@ -22,5 +22,8 @@ namespace Web.Model.Common
         public string OldPassword { get; set; }
 
         public string NewPassword { get; set; }
+        public bool IsActive { get; set; }
+
+        public bool IsAdmin { get; set; }
     }
 }

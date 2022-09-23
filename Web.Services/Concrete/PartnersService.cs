@@ -114,6 +114,11 @@ namespace Web.Services.Concrete
             var partnerList = _partnersRepo.Table.Where(p => p.IsActive == true).ToList();
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Partner list return", Body = partnerList };
         }
+        public BaseResponse GetPartnerDetails(int PartnerId)
+        {
+            var partner = this._partnersRepo.Table.Where(p => p.Id == PartnerId && p.IsActive != false).FirstOrDefault();
+            return new BaseResponse { Status = HttpStatusCode.OK, Message = "Data returned", Body = partner };
+        }
 
     }
 }

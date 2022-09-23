@@ -14,5 +14,6 @@ namespace Web.Services.Interfaces
         BaseResponse InvitePartner(PartnerInvitationVM partner);
         BaseResponse CreatePartner(PartnerVM partner);
         BaseResponse GetAllPartner();
+        BaseResponse GetPartnerDetails(int PartnerId);
     }
 }

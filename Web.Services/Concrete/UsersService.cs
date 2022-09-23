@@ -32,6 +32,7 @@ namespace Web.Services.Concrete
             if (user.Id > 0)
             {
                 var dbUser = this._usersRepo.Table.Where(x => x.Id == user.Id && x.IsActive != false).FirstOrDefault();
+                user.ConfirmPassword = Encryption.MD5Hash(user.ConfirmPassword);
                 if (dbUser.Password == user.ConfirmPassword)
                 {
 
@@ -39,6 +40,8 @@ namespace Web.Services.Concrete
                     dbUser.FullName = user.FullName;
                     dbUser.Email = user.Email;
                     dbUser.Phone = user.Phone;
+                    dbUser.IsActive = user.IsActive;
+                    dbUser.IsAdmin = user.IsAdmin;
                     this._usersRepo.Update(dbUser);
                     return new BaseResponse { Status = HttpStatusCode.OK, Message = "User's data updated successfully" };
                 }
@@ -96,6 +99,11 @@ namespace Web.Services.Concrete
                 return new BaseResponse { Status = HttpStatusCode.OK, Message = "Username available", Body = new { usernameAvailable = true, message = "Username available" } };
 
             }
+        }
+        public BaseResponse GetAllUser()
+        {
+            var userList = _usersRepo.Table.Where(x => x.IsActive == true).ToList();
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "User's list returned", Body = userList };
         }
 
     }
