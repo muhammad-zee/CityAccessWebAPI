@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -8,7 +9,6 @@ using Web.Data.Models;
 using Web.DLL.Generic_Repository;
 using Web.Model;
 using Web.Model.Common;
-using Web.Services.CommonVM;
 using Web.Services.Enums;
 using Web.Services.Helper;
 using Web.Services.Interfaces;
@@ -118,7 +118,7 @@ namespace Web.Services.Concrete
             foreach (var date in dateList)
             {
                 timeSlots = new();
-                var timeList = reqList.Where(r=>r.EventDate==date).Select(r => r.EventTime).Distinct();
+                var timeList = reqList.Where(r => r.EventDate == date).Select(r => r.EventTime).Distinct();
                 foreach (var time in timeList)
                 {
                     var requests = reqList.Where(r => r.EventTime == time).ToList();
@@ -140,11 +140,58 @@ namespace Web.Services.Concrete
         public BaseResponse GetRequestDetail(int requestId)
         {
             var request = this._requestsRepo.Table.FirstOrDefault(r => r.Id == requestId);
+            var agreement = this._agreementsRepo.Table.FirstOrDefault(a => a.Id == request.AgreementId);
+            var partner = this._partnersRepo.Table.FirstOrDefault(p => p.Id == agreement.PartnerId && p.IsActive == true);
+            var requestVM = new RequestVM
+            {
+                ID = request.Id,
+                AgreementID = request.AgreementId,
+                AgreementName = agreement.Label,
+                PartnerName = partner.TradeName,
+                Price = request.Price,
+                EventDate = request.EventDate,
+                EventTime = request.EventTime,
+                Notes = request.Notes,
+                ContactName = request.ContactName,
+                ContactEmail = request.ContactEmail,
+                ContactPhone = request.ContactPhone,
+                NrPersons = request.NrPersons,
+                PickupLocation = request.PickupLocation,
+                DropoffLocation = request.DropoffLocation,
+                ReturnPickup = request.ReturnPickup,
+                ReturnDropoff = request.ReturnDropoff,
+                FlightNr = request.FlightNr,
+                ReturnDate = request.ReturnDate,
+                ReturnTime = request.ReturnTime,
+                ReturnFlight = request.ReturnFlight,
+                StateID = request.StateId,
+                Reference = request.Reference,
+                BookDate = request.BookDate,
+                BookTime = request.BookTime,
+                ExtraDate1 = request.ExtraDate1,
+                ExtraDate2 = request.ExtraDate2,
+                //ExtraDate3=request.ExtraDate3,
+                ExtraTime1 = request.ExtraTime1,
+                //ExtraTime2=request.ExtraTime2,
+                //ExtraTime3=request.ExtraTime3,
+                ExtraText1 = request.ExtraText1,
+                //ExtraText2=request.ExtraText2,
+                //ExtraText3=request.ExtraText3,
+                ExtraMultiText1 = request.ExtraMultiText1,
+                //ExtraMultiText2=request.ExtraMultiText2,
+                //ExtraMultiText3=request.ExtraMultiText3,
+                //OperatorNotes=request.OperatorNotes,
+                //EventId=request.EventId,
+                //ResponsibleId=request.ResponsibleId,
+                ClientNotes = request.ClientNotes,
+                ServiceImage = "/Images/logo.png"
+
+            };
             return new BaseResponse
             {
                 Status = HttpStatusCode.OK,
                 Message = "Request detail returned",
-                Body = request
+                Body = requestVM
             };
         }
         private void exportServicesToExcelSheet()
@@ -245,8 +292,8 @@ namespace Web.Services.Concrete
                 DropoffLocation = requestParam.DropoffLocation,
                 FlightNr = requestParam.FlightNr,
                 //HasReturn=requestParam.hasreturn,
-                ReturnDate = requestParam.returnDate,
-                ReturnTime = requestParam.returnTime,
+                ReturnDate = requestParam.ReturnDate,
+                ReturnTime = requestParam.ReturnTime,
                 ReturnFlight = requestParam.ReturnFlight,
                 ReturnPickup = requestParam.ReturnPickup,
                 ReturnDropoff = requestParam.ReturnDropoff,
@@ -600,6 +647,215 @@ namespace Web.Services.Concrete
                 Status = HttpStatusCode.OK,
                 Message = "Request status updated"
             };
+        }
+        public BaseResponse UpdateRequestAssignee(int requestId, string stateID, string operatorNotes,string ResponsibleID)
+        {
+
+
+            int? responsibleID = null;
+
+            if (ResponsibleID != "")
+            {
+                responsibleID = Int32.Parse(ResponsibleID);
+            }
+
+
+
+            Request req = this._requestsRepo.Table.FirstOrDefault(r => r.Id == requestId);
+            var ag = this._agreementsRepo.Table.Where(z => z.Id == req.AgreementId).FirstOrDefault();
+            var serv = this._servicesRepo.Table.Where(p => p.Id == ag.ServiceId).FirstOrDefault();
+            var opr = this._partnersRepo.Table.Where(a => a.Id == serv.OperatorId).FirstOrDefault();
+            var part = this._partnersRepo.Table.Where(p => p.Id == ApplicationSettings.PartnerId).FirstOrDefault();
+            var user = this._usersRepo.Table.Where(u => u.Id == ApplicationSettings.UserId).FirstOrDefault();
+            var newResponsible = this._usersRepo.Table.Where(u => u.Id == responsibleID).FirstOrDefault();
+
+            string Changes = string.Empty;
+
+            string Changes1 = "<table cellpadding='4' border='1' style='line-height:1.5;font-size:12px;border-style:groove;border-color:rgb(63, 150, 170);border-width:1px;border-collapse:collapse;'><thead style ='background-color:rgb(63,150,170);color:white;'>" +
+                "<tr><th>Field</th><th>Old value</th><th>New value</th></tr></thead><tbody>";
+            if (req.StateId != stateID && stateID != "")
+            {
+                Changes = "-Status  from " + req.StateId + " to " + stateID + "\n";
+                Changes1 = Changes1 + "<tr><td>Status</td><td>" + req.StateId + "</td><td>" + stateID + "</td></tr>";
+                req.StateId = stateID;
+            }
+            if (req.OperatorNotes == null && operatorNotes != "")
+            {
+                Changes = Changes + "-Operator notes from no value to " + operatorNotes + "\n";
+                Changes1 = Changes1 + "<tr><td>Operator notes</td><td>No value</td><td>" + operatorNotes + "</td></tr>";
+                req.OperatorNotes = operatorNotes;
+            }
+            else
+            {
+                if (req.OperatorNotes != operatorNotes && operatorNotes != "")
+                {
+                    Changes = Changes + "-Operator notes from " + req.OperatorNotes + " to " + operatorNotes + "\n";
+                    Changes1 = Changes1 + "<tr><td>Operator notes</td><td>" + req.OperatorNotes + "</td><td>" + operatorNotes + "</td></tr>";
+                    req.OperatorNotes = operatorNotes;
+                }
+            }
+            if (req.ResponsibleId != responsibleID && (newResponsible != null || responsibleID == 0))
+            {
+                string oldResponsible = " no value ";
+
+                string NewResponsible = "no value";
+
+                if (req != null)
+                {
+                    var User1 = this._usersRepo.Table.FirstOrDefault(x => x.Id == req.BookerId);
+                    oldResponsible = User1.FullName;
+                }
+
+                if (newResponsible != null)
+                {
+                    NewResponsible = newResponsible.FullName;
+                }
+
+                Changes = Changes + "- Assigned from " + oldResponsible + " to " + NewResponsible + "\n";
+                Changes1 = Changes1 + "<tr><td>Assigned</td><td>" + oldResponsible + "</td><td>" + NewResponsible + "</td></tr>";
+
+                if (responsibleID == 0)
+                {
+                    responsibleID = null;
+                }
+
+                req.ResponsibleId = responsibleID;
+            }
+
+            Changes1 = Changes1 + "</tbody></table>";
+
+            //DB data needed for the e-mail
+            var agentUser = this._usersRepo.Table.Where(x => x.Id == req.BookerId).FirstOrDefault();
+            agentUser.Partner = this._partnersRepo.Table.FirstOrDefault(x => x.Id == agentUser.PartnerId && x.IsActive == true);
+
+                if (Changes != string.Empty)
+                {
+                    _requestsRepo.Update(req);
+
+                    RequestLog reqLog = new RequestLog();
+                    reqLog.Date = System.DateTime.Now;
+                    reqLog.Time = System.DateTime.Now.ToString("HH:mm");
+                    reqLog.RequestId = req.Id;
+                    reqLog.UserId = ApplicationSettings.UserId;
+                    reqLog.Notes = Changes;
+                    this._requestLogsRepo.Insert(reqLog);
+
+                    //Set up and forwarding e-mails
+
+                    //var link = Request.url.AbsoluteUri.Replace(Request.url.PathAndQuery, "/");
+
+                    string url = "ServicesBooked/Edit/" + req.Id;
+                    //url = link + url;
+
+                    string subject = "Booking " + req.Agreement.Label + "#" + req.Id + "-" + part.TradeName + " was changed.";
+
+                    Changes = "<br/><br>" + Changes1;
+
+
+                    //general info about the request
+                    string reqDetails = String.Empty;
+
+                    string og = " " + req.EventDate.ToString("dd-MM-yyyy");
+                    string date = og.Replace("12:00:00 AM", " ");
+
+                    reqDetails = "<br/><br><p></p>Request general details:<br/><br> ";
+
+                    if (req.ReturnDate == null)
+                    {
+
+                        reqDetails = reqDetails + "<table cellpadding='4' border='1' style='line-height:1.5;font-size:12px;border-style:groove;border-color:rgb(63, 150, 170);border-width:1px;border-collapse:collapse;'><thead style ='background-color:rgb(63,150,170);color:white;'>"
+                            + "<tr><th>Field</th><th>Value</th></tr></thead>" +
+                            "<tbody style='line-height: 1.5;font-size: 12px;'>" +
+                            "<tr><td>Service</td><td>" + serv.Name + "</td></tr>"
+                            + "<tr><td> Operator </td><td> " + part.TradeName + " </td></tr>"
+                            + "<tr><td> Agent </td><td> " + agentUser.FullName + " </td></tr>"
+                            + "<tr><td> Date </td><td> " + og + " </td></tr>" +
+                            "<tr><td>Time</td><td>" + req.EventTime + "</td></tr>" +
+                            "<tr><td>Client name</td><td>" + req.ContactName + "</td></tr>" +
+                            "<tr><td>Client e-mail</td><td>" + req.ContactEmail + "</td></tr>" +
+                            "<tr><td>Client phone</td><td>" + req.ContactPhone + "</td></tr>" +
+                            "<tr><td>Nº of persons</td><td>" + req.NrPersons + "</td></tr>" +
+                            "<tr><td>Price</td><td>" + req.Price + "</td></tr>";
+                        if (req.PickupLocation != null)
+                        {
+                            reqDetails = reqDetails +
+                            "<tr><td>Pick up location</td><td>" + req.PickupLocation + "</td></tr>";
+                        }
+                        if (req.DropoffLocation != null)
+                        {
+                            reqDetails = reqDetails +
+                            "<tr><td>Dropoff location</td><td>" + req.DropoffLocation + "</td></tr>";
+                        }
+                        if (req.FlightNr != null)
+                        {
+                            reqDetails = reqDetails +
+                            "<tr><td>Flight number</td><td>" + req.FlightNr + "</td></tr>";
+                        }
+                        reqDetails = reqDetails +
+                            "<tr><td>Client notes</td><td>" + req.ClientNotes + "</td></tr>" +
+                            "<tr><td>Notes</td><td>" + req.Notes + "</td></tr>" +
+                            "<tr><td>Operator notes</td><td>" + req.OperatorNotes + "</td></tr></tbody></table>";
+                    }
+                    else
+                    {
+                        //og = " " + req.returnDate;
+                        string returnDate = " " + req.ReturnDate?.ToString("dd-MM-yyyy");
+
+                        reqDetails = reqDetails + "<table cellpadding='4' border='1' style='line-height:1.5;font-size:12px;border-style:groove;border-color:rgb(63, 150, 170);border-width:1px;border-collapse:collapse;'><thead style ='background-color:rgb(63,150,170);color:white;'>" +
+                            "<tr><th>Field</th><th>Value</th></tr></thead>" +
+                            "<tbody  style='line-height: 2;font-size: 12px;'>" +
+                            "<tr><td>Service</td><td>" + serv.Name + "</td></tr>"
+                            + "<tr><td> Operator </td><td> " + part.TradeName + " </td></tr>"
+                             + "<tr><td> Agent </td><td> " + agentUser.Partner.TradeName + " </td></tr>"
+                             + "<tr><td> Date </td><td> " + og + " </td></tr>" +
+                             "<tr><td>Time</td><td>" + req.EventTime + "</td></tr>" +
+                             "<tr><td>Client name</td><td>" + req.ContactName + "</td></tr>" +
+                             "<tr><td>Client e-mail</td><td>" + req.ContactEmail + "</td></tr>" +
+                             "<tr><td>Client phone</td><td>" + req.ContactPhone + "</td></tr>" +
+                             "<tr><td>Nº of persons</td><td>" + req.NrPersons + "</td></tr>" +
+                             "<tr><td>Price</td><td>" + req.Price + "</td></tr>" +
+                             "<tr><td>Pick up location</td><td>" + req.PickupLocation + "</td></tr>" +
+                             "<tr><td>Dropoff location</td><td>" + req.DropoffLocation + "</td></tr>" +
+                             "<tr><td>Flight number</td><td>" + req.FlightNr + "</td></tr>" +
+                             "<tr><td>Return Date</td><td>" + returnDate + "</td></tr>" +
+                             "<tr><td>Return Time</td><td>" + req.ReturnTime + "</td></tr>" +
+                             "<tr><td>Return flight number</td><td>" + req.ReturnFlight + "</td></tr>" +
+                             "<tr><td>Return pickup</td><td>" + req.ReturnPickup + "</td></tr>" +
+                             "<tr><td>Return dropoff</td><td>" + req.ReturnDropoff + "</td></tr>" +
+                             "<tr><td>Client notes</td><td>" + req.ClientNotes + "</td></tr>" +
+                             "<tr><td>Notes</td><td>" + req.Notes + "</td></tr>" +
+                             "<tr><td>Operator notes</td><td>" + req.OperatorNotes + "</td></tr></tbody></table>";
+                    }
+
+
+                    string time = System.DateTime.Now.ToString("HH:mm");
+                    string content = this._emailService.AgentContent(user.FullName, time) + Changes + reqDetails;
+
+                    this._emailService.Email_to_send(agentUser.Partner.Email, url, content, subject);
+
+                    url = "ServicesRequested/Details/" + req.Id;
+                    //url = link + url;
+
+                    subject = "Request " + req.Agreement.Label + "#" + req.Id + "-" + agentUser.Partner.TradeName + " was changed.";
+
+
+                    content = this._emailService.OperatorEditorContent(part.TradeName, time) + Changes + reqDetails;
+                    this._emailService.Email_to_send(part.Email, url, content, subject);
+
+                //content = email.OperatorEditorContent() + Changes;
+                //email.Email_to_send(user.email, url, content, subject);
+               
+
+                }
+
+                return new BaseResponse()
+                {
+                Status = HttpStatusCode.OK,
+                Message = "Request status Assign"
+                };
+
+
+
         }
 
     }

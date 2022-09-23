@@ -108,5 +108,20 @@ namespace Web.API.Controllers
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.Message.ToString(), Body = ex.ToString() };
             }
         }
+        [HttpGet("request/UpdateRequestAssignee")]
+        public BaseResponse UpdateRequestAssignee(int requestId, String stateID, string operatorNotes, String ResponsibleID)
+        {
+            try
+            {
+                var state = ModelState;
+                return this._requestsService.UpdateRequestAssignee( requestId, stateID, operatorNotes, ResponsibleID);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.Message.ToString(), Body = ex.ToString() };
+            }
+        }
     }
 }

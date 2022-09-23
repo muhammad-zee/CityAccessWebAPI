@@ -7,7 +7,6 @@ using Web.Services.Interfaces;
 using Web.DLL.Generic_Repository;
 using Web.Model;
 using Web.Data.Models;
-using Web.Services.CommonVM;
 using Web.Model.Common;
 using System.Net;
 using Web.Services.Helper;

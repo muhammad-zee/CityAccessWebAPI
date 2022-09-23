@@ -52,11 +52,11 @@ namespace Web.Model.Common
 
         [DataType(DataType.Date)]
         [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = @"{0:yyyy-MM-dd}")]
-        public Nullable<System.DateTime> returnDate { get; set; }
+        public Nullable<System.DateTime> ReturnDate { get; set; }
 
         [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = @"{0:hh\:mm}")]
         [DataType(DataType.Time)]
-        public Nullable<System.TimeSpan> returnTime { get; set; }
+        public Nullable<System.TimeSpan> ReturnTime { get; set; }
 
         public string ReturnFlight { get; set; }
 
