@@ -89,6 +89,19 @@ namespace Web.API.Controllers
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.Message.ToString(), Body = ex.ToString() };
             }
         }
-
+        [HttpGet("user/GetAllUser")]
+        public BaseResponse GetAllUser()
+        {
+            try
+            {
+                return this._usersService.GetAllUser();
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.Message.ToString(), Body = ex.ToString() };
+            }
+        }
     }
 }

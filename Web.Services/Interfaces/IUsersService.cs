@@ -16,5 +16,6 @@ namespace Web.Services.Interfaces
 
         BaseResponse UpdatePassword(UserVM user);
         BaseResponse CheckIfUsernameAvailable(string Username);
+        BaseResponse GetAllUser();
     }
 }
