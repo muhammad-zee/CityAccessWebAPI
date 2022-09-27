@@ -114,6 +114,7 @@ namespace Web.Services.Concrete
             var partnerList = _partnersRepo.Table.Where(p => p.IsActive == true).ToList();
             var responseList = partnerList.Select(partner => new PartnerVM
             {
+                PartnerId = partner.Id,
                 TradeName = partner.TradeName,
                 Description = partner.Description,
                 ContactPerson = partner.ContactPerson,
@@ -121,14 +122,14 @@ namespace Web.Services.Concrete
                 ContactPhone = partner.ContactPhone,
                 NotificationEmail = partner.Email,
                 InvoiceName = partner.InvoiceName,
+                VatNumber = "",
                 InvoiceAddress = partner.InvoiceAddress,
                 IsAgent = partner.IsAgent.Value,
                 IsOperator = partner.IsOperator.Value,
                 IsActive = partner.IsActive.Value,
                 IsPublic = partner.IsPublic.Value,
                 Country = partner.CountryId,
-                VatNumber = ""
-                //  Logo = partner.Logo,
+                Logo = "/images/logo.png",
             });
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Partner list return", Body = responseList };
         }
