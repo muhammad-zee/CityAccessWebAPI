@@ -46,7 +46,7 @@ namespace Web.Services.Concrete
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Mail sent", };
         }
 
-        public BaseResponse CreatePartner(PartnerVM param)
+        public BaseResponse SavePartner(PartnerVM param)
         {
             BaseResponse response = new BaseResponse();
             if (param.PartnerId == 0)
@@ -89,7 +89,7 @@ namespace Web.Services.Concrete
                 pa.IsOperator = param.IsOperator;
                 pa.IsActive = param.IsActive;
                 pa.IsPublic = param.IsPublic;
-                // Country = partner.Country,
+                pa.CountryId = param.Country;
                 //  Logo = partner.Logo,
                 this._partnersRepo.Update(pa);
                 response.Status = HttpStatusCode.OK;
@@ -112,12 +112,48 @@ namespace Web.Services.Concrete
         public BaseResponse GetAllPartner()
         {
             var partnerList = _partnersRepo.Table.Where(p => p.IsActive == true).ToList();
-            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Partner list return", Body = partnerList };
+            var responseList = partnerList.Select(partner => new PartnerVM
+            {
+                TradeName = partner.TradeName,
+                Description = partner.Description,
+                ContactPerson = partner.ContactPerson,
+                ContactEmail = partner.ContactEmail,
+                ContactPhone = partner.ContactPhone,
+                NotificationEmail = partner.Email,
+                InvoiceName = partner.InvoiceName,
+                InvoiceAddress = partner.InvoiceAddress,
+                IsAgent = partner.IsAgent.Value,
+                IsOperator = partner.IsOperator.Value,
+                IsActive = partner.IsActive.Value,
+                IsPublic = partner.IsPublic.Value,
+                Country = partner.CountryId,
+                VatNumber = ""
+                //  Logo = partner.Logo,
+            });
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Partner list return", Body = responseList };
         }
         public BaseResponse GetPartnerDetails(int PartnerId)
         {
             var partner = this._partnersRepo.Table.Where(p => p.Id == PartnerId && p.IsActive != false).FirstOrDefault();
-            return new BaseResponse { Status = HttpStatusCode.OK, Message = "Data returned", Body = partner };
+            PartnerVM pa = new PartnerVM
+            {
+                TradeName = partner.TradeName,
+                Description = partner.Description,
+                ContactPerson = partner.ContactPerson,
+                ContactEmail = partner.ContactEmail,
+                ContactPhone = partner.ContactPhone,
+                NotificationEmail = partner.Email,
+                InvoiceName = partner.InvoiceName,
+                InvoiceAddress = partner.InvoiceAddress,
+                IsAgent = partner.IsAgent.Value,
+                IsOperator = partner.IsOperator.Value,
+                IsActive = partner.IsActive.Value,
+                IsPublic = partner.IsPublic.Value,
+                Country = partner.CountryId,
+                VatNumber = ""
+                //  Logo = partner.Logo,
+            };
+            return new BaseResponse { Status = HttpStatusCode.OK, Message = "Data returned", Body = pa };
         }
 
     }

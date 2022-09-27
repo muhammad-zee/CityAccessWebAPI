@@ -8,7 +8,7 @@ namespace Web.Model.Common
 {
     public class AgreementVM
     {
-        public int Id { get; set; }
+        public int AgreementId { get; set; }
         public int? PartnerId { get; set; }
         public string PartnerTradeName { get; set; }
         public string PartnerLogo { get; set; }
@@ -22,7 +22,7 @@ namespace Web.Model.Common
         public string AgentInstructions { get; set; }
         public string CancellationPolicy { get; set; }
         public bool? NeedsApproval { get; set; }
-        public decimal? Price { get; set; }
+        public decimal? AgreementPrice { get; set; }
         public int? CommissionType { get; set; }
         public decimal? CommissionValue { get; set; }
         public bool? Override1 { get; set; }
@@ -32,6 +32,6 @@ namespace Web.Model.Common
         public int? PriceType { get; set; }
         public int? TypeCommission { get; set; }
         public bool? IsConfirmed { get; set; }
-        public byte[] ServiceImage { get; set; }
+        public string ServiceImage { get; set; }
     }
 }

@@ -12,7 +12,7 @@ namespace Web.Services.Interfaces
    public interface IPartnersService
     {
         BaseResponse InvitePartner(PartnerInvitationVM partner);
-        BaseResponse CreatePartner(PartnerVM partner);
+        BaseResponse SavePartner(PartnerVM partner);
         BaseResponse GetAllPartner();
         BaseResponse GetPartnerDetails(int PartnerId);
     }

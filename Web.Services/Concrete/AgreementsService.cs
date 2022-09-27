@@ -11,6 +11,7 @@ using Web.Model;
 using Web.Model.Common;
 using Web.Services.CommonVM;
 using Web.Services.Enums;
+using Web.Services.Helper;
 using Web.Services.Interfaces;
 
 namespace Web.Services.Concrete
@@ -27,7 +28,7 @@ namespace Web.Services.Concrete
         private readonly IGenericRepository<ServiceImage> _serviceImagesRepo;
         private readonly IGenericRepository<PartnerLogo> _partnerLogosRepo;
         private readonly IGenericRepository<DynamicFieldAlternative> _dynamicFieldAlternativeRepo;
-  
+
         public AgreementsService(IConfiguration config,
             CityAccess_DbContext dbContext,
             IEmailService emailService,
@@ -61,330 +62,27 @@ namespace Web.Services.Concrete
         }
         public BaseResponse GetAgreements(AgreementsFilterVM filter)
         {
-            int partnerId = ApplicationSettings.PartnerId;
-            Partner partner = this._partnersRepo.Table.Where(p => p.Id == partnerId && p.IsActive != false).FirstOrDefault();
-            IQueryable<AgreementVM> queryable = null;
-            var agreements = queryable;
-            var agreements1 = queryable;
-            int? value = null;
-            if (partner.IsAgent == true && partner.IsOperator != true)
+            var agreements = this._dbContext.LoadStoredProcedure("ca_getAgreementsByPartnerId")
+                .WithSqlParam("@pPartnerId",ApplicationSettings.PartnerId)
+                .WithSqlParam("@pAgentId", filter.AgentId)
+                .WithSqlParam("@pOperatorId", filter.OperatorId)
+                .WithSqlParam("@pNotConfirmed", filter.NotConfirmed)
+                .WithSqlParam("@pServiceId", filter.ServiceId)
+                .WithSqlParam("@pSearchString", filter.SearchString)
+                .ExecuteStoredProc<AgreementVM>();
+
+
+            var frequentlyBookedAgreements = this._dbContext.LoadStoredProcedure("ca_getAgreementsByPartnerId")
+                .WithSqlParam("@pPartnerId", ApplicationSettings.PartnerId)
+                .WithSqlParam("@pSelectFrequentlyBooked", true)
+                .ExecuteStoredProc<AgreementVM>();
+
+            var responseBodyObj = new
             {
-                if (this._partnerLogosRepo.Table.Where(x => x.PartnerId == partnerId).Any())
-                {
-                    agreements = (from ag in this._agreementsRepo.Table
-                                  join serv in this._servicesRepo.Table on ag.ServiceId equals serv.Id
-                                  join partn in this._partnersRepo.Table on serv.OperatorId equals partn.Id
-                                  join servImg in this._serviceImagesRepo.Table on serv.Id equals servImg.ServiceId
-                                  //join partLogo in db.PartnerLogoes on ag.PartnerId equals partLogo.PartnerID
-                                  where servImg.SequenceNr == 1
-                                  where serv.IsActive == true
-                                  where ag.PartnerId == partnerId || (value == null ? ag.PartnerId == null : ag.PartnerId == value)
-
-                                  //select new Agr_Partn_Comm { Agreement = ag, Partner = partn, BaseService = baseService, serviceImage = servImg/*, PartnerLogo = partLogo*/ }).AsQueryable();
-                                  select new AgreementVM
-                                  {
-                                      Id = ag.Id,
-                                      Label = ag.Label,
-                                      PartnerId = partn.Id,
-                                      PartnerTradeName = partn.TradeName,
-                                      ServiceId = serv.Id,
-                                      ServiceName = serv.Name,
-                                      ServiceImage = servImg.Image,
-                                      ServicePrice = serv.Price,
-                                      Price = ag.Price
-                                  }).AsQueryable();
-
-                    agreements1 = (from ag in this._agreementsRepo.Table
-                                   join serv in this._servicesRepo.Table on ag.ServiceId equals serv.Id
-                                   join partn in this._partnersRepo.Table on serv.OperatorId equals partn.Id
-                                   where serv.IsActive == true && (value == null ? serv.ServiceImages.FirstOrDefault().Image == null : serv.ServiceImages.FirstOrDefault().Id == value)
-                                   where ag.PartnerId == partnerId || (value == null ? ag.PartnerId == null : ag.PartnerId == value)
-
-                                   //select new Agr_Partn_Comm { Agreement = ag, Partner = partn, BaseService = baseService, serviceImage = null }).AsQueryable();
-                                   select new AgreementVM
-                                   {
-                                       Id = ag.Id,
-                                       Label = ag.Label,
-                                       PartnerId = partn.Id,
-                                       PartnerTradeName = partn.TradeName,
-                                       ServiceId = serv.Id,
-                                       ServiceName = serv.Name,
-                                       ServicePrice = serv.Price,
-                                       Price = ag.Price
-                                   }).AsQueryable();
-
-                    agreements = agreements.AsEnumerable().Union(agreements1.AsEnumerable()).AsQueryable();
-                }
-                else
-                {
-                    agreements = (from ag in this._agreementsRepo.Table
-                                  join serv in this._servicesRepo.Table on ag.ServiceId equals serv.Id
-                                  join partn in this._partnersRepo.Table on serv.OperatorId equals partn.Id
-                                  join servImg in this._serviceImagesRepo.Table on serv.Id equals servImg.ServiceId
-                                  where servImg.SequenceNr == 1
-                                  where serv.IsActive == true
-                                  where ag.PartnerId == partnerId || (value == null ? ag.PartnerId == null : ag.PartnerId == value)
-
-                                  //select new Agr_Partn_Comm { Agreement = ag, Partner = partn, BaseService = baseService, serviceImage = servImg }).AsQueryable();                                  
-                                  select new AgreementVM
-                                  {
-                                      Id = ag.Id,
-                                      Label = ag.Label,
-                                      PartnerId = partn.Id,
-                                      PartnerTradeName = partn.TradeName,
-                                      ServiceId = serv.Id,
-                                      ServiceName = serv.Name,
-                                      ServiceImage = servImg.Image,
-                                      ServicePrice = serv.Price,
-                                      Price = ag.Price
-                                  }).AsQueryable();
-
-                    agreements1 = (from ag in this._agreementsRepo.Table
-                                   join serv in this._servicesRepo.Table on ag.ServiceId equals serv.Id
-                                   join partn in this._partnersRepo.Table on serv.OperatorId equals partn.Id
-                                   where serv.IsActive == true && (value == null ? serv.ServiceImages.FirstOrDefault().Image == null : serv.ServiceImages.FirstOrDefault().Id == value)
-                                   where ag.PartnerId == partnerId || (value == null ? ag.PartnerId == null : ag.PartnerId == value)
-
-                                   //select new Agr_Partn_Comm { Agreement = ag, Partner = partn, BaseService = baseService, serviceImage = null }).AsQueryable();
-                                   select new AgreementVM
-                                   {
-                                       Id = ag.Id,
-                                       Label = ag.Label,
-                                       PartnerId = partn.Id,
-                                       PartnerTradeName = partn.TradeName,
-                                       ServiceId = serv.Id,
-                                       ServiceName = serv.Name,
-                                       //ServiceImage = servImg.Image,
-                                       ServicePrice = serv.Price,
-                                       Price = ag.Price
-                                   }).AsQueryable();
-
-                    agreements = agreements.AsEnumerable().Union(agreements1.AsEnumerable()).AsQueryable();
-                }
-            }
-            else
-            {
-                if (partner.IsAgent == true && partner.IsOperator == true)
-                {
-                    if (this._partnerLogosRepo.Table.Where(x => x.PartnerId == partnerId).Any())
-                    {
-                        agreements = (from ag in this._agreementsRepo.Table
-                                      join serv in this._servicesRepo.Table on ag.ServiceId equals serv.Id
-                                      join partn in this._partnersRepo.Table on serv.OperatorId equals partn.Id
-                                      join servImg in this._serviceImagesRepo.Table on serv.Id equals servImg.ServiceId
-                                      //join partLogo in db.PartnerLogoes on ag.PartnerId equals partLogo.PartnerID
-                                      where servImg.SequenceNr == 1
-                                      where serv.IsActive == true
-                                      where ag.PartnerId == partnerId || (value == null ? ag.PartnerId == null : ag.PartnerId == value) || (serv.OperatorId == partnerId && ag.PartnerId != null && ag.PartnerId != serv.OperatorId)
-
-                                      //select new Agr_Partn_Comm { Agreement = ag, Partner = partn, BaseService = baseService, serviceImage = servImg, /*PartnerLogo = partLogo*/ }).AsQueryable();
-                                      select new AgreementVM
-                                      {
-                                          Id = ag.Id,
-                                          Label = ag.Label,
-                                          PartnerId = partn.Id,
-                                          PartnerTradeName = partn.TradeName,
-                                          ServiceId = serv.Id,
-                                          ServiceName = serv.Name,
-                                          ServiceImage = servImg.Image,
-                                          ServicePrice = serv.Price,
-                                          Price = ag.Price
-                                      }).AsQueryable();
-
-                        agreements1 = (from ag in this._agreementsRepo.Table
-                                       join serv in this._servicesRepo.Table on ag.ServiceId equals serv.Id
-                                       join partn in this._partnersRepo.Table on serv.OperatorId equals partn.Id
-                                       where serv.IsActive == true && (value == null ? serv.ServiceImages.FirstOrDefault().Image == null : serv.ServiceImages.FirstOrDefault().Id == value)
-                                       where ag.PartnerId == partnerId || (value == null ? ag.PartnerId == null : ag.PartnerId == value) || (serv.OperatorId == partnerId && ag.PartnerId != null && ag.PartnerId != serv.OperatorId)
-
-                                       //select new Agr_Partn_Comm { Agreement = ag, Partner = partn, BaseService = baseService, serviceImage = null }).AsQueryable();
-                                       select new AgreementVM
-                                       {
-                                           Id = ag.Id,
-                                           Label = ag.Label,
-                                           PartnerId = partn.Id,
-                                           PartnerTradeName = partn.TradeName,
-                                           ServiceId = serv.Id,
-                                           ServiceName = serv.Name,
-                                           //ServiceImage = servImg.Image,
-                                           ServicePrice = serv.Price,
-                                           Price = ag.Price
-                                       }).AsQueryable();
-
-                        agreements = agreements.AsEnumerable().Union(agreements1.AsEnumerable()).AsQueryable();
-                    }
-                    else
-                    {
-                        agreements = (from ag in this._agreementsRepo.Table
-                                      join serv in this._servicesRepo.Table on ag.ServiceId equals serv.Id
-                                      join partn in this._partnersRepo.Table on serv.OperatorId equals partn.Id
-                                      join servImg in this._serviceImagesRepo.Table on serv.Id equals servImg.ServiceId
-                                      where servImg.SequenceNr == 1
-                                      where serv.IsActive == true
-                                      where ag.PartnerId == partnerId || (value == null ? ag.PartnerId == null : ag.PartnerId == value) || (serv.OperatorId == partnerId && ag.PartnerId != null && ag.PartnerId != serv.OperatorId)
-
-                                      //select new Agr_Partn_Comm { Agreement = ag, Partner = partn, BaseService = baseService, serviceImage = servImg }).AsQueryable();
-                                      select new AgreementVM
-                                      {
-                                          Id = ag.Id,
-                                          Label = ag.Label,
-                                          PartnerId = partn.Id,
-                                          PartnerTradeName = partn.TradeName,
-                                          ServiceId = serv.Id,
-                                          ServiceName = serv.Name,
-                                          ServiceImage = servImg.Image,
-                                          ServicePrice = serv.Price,
-                                          Price = ag.Price
-                                      }).AsQueryable();
-
-                        agreements1 = (from ag in this._agreementsRepo.Table
-                                       join serv in this._servicesRepo.Table on ag.ServiceId equals serv.Id
-                                       join partn in this._partnersRepo.Table on serv.OperatorId equals partn.Id
-                                       where serv.IsActive == true && (value == null ? serv.ServiceImages.FirstOrDefault().Image == null : serv.ServiceImages.FirstOrDefault().Id == value)
-                                       where ag.PartnerId == partnerId || (value == null ? ag.PartnerId == null : ag.PartnerId == value) || (serv.OperatorId == partnerId && ag.PartnerId != null && ag.PartnerId != serv.OperatorId)
-
-                                       //select new Agr_Partn_Comm { Agreement = ag, Partner = partn, BaseService = baseService, serviceImage = null }).AsQueryable();
-                                       select new AgreementVM
-                                       {
-                                           Id = ag.Id,
-                                           Label = ag.Label,
-                                           PartnerId = partn.Id,
-                                           PartnerTradeName = partn.TradeName,
-                                           ServiceId = serv.Id,
-                                           ServiceName = serv.Name,
-                                           //ServiceImage = servImg.Image,
-                                           ServicePrice = serv.Price,
-                                           Price = ag.Price
-                                       }).AsQueryable();
-                        agreements = agreements.AsEnumerable().Union(agreements1.AsEnumerable()).AsQueryable();
-                    }
-                }
-            }
-            if (partner.IsAgent != true && partner.IsOperator == true)
-            {
-                if (this._partnerLogosRepo.Table.Where(x => x.PartnerId == partnerId).Any())
-                {
-                    agreements = (from ag in this._agreementsRepo.Table
-                                  join serv in this._servicesRepo.Table on ag.ServiceId equals serv.Id
-                                  join partn in this._partnersRepo.Table on serv.OperatorId equals partn.Id
-                                  join servImg in this._serviceImagesRepo.Table on serv.Id equals servImg.ServiceId
-                                  //join partLogo in db.PartnerLogoes on ag.PartnerId equals partLogo.PartnerID
-                                  where servImg.SequenceNr == 1
-                                  where serv.IsActive == true
-                                  where serv.OperatorId == partnerId
-
-                                  //select new Agr_Partn_Comm { Agreement = ag, Partner = partn, BaseService = baseService, serviceImage = servImg/*, PartnerLogo = partLogo */}).AsQueryable();
-                                  select new AgreementVM
-                                  {
-                                      Id = ag.Id,
-                                      Label = ag.Label,
-                                      PartnerId = partn.Id,
-                                      PartnerTradeName = partn.TradeName,
-                                      ServiceId = serv.Id,
-                                      ServiceName = serv.Name,
-                                      ServiceImage = servImg.Image,
-                                      ServicePrice = serv.Price,
-                                      Price = ag.Price
-                                  }).AsQueryable();
-
-                    agreements1 = (from ag in this._agreementsRepo.Table
-                                   join serv in this._servicesRepo.Table on ag.ServiceId equals serv.Id
-                                   join partn in this._partnersRepo.Table on serv.OperatorId equals partn.Id
-                                   where serv.IsActive == true && (value == null ? serv.ServiceImages.FirstOrDefault().Image == null : serv.ServiceImages.FirstOrDefault().Id == value)
-                                   where serv.OperatorId == partnerId
-
-                                   //select new Agr_Partn_Comm { Agreement = ag, Partner = partn, BaseService = baseService, serviceImage = null }).AsQueryable();
-                                   select new AgreementVM
-                                   {
-                                       Id = ag.Id,
-                                       Label = ag.Label,
-                                       PartnerId = partn.Id,
-                                       PartnerTradeName = partn.TradeName,
-                                       ServiceId = serv.Id,
-                                       ServiceName = serv.Name,
-                                       //ServiceImage = servImg.Image,
-                                       ServicePrice = serv.Price,
-                                       Price = ag.Price
-                                   }).AsQueryable();
-                    agreements = agreements.AsEnumerable().Union(agreements1.AsEnumerable()).AsQueryable();
-                }
-                else
-                {
-                    agreements = (from ag in this._agreementsRepo.Table
-                                  join serv in this._servicesRepo.Table on ag.ServiceId equals serv.Id
-                                  join partn in this._partnersRepo.Table on serv.OperatorId equals partn.Id
-                                  join servImg in this._serviceImagesRepo.Table on serv.Id equals servImg.ServiceId
-                                  where servImg.SequenceNr == 1
-                                  where serv.IsActive == true
-                                  where serv.OperatorId == partnerId
-
-                                  //select new Agr_Partn_Comm { Agreement = ag, Partner = partn, BaseService = baseService, serviceImage = servImg }).AsQueryable();
-                                  select new AgreementVM
-                                  {
-                                      Id = ag.Id,
-                                      Label = ag.Label,
-                                      PartnerId = partn.Id,
-                                      PartnerTradeName = partn.TradeName,
-                                      ServiceId = serv.Id,
-                                      ServiceName = serv.Name,
-                                      ServiceImage = servImg.Image,
-                                      ServicePrice = serv.Price,
-                                      Price = ag.Price
-                                  }).AsQueryable();
-
-                    agreements1 = (from ag in this._agreementsRepo.Table
-                                   join serv in this._servicesRepo.Table on ag.ServiceId equals serv.Id
-                                   join partn in this._partnersRepo.Table on serv.OperatorId equals partn.Id
-                                   where serv.IsActive == true && (value == null ? serv.ServiceImages.FirstOrDefault().Image == null : serv.ServiceImages.FirstOrDefault().Id == value)
-                                   where serv.OperatorId == partnerId
-
-                                   //select new Agr_Partn_Comm { Agreement = ag, Partner = partn, BaseService = baseService, serviceImage = null }).AsQueryable();
-                                   select new AgreementVM
-                                   {
-                                       Id = ag.Id,
-                                       Label = ag.Label,
-                                       PartnerId = partn.Id,
-                                       PartnerTradeName = partn.TradeName,
-                                       ServiceId = serv.Id,
-                                       ServiceName = serv.Name,
-                                       //ServiceImage = servImg.Image,
-                                       ServicePrice = serv.Price,
-                                       Price = ag.Price
-                                   }).AsQueryable();
-
-                    agreements = agreements.AsEnumerable().Union(agreements1.AsEnumerable()).AsQueryable();
-                }
-            }
-
-            //if (filter.Agent != null && filter.Agent != "")
-            //{
-            //    agreements = agreements.Where(x => x.Agreement.Partner.TradeName == filter.Agent);
-            //}
-            //if (filter.Operator1 != null && filter.Operator1 != "")
-            //{
-            //    agreements = agreements.Where(x => x.Partner.TradeName == filter.Operator1);
-            //}
-            //if (filter.agr == true)
-            //{
-            //    agreements = agreements.Where(x => x.Agreement.IsConfirmed == false || x.Agreement.IsConfirmed == null);
-            //}
-            //else
-            //{
-            //    agreements = agreements.Where(x => x.Agreement.IsConfirmed == true);
-            //}
-
-
-            //if (!String.IsNullOrEmpty(filter.SearchString))
-            //{
-            //    agreements = agreements.Where(s => s.Agreement.Label.Contains(filter.SearchString) || s.Agreement.Description.Contains(filter.SearchString));
-            //}
-
-            //if (!String.IsNullOrEmpty(filter.Service))
-            //{
-            //    agreements = agreements.Where(x => x.Agreement.Service.Name == filter.Service);
-            //}
-
-            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = agreements };
+                AllAgreements = agreements,
+                FrequentlyBookedAgreements = frequentlyBookedAgreements
+            };
+            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = responseBodyObj };
         }
         public BaseResponse GetAgreementDetailsByAgreementId(int agreementId)
         {
@@ -496,7 +194,7 @@ namespace Web.Services.Concrete
         public BaseResponse SaveAgreement(AgreementVM agreement)
         {
             BaseResponse response = new BaseResponse();
-            if (agreement.Id == 0)
+            if (agreement.AgreementId == 0)
             {
                 Agreement ag = new Agreement
                 {
@@ -509,7 +207,7 @@ namespace Web.Services.Concrete
                     AgentInstructions = agreement.AgentInstructions,
                     CancellationPolicy = agreement.CancellationPolicy,
                     NeedsApproval = agreement.NeedsApproval,
-                    Price = agreement.Price,
+                    Price = agreement.AgreementPrice,
                     CommissionType = agreement.CommissionType,
                     CommissionValue = agreement.CommissionValue,
                     Override1 = agreement.Override1,
@@ -529,7 +227,7 @@ namespace Web.Services.Concrete
             }
             else
             {
-                Agreement ag = this._agreementsRepo.Table.FirstOrDefault(a => a.Id == agreement.Id);
+                Agreement ag = this._agreementsRepo.Table.FirstOrDefault(a => a.Id == agreement.AgreementId);
                 ag.PartnerId = agreement.PartnerId;
                 ag.Label = agreement.Label;
                 ag.Description = agreement.Description;
@@ -538,7 +236,7 @@ namespace Web.Services.Concrete
                 ag.AgentInstructions = agreement.AgentInstructions;
                 ag.CancellationPolicy = agreement.CancellationPolicy;
                 ag.NeedsApproval = agreement.NeedsApproval;
-                ag.Price = agreement.Price;
+                ag.Price = agreement.AgreementPrice;
                 ag.CommissionType = agreement.CommissionType;
                 ag.CommissionValue = agreement.CommissionValue;
                 ag.Override1 = agreement.Override1;

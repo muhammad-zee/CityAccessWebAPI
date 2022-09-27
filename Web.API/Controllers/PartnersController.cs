@@ -48,12 +48,12 @@ namespace Web.API.Controllers
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.Message.ToString(), Body = ex.ToString() };
             }
         }
-        [HttpPost("Partners/CreatePartner")]
-        public BaseResponse CreatePartner([FromBody] PartnerVM partner)
+        [HttpPost("Partners/SavePartner")]
+        public BaseResponse SavePartner([FromBody] PartnerVM partner)
         {
             try
             {
-                return this._partnersService.CreatePartner(partner);
+                return this._partnersService.SavePartner(partner);
             }
             catch (Exception ex)
             {

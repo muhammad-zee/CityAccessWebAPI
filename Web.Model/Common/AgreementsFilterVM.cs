@@ -12,6 +12,6 @@ namespace Web.Model.Common
         public int OperatorId { get; set; }
         public string SearchString { get; set; }
         public int ServiceId { get; set; }
-        public bool IsConfirmed { get; set; }
+        public bool NotConfirmed { get; set; }
     }
 }

@@ -114,6 +114,8 @@ namespace Web.Services.Concrete
                 token = new JwtSecurityTokenHandler().WriteToken(token),
                 expires = tokenExpiryTime,
                 UserId = user.Id,
+                PartnerId = user.PartnerId,
+                PartnerTradeName = partner.TradeName,
                 UserFullName = user.FullName,
                 PhoneNumber = user.Phone,
                 Username = user.Username,
