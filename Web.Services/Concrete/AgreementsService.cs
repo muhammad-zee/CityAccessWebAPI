@@ -63,7 +63,7 @@ namespace Web.Services.Concrete
         public BaseResponse GetAgreements(AgreementsFilterVM filter)
         {
             var agreements = this._dbContext.LoadStoredProcedure("ca_getAgreementsByPartnerId")
-                .WithSqlParam("@pPartnerId",ApplicationSettings.PartnerId)
+                .WithSqlParam("@pPartnerId", ApplicationSettings.PartnerId)
                 .WithSqlParam("@pAgentId", filter.AgentId)
                 .WithSqlParam("@pOperatorId", filter.OperatorId)
                 .WithSqlParam("@pNotConfirmed", filter.NotConfirmed)
@@ -202,21 +202,21 @@ namespace Web.Services.Concrete
                     ServiceId = agreement.ServiceId,
                     Label = agreement.Label,
                     Description = agreement.Description,
-                    IsActive = agreement.IsActive,
                     MessageTemplate = agreement.MessageTemplate,
                     AgentInstructions = agreement.AgentInstructions,
                     CancellationPolicy = agreement.CancellationPolicy,
                     NeedsApproval = agreement.NeedsApproval,
                     Price = agreement.AgreementPrice,
-                    CommissionType = agreement.CommissionType,
+                    TypeCommission = agreement.CommissionTypeId,
+                    CommissionType = agreement.CommissionTypeId,
                     CommissionValue = agreement.CommissionValue,
                     Override1 = agreement.Override1,
                     PaymentAgent = agreement.PaymentAgent,
                     EmailToCustomer = agreement.EmailToCustomer,
-                    PaymentAgentType = agreement.PaymentAgentType,
-                    PriceType = agreement.PriceType,
-                    TypeCommission = agreement.TypeCommission,
+                    PaymentAgentType = agreement.PaymentAgentTypeId,
+                    PriceType = agreement.PriceTypeId,
                     IsConfirmed = agreement.IsConfirmed,
+                    IsActive = true,
                 };
                 this._agreementsRepo.Insert(ag);
 
@@ -229,22 +229,22 @@ namespace Web.Services.Concrete
             {
                 Agreement ag = this._agreementsRepo.Table.FirstOrDefault(a => a.Id == agreement.AgreementId);
                 ag.PartnerId = agreement.PartnerId;
+                ag.ServiceId = agreement.ServiceId;
                 ag.Label = agreement.Label;
                 ag.Description = agreement.Description;
-                ag.IsActive = agreement.IsActive;
                 ag.MessageTemplate = agreement.MessageTemplate;
                 ag.AgentInstructions = agreement.AgentInstructions;
                 ag.CancellationPolicy = agreement.CancellationPolicy;
                 ag.NeedsApproval = agreement.NeedsApproval;
                 ag.Price = agreement.AgreementPrice;
-                ag.CommissionType = agreement.CommissionType;
+                ag.TypeCommission = agreement.CommissionTypeId;
+                ag.CommissionType = agreement.CommissionTypeId;
                 ag.CommissionValue = agreement.CommissionValue;
                 ag.Override1 = agreement.Override1;
                 ag.PaymentAgent = agreement.PaymentAgent;
                 ag.EmailToCustomer = agreement.EmailToCustomer;
-                ag.PaymentAgentType = agreement.PaymentAgentType;
-                ag.PriceType = agreement.PriceType;
-                ag.TypeCommission = agreement.TypeCommission;
+                ag.PaymentAgentType = agreement.PaymentAgentTypeId;
+                ag.PriceType = agreement.PriceTypeId;
                 ag.IsConfirmed = agreement.IsConfirmed;
                 this._agreementsRepo.Update(ag);
                 response.Status = HttpStatusCode.OK;

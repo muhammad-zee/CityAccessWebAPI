@@ -14,7 +14,6 @@ using Web.Services.Helper;
 namespace Web.Services.Concrete
 {
     public class UsersService : IUsersService
-
     {
         private readonly IGenericRepository<User> _usersRepo;
         private readonly IGenericRepository<Partner> _partnerRepo;
@@ -44,26 +43,24 @@ namespace Web.Services.Concrete
         }
         public BaseResponse SaveUser(UserVM user)
         {
-            if (user.Id > 0)
+            if (user.UserId > 0)
             {
-                var dbUser = this._usersRepo.Table.Where(x => x.Id == user.Id && x.IsActive != false).FirstOrDefault();
-                user.ConfirmPassword = Encryption.MD5Hash(user.ConfirmPassword);
-                if (dbUser.Password == user.ConfirmPassword)
+                var dbUser = this._usersRepo.Table.Where(x => x.Id == user.UserId && x.IsActive != false).FirstOrDefault();
+                user.Password = Encryption.MD5Hash(user.Password);
+                if (dbUser.Password == user.Password)
                 {
-
                     dbUser.Username = user.UserName;
                     dbUser.FullName = user.FullName;
                     dbUser.Email = user.Email;
                     dbUser.Phone = user.Phone;
-                    dbUser.IsActive = user.IsActive;
                     dbUser.IsAdmin = user.IsAdmin;
+                    dbUser.IsActive = user.IsActive;
                     this._usersRepo.Update(dbUser);
                     return new BaseResponse { Status = HttpStatusCode.OK, Message = "User's data updated successfully" };
                 }
                 else
                 {
                     return new BaseResponse { Status = HttpStatusCode.BadRequest, Message = "Password incorrect" };
-
                 }
             }
             else
@@ -74,7 +71,7 @@ namespace Web.Services.Concrete
                     UserIcalLink = Guid.NewGuid(),
                     Username = user.UserName,
                     FullName = user.FullName,
-                    Password = user.NewPassword,
+                    Password = Encryption.MD5Hash(user.Password),
                     Email = user.Email,
                     Phone = user.Phone,
                     //PartnerId = user.
@@ -87,9 +84,9 @@ namespace Web.Services.Concrete
             }
         }
 
-        public BaseResponse UpdatePassword(UserVM user)
+        public BaseResponse UpdatePassword(UserPasswordVM user)
         {
-            var dbUser = this._usersRepo.Table.Where(x => x.Id == user.Id && x.IsActive != false).FirstOrDefault();
+            var dbUser = this._usersRepo.Table.Where(x => x.Id == user.UserId && x.IsActive != false).FirstOrDefault();
             user.OldPassword = Encryption.MD5Hash(user.OldPassword);
             if (dbUser.Password == user.OldPassword)
             {

@@ -63,7 +63,7 @@ namespace Web.API.Controllers
             }
         }
         [HttpPost("user/UpdatePassword")]
-        public BaseResponse UpdatePassword([FromBody] UserVM user)
+        public BaseResponse UpdatePassword([FromBody] UserPasswordVM user)
         {
             try
             {

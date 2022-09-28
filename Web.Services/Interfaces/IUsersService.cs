@@ -11,10 +11,8 @@ namespace Web.Services.Interfaces
     public interface IUsersService
     {
         UserDetailVM GetUserDetails(int UserId);
-
         BaseResponse SaveUser(UserVM user);
-
-        BaseResponse UpdatePassword(UserVM user);
+        BaseResponse UpdatePassword(UserPasswordVM user);
         bool CheckIfUsernameAvailable(string Username);
         IQueryable<UserDetailVM> GetAllUser();
     }
