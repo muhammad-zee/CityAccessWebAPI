@@ -36,7 +36,8 @@ namespace Web.API.Controllers
         {
             try
             {
-                return this._servicesService.GetAllService();
+                var responseList = this._servicesService.GetAllService();
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Sevice list return", Body = responseList };
             }
             catch (Exception ex)
             {
@@ -50,7 +51,13 @@ namespace Web.API.Controllers
         {
             try
             {
-                return this._servicesService.GetServiceDetails(ServiceId);
+                var serviceDetail = this._servicesService.GetServiceDetails(ServiceId);
+                return new BaseResponse
+                {
+                    Status = HttpStatusCode.OK,
+                    Message = "Service detail returned",
+                    Body = serviceDetail
+                };
             }
             catch (Exception ex)
             {
@@ -60,7 +67,7 @@ namespace Web.API.Controllers
             }
         }
         [HttpPost("services/SaveService")]
-        public BaseResponse SaveService(ServicesVM service)
+        public BaseResponse SaveService([FromBody]ServicesVM service)
         {
             try
             {

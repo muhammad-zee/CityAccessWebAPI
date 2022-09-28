@@ -37,7 +37,8 @@ namespace Web.API.Controllers
         {
             try
             {
-                return this._usersService.GetUserDetails(UserId);
+                var response = this._usersService.GetUserDetails(UserId);
+                return new BaseResponse { Status = HttpStatusCode.OK, Message = "Data returned", Body = response };
             }
             catch (Exception ex)
             {
@@ -45,10 +46,10 @@ namespace Web.API.Controllers
                 _logger.LogExceptions(ex);
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.Message.ToString(), Body = ex.ToString() };
             }
-           
+
         }
         [HttpPost("user/SaveUser")]
-        public BaseResponse SaveUser([FromBody]UserVM user)
+        public BaseResponse SaveUser([FromBody] UserVM user)
         {
             try
             {
@@ -62,7 +63,7 @@ namespace Web.API.Controllers
             }
         }
         [HttpPost("user/UpdatePassword")]
-        public BaseResponse UpdatePassword([FromBody]UserVM user)
+        public BaseResponse UpdatePassword([FromBody] UserVM user)
         {
             try
             {
@@ -80,7 +81,16 @@ namespace Web.API.Controllers
         {
             try
             {
-                return this._usersService.CheckIfUsernameAvailable(Username);
+                bool userNameAvailable = this._usersService.CheckIfUsernameAvailable(Username);
+                if (!userNameAvailable)
+                {
+                    return new BaseResponse { Status = HttpStatusCode.OK, Message = "Username already exists", Body = new { usernameAvailable = false, message = "Username already exists" } };
+                }
+                else
+                {
+                    return new BaseResponse { Status = HttpStatusCode.OK, Message = "Username available", Body = new { usernameAvailable = true, message = "Username available" } };
+
+                }
             }
             catch (Exception ex)
             {
@@ -94,7 +104,8 @@ namespace Web.API.Controllers
         {
             try
             {
-                return this._usersService.GetAllUser();
+                var responseList = this._usersService.GetAllUser();
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "User's list returned", Body = responseList };
             }
             catch (Exception ex)
             {

@@ -23,12 +23,14 @@ namespace Web.Services.Concrete
         private readonly IGenericRepository<Service> _servicesRepo;
         private readonly IGenericRepository<Partner> _partnersRepo;
         private readonly IGenericRepository<CommissionType> _commissiontypeRepo;
+        private readonly IGenericRepository<DynamicFieldAlternative> _dynamicFieldAlternative;
 
         public ServicesService(IConfiguration config,
             CityAccess_DbContext dbContext,
             IEmailService emailService,
             IGenericRepository<Service> servicesRepo, IGenericRepository<Partner> partnersRepo,
-             IGenericRepository<CommissionType> commissiontypeRepo) 
+             IGenericRepository<CommissionType> commissiontypeRepo,
+             IGenericRepository<DynamicFieldAlternative> dynamicFieldAlternative)
         {
             this._config = config;
             this._dbContext = dbContext;
@@ -36,104 +38,92 @@ namespace Web.Services.Concrete
             this._servicesRepo = servicesRepo;
             this._partnersRepo = partnersRepo;
             this._commissiontypeRepo = commissiontypeRepo;
-
+            this._dynamicFieldAlternative = dynamicFieldAlternative;
         }
-        public BaseResponse GetAllService()
+        public IQueryable<ServicesVM> GetAllService()
         {
-            var ServiceList = _servicesRepo.Table.Where(s => s.IsActive == true).ToList();
-            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Sevice list return", Body = ServiceList };
+            var servicesList = this._dbContext.LoadStoredProcedure("ca_getServicesByPartnerId")
+               .WithSqlParam("@pPartnerId", ApplicationSettings.PartnerId)
+               .ExecuteStoredProc<ServicesVM>();
+            servicesList.ForEach(x => x.ServiceImage = "/Images/logo.png");
+            return servicesList.AsQueryable();
         }
-        public BaseResponse GetServiceDetails(int ServiceId)
+        public ServicesVM GetServiceDetails(int ServiceId)
         {
-            var service = this._servicesRepo.Table.Where(s => s.Id == ServiceId && s.IsActive != false).FirstOrDefault();
-            var partner = this._partnersRepo.Table.FirstOrDefault(p => p.Id == service.OperatorId && p.IsActive == true);
-           var commissiontype = this._commissiontypeRepo.Table.Where(c => c.Id == service.ComissionType ).FirstOrDefault();
+            var serviceDetail = this._dbContext.LoadStoredProcedure("ca_getServiceDetailByServiceId")
+                .WithSqlParam("@pServiceId", ServiceId)
+                .ExecuteStoredProc<ServicesVM>().FirstOrDefault();
+            var dynamicFieldsList = this._dynamicFieldAlternative.Table;
+            serviceDetail.PriceTypeLabel = dynamicFieldsList.Where(x => x.Id == serviceDetail.PriceTypeId).Select(x => x.Label).FirstOrDefault();
+            serviceDetail.PaymentAgentTypeLabel = dynamicFieldsList.Where(x => x.Id == serviceDetail.PaymentAgentTypeId).Select(x => x.Label).FirstOrDefault();
+            serviceDetail.AvailabilityLabel = dynamicFieldsList.Where(x => x.Id == serviceDetail.AvailabilityId).Select(x => x.Label).FirstOrDefault();
+            serviceDetail.ServiceImage = "/Images/logo.png";
+            return serviceDetail;
 
-            var serviceVM = new ServicesVM
-            {
-                Id = service.Id,
-                ServiceName = service.Name,
-                Descritpion = service.Description,
-                CommissionTypeId = service.ComissionType,
-                CommissionTypeName = commissiontype.Label,
-                MaxNumberOfPersons = service.MaxPersonNum,
-                MinNumberOfPersons = service.MinPersonNum,
-                Availability = service.Availability1,
-                Price = service.Price,
-                TypeofPrice = service.Price,
-                OverridePrice = service.Override1,
-                AgentPayment = service.PaymentAgent,
-                TypeOfAgentPayment = service.PaymentAgent,
-                AgentInstructions = service.AgentInstructions,
-                ConfirmationText = service.ConfirmationText,
-                CancellationPolicy = service.CancellationPolicy,
-                IsPublic = service.IsPublic,
-                IsActive = service.IsActive,
-                //City = service.City,
-                PartnerTradeName = partner.TradeName
-                
-            };
-            return new BaseResponse
-            {
-                Status = HttpStatusCode.OK,
-                Message = "Service detail returned",
-                Body = serviceVM
-            };
+
         }
         public BaseResponse SaveService(ServicesVM service)
         {
-            if (service.Id > 0)
+            if (service.ServiceId > 0)
             {
-                var dbService = this._servicesRepo.Table.Where(s => s.Id == service.Id && s.IsActive != false).FirstOrDefault();
+                var dbService = this._servicesRepo.Table.Where(s => s.Id == service.ServiceId && s.IsActive != false).FirstOrDefault();
 
-                dbService.Id = service.Id;
-                // dbService.Type = service.Type;
+                dbService.Id = service.ServiceId;
+                dbService.TypeId = service.ServiceTypeId;
                 dbService.Name = service.ServiceName;
                 dbService.Description = service.Descritpion;
+                dbService.OperatorId = service.PartnerId;
                 dbService.Duration = service.Duration;
                 dbService.ComissionType = service.CommissionTypeId;
+                dbService.CommissionValue = service.CommissionValue;
                 dbService.MaxPersonNum = service.MaxNumberOfPersons;
                 dbService.MinPersonNum = service.MinNumberOfPersons;
-                dbService.Availability1 = service.Availability;
+                dbService.Availability1 = service.AvailabilityId;
                 dbService.Price = service.Price;
+                dbService.PriceType = service.PriceTypeId;
                 dbService.Override1 = service.OverridePrice;
-                dbService.PaymentAgent = service.AgentPayment;
+                dbService.PaymentAgent = service.PaymentAgentTypeId;
+                dbService.PaymentAgentType = service.PaymentAgentTypeId;
                 dbService.AgentInstructions = service.AgentInstructions;
                 dbService.ConfirmationText = service.ConfirmationText;
                 dbService.CancellationPolicy = service.CancellationPolicy;
-                //   dbService.City = service.City;
+                dbService.CityId = service.CityId;
                 dbService.IsPublic = service.IsPublic;
-                dbService.IsActive = service.IsActive;
                 //  dbService.ServiceImages = service.image;
                 this._servicesRepo.Update(dbService);
-                return new BaseResponse { Status = HttpStatusCode.OK, Message = "Services updated successfully" };
+                return new BaseResponse { Status = HttpStatusCode.OK, Message = "Service updated successfully" };
             }
             else
             {
                 Service newService = new Service
                 {
-                    //Type = service.Type,
                     Name = service.ServiceName,
+                    TypeId = service.ServiceTypeId,
                     Description = service.Descritpion,
+                    OperatorId = service.PartnerId,
                     Duration = service.Duration,
                     ComissionType = service.CommissionTypeId,
+                    CommissionValue = service.CommissionValue,
                     MaxPersonNum = service.MaxNumberOfPersons,
                     MinPersonNum = service.MinNumberOfPersons,
-                    Availability1 = service.Availability,
+                    Availability1 = service.AvailabilityId,
                     Price = service.Price,
+                    PriceType = service.PriceTypeId,
                     Override1 = service.OverridePrice,
-                    PaymentAgent = service.AgentPayment,
+                    PaymentAgent = service.PaymentAgent,
+                    PaymentAgentType = service.PaymentAgentTypeId,
                     AgentInstructions = service.AgentInstructions,
                     ConfirmationText = service.ConfirmationText,
                     CancellationPolicy = service.CancellationPolicy,
+                    CityId = service.CityId,
                     IsPublic = service.IsPublic,
-                    IsActive = service.IsActive
+                    IsActive = true
                 };
                 this._servicesRepo.Insert(newService);
-                return new BaseResponse { Status = HttpStatusCode.OK, Message = "Services created successfully" };
+                return new BaseResponse { Status = HttpStatusCode.OK, Message = "Service created successfully" };
             }
         }
-       
+
     }
 }
 

@@ -10,8 +10,8 @@ namespace Web.Services.Interfaces
 {
    public interface IServicesService
     {
-        BaseResponse GetAllService();
-        BaseResponse GetServiceDetails(int ServiceId);
+        IQueryable<ServicesVM> GetAllService();
+        ServicesVM GetServiceDetails(int ServiceId);
         BaseResponse SaveService(ServicesVM service);
     }
 }

@@ -17,15 +17,30 @@ namespace Web.Services.Concrete
 
     {
         private readonly IGenericRepository<User> _usersRepo;
+        private readonly IGenericRepository<Partner> _partnerRepo;
 
-        public UsersService(IGenericRepository<User> usersRepo)
+        public UsersService(IGenericRepository<User> usersRepo, IGenericRepository<Partner> partnerRepo)
         {
             this._usersRepo = usersRepo;
+            this._partnerRepo = partnerRepo;
         }
-        public BaseResponse GetUserDetails(int UserId)
+        public UserDetailVM GetUserDetails(int UserId)
         {
-            var user = this._usersRepo.Table.Where(x => x.Id == UserId && x.IsActive != false).FirstOrDefault();
-            return new BaseResponse { Status = HttpStatusCode.OK, Message = "Data returned", Body = user };
+            var user = this._usersRepo.Table.FirstOrDefault(x => x.Id == UserId && x.IsActive == true);
+            var userPartner = this._partnerRepo.Table.FirstOrDefault(p => p.Id == user.PartnerId);
+            var response = new UserDetailVM
+            {
+                UserId = user.Id,
+                UserName = user.Username,
+                FullName = user.FullName,
+                Email = user.Email,
+                Phone = user.Phone,
+                PartnerId = user.PartnerId,
+                PartnerTradeName = userPartner.TradeName,
+                LastLoginDate = user.LastLoginDate,
+                IsAdmin = true,
+            };
+            return response;
         }
         public BaseResponse SaveUser(UserVM user)
         {
@@ -87,23 +102,27 @@ namespace Web.Services.Concrete
                 return new BaseResponse { Status = HttpStatusCode.BadRequest, Message = "Password incorrect" };
             }
         }
-        public BaseResponse CheckIfUsernameAvailable(string Username)
+        public bool CheckIfUsernameAvailable(string Username)
         {
-            var usernameCount= this._usersRepo.Table.Count(x => x.Username == Username);
-            if (usernameCount > 0)
-            {
-                return new BaseResponse { Status = HttpStatusCode.OK, Message = "Username already exists",Body=new { usernameAvailable=false,message= "Username already exists" } };
-            }
-            else
-            {
-                return new BaseResponse { Status = HttpStatusCode.OK, Message = "Username available", Body = new { usernameAvailable = true, message = "Username available" } };
-
-            }
+            var usernameCount = this._usersRepo.Table.Count(x => x.Username == Username);
+            return usernameCount == 0;
         }
-        public BaseResponse GetAllUser()
+        public IQueryable<UserDetailVM> GetAllUser()
         {
-            var userList = _usersRepo.Table.Where(x => x.IsActive == true).ToList();
-            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "User's list returned", Body = userList };
+            var userList = _usersRepo.Table.Where(x => x.IsActive == true);
+            var responseList = userList.Select(user => new UserDetailVM
+            {
+                UserId = user.Id,
+                UserName = user.Username,
+                FullName = user.FullName,
+                Email = user.Email,
+                Phone = user.Phone,
+                PartnerId = user.PartnerId,
+                PartnerTradeName = this._partnerRepo.Table.Where(p => p.Id == user.PartnerId).Select(p => p.TradeName).FirstOrDefault(),
+                LastLoginDate = user.LastLoginDate,
+                IsAdmin = true,
+            }).AsQueryable();
+            return responseList;
         }
 
     }
