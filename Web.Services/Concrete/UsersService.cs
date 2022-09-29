@@ -25,7 +25,7 @@ namespace Web.Services.Concrete
         }
         public UserDetailVM GetUserDetails(int UserId)
         {
-            var user = this._usersRepo.Table.FirstOrDefault(x => x.Id == UserId && x.IsActive == true);
+            var user = this._usersRepo.Table.FirstOrDefault(x => x.Id == UserId);
             var userPartner = this._partnerRepo.Table.FirstOrDefault(p => p.Id == user.PartnerId);
             var response = new UserDetailVM
             {

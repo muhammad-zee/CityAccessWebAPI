@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -43,6 +44,7 @@ namespace Web.Model.Common
         [JsonIgnore]
         public string AvailabilityLabel { get; set; }
         public string ServiceImage { get; set; }
+        [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = @"{0:hh\:mm}")]
         public TimeSpan Duration { get; set; }
 
 
