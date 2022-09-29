@@ -80,5 +80,19 @@ namespace Web.API.Controllers
                 return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.Message.ToString(), Body = ex.ToString() };
             }
         }
+        [HttpGet("services/DeleteService")]
+        public BaseResponse DeleteServices(int ServiceId)
+        {
+            try
+            {
+                return this._servicesService.DeleteServices(ServiceId);
+            }
+            catch (Exception ex)
+            {
+                ElmahExtensions.RiseError(ex);
+                _logger.LogExceptions(ex);
+                return new BaseResponse() { Status = HttpStatusCode.BadRequest, Message = ex.Message.ToString(), Body = ex.ToString() };
+            }
+        }
     }
 }
