@@ -226,16 +226,16 @@ namespace Web.Services.Extensions
 
         public static int GetActiveCodeId(this string codeName)
         {
-            var val = typeof(UCLEnums).GetField(codeName).GetRawConstantValue();
-            try
-            {
-                int codeId = val.ToInt();
-                return codeId;
-            }
-            catch
-            {
+           // var val = typeof(UCLEnums).GetField(codeName).GetRawConstantValue();
+          //  try
+          //  {
+           //     int codeId = val.ToInt();
+           //     return codeId;
+           // }
+           // catch
+           // {
                 return 0;
-            }
+          //  }
         }
 
         public static string GetEnumDescription<T>(this string enumName) 

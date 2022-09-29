@@ -13,5 +13,6 @@ namespace Web.Services.Interfaces
         IQueryable<ServicesVM> GetAllService();
         ServicesVM GetServiceDetails(int ServiceId);
         BaseResponse SaveService(ServicesVM service);
+        BaseResponse DeleteServices(int ServiceId);
     }
 }

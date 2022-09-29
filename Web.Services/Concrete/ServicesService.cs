@@ -123,7 +123,12 @@ namespace Web.Services.Concrete
                 return new BaseResponse { Status = HttpStatusCode.OK, Message = "Service created successfully" };
             }
         }
-
+        public BaseResponse DeleteServices(int ServiceId)
+        {
+            var dbService = this._servicesRepo.Table.Where(s => s.Id == ServiceId && s.IsActive != false).FirstOrDefault();
+            this._servicesRepo.Update(dbService);
+            return new BaseResponse { Status = HttpStatusCode.OK, Message = "Service delete successfully" };
+        }
     }
 }
 
