@@ -17,5 +17,12 @@ namespace Web.Services.Enums
             public const string SiteCanceled = "Site Canceled";
             public const string Submitted = "Submitted";
         }
+        public static class EventStates
+        {
+            public const string Confirmed = "Confirmed";
+            public const string Canceled = "Canceled";
+            public const string Open = "Open";
+        }
+
     }
 }
