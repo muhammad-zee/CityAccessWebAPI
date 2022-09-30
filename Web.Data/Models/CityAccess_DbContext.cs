@@ -26,6 +26,7 @@ namespace Web.Data.Models
         public virtual DbSet<DynamicFieldAlternativeMl> DynamicFieldAlternativeMls { get; set; }
         public virtual DbSet<DynamicFieldMl> DynamicFieldMls { get; set; }
         public virtual DbSet<ElmahError> ElmahErrors { get; set; }
+        public virtual DbSet<EmailLog> EmailLogs { get; set; }
         public virtual DbSet<ErrorLog> ErrorLogs { get; set; }
         public virtual DbSet<Event> Events { get; set; }
         public virtual DbSet<EventState> EventStates { get; set; }
@@ -47,7 +48,7 @@ namespace Web.Data.Models
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseSqlServer("Data Source=cityAccess.mssql.somee.com;Initial Catalog=cityAccess;User Id=Suffiullah0002_SQLLogin_1;Password=xk36yc6rim;");
+                optionsBuilder.UseSqlServer("Server=ZEESHANASGHAR\\SQLEXPRESS;Database=cityAccess;User Id=zee;Password=zee;");
             }
         }
 
@@ -341,6 +342,31 @@ namespace Web.Data.Models
                 entity.Property(e => e.User)
                     .IsRequired()
                     .HasMaxLength(50);
+            });
+
+            modelBuilder.Entity<EmailLog>(entity =>
+            {
+                entity.Property(e => e.Body).IsUnicode(false);
+
+                entity.Property(e => e.ErrorMessage).IsUnicode(false);
+
+                entity.Property(e => e.Form)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.IsMailSent)
+                    .IsRequired()
+                    .HasDefaultValueSql("((1))");
+
+                entity.Property(e => e.SentDate).HasColumnType("datetime");
+
+                entity.Property(e => e.Subject)
+                    .HasMaxLength(500)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.To)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
             });
 
             modelBuilder.Entity<ErrorLog>(entity =>
@@ -992,7 +1018,9 @@ namespace Web.Data.Models
                     .HasMaxLength(50)
                     .HasColumnName("fullName");
 
-                entity.Property(e => e.IsActive).HasColumnName("isActive");
+                entity.Property(e => e.IsActive)
+                    .HasColumnName("isActive")
+                    .HasDefaultValueSql("((1))");
 
                 entity.Property(e => e.IsAdmin).HasColumnName("isAdmin");
 
