@@ -50,7 +50,8 @@ namespace Web.API.Controllers
         {
             try
             {
-                return this._agreementsService.GetAgreements(filter);
+                var resp =  this._agreementsService.GetAgreements(filter);
+                return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = resp };
             }
             catch (Exception ex)
             {
@@ -64,7 +65,8 @@ namespace Web.API.Controllers
         {
             try
             {
-                return this._agreementsService.GetAgreementDetailsByAgreementId(agreementId);
+                var agreement = this._agreementsService.GetAgreementDetailsByAgreementId(agreementId);
+                return new BaseResponse { Status = HttpStatusCode.OK, Message = "Data returned", Body = agreement };
             }
             catch (Exception ex)
             {

@@ -33,7 +33,7 @@ namespace Web.API.Controllers
             this._adminService = adminService;
         }
         [HttpGet("GetAllcities")]
-        public BaseResponse GetAllcities(int requstId)
+        public BaseResponse GetAllcities()
         {
             try
             {
@@ -49,7 +49,7 @@ namespace Web.API.Controllers
             }
         }
         [HttpGet("GetAllCommissionTypes")]
-        public BaseResponse GetAllCommissionTypes(int requstId)
+        public BaseResponse GetAllCommissionTypes()
         {
             try
             {
@@ -65,7 +65,7 @@ namespace Web.API.Controllers
             }
         }
         [HttpGet("GetAllDynamicFields")]
-        public BaseResponse GetAllDynamicFields(int requstId)
+        public BaseResponse GetAllDynamicFields()
         {
             try
             {

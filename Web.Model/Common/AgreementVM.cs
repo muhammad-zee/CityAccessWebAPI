@@ -30,7 +30,7 @@ namespace Web.Model.Common
         [JsonIgnore]
         public string CommissionTypeName { get; set; }
         public decimal? CommissionValue { get; set; }
-        public bool? Override1 { get; set; }
+        public bool? Override { get; set; }
         public decimal? PaymentAgent { get; set; }
         public string EmailToCustomer { get; set; }
         public int? PaymentAgentTypeId { get; set; }

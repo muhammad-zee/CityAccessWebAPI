@@ -12,6 +12,6 @@ namespace Web.Services.Interfaces
     {
         IQueryable<City> GetAllcities();
         IQueryable<CommissionType> GetAllCommissionTypes();
-        IQueryable<DynamicFieldAlternativeVM> GetAllDynamicFields();
+        IDictionary<string, IQueryable<DynamicFieldAlternativeVM>> GetAllDynamicFields();
     }
 }

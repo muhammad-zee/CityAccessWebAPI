@@ -26,7 +26,6 @@ namespace Web.Services.Concrete
         private readonly IGenericRepository<Service> _servicesRepo;
         private readonly IGenericRepository<Partner> _partnersRepo;
         private readonly IGenericRepository<ServiceImage> _serviceImagesRepo;
-        private readonly IGenericRepository<PartnerLogo> _partnerLogosRepo;
         private readonly IGenericRepository<DynamicFieldAlternative> _dynamicFieldAlternativeRepo;
 
         public AgreementsService(IConfiguration config,
@@ -49,7 +48,6 @@ namespace Web.Services.Concrete
             this._servicesRepo = servicesRepo;
             this._partnersRepo = partnersRepo;
             this._serviceImagesRepo = serviceImagesRepo;
-            this._partnerLogosRepo = partnerLogosRepo;
             this._dynamicFieldAlternativeRepo = dynamicFieldAlternativeRepo;
         }
         public BaseResponse GetServices()
@@ -60,8 +58,9 @@ namespace Web.Services.Concrete
                             select serv).Distinct();
             return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = Services };
         }
-        public BaseResponse GetAgreements(AgreementsFilterVM filter)
+        public AgreementsListResponseVM GetAgreements(AgreementsFilterVM filter)
         {
+            var dynamicFieldAttributes = this._dynamicFieldAlternativeRepo.Table;
             var agreements = this._dbContext.LoadStoredProcedure("ca_getAgreementsByPartnerId")
                 .WithSqlParam("@pPartnerId", ApplicationSettings.PartnerId)
                 .WithSqlParam("@pAgentId", filter.AgentId)
@@ -70,127 +69,37 @@ namespace Web.Services.Concrete
                 .WithSqlParam("@pServiceId", filter.ServiceId)
                 .WithSqlParam("@pSearchString", filter.SearchString)
                 .ExecuteStoredProc<AgreementVM>();
+            agreements.ForEach(x =>
+            {
+                x.PaymentAgentTypeLabel = dynamicFieldAttributes.Where(a => a.Id == x.PaymentAgentTypeId).Select(a => a.Label).FirstOrDefault();
+                x.PriceTypeLabel = dynamicFieldAttributes.Where(a => a.Id == x.PriceTypeId).Select(a => a.Label).FirstOrDefault();
 
+            });
 
             var frequentlyBookedAgreements = this._dbContext.LoadStoredProcedure("ca_getAgreementsByPartnerId")
                 .WithSqlParam("@pPartnerId", ApplicationSettings.PartnerId)
                 .WithSqlParam("@pSelectFrequentlyBooked", true)
                 .ExecuteStoredProc<AgreementVM>();
+            frequentlyBookedAgreements.ForEach(x =>
+            {
+                x.PaymentAgentTypeLabel = dynamicFieldAttributes.Where(a => a.Id == x.PaymentAgentTypeId).Select(a => a.Label).FirstOrDefault();
+                x.PriceTypeLabel = dynamicFieldAttributes.Where(a => a.Id == x.PriceTypeId).Select(a => a.Label).FirstOrDefault();
 
-            var responseBodyObj = new
+            });
+            var responseBodyObj = new AgreementsListResponseVM
             {
                 AllAgreements = agreements,
                 FrequentlyBookedAgreements = frequentlyBookedAgreements
             };
-            return new BaseResponse() { Status = HttpStatusCode.OK, Message = "Data Returned", Body = responseBodyObj };
+            return responseBodyObj;
         }
-        public BaseResponse GetAgreementDetailsByAgreementId(int agreementId)
+        public Agreement GetAgreementDetailsByAgreementId(int agreementId)
         {
             Agreement ag = this._agreementsRepo.Table.FirstOrDefault(a => a.Id == agreementId && a.IsActive != false);
-            if (ag != null)
-            {
-                var serv = this._servicesRepo.Table.Where(x => x.Id == ag.ServiceId).FirstOrDefault();
-                //var servType = db.serviceTypes.Where(w => w.ID == serv.typeID).FirstOrDefault();
-                var servImg = this._serviceImagesRepo.Table.Where(j => j.ServiceId == serv.Id && j.SequenceNr == 1).FirstOrDefault();
+            return ag;
 
-                Req_User agr = AgreementDetails(ag);
-                agr.Agreement = ag;
-                agr.serviceImage = servImg;
-
-                //int partnerID = (int)Session["partnerID"];
-
-                //if (ag.partnerID == partnerID)
-                //{
-                //    ViewBag.Agent = true;
-                //}
-                agr.isConfirmed = agr.Agreement.IsConfirmed;
-                return new BaseResponse { Status = HttpStatusCode.OK, Message = "Data returned", Body = agr };
-            }
-            else
-            {
-                return new BaseResponse { Status = HttpStatusCode.NotFound, Message = "Data not found" };
-
-            }
         }
-        public Req_User AgreementDetails(Agreement ag)
-        {
-            Service serv = ag.Service;
-            DynamicFieldAlternative dFA = new DynamicFieldAlternative();
-
-            Req_User req_User = new Req_User
-            {
-                Description = ag.Description,
-                CommissionValue = ag.CommissionValue,
-                AgentInstructions = ag.AgentInstructions,
-                ConfirmationText = ag.MessageTemplate,
-                CancellationPolicy = ag.CancellationPolicy,
-                PriceValue = ag.Price,
-                AgentPaymentValue = ag.PaymentAgent,
-            };
-
-
-            if (ag.PriceType == null)
-            {
-                dFA = this._dynamicFieldAlternativeRepo.Table.FirstOrDefault(x => x.Id == serv.PriceType);
-                req_User.PriceType = dFA.Label;
-            }
-            else
-            {
-                dFA = this._dynamicFieldAlternativeRepo.Table.FirstOrDefault(x => x.Id == serv.PriceType);
-                req_User.PriceType = dFA.Label;
-            }
-            if (ag.TypeCommission == null)
-            {
-                dFA = this._dynamicFieldAlternativeRepo.Table.FirstOrDefault(x => x.Id == serv.ComissionType);
-                req_User.CommissionType = dFA.Label;
-            }
-            else
-            {
-                dFA = this._dynamicFieldAlternativeRepo.Table.FirstOrDefault(x => x.Id == ag.TypeCommission);
-                req_User.CommissionType = dFA.Label;
-            }
-            if (ag.PaymentAgentType == null)
-            {
-                dFA = this._dynamicFieldAlternativeRepo.Table.FirstOrDefault(x => x.Id == serv.PaymentAgentType);
-                req_User.AgentPaymentType = dFA.Label;
-            }
-            else
-            {
-                dFA = this._dynamicFieldAlternativeRepo.Table.FirstOrDefault(x => x.Id == ag.PaymentAgentType);
-                req_User.AgentPaymentType = dFA.Label;
-            }
-            if (ag.Description == null)
-            {
-                req_User.Description = serv.Description;
-            }
-            if (ag.CommissionValue == null)
-            {
-                req_User.CommissionValue = serv.CommissionValue;
-            }
-            if (ag.PaymentAgent == null)
-            {
-                req_User.AgentPaymentValue = serv.PaymentAgent;
-            }
-            if (ag.Price == null)
-            {
-                req_User.PriceValue = serv.Price;
-            }
-            if (ag.AgentInstructions == null)
-            {
-                req_User.AgentInstructions = serv.AgentInstructions;
-            }
-            if (ag.MessageTemplate == null)
-            {
-                req_User.ConfirmationText = serv.ConfirmationText;
-            }
-            if (ag.CancellationPolicy == null)
-            {
-                req_User.CancellationPolicy = serv.CancellationPolicy;
-            }
-
-            return req_User;
-        }
-
+       
         public BaseResponse SaveAgreement(AgreementVM agreement)
         {
             BaseResponse response = new BaseResponse();
@@ -210,7 +119,7 @@ namespace Web.Services.Concrete
                     TypeCommission = agreement.CommissionTypeId,
                     CommissionType = agreement.CommissionTypeId,
                     CommissionValue = agreement.CommissionValue,
-                    Override1 = agreement.Override1,
+                    Override1 = agreement.Override,
                     PaymentAgent = agreement.PaymentAgent,
                     EmailToCustomer = agreement.EmailToCustomer,
                     PaymentAgentType = agreement.PaymentAgentTypeId,
@@ -240,7 +149,7 @@ namespace Web.Services.Concrete
                 ag.TypeCommission = agreement.CommissionTypeId;
                 ag.CommissionType = agreement.CommissionTypeId;
                 ag.CommissionValue = agreement.CommissionValue;
-                ag.Override1 = agreement.Override1;
+                ag.Override1 = agreement.Override;
                 ag.PaymentAgent = agreement.PaymentAgent;
                 ag.EmailToCustomer = agreement.EmailToCustomer;
                 ag.PaymentAgentType = agreement.PaymentAgentTypeId;

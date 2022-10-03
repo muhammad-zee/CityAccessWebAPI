@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -46,18 +47,24 @@ namespace Web.Services.Concrete
         {
             return this._commissionTypeRepo.Table;
         }
-        public IQueryable<DynamicFieldAlternativeVM> GetAllDynamicFields()
+        public IDictionary<string, IQueryable<DynamicFieldAlternativeVM>> GetAllDynamicFields()
         {
             var dynamicFields = this._dynamicFieldRepo.Table;
             var dynamicFieldsAlternative = this._dynamicFieldAlternativeRepo.Table.Where(x => dynamicFields.Any(df => df.Id == x.DynamicfieldId));
-            var response = dynamicFieldsAlternative.Select(x => new DynamicFieldAlternativeVM
+            IDictionary<string, IQueryable<DynamicFieldAlternativeVM>> dictionary = new Dictionary<string, IQueryable<DynamicFieldAlternativeVM>>();
+            foreach (var field in dynamicFields)
             {
-                Id =x.Id,
-                Label= x.Label,
-                DynamicFieldId = x.DynamicfieldId,
-                DynamicFieldName = dynamicFields.FirstOrDefault(f=>f.Id == x.DynamicfieldId).FieldType
-            });
-            return response;
+                var attributes= dynamicFieldsAlternative.Where(x=>x.DynamicfieldId == field.Id).Select(x => new DynamicFieldAlternativeVM
+                {
+                    Id = x.Id,
+                    Label = x.Label,
+                    DynamicFieldId = x.DynamicfieldId,
+                    DynamicFieldName = field.FieldType
+                });
+                dictionary.Add(field.FieldType, attributes);
+            }
+          
+            return dictionary;
         }
 
     }
